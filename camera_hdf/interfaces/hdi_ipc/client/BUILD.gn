@@ -25,7 +25,6 @@ ohos_shared_library("distributed_camera_hdf_client") {
     "${fwk_common_path}/utils/include/",
     "${fwk_utils_path}/include",
     "${fwk_utils_path}/include/log",
-    "${camera_hdf_path}/camera/interfaces/include",
     "${hdf_framework_path}/include/utils",
     "${hdf_uhdf_path}/include/hdi",
     "${hdf_uhdf_path}/osal/include",
@@ -39,6 +38,23 @@ ohos_shared_library("distributed_camera_hdf_client") {
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//foundation/multimedia/camera_standard/frameworks/native/metadata/include",
   ]
+
+  cflags = [
+    "-fPIC",
+    "-Wall",
+  ]
+
+  if (device_name == "baltimore") {
+    cflags += [ "-DBALTIMORE_CAMERA" ]
+    include_dirs += [
+      "${camera_hdf_path_baltimore}/camera/interfaces/include",
+    ]
+  } else {
+    include_dirs += [
+      "${camera_hdf_path}/camera/interfaces/include",
+      "${camera_hdf_path}/camera/interfaces/hdi_ipc",
+    ]
+  }
 
   sources = [
     "device/dcamera_device_callback_stub.cpp",
@@ -76,6 +92,7 @@ ohos_shared_library("distributed_camera_hdf_client") {
     "hiviewdfx_hilog_native:libhilog",
   ]
 
+  cflags_cc = cflags
   subsystem_name = "distributedhardware"
   part_name = "distributed_camera"
 }

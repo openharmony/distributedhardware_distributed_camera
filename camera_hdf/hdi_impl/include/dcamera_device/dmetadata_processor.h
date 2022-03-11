@@ -21,8 +21,13 @@
 #include <vector>
 #include "constants.h"
 #include "dcamera.h"
-#include <drivers/peripheral/adapter/camera/interfaces/include/types.h>
+
 #include <foundation/distributedhardware/distributedcamera/camera_hdf/interfaces/include/types.h>
+#ifdef BALTIMORE_CAMERA
+#include <drivers/peripheral/adapter/camera/interfaces/include/types.h>
+#else
+#include <drivers/peripheral/camera/interfaces/include/types.h>
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {

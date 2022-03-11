@@ -36,8 +36,6 @@ ohos_shared_library("distributed_camera_hdf") {
     "${fwk_common_path}/utils/include/",
     "${fwk_utils_path}/include",
     "${fwk_utils_path}/include/log",
-    "${camera_hdf_path}/camera/interfaces/include",
-    "${camera_hdf_path}/gralloc/src/adapter",
     "${display_hdf_path}/interfaces/include",
     "${hdf_framework_path}/include/utils",
     "${hdf_framework_path}/include/core",
@@ -51,7 +49,7 @@ ohos_shared_library("distributed_camera_hdf") {
     #producer
     "//foundation/graphic/standard/frameworks/surface/include",
     "//foundation/graphic/standard/interfaces/kits/surface",
-    "//foundation/graphic/standard/utils/include",
+    "//foundation/graphic/standard/utils/buffer_handle/export",
     "//foundation/communication/ipc/ipc/native/src/core/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//foundation/multimedia/camera_standard/frameworks/native/metadata/include",
@@ -79,6 +77,23 @@ ohos_shared_library("distributed_camera_hdf") {
     "src/utils/dcamera.cpp"
   ]
 
+  cflags = [
+    "-fPIC",
+    "-Wall",
+  ]
+
+  if (device_name == "baltimore") {
+    cflags += [ "-DBALTIMORE_CAMERA" ]
+    include_dirs += [
+      "${camera_hdf_path_baltimore}/camera/interfaces/include",
+    ]
+  } else {
+    include_dirs += [
+      "${camera_hdf_path}/camera/interfaces/include",
+      "${camera_hdf_path}/camera/interfaces/hdi_ipc",
+    ]
+  }
+
   deps = [
     "//utils/native/base:utils",
     "${common_path}:distributed_camera_utils",
@@ -89,7 +104,6 @@ ohos_shared_library("distributed_camera_hdf") {
     "//drivers/peripheral/display/hal:hdi_display_gralloc",
     "//foundation/multimedia/camera_standard/frameworks/native/metadata:metadata",
     "//third_party/jsoncpp:jsoncpp",
-    "${camera_hdf_path}/gralloc/src/adapter:libgralloc_adapter",
   ]
 
   defines = [
@@ -102,6 +116,7 @@ ohos_shared_library("distributed_camera_hdf") {
     "hiviewdfx_hilog_native:libhilog",
   ]
 
+  cflags_cc = cflags
   subsystem_name = "distributedhardware"
 
   part_name = "distributed_camera"

@@ -15,12 +15,17 @@
 
 #include "dstream_operator_proxy.h"
 #include <hdf_base.h>
+#include <hdf_log.h>
 #include <message_parcel.h>
 #include "distributed_hardware_log.h"
 #include "ioffline_stream_operator.h"
 #include "ipc_data_utils.h"
 #include "istream_operator_callback.h"
 #include "metadata_utils.h"
+
+#ifndef BALTIMORE_CAMERA
+#include "cmd_common.h"
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {

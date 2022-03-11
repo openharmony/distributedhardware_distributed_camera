@@ -458,7 +458,7 @@ void DMetadataProcessor::ResizeMetadataHeader(common_metadata_header_t *header,
 
 uint32_t DMetadataProcessor::GetDataSize(uint32_t type)
 {
-    int32_t size = 0;
+    uint32_t size = 0;
     if (type == META_TYPE_BYTE) {
         size = sizeof(uint8_t);
     } else if (type == META_TYPE_INT32) {

@@ -18,6 +18,10 @@
 #include <message_parcel.h>
 #include "distributed_hardware_log.h"
 
+#ifndef BALTIMORE_CAMERA
+#include "cmd_common.h"
+#endif
+
 namespace OHOS {
 namespace DistributedHardware {
 void DCameraHostCallbackProxy::OnCameraStatus(const std::string &cameraId, CameraStatus status)

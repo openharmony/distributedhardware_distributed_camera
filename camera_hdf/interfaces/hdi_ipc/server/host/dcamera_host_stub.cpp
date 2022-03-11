@@ -23,6 +23,10 @@
 #include "ipc_data_utils.h"
 #include "metadata_utils.h"
 
+#ifndef BALTIMORE_CAMERA
+#include "cmd_common.h"
+#endif
+
 namespace OHOS {
 namespace DistributedHardware {
 DCameraHostStub::DCameraHostStub()

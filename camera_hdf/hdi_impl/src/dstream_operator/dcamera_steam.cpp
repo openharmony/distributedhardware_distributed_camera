@@ -197,8 +197,7 @@ DCamRetCode DCameraStream::GetNextRequest()
     }
 
     std::shared_ptr<DImageBuffer> imageBuffer = std::make_shared<DImageBuffer>();
-    auto surface = OHOS::SurfaceBufferImpl::FromBase(surfaceBuffer);
-    RetCode ret = DBufferManager::SurfaceBufferToDImageBuffer(surface, imageBuffer);
+    RetCode ret = DBufferManager::SurfaceBufferToDImageBuffer(surfaceBuffer, imageBuffer);
     if (ret != RC_OK) {
         DHLOGE("Convert surface buffer to image buffer failed, streamId = %d.", dcStreamInfo_->streamId_);
         return DCamRetCode::EXCEED_MAX_NUMBER;

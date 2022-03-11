@@ -17,6 +17,7 @@
 #define OHOS_IMAGE_COMMON_TYPE_H
 
 #include <cstdlib>
+#include <cstdint>
 
 namespace OHOS {
 namespace DistributedHardware {

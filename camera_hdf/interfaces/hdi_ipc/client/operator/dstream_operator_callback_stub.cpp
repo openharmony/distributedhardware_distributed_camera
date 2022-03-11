@@ -19,6 +19,10 @@
 #include "distributed_hardware_log.h"
 #include "dstream_operator_callback.h"
 
+#ifndef BALTIMORE_CAMERA
+#include "cmd_common.h"
+#endif
+
 namespace OHOS {
 namespace DistributedHardware {
 int32_t DStreamOperatorCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,

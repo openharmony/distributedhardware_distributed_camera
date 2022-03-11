@@ -14,6 +14,8 @@
  */
 
 #include "dcamera_provider_stub.h"
+
+#include <buffer_handle_parcel.h>
 #include <hdf_base.h>
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>

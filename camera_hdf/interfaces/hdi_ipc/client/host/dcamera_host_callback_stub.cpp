@@ -19,6 +19,10 @@
 
 #include <hdf_base.h>
 
+#ifndef BALTIMORE_CAMERA
+#include "cmd_common.h"
+#endif
+
 namespace OHOS {
 namespace DistributedHardware {
 int32_t DCameraHostCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,

@@ -47,7 +47,7 @@ public:
 
     bool operator < (const DCameraStreamConfig& others) const
     {
-        return (this->width_ < others.width_) || ((this->width_ == others.width_) && (this->height_ < this->height_));
+        return (this->width_ < others.width_) || ((this->width_ == others.width_) && (this->height_ < others.height_));
     }
 };
 

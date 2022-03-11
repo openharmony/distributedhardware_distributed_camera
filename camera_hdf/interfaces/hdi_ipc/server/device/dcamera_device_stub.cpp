@@ -22,6 +22,10 @@
 #include "istream_operator_callback.h"
 #include "metadata_utils.h"
 
+#ifndef BALTIMORE_CAMERA
+#include "cmd_common.h"
+#endif
+
 namespace OHOS {
 namespace DistributedHardware {
 int32_t DCameraDeviceStub::OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply,
