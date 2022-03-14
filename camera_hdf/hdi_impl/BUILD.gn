@@ -13,7 +13,8 @@
 
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
-import("//foundation/distributedhardware/distributedcamera/distributedcamera.gni")
+import(
+    "//foundation/distributedhardware/distributedcamera/distributedcamera.gni")
 
 ohos_shared_library("distributed_camera_hdf") {
   include_dirs = [
@@ -51,7 +52,6 @@ ohos_shared_library("distributed_camera_hdf") {
     "//foundation/graphic/standard/interfaces/kits/surface",
     "//foundation/graphic/standard/utils/buffer_handle/export",
     "//foundation/communication/ipc/ipc/native/src/core/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//foundation/multimedia/camera_standard/frameworks/native/metadata/include",
   ]
 
@@ -69,12 +69,12 @@ ohos_shared_library("distributed_camera_hdf") {
     "src/dcamera_device/dmetadata_processor.cpp",
     "src/dcamera_host/dcamera_host.cpp",
     "src/dcamera_provider/dcamera_provider.cpp",
+    "src/dstream_operator/dbuffer_manager.cpp",
+    "src/dstream_operator/dcamera_steam.cpp",
+    "src/dstream_operator/dimage_buffer.cpp",
     "src/dstream_operator/doffline_stream_operator.cpp",
     "src/dstream_operator/dstream_operator.cpp",
-    "src/dstream_operator/dbuffer_manager.cpp",
-    "src/dstream_operator/dimage_buffer.cpp",
-    "src/dstream_operator/dcamera_steam.cpp",
-    "src/utils/dcamera.cpp"
+    "src/utils/dcamera.cpp",
   ]
 
   cflags = [
@@ -84,9 +84,7 @@ ohos_shared_library("distributed_camera_hdf") {
 
   if (device_name == "baltimore") {
     cflags += [ "-DBALTIMORE_CAMERA" ]
-    include_dirs += [
-      "${camera_hdf_path_baltimore}/camera/interfaces/include",
-    ]
+    include_dirs += [ "${camera_hdf_path_baltimore}/camera/interfaces/include" ]
   } else {
     include_dirs += [
       "${camera_hdf_path}/camera/interfaces/include",
@@ -95,15 +93,14 @@ ohos_shared_library("distributed_camera_hdf") {
   }
 
   deps = [
-    "//utils/native/base:utils",
     "${common_path}:distributed_camera_utils",
     "${fwk_utils_path}:distributedhardwareutils",
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
-    "//foundation/graphic/standard/frameworks/surface:surface",
     "//drivers/peripheral/display/hal:hdi_display_gralloc",
+    "//foundation/graphic/standard/frameworks/surface:surface",
     "//foundation/multimedia/camera_standard/frameworks/native/metadata:metadata",
     "//third_party/jsoncpp:jsoncpp",
+    "//utils/native/base:utils",
   ]
 
   defines = [
@@ -114,6 +111,7 @@ ohos_shared_library("distributed_camera_hdf") {
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_single",
   ]
 
   cflags_cc = cflags

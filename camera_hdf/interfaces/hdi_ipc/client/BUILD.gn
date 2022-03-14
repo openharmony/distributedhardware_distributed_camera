@@ -13,7 +13,8 @@
 
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
-import("//foundation/distributedhardware/distributedcamera/distributedcamera.gni")
+import(
+    "//foundation/distributedhardware/distributedcamera/distributedcamera.gni")
 
 ohos_shared_library("distributed_camera_hdf_client") {
   include_dirs = [
@@ -35,7 +36,6 @@ ohos_shared_library("distributed_camera_hdf_client") {
     "//foundation/graphic/standard/interfaces/kits/surface",
     "//foundation/graphic/standard/utils/include",
     "//foundation/communication/ipc/ipc/native/src/core/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//foundation/multimedia/camera_standard/frameworks/native/metadata/include",
   ]
 
@@ -46,9 +46,7 @@ ohos_shared_library("distributed_camera_hdf_client") {
 
   if (device_name == "baltimore") {
     cflags += [ "-DBALTIMORE_CAMERA" ]
-    include_dirs += [
-      "${camera_hdf_path_baltimore}/camera/interfaces/include",
-    ]
+    include_dirs += [ "${camera_hdf_path_baltimore}/camera/interfaces/include" ]
   } else {
     include_dirs += [
       "${camera_hdf_path}/camera/interfaces/include",
@@ -57,29 +55,28 @@ ohos_shared_library("distributed_camera_hdf_client") {
   }
 
   sources = [
-    "device/dcamera_device_callback_stub.cpp",
     "device/dcamera_device_callback.cpp",
+    "device/dcamera_device_callback_stub.cpp",
     "device/dcamera_device_proxy.cpp",
-    "host/dcamera_host_callback_stub.cpp",
     "host/dcamera_host_callback.cpp",
+    "host/dcamera_host_callback_stub.cpp",
     "host/dcamera_host_proxy.cpp",
     "operator/doffline_stream_operator_proxy.cpp",
-    "operator/dstream_operator_callback_stub.cpp",
     "operator/dstream_operator_callback.cpp",
+    "operator/dstream_operator_callback_stub.cpp",
     "operator/dstream_operator_proxy.cpp",
-    "provider/dcamera_provider_callback_stub.cpp",
     "provider/dcamera_provider_callback.cpp",
+    "provider/dcamera_provider_callback_stub.cpp",
     "provider/dcamera_provider_proxy.cpp",
   ]
 
   deps = [
-    "//utils/native/base:utils",
-    "${hdf_uhdf_path}/hdi:libhdi",
     "${fwk_utils_path}:distributedhardwareutils",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
-    "//foundation/graphic/standard/frameworks/surface:surface",
+    "${hdf_uhdf_path}/hdi:libhdi",
     "//drivers/peripheral/display/hal:hdi_display_gralloc",
+    "//foundation/graphic/standard/frameworks/surface:surface",
     "//foundation/multimedia/camera_standard/frameworks/native/metadata:metadata",
+    "//utils/native/base:utils",
   ]
 
   defines = [
@@ -90,6 +87,7 @@ ohos_shared_library("distributed_camera_hdf_client") {
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_single",
   ]
 
   cflags_cc = cflags

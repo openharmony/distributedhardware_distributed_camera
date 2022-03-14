@@ -85,9 +85,6 @@
                 }
             ],
             "test":[
-                "//foundation/distributedhardware/distributedcamera/services/cameraservice/cameraoperator/client/test/unittest:camera_client_test",
-                "//foundation/distributedhardware/distributedcamera/services/cameraservice/cameraoperator/handler/test/unittest:camera_handler_test",
-                "//foundation/distributedhardware/distributedcamera/services/cameraservice/sinkservice/test/unittest:sink_service_test",
                 "//foundation/distributedhardware/distributedcamera/services/cameraservice/sourceservice/test/unittest:source_service_test",
                 "//foundation/distributedhardware/distributedcamera/services/cameraservice/base/test/unittest:services_base_test"
             ]
