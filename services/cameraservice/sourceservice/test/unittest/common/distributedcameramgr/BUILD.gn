@@ -12,7 +12,8 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("//foundation/distributedhardware/distributedcamera/distributedcamera.gni")
+import(
+    "//foundation/distributedhardware/distributedcamera/distributedcamera.gni")
 module_out_path = "distributed_camera/dcamera_source_mgr_test"
 
 config("module_private_config") {
@@ -56,28 +57,25 @@ config("module_private_config") {
 ohos_unittest("DCameraSourceMgrTest") {
   module_out_path = module_out_path
 
-  sources = [
-    "dcamera_source_state_machine_test.cpp",
-  ]
+  sources = [ "dcamera_source_state_machine_test.cpp" ]
 
   configs = [ ":module_private_config" ]
 
   deps = [
+    "${common_path}:distributed_camera_utils",
+    "${fwk_utils_path}:distributedhardwareutils",
     "${services_path}/cameraservice/sourceservice:distributed_camera_source",
     "${services_path}/channel:distributed_camera_channel",
-    "${common_path}:distributed_camera_utils",
+    "//third_party/googletest:gtest_main",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
-    "${fwk_utils_path}:distributedhardwareutils",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
-    "ipc:ipc_core",
-    "eventhandler:libeventhandler",
-
     "dsoftbus_standard:softbus_client",
+    "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
   ]
 
   defines = [

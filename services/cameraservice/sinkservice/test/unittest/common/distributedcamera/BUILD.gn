@@ -12,30 +12,29 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("//foundation/distributedhardware/distributedcamera/distributedcamera.gni")
+import(
+    "//foundation/distributedhardware/distributedcamera/distributedcamera.gni")
 module_out_path = "distributed_camera/dcamera_sink_test"
 
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
-      "${services_path}/cameraservice/sinkservice/include/distributedcamera",
-      "${services_path}/cameraservice/sinkservice/include/distributedcameramgr",
-      "${services_path}/cameraservice/sinkservice/include/distributedcameramgr/interface",
-      "${services_path}/cameraservice/base/include",
-      "${common_path}/include/constants",
-      "${common_path}/include/utils",
-      "${distributedcamera_hdf_path}/interfaces/include",
-      "${innerkits_path}/native_cpp/camera_sink/include",
-      "//drivers/peripheral/base",
-    ]
+    "${services_path}/cameraservice/sinkservice/include/distributedcamera",
+    "${services_path}/cameraservice/sinkservice/include/distributedcameramgr",
+    "${services_path}/cameraservice/sinkservice/include/distributedcameramgr/interface",
+    "${services_path}/cameraservice/base/include",
+    "${common_path}/include/constants",
+    "${common_path}/include/utils",
+    "${distributedcamera_hdf_path}/interfaces/include",
+    "${innerkits_path}/native_cpp/camera_sink/include",
+    "//drivers/peripheral/base",
+  ]
 }
 
 ohos_unittest("DistributedCameraSinkServiceTest") {
   module_out_path = module_out_path
 
-  sources = [
-    "distributed_camera_sink_service_test.cpp"
-  ]
+  sources = [ "distributed_camera_sink_service_test.cpp" ]
 
   configs = [ ":module_private_config" ]
 
@@ -45,13 +44,11 @@ ohos_unittest("DistributedCameraSinkServiceTest") {
     "//utils/native/base:utils",
   ]
 
-  defines = [
-    "HI_LOG_ENABLE",
-  ]
+  defines = [ "HI_LOG_ENABLE" ]
   external_deps = [
+    "eventhandler:libeventhandler",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "eventhandler:libeventhandler",
   ]
 }
 

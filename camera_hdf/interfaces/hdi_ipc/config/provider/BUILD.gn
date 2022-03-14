@@ -13,7 +13,8 @@
 
 import("//build/ohos.gni")
 import("//drivers/adapter/uhdf2/uhdf.gni")
-import("//foundation/distributedhardware/distributedcamera/distributedcamera.gni")
+import(
+    "//foundation/distributedhardware/distributedcamera/distributedcamera.gni")
 
 ohos_shared_library("distributed_camera_provider_config") {
   include_dirs = [
@@ -46,9 +47,7 @@ ohos_shared_library("distributed_camera_provider_config") {
 
   if (device_name == "baltimore") {
     cflags += [ "-DBALTIMORE_CAMERA" ]
-    include_dirs += [
-      "${camera_hdf_path_baltimore}/camera/interfaces/include",
-    ]
+    include_dirs += [ "${camera_hdf_path_baltimore}/camera/interfaces/include" ]
   } else {
     include_dirs += [
       "${camera_hdf_path}/camera/interfaces/include",
@@ -56,14 +55,12 @@ ohos_shared_library("distributed_camera_provider_config") {
     ]
   }
 
-  sources = [
-    "dcamera_provider_config.cpp"
-  ]
+  sources = [ "dcamera_provider_config.cpp" ]
 
   deps = [
-    "//utils/native/base:utils",
     "${distributedcamera_hdf_path}/hdi_impl:distributed_camera_hdf",
     "//foundation/graphic/standard/frameworks/surface:surface",
+    "//utils/native/base:utils",
   ]
 
   defines = [
