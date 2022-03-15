@@ -53,7 +53,7 @@ private:
 
 void* DCameraProviderStubInstance();
 
-void DestroyDCameraProviderStub(void* obj);
+void DestroyDCameraProviderStub(void* stubObj);
 
 int32_t DCProviderServiceOnRemoteRequest(void* stub, int cmdId, struct HdfSBuf* data, struct HdfSBuf* reply);
 

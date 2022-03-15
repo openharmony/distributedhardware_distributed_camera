@@ -36,7 +36,7 @@ public:
     virtual ~DCameraSourceDev();
 
     int32_t InitDCameraSourceDev();
-    int32_t RegisterDistributedHardware(const std::string& devId, const std::string& dhId, const std::string& reqId, 
+    int32_t RegisterDistributedHardware(const std::string& devId, const std::string& dhId, const std::string& reqId,
         const std::string& ver, const std::string attrs);
     int32_t UnRegisterDistributedHardware(const std::string devId, const std::string dhId, const std::string reqId);
     int32_t DCameraNotify(std::string& eventStr);
