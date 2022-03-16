@@ -18,7 +18,7 @@
 
 #include <cstdint>
 #include <memory>
-#include <vector> 
+#include <vector>
 
 #include "dcamera_capture_info_cmd.h"
 #include "dcamera_channel_info_cmd.h"

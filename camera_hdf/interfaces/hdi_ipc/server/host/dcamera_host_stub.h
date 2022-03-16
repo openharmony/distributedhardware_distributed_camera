@@ -62,7 +62,7 @@ private:
 
 void* DCameraHostStubInstance();
 
-void DestroyDCameraHostStub(void* obj);
+void DestroyDCameraHostStub(void* stubObj);
 
 int32_t DCHostServiceOnRemoteRequest(void* stub, int cmdId, struct HdfSBuf* data, struct HdfSBuf* reply);
 
