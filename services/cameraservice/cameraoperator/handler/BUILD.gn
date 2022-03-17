@@ -13,7 +13,8 @@
 
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
-import("//foundation/distributedhardware/distributedcamera/distributedcamera.gni")
+import(
+    "//foundation/distributedhardware/distributedcamera/distributedcamera.gni")
 
 ohos_shared_library("distributed_camera_handler") {
   include_dirs = [
@@ -45,24 +46,22 @@ ohos_shared_library("distributed_camera_handler") {
     "${services_path}/cameraservice/cameraoperator/client/include/callback",
   ]
 
-  sources = [
-      "${services_path}/cameraservice/cameraoperator/client/src/callback/dcamera_manager_callback.cpp",
-  ]
+  sources = [ "${services_path}/cameraservice/cameraoperator/client/src/callback/dcamera_manager_callback.cpp" ]
 
   if (device_name == "baltimore") {
-    sources += [ "src/dcamera_handler.cpp", ]
+    sources += [ "src/dcamera_handler.cpp" ]
   } else {
-    sources += [ "src/dcamera_handler_common.cpp", ]
+    sources += [ "src/dcamera_handler_common.cpp" ]
   }
 
   deps = [
-    "${fwk_utils_path}:distributedhardwareutils",
-    "${common_path}:distributed_camera_utils",
-    "${graphicstandard_path}:libsurface",
     "${camerastandard_path}/frameworks/native/camera:camera_framework",
     "${camerastandard_path}/frameworks/native/metadata:metadata",
-    "//utils/native/base:utils",
+    "${common_path}:distributed_camera_utils",
+    "${fwk_utils_path}:distributedhardwareutils",
+    "${graphicstandard_path}:libsurface",
     "//third_party/jsoncpp:jsoncpp",
+    "//utils/native/base:utils",
   ]
 
   defines = [

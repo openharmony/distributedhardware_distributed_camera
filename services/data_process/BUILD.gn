@@ -13,7 +13,8 @@
 
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
-import("//foundation/distributedhardware/distributedcamera/distributedcamera.gni")
+import(
+    "//foundation/distributedhardware/distributedcamera/distributedcamera.gni")
 
 ohos_shared_library("distributed_camera_data_process") {
   include_dirs = [
@@ -44,16 +45,16 @@ ohos_shared_library("distributed_camera_data_process") {
   ]
 
   sources = [
+    "src/pipeline/abstract_data_process.cpp",
     "src/pipeline/dcamera_pipeline_sink.cpp",
     "src/pipeline/dcamera_pipeline_source.cpp",
-    "src/pipeline/abstract_data_process.cpp",
-    "src/utils/image_common_type.cpp",
+    "src/pipeline_node/colorspace_conversion/convert_nv12_to_nv21.cpp",
+    "src/pipeline_node/fpscontroller/fps_controller_process.cpp",
     "src/pipeline_node/multimedia_codec/decode_video_callback.cpp",
     "src/pipeline_node/multimedia_codec/encode_video_callback.cpp",
-    "src/pipeline_node/fpscontroller/fps_controller_process.cpp",
-    "src/pipeline_node/colorspace_conversion/convert_nv12_to_nv21.cpp",
+    "src/utils/image_common_type.cpp",
   ]
-  
+
   if (device_name == "baltimore") {
     sources += [
       "src/pipeline_node/multimedia_codec/decode_data_process.cpp",
@@ -67,8 +68,8 @@ ohos_shared_library("distributed_camera_data_process") {
   }
 
   deps = [
-    "${fwk_utils_path}:distributedhardwareutils",
     "${common_path}:distributed_camera_utils",
+    "${fwk_utils_path}:distributedhardwareutils",
     "//foundation/graphic/standard/frameworks/surface:surface",
     "//utils/native/base:utils",
   ]
