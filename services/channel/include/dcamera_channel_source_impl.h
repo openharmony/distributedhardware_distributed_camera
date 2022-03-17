@@ -39,7 +39,7 @@ private:
     std::vector<std::shared_ptr<DCameraSoftbusSession>> softbusSessions_;
     std::string mySessionName_;
     DCameraSessionMode mode_;
-    const std::string SESSION_HEAD = "DBinder.ohos.dhardware.dcamera_";
+    const std::string SESSION_HEAD = "ohos.dhardware.dcamera_";
 };
 }
 }
