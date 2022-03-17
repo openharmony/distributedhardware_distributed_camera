@@ -78,7 +78,6 @@ private:
     int32_t InitDecoder();
     int32_t InitDecoderMetadataFormat();
     int32_t SetDecoderOutputSurface();
-    void ReleaseDecoder();
     int32_t FeedDecoderInputBuffer();
     int64_t GetDecoderTimeStamp();
     int32_t GetAlignedHeight();
@@ -113,6 +112,7 @@ private:
     std::shared_ptr<Media::AVCodecCallback> decodeVideoCallback_ = nullptr;
     sptr<Surface> decodeConsumerSurface_ = nullptr;
     sptr<Surface> decodeProducerSurface_ = nullptr;
+    sptr<IBufferConsumerListener> decodeSurfaceListener_ = nullptr;
 
     bool isDecoderProcess_ = false;
     int32_t waitDecoderOutputCount_ = 0;
@@ -131,7 +131,7 @@ class DecodeSurfaceListener : public IBufferConsumerListener {
 public:
     DecodeSurfaceListener(sptr<Surface> surface, std::weak_ptr<DecodeDataProcess> decodeVideoNode)
         : surface_(surface), decodeVideoNode_(decodeVideoNode) {}
-    ~DecodeSurfaceListener() = default;
+    ~DecodeSurfaceListener();
 
     void OnBufferAvailable() override;
     void SetSurface(const sptr<Surface>& surface);
