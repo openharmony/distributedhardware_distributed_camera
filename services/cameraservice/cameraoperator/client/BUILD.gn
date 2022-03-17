@@ -47,16 +47,27 @@ ohos_shared_library("distributed_camera_client") {
   ]
 
   sources = [
-      "src/dcamera_client.cpp",
       "src/callback/dcamera_input_callback.cpp",
       "src/callback/dcamera_manager_callback.cpp",
       "src/callback/dcamera_photo_callback.cpp",
       "src/callback/dcamera_preview_callback.cpp",
       "src/callback/dcamera_session_callback.cpp",
       "src/callback/dcamera_video_callback.cpp",
+  ]
+
+  if (device_name == "baltimore") {
+    sources += [
+      "src/dcamera_client.cpp",
       "src/listener/dcamera_photo_surface_listener.cpp",
       "src/listener/dcamera_video_surface_listener.cpp",
-  ]
+    ]
+  } else {
+    sources += [
+      "src/dcamera_client_common.cpp",
+      "src/listener/dcamera_photo_surface_listener_common.cpp",
+      "src/listener/dcamera_video_surface_listener_common.cpp",
+    ]
+  }
 
   deps = [
     "${fwk_utils_path}:distributedhardwareutils",

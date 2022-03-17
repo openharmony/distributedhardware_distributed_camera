@@ -46,9 +46,14 @@ ohos_shared_library("distributed_camera_handler") {
   ]
 
   sources = [
-      "src/dcamera_handler.cpp",
       "${services_path}/cameraservice/cameraoperator/client/src/callback/dcamera_manager_callback.cpp",
   ]
+
+  if (device_name == "baltimore") {
+    sources += [ "src/dcamera_handler.cpp", ]
+  } else {
+    sources += [ "src/dcamera_handler_common.cpp", ]
+  }
 
   deps = [
     "${fwk_utils_path}:distributedhardwareutils",

@@ -276,6 +276,7 @@ DCamRetCode DCameraProviderProxy::Notify(const std::shared_ptr<DHBase> &dhBase,
     return static_cast<DCamRetCode>(reply.ReadInt32());
 }
 
+#ifdef BALTIMORE_CAMERA
 void* DCameraProviderProxy::DCameraMemoryMap(const BufferHandle *buffer)
 {
     if (buffer == nullptr) {
@@ -293,6 +294,22 @@ void* DCameraProviderProxy::DCameraMemoryMap(const BufferHandle *buffer)
     }
     return virAddr;
 }
+#else
+void* DCameraProviderProxy::DCameraMemoryMap(const BufferHandle *buffer)
+{
+    if (buffer == nullptr) {
+        DHLOGE("mmap the buffer handle is NULL");
+        return nullptr;
+    }
+
+    void* virAddr = mmap(NULL, buffer->size, PROT_READ | PROT_WRITE, MAP_SHARED, buffer->fd, 0);
+    if (virAddr == MAP_FAILED) {
+        DHLOGE("mmap failed errno %s, fd : %d", strerror(errno), buffer->fd);
+        return nullptr;
+    }
+    return virAddr;
+}
+#endif
 
 void DCameraProviderProxy::DCameraMemoryUnmap(BufferHandle *buffer)
 {

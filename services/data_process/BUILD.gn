@@ -48,13 +48,23 @@ ohos_shared_library("distributed_camera_data_process") {
     "src/pipeline/dcamera_pipeline_source.cpp",
     "src/pipeline/abstract_data_process.cpp",
     "src/utils/image_common_type.cpp",
-    "src/pipeline_node/multimedia_codec/decode_data_process.cpp",
     "src/pipeline_node/multimedia_codec/decode_video_callback.cpp",
-    "src/pipeline_node/multimedia_codec/encode_data_process.cpp",
     "src/pipeline_node/multimedia_codec/encode_video_callback.cpp",
     "src/pipeline_node/fpscontroller/fps_controller_process.cpp",
     "src/pipeline_node/colorspace_conversion/convert_nv12_to_nv21.cpp",
   ]
+  
+  if (device_name == "baltimore") {
+    sources += [
+      "src/pipeline_node/multimedia_codec/decode_data_process.cpp",
+      "src/pipeline_node/multimedia_codec/encode_data_process.cpp",
+    ]
+  } else {
+    sources += [
+      "src/pipeline_node/multimedia_codec/decode_data_process_common.cpp",
+      "src/pipeline_node/multimedia_codec/encode_data_process_common.cpp",
+    ]
+  }
 
   deps = [
     "${fwk_utils_path}:distributedhardwareutils",

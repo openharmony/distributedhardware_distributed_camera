@@ -81,7 +81,6 @@ ohos_shared_library("distributed_camera_sink") {
 
       "src/distributedcameramgr/dcamera_sink_access_control.cpp",
       "src/distributedcameramgr/dcamera_sink_controller.cpp",
-      "src/distributedcameramgr/dcamera_sink_data_process.cpp",
       "src/distributedcameramgr/dcamera_sink_dev.cpp",
       "src/distributedcameramgr/dcamera_sink_output.cpp",
       "src/distributedcameramgr/dcamera_sink_service_ipc.cpp",
@@ -93,6 +92,16 @@ ohos_shared_library("distributed_camera_sink") {
       "${services_path}/cameraservice/base/src/dcamera_metadata_setting_cmd.cpp",
       "${services_path}/cameraservice/base/src/dcamera_open_info_cmd.cpp",
   ]
+
+  if (device_name == "baltimore") {
+    sources += [
+      "src/distributedcameramgr/dcamera_sink_data_process.cpp",
+    ]
+  } else {
+    sources += [
+      "src/distributedcameramgr/dcamera_sink_data_process_common.cpp",
+    ]
+  }
 
   deps = [
     "${fwk_utils_path}:distributedhardwareutils",

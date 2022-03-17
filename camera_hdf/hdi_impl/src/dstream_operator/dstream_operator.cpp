@@ -50,7 +50,7 @@ CamRetCode DStreamOperator::IsStreamsSupported(OperationMode mode,
             return CamRetCode::INVALID_ARGUMENT;
         }
     }
-    return CamRetCode::METHOD_NOT_SUPPORTED;
+    return CamRetCode::NO_ERROR;
 }
 
 CamRetCode DStreamOperator::CreateStreams(const std::vector<std::shared_ptr<StreamInfo>>& streamInfos)

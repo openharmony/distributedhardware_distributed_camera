@@ -85,7 +85,6 @@
                 }
             ],
             "test":[
-                "//foundation/distributedhardware/distributedcamera/services/cameraservice/sourceservice/test/unittest:source_service_test",
                 "//foundation/distributedhardware/distributedcamera/services/cameraservice/base/test/unittest:services_base_test"
             ]
         }
