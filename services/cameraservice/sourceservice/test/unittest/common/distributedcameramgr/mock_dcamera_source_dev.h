@@ -25,7 +25,8 @@ namespace OHOS {
 namespace DistributedHardware {
 class MockDCameraSourceDev : public DCameraSourceDev {
 public:
-    MockDCameraSourceDev(std::string devId, std::string dhId) : DCameraSourceDev(devId, dhId, stateLisener_) {};
+    MockDCameraSourceDev(std::string devId, std::string dhId, std::shared_ptr<ICameraStateListener>& stateLisener)
+        : DCameraSourceDev(devId, dhId, stateLisener) {};
     ~MockDCameraSourceDev() = default;
 
     int32_t ExecuteRegister(std::shared_ptr<DCameraRegistParam>& param)
@@ -76,7 +77,7 @@ public:
 private:
     std::string devId_;
     std::string dhId_;
-    std::shared_ptr<ICameraStateListener> stateLisener_ = nullptr;
+    std::shared_ptr<ICameraStateListener> stateLisener_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

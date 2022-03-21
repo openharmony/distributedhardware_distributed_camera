@@ -27,6 +27,7 @@
 #include "dcamera_source_state_factory.h"
 #include "dcamera_source_state_machine.h"
 #include "mock_dcamera_source_dev.h"
+#include "mock_dcamera_source_state_listener.h"
 
 #include "anonymous_string.h"
 #include "distributed_camera_constants.h"
@@ -45,6 +46,7 @@ public:
     void TearDown();
 
     std::shared_ptr<DCameraSourceDev> camDev_;
+    std::shared_ptr<ICameraStateListener> stateListener_;
     std::shared_ptr<DCameraSourceStateMachine> stateMachine_;
 
 private:
@@ -150,7 +152,8 @@ void DCameraSourceStateMachineTest::TearDownTestCase(void)
 
 void DCameraSourceStateMachineTest::SetUp(void)
 {
-    camDev_ = std::make_shared<MockDCameraSourceDev>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0);
+    stateListener_ = std::make_shared<MockDCameraSourceStateListener>();
+    camDev_ = std::make_shared<MockDCameraSourceDev>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, stateListener_);
     stateMachine_ = std::make_shared<DCameraSourceStateMachine>(camDev_);
 }
 
@@ -158,6 +161,7 @@ void DCameraSourceStateMachineTest::TearDown(void)
 {
     stateMachine_ = nullptr;
     camDev_ = nullptr;
+    stateListener_ = nullptr;
 }
 
 /**
