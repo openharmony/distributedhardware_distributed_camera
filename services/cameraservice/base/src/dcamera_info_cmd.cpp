@@ -79,5 +79,5 @@ int32_t DCameraInfoCmd::Unmarshal(const std::string& jsonStr)
     value_ = info;
     return DCAMERA_OK;
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

@@ -604,5 +604,5 @@ void DMetadataProcessor::PrintDCameraMetadata(const common_metadata_header_t *me
         }
     }
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS

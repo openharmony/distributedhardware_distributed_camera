@@ -65,6 +65,6 @@ private:
     bool isInit;
     const std::string SESSION_FLAG = "control";
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_SOURCE_CONTROLLER_H

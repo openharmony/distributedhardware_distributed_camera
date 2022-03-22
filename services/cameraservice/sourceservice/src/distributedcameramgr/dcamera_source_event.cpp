@@ -102,5 +102,5 @@ DCAMERA_EVENT DCameraSourceEvent::GetEventType()
 {
     return eventType_;
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

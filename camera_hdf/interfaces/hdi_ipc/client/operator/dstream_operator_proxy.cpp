@@ -384,5 +384,5 @@ CamRetCode DStreamOperatorProxy::ChangeToOfflineStream(
     offlineOperator = OHOS::iface_cast<IOfflineStreamOperator>(remoteObj);
     return retCode;
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS

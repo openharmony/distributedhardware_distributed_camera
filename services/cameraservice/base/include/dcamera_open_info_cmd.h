@@ -41,6 +41,6 @@ public:
     int32_t Marshal(std::string& jsonStr);
     int32_t Unmarshal(const std::string& jsonStr);
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_OPEN_INFO_H

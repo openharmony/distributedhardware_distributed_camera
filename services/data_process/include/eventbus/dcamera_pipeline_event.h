@@ -96,6 +96,6 @@ private:
     std::shared_ptr<PipelineConfig> pipelineConfig_ = nullptr;
     PipelineAction action_;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_PIPELINE_EVENT_H

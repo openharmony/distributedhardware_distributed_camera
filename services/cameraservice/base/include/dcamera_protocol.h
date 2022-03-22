@@ -32,6 +32,6 @@ static const std::string DCAMERA_PROTOCOL_CMD_CAPTURE = "CAPTURE";
 static const std::string DCAMERA_PROTOCOL_CMD_STOP_CAPTURE = "STOP_CAPTURE";
 static const std::string DCAMERA_PROTOCOL_CMD_OPEN_CHANNEL = "OPEN_CHANNEL";
 static const std::string DCAMERA_PROTOCOL_CMD_CLOSE_CHANNEL = "CLOSE_CHANNEL";
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_PROTOCOL_H

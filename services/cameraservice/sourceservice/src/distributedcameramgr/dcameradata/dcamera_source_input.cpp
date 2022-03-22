@@ -373,5 +373,5 @@ int32_t DCameraSourceInput::ReleaseAllStreams()
     }
     return DCAMERA_OK;
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

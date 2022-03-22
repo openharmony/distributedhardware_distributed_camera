@@ -62,6 +62,6 @@ private:
     std::shared_ptr<DataProcessListener> listener_;
     std::map<uint32_t, std::shared_ptr<DCameraStreamDataProcessProducer>> producers_;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_STREAM_DATA_PROCESS_H

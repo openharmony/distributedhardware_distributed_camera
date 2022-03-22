@@ -61,5 +61,5 @@ std::shared_ptr<DCameraSourceState> DCameraSourceStateFactory::CreateState(DCame
 
     return state;
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

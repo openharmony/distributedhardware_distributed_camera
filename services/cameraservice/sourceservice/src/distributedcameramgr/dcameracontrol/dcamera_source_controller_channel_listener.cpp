@@ -63,5 +63,5 @@ void DCameraSourceControllerChannelListener::OnDataReceived(std::vector<std::sha
 
     controller->OnDataReceived(buffers);
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

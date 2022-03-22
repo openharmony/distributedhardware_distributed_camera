@@ -33,6 +33,6 @@ public:
     virtual void OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult) = 0;
     virtual void OnError(DataProcessErrorType errorType) = 0;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DATA_PROCESS_LISTENER_H

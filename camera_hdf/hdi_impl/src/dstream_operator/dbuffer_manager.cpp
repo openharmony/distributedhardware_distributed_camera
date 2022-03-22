@@ -158,5 +158,5 @@ RetCode DBufferManager::DImageBufferToDCameraBuffer(const std::shared_ptr<DImage
 
     return RC_OK;
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS

@@ -302,5 +302,5 @@ OHOS::sptr<DCameraDevice> DCameraProvider::GetDCameraDevice(const std::shared_pt
     }
     return dCameraHost->GetDCameraDeviceByDHBase(dhBase);
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS

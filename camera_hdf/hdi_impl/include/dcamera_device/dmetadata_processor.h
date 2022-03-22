@@ -80,7 +80,6 @@ private:
     // The latest result metadata that replied to the camera service.
     common_metadata_header_t *latestConsumerResultMetadata_;
 };
-} // end namespace DistributedHardware
-} // end namespace OHOS
-
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif // DISTRIBUTED_CAMERA_METADATA_PROCESSOR_H

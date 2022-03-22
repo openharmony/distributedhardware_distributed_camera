@@ -155,5 +155,5 @@ void DCameraSinkHandlerIpc::OnSinkLocalDmsDied(const sptr<IRemoteObject>& remote
     }
     localSink_ = nullptr;
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

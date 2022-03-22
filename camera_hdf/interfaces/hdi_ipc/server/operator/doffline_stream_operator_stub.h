@@ -34,6 +34,6 @@ public:
     int32_t DOfflineStreamOperatorStubReleaseStreams(MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int32_t DOfflineStreamOperatorStubRelease(MessageParcel &data, MessageParcel &reply, MessageOption &option);
 };
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif // DISTRIBUTED_OFFLINE_STREAM_OPERATOR_SERVER_STUB_H

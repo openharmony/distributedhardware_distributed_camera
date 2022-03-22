@@ -40,6 +40,6 @@ public:
 private:
     std::weak_ptr<DecodeDataProcess> decodeVideoNode_;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DECODE_VIDEO_CALLBACK_H

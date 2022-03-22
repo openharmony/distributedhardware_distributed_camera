@@ -442,5 +442,5 @@ bool DCameraDevice::IsOpened()
 {
     return isOpened_;
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS

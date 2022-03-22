@@ -83,10 +83,10 @@ struct HdfDriverEntry g_dCameraHostDriverEntry = {
 
 #ifndef __cplusplus
 extern "C" {
-#endif
+#endif // __cplusplus
 
 HDF_INIT(g_dCameraHostDriverEntry);
 
 #ifndef __cplusplus
 }
-#endif
+#endif // __cplusplus

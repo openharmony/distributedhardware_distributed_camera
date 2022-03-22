@@ -205,5 +205,5 @@ void DCameraPipelineSource::OnProcessedVideoBuffer(const std::shared_ptr<DataBuf
     }
     processListener_->OnProcessedVideoBuffer(videoResult);
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

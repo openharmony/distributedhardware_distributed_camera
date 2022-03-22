@@ -62,6 +62,6 @@ public:
     virtual int32_t StopCapture() = 0;
     virtual void GetAllStreamIds(std::vector<int32_t>& streamIds) = 0;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_ICAMERA_SOURCE_DATA_PROCESS_H

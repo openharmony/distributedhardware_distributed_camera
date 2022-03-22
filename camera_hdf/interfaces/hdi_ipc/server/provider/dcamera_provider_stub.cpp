@@ -244,8 +244,8 @@ int32_t DCameraProviderStub::OnRemoteRequest(uint32_t code, MessageParcel& data,
     }
     return ret;
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS
 
 void *DCameraProviderStubInstance()
 {

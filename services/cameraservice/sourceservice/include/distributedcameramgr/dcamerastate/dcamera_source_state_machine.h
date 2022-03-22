@@ -32,6 +32,6 @@ private:
     std::shared_ptr<DCameraSourceState> currentState_;
     std::weak_ptr<DCameraSourceDev> camDev_;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_SOURCE_STATE_MACHINE_H

@@ -35,6 +35,6 @@ public:
     virtual int32_t UnInit() = 0;
     virtual int32_t UpdateSettings(std::vector<std::shared_ptr<DCameraSettings>>& settings) = 0;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_ICAMERA_INPUT_H

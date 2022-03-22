@@ -35,6 +35,6 @@ public:
     virtual void OnFrameShutter(int32_t captureId,
                                 const std::vector<int32_t> &streamId, uint64_t timestamp) override;
 };
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif // DISTRIBUTED_STREAM_OPERATOR_CALLBACK_H

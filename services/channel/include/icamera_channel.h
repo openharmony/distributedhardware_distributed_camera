@@ -39,6 +39,6 @@ public:
     virtual int32_t ReleaseSession();
     virtual int32_t SendData(std::shared_ptr<DataBuffer>& buffer) = 0;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_ICAMERA_CHANNEL_H

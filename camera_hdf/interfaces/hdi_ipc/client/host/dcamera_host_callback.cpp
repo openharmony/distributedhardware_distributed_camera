@@ -32,5 +32,5 @@ void DCameraHostCallback::OnCameraEvent(const std::string &cameraId, CameraEvent
 {
     DHLOGW("DCameraHostCallback::OnCameraEvent enter.");
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS

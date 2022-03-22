@@ -194,5 +194,5 @@ int32_t DistributedCameraSourceService::UnLoadCameraHDF()
 {
     return DCAMERA_OK;
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

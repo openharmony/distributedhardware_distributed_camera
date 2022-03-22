@@ -62,5 +62,5 @@ uint32_t VideoConfigParams::GetHeight() const
 {
     return height_;
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

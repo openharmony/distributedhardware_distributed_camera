@@ -43,6 +43,6 @@ public:
 private:
     static inline BrokerDelegator<DCameraProviderCallbackProxy> delegator_;
 };
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif // DISTRIBUTED_CAMERA_PROVIDER_CALLBACK_PROXY_H

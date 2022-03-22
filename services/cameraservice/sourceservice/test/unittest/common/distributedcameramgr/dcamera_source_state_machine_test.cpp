@@ -355,5 +355,5 @@ HWTEST_F(DCameraSourceStateMachineTest, dcamera_source_state_machine_test_005, T
     ret = stateMachine_ ->Execute(DCAMERA_EVENT_UNREGIST, event1);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

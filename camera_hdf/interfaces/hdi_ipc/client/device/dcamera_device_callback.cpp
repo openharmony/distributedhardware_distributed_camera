@@ -27,5 +27,5 @@ void DCameraDeviceCallback::OnResult(uint64_t timestamp, const std::shared_ptr<C
 {
     DHLOGW("DCameraDeviceCallback::OnResult enter.");
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS

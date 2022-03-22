@@ -30,6 +30,6 @@ int64_t GetNowTimeStampUs();
 std::string Base64Encode(const unsigned char *toEncode, unsigned int len);
 std::string Base64Decode(const std::string& basicString);
 bool IsBase64(unsigned char c);
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_UTILS_TOOL_H

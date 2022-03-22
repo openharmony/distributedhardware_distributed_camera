@@ -108,6 +108,6 @@ struct DCResolution {
             (this->width_ == others.width_ && this->height_ < others.height_);
     }
 };
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif // DISTRIBUTED_CONSTANTS_H

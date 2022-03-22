@@ -88,5 +88,5 @@ int32_t DCameraServiceStateListener::OnUnregisterNotify(const std::string& devId
 
     return ret;
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

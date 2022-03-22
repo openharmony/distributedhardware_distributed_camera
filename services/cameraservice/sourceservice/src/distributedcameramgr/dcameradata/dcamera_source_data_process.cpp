@@ -161,5 +161,5 @@ void DCameraSourceDataProcess::GetAllStreamIds(std::vector<int32_t>& streamIds)
 {
     streamIds.assign(streamIds_.begin(), streamIds_.end());
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

@@ -39,6 +39,6 @@ private:
     int32_t DCDeviceStubDisableResult(MessageParcel& data, MessageParcel& reply, MessageOption& option);
     int32_t DCDeviceStubClose(MessageParcel& data, MessageParcel& reply, MessageOption& option);
 };
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif // DISTRIBUTED_CAMERA_DEVICE_SERVER_STUB_H

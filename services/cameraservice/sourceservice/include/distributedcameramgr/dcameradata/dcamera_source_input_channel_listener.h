@@ -36,6 +36,6 @@ private:
     std::weak_ptr<DCameraSourceInput> input_;
     DCStreamType streamType_;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_SOURCE_INPUT_CHANNEL_LISTENER_H

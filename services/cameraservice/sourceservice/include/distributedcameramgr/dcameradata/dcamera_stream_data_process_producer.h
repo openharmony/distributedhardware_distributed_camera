@@ -62,6 +62,6 @@ private:
     DCStreamType streamType_;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_ICAMERA_SOURCE_DATA_PROCESS_PRODUCER_H

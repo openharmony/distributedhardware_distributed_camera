@@ -52,5 +52,4 @@ public:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-
-#endif
+#endif // OHOS_MOCK_DATA_PROCESS_PIPELINE_H

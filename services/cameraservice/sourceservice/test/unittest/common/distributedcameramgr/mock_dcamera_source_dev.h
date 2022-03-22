@@ -81,5 +81,4 @@ private:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-
-#endif
+#endif // OHOS_DISTRIBUTED_CAMERA_MOCKSOURCE_DEV_H

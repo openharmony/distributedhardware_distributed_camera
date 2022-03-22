@@ -63,5 +63,5 @@ void DecodeVideoCallback::OnOutputBufferAvailable(uint32_t index, Media::AVCodec
     }
     targetDecoderNode->OnOutputBufferAvailable(index, info, flag);
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

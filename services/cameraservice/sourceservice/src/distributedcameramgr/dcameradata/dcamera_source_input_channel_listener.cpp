@@ -63,5 +63,5 @@ void DCameraSourceInputChannelListener::OnDataReceived(std::vector<std::shared_p
 
     input->OnDataReceived(streamType_, buffers);
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

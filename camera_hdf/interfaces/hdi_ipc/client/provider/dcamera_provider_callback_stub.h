@@ -39,6 +39,6 @@ private:
     int32_t DCProviderStopCaptureStub(MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int32_t DCProviderUpdateSettingsStub(MessageParcel &data, MessageParcel &reply, MessageOption &option);
 };
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif // DISTRIBUTED_CAMERA_PROVIDER_CALLBACK_CLIENT_STUB_H

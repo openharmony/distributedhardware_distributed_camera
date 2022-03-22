@@ -53,6 +53,6 @@ private:
     std::list<std::shared_ptr<DImageBuffer>> idleList_ = {};
     std::list<std::shared_ptr<DImageBuffer>> busyList_ = {};
 };
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif // DISTRIBUTED_CAMERA_BUFFER_MANAGER_H

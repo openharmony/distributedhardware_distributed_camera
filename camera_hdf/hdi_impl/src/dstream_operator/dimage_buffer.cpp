@@ -238,5 +238,5 @@ bool DImageBuffer::operator==(const DImageBuffer& u)
     }
     return u.GetPhyAddress() == phyAddr_;
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS

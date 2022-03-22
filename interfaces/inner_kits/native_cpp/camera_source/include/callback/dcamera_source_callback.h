@@ -41,6 +41,6 @@ private:
     std::map<std::string, std::shared_ptr<RegisterCallback>> regCallbacks_;
     std::map<std::string, std::shared_ptr<UnregisterCallback>> unregCallbacks_;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_SOURCE_CALLBACK_H

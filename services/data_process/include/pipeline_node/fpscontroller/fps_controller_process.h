@@ -74,6 +74,6 @@ private:
     int32_t frameRateOvershootMdf_ = 0;
     int64_t incomingFrameTimesMs_[INCOME_FRAME_TIME_HISTORY_WINDOWS_SIZE];
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_FPS_CONTROLLER_PROCESS_H

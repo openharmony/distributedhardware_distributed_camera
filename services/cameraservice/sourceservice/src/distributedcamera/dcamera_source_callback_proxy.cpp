@@ -74,5 +74,5 @@ int32_t DCameraSourceCallbackProxy::OnNotifyUnregResult(const std::string& devId
     int32_t result = reply.ReadInt32();
     return result;
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

@@ -34,6 +34,6 @@ public:
     virtual int32_t OnNotifyUnregResult(const std::string& devId, const std::string& dhId, const std::string& reqId,
         int32_t status, std::string& data) = 0;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_IDCAMERA_SOURCE_CALLBACL_H

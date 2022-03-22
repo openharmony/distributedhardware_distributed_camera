@@ -708,5 +708,5 @@ DecodeSurfaceListener::~DecodeSurfaceListener()
     DHLOGD("DecodeSurfaceListener : ~DecodeSurfaceListener.");
     surface_ = nullptr;
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

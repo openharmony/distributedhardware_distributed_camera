@@ -148,5 +148,5 @@ int32_t DStreamOperatorCallbackStub::OnFrameShutterStub(MessageParcel &data, Mes
     OnFrameShutter(captureId, streamIds, timestamp);
     return HDF_SUCCESS;
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS

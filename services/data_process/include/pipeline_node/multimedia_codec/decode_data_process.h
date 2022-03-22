@@ -141,6 +141,6 @@ private:
     sptr<Surface> surface_;
     std::weak_ptr<DecodeDataProcess> decodeVideoNode_;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DECODE_DATA_PROCESS_H

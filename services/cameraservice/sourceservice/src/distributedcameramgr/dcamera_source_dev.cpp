@@ -534,5 +534,5 @@ void DCameraSourceDev::NotifyHalResult(DCAMERA_EVENT eventType, DCameraSourceEve
     ExecuteCameraEventNotify(events);
     return;
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

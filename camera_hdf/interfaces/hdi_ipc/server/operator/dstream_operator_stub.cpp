@@ -352,5 +352,5 @@ int32_t DStreamOperatorStub::DStreamOperatorStubChangeToOfflineStream(MessagePar
     }
     return HDF_SUCCESS;
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS

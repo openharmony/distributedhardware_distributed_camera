@@ -60,6 +60,6 @@ private:
     std::mutex inputMutex_;
     bool isCapture_;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_SOURCE_INPUT_H

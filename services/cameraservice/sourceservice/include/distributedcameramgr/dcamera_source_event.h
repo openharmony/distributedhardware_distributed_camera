@@ -119,6 +119,6 @@ private:
     DCAMERA_EVENT eventType_;
     EventParam eventParam_;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_SOURCE_EVENT_H

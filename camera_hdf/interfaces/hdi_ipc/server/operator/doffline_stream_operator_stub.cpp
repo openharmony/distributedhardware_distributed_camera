@@ -104,5 +104,5 @@ int32_t DOfflineStreamOperatorStub::DOfflineStreamOperatorStubRelease(MessagePar
     }
     return HDF_SUCCESS;
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS

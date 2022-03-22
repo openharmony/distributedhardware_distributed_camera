@@ -78,7 +78,6 @@ private:
     bool isOpenSessFailed_ = false;
     std::mutex isOpenSessFailedlock_;
 };
-} // end namespace DistributedHardware
-} // end namespace OHOS
-
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif // DISTRIBUTED_CAMERA_DEVICE_H

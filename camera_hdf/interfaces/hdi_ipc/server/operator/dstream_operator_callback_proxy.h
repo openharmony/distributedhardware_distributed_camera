@@ -40,6 +40,6 @@ public:
 private:
     static inline BrokerDelegator<DStreamOperatorCallbackProxy> delegator_;
 };
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif // DISTRIBUTED_STREAM_OPERATOR_CALLBACK_PROXY_H

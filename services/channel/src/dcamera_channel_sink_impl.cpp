@@ -122,5 +122,5 @@ int32_t DCameraChannelSinkImpl::SendData(std::shared_ptr<DataBuffer>& buffer)
     }
     return ret;
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

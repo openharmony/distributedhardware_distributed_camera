@@ -484,5 +484,5 @@ int32_t DCameraSoftbusAdapter::GetLocalNetworkId(std::string& myDevId)
     myDevId = std::string(basicInfo.networkId);
     return DCAMERA_OK;
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

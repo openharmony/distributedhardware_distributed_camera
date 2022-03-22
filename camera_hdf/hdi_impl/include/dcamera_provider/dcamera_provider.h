@@ -74,6 +74,6 @@ private:
     static AutoRelease autoRelease_;
     static std::shared_ptr<DCameraProvider> instance_;
 };
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif // DISTRIBUTED_CAMERA_PROVIDER_H

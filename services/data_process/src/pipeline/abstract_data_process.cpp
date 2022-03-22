@@ -33,5 +33,5 @@ void AbstractDataProcess::SetNodeRank(size_t curNodeRank)
 {
     nodeRank_ = curNodeRank;
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

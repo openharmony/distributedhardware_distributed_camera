@@ -301,7 +301,6 @@ using DCameraHDFEvent = struct _DCameraHDFEvent {
      */
     std::string content_;
 };
-} // end namespace DistributedHardware
-} // end namespace OHOS
-
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif // DISTRIBUTED_CAMERA_PROVIDER_TYPES_H

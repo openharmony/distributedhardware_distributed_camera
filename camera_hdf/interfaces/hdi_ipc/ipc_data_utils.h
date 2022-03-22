@@ -102,6 +102,6 @@ public:
         pEvent->content_ = parcel.ReadString();
     }
 };
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif // HDI_IPC_DATA_UTILS_H

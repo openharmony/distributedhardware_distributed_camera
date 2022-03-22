@@ -35,6 +35,6 @@ public:
     virtual int32_t ProcessData(std::vector<std::shared_ptr<DataBuffer>>& dataBuffers) = 0;
     virtual void DestroyDataProcessPipeline() = 0;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_IDATA_PROCESS_PIPELINE_H

@@ -36,6 +36,6 @@ private:
     int32_t OnCaptureErrorStub(MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int32_t OnFrameShutterStub(MessageParcel &data, MessageParcel &reply, MessageOption &option);
 };
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif // DISTRIBUTED_STREAM_OPERATOR_CALLBACK_CLIENT_STUB_H

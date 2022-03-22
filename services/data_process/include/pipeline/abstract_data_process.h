@@ -39,6 +39,6 @@ protected:
     std::shared_ptr<AbstractDataProcess> nextDataProcess_ = nullptr;
     size_t nodeRank_;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_ABSTRACT_DATA_PROCESS_H

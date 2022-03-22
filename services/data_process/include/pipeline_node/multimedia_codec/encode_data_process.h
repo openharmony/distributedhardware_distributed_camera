@@ -119,6 +119,6 @@ private:
     Media::Format metadataFormat_;
     Media::Format encodeOutputFormat_;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_ENCODE_DATA_PROCESS_H

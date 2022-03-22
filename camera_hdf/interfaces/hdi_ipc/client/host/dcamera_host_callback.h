@@ -31,6 +31,6 @@ public:
     virtual void OnFlashlightStatus(const std::string &cameraId, FlashlightStatus status) override;
     virtual void OnCameraEvent(const std::string &cameraId, CameraEvent event) override;
 };
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif // DISTRIBUTED_CAMERA_HOST_CALLBACK_H

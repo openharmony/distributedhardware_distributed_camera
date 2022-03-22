@@ -47,6 +47,6 @@ private:
     std::weak_ptr<DCameraSourceStateMachine> stateMachine_;
     std::map<uint32_t, DCameraFunc> memberFuncMap_;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_SOURCE_CAPTURE_STATE_H

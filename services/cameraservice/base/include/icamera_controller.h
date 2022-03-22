@@ -15,6 +15,7 @@
 
 #ifndef OHOS_ICAMERA_CONTROLLER_H
 #define OHOS_ICAMERA_CONTROLLER_H
+
 #include "dcamera_capture_info_cmd.h"
 #include "dcamera_channel_info_cmd.h"
 #include "dcamera_event_cmd.h"
@@ -40,6 +41,6 @@ public:
     virtual int32_t Init(std::vector<DCameraIndex>& indexs) = 0;
     virtual int32_t UnInit() = 0;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_ICAMERA_CONTROLLER_H

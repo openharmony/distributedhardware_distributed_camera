@@ -69,6 +69,6 @@ private:
     int captureBufferCount_ = 0;
     bool isBufferMgrInited_ = false;
 };
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif // DISTRIBUTED_CAMERA_STREAM_H

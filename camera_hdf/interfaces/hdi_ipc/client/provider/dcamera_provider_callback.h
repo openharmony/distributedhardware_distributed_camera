@@ -38,6 +38,6 @@ public:
     virtual DCamRetCode UpdateSettings(const std::shared_ptr<DHBase> &dhBase,
                                        const std::vector<std::shared_ptr<DCameraSettings>> &settings) override;
 };
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif // DISTRIBUTED_CAMERA_PROVIDER_CALLBACK_H

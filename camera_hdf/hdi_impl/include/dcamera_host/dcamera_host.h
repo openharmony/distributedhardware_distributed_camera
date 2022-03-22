@@ -77,6 +77,6 @@ private:
     std::map<DHBase, std::string> dhBaseHashDCamIdMap_;
     std::map<std::string, OHOS::sptr<DCameraDevice>> dCameraDeviceMap_;
 };
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif // DISTRIBUTED_CAMERA_HOST_H

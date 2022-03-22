@@ -231,5 +231,5 @@ int32_t DCameraStreamDataProcessProducer::FeedStreamToDriver(const std::shared_p
         GetAnonyString(dhId_).c_str(), buffer->Size(), streamType_);
     return ret;
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

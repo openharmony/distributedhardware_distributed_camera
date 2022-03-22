@@ -107,7 +107,6 @@ private:
     OperationMode currentOperMode_ = OperationMode::NORMAL;
     std::shared_ptr<CameraStandard::CameraMetadata> latestStreamSetting_;
 };
-} // end namespace DistributedHardware
-} // end namespace OHOS
-
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif // DISTRIBUTED_CAMERA_STREAM_OPERATOR_H

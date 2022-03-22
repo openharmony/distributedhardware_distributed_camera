@@ -39,6 +39,6 @@ public:
         return DCAMERA_OK;
     }
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DISTRIBUTED_CAMERA_MOCKSOURCE_STATE_LISTENER_H

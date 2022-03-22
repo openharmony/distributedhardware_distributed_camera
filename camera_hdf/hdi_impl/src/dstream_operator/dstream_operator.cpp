@@ -749,5 +749,5 @@ DCEncodeType DStreamOperator::ConvertDCEncodeType(std::string &srcEncodeType)
         return DCEncodeType::ENCODE_TYPE_NULL;
     }
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS

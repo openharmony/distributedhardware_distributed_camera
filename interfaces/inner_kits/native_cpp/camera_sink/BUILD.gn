@@ -57,4 +57,3 @@ ohos_shared_library("distributed_camera_sink_sdk") {
 
   part_name = "distributed_camera"
 }
-

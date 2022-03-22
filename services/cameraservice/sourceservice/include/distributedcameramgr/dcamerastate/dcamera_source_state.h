@@ -38,6 +38,6 @@ public:
         DCameraSourceEvent& event) = 0;
     virtual DCameraStateType GetStateType() = 0;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_SOURCE_STATE_H

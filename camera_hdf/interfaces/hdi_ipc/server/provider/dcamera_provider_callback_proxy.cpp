@@ -263,5 +263,5 @@ DCamRetCode DCameraProviderCallbackProxy::UpdateSettings(const std::shared_ptr<D
     }
     return static_cast<DCamRetCode>(reply.ReadInt32());
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS

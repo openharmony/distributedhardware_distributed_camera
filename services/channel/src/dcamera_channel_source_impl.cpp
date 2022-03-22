@@ -141,5 +141,5 @@ int32_t DCameraChannelSourceImpl::SendData(std::shared_ptr<DataBuffer>& buffer)
     }
     return ret;
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

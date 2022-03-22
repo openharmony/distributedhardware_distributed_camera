@@ -74,5 +74,4 @@ public:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-
-#endif
+#endif // OHOS_MOCK_DCAMERA_SINK_DATA_PROCESS_H

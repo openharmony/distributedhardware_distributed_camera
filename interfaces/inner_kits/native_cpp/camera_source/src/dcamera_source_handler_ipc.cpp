@@ -155,5 +155,5 @@ void DCameraSourceHandlerIpc::OnSourceLocalDmsDied(const sptr<IRemoteObject>& re
     }
     localSource_ = nullptr;
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

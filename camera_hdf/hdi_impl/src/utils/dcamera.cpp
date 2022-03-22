@@ -85,5 +85,5 @@ void SplitString(const std::string &str, std::vector<std::string> &tokens, const
         tokens.push_back(str.substr(lastPos));
     }
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS

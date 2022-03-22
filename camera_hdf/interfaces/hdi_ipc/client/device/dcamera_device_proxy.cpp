@@ -205,5 +205,5 @@ void DCameraDeviceProxy::Close()
         DHLOGE("SendRequest failed, error code is %d.", ret);
     }
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS

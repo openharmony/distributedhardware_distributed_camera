@@ -84,6 +84,6 @@ private:
 
     std::mutex l_;
 };
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif // DISTRIBUTED_CAMERA_IMAGE_BUFFER_H

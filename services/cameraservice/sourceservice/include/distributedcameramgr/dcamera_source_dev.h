@@ -88,6 +88,6 @@ private:
     std::map<uint32_t, DCameraNotifyFunc> memberFuncMap_;
     std::map<uint32_t, DCameraEventResult> eventResultMap_;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_SOURCE_DEV_H

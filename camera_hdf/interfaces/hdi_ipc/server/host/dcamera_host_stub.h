@@ -57,8 +57,8 @@ private:
 private:
     std::shared_ptr<DCameraHost> dcameraHost_ = nullptr;
 };
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS
 
 void* DCameraHostStubInstance();
 

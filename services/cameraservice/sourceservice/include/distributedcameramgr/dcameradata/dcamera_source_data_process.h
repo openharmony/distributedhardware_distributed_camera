@@ -45,6 +45,6 @@ private:
     std::string dhId_;
     DCStreamType streamType_;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_SOURCE_DATRA_PROCESS_H

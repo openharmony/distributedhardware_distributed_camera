@@ -43,6 +43,6 @@ public:
         const std::string& reqId) = 0;
     virtual int32_t DCameraNotify(const std::string& devId, const std::string& dhId, std::string& events) = 0;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_IDISTRIBUTED_CAMERA_SOURCE_H

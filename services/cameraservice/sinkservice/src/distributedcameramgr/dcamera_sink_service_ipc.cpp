@@ -187,5 +187,5 @@ void DCameraSinkServiceIpc::OnSourceRemoteDmsDied(const sptr<IRemoteObject>& rem
     }
     remoteSources_.erase(iter);
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

@@ -34,5 +34,5 @@ CamRetCode DOfflineStreamOperator::Release()
 {
     return CamRetCode::METHOD_NOT_SUPPORTED;
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS

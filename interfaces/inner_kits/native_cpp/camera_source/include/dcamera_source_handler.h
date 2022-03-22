@@ -51,11 +51,11 @@ private:
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif // __cplusplus
 __attribute__((visibility("default"))) IDistributedHardwareSource *GetSourceHardwareHandler();
 #ifdef __cplusplus
 }
-#endif
-}
-}
-#endif
+#endif // __cplusplus
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_SOURCE_HANDLER_H

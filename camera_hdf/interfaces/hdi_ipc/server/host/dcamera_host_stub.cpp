@@ -211,8 +211,8 @@ int32_t DCameraHostStub::OnRemoteRequest(int cmdId, MessageParcel &data,
     }
     return HDF_SUCCESS;
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS
 
 void *DCameraHostStubInstance()
 {

@@ -63,5 +63,5 @@ DCamRetCode DCameraProviderCallback::UpdateSettings(const std::shared_ptr<DHBase
     DHLOGW("DCameraProviderCallback::UpdateSettings enter.");
     return DCamRetCode::SUCCESS;
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS

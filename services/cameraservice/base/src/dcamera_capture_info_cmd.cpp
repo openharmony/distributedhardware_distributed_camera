@@ -166,5 +166,5 @@ int32_t DCameraCaptureInfoCmd::UmarshalSettings(Json::Value& valueJson,
     }
     return DCAMERA_OK;
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

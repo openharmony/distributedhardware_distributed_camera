@@ -115,6 +115,6 @@ private:
     std::map<DCameraSessionMode, DCameraSendFuc> sendFuncMap_;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_SOFTBUS_SESSION_H

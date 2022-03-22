@@ -41,6 +41,6 @@ private:
     DCameraSessionMode mode_;
     const std::string SESSION_HEAD = "ohos.dhardware.dcamera_";
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_CHANNEL_SINK_IMPL_H

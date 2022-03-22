@@ -228,5 +228,5 @@ void DCameraHost::NotifyDCameraStatus(const std::shared_ptr<DHBase> &dhBase, int
         dCameraHostCallback_->OnCameraStatus(dCameraId, CameraStatus::UN_AVAILABLE);
     }
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS

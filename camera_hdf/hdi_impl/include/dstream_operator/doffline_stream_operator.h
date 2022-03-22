@@ -35,7 +35,6 @@ public:
     virtual CamRetCode ReleaseStreams(const std::vector<int>& streamIds) override;
     virtual CamRetCode Release() override;
 };
-} // end namespace DistributedHardware
-} // end namespace OHOS
-
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif // DISTRIBUTED_CAMERA_OFFLINE_STREAM_OPERATOR_H

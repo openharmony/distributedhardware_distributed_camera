@@ -360,5 +360,5 @@ std::shared_ptr<DataBuffer> ConvertNV12ToNV21::ProcessData(const std::shared_ptr
         sourceConfig.GetWidth(), sourceConfig.GetHeight(), dstBuf->Size(), timeStamp);
     return dstBuf;
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

@@ -85,6 +85,6 @@ private:
     std::shared_ptr<CodecPacket> codecPacket_;
     VideoCodecAction action_;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_CODEC_EVENT_H

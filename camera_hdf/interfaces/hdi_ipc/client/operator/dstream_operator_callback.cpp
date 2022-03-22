@@ -40,5 +40,5 @@ void DStreamOperatorCallback::OnFrameShutter(int32_t captureId, const std::vecto
 {
     DHLOGW("DStreamOperatorCallback::OnFrameShutter enter.");
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS

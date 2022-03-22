@@ -328,5 +328,5 @@ void DCameraProviderProxy::DCameraMemoryUnmap(BufferHandle *buffer)
     buffer->virAddr = nullptr;
     FreeBufferHandle(buffer);
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS

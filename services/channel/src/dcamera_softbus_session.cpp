@@ -447,5 +447,5 @@ std::string DCameraSoftbusSession::GetMySessionName()
 {
     return mySessionName_;
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

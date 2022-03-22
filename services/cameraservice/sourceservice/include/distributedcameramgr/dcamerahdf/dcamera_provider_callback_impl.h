@@ -42,6 +42,6 @@ private:
     std::string dhId_;
     std::weak_ptr<DCameraSourceDev> sourceDev_;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_PROVIDER_CALLBACK_IMPL_H

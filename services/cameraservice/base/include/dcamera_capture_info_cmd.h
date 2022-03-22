@@ -49,6 +49,6 @@ private:
     int32_t UmarshalValue(Json::Value& rootValue);
     int32_t UmarshalSettings(Json::Value& valueJson, std::shared_ptr<DCameraCaptureInfo>& captureInfo);
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_CAPTURE_INFO_H

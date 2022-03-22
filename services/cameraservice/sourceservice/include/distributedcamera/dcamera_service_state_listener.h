@@ -34,6 +34,6 @@ public:
 private:
     sptr<IDCameraSourceCallback> callbackProxy_;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_SERVICE_STATE_LISTENER_H

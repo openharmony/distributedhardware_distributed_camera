@@ -59,5 +59,4 @@ public:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-
-#endif
+#endif // OHOS_MOCK_CAMERA_CHANNEL_H

@@ -31,6 +31,6 @@ public:
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
                             MessageOption &option) override;
 };
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif // DISTRIBUTED_CAMERA_HOST_CALLBACK_CLIENT_STUB_H

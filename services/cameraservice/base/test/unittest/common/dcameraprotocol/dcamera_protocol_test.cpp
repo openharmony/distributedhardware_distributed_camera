@@ -194,5 +194,5 @@ HWTEST_F(DCameraProtocolTest, dcamera_protocol_test_006, TestSize.Level1)
     ret = cmd.Marshal(jsonStr);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

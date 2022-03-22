@@ -454,5 +454,5 @@ VideoConfigParams EncodeDataProcess::GetTargetConfig() const
 {
     return targetConfig_;
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

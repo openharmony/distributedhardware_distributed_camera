@@ -122,5 +122,5 @@ IDistributedHardwareSource *GetSourceHardwareHandler()
     DHLOGI("DCameraSourceHandler GetSourceHardwareHandler Start");
     return &DCameraSourceHandler::GetInstance();
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

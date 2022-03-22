@@ -34,6 +34,6 @@ public:
 private:
     std::weak_ptr<DCameraSourceController> controller_;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_SOURCE_CONTROLLER_CHANNEL_LISTENER_H

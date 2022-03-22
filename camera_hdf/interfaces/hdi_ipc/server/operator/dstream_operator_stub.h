@@ -42,6 +42,6 @@ private:
     int32_t DStreamOperatorStubCancelCapture(MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int32_t DStreamOperatorStubChangeToOfflineStream(MessageParcel &data, MessageParcel &reply, MessageOption &option);
 };
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif // DISTRIBUTED_STREAM_OPERATOR_SERVER_STUB_H

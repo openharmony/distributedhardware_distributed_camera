@@ -36,7 +36,6 @@ DCamRetCode MapToInternalRetCode(CamRetCode retCode);
 uint64_t GetCurrentLocalTimeStamp();
 
 void SplitString(const std::string &str, std::vector<std::string> &tokens, const std::string &delimiters);
-} // end namespace DistributedHardware
-} // end namespace OHOS
-
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif // DISTRIBUTED_CAMERA_H

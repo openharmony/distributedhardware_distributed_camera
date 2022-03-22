@@ -26,6 +26,6 @@ public:
     std::shared_ptr<DCameraSourceState> CreateState(DCameraStateType stateType,
         std::shared_ptr<DCameraSourceStateMachine>& stateMachine);
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_SOURCE_STATE_FACTORY_H

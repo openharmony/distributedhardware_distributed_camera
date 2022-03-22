@@ -71,6 +71,6 @@ private:
     PipelineType piplineType_ = PipelineType::VIDEO;
     std::vector<std::shared_ptr<AbstractDataProcess>> pipNodeRanks_;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_PIPELINE_SOURCE_H

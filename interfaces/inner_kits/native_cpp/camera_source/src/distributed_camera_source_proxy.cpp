@@ -156,5 +156,5 @@ int32_t DistributedCameraSourceProxy::DCameraNotify(const std::string& devId, co
     int32_t result = reply.ReadInt32();
     return result;
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

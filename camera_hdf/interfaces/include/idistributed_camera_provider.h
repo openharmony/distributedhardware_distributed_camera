@@ -158,7 +158,6 @@ public:
     virtual DCamRetCode Notify(const std::shared_ptr<DHBase> &dhBase,
         const std::shared_ptr<DCameraHDFEvent> &event) = 0;
 };
-} // end namespace DistributedHardware
-} // end namespace OHOS
-
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif // HDI_DISTRIBUTED_CAMERA_PROVIDER_H

@@ -62,5 +62,5 @@ int32_t DCameraDeviceCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel 
     }
     return 0;
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS

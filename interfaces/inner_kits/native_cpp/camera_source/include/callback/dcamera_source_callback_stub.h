@@ -36,6 +36,6 @@ private:
     using DCameraFunc = int32_t (DCameraSourceCallbackStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, DCameraFunc> memberFuncMap_;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_SOURCE_CALLBACK_STUB_H

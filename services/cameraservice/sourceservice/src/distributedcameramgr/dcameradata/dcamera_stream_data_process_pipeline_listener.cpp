@@ -51,5 +51,5 @@ void DCameraStreamDataProcessPipelineListener::OnError(DataProcessErrorType erro
     }
     process->OnError(errorType);
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

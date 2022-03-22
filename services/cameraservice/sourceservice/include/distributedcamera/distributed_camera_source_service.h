@@ -62,7 +62,6 @@ private:
     sptr<IDCameraSourceCallback> callbackProxy_;
     std::string sourceVer_;
 };
-}
-}
-
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DISTRIBUTED_CAMERA_SOURCE_SERVICE_H

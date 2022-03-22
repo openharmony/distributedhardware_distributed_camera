@@ -379,5 +379,5 @@ OHOS::sptr<OHOS::IBufferProducer> Test::StreamConsumer::CreateProducer(std::func
     });
     return producer;
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS

@@ -153,5 +153,5 @@ bool IsBase64(unsigned char c)
 {
     return (isalnum(c) || (c == '+') || (c == '/'));
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

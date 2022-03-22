@@ -86,5 +86,5 @@ void DCameraSourceCallback::PopUnregCallback(std::string& reqId)
 {
     unregCallbacks_.erase(reqId);
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

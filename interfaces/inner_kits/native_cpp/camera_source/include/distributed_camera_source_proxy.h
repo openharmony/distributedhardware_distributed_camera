@@ -44,7 +44,6 @@ public:
 private:
     static inline BrokerDelegator<DistributedCameraSourceProxy> delegator_;
 };
-}
-}
-
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DISTRIBUTED_CAMERA_SOURCE_PROXY_H

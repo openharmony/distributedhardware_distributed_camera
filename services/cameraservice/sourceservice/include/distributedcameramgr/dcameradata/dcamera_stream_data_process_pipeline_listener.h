@@ -35,6 +35,6 @@ public:
 private:
     std::weak_ptr<DCameraStreamDataProcess> process_;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_STREAM_DATA_PROCESS_PIPELINE_LISTENER_H

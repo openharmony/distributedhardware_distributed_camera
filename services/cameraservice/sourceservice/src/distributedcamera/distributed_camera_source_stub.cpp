@@ -131,5 +131,5 @@ int32_t DistributedCameraSourceStub::DCameraNotifyInner(MessageParcel &data, Mes
     reply.WriteInt32(ret);
     return ret;
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

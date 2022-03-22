@@ -207,5 +207,5 @@ CamRetCode DCameraHostProxy::SetFlashlight(const std::string &cameraId, bool &is
     }
     return static_cast<CamRetCode>(reply.ReadInt32());
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS

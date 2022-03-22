@@ -38,6 +38,6 @@ public:
     std::string devId_;
     std::string dhId_;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_INDEX_H

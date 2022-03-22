@@ -85,5 +85,5 @@ void DCameraDeviceCallbackProxy::OnResult(uint64_t timestamp,
         return;
     }
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS

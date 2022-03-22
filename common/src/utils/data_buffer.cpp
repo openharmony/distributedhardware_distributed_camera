@@ -115,5 +115,5 @@ DataBuffer::~DataBuffer()
         data_ = nullptr;
     }
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

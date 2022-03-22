@@ -78,5 +78,4 @@ public:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-
-#endif
+#endif // OHOS_MOCK_CAMERA_OPERATOR_H

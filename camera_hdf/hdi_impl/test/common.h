@@ -173,6 +173,6 @@ public:
         return 0;
     }
 };
-} // end namespace DistributedHardware
-} // end namespace OHOS
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // DISTRIBUTED_CAMERA_TEST_COMMON_H

@@ -254,5 +254,5 @@ int32_t DCameraSourceConfigStreamState::DoEventNofityTask(std::shared_ptr<DCamer
     }
     return DCAMERA_OK;
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

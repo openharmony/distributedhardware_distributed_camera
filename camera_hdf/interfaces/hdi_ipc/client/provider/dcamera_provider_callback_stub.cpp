@@ -251,5 +251,5 @@ int32_t DCameraProviderCallbackStub::DCProviderUpdateSettingsStub(MessageParcel 
     }
     return HDF_SUCCESS;
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS

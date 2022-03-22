@@ -78,5 +78,5 @@ int32_t DCameraSourceCallbackStub::NotifyUnregResultInner(MessageParcel &data, M
     reply.WriteInt32(ret);
     return ret;
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

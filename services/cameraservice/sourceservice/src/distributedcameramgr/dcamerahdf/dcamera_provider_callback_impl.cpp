@@ -177,5 +177,5 @@ DCamRetCode DCameraProviderCallbackImpl::UpdateSettings(const std::shared_ptr<DH
     }
     return SUCCESS;
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

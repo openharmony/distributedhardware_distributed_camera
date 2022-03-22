@@ -232,5 +232,5 @@ int32_t DCameraDeviceStub::DCDeviceStubClose(MessageParcel& data, MessageParcel&
     Close();
     return HDF_SUCCESS;
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS

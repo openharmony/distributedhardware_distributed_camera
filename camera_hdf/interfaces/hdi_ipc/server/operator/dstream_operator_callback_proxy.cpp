@@ -159,5 +159,5 @@ void DStreamOperatorCallbackProxy::OnFrameShutter(int32_t captureId,
         DHLOGE("SendRequest failed, error code is %d.", ret);
     }
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS

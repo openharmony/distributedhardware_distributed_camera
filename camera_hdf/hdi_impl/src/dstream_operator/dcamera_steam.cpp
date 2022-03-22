@@ -358,5 +358,5 @@ bool DCameraStream::HasBufferQueue()
     }
     return true;
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS

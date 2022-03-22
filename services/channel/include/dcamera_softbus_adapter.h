@@ -81,6 +81,6 @@ private:
     std::mutex idMapLock_;
     std::map<int32_t, std::shared_ptr<DCameraSoftbusSession>> sessionIdMap_;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_SOFTBUS_ADAPTER_H

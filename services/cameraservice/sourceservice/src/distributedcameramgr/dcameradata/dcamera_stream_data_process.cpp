@@ -225,5 +225,5 @@ Videoformat DCameraStreamDataProcess::GetPipelineFormat(int32_t format)
 {
     return Videoformat::NV21;
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

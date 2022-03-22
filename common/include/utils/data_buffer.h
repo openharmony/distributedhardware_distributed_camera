@@ -55,6 +55,6 @@ private:
     DataBuffer(const DataBuffer &) = delete;
     DataBuffer &operator = (const DataBuffer &) = delete;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DATA_BUFFER_H

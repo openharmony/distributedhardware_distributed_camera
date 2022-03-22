@@ -74,6 +74,6 @@ struct ImageUnitInfo {
     size_t imgSize;
     uint8_t *imgData;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_IMAGE_COMMON_TYPE_H

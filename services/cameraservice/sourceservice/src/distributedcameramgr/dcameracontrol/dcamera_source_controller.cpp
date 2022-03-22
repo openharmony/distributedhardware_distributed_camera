@@ -468,5 +468,5 @@ void DCameraSourceController::HandleMetaDataResult(std::string& jsonStr)
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     }
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

@@ -38,6 +38,6 @@ public:
     virtual void OnSessionError(int32_t eventType, int32_t eventReason, std::string detail) = 0;
     virtual void OnDataReceived(std::vector<std::shared_ptr<DataBuffer>>& buffers) = 0;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_ICAMERA_CHANNEL_LISTENER_H

@@ -184,5 +184,5 @@ int32_t DCameraSourceOpenedState::DoEventNofityTask(std::shared_ptr<DCameraSourc
     }
     return DCAMERA_OK;
 }
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS

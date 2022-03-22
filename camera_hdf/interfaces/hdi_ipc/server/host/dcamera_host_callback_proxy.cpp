@@ -104,5 +104,5 @@ void DCameraHostCallbackProxy::OnCameraEvent(const std::string &cameraId, Camera
         DHLOGE("SendRequest failed, error code is %d.", ret);
     }
 }
-} // end namespace DistributedHardware
-} // end namespace OHOS
+} // namespace DistributedHardware
+} // namespace OHOS
