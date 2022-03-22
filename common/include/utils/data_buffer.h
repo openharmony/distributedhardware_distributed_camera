@@ -42,6 +42,7 @@ public:
     bool FindString(const string& name, string& value);
 
     virtual ~DataBuffer();
+
 private:
     size_t capacity_ = 0;
     size_t rangeOffset_ = 0;

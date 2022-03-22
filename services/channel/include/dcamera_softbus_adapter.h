@@ -34,6 +34,7 @@ typedef enum {
 
 class DCameraSoftbusAdapter {
 DECLARE_SINGLE_INSTANCE_BASE(DCameraSoftbusAdapter);
+
 public:
     int32_t CreateSoftbusSessionServer(std::string sessionName, DCAMERA_CHANNEL_ROLE role);
     int32_t DestroySoftbusSessionServer(std::string sessionName);

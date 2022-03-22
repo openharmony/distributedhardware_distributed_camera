@@ -54,6 +54,7 @@ public:
 
 class DCameraSourceEvent : public Event {
     TYPEINDENT(DCameraSourceEvent)
+
 public:
     DCameraSourceEvent(EventSender& sender) : Event(sender) {}
     ~DCameraSourceEvent() = default;

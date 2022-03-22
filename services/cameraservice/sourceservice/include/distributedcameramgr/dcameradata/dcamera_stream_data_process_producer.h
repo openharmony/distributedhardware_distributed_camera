@@ -40,6 +40,7 @@ public:
     void Stop();
     void FeedStream(const std::shared_ptr<DataBuffer>& buffer);
     void UpdateInterval(uint32_t fps);
+
 private:
     void LooperContinue();
     void LooperSnapShot();

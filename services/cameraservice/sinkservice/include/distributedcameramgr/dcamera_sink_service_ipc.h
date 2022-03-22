@@ -24,6 +24,7 @@ namespace OHOS {
 namespace DistributedHardware {
 class DCameraSinkServiceIpc {
 DECLARE_SINGLE_INSTANCE_BASE(DCameraSinkServiceIpc);
+
 public:
     void Init();
     void UnInit();

@@ -32,6 +32,7 @@ namespace OHOS {
 namespace DistributedHardware {
 class DistributedCameraSourceService : public SystemAbility, public DistributedCameraSourceStub {
 DECLARE_SYSTEM_ABILITY(DistributedCameraSourceService);
+
 public:
     DistributedCameraSourceService(int32_t saId, bool runOnCreate);
     ~DistributedCameraSourceService() = default;

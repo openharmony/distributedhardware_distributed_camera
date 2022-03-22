@@ -141,6 +141,7 @@ public:
                 delete consumerThread_;
             }
         }
+
     public:
         std::atomic<uint64_t> shotCount_ = 0;
         std::mutex l_;

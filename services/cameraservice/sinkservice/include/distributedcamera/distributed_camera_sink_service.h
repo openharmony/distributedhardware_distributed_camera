@@ -27,6 +27,7 @@ namespace OHOS {
 namespace DistributedHardware {
 class DistributedCameraSinkService : public SystemAbility, public DistributedCameraSinkStub {
 DECLARE_SYSTEM_ABILITY(DistributedCameraSinkService);
+
 public:
     DistributedCameraSinkService(int32_t saId, bool runOnCreate);
     ~DistributedCameraSinkService() = default;
