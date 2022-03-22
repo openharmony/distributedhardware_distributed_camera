@@ -492,6 +492,21 @@ DCamRetCode DStreamOperator::ShutterBuffer(int streamId, const std::shared_ptr<D
             return ret;
         }
         acceptedBufferNum_[std::make_pair(captureId, streamId)]++;
+
+        auto dcStreamInfo = dcStreamInfoMap_.find(streamId);
+        if(dcStreamInfo != dcStreamInfoMap_.end()) {
+            if(dcStreamInfo->second->type_ == DCStreamType::SNAPSHOT_FRAME) {
+                std::vector<std::shared_ptr<CaptureEndedInfo>> info;
+                std::shared_ptr<CaptureEndedInfo> tmp = std::make_shared<CaptureEndedInfo>();
+                tmp->frameCount_ = acceptedBufferNum_[std::make_pair(captureId, streamId)];
+                tmp->streamId_ = streamId;
+                info.push_back(tmp);
+                if (dcStreamOperatorCallback_) {
+                    dcStreamOperatorCallback_->OnCaptureEnded(captureId, info);
+                    DHLOGD("snapshot stream successfully reported captureId = %d streamId = %d.", captureId, streamId);
+                }
+            }
+        }
     }
 
     uint64_t resultTimestamp = GetCurrentLocalTimeStamp();
