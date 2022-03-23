@@ -77,7 +77,7 @@ void DStreamOperatorCallbackProxy::OnCaptureEnded(int32_t captureId,
         auto captureEndInfo = info.at(i);
         bool bRet = data.WriteBuffer((void *)captureEndInfo.get(), sizeof(CaptureEndedInfo));
         if (!bRet) {
-            DHLOGE("Write info index = %d failed.", i);
+            DHLOGE("Write info index = %zu failed.", i);
             return;
         }
     }
@@ -115,7 +115,7 @@ void DStreamOperatorCallbackProxy::OnCaptureError(int32_t captureId,
         auto captureErrorInfo = info.at(i);
         bool bRet = data.WriteBuffer((void *)captureErrorInfo.get(), sizeof(CaptureErrorInfo));
         if (!bRet) {
-            DHLOGE("Write info index = %d failed.", i);
+            DHLOGE("Write info index = %zu failed.", i);
             return;
         }
     }

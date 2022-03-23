@@ -43,7 +43,7 @@ public:
         bRet = (bRet && parcel.WriteInt32(static_cast<int32_t>(pInfo->width_)));
         bRet = (bRet && parcel.WriteInt32(static_cast<int32_t>(pInfo->height_)));
         bRet = (bRet && parcel.WriteInt32(static_cast<int32_t>(pInfo->format_)));
-        bRet = (bRet = (bRet && parcel.WriteInt32(pInfo->intent_)));
+        bRet = (bRet && parcel.WriteInt32(pInfo->intent_));
         bRet = (bRet && parcel.WriteBool(pInfo->tunneledMode_));
         bool bufferQueueFlag = (pInfo->bufferQueue_ != nullptr) ? true : false;
         bRet = (bRet && parcel.WriteBool(bufferQueueFlag));

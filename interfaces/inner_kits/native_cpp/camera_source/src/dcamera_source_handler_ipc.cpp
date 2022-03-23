@@ -144,15 +144,17 @@ void DCameraSourceHandlerIpc::OnSourceLocalDmsDied(const wptr<IRemoteObject>& re
 void DCameraSourceHandlerIpc::OnSourceLocalDmsDied(const sptr<IRemoteObject>& remote)
 {
     std::lock_guard<std::mutex> autoLock(sourceLocalDmsLock_);
+    if (localSource_ == nullptr) {
+        DHLOGE("DCameraSourceHandlerIpc::OnSourceLocalDmsDied, localSource is null.");
+        return;
+    }
     if (localSource_->AsObject() != remote) {
-        DHLOGI("OnSourceLocalDmsDied not found remote object");
+        DHLOGI("OnSourceLocalDmsDied not found remote object.");
         return;
     }
 
     DHLOGI("OnSourceLocalDmsDied Clear");
-    if (localSource_ != nullptr) {
-        localSource_->AsObject()->RemoveDeathRecipient(sourceLocalRecipient_);
-    }
+    localSource_->AsObject()->RemoveDeathRecipient(sourceLocalRecipient_);
     localSource_ = nullptr;
 }
 } // namespace DistributedHardware

@@ -28,6 +28,10 @@ static int32_t DCameraServiceDispatch(struct HdfDeviceIoClient *client, int cmdI
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     HdfDCameraService *service = CONTAINER_OF(client->device->service, HdfDCameraService, ioservice);
+    if (service == nullptr) {
+        HDF_LOGE("HdfDCameraService CONTAINER_OF failed!");
+        return HDF_FAILURE;
+    }
     return DCHostServiceOnRemoteRequest(service->instance, cmdId, data, reply);
 }
 

@@ -133,7 +133,7 @@ DCamRetCode DCameraProviderProxy::AcquireBuffer(const std::shared_ptr<DHBase> &d
     }
     int32_t retCode = reply.ReadInt32();
     if (retCode != DCamRetCode::SUCCESS) {
-        DHLOGE("Acquire avaliable buffer from stub failed.");
+        DHLOGE("Acquire available buffer from stub failed.");
         return static_cast<DCamRetCode>(retCode);
     }
 
@@ -143,7 +143,7 @@ DCamRetCode DCameraProviderProxy::AcquireBuffer(const std::shared_ptr<DHBase> &d
 
     BufferHandle* retHandle = ReadBufferHandle(reply);
     if (retHandle == nullptr) {
-        DHLOGE("Read retrun buffer handle failed.");
+        DHLOGE("Read return buffer handle failed.");
         FreeBufferHandle(buffer->bufferHandle_);
         return DCamRetCode::INVALID_ARGUMENT;
     }

@@ -339,8 +339,12 @@ void DCameraSoftbusAdapter::OnSourceMessageReceived(int32_t sessionId, const voi
 void DCameraSoftbusAdapter::OnSourceStreamReceived(int32_t sessionId, const StreamData *data, const StreamData *ext,
     const StreamFrameInfo *param)
 {
+    if (data == nullptr) {
+        DHLOGE("DCameraSoftbusAdapter::OnSourceStreamReceived, data is null, sessionId: %d.", sessionId);
+        return;
+    }
     int32_t dataLen = data->bufLen;
-    if (dataLen <= 0 || dataLen > (int32_t)DCAMERA_MAX_RECV_DATA_LEN || data == nullptr) {
+    if (dataLen <= 0 || dataLen > (int32_t)DCAMERA_MAX_RECV_DATA_LEN) {
         DHLOGE("DCameraSoftbusAdapter OnSourceStreamReceived dataLen: %d, sessionId: %d", dataLen, sessionId);
         return;
     }
@@ -450,8 +454,12 @@ void DCameraSoftbusAdapter::OnSinkMessageReceived(int32_t sessionId, const void 
 void DCameraSoftbusAdapter::OnSinkStreamReceived(int32_t sessionId, const StreamData *data, const StreamData *ext,
     const StreamFrameInfo *param)
 {
+    if (data == nullptr) {
+        DHLOGE("DCameraSoftbusAdapter::OnSinkStreamReceived, data is null, sessionId: %d.", sessionId);
+        return;
+    }
     int32_t dataLen = data->bufLen;
-    if (dataLen <= 0 || dataLen > (int32_t)DCAMERA_MAX_RECV_DATA_LEN || data == nullptr) {
+    if (dataLen <= 0 || dataLen > (int32_t)DCAMERA_MAX_RECV_DATA_LEN) {
         DHLOGE("DCameraSoftbusAdapter OnSinkStreamReceived dataLen: %d sessionId: %d", dataLen, sessionId);
         return;
     }

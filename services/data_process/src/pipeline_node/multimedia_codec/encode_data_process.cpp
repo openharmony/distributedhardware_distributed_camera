@@ -71,7 +71,7 @@ int32_t EncodeDataProcess::InitNode()
 
     int32_t err = InitEncoder();
     if (err != DCAMERA_OK) {
-        DHLOGE("Init video encoder fail.");
+        DHLOGE("Init video encoder failed.");
         ReleaseProcessNode();
         return err;
     }
@@ -97,12 +97,12 @@ int32_t EncodeDataProcess::InitEncoder()
     DHLOGD("Init video encoder.");
     int32_t err = InitEncoderMetadataFormat();
     if (err != DCAMERA_OK) {
-        DHLOGE("Init video encoder metadata format fail.");
+        DHLOGE("Init video encoder metadata format failed.");
         return err;
     }
     err = InitEncoderBitrateFormat();
     if (err != DCAMERA_OK) {
-        DHLOGE("Init video encoder bitrate format fail.");
+        DHLOGE("Init video encoder bitrate format failed.");
         return err;
     }
 
@@ -269,7 +269,7 @@ int32_t EncodeDataProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>&
     }
     int32_t err = FeedEncoderInputBuffer(inputBuffers[0]);
     if (err != DCAMERA_OK) {
-        DHLOGE("Feed encoder input Buffer fail.");
+        DHLOGE("Feed encoder input Buffer failed.");
         return err;
     }
     {
@@ -375,7 +375,7 @@ int32_t EncodeDataProcess::GetEncoderOutputBuffer(uint32_t index, Media::AVCodec
     }
     std::shared_ptr<Media::AVSharedMemory> sharedMemoryOutput = videoEncoder_->GetOutputBuffer(index);
     if (sharedMemoryOutput == nullptr) {
-        DHLOGE("Failed to get the output shared memory, index : %d", index);
+        DHLOGE("Failed to get the output shared memory, index : %u", index);
         return DCAMERA_BAD_OPERATE;
     }
 
@@ -412,7 +412,7 @@ int32_t EncodeDataProcess::EncodeDone(std::vector<std::shared_ptr<DataBuffer>> o
         DHLOGD("Send to the next node of the encoder for processing.");
         int32_t err = nextDataProcess_->ProcessData(outputBuffers);
         if (err != DCAMERA_OK) {
-            DHLOGE("Someone node after the encoder processes fail.");
+            DHLOGE("Someone node after the encoder processes failed.");
         }
         return err;
     }
@@ -442,7 +442,7 @@ void EncodeDataProcess::OnError()
 
 void EncodeDataProcess::OnInputBufferAvailable(uint32_t index)
 {
-    DHLOGD("The available input buffer index : %d. No operation when using surface input.", index);
+    DHLOGD("The available input buffer index : %u. No operation when using surface input.", index);
 }
 
 void EncodeDataProcess::OnOutputFormatChanged(const Media::Format &format)
@@ -465,7 +465,7 @@ void EncodeDataProcess::OnOutputBufferAvailable(uint32_t index, Media::AVCodecBu
         info.presentationTimeUs, info.size, info.offset, flag);
     int32_t err = GetEncoderOutputBuffer(index, info);
     if (err != DCAMERA_OK) {
-        DHLOGE("Get encode output Buffer fail.");
+        DHLOGE("Get encode output Buffer failed.");
         return;
     }
     {
@@ -482,7 +482,7 @@ void EncodeDataProcess::OnOutputBufferAvailable(uint32_t index, Media::AVCodecBu
     }
     int32_t errRelease = videoEncoder_->ReleaseOutputBuffer(index);
     if (errRelease != Media::MediaServiceErrCode::MSERR_OK) {
-        DHLOGE("The video encoder release output buffer fail, index : [%d].", index);
+        DHLOGE("The video encoder release output buffer failed, index : [%u].", index);
     }
 }
 VideoConfigParams EncodeDataProcess::GetSourceConfig() const

@@ -53,7 +53,7 @@ int32_t DecodeDataProcess::InitNode()
     InitCodecEvent();
     int32_t err = InitDecoder();
     if (err != DCAMERA_OK) {
-        DHLOGE("Init video decoder fail.");
+        DHLOGE("Init video decoder failed.");
         ReleaseProcessNode();
         return err;
     }
@@ -101,7 +101,7 @@ int32_t DecodeDataProcess::InitDecoder()
     DHLOGD("Init video decoder.");
     int32_t err = InitDecoderMetadataFormat();
     if (err != DCAMERA_OK) {
-        DHLOGE("Init video decoder metadata format fail.");
+        DHLOGE("Init video decoder metadata format failed.");
         return err;
     }
 
@@ -123,7 +123,7 @@ int32_t DecodeDataProcess::InitDecoder()
     }
     retVal = SetDecoderOutputSurface();
     if (retVal != DCAMERA_OK) {
-        DHLOGE("Set decoder output surface fail.");
+        DHLOGE("Set decoder output surface failed.");
         return retVal;
     }
 
@@ -174,7 +174,7 @@ int32_t DecodeDataProcess::SetDecoderOutputSurface()
 
     decodeConsumerSurface_ = Surface::CreateSurfaceAsConsumer();
     if (decodeConsumerSurface_ == nullptr) {
-        DHLOGE("Creat the decode consumer surface fail.");
+        DHLOGE("Create the decode consumer surface failed.");
         return DCAMERA_INIT_ERR;
     }
     decodeConsumerSurface_->SetDefaultWidthAndHeight((int32_t)sourceConfig_.GetWidth(),
@@ -182,25 +182,25 @@ int32_t DecodeDataProcess::SetDecoderOutputSurface()
     decodeSurfaceListener_ = new DecodeSurfaceListener(decodeConsumerSurface_, shared_from_this());
     if (decodeConsumerSurface_->RegisterConsumerListener(decodeSurfaceListener_) !=
         SURFACE_ERROR_OK) {
-        DHLOGE("Register consumer listener fail.");
+        DHLOGE("Register consumer listener failed.");
         return DCAMERA_INIT_ERR;
     }
 
     sptr<IBufferProducer> surfaceProducer = decodeConsumerSurface_->GetProducer();
     if (surfaceProducer == nullptr) {
-        DHLOGE("Get the surface producer of the decode consumer surface fail.");
+        DHLOGE("Get the surface producer of the decode consumer surface failed.");
         return DCAMERA_INIT_ERR;
     }
     decodeProducerSurface_ = Surface::CreateSurfaceAsProducer(surfaceProducer);
     if (decodeProducerSurface_ == nullptr) {
-        DHLOGE("Creat the decode producer surface of the decode consumer surface fail.");
+        DHLOGE("Create the decode producer surface of the decode consumer surface failed.");
         return DCAMERA_INIT_ERR;
     }
 
     DHLOGD("Set the producer surface to video decoder output surface.");
     int32_t err = videoDecoder_->SetOutputSurface(decodeProducerSurface_);
     if (err != Media::MediaServiceErrCode::MSERR_OK) {
-        DHLOGE("Set decoder output surface fail.");
+        DHLOGE("Set decoder output surface failed.");
         return DCAMERA_INIT_ERR;
     }
     return DCAMERA_OK;
@@ -277,7 +277,7 @@ int32_t DecodeDataProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>&
         return DCAMERA_INDEX_OVERFLOW;
     }
     if (inputBuffers[0]->Size() > MAX_YUV420_BUFFER_SIZE) {
-        DHLOGE("DecodeNode input buffer size %d error.", inputBuffers[0]->Size());
+        DHLOGE("DecodeNode input buffer size %zu error.", inputBuffers[0]->Size());
         return DCAMERA_MEMORY_OPT_ERROR;
     }
     if (!isDecoderProcess_) {
@@ -285,12 +285,12 @@ int32_t DecodeDataProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>&
         return DCAMERA_DISABLE_PROCESS;
     }
     inputBuffersQueue_.push(inputBuffers[0]);
-    DHLOGD("Push inputBuffer sucess. BufSize %d, QueueSize %d.", inputBuffers[0]->Size(), inputBuffersQueue_.size());
+    DHLOGD("Push inputBuf sucess. BufSize %zu, QueueSize %zu.", inputBuffers[0]->Size(), inputBuffersQueue_.size());
     int32_t err = FeedDecoderInputBuffer();
     if (err != DCAMERA_OK) {
         int32_t sleepTimeUs = 5000;
         std::this_thread::sleep_for(std::chrono::microseconds(sleepTimeUs));
-        DHLOGD("Feed decoder input buffer fail. Try FeedDecoderInputBuffer again.");
+        DHLOGD("Feed decoder input buffer failed. Try FeedDecoderInputBuffer again.");
         std::shared_ptr<CodecPacket> reFeedInputPacket = std::make_shared<CodecPacket>();
         reFeedInputPacket->SetVideoCodecType(sourceConfig_.GetVideoCodecType());
         DCameraCodecEvent dCamCodecEv(*this, reFeedInputPacket, VideoCodecAction::ACTION_ONCE_AGAIN);
@@ -309,7 +309,7 @@ int32_t DecodeDataProcess::FeedDecoderInputBuffer()
     while ((!inputBuffersQueue_.empty()) && (isDecoderProcess_)) {
         std::shared_ptr<DataBuffer> buffer = inputBuffersQueue_.front();
         if (buffer == nullptr || availableInputIndexsQueue_.empty()) {
-            DHLOGE("inputBuffersQueue size %d, availableInputIndexsQueue size %d.",
+            DHLOGE("inputBuffersQueue size %zu, availableInputIndexsQueue size %zu.",
                 inputBuffersQueue_.size(), availableInputIndexsQueue_.size());
             return DCAMERA_BAD_VALUE;
         }
@@ -323,7 +323,7 @@ int32_t DecodeDataProcess::FeedDecoderInputBuffer()
             uint32_t index = availableInputIndexsQueue_.front();
             std::shared_ptr<Media::AVSharedMemory> sharedMemoryInput = videoDecoder_->GetInputBuffer(index);
             if (sharedMemoryInput == nullptr) {
-                DHLOGE("Failed to obtain the input shared memory corresponding to the [%d] index.", index);
+                DHLOGE("Failed to obtain the input shared memory corresponding to the [%u] index.", index);
                 return DCAMERA_BAD_VALUE;
             }
             size_t inputMemoDataSize = static_cast<size_t>(sharedMemoryInput->GetSize());
@@ -333,7 +333,7 @@ int32_t DecodeDataProcess::FeedDecoderInputBuffer()
                 return DCAMERA_MEMORY_OPT_ERROR;
             }
             int64_t timeUs = GetDecoderTimeStamp();
-            DHLOGD("Decoder input buffer size %d, timeStamp %lld.", buffer->Size(), (long long)timeUs);
+            DHLOGD("Decoder input buffer size %zu, timeStamp %lld.", buffer->Size(), (long long)timeUs);
             Media::AVCodecBufferInfo bufferInfo {timeUs, static_cast<int32_t>(buffer->Size()), 0};
             int32_t ret = videoDecoder_->QueueInputBuffer(index, bufferInfo,
                 Media::AVCODEC_BUFFER_FLAG_NONE);
@@ -420,7 +420,7 @@ void DecodeDataProcess::CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int6
                                                        bytesPerPixel / y2UvRatio);
     size_t surfaceBufSize = static_cast<size_t>(surBuf->GetSize());
     if (validDecodedImageAlignedSize > surfaceBufSize || validDecodedImageAlignedSize < validDecodedImageSize) {
-        DHLOGE("Buffer size error, validDecodedImageSize %d, validDecodedImageAlignedSize %d, surBufSize %d.",
+        DHLOGE("Buffer size error, validDecodedImageSize %zu, validDecodedImageAlignedSize %zu, surBufSize %zu.",
             validDecodedImageSize, validDecodedImageAlignedSize, surBuf->GetSize());
         return;
     }
@@ -567,7 +567,7 @@ int32_t DecodeDataProcess::DecodeDone(std::vector<std::shared_ptr<DataBuffer>> o
         DHLOGD("Send to the next node of the decoder for processing.");
         int32_t err = nextDataProcess_->ProcessData(outputBuffers);
         if (err != DCAMERA_OK) {
-            DHLOGE("Someone node after the decoder processes fail.");
+            DHLOGE("Someone node after the decoder processes failed.");
         }
         return err;
     }
@@ -636,7 +636,7 @@ void DecodeDataProcess::OnInputBufferAvailable(uint32_t index)
         DHLOGE("Video decoder available indexs queue overflow.");
         return;
     }
-    DHLOGD("Video decoder available indexs queue push index [%d].", index);
+    DHLOGD("Video decoder available indexs queue push index [%u].", index);
     availableInputIndexsQueue_.push(index);
 }
 
@@ -667,7 +667,7 @@ void DecodeDataProcess::OnOutputBufferAvailable(uint32_t index, const Media::AVC
         }
         int32_t errRelease = videoDecoder_->ReleaseOutputBuffer(index, true);
         if (errRelease != Media::MediaServiceErrCode::MSERR_OK) {
-            DHLOGE("The video decoder output decoded data to surface fail, index : [%d].", index);
+            DHLOGE("The video decoder output decoded data to surface failed, index : [%u].", index);
         }
     }
 }

@@ -267,7 +267,7 @@ using DCCaptureInfo = struct _DCCaptureInfo {
 
 /**
  * @brief Defines the inner buffer of the distributed camera,
- * which is used to acquire buffer during procesing capture requests.
+ * which is used to acquire buffer during processing capture requests.
  */
 using DCameraBuffer = struct _DCameraBuffer {
     /**

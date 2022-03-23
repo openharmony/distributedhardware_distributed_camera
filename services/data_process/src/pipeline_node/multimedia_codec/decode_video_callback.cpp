@@ -21,7 +21,7 @@ namespace OHOS {
 namespace DistributedHardware {
 void DecodeVideoCallback::OnError(Media::AVCodecErrorType errorType, int32_t errorCode)
 {
-    DHLOGE("DecodeVideoCallback : OnError. Error type: %d . Error code: %d ", errorType, errorCode);
+    DHLOGE("DecodeVideoCallback : OnError. Error type: %d. Error code: %d ", errorType, errorCode);
     std::shared_ptr<DecodeDataProcess> targetDecoderNode = decodeVideoNode_.lock();
     if (targetDecoderNode == nullptr) {
         DHLOGE("decodeVideoNode_ is nullptr.");

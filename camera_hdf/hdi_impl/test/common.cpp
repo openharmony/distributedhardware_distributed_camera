@@ -38,12 +38,18 @@ int32_t Test::SaveYUV(const char* type, const void* buffer, int32_t size)
     char path[PATH_MAX] = {0};
     if (strncmp(type, "preview", strlen(type)) == 0) {
         system("mkdir -p /data/dcamera/preview");
-        sprintf_s(path, sizeof(path) / sizeof(path[0]), "/data/dcamera/preview/%s_%lld.yuv",
-            type, GetCurrentLocalTimeStamp());
+        if (sprintf_s(path, sizeof(path) / sizeof(path[0]), "/data/dcamera/preview/%s_%lld.yuv",
+            type, GetCurrentLocalTimeStamp()) < 0) {
+            std::cout << "SaveYUV : preview sprintf_s fail." << std::endl;
+            return -1;
+        }
     } else {
         system("mkdir -p /data/dcamera/capture");
-        sprintf_s(path, sizeof(path) / sizeof(path[0]), "/data/dcamera/capture/%s_%lld.jpg",
-            type, GetCurrentLocalTimeStamp());
+        if (sprintf_s(path, sizeof(path) / sizeof(path[0]), "/data/dcamera/capture/%s_%lld.jpg",
+            type, GetCurrentLocalTimeStamp()) < 0) {
+            std::cout << "SaveYUV : capture sprintf_s fail." << std::endl;
+            return -1;
+        }
     }
     std::cout << "save yuv to file:" << path << std::endl;
 
@@ -69,8 +75,11 @@ int32_t Test::SaveVideoFile(const char* type, const void* buffer, int32_t size, 
     if (operationMode == 0) {
         char path[PATH_MAX] = {0};
         system("mkdir -p /data/dcamera/video");
-        sprintf_s(path, sizeof(path) / sizeof(path[0]), "/data/dcamera/video/%s_%lld.h265",
-            type, GetCurrentLocalTimeStamp());
+        if (sprintf_s(path, sizeof(path) / sizeof(path[0]), "/data/dcamera/video/%s_%lld.h265",
+            type, GetCurrentLocalTimeStamp()) < 0) {
+            std::cout << "SaveVideoFile : video sprintf_s fail." << std::endl;
+            return -1;
+        }
         std::cout << "save yuv to file " << std::string(path) << std::endl;
         int mode = 00766;
         videoFd = open(path, O_RDWR | O_CREAT, mode);

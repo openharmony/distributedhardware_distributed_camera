@@ -75,7 +75,7 @@ int32_t FpsControllerProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer
     }
     int64_t timeStampUs = 0;
     if (!inputBuffers[0]->FindInt64("timeUs", timeStampUs)) {
-        DHLOGE("Find decoder output timestamp fail.");
+        DHLOGE("Find decoder output timestamp failed.");
         return DCAMERA_BAD_TYPE;
     }
 
@@ -270,7 +270,7 @@ bool FpsControllerProcess::ReduceFrameRateByUniformStrategy(int32_t incomingFrmR
     if (overshoot && DOUBLE_MULTIPLE * overshoot < incomingFrmRate) {
         /*
          * When the actual input frame rate is less than or equal to twice the target frame rate,
-         * one frame is droped every (incomingFrmRate / overshoot) frames.
+         * one frame is dropped every (incomingFrmRate / overshoot) frames.
          */
         if (keepMoreThanDoubleCount_) {
             keepMoreThanDoubleCount_ = 0;
@@ -314,7 +314,7 @@ int32_t FpsControllerProcess::FpsControllerDone(std::vector<std::shared_ptr<Data
         DHLOGD("Send to the next node of the FpsController for processing.");
         int32_t err = nextDataProcess_->ProcessData(outputBuffers);
         if (err != DCAMERA_OK) {
-            DHLOGE("Someone node after the FpsController processes fail.");
+            DHLOGE("Someone node after the FpsController processes failed.");
         }
         return err;
     }

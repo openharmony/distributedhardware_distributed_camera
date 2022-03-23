@@ -71,7 +71,7 @@ int32_t DCameraSourceController::StartCapture(std::vector<std::shared_ptr<DCamer
     std::string jsonStr;
     int32_t ret = cmd.Marshal(jsonStr);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceController StartCapture Marshal faied %d, devId: %s, dhId: %s", ret,
+        DHLOGE("DCameraSourceController StartCapture Marshal failed %d, devId: %s, dhId: %s", ret,
             GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
         return ret;
     }
@@ -207,7 +207,7 @@ int32_t DCameraSourceController::UpdateSettings(std::vector<std::shared_ptr<DCam
     std::string jsonStr;
     int32_t ret = cmd.Marshal(jsonStr);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceController UpdateSettings Marshal faied %d, devId: %s, dhId: %s", ret,
+        DHLOGE("DCameraSourceController UpdateSettings Marshal failed %d, devId: %s, dhId: %s", ret,
             GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
         return ret;
     }

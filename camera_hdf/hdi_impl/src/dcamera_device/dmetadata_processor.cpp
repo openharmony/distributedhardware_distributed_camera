@@ -246,7 +246,7 @@ DCamRetCode DMetadataProcessor::AddAbilityEntry(uint32_t tag, const void *data, 
     int ret = CameraStandard::FindCameraMetadataItem(dCameraAbility_->get(), tag, &item);
     if (ret) {
         if (!dCameraAbility_->addEntry(tag, data, size)) {
-            DHLOGE("Add tag %d failed.", tag);
+            DHLOGE("Add tag %u failed.", tag);
             return FAILED;
         }
     }
@@ -264,12 +264,12 @@ DCamRetCode DMetadataProcessor::UpdateAbilityEntry(uint32_t tag, const void *dat
     int ret = CameraStandard::FindCameraMetadataItem(dCameraAbility_->get(), tag, &item);
     if (ret) {
         if (!dCameraAbility_->addEntry(tag, data, size)) {
-            DHLOGE("Add tag %d failed.", tag);
+            DHLOGE("Add tag %u failed.", tag);
             return FAILED;
         }
     } else {
         if (!dCameraAbility_->updateEntry(tag, data, size)) {
-            DHLOGE("Update tag %d failed.", tag);
+            DHLOGE("Update tag %u failed.", tag);
             return FAILED;
         }
     }

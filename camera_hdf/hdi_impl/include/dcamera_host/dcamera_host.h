@@ -62,13 +62,13 @@ private:
 private:
     class AutoRelease {
     public:
-        AutoRelease() {};
+        AutoRelease() {}
         ~AutoRelease()
         {
             if (DCameraHost::instance_ != nullptr) {
                 DCameraHost::instance_ = nullptr;
             }
-        };
+        }
     };
     static AutoRelease autoRelease_;
     static std::shared_ptr<DCameraHost> instance_;

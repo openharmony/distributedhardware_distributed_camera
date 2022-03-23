@@ -144,15 +144,17 @@ void DCameraSinkHandlerIpc::OnSinkLocalDmsDied(const wptr<IRemoteObject>& remote
 void DCameraSinkHandlerIpc::OnSinkLocalDmsDied(const sptr<IRemoteObject>& remote)
 {
     std::lock_guard<std::mutex> autoLock(sinkLocalDmsLock_);
+    if (localSink_ == nullptr) {
+        DHLOGE("DCameraSinkHandlerIpc::OnSinkLocalDmsDied, localSink is null.");
+        return;
+    }
     if (localSink_->AsObject() != remote) {
-        DHLOGI("OnSinkLocalDmsDied not found remote object");
+        DHLOGI("OnSinkLocalDmsDied not found remote object.");
         return;
     }
 
     DHLOGI("OnSinkLocalDmsDied Clear");
-    if (localSink_ != nullptr) {
-        localSink_->AsObject()->RemoveDeathRecipient(sinkLocalRecipient_);
-    }
+    localSink_->AsObject()->RemoveDeathRecipient(sinkLocalRecipient_);
     localSink_ = nullptr;
 }
 } // namespace DistributedHardware

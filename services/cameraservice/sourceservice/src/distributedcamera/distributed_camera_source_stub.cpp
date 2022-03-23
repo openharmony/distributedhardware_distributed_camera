@@ -36,7 +36,7 @@ DistributedCameraSourceStub::~DistributedCameraSourceStub()
 int32_t DistributedCameraSourceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
-    DHLOGI("DistributedCameraSourceStub OnRemoteRequest code: %d", code);
+    DHLOGI("DistributedCameraSourceStub OnRemoteRequest code: %u", code);
     std::u16string desc = DistributedCameraSourceStub::GetDescriptor();
     std::u16string remoteDesc = data.ReadInterfaceToken();
     if (desc != remoteDesc) {

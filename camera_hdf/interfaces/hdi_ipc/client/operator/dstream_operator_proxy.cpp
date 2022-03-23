@@ -112,7 +112,7 @@ CamRetCode DStreamOperatorProxy::CreateStreams(const std::vector<std::shared_ptr
         std::shared_ptr<StreamInfo> streamInfo = streamInfos.at(i);
         bool bRet = IpcDataUtils::EncodeStreamInfo(streamInfo, data);
         if (!bRet) {
-            DHLOGE("Write streamInfo failed. index = %d", i);
+            DHLOGE("Write streamInfo failed. index = %zu", i);
             return CamRetCode::INVALID_ARGUMENT;
         }
     }

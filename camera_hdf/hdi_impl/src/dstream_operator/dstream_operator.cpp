@@ -480,7 +480,7 @@ DCamRetCode DStreamOperator::ShutterBuffer(int streamId, const std::shared_ptr<D
         }
     }
     if (captureId == -1) {
-        DHLOGE("ShutterBuffer falied, invalid streamId = %d", streamId);
+        DHLOGE("ShutterBuffer failed, invalid streamId = %d", streamId);
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
@@ -714,6 +714,10 @@ void DStreamOperator::ChooseSuitableFormat(std::vector<std::shared_ptr<DCStreamI
 void DStreamOperator::ChooseSuitableResolution(std::vector<std::shared_ptr<DCStreamInfo>> &streamInfo,
     std::shared_ptr<DCCaptureInfo> &captureInfo)
 {
+    if (captureInfo == nullptr) {
+        DHLOGE("DStreamOperator::ChooseSuitableResolution, captureInfo is null.");
+        return;
+    }
     std::vector<DCResolution> supportedResolutionList = dcSupportedResolutionMap_[captureInfo->format_];
 
     DCResolution tempResolution = { 0, 0 };
@@ -727,7 +731,7 @@ void DStreamOperator::ChooseSuitableResolution(std::vector<std::shared_ptr<DCStr
             }
         }
         captureInfo->streamIds_.push_back(stream->streamId_);
-    };
+    }
 
     if ((tempResolution.width_ == 0) || (tempResolution.height_ == 0)) {
         captureInfo->width_ = MAX_SUPPORT_PREVIEW_WIDTH;

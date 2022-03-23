@@ -111,7 +111,7 @@ int32_t DCameraProviderStub::DCProviderStubAcquireBuffer(MessageParcel& data, Me
         return HDF_FAILURE;
     }
     if (ret != DCamRetCode::SUCCESS) {
-        DHLOGE("Acquire avaliable buffer failed.");
+        DHLOGE("Acquire available buffer failed.");
         return HDF_SUCCESS;
     }
     if (!reply.WriteInt32(dCamerabuffer->index_) || !reply.WriteInt32(dCamerabuffer->size_)) {
@@ -169,11 +169,11 @@ int32_t DCameraProviderStub::DCProviderStubOnSettingsResult(MessageParcel& data,
     std::shared_ptr<DCameraSettings> dCameraSettings = std::make_shared<DCameraSettings>();
     bool flag = data.ReadBool();
     if (flag) {
-        IpcDataUtils::DecodeDCameraSettings(data, dCameraSettings);
         if (dCameraSettings == nullptr) {
-            DHLOGE("Read distributed camera settings failed.");
+            DHLOGE("Read distributed camera settings failed, dCameraSettings is null.");
             return HDF_FAILURE;
         }
+        IpcDataUtils::DecodeDCameraSettings(data, dCameraSettings);
     }
     DCamRetCode ret = dcameraProvider_->OnSettingsResult(dhBase, dCameraSettings);
     if (!reply.WriteInt32(static_cast<int32_t>(ret))) {
@@ -195,11 +195,11 @@ int32_t DCameraProviderStub::DCProviderStubNotify(MessageParcel& data, MessagePa
     std::shared_ptr<DCameraHDFEvent> dCameraEvent = std::make_shared<DCameraHDFEvent>();
     bool flag = data.ReadBool();
     if (flag) {
-        IpcDataUtils::DecodeDCameraHDFEvent(data, dCameraEvent);
         if (dCameraEvent == nullptr) {
-            DHLOGE("Read distributed camera hdf event failed.");
+            DHLOGE("Read distributed camera hdf event failed, dCameraEvent is null.");
             return HDF_FAILURE;
         }
+        IpcDataUtils::DecodeDCameraHDFEvent(data, dCameraEvent);
     }
     DCamRetCode ret = dcameraProvider_->Notify(dhBase, dCameraEvent);
     if (!reply.WriteInt32(static_cast<int32_t>(ret))) {

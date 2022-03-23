@@ -187,7 +187,7 @@ DCamRetCode DCameraStream::GetNextRequest()
 
     OHOS::SurfaceError surfaceError = dcStreamProducer_->RequestBuffer(surfaceBuffer, fence, config);
     if (surfaceError == OHOS::SURFACE_ERROR_NO_BUFFER) {
-        DHLOGE("No availiable buffer to request in surface.");
+        DHLOGE("No available buffer to request in surface.");
         return DCamRetCode::EXCEED_MAX_NUMBER;
     }
 

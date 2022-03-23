@@ -250,7 +250,7 @@ DCamRetCode DCameraProviderCallbackProxy::UpdateSettings(const std::shared_ptr<D
     for (size_t i = 0; i < size; i++) {
         bool bRet = IpcDataUtils::EncodeDCameraSettings(settings.at(i), data);
         if (!bRet) {
-            DHLOGE("Write distributed camera settings index = %d failed.", i);
+            DHLOGE("Write distributed camera settings index = %zu failed.", i);
             return INVALID_ARGUMENT;
         }
     }
