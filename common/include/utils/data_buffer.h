@@ -26,7 +26,7 @@ namespace OHOS {
 namespace DistributedHardware {
 class DataBuffer {
 public:
-    DataBuffer(size_t capacity);
+    explicit DataBuffer(size_t capacity);
 
     size_t Size() const;
     size_t Offset() const;

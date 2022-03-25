@@ -354,7 +354,7 @@ OHOS::sptr<OHOS::IBufferProducer> Test::StreamConsumer::CreateProducer(std::func
         int32_t flushFence = 0;
         int64_t timestamp = 0;
         OHOS::Rect damage;
-        while (running_ == true) {
+        while (running_) {
             OHOS::sptr<OHOS::SurfaceBuffer> buffer = nullptr;
             consumer_->AcquireBuffer(buffer, flushFence, timestamp, damage);
             if (buffer != nullptr) {
@@ -380,7 +380,7 @@ OHOS::sptr<OHOS::IBufferProducer> Test::StreamConsumer::CreateProducer(std::func
                     cv_.notify_one();
                 }
             }
-            if (running_ == false) {
+            if (!running_) {
                 break;
             }
             std::this_thread::sleep_for(1ms);

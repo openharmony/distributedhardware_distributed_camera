@@ -33,7 +33,7 @@ using namespace std;
 class DCameraProvider;
 class DStreamOperator : public DStreamOperatorStub {
 public:
-    DStreamOperator(std::shared_ptr<DMetadataProcessor> &dMetadataProcessor);
+    explicit DStreamOperator(std::shared_ptr<DMetadataProcessor> &dMetadataProcessor);
     DStreamOperator() = default;
     virtual ~DStreamOperator() = default;
     DStreamOperator(const DStreamOperator &other) = delete;

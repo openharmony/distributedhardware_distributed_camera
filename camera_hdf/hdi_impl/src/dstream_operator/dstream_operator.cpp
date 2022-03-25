@@ -65,7 +65,7 @@ CamRetCode DStreamOperator::CreateStreams(const std::vector<std::shared_ptr<Stre
         if (halStreamMap_.find(info->streamId_) != halStreamMap_.end()) {
             return CamRetCode::INVALID_ARGUMENT;
         }
-        if (info->tunneledMode_ != true) {
+        if (!info->tunneledMode_) {
             return CamRetCode::METHOD_NOT_SUPPORTED;
         }
 
@@ -418,8 +418,8 @@ DCamRetCode DStreamOperator::InitOutputConfigurations(const std::shared_ptr<DHBa
                 if (reso.size() != SIZE_FMT_LEN) {
                     continue;
                 }
-                uint32_t width = static_cast<uint32_t>(std::atoi(reso[0].c_str()));
-                uint32_t height = static_cast<uint32_t>(std::atoi(reso[1].c_str()));
+                uint32_t width = static_cast<uint32_t>(std::stoi(reso[0]));
+                uint32_t height = static_cast<uint32_t>(std::stoi(reso[1]));
                 if (height == 0 || width == 0 ||
                     (isPhotoFormat && (width > MAX_SUPPORT_PHOTO_WIDTH || height > MAX_SUPPORT_PHOTO_HEIGHT)) ||
                     (!isPhotoFormat &&

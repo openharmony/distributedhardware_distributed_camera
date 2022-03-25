@@ -26,7 +26,7 @@ namespace DistributedHardware {
 class DCameraStreamDataProcess;
 class DCameraStreamDataProcessPipelineListener : public DataProcessListener {
 public:
-    DCameraStreamDataProcessPipelineListener(std::shared_ptr<DCameraStreamDataProcess>& process);
+    explicit DCameraStreamDataProcessPipelineListener(std::shared_ptr<DCameraStreamDataProcess>& process);
     ~DCameraStreamDataProcessPipelineListener();
 
     void OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult) override;

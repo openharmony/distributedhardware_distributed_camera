@@ -23,7 +23,7 @@ namespace OHOS {
 namespace DistributedHardware {
 class DCameraServiceStateListener : public ICameraStateListener {
 public:
-    DCameraServiceStateListener(sptr<IDCameraSourceCallback> callback);
+    explicit DCameraServiceStateListener(sptr<IDCameraSourceCallback> callback);
     ~DCameraServiceStateListener();
 
     int32_t OnRegisterNotify(const std::string& devId, const std::string& dhId, const std::string& reqId,

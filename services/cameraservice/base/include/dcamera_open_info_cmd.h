@@ -25,7 +25,7 @@ namespace DistributedHardware {
 class DCameraOpenInfo {
 public:
     DCameraOpenInfo() {}
-    DCameraOpenInfo(std::string sourceDevId) : sourceDevId_(sourceDevId) {}
+    explicit DCameraOpenInfo(std::string sourceDevId) : sourceDevId_(sourceDevId) {}
     ~DCameraOpenInfo() = default;
     std::string sourceDevId_;
 };

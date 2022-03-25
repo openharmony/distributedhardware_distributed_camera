@@ -160,7 +160,7 @@ DCamRetCode DCameraStream::FinishCommitStream()
 
 DCamRetCode DCameraStream::GetNextRequest()
 {
-    if (isBufferMgrInited_ == false) {
+    if (!isBufferMgrInited_) {
         DHLOGE("BufferManager not be init.");
         return DCamRetCode::INVALID_ARGUMENT;
     }
@@ -353,7 +353,7 @@ DCamRetCode DCameraStream::FlushDCameraBuffer()
 
 bool DCameraStream::HasBufferQueue()
 {
-    if (dcStreamProducer_ == nullptr || isBufferMgrInited_ == false) {
+    if (dcStreamProducer_ == nullptr || !isBufferMgrInited_) {
         return false;
     }
     return true;

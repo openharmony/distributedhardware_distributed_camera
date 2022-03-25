@@ -23,7 +23,7 @@ namespace DistributedHardware {
 class DCameraSourceDev;
 class DCameraSourceStateMachine : public std::enable_shared_from_this<DCameraSourceStateMachine> {
 public:
-    DCameraSourceStateMachine(std::shared_ptr<DCameraSourceDev>& camDev);
+    explicit DCameraSourceStateMachine(std::shared_ptr<DCameraSourceDev>& camDev);
     ~DCameraSourceStateMachine();
     int32_t Execute(DCAMERA_EVENT eventType, DCameraSourceEvent& event);
     void UpdateState(DCameraStateType stateType);

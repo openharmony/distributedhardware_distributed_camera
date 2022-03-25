@@ -23,7 +23,7 @@ namespace OHOS {
 namespace DistributedHardware {
 class DCameraSourceInitState : public DCameraSourceState {
 public:
-    DCameraSourceInitState(std::shared_ptr<DCameraSourceStateMachine>& stateMachine);
+    explicit DCameraSourceInitState(std::shared_ptr<DCameraSourceStateMachine>& stateMachine);
     ~DCameraSourceInitState() {}
 
     int32_t Execute(std::shared_ptr<DCameraSourceDev>& camDev, DCAMERA_EVENT eventType,

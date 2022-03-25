@@ -23,7 +23,7 @@ namespace OHOS {
 namespace DistributedHardware {
 class DCameraSourceConfigStreamState : public DCameraSourceState {
 public:
-    DCameraSourceConfigStreamState(std::shared_ptr<DCameraSourceStateMachine>& stateMachine);
+    explicit DCameraSourceConfigStreamState(std::shared_ptr<DCameraSourceStateMachine>& stateMachine);
     DCameraSourceConfigStreamState() {}
     ~DCameraSourceConfigStreamState() {}
 

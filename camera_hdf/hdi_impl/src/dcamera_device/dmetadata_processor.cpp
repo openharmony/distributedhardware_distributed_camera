@@ -529,8 +529,8 @@ std::map<int, std::vector<DCResolution>> DMetadataProcessor::GetDCameraSupported
                 if (reso.size() != SIZE_FMT_LEN) {
                     continue;
                 }
-                uint32_t width = static_cast<uint32_t>(std::atoi(reso[0].c_str()));
-                uint32_t height = static_cast<uint32_t>(std::atoi(reso[1].c_str()));
+                uint32_t width = static_cast<uint32_t>(std::stoi(reso[0]));
+                uint32_t height = static_cast<uint32_t>(std::stoi(reso[1]));
                 if (height == 0 || width == 0 ||
                     (isPhotoFormat && (width > MAX_SUPPORT_PHOTO_WIDTH || height > MAX_SUPPORT_PHOTO_HEIGHT)) ||
                     (!isPhotoFormat &&

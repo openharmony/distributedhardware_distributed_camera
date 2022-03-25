@@ -25,7 +25,7 @@ namespace DistributedHardware {
 class DCameraSourceController;
 class DCameraSourceControllerChannelListener : public ICameraChannelListener {
 public:
-    DCameraSourceControllerChannelListener(std::shared_ptr<DCameraSourceController>& controller);
+    explicit DCameraSourceControllerChannelListener(std::shared_ptr<DCameraSourceController>& controller);
     ~DCameraSourceControllerChannelListener();
     void OnSessionState(int32_t state) override;
     void OnSessionError(int32_t eventType, int32_t eventReason, std::string detail) override;
