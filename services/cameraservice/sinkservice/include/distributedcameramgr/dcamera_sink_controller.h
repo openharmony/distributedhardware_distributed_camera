@@ -66,6 +66,7 @@ private:
 
     bool isInit_;
     int32_t sessionState_;
+    std::mutex autoLock_;
     std::mutex captureLock_;
     std::mutex channelLock_;
     std::string dhId_;

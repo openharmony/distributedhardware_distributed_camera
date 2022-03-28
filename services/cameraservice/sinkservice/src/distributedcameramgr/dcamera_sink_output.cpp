@@ -152,20 +152,25 @@ int32_t DCameraSinkOutput::StartCapture(std::vector<std::shared_ptr<DCameraCaptu
 int32_t DCameraSinkOutput::StopCapture()
 {
     DHLOGI("DCameraSinkOutput::StopCapture dhId: %s", GetAnonyString(dhId_).c_str());
-    int32_t ret = dataProcesses_[CONTINUOUS_FRAME]->StopCapture();
-    if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSinkOutput::StopCapture continuous data process stop capture failed, dhId: %s, ret: %d",
-               GetAnonyString(dhId_).c_str(), ret);
-        return ret;
+    auto iterCon = dataProcesses_.find(CONTINUOUS_FRAME);
+    if (iterCon != dataProcesses_.end()) {
+        DHLOGI("DCameraSinkOutput::StopCapture %s continuous frame stop capture", GetAnonyString(dhId_).c_str());
+        int32_t ret = iterCon->second->StopCapture();
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCameraSinkOutput::StopCapture continuous data process stop capture failed, dhId: %s, ret: %d",
+                GetAnonyString(dhId_).c_str(), ret);
+        }
     }
 
-    ret = dataProcesses_[SNAPSHOT_FRAME]->StopCapture();
-    if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSinkOutput::StopCapture snapshot data process stop capture failed, dhId: %s, ret: %d",
-               GetAnonyString(dhId_).c_str(), ret);
-        return ret;
+    auto iterSnap = dataProcesses_.find(SNAPSHOT_FRAME);
+    if (iterSnap != dataProcesses_.end()) {
+        DHLOGI("DCameraSinkOutput::StopCapture %s snapshot frame stop capture", GetAnonyString(dhId_).c_str());
+        int32_t ret = iterSnap->second->StopCapture();
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCameraSinkOutput::StopCapture snapshot data process stop capture failed, dhId: %s, ret: %d",
+                GetAnonyString(dhId_).c_str(), ret);
+        }
     }
-
     DHLOGI("DCameraSinkOutput::StopCapture %s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
 }

@@ -52,7 +52,7 @@ int32_t DCameraServiceStateListener::OnRegisterNotify(const std::string& devId, 
         DHLOGE("DCameraServiceStateListener OnRegisterNotify OnNotifyRegResult failed: %d", ret);
     }
     if (status != DCAMERA_OK) {
-        std::thread([this, &devId, &dhId]() {
+        std::thread([this, devId, dhId]() {
             DHLOGI("DCameraServiceStateListener OnRegisterNotify thread delete devId: %s dhId: %s",
                 GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
             DCameraIndex camIndex(devId, dhId);
@@ -78,7 +78,7 @@ int32_t DCameraServiceStateListener::OnUnregisterNotify(const std::string& devId
     }
 
     if (status == DCAMERA_OK) {
-        std::thread([this, &devId, &dhId]() {
+        std::thread([this, devId, dhId]() {
             DHLOGI("DCameraServiceStateListener OnUnregisterNotify thread delete devId: %s dhId: %s",
                 GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
             DCameraIndex camIndex(devId, dhId);
