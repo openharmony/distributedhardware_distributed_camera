@@ -15,6 +15,8 @@
 
 #include "dcamera_sink_controller.h"
 
+#include <thread>
+
 #include "anonymous_string.h"
 #include "dcamera_channel_sink_impl.h"
 #include "dcamera_client.h"
@@ -71,8 +73,8 @@ int32_t DCameraSinkController::StartCapture(std::vector<std::shared_ptr<DCameraC
 
 int32_t DCameraSinkController::StopCapture()
 {
-    std::lock_guard<std::mutex> autoLock(captureLock_);
     DHLOGI("DCameraSinkController::StopCapture dhId: %s", GetAnonyString(dhId_).c_str());
+    std::lock_guard<std::mutex> autoLock(captureLock_);
     int32_t ret = operator_->StopCapture();
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSinkController::StopCapture client stop capture failed, dhId: %s, ret: %d",
@@ -201,8 +203,8 @@ int32_t DCameraSinkController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& ope
 
 int32_t DCameraSinkController::CloseChannel()
 {
-    std::lock_guard<std::mutex> autoLock(channelLock_);
     DHLOGI("DCameraSinkController::CloseChannel dhId: %s", GetAnonyString(dhId_).c_str());
+    std::lock_guard<std::mutex> autoLock(channelLock_);
     DCameraSinkServiceIpc::GetInstance().DeleteSourceRemoteDhms(srcDevId_);
     srcDevId_.clear();
     int32_t ret = channel_->ReleaseSession();
@@ -259,8 +261,19 @@ int32_t DCameraSinkController::Init(std::vector<DCameraIndex>& indexs)
 int32_t DCameraSinkController::UnInit()
 {
     DHLOGI("DCameraSinkController::UnInit dhId: %s", GetAnonyString(dhId_).c_str());
+    std::lock_guard<std::mutex> autoLock(autoLock_);
+    int32_t ret = StopCapture();
+    if (ret != DCAMERA_OK) {
+        DHLOGE("DCameraSinkController::UnInit %s stop capture failed, ret: %d", GetAnonyString(dhId_).c_str(), ret);
+    }
+
+    ret = CloseChannel();
+    if (ret != DCAMERA_OK) {
+        DHLOGE("DCameraSinkController::UnInit %s close channel failed, ret: %d", GetAnonyString(dhId_).c_str(), ret);
+    }
+
     if (output_ != nullptr) {
-        int32_t ret = output_->UnInit();
+        ret = output_->UnInit();
         if (ret != DCAMERA_OK) {
             DHLOGE("DCameraSinkController release output failed, dhId: %s, ret: %d",
                    GetAnonyString(dhId_).c_str(), ret);
@@ -268,7 +281,7 @@ int32_t DCameraSinkController::UnInit()
     }
 
     if (operator_ != nullptr) {
-        int32_t ret = operator_->UnInit();
+        ret = operator_->UnInit();
         if (ret != DCAMERA_OK) {
             DHLOGE("DCameraSinkController release operator failed, dhId: %s, ret: %d",
                    GetAnonyString(dhId_).c_str(), ret);
@@ -319,16 +332,21 @@ void DCameraSinkController::OnSessionState(int32_t state)
         }
         case DCAMERA_CHANNEL_STATE_DISCONNECTED: {
             DHLOGI("DCameraSinkController::OnSessionState channel is disconnected");
-            int32_t ret = StopCapture();
-            if (ret != DCAMERA_OK) {
-                DHLOGE("DCameraSinkController::OnSessionState session state: %d, %s stop capture failed, ret: %d",
-                       sessionState_, GetAnonyString(dhId_).c_str(), ret);
-            }
-            ret = CloseChannel();
-            if (ret != DCAMERA_OK) {
-                DHLOGE("DCameraSinkController::OnSessionState session state: %d, %s close channel failed, ret: %d",
-                       sessionState_, GetAnonyString(dhId_).c_str(), ret);
-            }
+            std::thread([this]() {
+                DHLOGI("DCameraSinkController::OnSessionState %s new thread session state: %d",
+                    GetAnonyString(dhId_).c_str(), sessionState_);
+                std::lock_guard<std::mutex> autoLock(autoLock_);
+                int32_t ret = StopCapture();
+                if (ret != DCAMERA_OK) {
+                    DHLOGE("DCameraSinkController::OnSessionState session state: %d, %s stop capture failed, ret: %d",
+                        sessionState_, GetAnonyString(dhId_).c_str(), ret);
+                }
+                ret = CloseChannel();
+                if (ret != DCAMERA_OK) {
+                    DHLOGE("DCameraSinkController::OnSessionState session state: %d, %s close channel failed, ret: %d",
+                        sessionState_, GetAnonyString(dhId_).c_str(), ret);
+                }
+            }).detach();
             break;
         }
         default: {
@@ -363,8 +381,8 @@ void DCameraSinkController::PostAuthorization(std::vector<std::shared_ptr<DCamer
 
 int32_t DCameraSinkController::StartCaptureInner(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos)
 {
-    std::lock_guard<std::mutex> autoLock(captureLock_);
     DHLOGI("DCameraSinkController::StartCaptureInner dhId: %s", GetAnonyString(dhId_).c_str());
+    std::lock_guard<std::mutex> autoLock(captureLock_);
     int32_t ret = output_->StartCapture(captureInfos);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSinkController::StartCaptureInner output start capture failed, dhId: %s, ret: %d",
