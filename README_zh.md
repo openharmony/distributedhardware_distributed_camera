@@ -69,5 +69,16 @@
 
 ## **涉及仓**
 ****
-**分布式相机**  
-[distributed_camera](https://gitee.com/openharmony/distributed_camera)
+**分布式硬件子系统：**  
+
+设备管理
+[device_manager](https://gitee.com/openharmony/device_manager)
+
+分步式硬件管理框架
+[distributed_hardware_fwk](https://gitee.com/openharmony/distributed_hardware_fwk)
+
+**分布式相机
+[distributed_camera](https://gitee.com/openharmony/distributed_camera)**
+
+分布式屏幕
+[distributed_screen](https://gitee.com/openharmony/distributed_screen)
