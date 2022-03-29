@@ -62,8 +62,10 @@ std::vector<DHItem> DCameraHandler::Query()
             DHLOGI("DCameraHandler::Query connection type: %d", info->GetConnectionType());
             continue;
         }
-        if ((info->GetPosition() == OHOS_CAMERA_POSITION_FRONT) ||
-            (info->GetPosition() == OHOS_CAMERA_POSITION_BACK && info->GetCameraType() == OHOS_CAMERA_TYPE_LOGICAL)) {
+        if ((info->GetPosition() == OHOS_CAMERA_POSITION_OTHER) ||
+            (info->GetPosition() == OHOS_CAMERA_POSITION_FRONT) ||
+            (info->GetPosition() == OHOS_CAMERA_POSITION_BACK &&
+             info->GetCameraType() == OHOS_CAMERA_TYPE_LOGICAL)) {
             DHItem item = CreateDHItem(info);
             itemList.push_back(item);
         }
@@ -108,8 +110,10 @@ std::vector<std::string> DCameraHandler::GetCameras()
             DHLOGI("DCameraHandler::GetCameras connection type: %d", info->GetConnectionType());
             continue;
         }
-        if ((info->GetPosition() == OHOS_CAMERA_POSITION_FRONT) ||
-            (info->GetPosition() == OHOS_CAMERA_POSITION_BACK && info->GetCameraType() == OHOS_CAMERA_TYPE_LOGICAL)) {
+        if ((info->GetPosition() == OHOS_CAMERA_POSITION_OTHER) ||
+            (info->GetPosition() == OHOS_CAMERA_POSITION_FRONT) ||
+            (info->GetPosition() == OHOS_CAMERA_POSITION_BACK &&
+             info->GetCameraType() == OHOS_CAMERA_TYPE_LOGICAL)) {
             std::string dhId = CAMERA_ID_PREFIX + info->GetID();
             cameras.push_back(dhId);
         }
@@ -233,10 +237,12 @@ bool DCameraHandler::IsValid(DCStreamType type, CameraStandard::CameraPicSize& s
             break;
         }
         case SNAPSHOT_FRAME: {
+            uint64_t dcResolution = static_cast<uint64_t>(size.width * size.width);
+            uint64_t dcMaxResolution = static_cast<uint64_t>(RESOLUTION_MAX_WIDTH_SNAPSHOT *
+                                                             RESOLUTION_MAX_HEIGHT_SNAPSHOT);
             ret = (size.width >= RESOLUTION_MIN_WIDTH) &&
                     (size.height >= RESOLUTION_MIN_HEIGHT) &&
-                    (size.width <= RESOLUTION_MAX_WIDTH_SNAPSHOT) &&
-                    (size.height <= RESOLUTION_MAX_HEIGHT_SNAPSHOT);
+                    (dcResolution <= dcMaxResolution);
             break;
         }
         default: {
