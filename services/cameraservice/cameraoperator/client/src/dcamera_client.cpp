@@ -441,7 +441,7 @@ void DCameraClient::SetQualityAndGpsLocation(const std::shared_ptr<CameraStandar
             GetAnonyString(cameraId_).c_str());
         double gpsCoordinates[2] = {-1.0, -1.0};
         if (memcpy_s(gpsCoordinates, sizeof(gpsCoordinates), item.data.d, sizeof(gpsCoordinates)) != EOK) {
-            DHLOGE("DCameraClient::memcpy_s gpsCoordinates failed");
+            DHLOGE("DCameraClient::SetQualityAndGpsLocation memcpy_s gpsCoordinates failed");
             return;
         }
         DHLOGI("DCameraClient::SetQualityAndGpsLocation %s photo capture settings set "
