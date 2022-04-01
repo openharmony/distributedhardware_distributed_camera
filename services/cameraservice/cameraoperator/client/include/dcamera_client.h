@@ -55,6 +55,8 @@ private:
     int32_t StartCaptureInner(std::shared_ptr<DCameraCaptureInfo>& info);
     int32_t StartPhotoOutput(std::shared_ptr<DCameraCaptureInfo>& info);
     int32_t StartVideoOutput();
+    void SetQualityAndGpsLocation(const std::shared_ptr<CameraStandard::CameraMetadata>& cameraMetadata,
+        std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSettings);
 
     bool isInit_;
     std::string cameraId_;

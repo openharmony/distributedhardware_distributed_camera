@@ -15,7 +15,9 @@
 
 #include "dcamera_client.h"
 
+#include <securec.h>
 #include "anonymous_string.h"
+#include "camera_metadata_operator.h"
 #include "dcamera_input_callback.h"
 #include "dcamera_manager_callback.h"
 #include "dcamera_photo_callback.h"
@@ -409,6 +411,7 @@ int32_t DCameraClient::StartPhotoOutput(std::shared_ptr<DCameraCaptureInfo>& inf
     std::shared_ptr<CameraStandard::PhotoCaptureSetting> photoCaptureSettings =
             std::make_shared<CameraStandard::PhotoCaptureSetting>();
     photoCaptureSettings->SetRotation(rotation);
+    SetQualityAndGpsLocation(cameraMetadata, photoCaptureSettings);
     ret = ((sptr<CameraStandard::PhotoOutput> &)photoOutput_)->Capture(photoCaptureSettings);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraClient::StartPhotoOutput %s photoOutput capture failed, ret: %d",
@@ -416,6 +419,37 @@ int32_t DCameraClient::StartPhotoOutput(std::shared_ptr<DCameraCaptureInfo>& inf
         return ret;
     }
     return DCAMERA_OK;
+}
+
+void DCameraClient::SetQualityAndGpsLocation(const std::shared_ptr<CameraStandard::CameraMetadata>& cameraMetadata,
+    std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSettings)
+{
+    camera_metadata_item_t item;
+    int32_t ret = CameraStandard::FindCameraMetadataItem(cameraMetadata->get(), OHOS_JPEG_QUALITY, &item);
+    if (ret == CAM_META_SUCCESS) {
+        DHLOGI("DCameraClient::SetQualityAndGpsLocation %s find camera quality item",
+            GetAnonyString(cameraId_).c_str());
+        CameraStandard::PhotoCaptureSetting::QualityLevel quality =
+            static_cast<CameraStandard::PhotoCaptureSetting::QualityLevel>(item.data.u8[0]);
+        DHLOGI("DCameraClient::SetQualityAndGpsLocation %s photo capture settings set quality: %d",
+            GetAnonyString(cameraId_).c_str(), quality);
+        photoCaptureSettings->SetQuality(quality);
+    }
+    ret = CameraStandard::FindCameraMetadataItem(cameraMetadata->get(), OHOS_JPEG_GPS_COORDINATES, &item);
+    if (ret == CAM_META_SUCCESS) {
+        DHLOGI("DCameraClient::SetQualityAndGpsLocation %s find camera gpsCoordinates item",
+            GetAnonyString(cameraId_).c_str());
+        double gpsCoordinates[2] = {-1.0, -1.0};
+        if (memcpy_s(gpsCoordinates, sizeof(gpsCoordinates), item.data.d, sizeof(gpsCoordinates)) != EOK) {
+            DHLOGE("DCameraClient::SetQualityAndGpsLocation memcpy_s gpsCoordinates failed");
+            return;
+        }
+        DHLOGI("DCameraClient::SetQualityAndGpsLocation %s photo capture settings set "
+            "gpsCoordinates[0]: %f, gpsCoordinates[1]: %f",
+            GetAnonyString(cameraId_).c_str(), gpsCoordinates[0], gpsCoordinates[1]);
+        photoCaptureSettings->SetGpsLocation(gpsCoordinates[0], gpsCoordinates[1]);
+    }
+    return;
 }
 
 int32_t DCameraClient::StartVideoOutput()
