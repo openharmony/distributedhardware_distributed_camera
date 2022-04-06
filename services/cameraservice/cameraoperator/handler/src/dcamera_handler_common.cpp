@@ -99,7 +99,7 @@ void DCameraHandler::RegisterPluginListener(std::shared_ptr<PluginListener> list
 void DCameraHandler::UnRegisterPluginListener()
 {
     DHLOGI("DCameraHandler::UnRegisterPluginListener");
-    listener == nullptr;
+    pluginListener_ == nullptr;
 }
 
 std::vector<std::string> DCameraHandler::GetCameras()
