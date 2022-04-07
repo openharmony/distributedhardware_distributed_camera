@@ -117,8 +117,6 @@ ohos_shared_library("distributed_camera_sink") {
   ]
 
   external_deps = [
-    "access_token:libaccesstoken_sdk",
-    "access_token:libtoken_setproc",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",

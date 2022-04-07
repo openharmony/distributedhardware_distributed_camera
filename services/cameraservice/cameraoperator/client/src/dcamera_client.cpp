@@ -36,21 +36,6 @@ DCameraClient::DCameraClient(const std::string& dhId)
     DHLOGI("DCameraClient Constructor dhId: %s", GetAnonyString(dhId).c_str());
     cameraId_ = dhId.substr(CAMERA_ID_PREFIX.size());
     isInit_ = false;
-
-    tokenIdEx_ = Security::AccessToken::AccessTokenKit::AllocHapToken(HAP_INFO_PARAMS, HAP_POLICY_PARAMS);
-    if (tokenIdEx_.tokenIdExStruct.tokenID == 0) {
-        DHLOGE("DCameraClient Constructor alloc tokenId failed, dhId: %s", GetAnonyString(dhId).c_str());
-        return;
-    }
-
-    (void)SetSelfTokenID(tokenIdEx_.tokenIdExStruct.tokenID);
-
-    int32_t ret = Security::AccessToken::AccessTokenKit::GrantPermission(tokenIdEx_.tokenIdExStruct.tokenID,
-        "ohos.permission.CAMERA", Security::AccessToken::PERMISSION_USER_FIXED);
-    if (ret != 0) {
-        DHLOGE("DCameraClient Constructor grant permission failed, dhId: %s", GetAnonyString(dhId).c_str());
-        return;
-    }
 }
 
 DCameraClient::~DCameraClient()
@@ -58,7 +43,6 @@ DCameraClient::~DCameraClient()
     if (isInit_) {
         UnInit();
     }
-    (void)Security::AccessToken::AccessTokenKit::DeleteToken(tokenIdEx_.tokenIdExStruct.tokenID);
 }
 
 int32_t DCameraClient::Init()

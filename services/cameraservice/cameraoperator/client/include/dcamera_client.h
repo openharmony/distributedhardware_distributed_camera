@@ -18,19 +18,14 @@
 
 #include "icamera_operator.h"
 
-#include "access_token.h"
-#include "accesstoken_kit.h"
 #include "camera_info.h"
 #include "camera_input.h"
 #include "camera_manager.h"
 #include "capture_input.h"
 #include "capture_output.h"
 #include "capture_session.h"
-#include "hap_token_info.h"
-#include "ipc_skeleton.h"
 #include "photo_output.h"
 #include "preview_output.h"
-#include "token_setproc.h"
 #include "video_output.h"
 
 #include "dcamera_photo_surface_listener.h"
@@ -38,52 +33,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-const std::string OHOS_PERMISSION_CAMERA = "ohos.permission.CAMERA";
-const std::string APP_ID_DESC = "distributed camera";
-const std::string LABEL = "label";
-const std::string DESCRIPTION = "distributed camera";
-const std::string RES_DEVICE_ID = "local";
-const std::string DOMAIN = "distribtued_camera.domain";
-const int32_t USER_ID = 1;
-const int32_t INST_INDEX = 0;
-const int32_t GRANT_MODE = 1;
-const int32_t GRANT_FLAGS = 1;
-const int32_t LABEL_ID = 1;
-const int32_t DESCRIPTION_ID = 1;
-
-const Security::AccessToken::HapInfoParams HAP_INFO_PARAMS = {
-    .userID = USER_ID,
-    .bundleName = OHOS_PERMISSION_CAMERA,
-    .instIndex = INST_INDEX,
-    .appIDDesc = APP_ID_DESC
-};
-
-const Security::AccessToken::PermissionDef PERMISSION_DEF = {
-    .permissionName = OHOS_PERMISSION_CAMERA,
-    .bundleName = OHOS_PERMISSION_CAMERA,
-    .grantMode = GRANT_MODE,
-    .availableLevel = Security::AccessToken::ATokenAplEnum::APL_NORMAL,
-    .label = LABEL,
-    .labelId = LABEL_ID,
-    .description = DESCRIPTION,
-    .descriptionId = DESCRIPTION_ID
-};
-
-const Security::AccessToken::PermissionStateFull PERMISSION_STATE_FULL = {
-    .permissionName = OHOS_PERMISSION_CAMERA,
-    .isGeneral = true,
-    .resDeviceID = {RES_DEVICE_ID},
-    .grantStatus = {Security::AccessToken::PermissionState::PERMISSION_GRANTED},
-    .grantFlags = {GRANT_FLAGS}
-};
-
-const Security::AccessToken::HapPolicyParams HAP_POLICY_PARAMS = {
-    .apl = Security::AccessToken::ATokenAplEnum::APL_NORMAL,
-    .domain = DOMAIN,
-    .permList = {PERMISSION_DEF},
-    .permStateList = {PERMISSION_STATE_FULL}
-};
-
 class DCameraClient : public ICameraOperator {
 public:
     explicit DCameraClient(const std::string& dhId);
@@ -124,7 +73,6 @@ private:
     std::shared_ptr<ResultCallback> resultCallback_;
     std::shared_ptr<DCameraPhotoSurfaceListener> photoListener_;
     std::shared_ptr<DCameraVideoSurfaceListener> videoListener_;
-    Security::AccessToken::AccessTokenIDEx tokenIdEx_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

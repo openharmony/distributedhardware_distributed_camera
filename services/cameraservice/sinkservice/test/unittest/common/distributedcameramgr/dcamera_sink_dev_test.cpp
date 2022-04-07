@@ -43,7 +43,7 @@ public:
 
     std::shared_ptr<DCameraSinkDev> dev_;
 };
-const std::string TEST_CAMERA_DH_ID_0 = "Camera_device@3.5/legacy/1";
+
 const std::string TEST_PARAMETER = "";
 std::string g_testCameraInfo = "";
 
@@ -75,7 +75,8 @@ void DCameraSinkDevTest::TearDownTestCase(void)
 
 void DCameraSinkDevTest::SetUp(void)
 {
-    dev_ = std::make_shared<DCameraSinkDev>(TEST_CAMERA_DH_ID_0);
+    std::vector<std::string> cameras = DCameraHandler::GetInstance().GetCameras();
+    dev_ = std::make_shared<DCameraSinkDev>(cameras[0]);
 
     dev_->accessControl_ = std::make_shared<DCameraSinkAccessControl>();
     dev_->controller_ = std::make_shared<MockDCameraSinkController>(dev_->accessControl_);

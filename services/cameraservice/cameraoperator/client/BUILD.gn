@@ -87,8 +87,6 @@ ohos_shared_library("distributed_camera_client") {
   ]
 
   external_deps = [
-    "access_token:libaccesstoken_sdk",
-    "access_token:libtoken_setproc",
     "hiviewdfx_hilog_native:libhilog",
     "multimedia_media_standard:media_client",
   ]

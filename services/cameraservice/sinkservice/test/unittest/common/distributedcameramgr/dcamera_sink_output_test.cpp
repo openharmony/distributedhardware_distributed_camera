@@ -46,7 +46,7 @@ public:
     std::shared_ptr<ICameraChannel> channel_;
     std::shared_ptr<ICameraSinkDataProcess> dataProcess_;
 };
-const std::string TEST_DH_ID = "Camera_device@3.5/legacy/1";
+
 const std::string SESSION_FLAG_CONTINUE = "dataContinue";
 const std::string SESSION_FLAG_SNAPSHOT = "dataSnapshot";
 const int32_t TEST_WIDTH = 1080;
@@ -114,8 +114,9 @@ void DCameraSinkOutputTest::TearDownTestCase(void)
 
 void DCameraSinkOutputTest::SetUp(void)
 {
+    std::vector<std::string> cameras = DCameraHandler::GetInstance().GetCameras();
     operator_ = std::make_shared<MockCameraOperator>();
-    output_ = std::make_shared<DCameraSinkOutput>(TEST_DH_ID, operator_);
+    output_ = std::make_shared<DCameraSinkOutput>(cameras[0], operator_);
     channel_ = std::make_shared<MockCameraChannel>();
     dataProcess_ = std::make_shared<MockDCameraSinkDataProcess>(channel_);
     output_->channels_.emplace(SNAPSHOT_FRAME, channel_);
