@@ -43,6 +43,7 @@ public:
     std::map<std::string, std::string> QueryExtraInfo() override;
     bool IsSupportPlugin() override;
     void RegisterPluginListener(std::shared_ptr<PluginListener> listener) override;
+    void UnRegisterPluginListener() override;
 
     std::vector<std::string> GetCameras();
 
