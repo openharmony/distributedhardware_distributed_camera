@@ -108,7 +108,7 @@ private:
     std::shared_ptr<EventBus> eventBusDecode_ = nullptr;
     std::shared_ptr<EventRegistration> eventBusRegHandleDecode_ = nullptr;
     std::shared_ptr<EventRegistration> eventBusRegHandlePipeline2Decode_ = nullptr;
-    std::shared_ptr<Media::VideoDecoder> videoDecoder_ = nullptr;
+    std::shared_ptr<Media::AVCodecVideoDecoder> videoDecoder_ = nullptr;
     std::shared_ptr<Media::AVCodecCallback> decodeVideoCallback_ = nullptr;
     sptr<Surface> decodeConsumerSurface_ = nullptr;
     sptr<Surface> decodeProducerSurface_ = nullptr;

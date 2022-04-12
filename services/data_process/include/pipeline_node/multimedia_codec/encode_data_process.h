@@ -107,7 +107,7 @@ private:
     VideoConfigParams sourceConfig_;
     VideoConfigParams targetConfig_;
     std::weak_ptr<DCameraPipelineSink> callbackPipelineSink_;
-    std::shared_ptr<Media::VideoEncoder> videoEncoder_ = nullptr;
+    std::shared_ptr<Media::AVCodecVideoEncoder> videoEncoder_ = nullptr;
     std::shared_ptr<Media::AVCodecCallback> encodeVideoCallback_ = nullptr;
     sptr<Surface> encodeProducerSurface_ = nullptr;
 
