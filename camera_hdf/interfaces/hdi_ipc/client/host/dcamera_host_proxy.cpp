@@ -14,19 +14,18 @@
  */
 
 #include "dcamera_host_proxy.h"
+
 #include <hdf_base.h>
 #include <hdf_log.h>
 #include <message_parcel.h>
+
+#include "cmd_common.h"
 #include "distributed_hardware_log.h"
 #include "icamera_device.h"
 #include "icamera_device_callback.h"
 #include "icamera_host_callback.h"
 #include "ipc_data_utils.h"
 #include "metadata_utils.h"
-
-#ifndef BALTIMORE_CAMERA
-#include "cmd_common.h"
-#endif
 
 OHOS::sptr<OHOS::Camera::ICameraHost> OHOS::Camera::ICameraHost::Get(const char *serviceName)
 {

@@ -22,6 +22,8 @@ ohos_shared_library("distributed_camera_hdf_client") {
     "../../include",
     "//utils/native/base/include",
     "//utils/system/safwk/native/include",
+    "${camera_hdf_path}/camera/interfaces/include",
+    "${camera_hdf_path}/camera/interfaces/hdi_ipc",
     "${fwk_common_path}/log/include",
     "${fwk_common_path}/utils/include/",
     "${fwk_utils_path}/include",
@@ -44,14 +46,8 @@ ohos_shared_library("distributed_camera_hdf_client") {
     "-Wall",
   ]
 
-  if (device_name == "baltimore") {
-    cflags += [ "-DBALTIMORE_CAMERA" ]
-    include_dirs += [ "${camera_hdf_path_baltimore}/camera/interfaces/include" ]
-  } else {
-    include_dirs += [
-      "${camera_hdf_path}/camera/interfaces/include",
-      "${camera_hdf_path}/camera/interfaces/hdi_ipc",
-    ]
+  if ("${product_name}" == "m40") {
+    cflags += [ "-DPRODUCT_M40" ]
   }
 
   sources = [

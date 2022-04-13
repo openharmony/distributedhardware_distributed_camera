@@ -276,7 +276,7 @@ DCamRetCode DCameraProviderProxy::Notify(const std::shared_ptr<DHBase> &dhBase,
     return static_cast<DCamRetCode>(reply.ReadInt32());
 }
 
-#ifdef BALTIMORE_CAMERA
+#ifdef PRODUCT_M40
 void* DCameraProviderProxy::DCameraMemoryMap(const BufferHandle *buffer)
 {
     if (buffer == nullptr) {

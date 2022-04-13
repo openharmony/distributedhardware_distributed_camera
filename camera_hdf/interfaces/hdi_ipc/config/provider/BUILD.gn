@@ -24,6 +24,8 @@ ohos_shared_library("distributed_camera_provider_config") {
     "${distributedcamera_hdf_path}/hdi_impl/include/utils",
     "//utils/native/base/include",
     "//utils/system/safwk/native/include",
+    "${camera_hdf_path}/camera/interfaces/include",
+    "${camera_hdf_path}/camera/interfaces/hdi_ipc",
     "${hdf_framework_path}/include/utils",
     "${hdf_framework_path}/include/core",
     "${hdf_framework_path}/include/osal",
@@ -39,21 +41,6 @@ ohos_shared_library("distributed_camera_provider_config") {
     "//foundation/communication/ipc/ipc/native/src/core/include",
     "//foundation/multimedia/camera_standard/frameworks/native/metadata/include",
   ]
-
-  cflags = [
-    "-fPIC",
-    "-Wall",
-  ]
-
-  if (device_name == "baltimore") {
-    cflags += [ "-DBALTIMORE_CAMERA" ]
-    include_dirs += [ "${camera_hdf_path_baltimore}/camera/interfaces/include" ]
-  } else {
-    include_dirs += [
-      "${camera_hdf_path}/camera/interfaces/include",
-      "${camera_hdf_path}/camera/interfaces/hdi_ipc",
-    ]
-  }
 
   sources = [ "dcamera_provider_config.cpp" ]
 
@@ -74,7 +61,7 @@ ohos_shared_library("distributed_camera_provider_config") {
     "ipc:ipc_single",
   ]
   install_images = [ chipset_base_dir ]
-  cflags_cc = cflags
+
   subsystem_name = "distributedhardware"
 
   part_name = "distributed_camera"

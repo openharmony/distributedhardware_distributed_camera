@@ -14,16 +14,15 @@
  */
 
 #include "dstream_operator_stub.h"
+
 #include <hdf_base.h>
+
+#include "cmd_common.h"
 #include "distributed_hardware_log.h"
 #include "ioffline_stream_operator.h"
 #include "ipc_data_utils.h"
 #include "istream_operator_callback.h"
 #include "metadata_utils.h"
-
-#ifndef BALTIMORE_CAMERA
-#include "cmd_common.h"
-#endif
 
 namespace OHOS {
 namespace DistributedHardware {

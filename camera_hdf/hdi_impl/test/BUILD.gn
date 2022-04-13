@@ -54,25 +54,12 @@ ohos_executable("dcamera_hdi_sample") {
     "//foundation/communication/ipc/ipc/native/src/core/include",
     "//foundation/multimedia/camera_standard/frameworks/native/metadata/include",
 
+    "${camera_hdf_path}/camera/interfaces/include",
+    "${camera_hdf_path}/camera/interfaces/hdi_ipc",
     "${innerkits_path}/native_cpp/camera_source/include",
     "${innerkits_path}/native_cpp/camera_source/include/callback",
     "${fwk_common_path}/utils/include",
   ]
-
-  cflags = [
-    "-fPIC",
-    "-Wall",
-  ]
-
-  if (device_name == "baltimore") {
-    cflags += [ "-DBALTIMORE_CAMERA" ]
-    include_dirs += [ "${camera_hdf_path_baltimore}/camera/interfaces/include" ]
-  } else {
-    include_dirs += [
-      "${camera_hdf_path}/camera/interfaces/include",
-      "${camera_hdf_path}/camera/interfaces/hdi_ipc",
-    ]
-  }
 
   deps = [
     "${distributedcamera_hdf_path}/interfaces/hdi_ipc/client:distributed_camera_hdf_client",
@@ -91,7 +78,6 @@ ohos_executable("dcamera_hdi_sample") {
     "samgr_standard:samgr_proxy",
   ]
 
-  cflags_cc = cflags
   part_name = "distributed_camera"
   subsystem_name = "distributedhardware"
 }

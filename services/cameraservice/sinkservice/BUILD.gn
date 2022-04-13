@@ -89,7 +89,7 @@ ohos_shared_library("distributed_camera_sink") {
     "src/distributedcameramgr/listener/dcamera_sink_output_channel_listener.cpp",
   ]
 
-  if (device_name == "baltimore") {
+  if ("${product_name}" == "m40") {
     sources += [ "src/distributedcameramgr/dcamera_sink_data_process.cpp" ]
   } else {
     sources +=

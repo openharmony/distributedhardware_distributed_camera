@@ -13,11 +13,10 @@
 
 distributedcamera_path = "//foundation/distributedhardware/distributedcamera"
 
-distributedhardwarefwk_path = "//foundation/distributedhardware/distributedhardwarefwk"
+distributedhardwarefwk_path =
+    "//foundation/distributedhardware/distributedhardwarefwk"
 
 hdf_framework_path = "//drivers/framework"
-
-camera_hdf_path_baltimore = "//drivers/peripheral/adapter"
 
 camera_hdf_path = "//drivers/peripheral"
 

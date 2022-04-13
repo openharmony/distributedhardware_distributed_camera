@@ -33,7 +33,7 @@
 #include "camera_metadata_info.h"
 #include "display_type.h"
 #include "distributed_hardware_log.h"
-#include "drivers/peripheral/adapter/camera/interfaces/include/types.h"
+#include "drivers/peripheral/camera/interfaces/include/types.h"
 #include "foundation/distributedhardware/distributedcamera/camera_hdf/interfaces/include/types.h"
 #include "icamera_device.h"
 #include "icamera_host.h"

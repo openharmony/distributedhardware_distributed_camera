@@ -14,12 +14,11 @@
  */
 
 #include "doffline_stream_operator_stub.h"
-#include <hdf_base.h>
-#include "distributed_hardware_log.h"
 
-#ifndef BALTIMORE_CAMERA
+#include <hdf_base.h>
+
 #include "cmd_common.h"
-#endif
+#include "distributed_hardware_log.h"
 
 namespace OHOS {
 namespace DistributedHardware {

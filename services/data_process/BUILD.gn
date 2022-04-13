@@ -55,7 +55,7 @@ ohos_shared_library("distributed_camera_data_process") {
     "src/utils/image_common_type.cpp",
   ]
 
-  if (device_name == "baltimore") {
+  if ("${product_name}" == "m40") {
     sources += [
       "src/pipeline_node/multimedia_codec/decode_data_process.cpp",
       "src/pipeline_node/multimedia_codec/encode_data_process.cpp",

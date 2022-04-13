@@ -14,16 +14,14 @@
  */
 
 #include "dcamera_device_callback_stub.h"
+
+#include <hdf_base.h>
+
+#include "cmd_common.h"
 #include "dcamera_device_callback.h"
 #include "distributed_hardware_log.h"
 #include "ipc_data_utils.h"
 #include "metadata_utils.h"
-
-#include <hdf_base.h>
-
-#ifndef BALTIMORE_CAMERA
-#include "cmd_common.h"
-#endif
 
 namespace OHOS {
 namespace DistributedHardware {

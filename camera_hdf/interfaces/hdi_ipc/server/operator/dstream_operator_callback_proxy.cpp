@@ -14,13 +14,12 @@
  */
 
 #include "dstream_operator_callback_proxy.h"
+
 #include <hdf_base.h>
 #include <message_parcel.h>
-#include "distributed_hardware_log.h"
 
-#ifndef BALTIMORE_CAMERA
 #include "cmd_common.h"
-#endif
+#include "distributed_hardware_log.h"
 
 namespace OHOS {
 namespace DistributedHardware {
