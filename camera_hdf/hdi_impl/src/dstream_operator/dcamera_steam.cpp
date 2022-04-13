@@ -287,9 +287,9 @@ DCamRetCode DCameraStream::ReturnDCameraBuffer(const shared_ptr<DCameraBuffer> &
         if (dcStreamInfo_->intent_ == StreamIntent::VIDEO) {
             int32_t size = (dcStreamInfo_->width_) * (dcStreamInfo_->height_) * YUV_WIDTH_RATIO / YUV_HEIGHT_RATIO;
             int64_t timeStamp = static_cast<int64_t>(GetCurrentLocalTimeStamp());
-            surfaceBuffer->ExtraSet("dataSize", size);
-            surfaceBuffer->ExtraSet("isKeyFrame", (int32_t)0);
-            surfaceBuffer->ExtraSet("timeStamp", timeStamp);
+            surfaceBuffer->GetExtraData()->ExtraSet("dataSize", size);
+            surfaceBuffer->GetExtraData()->ExtraSet("isKeyFrame", (int32_t)0);
+            surfaceBuffer->GetExtraData()->ExtraSet("timeStamp", timeStamp);
         }
         int ret = dcStreamProducer_->FlushBuffer(surfaceBuffer, fence, flushConf);
         if (ret != 0) {

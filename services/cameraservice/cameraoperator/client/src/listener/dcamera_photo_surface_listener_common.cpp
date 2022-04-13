@@ -47,8 +47,8 @@ void DCameraPhotoSurfaceListener::OnBufferAvailable()
     }
 
     do {
-        int32_t size;
-        buffer->ExtraGet("dataSize", size);
+        int32_t size = -1;
+        buffer->GetExtraData()->ExtraGet("dataSize", size);
         if (size <= 0) {
             size = static_cast<int32_t>(buffer->GetSize());
         }
