@@ -102,7 +102,7 @@ int32_t DistributedCameraSourceService::ReleaseSource()
         return ret;
     }
     listener_ = nullptr;
-	exit(0);
+    exit(0);
     return DCAMERA_OK;
 }
 
