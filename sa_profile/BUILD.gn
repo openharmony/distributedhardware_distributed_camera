@@ -18,7 +18,9 @@ ohos_sa_profile("dcamera_sa_profile") {
     "4803.xml",
     "4804.xml",
   ]
-
+  deps = [
+    :dcamera.cfg,
+  ]
   part_name = "distributed_camera"
 }
 ohos_prebuilt_etc("dcamera.cfg") {
