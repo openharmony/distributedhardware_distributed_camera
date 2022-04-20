@@ -93,7 +93,6 @@ ohos_shared_library("distributed_camera_source") {
     "${services_path}/data_process:distributed_camera_data_process",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
-    ":dcamerasrc.cfg",
   ]
 
   defines = [
@@ -113,11 +112,4 @@ ohos_shared_library("distributed_camera_source") {
   subsystem_name = "distributedhardware"
 
   part_name = "distributed_camera"
-
-}
-ohos_prebuilt_etc("dcamerasrc.cfg") {
-  relative_install_dir = "init"
-  source = "dcamerasrc.cfg"
-  part_name = "distributed_camera"
-  subsystem_name = "distributedhardware"
 }
