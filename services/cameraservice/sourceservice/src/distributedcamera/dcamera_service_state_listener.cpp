@@ -59,6 +59,11 @@ int32_t DCameraServiceStateListener::OnRegisterNotify(const std::string& devId, 
                 DHLOGE("DCameraServiceStateListener OnRegisterNotify OnNotifyRegResult failed: %d", ret);
             }
         }).detach();
+    } else {
+        int32_t ret = callbackProxy_->OnNotifyRegResult(devId, dhId, reqId, status, data);
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCameraServiceStateListener OnRegisterNotify OnNotifyRegResult failed: %d", ret);
+        }
     }
     return DCAMERA_OK;
 }
@@ -85,6 +90,11 @@ int32_t DCameraServiceStateListener::OnUnregisterNotify(const std::string& devId
                 DHLOGE("DCameraServiceStateListener OnUnregisterNotify failed, ret: %d", ret);
             }
         }).detach();
+    } else {
+        int32_t ret = callbackProxy_->OnNotifyUnregResult(devId, dhId, reqId, status, data);
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCameraServiceStateListener OnUnregisterNotify failed, ret: %d", ret);
+        }
     }
 
     return DCAMERA_OK;
