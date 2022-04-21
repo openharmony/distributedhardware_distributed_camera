@@ -19,27 +19,26 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-DCameraSourceLoadCallback::DCameraSourceLoadCallback(const std::string params) : params(params) {}
+DCameraSourceLoadCallback::DCameraSourceLoadCallback(const std::string params) : params_(params) {}
 void DCameraSourceLoadCallback::OnLoadSystemAbilitySuccess(int32_t systemAbilityId,
     const sptr<IRemoteObject>& remoteObject)
 {
-    DHLOGI("OnLoadSystemAbilitySuccess start systemAbilityId: %d.", systemAbilityId);
+    DHLOGI("OnLoadSystemAbilitySuccess systemAbilityId: %d, IRmoteObject result: %s",
+        systemAbilityId, (remoteObject != nullptr) ? "true" : "false");
     if (systemAbilityId != DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID) {
         DHLOGE("start systemabilityId is not sourceSAId!");
         return;
     }
-    DHLOGE("OnLoadSystemAbilitySuccess systemAbilityId: %d, IRmoteObject result: %s",
-        systemAbilityId, (remoteObject != nullptr) ? "true" : "false");
     if (remoteObject == nullptr) {
         DHLOGE("remoteObject is null.");
         return;
     }
-    DCameraSourceHandler::GetInstance().FinishStartSA(params);
+    DCameraSourceHandler::GetInstance().FinishStartSA(params_);
 }
 
 void DCameraSourceLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId)
 {
-    DHLOGE("OnLoadSystemAbilityFail systemAbilityId: %d.", systemAbilityId);
+    DHLOGI("OnLoadSystemAbilityFail systemAbilityId: %d.", systemAbilityId);
     if (systemAbilityId != DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID) {
         DHLOGE("start systemabilityId is not sourceSAId!");
         return;

@@ -14,10 +14,10 @@
  */
 
 #include "dcamera_sink_handler.h"
-#include "dcamera_sink_load_callback.h"
 
 #include "anonymous_string.h"
 #include "dcamera_sink_handler_ipc.h"
+#include "dcamera_sink_load_callback.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"

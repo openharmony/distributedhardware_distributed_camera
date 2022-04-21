@@ -21,12 +21,11 @@ namespace OHOS {
 namespace DistributedHardware {
 class DCameraSinkLoadCallback : public SystemAbilityLoadCallbackStub {
 public:
-
     explicit DCameraSinkLoadCallback(const std::string params);
-    void OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject);
-    void OnLoadSystemAbilityFail(int32_t systemAbilityId);
+    void OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject>& remoteObject) override;
+    void OnLoadSystemAbilityFail(int32_t systemAbilityId) override;
 private:
-    std::string params;
+    std::string params_;
 };
 }
 }

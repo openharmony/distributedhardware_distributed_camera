@@ -14,17 +14,17 @@
  */
 
 #include "dcamera_source_handler.h"
-#include "dcamera_source_callback.h"
-#include "dcamera_source_load_callback.h"
 
-#include "if_system_ability_manager.h"
-#include "iservice_registry.h"
 #include "anonymous_string.h"
+#include "dcamera_source_callback.h"
 #include "dcamera_source_handler_ipc.h"
+#include "dcamera_source_load_callback.h"
 #include "dh_utils_tool.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
+#include "if_system_ability_manager.h"
+#include "iservice_registry.h"
 
 namespace OHOS {
 namespace DistributedHardware {

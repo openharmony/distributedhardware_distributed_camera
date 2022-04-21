@@ -19,22 +19,21 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-DCameraSinkLoadCallback::DCameraSinkLoadCallback(const std::string params) : params(params) {}
+DCameraSinkLoadCallback::DCameraSinkLoadCallback(const std::string params) : params_(params) {}
 void DCameraSinkLoadCallback::OnLoadSystemAbilitySuccess(int32_t systemAbilityId,
     const sptr<IRemoteObject>& remoteObject)
 {
-    DHLOGI("OnLoadSystemAbilitySuccess start systemAbilityId: %d.", systemAbilityId);
+    DHLOGI("OnLoadSystemAbilitySuccess systemAbilityId: %d, IRmoteObject result: %s",
+        systemAbilityId, (remoteObject != nullptr) ? "true" : "false");
     if (systemAbilityId != DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID) {
         DHLOGE("start aystemabilityId is not sinkSAId!");
         return;
     }
-    DHLOGE("OnLoadSystemAbilitySuccess systemAbilityId: %d, IRmoteObject result: %s",
-        systemAbilityId, (remoteObject != nullptr) ? "true" : "false");
     if (remoteObject == nullptr) {
         DHLOGE("remoteObject is null.");
         return;
     }
-    DCameraSinkHandler::GetInstance().FinishStartSA(params);
+    DCameraSinkHandler::GetInstance().FinishStartSA(params_);
 }
 
 void DCameraSinkLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId)
