@@ -36,6 +36,7 @@ ohos_shared_library("distributed_camera_source_sdk") {
     "src/callback/dcamera_source_callback_stub.cpp",
     "src/dcamera_source_handler.cpp",
     "src/dcamera_source_handler_ipc.cpp",
+    "src/dcamera_source_load_callback.cpp",
     "src/distributed_camera_source_proxy.cpp",
   ]
 

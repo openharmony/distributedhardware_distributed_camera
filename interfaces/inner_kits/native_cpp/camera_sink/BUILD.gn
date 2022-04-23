@@ -33,6 +33,7 @@ ohos_shared_library("distributed_camera_sink_sdk") {
   sources = [
     "src/dcamera_sink_handler.cpp",
     "src/dcamera_sink_handler_ipc.cpp",
+    "src/dcamera_sink_load_callback.cpp",
     "src/distributed_camera_sink_proxy.cpp",
   ]
 

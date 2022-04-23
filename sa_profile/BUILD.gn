@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/ohos.gni")
 import("//build/ohos/sa_profile/sa_profile.gni")
 
 ohos_sa_profile("dcamera_sa_profile") {
@@ -20,4 +21,10 @@ ohos_sa_profile("dcamera_sa_profile") {
   ]
 
   part_name = "distributed_camera"
+}
+ohos_prebuilt_etc("dcamera.cfg") {
+  relative_install_dir = "init"
+  source = "dcamera.cfg"
+  part_name = "distributed_camera"
+  subsystem_name = "distributedhardware"
 }

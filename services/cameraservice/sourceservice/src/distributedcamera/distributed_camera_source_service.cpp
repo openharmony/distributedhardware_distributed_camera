@@ -23,6 +23,7 @@
 #include "system_ability_definition.h"
 
 #include "anonymous_string.h"
+#include "dcamera_service_state_listener.h"
 #include "dcamera_source_service_ipc.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -101,6 +102,8 @@ int32_t DistributedCameraSourceService::ReleaseSource()
         return ret;
     }
     listener_ = nullptr;
+    DHLOGI("exit source sa process.");
+    exit(0);
     return DCAMERA_OK;
 }
 

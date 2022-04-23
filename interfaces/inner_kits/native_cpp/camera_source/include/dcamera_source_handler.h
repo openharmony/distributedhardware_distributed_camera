@@ -17,6 +17,7 @@
 #define OHOS_DCAMERA_SOURCE_HANDLER_H
 
 #include <mutex>
+#include <condition_variable>
 
 #include "iremote_proxy.h"
 #include "iremote_broker.h"
@@ -39,14 +40,22 @@ public:
         std::shared_ptr<UnregisterCallback> callback) override;
     int32_t ConfigDistributedHardware(const std::string& devId, const std::string& dhId, const std::string& key,
         const std::string& value) override;
-
+    void FinishStartSA(const std::string &params);
+    void FinishStartSAFailed(int32_t systemAbilityId);
 private:
+    typedef enum {
+        DCAMERA_SA_STATE_STOP = 0,
+        DCAMERA_SA_STATE_START = 1,
+    } DCameraSAState;
     DCameraSourceHandler() = default;
     ~DCameraSourceHandler();
 
 private:
     std::mutex optLock_;
     sptr<DCameraSourceCallback> callback_;
+    std::condition_variable producerCon_;
+    std::mutex producerMutex_;
+    DCameraSAState state_ = DCAMERA_SA_STATE_STOP;
 };
 
 #ifdef __cplusplus

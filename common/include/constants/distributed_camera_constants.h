@@ -74,7 +74,7 @@ const uint32_t DCAMERA_PRODUCER_FPS_DEFAULT = 30;
 const uint32_t DCAMERA_MAX_RECV_DATA_LEN = 104857600;
 const uint32_t DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID = 4803;
 const uint32_t DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID = 4804;
-const std::string DCAMERA_PKG_NAME = "ohos.dhardware";
+const std::string DCAMERA_PKG_NAME = "ohos.dhardware.dcamera";
 const std::string SNAP_SHOT_SESSION_FLAG = "dataSnapshot";
 const std::string CONTINUE_SESSION_FLAG = "dataContinue";
 

@@ -16,6 +16,9 @@
 #ifndef OHOS_DCAMERA_SINK_HANDLER_H
 #define OHOS_DCAMERA_SINK_HANDLER_H
 
+#include <mutex>
+#include <condition_variable>
+
 #include "idistributed_hardware_sink.h"
 #include "single_instance.h"
 
@@ -28,10 +31,19 @@ public:
     int32_t ReleaseSink() override;
     int32_t SubscribeLocalHardware(const std::string& dhId, const std::string& parameters) override;
     int32_t UnsubscribeLocalHardware(const std::string& dhId) override;
-
+    void FinishStartSA(const std::string &params);
+    void FinishStartSAFailed(int32_t systemAbilityId);
 private:
+    typedef enum {
+        DCAMERA_SA_STATE_STOP = 0,
+        DCAMERA_SA_STATE_START = 1,
+    } DCameraSAState;
     DCameraSinkHandler() = default;
     ~DCameraSinkHandler();
+private:
+    std::condition_variable producerCon_;
+    std::mutex producerMutex_;
+    DCameraSAState state_ = DCAMERA_SA_STATE_STOP;
 };
 
 #ifdef __cplusplus
