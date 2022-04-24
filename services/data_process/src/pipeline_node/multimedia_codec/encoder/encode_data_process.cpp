@@ -388,16 +388,16 @@ sptr<SurfaceBuffer> EncodeDataProcess::GetEncoderInputSurfaceBuffer()
 
 int64_t EncodeDataProcess::GetEncoderTimeStamp()
 {
-    int64_t TimeDifferenceStampUs = 0;
+    int64_t TimeIntervalStampUs = 0;
     const int64_t nsPerUs = 1000L;
     int64_t nowTimeUs = GetNowTimeStampUs() * nsPerUs;
     if (lastFeedEncoderInputBufferTimeUs_ == 0) {
         lastFeedEncoderInputBufferTimeUs_ = nowTimeUs;
-        return TimeDifferenceStampUs;
+        return TimeIntervalStampUs;
     }
-    TimeDifferenceStampUs = nowTimeUs - lastFeedEncoderInputBufferTimeUs_;
+    TimeIntervalStampUs = nowTimeUs - lastFeedEncoderInputBufferTimeUs_;
     lastFeedEncoderInputBufferTimeUs_ = nowTimeUs;
-    return TimeDifferenceStampUs;
+    return TimeIntervalStampUs;
 }
 
 void EncodeDataProcess::IncreaseWaitDecodeCnt()
