@@ -16,6 +16,7 @@ import("//build/config/features.gni")
 import("//build/test.gni")
 import(
     "//foundation/distributedhardware/distributedcamera/distributedcamera.gni")
+
 ##############################fuzztest##########################################
 ohos_fuzztest("DCameraSinkLoadCallbackFuzzTest") {
   module_out_path = "distributed_camera/dcamerasinkloadcallback"
@@ -41,9 +42,7 @@ ohos_fuzztest("DCameraSinkLoadCallbackFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
-  sources = [
-    "dcamera_sink_load_callback_fuzzer.cpp",
-  ]
+  sources = [ "dcamera_sink_load_callback_fuzzer.cpp" ]
 
   deps = [
     "${fwk_utils_path}:distributedhardwareutils",
@@ -64,10 +63,10 @@ ohos_fuzztest("DCameraSinkLoadCallbackFuzzTest") {
     "samgr_standard:samgr_proxy",
   ]
 }
+
 ###############################################################################
 group("fuzztest") {
   testonly = true
   deps = [ ":DCameraSinkLoadCallbackFuzzTest" ]
-
 }
 ###############################################################################

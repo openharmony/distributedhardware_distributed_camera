@@ -16,13 +16,15 @@ import("//build/config/features.gni")
 import("//build/test.gni")
 import(
     "//foundation/distributedhardware/distributedcamera/distributedcamera.gni")
+
 ##############################fuzztest##########################################
 ohos_fuzztest("DCameraSinkProxyFuzzTest") {
   module_out_path = "distributed_camera/dcamerasinkproxy"
 
-  fuzz_config_file = "${innerkits_path}/native_cpp/test/fuzztest/dcamerasinkproxy_fuzzer"
+  fuzz_config_file =
+      "${innerkits_path}/native_cpp/test/fuzztest/dcamerasinkproxy_fuzzer"
 
-include_dirs = [
+  include_dirs = [
     "//utils/system/safwk/native/include",
     "${fwk_common_path}/utils/include",
   ]

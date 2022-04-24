@@ -16,6 +16,7 @@ import("//build/config/features.gni")
 import("//build/test.gni")
 import(
     "//foundation/distributedhardware/distributedcamera/distributedcamera.gni")
+
 ##############################fuzztest##########################################
 ohos_fuzztest("DCameraSourceHandlerIpcFuzzTest") {
   module_out_path = "distributed_camera/dcamerasourcehandleripc"
@@ -45,9 +46,7 @@ ohos_fuzztest("DCameraSourceHandlerIpcFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
-  sources = [
-    "dcamera_source_handler_ipc_fuzzer.cpp",
-  ]
+  sources = [ "dcamera_source_handler_ipc_fuzzer.cpp" ]
 
   deps = [
     "${fwk_utils_path}:distributedhardwareutils",
@@ -67,12 +66,11 @@ ohos_fuzztest("DCameraSourceHandlerIpcFuzzTest") {
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]
-
 }
+
 ###############################################################################
 group("fuzztest") {
   testonly = true
   deps = [ ":DCameraSourceHandlerIpcFuzzTest" ]
-
 }
 ###############################################################################
