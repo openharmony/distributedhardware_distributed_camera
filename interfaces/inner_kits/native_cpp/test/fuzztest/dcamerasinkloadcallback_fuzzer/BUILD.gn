@@ -31,8 +31,8 @@ ohos_fuzztest("DCameraSinkLoadCallbackFuzzTest") {
   include_dirs += [
     "include",
     "${common_path}/include",
+    "${common_path}/include/constants",
     "${innerkits_path}/native_cpp/camera_sink/include",
-    "//foundation/distributedhardware/distributedcamera/common/include/constants",
   ]
 
   cflags = [

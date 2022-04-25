@@ -32,11 +32,10 @@ ohos_fuzztest("DCameraSourceHandlerIpcFuzzTest") {
   include_dirs += [
     "include",
     "${common_path}/include",
+    "${common_path}/include/constants",
     "${innerkits_path}/native_cpp/camera_source/include",
     "${innerkits_path}/native_cpp/camera_source/include/callback",
-    "//foundation/distributedhardware/distributedcamera/common/include/constants",
     "${fwk_services_path}/distributedhardwarefwkserviceimpl/include/componentmanager",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
   ]
 
   cflags = [
@@ -61,6 +60,7 @@ ohos_fuzztest("DCameraSourceHandlerIpcFuzzTest") {
   ]
 
   external_deps = [
+    "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
