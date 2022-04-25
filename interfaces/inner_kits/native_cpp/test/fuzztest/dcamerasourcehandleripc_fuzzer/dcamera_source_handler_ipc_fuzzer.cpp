@@ -18,9 +18,9 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "distributed_camera_constants.h"
 #include "dcamera_source_handler.h"
 #include "dcamera_source_handler_ipc.h"
+#include "distributed_camera_constants.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 

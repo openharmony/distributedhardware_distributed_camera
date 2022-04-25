@@ -28,7 +28,7 @@ namespace OHOS {
 namespace DistributedHardware {
 void DCameraSinkLoadCallbackFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (sizeof(int32_t) <= 0)) {
+    if ((data == nullptr) || (size < (sizeof(int32_t))) {
         return;
     }
     int32_t systemAbilityId = *(reinterpret_cast<const int32_t *>(data));
