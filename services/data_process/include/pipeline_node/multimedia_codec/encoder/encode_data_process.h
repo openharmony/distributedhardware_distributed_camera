@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -68,41 +68,43 @@ private:
     int32_t FeedEncoderInputBuffer(std::shared_ptr<DataBuffer>& inputBuffer);
     sptr<SurfaceBuffer> GetEncoderInputSurfaceBuffer();
     int64_t GetEncoderTimeStamp();
+    void IncreaseWaitDecodeCnt();
+    void ReduceWaitDecodeCnt();
     int32_t GetEncoderOutputBuffer(uint32_t index, Media::AVCodecBufferInfo info);
     int32_t EncodeDone(std::vector<std::shared_ptr<DataBuffer>>& outputBuffers);
 
 private:
-    const static int32_t ENCODER_STRIDE_ALIGNMENT = 8;
-    const static int64_t NORM_YUV420_BUFFER_SIZE = 1920 * 1080 * 3 / 2;
-    const static int32_t NORM_RGB32_BUFFER_SIZE = 1920 * 1080 * 4;
-    const static uint32_t MAX_FRAME_RATE = 30;
-    const static uint32_t MIN_VIDEO_WIDTH = 320;
-    const static uint32_t MIN_VIDEO_HEIGHT = 240;
-    const static uint32_t MAX_VIDEO_WIDTH = 1920;
-    const static uint32_t MAX_VIDEO_HEIGHT = 1080;
-    const static int32_t IDR_FRAME_INTERVAL_MS = 300;
-    const static int32_t FIRST_FRAME_OUTPUT_NUM = 2;
+    constexpr static int32_t ENCODER_STRIDE_ALIGNMENT = 8;
+    constexpr static int64_t NORM_YUV420_BUFFER_SIZE = 1920 * 1080 * 3 / 2;
+    constexpr static int32_t NORM_RGB32_BUFFER_SIZE = 1920 * 1080 * 4;
+    constexpr static uint32_t MAX_FRAME_RATE = 30;
+    constexpr static uint32_t MIN_VIDEO_WIDTH = 320;
+    constexpr static uint32_t MIN_VIDEO_HEIGHT = 240;
+    constexpr static uint32_t MAX_VIDEO_WIDTH = 1920;
+    constexpr static uint32_t MAX_VIDEO_HEIGHT = 1080;
+    constexpr static int32_t IDR_FRAME_INTERVAL_MS = 300;
+    constexpr static int32_t FIRST_FRAME_OUTPUT_NUM = 2;
 
-    const static int64_t WIDTH_320_HEIGHT_240 = 320 * 240;
-    const static int64_t WIDTH_480_HEIGHT_360 = 480 * 360;
-    const static int64_t WIDTH_640_HEIGHT_360 = 640 * 360;
-    const static int64_t WIDTH_640_HEIGHT_480 = 640 * 480;
-    const static int64_t WIDTH_720_HEIGHT_540 = 720 * 540;
-    const static int64_t WIDTH_960_HEIGHT_540 = 960 * 540;
-    const static int64_t WIDTH_960_HEIGHT_720 = 960 * 720;
-    const static int64_t WIDTH_1280_HEIGHT_720 = 1280 * 720;
-    const static int64_t WIDTH_1440_HEIGHT_1080 = 1440 * 1080;
-    const static int64_t WIDTH_1920_HEIGHT_1080 = 1920 * 1080;
-    const static int32_t BITRATE_500000 = 500000;
-    const static int32_t BITRATE_1110000 = 1110000;
-    const static int32_t BITRATE_1500000 = 1500000;
-    const static int32_t BITRATE_1800000 = 1800000;
-    const static int32_t BITRATE_2100000 = 2100000;
-    const static int32_t BITRATE_2300000 = 2300000;
-    const static int32_t BITRATE_2800000 = 2800000;
-    const static int32_t BITRATE_3400000 = 3400000;
-    const static int32_t BITRATE_5000000 = 5000000;
-    const static int32_t BITRATE_6000000 = 6000000;
+    constexpr static int64_t WIDTH_320_HEIGHT_240 = 320 * 240;
+    constexpr static int64_t WIDTH_480_HEIGHT_360 = 480 * 360;
+    constexpr static int64_t WIDTH_640_HEIGHT_360 = 640 * 360;
+    constexpr static int64_t WIDTH_640_HEIGHT_480 = 640 * 480;
+    constexpr static int64_t WIDTH_720_HEIGHT_540 = 720 * 540;
+    constexpr static int64_t WIDTH_960_HEIGHT_540 = 960 * 540;
+    constexpr static int64_t WIDTH_960_HEIGHT_720 = 960 * 720;
+    constexpr static int64_t WIDTH_1280_HEIGHT_720 = 1280 * 720;
+    constexpr static int64_t WIDTH_1440_HEIGHT_1080 = 1440 * 1080;
+    constexpr static int64_t WIDTH_1920_HEIGHT_1080 = 1920 * 1080;
+    constexpr static int32_t BITRATE_500000 = 500000;
+    constexpr static int32_t BITRATE_1110000 = 1110000;
+    constexpr static int32_t BITRATE_1500000 = 1500000;
+    constexpr static int32_t BITRATE_1800000 = 1800000;
+    constexpr static int32_t BITRATE_2100000 = 2100000;
+    constexpr static int32_t BITRATE_2300000 = 2300000;
+    constexpr static int32_t BITRATE_2800000 = 2800000;
+    constexpr static int32_t BITRATE_3400000 = 3400000;
+    constexpr static int32_t BITRATE_5000000 = 5000000;
+    constexpr static int32_t BITRATE_6000000 = 6000000;
     const static std::map<std::int64_t, int32_t> ENCODER_BITRATE_TABLE;
 
     std::mutex mtxEncoderState_;

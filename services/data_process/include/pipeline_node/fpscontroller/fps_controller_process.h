@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -46,15 +46,15 @@ private:
     int32_t FpsControllerDone(std::vector<std::shared_ptr<DataBuffer>>& outputBuffers);
 
 private:
-    const static uint32_t MAX_TARGET_FRAME_RATE = 30;
-    const static int32_t VIDEO_FRAME_DROP_INTERVAL = 4;
-    const static int32_t MIN_INCOME_FRAME_NUM_COEFFICIENT = 3;
-    const static int32_t INCOME_FRAME_TIME_HISTORY_WINDOWS_SIZE = 60;
+    constexpr static uint32_t MAX_TARGET_FRAME_RATE = 30;
+    constexpr static int32_t VIDEO_FRAME_DROP_INTERVAL = 4;
+    constexpr static int32_t MIN_INCOME_FRAME_NUM_COEFFICIENT = 3;
+    constexpr static int32_t INCOME_FRAME_TIME_HISTORY_WINDOWS_SIZE = 60;
     /* Receive video frame detect time windows */
-    const static int32_t FRAME_HISTORY_TIME_WINDOWS_MS = 2000;
-    const static int64_t FRMAE_MAX_INTERVAL_TIME_WINDOW_MS = 700;
-    const static int32_t OVERSHOOT_MODIFY_COEFFICIENT = 3;
-    const static int32_t DOUBLE_MULTIPLE = 2;
+    constexpr static int32_t FRAME_HISTORY_TIME_WINDOWS_MS = 2000;
+    constexpr static int64_t FRMAE_MAX_INTERVAL_TIME_WINDOW_MS = 700;
+    constexpr static int32_t OVERSHOOT_MODIFY_COEFFICIENT = 3;
+    constexpr static int32_t DOUBLE_MULTIPLE = 2;
 
     std::mutex mtx;
     VideoConfigParams sourceConfig_;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -137,7 +137,6 @@ int32_t EncodeDataProcess::InitEncoder()
         DHLOGE("Video encoder start failed.");
         return DCAMERA_INIT_ERR;
     }
-    DHLOGI("Common Init video encoder success");
     return DCAMERA_OK;
 }
 
@@ -196,14 +195,20 @@ int32_t EncodeDataProcess::StopVideoEncoder()
         DHLOGE("The video encoder does not exist before StopVideoEncoder.");
         return DCAMERA_BAD_VALUE;
     }
+
+    bool isSuccess = true;
     int32_t ret = videoEncoder_->Flush();
     if (ret != Media::MediaServiceErrCode::MSERR_OK) {
         DHLOGE("VideoEncoder flush failed. Error type: %d.", ret);
-        return DCAMERA_BAD_OPERATE;
+        isSuccess = isSuccess && false;
     }
     ret = videoEncoder_->Stop();
     if (ret != Media::MediaServiceErrCode::MSERR_OK) {
         DHLOGE("VideoEncoder stop failed. Error type: %d.", ret);
+        isSuccess = isSuccess && false;
+    }
+
+    if (!isSuccess) {
         return DCAMERA_BAD_OPERATE;
     }
     return DCAMERA_OK;
@@ -281,15 +286,8 @@ int32_t EncodeDataProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>&
         DHLOGE("Feed encoder input Buffer fail.");
         return err;
     }
-    {
-        std::lock_guard<std::mutex> lck(mtxHoldCount_);
-        if (inputTimeStampUs_ == 0) {
-            waitEncoderOutputCount_ += FIRST_FRAME_OUTPUT_NUM;
-        } else {
-            waitEncoderOutputCount_++;
-        }
-        DHLOGD("Wait encoder output frames number is %d.", waitEncoderOutputCount_);
-    }
+
+    IncreaseWaitDecodeCnt();
     return DCAMERA_OK;
 }
 
@@ -301,6 +299,7 @@ int32_t EncodeDataProcess::FeedEncoderInputBuffer(std::shared_ptr<DataBuffer>& i
         DHLOGE("Get encoder input producer surface failed.");
         return DCAMERA_INIT_ERR;
     }
+
     sptr<SurfaceBuffer> surfacebuffer = GetEncoderInputSurfaceBuffer();
     if (surfacebuffer == nullptr) {
         DHLOGE("Get encoder input producer surface buffer failed.");
@@ -314,14 +313,15 @@ int32_t EncodeDataProcess::FeedEncoderInputBuffer(std::shared_ptr<DataBuffer>& i
     }
     size_t size = static_cast<size_t>(surfacebuffer->GetSize());
     errno_t err = memcpy_s(addr, size, inputBuffer->Data(), inputBuffer->Size());
-    DHLOGI("FeedEncoderInputBuffer size: %d, bufferSize: %d, err: %d", size, inputBuffer->Size(), err);
     if (err != EOK) {
-        DHLOGE("memcpy_s encoder input producer surface buffer failed.");
+        DHLOGE("memcpy_s encoder input producer surface buffer failed, surBufSize %z.", size);
         return DCAMERA_MEMORY_OPT_ERROR;
     }
+
     inputTimeStampUs_ = GetEncoderTimeStamp();
     DHLOGD("Encoder input buffer size %d, timeStamp %lld.", inputBuffer->Size(), (long long)inputTimeStampUs_);
     surfacebuffer->GetExtraData()->ExtraSet("timeStamp", inputTimeStampUs_);
+
     BufferFlushConfig flushConfig = { {0, 0, sourceConfig_.GetWidth(), sourceConfig_.GetHeight()}, 0};
     SurfaceError ret = encodeProducerSurface_->FlushBuffer(surfacebuffer, -1, flushConfig);
     if (ret != SURFACE_ERROR_OK) {
@@ -354,6 +354,27 @@ int64_t EncodeDataProcess::GetEncoderTimeStamp()
     const int64_t nsPerUs = 1000L;
     int64_t nowTimeUs = GetNowTimeStampUs() * nsPerUs;
     return nowTimeUs;
+}
+
+void EncodeDataProcess::IncreaseWaitDecodeCnt()
+{
+    std::lock_guard<std::mutex> lck(mtxHoldCount_);
+    if (inputTimeStampUs_ == 0) {
+        waitEncoderOutputCount_ += FIRST_FRAME_OUTPUT_NUM;
+    } else {
+        waitEncoderOutputCount_++;
+    }
+    DHLOGD("Wait encoder output frames number is %d.", waitEncoderOutputCount_);
+}
+
+void EncodeDataProcess::ReduceWaitDecodeCnt()
+{
+    std::lock_guard<std::mutex> lck(mtxHoldCount_);
+    if (waitEncoderOutputCount_ <= 0) {
+        DHLOGE("The waitEncoderOutputCount_ = %d.", waitEncoderOutputCount_);
+    }
+    waitEncoderOutputCount_--;
+    DHLOGD("Wait encoder output frames number is %d.", waitEncoderOutputCount_);
 }
 
 int32_t EncodeDataProcess::GetEncoderOutputBuffer(uint32_t index, Media::AVCodecBufferInfo info)
@@ -458,14 +479,8 @@ void EncodeDataProcess::OnOutputBufferAvailable(uint32_t index, Media::AVCodecBu
         DHLOGE("Get encode output Buffer fail.");
         return;
     }
-    {
-        std::lock_guard<std::mutex> lck(mtxHoldCount_);
-        if (waitEncoderOutputCount_ <= 0) {
-            DHLOGE("The waitEncoderOutputCount_ = %d.", waitEncoderOutputCount_);
-        }
-        waitEncoderOutputCount_--;
-        DHLOGD("Wait encoder output frames number is %d.", waitEncoderOutputCount_);
-    }
+    ReduceWaitDecodeCnt();
+
     if (videoEncoder_ == nullptr) {
         DHLOGE("The video encoder does not exist before release output buffer index.");
         return;

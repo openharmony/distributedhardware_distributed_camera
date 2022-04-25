@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -276,10 +276,8 @@ void DecodeDataProcess::ReleaseProcessNode()
     ReleaseDecoderSurface();
 
     processType_ = "";
-    std::queue<std::shared_ptr<DataBuffer>> emptyBuffersQueue;
-    inputBuffersQueue_.swap(emptyBuffersQueue);
-    std::queue<uint32_t> emptyIndexsQueue;
-    availableInputIndexsQueue_.swap(emptyIndexsQueue);
+    std::queue<std::shared_ptr<DataBuffer>>().swap(inputBuffersQueue_);
+    std::queue<uint32_t>().swap(availableInputIndexsQueue_);
     waitDecoderOutputCount_ = 0;
     lastFeedDecoderInputBufferTimeUs_ = 0;
     outputTimeStampUs_ = 0;
@@ -378,27 +376,44 @@ int32_t DecodeDataProcess::FeedDecoderInputBuffer()
         inputBuffersQueue_.pop();
         DHLOGD("Push inputBuffer sucess. inputBuffersQueue size is %d.", inputBuffersQueue_.size());
 
-        {
-            std::lock_guard<std::mutex> lck(mtxHoldCount_);
-            availableInputIndexsQueue_.pop();
-            waitDecoderOutputCount_++;
-            DHLOGD("Wait decoder output frames number is %d.", waitDecoderOutputCount_);
-        }
+    IncreaseWaitDecodeCnt();
     }
     return DCAMERA_OK;
 }
 
 int64_t DecodeDataProcess::GetDecoderTimeStamp()
 {
-    int64_t TimeDifferenceStampUs = 0;
+    int64_t TimeIntervalStampUs = 0;
     int64_t nowTimeUs = GetNowTimeStampUs();
     if (lastFeedDecoderInputBufferTimeUs_ == 0) {
         lastFeedDecoderInputBufferTimeUs_ = nowTimeUs;
-        return TimeDifferenceStampUs;
+        return TimeIntervalStampUs;
     }
-    TimeDifferenceStampUs = nowTimeUs - lastFeedDecoderInputBufferTimeUs_;
+    TimeIntervalStampUs = nowTimeUs - lastFeedDecoderInputBufferTimeUs_;
     lastFeedDecoderInputBufferTimeUs_ = nowTimeUs;
-    return TimeDifferenceStampUs;
+    return TimeIntervalStampUs;
+}
+
+void DecodeDataProcess::IncreaseWaitDecodeCnt()
+{
+    std::lock_guard<std::mutex> lck(mtxHoldCount_);
+    availableInputIndexsQueue_.pop();
+    waitDecoderOutputCount_++;
+    DHLOGD("Wait decoder output frames number is %d.", waitDecoderOutputCount_);
+}
+
+void DecodeDataProcess::ReduceWaitDecodeCnt()
+{
+    std::lock_guard<std::mutex> lck(mtxHoldCount_);
+    if (waitDecoderOutputCount_ <= 0) {
+        DHLOGE("The waitDecoderOutputCount_ = %d.", waitDecoderOutputCount_);
+    }
+    if (outputTimeStampUs_ == 0) {
+        waitDecoderOutputCount_ -= FIRST_FRAME_INPUT_NUM;
+    } else {
+        waitDecoderOutputCount_--;
+    }
+    DHLOGD("Wait decoder output frames number is %d.", waitDecoderOutputCount_);
 }
 
 void DecodeDataProcess::GetDecoderOutputBuffer(const sptr<Surface>& surface)
@@ -423,38 +438,22 @@ void DecodeDataProcess::GetDecoderOutputBuffer(const sptr<Surface>& surface)
     CopyDecodedImage(surfaceBuffer, timeStampUs, alignedWidth, alignedHeight);
     surface->ReleaseBuffer(surfaceBuffer, -1);
     outputTimeStampUs_ = timeStampUs;
-    {
-        std::lock_guard<std::mutex> lck(mtxHoldCount_);
-        if (waitDecoderOutputCount_ <= 0) {
-            DHLOGE("The waitDecoderOutputCount_ = %d.", waitDecoderOutputCount_);
-        }
-        if (outputTimeStampUs_ == 0) {
-            waitDecoderOutputCount_ -= FIRST_FRAME_INPUT_NUM;
-        } else {
-            waitDecoderOutputCount_--;
-        }
-        DHLOGD("Wait decoder output frames number is %d.", waitDecoderOutputCount_);
-    }
+    ReduceWaitDecodeCnt();
 }
 
 void DecodeDataProcess::CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int64_t timeStampUs, int32_t alignedWidth,
     int32_t alignedHeight)
 {
-    if (surBuf == nullptr) {
-        DHLOGE("surface buffer is null!");
+    if (!IsCorrectSurfaceBuffer(surBuf, alignedWidth, alignedHeight)) {
+        DHLOGE("Surface output buffer error.");
         return;
     }
-    size_t validDecodedImageSize = static_cast<size_t>(sourceConfig_.GetWidth() * sourceConfig_.GetHeight() *
+
+    size_t rgbImageSize = static_cast<size_t>(sourceConfig_.GetWidth() * sourceConfig_.GetHeight() *
         RGB32_MEMORY_COEFFICIENT);
-    size_t surfaceBufSize = static_cast<size_t>(surBuf->GetSize());
-    if (validDecodedImageSize > surfaceBufSize) {
-        DHLOGE("Buffer size error, validDecodedImageSize %d, surBufSize %d.",
-            validDecodedImageSize, surBuf->GetSize());
-        return;
-    }
-    std::shared_ptr<DataBuffer> bufferOutput = std::make_shared<DataBuffer>(validDecodedImageSize);
+    std::shared_ptr<DataBuffer> bufferOutput = std::make_shared<DataBuffer>(rgbImageSize);
     uint8_t *addr = static_cast<uint8_t *>(surBuf->GetVirAddr());
-    errno_t err = memcpy_s(bufferOutput->Data(), bufferOutput->Size(), addr, validDecodedImageSize);
+    errno_t err = memcpy_s(bufferOutput->Data(), bufferOutput->Size(), addr, rgbImageSize);
     if (err != EOK) {
         DHLOGE("memcpy_s surface buffer failed.");
         return;
@@ -466,6 +465,24 @@ void DecodeDataProcess::CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int6
     bufferOutput->SetInt32("width", static_cast<int32_t>(sourceConfig_.GetWidth()));
     bufferOutput->SetInt32("height", static_cast<int32_t>(sourceConfig_.GetHeight()));
     PostOutputDataBuffers(bufferOutput);
+}
+
+bool DecodeDataProcess::IsCorrectSurfaceBuffer(const sptr<SurfaceBuffer>& surBuf, int32_t alignedWidth,
+    int32_t alignedHeight)
+{
+    if (surBuf == nullptr) {
+        DHLOGE("surface buffer is null!");
+        return false;
+    }
+
+    size_t rgbImageSize = static_cast<size_t>(sourceConfig_.GetWidth() * sourceConfig_.GetHeight() *
+        RGB32_MEMORY_COEFFICIENT);
+    size_t surfaceBufSize = static_cast<size_t>(surBuf->GetSize());
+    if (rgbImageSize > surfaceBufSize) {
+        DHLOGE("Buffer size error, rgbImageSize %d, surBufSize %d.", rgbImageSize, surBuf->GetSize());
+        return false;
+    }
+    return true;
 }
 
 void DecodeDataProcess::PostOutputDataBuffers(std::shared_ptr<DataBuffer>& outputBuffer)

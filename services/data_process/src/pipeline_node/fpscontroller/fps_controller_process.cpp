@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -217,12 +217,12 @@ float FpsControllerProcess::CalculateFrameRate(int64_t nowMs)
     const int32_t minValidCalculatedFrameRatesNum = 2;
     int32_t minIncomingFrameNum = static_cast<int32_t>(targetFrameRate_) / MIN_INCOME_FRAME_NUM_COEFFICIENT;
     if (validFramesNumber > minIncomingFrameNum && validFramesNumber > minValidCalculatedFrameRatesNum) {
-        int64_t validTotalTimeDifference = (nowMs - incomingFrameTimesMs_[num - 1]);
-        if (validTotalTimeDifference < 0) {
-            validTotalTimeDifference = -validTotalTimeDifference;
+        int64_t validTotalTimeInterval = (nowMs - incomingFrameTimesMs_[num - 1]);
+        if (validTotalTimeInterval < 0) {
+            validTotalTimeInterval = -validTotalTimeInterval;
         }
-        if (validTotalTimeDifference > 0) {
-            return validFramesNumber * msPerSecond / validTotalTimeDifference + frameRateCorrectionFactor_;
+        if (validTotalTimeInterval > 0) {
+            return validFramesNumber * msPerSecond / validTotalTimeInterval + frameRateCorrectionFactor_;
         }
     }
     return static_cast<float>(validFramesNumber);

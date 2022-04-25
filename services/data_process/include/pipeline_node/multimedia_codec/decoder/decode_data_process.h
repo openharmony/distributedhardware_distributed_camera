@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -85,25 +85,30 @@ private:
     void ReleaseCodecEvent();
     int32_t FeedDecoderInputBuffer();
     int64_t GetDecoderTimeStamp();
+    void IncreaseWaitDecodeCnt();
+    void ReduceWaitDecodeCnt();
     void CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int64_t timeStampUs, int32_t alignedWidth,
         int32_t alignedHeight);
     int32_t CopyYUVPlaneByRow(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo);
     int32_t CheckCopyImageInfo(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo);
     bool IsCorrectImageUnitInfo(const ImageUnitInfo& imgInfo);
+    bool IsCorrectSurfaceBuffer(const sptr<SurfaceBuffer>& surBuf, int32_t alignedWidth, int32_t alignedHeight);
     void PostOutputDataBuffers(std::shared_ptr<DataBuffer>& outputBuffer);
     int32_t DecodeDone(std::vector<std::shared_ptr<DataBuffer>>& outputBuffers);
 
 private:
-    const static int32_t VIDEO_DECODER_QUEUE_MAX = 1000;
-    const static int32_t MAX_YUV420_BUFFER_SIZE = 1920 * 1080 * 3 / 2 * 2;
-    const static int32_t MAX_RGB32_BUFFER_SIZE = 1920 * 1080 * 4 * 2;
-    const static uint32_t MAX_FRAME_RATE = 30;
-    const static uint32_t MIN_VIDEO_WIDTH = 320;
-    const static uint32_t MIN_VIDEO_HEIGHT = 240;
-    const static uint32_t MAX_VIDEO_WIDTH = 1920;
-    const static uint32_t MAX_VIDEO_HEIGHT = 1080;
-    const static int32_t FIRST_FRAME_INPUT_NUM = 2;
-    const static int32_t RGB32_MEMORY_COEFFICIENT = 4;
+    constexpr static int32_t VIDEO_DECODER_QUEUE_MAX = 1000;
+    constexpr static int32_t MAX_YUV420_BUFFER_SIZE = 1920 * 1080 * 3 / 2 * 2;
+    constexpr static int32_t MAX_RGB32_BUFFER_SIZE = 1920 * 1080 * 4 * 2;
+    constexpr static uint32_t MAX_FRAME_RATE = 30;
+    constexpr static uint32_t MIN_VIDEO_WIDTH = 320;
+    constexpr static uint32_t MIN_VIDEO_HEIGHT = 240;
+    constexpr static uint32_t MAX_VIDEO_WIDTH = 1920;
+    constexpr static uint32_t MAX_VIDEO_HEIGHT = 1080;
+    constexpr static int32_t FIRST_FRAME_INPUT_NUM = 2;
+    constexpr static int32_t RGB32_MEMORY_COEFFICIENT = 4;
+    constexpr static int32_t YUV_BYTES_PER_PIXEL = 3;
+    constexpr static int32_t Y2UV_RATIO = 2;
 
     std::mutex mtxDecoderState_;
     std::mutex mtxHoldCount_;
