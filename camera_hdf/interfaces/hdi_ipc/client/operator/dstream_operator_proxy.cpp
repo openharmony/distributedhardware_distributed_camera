@@ -29,7 +29,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 CamRetCode DStreamOperatorProxy::IsStreamsSupported(OperationMode mode,
-    const std::shared_ptr<CameraStandard::CameraMetadata> &modeSetting,
+    const std::shared_ptr<Camera::CameraMetadata> &modeSetting,
     const std::vector<std::shared_ptr<StreamInfo>> &info,
     StreamSupportType &type)
 {
@@ -53,7 +53,7 @@ CamRetCode DStreamOperatorProxy::IsStreamsSupported(OperationMode mode,
         return CamRetCode::INVALID_ARGUMENT;
     }
 
-    if (nullFlag && !CameraStandard::MetadataUtils::EncodeCameraMetadata(modeSetting, data)) {
+    if (nullFlag && !Camera::MetadataUtils::EncodeCameraMetadata(modeSetting, data)) {
         DHLOGE("Write metadata failed.");
         return CamRetCode::INVALID_ARGUMENT;
     }
@@ -150,7 +150,7 @@ CamRetCode DStreamOperatorProxy::ReleaseStreams(const std::vector<int> &streamId
 }
 
 CamRetCode DStreamOperatorProxy::CommitStreams(OperationMode mode,
-    const std::shared_ptr<CameraStandard::CameraMetadata> &modeSetting)
+    const std::shared_ptr<Camera::CameraMetadata> &modeSetting)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -166,7 +166,7 @@ CamRetCode DStreamOperatorProxy::CommitStreams(OperationMode mode,
         return CamRetCode::INVALID_ARGUMENT;
     }
 
-    bool bRet = CameraStandard::MetadataUtils::EncodeCameraMetadata(modeSetting, data);
+    bool bRet = Camera::MetadataUtils::EncodeCameraMetadata(modeSetting, data);
     if (!bRet) {
         DHLOGE("Write metadata failed.");
         return CamRetCode::INVALID_ARGUMENT;
@@ -294,7 +294,7 @@ CamRetCode DStreamOperatorProxy::Capture(int captureId,
         return CamRetCode::INVALID_ARGUMENT;
     }
 
-    bool bRet = CameraStandard::MetadataUtils::EncodeCameraMetadata(info->captureSetting_, data);
+    bool bRet = Camera::MetadataUtils::EncodeCameraMetadata(info->captureSetting_, data);
     if (!bRet) {
         DHLOGE("Write metadata failed.");
         return CamRetCode::INVALID_ARGUMENT;

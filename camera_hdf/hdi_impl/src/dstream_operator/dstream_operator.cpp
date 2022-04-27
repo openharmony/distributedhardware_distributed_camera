@@ -30,7 +30,7 @@ DStreamOperator::DStreamOperator(std::shared_ptr<DMetadataProcessor> &dMetadataP
 }
 
 CamRetCode DStreamOperator::IsStreamsSupported(OperationMode mode,
-    const std::shared_ptr<CameraStandard::CameraMetadata> &modeSetting,
+    const std::shared_ptr<Camera::CameraMetadata> &modeSetting,
     const std::vector<std::shared_ptr<StreamInfo>> &info,
     StreamSupportType &type)
 {
@@ -136,7 +136,7 @@ CamRetCode DStreamOperator::ReleaseStreams(const std::vector<int>& streamIds)
 }
 
 CamRetCode DStreamOperator::CommitStreams(OperationMode mode,
-    const std::shared_ptr<CameraStandard::CameraMetadata>& modeSetting)
+    const std::shared_ptr<Camera::CameraMetadata>& modeSetting)
 {
     DHLOGI("DStreamOperator::CommitStreams, input operation mode=%d.", mode);
     if (IsCapturing()) {
@@ -498,7 +498,7 @@ DCamRetCode DStreamOperator::ShutterBuffer(int streamId, const std::shared_ptr<D
 
     uint64_t resultTimestamp = GetCurrentLocalTimeStamp();
     bool needReturn = false;
-    std::shared_ptr<CameraStandard::CameraMetadata> result = nullptr;
+    std::shared_ptr<Camera::CameraMetadata> result = nullptr;
     DCamRetCode ret = dMetadataProcessor_->UpdateResultMetadata(needReturn, result);
     if (ret != DCamRetCode::SUCCESS) {
         DHLOGE("Cannot handle result metadata.");
@@ -529,7 +529,7 @@ DCamRetCode DStreamOperator::SetCallBack(OHOS::sptr<IStreamOperatorCallback> con
 
 DCamRetCode DStreamOperator::SetDeviceCallback(
     std::function<void(ErrorType, int)> &errorCbk,
-    std::function<void(uint64_t, std::shared_ptr<CameraStandard::CameraMetadata>)> &resultCbk)
+    std::function<void(uint64_t, std::shared_ptr<Camera::CameraMetadata>)> &resultCbk)
 {
     errorCallback_ = errorCbk;
     resultCallback_ = resultCbk;
@@ -677,7 +677,7 @@ std::shared_ptr<DCCaptureInfo> DStreamOperator::BuildSuitableCaptureInfo(const s
 
     std::shared_ptr<DCameraSettings> dcSetting = std::make_shared<DCameraSettings>();
     dcSetting->type_ = DCSettingsType::UPDATE_METADATA;
-    std::string settingStr = CameraStandard::MetadataUtils::EncodeToString(srcCaptureInfo->captureSetting_);
+    std::string settingStr = Camera::MetadataUtils::EncodeToString(srcCaptureInfo->captureSetting_);
     dcSetting->value_ = Base64Encode(reinterpret_cast<const unsigned char *>(settingStr.c_str()), settingStr.length());
 
     captureInfo->captureSettings_.push_back(dcSetting);

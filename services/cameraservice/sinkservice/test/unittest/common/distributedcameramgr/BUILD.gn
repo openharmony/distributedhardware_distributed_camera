@@ -21,7 +21,6 @@ config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
     "${graphicstandard_path}/frameworks/surface/include",
-    "${camerastandard_path}/frameworks/native/metadata/include",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include/input",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include/output",
@@ -56,6 +55,7 @@ config("module_private_config") {
     "${fwk_common_path}/log/include",
 
     "//drivers/peripheral/base",
+    "//drivers/peripheral/camera/interfaces/metadata/include",
   ]
 }
 
@@ -74,13 +74,13 @@ ohos_unittest("DCameraSinkMgrTest") {
 
   deps = [
     "${camerastandard_path}/frameworks/native/camera:camera_framework",
-    "${camerastandard_path}/frameworks/native/metadata:metadata",
     "${common_path}:distributed_camera_utils",
     "${fwk_utils_path}:distributedhardwareutils",
     "${graphicstandard_path}:libsurface",
     "${services_path}/cameraservice/cameraoperator/handler:distributed_camera_handler",
     "${services_path}/cameraservice/sinkservice:distributed_camera_sink",
     "${services_path}/channel:distributed_camera_channel",
+    "//drivers/peripheral/camera/interfaces/metadata:metadata",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
   ]

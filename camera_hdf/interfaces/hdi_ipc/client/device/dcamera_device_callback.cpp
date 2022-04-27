@@ -23,7 +23,7 @@ void DCameraDeviceCallback::OnError(ErrorType type, int32_t errorMsg)
     DHLOGW("DCameraDeviceCallback::OnError enter.");
 }
 
-void DCameraDeviceCallback::OnResult(uint64_t timestamp, const std::shared_ptr<CameraStandard::CameraMetadata> &result)
+void DCameraDeviceCallback::OnResult(uint64_t timestamp, const std::shared_ptr<Camera::CameraMetadata> &result)
 {
     DHLOGW("DCameraDeviceCallback::OnResult enter.");
 }

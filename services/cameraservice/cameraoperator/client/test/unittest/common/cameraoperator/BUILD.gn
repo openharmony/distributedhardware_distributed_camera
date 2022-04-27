@@ -20,11 +20,11 @@ module_out_path = "distributed_camera/dcamera_client_test"
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
+    "//drivers/peripheral/camera/interfaces/metadata/include",
     "//third_party/jsoncpp/include",
     "//utils/native/base/include",
     "//utils/system/safwk/native/include",
     "${graphicstandard_path}/frameworks/surface/include",
-    "${camerastandard_path}/frameworks/native/metadata/include",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include/input",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include/output",
@@ -60,13 +60,13 @@ ohos_unittest("DCameraClientTest") {
 
   deps = [
     "${camerastandard_path}/frameworks/native/camera:camera_framework",
-    "${camerastandard_path}/frameworks/native/metadata:metadata",
     "${common_path}:distributed_camera_utils",
     "${fwk_utils_path}:distributedhardwareutils",
     "${graphicstandard_path}:libsurface",
     "${services_path}/cameraservice/cameraoperator/client:distributed_camera_client",
     "${services_path}/cameraservice/cameraoperator/handler:distributed_camera_handler",
     "${services_path}/cameraservice/sinkservice:distributed_camera_sink",
+    "//drivers/peripheral/camera/interfaces/metadata:metadata",
     "//third_party/googletest:gtest_main",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",

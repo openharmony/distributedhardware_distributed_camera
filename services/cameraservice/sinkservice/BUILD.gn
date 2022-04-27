@@ -20,8 +20,8 @@ ohos_shared_library("distributed_camera_sink") {
   include_dirs = [
     "//utils/native/base/include",
     "//utils/system/safwk/native/include",
+    "//drivers/peripheral/camera/interfaces/metadata/include",
     "${graphicstandard_path}/frameworks/surface/include",
-    "${camerastandard_path}/frameworks/native/metadata/include",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include/input",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include/output",
@@ -98,7 +98,6 @@ ohos_shared_library("distributed_camera_sink") {
 
   deps = [
     "${camerastandard_path}/frameworks/native/camera:camera_framework",
-    "${camerastandard_path}/frameworks/native/metadata:metadata",
     "${common_path}:distributed_camera_utils",
     "${fwk_utils_path}:distributedhardwareutils",
     "${graphicstandard_path}:libsurface",
@@ -106,6 +105,7 @@ ohos_shared_library("distributed_camera_sink") {
     "${services_path}/cameraservice/cameraoperator/handler:distributed_camera_handler",
     "${services_path}/channel:distributed_camera_channel",
     "${services_path}/data_process:distributed_camera_data_process",
+    "//drivers/peripheral/camera/interfaces/metadata:metadata",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
   ]

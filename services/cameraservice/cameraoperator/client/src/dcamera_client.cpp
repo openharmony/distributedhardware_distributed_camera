@@ -429,9 +429,9 @@ int32_t DCameraClient::StartPhotoOutput(std::shared_ptr<DCameraCaptureInfo>& inf
     camera_metadata_item_t item;
     CameraStandard::PhotoCaptureSetting::RotationConfig rotation =
             CameraStandard::PhotoCaptureSetting::RotationConfig::Rotation_0;
-    std::shared_ptr<CameraStandard::CameraMetadata> cameraMetadata =
-            CameraStandard::MetadataUtils::DecodeFromString(Base64Decode(metadataSetting));
-    int32_t ret = CameraStandard::FindCameraMetadataItem(cameraMetadata->get(), OHOS_JPEG_ORIENTATION, &item);
+    std::shared_ptr<Camera::CameraMetadata> cameraMetadata =
+            Camera::MetadataUtils::DecodeFromString(Base64Decode(metadataSetting));
+    int32_t ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_JPEG_ORIENTATION, &item);
     if (ret == DCAMERA_OK) {
         DHLOGI("DCameraClient::StartPhotoOutput %s find camera metadata item", GetAnonyString(cameraId_).c_str());
         rotation = static_cast<CameraStandard::PhotoCaptureSetting::RotationConfig>(item.data.i32[0]);
@@ -452,11 +452,11 @@ int32_t DCameraClient::StartPhotoOutput(std::shared_ptr<DCameraCaptureInfo>& inf
     return DCAMERA_OK;
 }
 
-void DCameraClient::SetQualityAndGpsLocation(const std::shared_ptr<CameraStandard::CameraMetadata>& cameraMetadata,
+void DCameraClient::SetQualityAndGpsLocation(const std::shared_ptr<Camera::CameraMetadata>& cameraMetadata,
     std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSettings)
 {
     camera_metadata_item_t item;
-    int32_t ret = CameraStandard::FindCameraMetadataItem(cameraMetadata->get(), OHOS_JPEG_QUALITY, &item);
+    int32_t ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_JPEG_QUALITY, &item);
     if (ret == CAM_META_SUCCESS) {
         DHLOGI("DCameraClient::SetQualityAndGpsLocation %s find camera quality item",
             GetAnonyString(cameraId_).c_str());
@@ -466,7 +466,7 @@ void DCameraClient::SetQualityAndGpsLocation(const std::shared_ptr<CameraStandar
             GetAnonyString(cameraId_).c_str(), quality);
         photoCaptureSettings->SetQuality(quality);
     }
-    ret = CameraStandard::FindCameraMetadataItem(cameraMetadata->get(), OHOS_JPEG_GPS_COORDINATES, &item);
+    ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_JPEG_GPS_COORDINATES, &item);
     if (ret == CAM_META_SUCCESS) {
         DHLOGI("DCameraClient::SetQualityAndGpsLocation %s find camera gpsCoordinates item",
             GetAnonyString(cameraId_).c_str());

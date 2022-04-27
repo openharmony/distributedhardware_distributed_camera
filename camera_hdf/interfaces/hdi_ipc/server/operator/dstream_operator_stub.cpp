@@ -89,10 +89,10 @@ int32_t DStreamOperatorStub::DStreamOperatorStubIsStreamsSupported(MessageParcel
 
     OperationMode operationMode = static_cast<OperationMode>(data.ReadInt32());
 
-    std::shared_ptr<CameraStandard::CameraMetadata> metadata = nullptr;
+    std::shared_ptr<Camera::CameraMetadata> metadata = nullptr;
     bool nullFlag = data.ReadBool();
     if (nullFlag) {
-        CameraStandard::MetadataUtils::DecodeCameraMetadata(data, metadata);
+        Camera::MetadataUtils::DecodeCameraMetadata(data, metadata);
     }
 
     int32_t count = data.ReadInt32();
@@ -176,8 +176,8 @@ int32_t DStreamOperatorStub::DStreamOperatorStubCommitStreams(MessageParcel &dat
 
     OperationMode mode = static_cast<OperationMode>(data.ReadInt32());
 
-    std::shared_ptr<CameraStandard::CameraMetadata> metadata = nullptr;
-    CameraStandard::MetadataUtils::DecodeCameraMetadata(data, metadata);
+    std::shared_ptr<Camera::CameraMetadata> metadata = nullptr;
+    Camera::MetadataUtils::DecodeCameraMetadata(data, metadata);
 
     CamRetCode ret = CommitStreams(mode, metadata);
     if (!reply.WriteInt32(static_cast<int32_t>(ret))) {
@@ -274,8 +274,8 @@ int32_t DStreamOperatorStub::DStreamOperatorStubCapture(MessageParcel &data, Mes
         return HDF_FAILURE;
     }
 
-    std::shared_ptr<CameraStandard::CameraMetadata> metadata = nullptr;
-    CameraStandard::MetadataUtils::DecodeCameraMetadata(data, metadata);
+    std::shared_ptr<Camera::CameraMetadata> metadata = nullptr;
+    Camera::MetadataUtils::DecodeCameraMetadata(data, metadata);
 
     bool enableShutterCallback = data.ReadBool();
     std::shared_ptr<CaptureInfo> pInfo = std::make_shared<CaptureInfo>();

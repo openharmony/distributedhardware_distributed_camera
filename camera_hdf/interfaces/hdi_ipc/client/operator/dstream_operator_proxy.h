@@ -28,13 +28,13 @@ public:
     virtual ~DStreamOperatorProxy() = default;
 
     virtual CamRetCode IsStreamsSupported(OperationMode mode,
-                                          const std::shared_ptr<CameraStandard::CameraMetadata> &modeSetting,
+                                          const std::shared_ptr<Camera::CameraMetadata> &modeSetting,
                                           const std::vector<std::shared_ptr<StreamInfo>> &info,
                                           StreamSupportType &type) override;
     virtual CamRetCode CreateStreams(const std::vector<std::shared_ptr<StreamInfo>> &streamInfos) override;
     virtual CamRetCode ReleaseStreams(const std::vector<int> &streamIds) override;
     virtual CamRetCode CommitStreams(OperationMode mode,
-                                     const std::shared_ptr<CameraStandard::CameraMetadata> &modeSetting) override;
+                                     const std::shared_ptr<Camera::CameraMetadata> &modeSetting) override;
     virtual CamRetCode GetStreamAttributes(std::vector<std::shared_ptr<StreamAttribute>> &attributes) override;
     virtual CamRetCode AttachBufferQueue(int streamId,
                                          const OHOS::sptr<OHOS::IBufferProducer> &producer) override;

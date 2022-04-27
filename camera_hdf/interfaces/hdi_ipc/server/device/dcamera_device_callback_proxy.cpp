@@ -53,7 +53,7 @@ void DCameraDeviceCallbackProxy::OnError(ErrorType type, int32_t errorMsg)
 }
 
 void DCameraDeviceCallbackProxy::OnResult(uint64_t timestamp,
-    const std::shared_ptr<CameraStandard::CameraMetadata> &result)
+    const std::shared_ptr<Camera::CameraMetadata> &result)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -73,7 +73,7 @@ void DCameraDeviceCallbackProxy::OnResult(uint64_t timestamp,
         return;
     }
 
-    if (!CameraStandard::MetadataUtils::EncodeCameraMetadata(result, data)) {
+    if (!Camera::MetadataUtils::EncodeCameraMetadata(result, data)) {
         DHLOGE("Write metadata failed.");
         return;
     }

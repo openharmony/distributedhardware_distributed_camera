@@ -39,7 +39,7 @@ ohos_shared_library("distributed_camera_provider_config") {
     "//foundation/graphic/standard/interfaces/kits/surface",
     "//foundation/graphic/standard/utils/include",
     "//foundation/communication/ipc/ipc/native/src/core/include",
-    "//foundation/multimedia/camera_standard/frameworks/native/metadata/include",
+    "//drivers/peripheral/camera/interfaces/metadata/include",
   ]
 
   sources = [ "dcamera_provider_config.cpp" ]

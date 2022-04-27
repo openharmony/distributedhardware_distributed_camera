@@ -18,10 +18,10 @@ import(
 
 ohos_shared_library("distributed_camera_client") {
   include_dirs = [
+    "//drivers/peripheral/camera/interfaces/metadata/include",
     "//utils/native/base/include",
     "//utils/system/safwk/native/include",
     "${graphicstandard_path}/frameworks/surface/include",
-    "${camerastandard_path}/frameworks/native/metadata/include",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include/input",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include/output",
@@ -72,10 +72,10 @@ ohos_shared_library("distributed_camera_client") {
 
   deps = [
     "${camerastandard_path}/frameworks/native/camera:camera_framework",
-    "${camerastandard_path}/frameworks/native/metadata:metadata",
     "${common_path}:distributed_camera_utils",
     "${fwk_utils_path}:distributedhardwareutils",
     "${graphicstandard_path}:libsurface",
+    "//drivers/peripheral/camera/interfaces/metadata:metadata",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
   ]
