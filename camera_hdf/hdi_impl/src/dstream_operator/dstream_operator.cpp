@@ -601,10 +601,13 @@ void DStreamOperator::ConvertStreamInfo(std::shared_ptr<StreamInfo> &srcInfo, st
     dstInfo->dataspace_ = srcInfo->datasapce_;
     dstInfo->encodeType_ = (DCEncodeType)srcInfo->encodeType_;
 
-    if ((srcInfo->intent_ == STILL_CAPTURE) || (srcInfo->intent_ == POST_VIEW) ||
-        (dstInfo->encodeType_ == ENCODE_TYPE_JPEG)) {
+    if ((srcInfo->intent_ == STILL_CAPTURE) || (srcInfo->intent_ == POST_VIEW)) {
         dstInfo->type_ = DCStreamType::SNAPSHOT_FRAME;
-        dstInfo->format_ = OHOS_CAMERA_FORMAT_JPEG;
+        if (dstInfo->encodeType_ == ENCODE_TYPE_JPEG) {
+            dstInfo->format_ = OHOS_CAMERA_FORMAT_JPEG;
+        } else if (dstInfo->encodeType_ == ENCODE_TYPE_NULL) {
+            dstInfo->format_ = OHOS_CAMERA_FORMAT_YCRCB_420_SP;
+        }
     } else {
         dstInfo->type_ = DCStreamType::CONTINUOUS_FRAME;
         dstInfo->format_ =
@@ -706,7 +709,11 @@ void DStreamOperator::ChooseSuitableFormat(std::vector<std::shared_ptr<DCStreamI
         if (dcSupportedFormatMap_.count(DCSceneType::PHOTO) > 0) {
             captureInfo->format_ = dcSupportedFormatMap_[DCSceneType::PHOTO].at(0);
         } else {
-            captureInfo->format_ = OHOS_CAMERA_FORMAT_JPEG;
+            if ((streamInfo.at(0))->encodeType_ == DCEncodeType::ENCODE_TYPE_JPEG) {
+                captureInfo->format_ = OHOS_CAMERA_FORMAT_JPEG;
+            } else {
+                captureInfo->format_ = OHOS_CAMERA_FORMAT_YCRCB_420_SP;
+            }
         }
     }
 }
@@ -760,7 +767,11 @@ void DStreamOperator::ChooseSuitableEncodeType(std::vector<std::shared_ptr<DCStr
             captureInfo->encodeType_ = DCEncodeType::ENCODE_TYPE_NULL;
         }
     } else {
-        captureInfo->encodeType_ = DCEncodeType::ENCODE_TYPE_JPEG;
+        if ((streamInfo.at(0))->encodeType_ == DCEncodeType::ENCODE_TYPE_JPEG) {
+            captureInfo->encodeType_ = DCEncodeType::ENCODE_TYPE_JPEG;
+        } else {
+            captureInfo->encodeType_ = DCEncodeType::ENCODE_TYPE_NULL;
+        }
     }
 }
 
