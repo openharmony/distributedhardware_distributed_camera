@@ -34,7 +34,7 @@ DCamRetCode DMetadataProcessor::InitDCameraAbility(const std::string &abilityInf
         if (rootValue.isMember("MetaData") && rootValue["MetaData"].isString()) {
             std::string metadataStr = rootValue["MetaData"].asString();
             if (!metadataStr.empty()) {
-                dCameraAbility_ = CameraStandard::MetadataUtils::DecodeFromString(Base64Decode(metadataStr));
+                dCameraAbility_ = Camera::MetadataUtils::DecodeFromString(metadataStr);
                 DHLOGI("Decode distributed camera metadata from string success.");
             }
         }
@@ -45,7 +45,7 @@ DCamRetCode DMetadataProcessor::InitDCameraAbility(const std::string &abilityInf
         dCameraAbility_ = std::make_shared<CameraAbility>(DEFAULT_ENTRY_CAPACITY, DEFAULT_DATA_CAPACITY);
     }
 
-    if (CameraStandard::GetCameraMetadataItemCount(dCameraAbility_->get()) <= 0) {
+    if (Camera::GetCameraMetadataItemCount(dCameraAbility_->get()) <= 0) {
         DCamRetCode ret = InitDCameraDefaultAbilityKeys(abilityInfo);
         if (ret != SUCCESS) {
             DHLOGE("Init distributed camera defalult abilily keys failed.");
@@ -61,7 +61,7 @@ DCamRetCode DMetadataProcessor::InitDCameraAbility(const std::string &abilityInf
         return ret;
     }
 
-    camera_metadata_item_entry_t* itemEntry = CameraStandard::GetMetadataItems(dCameraAbility_->get());
+    camera_metadata_item_entry_t* itemEntry = Camera::GetMetadataItems(dCameraAbility_->get());
     uint32_t count = dCameraAbility_->get()->item_count;
     for (uint32_t i = 0; i < count; i++, itemEntry++) {
         allResultSet_.insert((MetaType)(itemEntry->item));
@@ -243,7 +243,7 @@ DCamRetCode DMetadataProcessor::AddAbilityEntry(uint32_t tag, const void *data, 
     }
 
     camera_metadata_item_t item;
-    int ret = CameraStandard::FindCameraMetadataItem(dCameraAbility_->get(), tag, &item);
+    int ret = Camera::FindCameraMetadataItem(dCameraAbility_->get(), tag, &item);
     if (ret) {
         if (!dCameraAbility_->addEntry(tag, data, size)) {
             DHLOGE("Add tag %d failed.", tag);
@@ -261,7 +261,7 @@ DCamRetCode DMetadataProcessor::UpdateAbilityEntry(uint32_t tag, const void *dat
     }
 
     camera_metadata_item_t item;
-    int ret = CameraStandard::FindCameraMetadataItem(dCameraAbility_->get(), tag, &item);
+    int ret = Camera::FindCameraMetadataItem(dCameraAbility_->get(), tag, &item);
     if (ret) {
         if (!dCameraAbility_->addEntry(tag, data, size)) {
             DHLOGE("Add tag %d failed.", tag);
@@ -357,19 +357,19 @@ DCamRetCode DMetadataProcessor::ResetEnableResults()
 }
 
 DCamRetCode DMetadataProcessor::UpdateResultMetadata(bool &needReturn,
-    std::shared_ptr<CameraStandard::CameraMetadata> &result)
+    std::shared_ptr<Camera::CameraMetadata> &result)
 {
     if (latestProducerResultMetadata_ == nullptr) {
         needReturn = false;
         return SUCCESS;
     }
 
-    uint32_t itemCapacity = CameraStandard::GetCameraMetadataItemCapacity(latestProducerResultMetadata_);
-    uint32_t dataCapacity = CameraStandard::GetCameraMetadataDataSize(latestProducerResultMetadata_);
+    uint32_t itemCapacity = Camera::GetCameraMetadataItemCapacity(latestProducerResultMetadata_);
+    uint32_t dataCapacity = Camera::GetCameraMetadataDataSize(latestProducerResultMetadata_);
 
     if (metaResultMode_ == ResultCallbackMode::PER_FRAME) {
         ResizeMetadataHeader(latestConsumerResultMetadata_, itemCapacity, dataCapacity);
-        CameraStandard::CopyCameraMetadataItems(latestConsumerResultMetadata_, latestProducerResultMetadata_);
+        Camera::CopyCameraMetadataItems(latestConsumerResultMetadata_, latestProducerResultMetadata_);
         ConvertToCameraMetadata(latestConsumerResultMetadata_, result);
         needReturn = true;
         return SUCCESS;
@@ -377,12 +377,12 @@ DCamRetCode DMetadataProcessor::UpdateResultMetadata(bool &needReturn,
         for (auto tag : enabledResultSet_) {
             camera_metadata_item_t item;
             camera_metadata_item_t anoItem;
-            int ret1 = CameraStandard::FindCameraMetadataItem(latestProducerResultMetadata_, tag, &item);
-            int ret2 = CameraStandard::FindCameraMetadataItem(latestConsumerResultMetadata_, tag, &anoItem);
+            int ret1 = Camera::FindCameraMetadataItem(latestProducerResultMetadata_, tag, &item);
+            int ret2 = Camera::FindCameraMetadataItem(latestConsumerResultMetadata_, tag, &anoItem);
             if (ret1 == 0 && ret2 == 0) {
                 if (item.count != anoItem.count || item.data_type != anoItem.data_type) {
                     ResizeMetadataHeader(latestConsumerResultMetadata_, itemCapacity, dataCapacity);
-                    CameraStandard::CopyCameraMetadataItems(latestConsumerResultMetadata_,
+                    Camera::CopyCameraMetadataItems(latestConsumerResultMetadata_,
                         latestProducerResultMetadata_);
                     ConvertToCameraMetadata(latestConsumerResultMetadata_, result);
                     needReturn = true;
@@ -392,7 +392,7 @@ DCamRetCode DMetadataProcessor::UpdateResultMetadata(bool &needReturn,
                     for (uint32_t i = 0; i < (size * static_cast<uint32_t>(item.count)); i++) {
                         if (*(item.data.u8 + i) != *(anoItem.data.u8 + i)) {
                             ResizeMetadataHeader(latestConsumerResultMetadata_, itemCapacity, dataCapacity);
-                            CameraStandard::CopyCameraMetadataItems(latestConsumerResultMetadata_,
+                            Camera::CopyCameraMetadataItems(latestConsumerResultMetadata_,
                                 latestProducerResultMetadata_);
                             ConvertToCameraMetadata(latestConsumerResultMetadata_, result);
                             needReturn = true;
@@ -400,13 +400,13 @@ DCamRetCode DMetadataProcessor::UpdateResultMetadata(bool &needReturn,
                         }
                     }
                     ResizeMetadataHeader(latestConsumerResultMetadata_, itemCapacity, dataCapacity);
-                    CameraStandard::CopyCameraMetadataItems(latestConsumerResultMetadata_,
+                    Camera::CopyCameraMetadataItems(latestConsumerResultMetadata_,
                         latestProducerResultMetadata_);
                     needReturn = false;
                 }
             } else if (ret1 == 0 || ret2 == 0) {
                 ResizeMetadataHeader(latestConsumerResultMetadata_, itemCapacity, dataCapacity);
-                CameraStandard::CopyCameraMetadataItems(latestConsumerResultMetadata_, latestProducerResultMetadata_);
+                Camera::CopyCameraMetadataItems(latestConsumerResultMetadata_, latestProducerResultMetadata_);
                 ConvertToCameraMetadata(latestConsumerResultMetadata_, result);
                 needReturn = true;
                 return SUCCESS;
@@ -423,13 +423,13 @@ DCamRetCode DMetadataProcessor::SaveResultMetadata(std::string resultStr)
         return INVALID_ARGUMENT;
     }
 
-    latestProducerResultMetadata_ = CameraStandard::MetadataUtils::DecodeFromString(resultStr)->get();
+    latestProducerResultMetadata_ = Camera::MetadataUtils::DecodeFromString(resultStr)->get();
     if (latestProducerResultMetadata_ == nullptr) {
         DHLOGE("Failed to decode metadata setting from string.");
         return INVALID_ARGUMENT;
     }
 
-    if (!CameraStandard::GetCameraMetadataItemCount(latestProducerResultMetadata_)) {
+    if (!Camera::GetCameraMetadataItemCount(latestProducerResultMetadata_)) {
         DHLOGE("Input result metadata item is empty.");
         return INVALID_ARGUMENT;
     }
@@ -438,9 +438,9 @@ DCamRetCode DMetadataProcessor::SaveResultMetadata(std::string resultStr)
 }
 
 void DMetadataProcessor::ConvertToCameraMetadata(common_metadata_header_t *&input,
-    std::shared_ptr<CameraStandard::CameraMetadata> &output)
+    std::shared_ptr<Camera::CameraMetadata> &output)
 {
-    auto ret = CameraStandard::CopyCameraMetadataItems(output->get(), input);
+    auto ret = Camera::CopyCameraMetadataItems(output->get(), input);
     if (ret != CAM_META_SUCCESS) {
         DHLOGE("Failed to copy the old metadata to new metadata.");
         output = nullptr;
@@ -453,7 +453,7 @@ void DMetadataProcessor::ResizeMetadataHeader(common_metadata_header_t *header,
     if (header) {
         header = nullptr;
     }
-    header = CameraStandard::AllocateCameraMetadataBuffer(itemCapacity, dataCapacity);
+    header = Camera::AllocateCameraMetadataBuffer(itemCapacity, dataCapacity);
 }
 
 uint32_t DMetadataProcessor::GetDataSize(uint32_t type)
@@ -565,16 +565,16 @@ void DMetadataProcessor::PrintDCameraMetadata(const common_metadata_header_t *me
         return;
     }
 
-    uint32_t tagCount = CameraStandard::GetCameraMetadataItemCount(metadata);
+    uint32_t tagCount = Camera::GetCameraMetadataItemCount(metadata);
     DHLOGD("DMetadataProcessor::PrintDCameraMetadata, input metadata item count = %d.", tagCount);
     for (uint32_t i = 0; i < tagCount; i++) {
         camera_metadata_item_t item;
-        int ret = CameraStandard::GetCameraMetadataItem(metadata, i, &item);
+        int ret = Camera::GetCameraMetadataItem(metadata, i, &item);
         if (ret != 0) {
             continue;
         }
 
-        const char *name = CameraStandard::GetCameraMetadataItemName(item.item);
+        const char *name = Camera::GetCameraMetadataItemName(item.item);
         if (item.data_type == META_TYPE_BYTE) {
             for (size_t k = 0; k < item.count; k++) {
                 DHLOGI("tag index:%d, name:%s, value:%d", item.index, name, (uint8_t)(item.data.u8[k]));

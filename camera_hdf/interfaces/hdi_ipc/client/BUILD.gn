@@ -36,7 +36,7 @@ ohos_shared_library("distributed_camera_hdf_client") {
     "//foundation/graphic/standard/interfaces/kits/surface",
     "//foundation/graphic/standard/utils/include",
     "//foundation/communication/ipc/ipc/native/src/core/include",
-    "//foundation/multimedia/camera_standard/frameworks/native/metadata/include",
+    "//drivers/peripheral/camera/interfaces/metadata/include",
   ]
 
   cflags = [
@@ -73,9 +73,9 @@ ohos_shared_library("distributed_camera_hdf_client") {
   deps = [
     "${fwk_utils_path}:distributedhardwareutils",
     "${hdf_uhdf_path}/hdi:libhdi",
+    "//drivers/peripheral/camera/interfaces/metadata:metadata",
     "//drivers/peripheral/display/hal:hdi_display_gralloc",
     "//foundation/graphic/standard/frameworks/surface:surface",
-    "//foundation/multimedia/camera_standard/frameworks/native/metadata:metadata",
     "//utils/native/base:utils",
   ]
 

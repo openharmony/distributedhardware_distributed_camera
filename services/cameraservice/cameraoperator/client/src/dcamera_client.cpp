@@ -396,9 +396,9 @@ int32_t DCameraClient::StartPhotoOutput(std::shared_ptr<DCameraCaptureInfo>& inf
     camera_metadata_item_t item;
     CameraStandard::PhotoCaptureSetting::RotationConfig rotation =
             CameraStandard::PhotoCaptureSetting::RotationConfig::Rotation_0;
-    std::shared_ptr<CameraStandard::CameraMetadata> cameraMetadata =
-            CameraStandard::MetadataUtils::DecodeFromString(Base64Decode(metadataSetting));
-    int32_t ret = CameraStandard::FindCameraMetadataItem(cameraMetadata->get(), OHOS_JPEG_ORIENTATION, &item);
+    std::shared_ptr<Camera::CameraMetadata> cameraMetadata =
+            Camera::MetadataUtils::DecodeFromString(Base64Decode(metadataSetting));
+    int32_t ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_JPEG_ORIENTATION, &item);
     if (ret == DCAMERA_OK) {
         DHLOGI("DCameraClient::StartPhotoOutput %s find camera metadata item", GetAnonyString(cameraId_).c_str());
         rotation = static_cast<CameraStandard::PhotoCaptureSetting::RotationConfig>(item.data.i32[0]);

@@ -17,11 +17,11 @@ import("//foundation/distributedhardware/distributedcamera/distributedcamera.gni
 
 ohos_shared_library("distributed_camera_handler") {
   include_dirs = [
+    "//drivers/peripheral/camera/interfaces/metadata/include",
     "//third_party/jsoncpp/include",
     "//utils/native/base/include",
     "//utils/system/safwk/native/include",
     "${graphicstandard_path}/frameworks/surface/include",
-    "${camerastandard_path}/frameworks/native/metadata/include",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include/input",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include/output",
@@ -60,7 +60,7 @@ ohos_shared_library("distributed_camera_handler") {
     "${common_path}:distributed_camera_utils",
     "${graphicstandard_path}:libsurface",
     "${camerastandard_path}/frameworks/native/camera:camera_framework",
-    "${camerastandard_path}/frameworks/native/metadata:metadata",
+    "//drivers/peripheral/camera/interfaces/metadata:metadata",
     "//utils/native/base:utils",
     "//third_party/jsoncpp:jsoncpp",
   ]

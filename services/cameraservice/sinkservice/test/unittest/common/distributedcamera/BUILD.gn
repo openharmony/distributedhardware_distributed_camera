@@ -20,6 +20,7 @@ module_out_path = "distributed_camera/dcamera_sink_test"
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
+    "//drivers/peripheral/camera/interfaces/metadata/include",
     "${services_path}/cameraservice/sinkservice/include/distributedcamera",
     "${services_path}/cameraservice/sinkservice/include/distributedcameramgr",
     "${services_path}/cameraservice/sinkservice/include/distributedcameramgr/interface",
@@ -41,6 +42,7 @@ ohos_unittest("DistributedCameraSinkServiceTest") {
 
   deps = [
     "${services_path}/cameraservice/sinkservice:distributed_camera_sink",
+    "//drivers/peripheral/camera/interfaces/metadata:metadata",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
   ]

@@ -78,7 +78,7 @@ CamRetCode DCameraDeviceProxy::UpdateSettings(const std::shared_ptr<CameraSettin
         return CamRetCode::INVALID_ARGUMENT;
     }
 
-    bool bRet = CameraStandard::MetadataUtils::EncodeCameraMetadata(settings, data);
+    bool bRet = Camera::MetadataUtils::EncodeCameraMetadata(settings, data);
     if (!bRet) {
         DHLOGE("Write update settings metadata failed.");
         return CamRetCode::INVALID_ARGUMENT;

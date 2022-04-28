@@ -112,7 +112,7 @@ int32_t DCameraHostStub::DCHostStubGetCameraAbility(MessageParcel &data, Message
     }
 
     if (ret == CamRetCode::NO_ERROR) {
-        bool bRet = CameraStandard::MetadataUtils::EncodeCameraMetadata(ability, reply);
+        bool bRet = Camera::MetadataUtils::EncodeCameraMetadata(ability, reply);
         if (!bRet) {
             DHLOGE("Write ability failed.");
             return HDF_FAILURE;

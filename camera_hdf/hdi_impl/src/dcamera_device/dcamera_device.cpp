@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 using ErrorCallback = std::function<void (ErrorType, int32_t)>;
-using ResultCallback = std::function<void (uint64_t, std::shared_ptr<CameraStandard::CameraMetadata>)>;
+using ResultCallback = std::function<void (uint64_t, std::shared_ptr<Camera::CameraMetadata>)>;
 DCameraDevice::DCameraDevice(const std::shared_ptr<DHBase> &dhBase, const std::string &abilityInfo)
     : isOpened_(false),
       dCameraId_(GenerateCameraId(dhBase)),
@@ -71,7 +71,7 @@ DCamRetCode DCameraDevice::CreateDStreamOperator()
             }
         };
     ResultCallback onResultCallback =
-        [this](uint64_t timestamp, const std::shared_ptr<CameraStandard::CameraMetadata> &result) -> void {
+        [this](uint64_t timestamp, const std::shared_ptr<Camera::CameraMetadata> &result) -> void {
             if (dCameraDeviceCallback_) {
                 dCameraDeviceCallback_->OnResult(timestamp, result);
             }
@@ -119,7 +119,7 @@ CamRetCode DCameraDevice::UpdateSettings(const std::shared_ptr<CameraSetting> &s
     std::shared_ptr<DCameraSettings> dcSetting = std::make_shared<DCameraSettings>();
 
     dcSetting->type_ = DCSettingsType::UPDATE_METADATA;
-    std::string abilityStr = CameraStandard::MetadataUtils::EncodeToString(settings);
+    std::string abilityStr = Camera::MetadataUtils::EncodeToString(settings);
     dcSetting->value_ = Base64Encode(reinterpret_cast<const unsigned char *>(abilityStr.c_str()), abilityStr.length());
 
     std::vector<std::shared_ptr<DCameraSettings>> dcSettings;

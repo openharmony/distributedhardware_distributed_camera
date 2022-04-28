@@ -50,8 +50,8 @@ int32_t DCameraDeviceCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel 
             }
 
             uint64_t timestamp = data.ReadUint64();
-            std::shared_ptr<CameraStandard::CameraMetadata> result = nullptr;
-            CameraStandard::MetadataUtils::DecodeCameraMetadata(data, result);
+            std::shared_ptr<Camera::CameraMetadata> result = nullptr;
+            Camera::MetadataUtils::DecodeCameraMetadata(data, result);
             DHLOGI("DCameraDeviceCallbackStub::OnResult entry.");
             OnResult(timestamp, result);
             break;

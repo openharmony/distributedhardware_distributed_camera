@@ -44,6 +44,7 @@ config("module_private_config") {
     "${fwk_common_path}/log/include",
 
     "//drivers/peripheral/base",
+    "//drivers/peripheral/camera/interfaces/metadata/include",
   ]
 }
 
@@ -65,6 +66,7 @@ ohos_unittest("DCameraSinkMgrTest") {
     "${fwk_utils_path}:distributedhardwareutils",
     "${services_path}/cameraservice/sinkservice:distributed_camera_sink",
     "${services_path}/channel:distributed_camera_channel",
+    "//drivers/peripheral/camera/interfaces/metadata:metadata",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
   ]
