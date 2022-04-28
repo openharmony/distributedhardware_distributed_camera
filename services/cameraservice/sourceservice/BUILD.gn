@@ -75,6 +75,7 @@ ohos_shared_library("distributed_camera_source") {
     "src/distributedcameramgr/dcameradata/dcamera_stream_data_process.cpp",
     "src/distributedcameramgr/dcameradata/dcamera_stream_data_process_pipeline_listener.cpp",
     "src/distributedcameramgr/dcameradata/dcamera_stream_data_process_producer.cpp",
+    "src/distributedcameramgr/dcamerahdf/dcamera_hdf_operate.cpp",
     "src/distributedcameramgr/dcamerahdf/dcamera_provider_callback_impl.cpp",
     "src/distributedcameramgr/dcamerastate/dcamera_source_capture_state.cpp",
     "src/distributedcameramgr/dcamerastate/dcamera_source_config_stream_state.cpp",
@@ -102,6 +103,8 @@ ohos_shared_library("distributed_camera_source") {
   ]
 
   external_deps = [
+    "device_driver_framework:libhdf_utils",
+    "device_driver_framework:libhdi",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",

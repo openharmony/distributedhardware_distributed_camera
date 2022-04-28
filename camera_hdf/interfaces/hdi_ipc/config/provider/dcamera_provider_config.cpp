@@ -33,6 +33,15 @@ static int32_t DCameraProviderServiceDispatch(struct HdfDeviceIoClient *client, 
 
 int HdfDCameraProviderConfigInit(struct HdfDeviceObject *deviceObject)
 {
+    if (deviceObject == nullptr) {
+        HDF_LOGE("HdfDCameraProviderConfigInit: HdfDeviceObject is NULL !");
+        return HDF_FAILURE;
+    }
+
+    if (!HdfDeviceSetClass(deviceObject, DEVICE_CLASS_CAMERA)) {
+        HDF_LOGE("HdfDCameraProviderConfigInit set camera class failed");
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
 }
 
