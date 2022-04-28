@@ -31,8 +31,6 @@ public:
     int32_t ReleaseSink() override;
     int32_t SubscribeLocalHardware(const std::string& dhId, const std::string& parameters) override;
     int32_t UnsubscribeLocalHardware(const std::string& dhId) override;
-    void FinishStartSA(const std::string &params);
-    void FinishStartSAFailed(int32_t systemAbilityId);
 private:
     typedef enum {
         DCAMERA_SA_STATE_STOP = 0,
@@ -40,10 +38,13 @@ private:
     } DCameraSAState;
     DCameraSinkHandler() = default;
     ~DCameraSinkHandler();
+    void FinishStartSA(const std::string &params);
+    void FinishStartSAFailed(int32_t systemAbilityId);
 private:
     std::condition_variable producerCon_;
     std::mutex producerMutex_;
     DCameraSAState state_ = DCAMERA_SA_STATE_STOP;
+    friend class DCameraSinkLoadCallback;
 };
 
 #ifdef __cplusplus
