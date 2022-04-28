@@ -171,8 +171,6 @@ void DCameraSinkServiceIpc::OnSourceRemoteDmsDied(const wptr<IRemoteObject>& rem
         iter->second->AsObject()->RemoveDeathRecipient(sourceRemoteRecipient_);
     }
     remoteSources_.erase(iter);
-
 }
-
 } // namespace DistributedHardware
 } // namespace OHOS

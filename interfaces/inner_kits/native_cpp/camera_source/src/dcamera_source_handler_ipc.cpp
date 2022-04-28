@@ -142,6 +142,5 @@ void DCameraSourceHandlerIpc::OnSourceLocalDmsDied(const wptr<IRemoteObject>& re
     localSource_->AsObject()->RemoveDeathRecipient(sourceLocalRecipient_);
     localSource_ = nullptr;
 }
-
 } // namespace DistributedHardware
 } // namespace OHOS
