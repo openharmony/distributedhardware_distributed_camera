@@ -46,8 +46,6 @@ void DCameraSinkHandlerIpc::Init()
         DHLOGI("DCameraSinkHandlerIpc has already init");
         return;
     }
-    auto runner = AppExecFwk::EventRunner::Create("DCameraSinkHandlerIpcHandler");
-    serviceHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
     sinkLocalRecipient_ = new SinkLocalRecipient();
     isInit_ = true;
     DHLOGI("DCameraSinkHandlerIpc Init End");
@@ -62,8 +60,6 @@ void DCameraSinkHandlerIpc::UnInit()
         return;
     }
     DeleteSinkLocalDhms();
-    DHLOGI("DCameraSinkHandlerIpc Start free serviceHandler");
-    serviceHandler_ = nullptr;
     DHLOGI("DCameraSinkHandlerIpc Start free recipient");
     sinkLocalRecipient_ = nullptr;
     isInit_ = false;
@@ -127,28 +123,18 @@ void DCameraSinkHandlerIpc::SinkLocalRecipient::OnRemoteDied(const wptr<IRemoteO
 
 void DCameraSinkHandlerIpc::OnSinkLocalDmsDied(const wptr<IRemoteObject>& remote)
 {
-    sptr<IRemoteObject> diedRemoted = remote.promote();
-    if (diedRemoted == nullptr) {
-        DHLOGE("OnSinkLocalDmsDied promote failed!");
-        return;
-    }
     DHLOGI("OnSinkLocalDmsDied delete diedRemoted");
-    auto remoteDmsDiedFunc = [this, diedRemoted]() {
-        OnSinkLocalDmsDied(diedRemoted);
-    };
-    if (serviceHandler_ != nullptr) {
-        serviceHandler_->PostTask(remoteDmsDiedFunc);
-    }
-}
-
-void DCameraSinkHandlerIpc::OnSinkLocalDmsDied(const sptr<IRemoteObject>& remote)
-{
     std::lock_guard<std::mutex> autoLock(sinkLocalDmsLock_);
     if (localSink_ == nullptr) {
         DHLOGE("DCameraSinkHandlerIpc::OnSinkLocalDmsDied, localSink is null.");
         return;
     }
-    if (localSink_->AsObject() != remote) {
+    sptr<IRemoteObject> diedRemoted = remote.promote();
+    if (diedRemoted == nullptr) {
+        DHLOGE("OnSinkLocalDmsDied promote failed!");
+        return;
+    }
+    if (localSink_->AsObject() != diedRemoted) {
         DHLOGI("OnSinkLocalDmsDied not found remote object.");
         return;
     }

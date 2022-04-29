@@ -46,8 +46,6 @@ void DCameraSourceHandlerIpc::Init()
         DHLOGI("DCameraSourceHandlerIpc has already init");
         return;
     }
-    auto runner = AppExecFwk::EventRunner::Create("DCameraSourceHandlerIpcHandler");
-    serviceHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
     sourceLocalRecipient_ = new SourceLocalRecipient();
     isInit_ = true;
     DHLOGI("DCameraSourceHandlerIpc Init End");
@@ -62,8 +60,6 @@ void DCameraSourceHandlerIpc::UnInit()
         return;
     }
     DeleteSourceLocalDhms();
-    DHLOGI("DCameraSourceHandlerIpc Start free serviceHandler");
-    serviceHandler_ = nullptr;
     DHLOGI("DCameraSourceHandlerIpc Start free recipient");
     sourceLocalRecipient_ = nullptr;
     isInit_ = false;
@@ -127,32 +123,21 @@ void DCameraSourceHandlerIpc::SourceLocalRecipient::OnRemoteDied(const wptr<IRem
 
 void DCameraSourceHandlerIpc::OnSourceLocalDmsDied(const wptr<IRemoteObject>& remote)
 {
-    sptr<IRemoteObject> diedRemoted = remote.promote();
-    if (diedRemoted == nullptr) {
-        DHLOGE("OnSourceLocalDmsDied promote failed!");
-        return;
-    }
     DHLOGI("OnSourceLocalDmsDied delete diedRemoted");
-    auto remoteDmsDiedFunc = [this, diedRemoted]() {
-        OnSourceLocalDmsDied(diedRemoted);
-    };
-    if (serviceHandler_ != nullptr) {
-        serviceHandler_->PostTask(remoteDmsDiedFunc);
-    }
-}
-
-void DCameraSourceHandlerIpc::OnSourceLocalDmsDied(const sptr<IRemoteObject>& remote)
-{
     std::lock_guard<std::mutex> autoLock(sourceLocalDmsLock_);
     if (localSource_ == nullptr) {
         DHLOGE("DCameraSourceHandlerIpc::OnSourceLocalDmsDied, localSource is null.");
         return;
     }
-    if (localSource_->AsObject() != remote) {
+    sptr<IRemoteObject> diedRemoted = remote.promote();
+    if (diedRemoted == nullptr) {
+        DHLOGE("OnSourceLocalDmsDied promote failed!");
+        return;
+    }
+    if (localSource_->AsObject() != diedRemoted) {
         DHLOGI("OnSourceLocalDmsDied not found remote object.");
         return;
     }
-
     DHLOGI("OnSourceLocalDmsDied Clear");
     localSource_->AsObject()->RemoveDeathRecipient(sourceLocalRecipient_);
     localSource_ = nullptr;

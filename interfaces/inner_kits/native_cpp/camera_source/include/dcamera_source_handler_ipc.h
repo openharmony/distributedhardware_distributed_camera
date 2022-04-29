@@ -16,7 +16,6 @@
 #ifndef OHOS_DCAMERA_SOURCE_HANDLER_IPC_H
 #define OHOS_DCAMERA_SOURCE_HANDLER_IPC_H
 
-#include "event_handler.h"
 #include "idistributed_camera_source.h"
 #include "single_instance.h"
 
@@ -34,7 +33,6 @@ public:
 private:
     DCameraSourceHandlerIpc();
     ~DCameraSourceHandlerIpc();
-    void OnSourceLocalDmsDied(const sptr<IRemoteObject>& remote);
     void DeleteSourceLocalDhms();
 
     class SourceLocalRecipient : public IRemoteObject::DeathRecipient {
@@ -46,7 +44,6 @@ private:
     std::mutex sourceLocalDmsLock_;
 
     bool isInit_;
-    std::shared_ptr<AppExecFwk::EventHandler> serviceHandler_;
     std::mutex initDmsLock_;
 };
 } // namespace DistributedHardware

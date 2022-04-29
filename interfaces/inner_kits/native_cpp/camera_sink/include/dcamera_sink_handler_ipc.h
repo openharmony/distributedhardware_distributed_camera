@@ -16,7 +16,6 @@
 #ifndef OHOS_DCAMERA_SINK_HANDLER_IPC_H
 #define OHOS_DCAMERA_SINK_HANDLER_IPC_H
 
-#include "event_handler.h"
 #include "idistributed_camera_sink.h"
 #include "single_instance.h"
 
@@ -46,7 +45,6 @@ private:
     std::mutex sinkLocalDmsLock_;
 
     bool isInit_;
-    std::shared_ptr<AppExecFwk::EventHandler> serviceHandler_;
     std::mutex initDmsLock_;
 };
 } // namespace DistributedHardware

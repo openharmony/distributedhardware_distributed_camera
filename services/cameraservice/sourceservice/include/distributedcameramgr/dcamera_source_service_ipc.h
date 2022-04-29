@@ -16,8 +16,10 @@
 #ifndef OHOS_DCAMERA_SOURCE_SERVICE_IPC_H
 #define OHOS_DCAMERA_SOURCE_SERVICE_IPC_H
 
-#include "event_handler.h"
 #include "idistributed_camera_sink.h"
+
+#include <map>
+
 #include "single_instance.h"
 
 namespace OHOS {
@@ -35,7 +37,6 @@ public:
 private:
     DCameraSourceServiceIpc();
     ~DCameraSourceServiceIpc();
-    void OnSinkRemoteDmsDied(const sptr<IRemoteObject>& remote);
     void ClearSinkRemoteDhms();
 
     class SinkRemoteRecipient : public IRemoteObject::DeathRecipient {
@@ -47,7 +48,6 @@ private:
     std::mutex sinkRemoteDmsLock_;
 
     bool isInit_;
-    std::shared_ptr<AppExecFwk::EventHandler> serviceHandler_;
     std::mutex initDmsLock_;
 };
 } // namespace DistributedHardware

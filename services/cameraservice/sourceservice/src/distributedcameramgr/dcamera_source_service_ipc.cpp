@@ -46,8 +46,6 @@ void DCameraSourceServiceIpc::Init()
         DHLOGI("DCameraSourceServiceIpc has already init");
         return;
     }
-    auto runner = AppExecFwk::EventRunner::Create("DCameraSourceServiceIpcHandler");
-    serviceHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
     sinkRemoteRecipient_ = new SinkRemoteRecipient();
     isInit_ = true;
     DHLOGI("DCameraSourceServiceIpc Init End");
@@ -62,8 +60,6 @@ void DCameraSourceServiceIpc::UnInit()
         return;
     }
     ClearSinkRemoteDhms();
-    DHLOGI("DCameraSourceServiceIpc UnInit Start free servicehandle");
-    serviceHandler_ = nullptr;
     DHLOGI("DCameraSourceServiceIpc UnInit Start free recipient");
     sinkRemoteRecipient_ = nullptr;
     isInit_ = false;
@@ -155,26 +151,16 @@ void DCameraSourceServiceIpc::SinkRemoteRecipient::OnRemoteDied(const wptr<IRemo
 
 void DCameraSourceServiceIpc::OnSinkRemoteDmsDied(const wptr<IRemoteObject>& remote)
 {
+    DHLOGI("OnSinkRemoteDmsDied delete diedRemoted");
+    std::lock_guard<std::mutex> autoLock(sinkRemoteDmsLock_);
     sptr<IRemoteObject> diedRemoted = remote.promote();
     if (diedRemoted == nullptr) {
         DHLOGE("OnSinkRemoteDmsDied promote failed!");
         return;
     }
-    DHLOGI("OnSinkRemoteDmsDied delete diedRemoted");
-    auto remoteDmsDiedFunc = [this, diedRemoted]() {
-        OnSinkRemoteDmsDied(diedRemoted);
-    };
-    if (serviceHandler_ != nullptr) {
-        serviceHandler_->PostTask(remoteDmsDiedFunc);
-    }
-}
-
-void DCameraSourceServiceIpc::OnSinkRemoteDmsDied(const sptr<IRemoteObject>& remote)
-{
-    std::lock_guard<std::mutex> autoLock(sinkRemoteDmsLock_);
     auto iter = std::find_if(remoteSinks_.begin(), remoteSinks_.end(), [&](
         const std::pair<std::string, sptr<IDistributedCameraSink>> &item)->bool {
-            return item.second->AsObject() == remote;
+            return item.second->AsObject() == diedRemoted;
         });
     if (iter == remoteSinks_.end()) {
         DHLOGI("OnSinkRemoteDmsDied not found remote object");

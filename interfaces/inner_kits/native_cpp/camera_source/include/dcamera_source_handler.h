@@ -40,8 +40,6 @@ public:
         std::shared_ptr<UnregisterCallback> callback) override;
     int32_t ConfigDistributedHardware(const std::string& devId, const std::string& dhId, const std::string& key,
         const std::string& value) override;
-    void FinishStartSA(const std::string &params);
-    void FinishStartSAFailed(int32_t systemAbilityId);
 private:
     typedef enum {
         DCAMERA_SA_STATE_STOP = 0,
@@ -49,13 +47,15 @@ private:
     } DCameraSAState;
     DCameraSourceHandler() = default;
     ~DCameraSourceHandler();
-
+    void FinishStartSA(const std::string &params);
+    void FinishStartSAFailed(int32_t systemAbilityId);
 private:
     std::mutex optLock_;
     sptr<DCameraSourceCallback> callback_;
     std::condition_variable producerCon_;
     std::mutex producerMutex_;
     DCameraSAState state_ = DCAMERA_SA_STATE_STOP;
+    friend class DCameraSourceLoadCallback;
 };
 
 #ifdef __cplusplus

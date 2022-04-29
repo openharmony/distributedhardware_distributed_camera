@@ -46,8 +46,6 @@ void DCameraSinkServiceIpc::Init()
         DHLOGI("DCameraSinkServiceIpc has already init");
         return;
     }
-    auto runner = AppExecFwk::EventRunner::Create("DCameraSinkServiceIpcHandler");
-    serviceHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
     sourceRemoteRecipient_ = new SourceRemoteRecipient();
     isInit_ = true;
     DHLOGI("DCameraSinkServiceIpc Init End");
@@ -62,8 +60,6 @@ void DCameraSinkServiceIpc::UnInit()
         return;
     }
     ClearSourceRemoteDhms();
-    DHLOGI("DCameraSinkServiceIpc Start free serviceHandler");
-    serviceHandler_ = nullptr;
     DHLOGI("DCameraSinkServiceIpc Start free recipient");
     sourceRemoteRecipient_ = nullptr;
     isInit_ = false;
@@ -155,32 +151,21 @@ void DCameraSinkServiceIpc::SourceRemoteRecipient::OnRemoteDied(const wptr<IRemo
 
 void DCameraSinkServiceIpc::OnSourceRemoteDmsDied(const wptr<IRemoteObject>& remote)
 {
+    DHLOGI("OnSourceRemoteDmsDied delete diedRemoted");
+    std::lock_guard<std::mutex> autoLock(sourceRemoteDmsLock_);
     sptr<IRemoteObject> diedRemoted = remote.promote();
     if (diedRemoted == nullptr) {
         DHLOGE("OnSourceRemoteDmsDied promote failed!");
         return;
     }
-    DHLOGI("OnSourceRemoteDmsDied delete diedRemoted");
-    auto remoteDmsDiedFunc = [this, diedRemoted]() {
-        OnSourceRemoteDmsDied(diedRemoted);
-    };
-    if (serviceHandler_ != nullptr) {
-        serviceHandler_->PostTask(remoteDmsDiedFunc);
-    }
-}
-
-void DCameraSinkServiceIpc::OnSourceRemoteDmsDied(const sptr<IRemoteObject>& remote)
-{
-    std::lock_guard<std::mutex> autoLock(sourceRemoteDmsLock_);
     auto iter = std::find_if(remoteSources_.begin(), remoteSources_.end(), [&](
         const std::pair<std::string, sptr<IDistributedCameraSource>> &item)->bool {
-            return item.second->AsObject() == remote;
+            return item.second->AsObject() == diedRemoted;
         });
     if (iter == remoteSources_.end()) {
         DHLOGI("OnSourceRemoteDmsDied not found remote object");
         return;
     }
-
     DHLOGI("OnSourceRemoteDmsDied remote.devId: %s", GetAnonyString(iter->first).c_str());
     if (iter->second != nullptr) {
         iter->second->AsObject()->RemoveDeathRecipient(sourceRemoteRecipient_);
