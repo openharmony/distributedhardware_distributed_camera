@@ -20,11 +20,6 @@
 namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(DCameraSAProcessExit);
-DCameraSAProcessExit::DCameraSAProcessExit()
-{
-    DHLOGI("DCameraSAProcessExit Create");
-}
-
 DCameraSAProcessExit::~DCameraSAProcessExit()
 {
     DHLOGI("DCameraSAProcessExit Delete");
@@ -47,8 +42,8 @@ void DCameraSAProcessExit::checkSAProcessState()
     if (sourceSAProcessState_ == DCAMERA_SA_EXIT_STATE_START || sinkSAProcessState_ == DCAMERA_SA_EXIT_STATE_START) {
         return;
     }
-    sourceSAProcessState_ = DCAMERA_SA_EXIT_STATE_STOP;
-    sinkSAProcessState_ = DCAMERA_SA_EXIT_STATE_STOP;
+    sourceSAProcessState_ = DCAMERA_SA_EXIT_STATE_START;
+    sinkSAProcessState_ = DCAMERA_SA_EXIT_STATE_START;
     DHLOGI("exit sa process.");
     exit(0);
 }

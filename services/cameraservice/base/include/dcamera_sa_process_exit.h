@@ -32,7 +32,7 @@ private:
         DCAMERA_SA_EXIT_STATE_START = 0,
         DCAMERA_SA_EXIT_STATE_STOP = 1
     } DCameraSAProcessState;
-    DCameraSAProcessExit();
+    DCameraSAProcessExit() = default;
     ~DCameraSAProcessExit();
     DCameraSAProcessState sinkSAProcessState_ = DCAMERA_SA_EXIT_STATE_START;
     DCameraSAProcessState sourceSAProcessState_ = DCAMERA_SA_EXIT_STATE_START;
