@@ -54,6 +54,7 @@ private:
 
     std::string sinkVer_;
     std::map<std::string, std::shared_ptr<DCameraSinkDev>> camerasMap_;
+    std::mutex saProcessState_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

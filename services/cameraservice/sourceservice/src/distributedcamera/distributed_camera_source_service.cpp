@@ -27,6 +27,7 @@
 #include "dcamera_source_service_ipc.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
+#include "dcamera_sa_process_exit.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -103,7 +104,9 @@ int32_t DistributedCameraSourceService::ReleaseSource()
     }
     listener_ = nullptr;
     DHLOGI("exit source sa process.");
-    exit(0);
+    std::lock_guard<std::mutex> autoLock(saProcessState_);
+    DCameraSAProcessExit::GetInstance().setSourceProcessState();
+    DCameraSAProcessExit::GetInstance().checkSAProcessState();
     return DCAMERA_OK;
 }
 

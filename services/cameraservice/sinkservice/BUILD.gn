@@ -71,6 +71,7 @@ ohos_shared_library("distributed_camera_sink") {
     "${services_path}/cameraservice/base/src/dcamera_info_cmd.cpp",
     "${services_path}/cameraservice/base/src/dcamera_metadata_setting_cmd.cpp",
     "${services_path}/cameraservice/base/src/dcamera_open_info_cmd.cpp",
+    "${services_path}/cameraservice/base/src/dcamera_sa_process_exit.cpp",
     "src/distributedcamera/distributed_camera_sink_service.cpp",
     "src/distributedcamera/distributed_camera_sink_stub.cpp",
     "src/distributedcameramgr/callback/dcamera_sink_controller_state_callback.cpp",
