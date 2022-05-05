@@ -60,7 +60,7 @@ ohos_shared_library("distributed_camera_source") {
     "${services_path}/cameraservice/base/src/dcamera_info_cmd.cpp",
     "${services_path}/cameraservice/base/src/dcamera_metadata_setting_cmd.cpp",
     "${services_path}/cameraservice/base/src/dcamera_open_info_cmd.cpp",
-    "${services_path}/cameraservice/base/src/dcamera_sa_exit_state.cpp",
+    "${services_path}/cameraservice/base/src/dcamera_sa_process_exit.cpp",
     "src/distributedcamera/dcamera_service_state_listener.cpp",
     "src/distributedcamera/dcamera_source_callback_proxy.cpp",
     "src/distributedcamera/distributed_camera_source_service.cpp",
