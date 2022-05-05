@@ -27,12 +27,12 @@ void VideoConfigParams::SetVideoformat(Videoformat pixelFormat)
     pixelFormat_ = pixelFormat;
 }
 
-void VideoConfigParams::SetFrameRate(uint32_t frameRate)
+void VideoConfigParams::SetFrameRate(int32_t frameRate)
 {
     frameRate_ = frameRate;
 }
 
-void VideoConfigParams::SetWidthAndHeight(uint32_t width, uint32_t height)
+void VideoConfigParams::SetWidthAndHeight(int32_t width, int32_t height)
 {
     width_ = width;
     height_ = height;
@@ -48,17 +48,17 @@ Videoformat VideoConfigParams::GetVideoformat() const
     return pixelFormat_;
 }
 
-uint32_t VideoConfigParams::GetFrameRate() const
+int32_t VideoConfigParams::GetFrameRate() const
 {
     return frameRate_;
 }
 
-uint32_t VideoConfigParams::GetWidth() const
+int32_t VideoConfigParams::GetWidth() const
 {
     return width_;
 }
 
-uint32_t VideoConfigParams::GetHeight() const
+int32_t VideoConfigParams::GetHeight() const
 {
     return height_;
 }

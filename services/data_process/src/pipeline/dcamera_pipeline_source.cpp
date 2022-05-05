@@ -17,6 +17,7 @@
 
 #include "distributed_hardware_log.h"
 
+#include "color_format_process.h"
 #include "decode_data_process.h"
 #include "fps_controller_process.h"
 
@@ -72,9 +73,9 @@ int32_t DCameraPipelineSource::CreateDataProcessPipeline(PipelineType piplineTyp
 
 bool DCameraPipelineSource::IsInRange(const VideoConfigParams& curConfig)
 {
-    return (curConfig.GetFrameRate() <= MAX_FRAME_RATE || curConfig.GetWidth() >= MIN_VIDEO_WIDTH ||
-        curConfig.GetWidth() <= MAX_VIDEO_WIDTH || curConfig.GetHeight() >= MIN_VIDEO_HEIGHT ||
-        curConfig.GetHeight() <= MAX_VIDEO_HEIGHT);
+    return (curConfig.GetFrameRate() >= MIN_FRAME_RATE || curConfig.GetFrameRate() <= MAX_FRAME_RATE ||
+        curConfig.GetWidth() >= MIN_VIDEO_WIDTH || curConfig.GetWidth() <= MAX_VIDEO_WIDTH ||
+        curConfig.GetHeight() >= MIN_VIDEO_HEIGHT || curConfig.GetHeight() <= MAX_VIDEO_HEIGHT);
 }
 
 void DCameraPipelineSource::InitDCameraPipEvent()
@@ -97,23 +98,31 @@ int32_t DCameraPipelineSource::InitDCameraPipNodes(const VideoConfigParams& sour
         DHLOGE("eventBusSource is nullptr.");
         return DCAMERA_BAD_VALUE;
     }
-    pipNodeRanks_.push_back(std::make_shared<DecodeDataProcess>(sourceConfig, targetConfig,
-        eventBusSource_, shared_from_this()));
+
+    pipNodeRanks_.push_back(std::make_shared<DecodeDataProcess>(eventBusSource_, shared_from_this()));
+    pipNodeRanks_.push_back(std::make_shared<ColorFormatProcess>(shared_from_this()));
     if (pipNodeRanks_.size() == 0) {
         DHLOGD("Creating an empty source pipeline.");
         pipelineHead_ = nullptr;
         return DCAMERA_BAD_VALUE;
     }
+
+    VideoConfigParams curNodeSourceCfg = sourceConfig;
     for (size_t i = 0; i < pipNodeRanks_.size(); i++) {
         pipNodeRanks_[i]->SetNodeRank(i);
-        int32_t err = pipNodeRanks_[i]->InitNode();
+
+        VideoConfigParams curNodeProcessedCfg;
+        int32_t err = pipNodeRanks_[i]->InitNode(curNodeSourceCfg, targetConfig, curNodeProcessedCfg);
         if (err != DCAMERA_OK) {
             DHLOGE("Init source DCamera pipeline Node [%d] failed.", i);
             return DCAMERA_INIT_ERR;
         }
+        curNodeSourceCfg = curNodeProcessedCfg;
+
         if (i == 0) {
             continue;
         }
+
         err = pipNodeRanks_[i - 1]->SetNextNode(pipNodeRanks_[i]);
         if (err != DCAMERA_OK) {
             DHLOGE("Set the next node of Node [%d] failed in source pipeline.", i - 1);

@@ -23,45 +23,50 @@ namespace OHOS {
 namespace DistributedHardware {
 enum class PipelineType : int32_t {
     VIDEO = 0,
-    PHOTO_JPEG,
+    PHOTO_JPEG = 1,
 };
 
 enum class VideoCodecType : int32_t {
     NO_CODEC = 0,
-    CODEC_H264,
-    CODEC_H265,
+    CODEC_H264 = 1,
+    CODEC_H265 = 2,
+    CODEC_MPEG4 = 3,
 };
 
 enum class Videoformat : int32_t {
     YUVI420 = 0,
-    NV12,
-    NV21,
+    NV12 = 1,
+    NV21 = 2,
+    RGBA_8888 = 3,
 };
 
 class VideoConfigParams {
 public:
-    VideoConfigParams(VideoCodecType videoCodec, Videoformat pixelFormat, uint32_t frameRate, uint32_t width,
-        uint32_t height)
+    VideoConfigParams() : videoCodec_(VideoCodecType::NO_CODEC), pixelFormat_(Videoformat::YUVI420),
+        frameRate_(0), width_ (0), height_(0)
+        {}
+    VideoConfigParams(VideoCodecType videoCodec, Videoformat pixelFormat, int32_t frameRate, int32_t width,
+        int32_t height)
         : videoCodec_(videoCodec), pixelFormat_(pixelFormat), frameRate_(frameRate), width_ (width), height_(height)
         {}
     ~VideoConfigParams() = default;
 
     void SetVideoCodecType(VideoCodecType videoCodec);
     void SetVideoformat(Videoformat pixelFormat);
-    void SetFrameRate(uint32_t frameRate);
-    void SetWidthAndHeight(uint32_t width, uint32_t height);
+    void SetFrameRate(int32_t frameRate);
+    void SetWidthAndHeight(int32_t width, int32_t height);
     VideoCodecType GetVideoCodecType() const;
     Videoformat GetVideoformat() const;
-    uint32_t GetFrameRate() const;
-    uint32_t GetWidth() const;
-    uint32_t GetHeight() const;
+    int32_t GetFrameRate() const;
+    int32_t GetWidth() const;
+    int32_t GetHeight() const;
 
 private:
     VideoCodecType videoCodec_;
     Videoformat pixelFormat_;
-    uint32_t frameRate_;
-    uint32_t width_;
-    uint32_t height_;
+    int32_t frameRate_;
+    int32_t width_;
+    int32_t height_;
 };
 
 struct ImageUnitInfo {

@@ -41,12 +41,12 @@ class EncodeVideoCallback;
 
 class EncodeDataProcess : public AbstractDataProcess, public std::enable_shared_from_this<EncodeDataProcess> {
 public:
-    EncodeDataProcess(const VideoConfigParams &sourceConfig, const VideoConfigParams &targetConfig,
-        const std::weak_ptr<DCameraPipelineSink>& callbackPipSink)
-        : sourceConfig_(sourceConfig), targetConfig_(targetConfig), callbackPipelineSink_(callbackPipSink) {}
+    explicit EncodeDataProcess(const std::weak_ptr<DCameraPipelineSink>& callbackPipSink)
+        : callbackPipelineSink_(callbackPipSink) {}
     ~EncodeDataProcess();
 
-    int32_t InitNode() override;
+    int32_t InitNode(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig,
+        VideoConfigParams& processedConfig) override;
     int32_t ProcessData(std::vector<std::shared_ptr<DataBuffer>>& inputBuffers) override;
     void ReleaseProcessNode() override;
 
@@ -61,15 +61,17 @@ private:
     bool IsInEncoderRange(const VideoConfigParams& curConfig);
     bool IsConvertible(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig);
     int32_t InitEncoder();
+    int32_t ConfigureVideoEncoder();
     int32_t InitEncoderMetadataFormat();
     int32_t InitEncoderBitrateFormat();
+    int32_t StartVideoEncoder();
     int32_t StopVideoEncoder();
     void ReleaseVideoEncoder();
     int32_t FeedEncoderInputBuffer(std::shared_ptr<DataBuffer>& inputBuffer);
     sptr<SurfaceBuffer> GetEncoderInputSurfaceBuffer();
     int64_t GetEncoderTimeStamp();
-    void IncreaseWaitDecodeCnt();
-    void ReduceWaitDecodeCnt();
+    void IncreaseWaitEncodeCnt();
+    void ReduceWaitEncodeCnt();
     int32_t GetEncoderOutputBuffer(uint32_t index, Media::AVCodecBufferInfo info);
     int32_t EncodeDone(std::vector<std::shared_ptr<DataBuffer>>& outputBuffers);
 
@@ -77,11 +79,12 @@ private:
     constexpr static int32_t ENCODER_STRIDE_ALIGNMENT = 8;
     constexpr static int64_t NORM_YUV420_BUFFER_SIZE = 1920 * 1080 * 3 / 2;
     constexpr static int32_t NORM_RGB32_BUFFER_SIZE = 1920 * 1080 * 4;
-    constexpr static uint32_t MAX_FRAME_RATE = 30;
-    constexpr static uint32_t MIN_VIDEO_WIDTH = 320;
-    constexpr static uint32_t MIN_VIDEO_HEIGHT = 240;
-    constexpr static uint32_t MAX_VIDEO_WIDTH = 1920;
-    constexpr static uint32_t MAX_VIDEO_HEIGHT = 1080;
+    constexpr static int32_t MIN_FRAME_RATE = 0;
+    constexpr static int32_t MAX_FRAME_RATE = 30;
+    constexpr static int32_t MIN_VIDEO_WIDTH = 320;
+    constexpr static int32_t MIN_VIDEO_HEIGHT = 240;
+    constexpr static int32_t MAX_VIDEO_WIDTH = 1920;
+    constexpr static int32_t MAX_VIDEO_HEIGHT = 1080;
     constexpr static int32_t IDR_FRAME_INTERVAL_MS = 300;
     constexpr static int32_t FIRST_FRAME_OUTPUT_NUM = 2;
 
@@ -107,16 +110,17 @@ private:
     constexpr static int32_t BITRATE_6000000 = 6000000;
     const static std::map<std::int64_t, int32_t> ENCODER_BITRATE_TABLE;
 
+    std::weak_ptr<DCameraPipelineSink> callbackPipelineSink_;
     std::mutex mtxEncoderState_;
     std::mutex mtxHoldCount_;
     VideoConfigParams sourceConfig_;
     VideoConfigParams targetConfig_;
-    std::weak_ptr<DCameraPipelineSink> callbackPipelineSink_;
+    VideoConfigParams processedConfig_;
     std::shared_ptr<Media::AVCodecVideoEncoder> videoEncoder_ = nullptr;
     std::shared_ptr<Media::AVCodecCallback> encodeVideoCallback_ = nullptr;
     sptr<Surface> encodeProducerSurface_ = nullptr;
 
-    bool isEncoderProcess_ = false;
+    std::atomic<bool> isEncoderProcess_ = false;
     int32_t waitEncoderOutputCount_ = 0;
     int64_t lastFeedEncoderInputBufferTimeUs_ = 0;
     int64_t inputTimeStampUs_ = 0;

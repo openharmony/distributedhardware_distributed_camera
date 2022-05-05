@@ -57,11 +57,12 @@ private:
 
 private:
     const static std::string PIPELINE_OWNER;
-    constexpr static uint32_t MAX_FRAME_RATE = 30;
-    constexpr static uint32_t MIN_VIDEO_WIDTH = 320;
-    constexpr static uint32_t MIN_VIDEO_HEIGHT = 240;
-    constexpr static uint32_t MAX_VIDEO_WIDTH = 1920;
-    constexpr static uint32_t MAX_VIDEO_HEIGHT = 1080;
+    constexpr static int32_t MIN_FRAME_RATE = 0;
+    constexpr static int32_t MAX_FRAME_RATE = 30;
+    constexpr static int32_t MIN_VIDEO_WIDTH = 320;
+    constexpr static int32_t MIN_VIDEO_HEIGHT = 240;
+    constexpr static int32_t MAX_VIDEO_WIDTH = 1920;
+    constexpr static int32_t MAX_VIDEO_HEIGHT = 1080;
 
     std::shared_ptr<DataProcessListener> processListener_ = nullptr;
     std::shared_ptr<AbstractDataProcess> pipelineHead_ = nullptr;
