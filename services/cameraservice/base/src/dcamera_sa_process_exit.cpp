@@ -28,13 +28,13 @@ DCameraSAProcessExit::~DCameraSAProcessExit()
 void DCameraSAProcessExit::setSinkProcessState()
 {
     DHLOGI("release sink success.");
-    sourceSAProcessState_ = DCAMERA_SA_EXIT_STATE_STOP;
+    sinkSAProcessState_ = DCAMERA_SA_EXIT_STATE_STOP;
 }
 
 void DCameraSAProcessExit::setSourceProcessState()
 {
     DHLOGI("release source success.");
-    sinkSAProcessState_ = DCAMERA_SA_EXIT_STATE_STOP;
+    sourceSAProcessState_ = DCAMERA_SA_EXIT_STATE_STOP;
 }
 
 void DCameraSAProcessExit::checkSAProcessState()
