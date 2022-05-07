@@ -45,6 +45,7 @@ void DCameraSAProcessState::SetSourceProcessExit()
 void DCameraSAProcessState::CheckSAProcessState()
 {
     DHLOGI("start exit sa process.");
+    DHLOGI("sourceSAState_ = %d sinkSAState_ = %d", sourceSAState_, sinkSAState_);
     if (sourceSAState_ == DCAMERA_SA_EXIT_STATE_START || sinkSAState_ == DCAMERA_SA_EXIT_STATE_START) {
         DHLOGI("=============DCAMERA_SA_EXIT_STATE_START==============");
         return;
