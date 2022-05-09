@@ -69,9 +69,9 @@ int32_t DCameraPipelineSink::CreateDataProcessPipeline(PipelineType piplineType,
 
 bool DCameraPipelineSink::IsInRange(const VideoConfigParams& curConfig)
 {
-    return (curConfig.GetFrameRate() <= MAX_FRAME_RATE || curConfig.GetWidth() >= MIN_VIDEO_WIDTH ||
-        curConfig.GetWidth() <= MAX_VIDEO_WIDTH || curConfig.GetHeight() >= MIN_VIDEO_HEIGHT ||
-        curConfig.GetHeight() <= MAX_VIDEO_HEIGHT);
+    return (curConfig.GetFrameRate() >= MIN_FRAME_RATE || curConfig.GetFrameRate() <= MAX_FRAME_RATE ||
+        curConfig.GetWidth() >= MIN_VIDEO_WIDTH || curConfig.GetWidth() <= MAX_VIDEO_WIDTH ||
+        curConfig.GetHeight() >= MIN_VIDEO_HEIGHT || curConfig.GetHeight() <= MAX_VIDEO_HEIGHT);
 }
 
 int32_t DCameraPipelineSink::InitDCameraPipNodes(const VideoConfigParams& sourceConfig,
@@ -83,22 +83,29 @@ int32_t DCameraPipelineSink::InitDCameraPipNodes(const VideoConfigParams& source
         return DCAMERA_NOT_FOUND;
     }
 
-    pipNodeRanks_.push_back(std::make_shared<EncodeDataProcess>(sourceConfig, targetConfig, shared_from_this()));
+    pipNodeRanks_.push_back(std::make_shared<EncodeDataProcess>(shared_from_this()));
     if (pipNodeRanks_.size() == 0) {
         DHLOGD("Creating an empty sink pipeline.");
         pipelineHead_ = nullptr;
         return DCAMERA_BAD_VALUE;
     }
+
+    VideoConfigParams curNodeSourceCfg = sourceConfig;
     for (size_t i = 0; i < pipNodeRanks_.size(); i++) {
         pipNodeRanks_[i]->SetNodeRank(i);
-        int32_t err = pipNodeRanks_[i]->InitNode();
+
+        VideoConfigParams curNodeProcessedCfg;
+        int32_t err = pipNodeRanks_[i]->InitNode(curNodeSourceCfg, targetConfig, curNodeProcessedCfg);
         if (err != DCAMERA_OK) {
             DHLOGE("Init sink DCamera pipeline Node [%d] failed.", i);
             return DCAMERA_INIT_ERR;
         }
+        curNodeSourceCfg = curNodeProcessedCfg;
+
         if (i == 0) {
             continue;
         }
+
         err = pipNodeRanks_[i - 1]->SetNextNode(pipNodeRanks_[i]);
         if (err != DCAMERA_OK) {
             DHLOGE("Set the next node of Node [%d] failed in sink pipeline.", i - 1);

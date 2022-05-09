@@ -29,14 +29,20 @@ FpsControllerProcess::~FpsControllerProcess()
     }
 }
 
-int32_t FpsControllerProcess::InitNode()
+int32_t FpsControllerProcess::InitNode(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig,
+    VideoConfigParams& processedConfig)
 {
-    if (targetConfig_.GetFrameRate() > MAX_TARGET_FRAME_RATE) {
+    if (targetConfig.GetFrameRate() > MAX_TARGET_FRAME_RATE) {
         DHLOGE("The target framerate : %d is greater than the max framerate : %d.",
-            targetConfig_.GetFrameRate(), MAX_TARGET_FRAME_RATE);
+            targetConfig.GetFrameRate(), MAX_TARGET_FRAME_RATE);
         return DCAMERA_BAD_TYPE;
     }
+    sourceConfig_ = sourceConfig;
+    targetConfig_ = targetConfig;
     targetFrameRate_ = targetConfig_.GetFrameRate();
+
+    processedConfig_ = sourceConfig;
+    processedConfig = processedConfig_;
     isFpsControllerProcess_ = true;
     return DCAMERA_OK;
 }
@@ -215,7 +221,7 @@ float FpsControllerProcess::CalculateFrameRate(int64_t nowMs)
 
     const float msPerSecond = 1000;
     const int32_t minValidCalculatedFrameRatesNum = 2;
-    int32_t minIncomingFrameNum = static_cast<int32_t>(targetFrameRate_) / MIN_INCOME_FRAME_NUM_COEFFICIENT;
+    int32_t minIncomingFrameNum = targetFrameRate_ / MIN_INCOME_FRAME_NUM_COEFFICIENT;
     if (validFramesNumber > minIncomingFrameNum && validFramesNumber > minValidCalculatedFrameRatesNum) {
         int64_t validTotalTimeInterval = (nowMs - incomingFrameTimesMs_[num - 1]);
         if (validTotalTimeInterval < 0) {
@@ -240,7 +246,7 @@ bool FpsControllerProcess::IsDropFrame(float incomingFps)
         return false;
     }
     const int32_t incomingFrmRate = static_cast<int32_t>(incomingFps);
-    if (incomingFrmRate > static_cast<int32_t>(targetFrameRate_)) {
+    if (incomingFrmRate > targetFrameRate_) {
         DHLOGD("incoming fps not more than targetFrameRate_, not drop");
         return false;
     }
@@ -252,7 +258,7 @@ bool FpsControllerProcess::IsDropFrame(float incomingFps)
 bool FpsControllerProcess::ReduceFrameRateByUniformStrategy(int32_t incomingFrmRate)
 {
     DHLOGD("Frame control, reduce frame rate by uniform rate strategy");
-    if (incomingFrmRate > static_cast<int32_t>(targetFrameRate_)) {
+    if (incomingFrmRate > targetFrameRate_) {
         DHLOGD("incoming fps not more than targetFrameRate_, not drop");
         return false;
     }
@@ -295,7 +301,7 @@ bool FpsControllerProcess::ReduceFrameRateByUniformStrategy(int32_t incomingFrmR
             isDrop = true;
             keepMoreThanDoubleCount_++;
         } else {
-            frameRateOvershootMdf_ = overshoot % static_cast<int32_t>(targetFrameRate_);
+            frameRateOvershootMdf_ = overshoot % targetFrameRate_;
             isDrop = false;
             keepMoreThanDoubleCount_ = 0;
         }

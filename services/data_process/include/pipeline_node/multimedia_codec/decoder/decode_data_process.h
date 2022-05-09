@@ -51,14 +51,13 @@ class DecodeVideoCallback;
 class DecodeDataProcess : public EventSender, public EventBusHandler<DCameraCodecEvent>, public AbstractDataProcess,
     public std::enable_shared_from_this<DecodeDataProcess> {
 public:
-    DecodeDataProcess(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig,
-        const std::shared_ptr<EventBus>& eventBusPipeline,
+    DecodeDataProcess(const std::shared_ptr<EventBus>& eventBusPipeline,
         const std::weak_ptr<DCameraPipelineSource>& callbackPipSource)
-        : sourceConfig_(sourceConfig), targetConfig_(targetConfig), eventBusPipeline_(eventBusPipeline),
-        callbackPipelineSource_(callbackPipSource) {}
+        : eventBusPipeline_(eventBusPipeline), callbackPipelineSource_(callbackPipSource) {}
     ~DecodeDataProcess();
 
-    int32_t InitNode() override;
+    int32_t InitNode(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig,
+        VideoConfigParams& processedConfig) override;
     int32_t ProcessData(std::vector<std::shared_ptr<DataBuffer>>& inputBuffers) override;
     void ReleaseProcessNode() override;
     void OnEvent(DCameraCodecEvent& ev) override;
@@ -77,8 +76,10 @@ private:
     bool IsConvertible(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig);
     void InitCodecEvent();
     int32_t InitDecoder();
+    int32_t ConfigureVideoDecoder();
     int32_t InitDecoderMetadataFormat();
     int32_t SetDecoderOutputSurface();
+    int32_t StartVideoDecoder();
     int32_t StopVideoDecoder();
     void ReleaseVideoDecoder();
     void ReleaseDecoderSurface();
@@ -100,22 +101,24 @@ private:
     constexpr static int32_t VIDEO_DECODER_QUEUE_MAX = 1000;
     constexpr static int32_t MAX_YUV420_BUFFER_SIZE = 1920 * 1080 * 3 / 2 * 2;
     constexpr static int32_t MAX_RGB32_BUFFER_SIZE = 1920 * 1080 * 4 * 2;
-    constexpr static uint32_t MAX_FRAME_RATE = 30;
-    constexpr static uint32_t MIN_VIDEO_WIDTH = 320;
-    constexpr static uint32_t MIN_VIDEO_HEIGHT = 240;
-    constexpr static uint32_t MAX_VIDEO_WIDTH = 1920;
-    constexpr static uint32_t MAX_VIDEO_HEIGHT = 1080;
+    constexpr static int32_t MIN_FRAME_RATE = 0;
+    constexpr static int32_t MAX_FRAME_RATE = 30;
+    constexpr static int32_t MIN_VIDEO_WIDTH = 320;
+    constexpr static int32_t MIN_VIDEO_HEIGHT = 240;
+    constexpr static int32_t MAX_VIDEO_WIDTH = 1920;
+    constexpr static int32_t MAX_VIDEO_HEIGHT = 1080;
     constexpr static int32_t FIRST_FRAME_INPUT_NUM = 2;
     constexpr static int32_t RGB32_MEMORY_COEFFICIENT = 4;
     constexpr static int32_t YUV_BYTES_PER_PIXEL = 3;
     constexpr static int32_t Y2UV_RATIO = 2;
 
+    std::shared_ptr<EventBus> eventBusPipeline_;
+    std::weak_ptr<DCameraPipelineSource> callbackPipelineSource_;
     std::mutex mtxDecoderState_;
     std::mutex mtxHoldCount_;
     VideoConfigParams sourceConfig_;
     VideoConfigParams targetConfig_;
-    std::shared_ptr<EventBus> eventBusPipeline_;
-    std::weak_ptr<DCameraPipelineSource> callbackPipelineSource_;
+    VideoConfigParams processedConfig_;
     std::shared_ptr<EventBus> eventBusDecode_ = nullptr;
     std::shared_ptr<EventRegistration> eventBusRegHandleDecode_ = nullptr;
     std::shared_ptr<EventRegistration> eventBusRegHandlePipeline2Decode_ = nullptr;
@@ -125,7 +128,7 @@ private:
     sptr<Surface> decodeProducerSurface_ = nullptr;
     sptr<IBufferConsumerListener> decodeSurfaceListener_ = nullptr;
 
-    bool isDecoderProcess_ = false;
+    std::atomic<bool> isDecoderProcess_ = false;
     int32_t waitDecoderOutputCount_ = 0;
     int32_t alignedHeight_ = 0;
     int64_t lastFeedDecoderInputBufferTimeUs_ = 0;

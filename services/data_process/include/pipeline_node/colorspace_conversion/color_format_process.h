@@ -13,27 +13,35 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_CONVERT_NV12TONV21_H
-#define OHOS_CONVERT_NV12TONV21_H
+#ifndef OHOS_COLOR_FORMAT_PROCESS_H
+#define OHOS_COLOR_FORMAT_PROCESS_H
 
 #include "securec.h"
+
+#include "abstract_data_process.h"
 #include "data_buffer.h"
+#include "dcamera_pipeline_source.h"
 #include "image_common_type.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class ConvertNV12ToNV21 {
+class ColorFormatProcess : public AbstractDataProcess {
 public:
-    ConvertNV12ToNV21() = default;
-    ~ConvertNV12ToNV21() = default;
-    std::shared_ptr<DataBuffer> ProcessData(const std::shared_ptr<DataBuffer>& srcBuf,
-        const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig);
+    explicit ColorFormatProcess(const std::weak_ptr<DCameraPipelineSource>& callbackPipSource)
+        : callbackPipelineSource_(callbackPipSource) {}
+    ~ColorFormatProcess();
+
+    int32_t InitNode(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig,
+        VideoConfigParams& processedConfig) override;
+    int32_t ProcessData(std::vector<std::shared_ptr<DataBuffer>>& inputBuffers) override;
+    void ReleaseProcessNode() override;
 
 private:
     bool IsConvertible(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig);
     int32_t GetImageUnitInfo(ImageUnitInfo& imgInfo, const std::shared_ptr<DataBuffer>& imgBuf);
+    bool CheckColorProcessInputInfo(const ImageUnitInfo& srcImgInfo);
+    bool CheckColorConvertInfo(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo);
     bool IsCorrectImageUnitInfo(const ImageUnitInfo& imgInfo);
-    int32_t CheckColorConvertInfo(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo);
     void SeparateUVPlaneByRow(const uint8_t *srcUVPlane, uint8_t *dstUPlane, uint8_t *dstVPlane,
         int32_t srcHalfWidth);
     int32_t SeparateNV12UVPlane(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo);
@@ -42,7 +50,20 @@ private:
     int32_t CombineNV12UVPlane(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo);
     int32_t CopyYPlane(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo);
     int32_t ColorConvertNV12ToNV21(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo);
+    int32_t ColorConvertNV12ToI420(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo);
+    int32_t ColorConvertByColorFormat(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo);
+    int32_t ColorFormatDone(std::vector<std::shared_ptr<DataBuffer>>& outputBuffers);
+
+private:
+    constexpr static int32_t YUV_BYTES_PER_PIXEL = 3;
+    constexpr static int32_t Y2UV_RATIO = 2;
+
+    std::weak_ptr<DCameraPipelineSource> callbackPipelineSource_;
+    VideoConfigParams sourceConfig_;
+    VideoConfigParams targetConfig_;
+    VideoConfigParams processedConfig_;
+    std::atomic<bool> isColorFormatProcess_ = false;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_CONVERT_NV12TONV21_H
+#endif // OHOS_COLOR_FORMAT_PROCESS_H

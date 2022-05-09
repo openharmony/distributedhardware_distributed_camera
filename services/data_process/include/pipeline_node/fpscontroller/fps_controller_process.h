@@ -27,12 +27,12 @@ class DCameraPipelineSource;
 
 class FpsControllerProcess : public AbstractDataProcess {
 public:
-    FpsControllerProcess(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig,
-        const std::weak_ptr<DCameraPipelineSource>& callbackPipSource)
-        : sourceConfig_(sourceConfig), targetConfig_(targetConfig), callbackPipelineSource_(callbackPipSource) {}
+    explicit FpsControllerProcess(const std::weak_ptr<DCameraPipelineSource>& callbackPipSource)
+        : callbackPipelineSource_(callbackPipSource) {}
     ~FpsControllerProcess();
 
-    int32_t InitNode() override;
+    int32_t InitNode(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig,
+        VideoConfigParams& processedConfig) override;
     int32_t ProcessData(std::vector<std::shared_ptr<DataBuffer>>& inputBuffers) override;
     void ReleaseProcessNode() override;
 
@@ -46,7 +46,7 @@ private:
     int32_t FpsControllerDone(std::vector<std::shared_ptr<DataBuffer>>& outputBuffers);
 
 private:
-    constexpr static uint32_t MAX_TARGET_FRAME_RATE = 30;
+    constexpr static int32_t MAX_TARGET_FRAME_RATE = 30;
     constexpr static int32_t VIDEO_FRAME_DROP_INTERVAL = 4;
     constexpr static int32_t MIN_INCOME_FRAME_NUM_COEFFICIENT = 3;
     constexpr static int32_t INCOME_FRAME_TIME_HISTORY_WINDOWS_SIZE = 60;
@@ -56,13 +56,14 @@ private:
     constexpr static int32_t OVERSHOOT_MODIFY_COEFFICIENT = 3;
     constexpr static int32_t DOUBLE_MULTIPLE = 2;
 
+    std::weak_ptr<DCameraPipelineSource> callbackPipelineSource_;
     std::mutex mtx;
     VideoConfigParams sourceConfig_;
     VideoConfigParams targetConfig_;
-    std::weak_ptr<DCameraPipelineSource> callbackPipelineSource_;
+    VideoConfigParams processedConfig_;
     bool isFpsControllerProcess_ = false;
     bool isFirstFrame_ = false;
-    uint32_t targetFrameRate_ = 0;
+    int32_t targetFrameRate_ = 0;
     int64_t lastFrameIncomeTimeMs_ = 0;
     /* the time span between current and last frame */
     int64_t recentFrameTimeSpanMs_ = -1;

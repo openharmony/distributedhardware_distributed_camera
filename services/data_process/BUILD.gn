@@ -49,7 +49,7 @@ ohos_shared_library("distributed_camera_data_process") {
     "src/pipeline/abstract_data_process.cpp",
     "src/pipeline/dcamera_pipeline_sink.cpp",
     "src/pipeline/dcamera_pipeline_source.cpp",
-    "src/pipeline_node/colorspace_conversion/convert_nv12_to_nv21.cpp",
+    "src/pipeline_node/colorspace_conversion/color_format_process.cpp",
     "src/pipeline_node/fpscontroller/fps_controller_process.cpp",
     "src/pipeline_node/multimedia_codec/decoder/decode_surface_listener.cpp",
     "src/pipeline_node/multimedia_codec/decoder/decode_video_callback.cpp",

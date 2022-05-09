@@ -31,7 +31,8 @@ public:
     int32_t SetNextNode(std::shared_ptr<AbstractDataProcess>& nextDataProcess);
     void SetNodeRank(size_t curNodeRank);
 
-    virtual int32_t InitNode() = 0;
+    virtual int32_t InitNode(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig,
+        VideoConfigParams& processedConfig) = 0;
     virtual int32_t ProcessData(std::vector<std::shared_ptr<DataBuffer>>& inputBuffers) = 0;
     virtual void ReleaseProcessNode() = 0;
 

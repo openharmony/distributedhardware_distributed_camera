@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "convert_nv12_to_nv21.h"
+#include "color_format_process.h"
 
 #include "distributed_hardware_log.h"
 
@@ -21,13 +21,104 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-bool ConvertNV12ToNV21::IsConvertible(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig)
+ColorFormatProcess::~ColorFormatProcess()
+{
+    if (isColorFormatProcess_.load()) {
+        DHLOGD("~ColorFormatProcess : ReleaseProcessNode.");
+        ReleaseProcessNode();
+    }
+}
+
+int32_t ColorFormatProcess::InitNode(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig,
+    VideoConfigParams& processedConfig)
+{
+    DHLOGD("ColorFormatProcess : InitNode.");
+    if (!IsConvertible(sourceConfig, targetConfig)) {
+        DHLOGE("sourceConfig: Videoformat %d Width %d, Height %d, targetConfig: Videoformat %d Width %d, Height %d.",
+            sourceConfig.GetVideoformat(), sourceConfig.GetWidth(), sourceConfig.GetHeight(),
+            targetConfig.GetVideoformat(), targetConfig.GetWidth(), targetConfig.GetHeight());
+        return DCAMERA_BAD_TYPE;
+    }
+
+    sourceConfig_ = sourceConfig;
+    targetConfig_ = targetConfig;
+    processedConfig_ = sourceConfig;
+
+    if (sourceConfig_.GetVideoformat() != targetConfig_.GetVideoformat()) {
+        processedConfig_.SetVideoformat(targetConfig_.GetVideoformat());
+    }
+
+    processedConfig = processedConfig_;
+    isColorFormatProcess_.store(true);
+    return DCAMERA_OK;
+}
+
+bool ColorFormatProcess::IsConvertible(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig)
 {
     return (sourceConfig.GetVideoformat() == Videoformat::NV12 && targetConfig.GetVideoformat() == Videoformat::NV21 &&
         sourceConfig.GetWidth() == targetConfig.GetWidth() && sourceConfig.GetHeight() == targetConfig.GetHeight());
 }
 
-int32_t ConvertNV12ToNV21::GetImageUnitInfo(ImageUnitInfo& imgInfo, const std::shared_ptr<DataBuffer>& imgBuf)
+void ColorFormatProcess::ReleaseProcessNode()
+{
+    DHLOGD("Start release [%d] node : ColorFormatNode.", nodeRank_);
+    isColorFormatProcess_.store(false);
+
+    if (nextDataProcess_ != nullptr) {
+        nextDataProcess_->ReleaseProcessNode();
+    }
+    nextDataProcess_ = nullptr;
+}
+
+int32_t ColorFormatProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& inputBuffers)
+{
+    DHLOGD("Process data in ColorFormatProcess.");
+    if (inputBuffers.empty() || inputBuffers[0] == nullptr) {
+        DHLOGE("The input data buffers is empty.");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    if (sourceConfig_.GetVideoformat() == processedConfig_.GetVideoformat()) {
+        DHLOGD("The target VideoCodecType : %d is the same as the source VideoCodecType : %d.",
+            sourceConfig_.GetVideoformat(), processedConfig_.GetVideoformat());
+        return ColorFormatDone(inputBuffers);
+    }
+
+    int64_t timeStamp = 0;
+    if (!(inputBuffers[0]->FindInt64("timeUs", timeStamp))) {
+        DHLOGE("ColorConvertProcess : Find inputBuffer timeStamp failed.");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    ImageUnitInfo srcImgInfo {Videoformat::YUVI420, 0, 0, 0, 0, 0, 0, nullptr};
+    if (GetImageUnitInfo(srcImgInfo, inputBuffers[0]) != DCAMERA_OK || !CheckColorProcessInputInfo(srcImgInfo)) {
+        DHLOGE("ColorConvertProcess : srcImgInfo error.");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    size_t dstBufsize = sourceConfig_.GetWidth() * sourceConfig_.GetHeight() * YUV_BYTES_PER_PIXEL / Y2UV_RATIO;
+    std::shared_ptr<DataBuffer> dstBuf = std::make_shared<DataBuffer>(dstBufsize);
+    ImageUnitInfo dstImgInfo = { processedConfig_.GetVideoformat(), processedConfig_.GetWidth(),
+        processedConfig_.GetHeight(), processedConfig_.GetWidth(), processedConfig_.GetHeight(),
+        processedConfig_.GetWidth() * processedConfig_.GetHeight(), dstBuf->Size(), dstBuf->Data() };
+    if (ColorConvertByColorFormat(srcImgInfo, dstImgInfo) != DCAMERA_OK) {
+        DHLOGE("ColorConvertProcess : ColorConvertByColorFormat failed.");
+        return DCAMERA_BAD_OPERATE;
+    }
+
+    dstBuf->SetInt64("timeUs", timeStamp);
+    dstBuf->SetInt32("Videoformat", static_cast<int32_t>(processedConfig_.GetVideoformat()));
+    dstBuf->SetInt32("alignedWidth", processedConfig_.GetWidth());
+    dstBuf->SetInt32("alignedHeight", processedConfig_.GetHeight());
+    dstBuf->SetInt32("width", processedConfig_.GetWidth());
+    dstBuf->SetInt32("height", processedConfig_.GetHeight());
+
+    std::vector<std::shared_ptr<DataBuffer>> outputBuffers;
+    outputBuffers.push_back(dstBuf);
+    return ColorFormatDone(outputBuffers);
+}
+
+int32_t ColorFormatProcess::GetImageUnitInfo(ImageUnitInfo& imgInfo, const std::shared_ptr<DataBuffer>& imgBuf)
 {
     if (imgBuf == nullptr) {
         DHLOGE("GetImageUnitInfo failed, imgBuf is nullptr.");
@@ -71,48 +162,54 @@ int32_t ConvertNV12ToNV21::GetImageUnitInfo(ImageUnitInfo& imgInfo, const std::s
     return DCAMERA_OK;
 }
 
-bool ConvertNV12ToNV21::IsCorrectImageUnitInfo(const ImageUnitInfo& imgInfo)
+bool ColorFormatProcess::CheckColorProcessInputInfo(const ImageUnitInfo& srcImgInfo)
 {
-    int32_t y2UvRatio = 2;
-    int32_t bytesPerPixel = 3;
-    size_t expectedImgSize = static_cast<size_t>(imgInfo.alignedWidth * imgInfo.alignedHeight *
-                                                 bytesPerPixel / y2UvRatio);
-    size_t expectedChromaOffset = static_cast<size_t>(imgInfo.alignedWidth * imgInfo.alignedHeight);
-    return (imgInfo.width <= imgInfo.alignedWidth && imgInfo.height <= imgInfo.alignedHeight &&
-        imgInfo.imgSize >= expectedImgSize && imgInfo.chromaOffset == expectedChromaOffset);
+    return srcImgInfo.colorFormat == sourceConfig_.GetVideoformat() &&
+        srcImgInfo.alignedWidth == sourceConfig_.GetWidth() &&
+        srcImgInfo.alignedHeight == sourceConfig_.GetHeight() &&
+        IsCorrectImageUnitInfo(srcImgInfo);
 }
 
-int32_t ConvertNV12ToNV21::CheckColorConvertInfo(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo)
+bool ColorFormatProcess::CheckColorConvertInfo(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo)
 {
     if (srcImgInfo.imgData == nullptr || dstImgInfo.imgData == nullptr) {
         DHLOGE("The imgData of srcImgInfo or the imgData of dstImgInfo are null!");
-        return DCAMERA_BAD_VALUE;
+        return false;
     }
     if (srcImgInfo.colorFormat != Videoformat::NV12 && dstImgInfo.colorFormat != Videoformat::NV21) {
         DHLOGE("CopyInfo error : srcImgInfo colorFormat %d, dstImgInfo colorFormat %d.",
             srcImgInfo.colorFormat, dstImgInfo.colorFormat);
-        return DCAMERA_BAD_VALUE;
+        return false;
     }
 
     if (!IsCorrectImageUnitInfo(srcImgInfo)) {
         DHLOGE("srcImginfo fail: width %d, height %d, alignedWidth %d, alignedHeight %d, chromaOffset %lld, " +
             "imgSize %lld.", srcImgInfo.width, srcImgInfo.height, srcImgInfo.alignedWidth, srcImgInfo.alignedHeight,
             srcImgInfo.chromaOffset, srcImgInfo.imgSize);
-        return DCAMERA_BAD_VALUE;
+        return false;
     }
     if (!IsCorrectImageUnitInfo(dstImgInfo)) {
         DHLOGE("dstImginfo fail: width %d, height %d, alignedWidth %d, alignedHeight %d, chromaOffset %lld, " +
             "imgSize %lld.", dstImgInfo.width, dstImgInfo.height, dstImgInfo.alignedWidth, dstImgInfo.alignedHeight,
             dstImgInfo.chromaOffset, dstImgInfo.imgSize);
-        return DCAMERA_BAD_VALUE;
+        return false;
     }
 
     if (dstImgInfo.width > srcImgInfo.alignedWidth || dstImgInfo.height > srcImgInfo.alignedHeight) {
         DHLOGE("Comparison ImgInfo fail: dstwidth %d, dstheight %d, srcAlignedWidth %d, srcAlignedHeight %d.",
             dstImgInfo.width, dstImgInfo.height, srcImgInfo.alignedWidth, srcImgInfo.alignedHeight);
-        return DCAMERA_BAD_VALUE;
+        return false;
     }
-    return DCAMERA_OK;
+    return true;
+}
+
+bool ColorFormatProcess::IsCorrectImageUnitInfo(const ImageUnitInfo& imgInfo)
+{
+    size_t expectedImgSize = static_cast<size_t>(imgInfo.alignedWidth * imgInfo.alignedHeight *
+                                                 YUV_BYTES_PER_PIXEL / Y2UV_RATIO);
+    size_t expectedChromaOffset = static_cast<size_t>(imgInfo.alignedWidth * imgInfo.alignedHeight);
+    return (imgInfo.width <= imgInfo.alignedWidth && imgInfo.height <= imgInfo.alignedHeight &&
+        imgInfo.imgSize >= expectedImgSize && imgInfo.chromaOffset == expectedChromaOffset);
 }
 
 /**
@@ -120,7 +217,7 @@ int32_t ConvertNV12ToNV21::CheckColorConvertInfo(const ImageUnitInfo& srcImgInfo
 * converts the UVPlane memory arrangement of NV12 to the UV memory arrangement of YUVI420. Note that the
 * stride and width of the dstImage must be the same.
 */
-void ConvertNV12ToNV21::SeparateUVPlaneByRow(const uint8_t *srcUVPlane, uint8_t *dstUPlane, uint8_t *dstVPlane,
+void ColorFormatProcess::SeparateUVPlaneByRow(const uint8_t *srcUVPlane, uint8_t *dstUPlane, uint8_t *dstVPlane,
     int32_t srcHalfWidth)
 {
     int32_t memoryOffset0 = 0;
@@ -141,23 +238,21 @@ void ConvertNV12ToNV21::SeparateUVPlaneByRow(const uint8_t *srcUVPlane, uint8_t 
     }
 }
 
-int32_t ConvertNV12ToNV21::SeparateNV12UVPlane(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo)
+int32_t ColorFormatProcess::SeparateNV12UVPlane(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo)
 {
-    int32_t ret = CheckColorConvertInfo(srcImgInfo, dstImgInfo);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("ColorConvert : CheckColorConvertInfo failed.");
-        return ret;
+    if (!CheckColorConvertInfo(srcImgInfo, dstImgInfo)) {
+        DHLOGE("ColorFormatProcess : CheckColorConvertInfo failed.");
+        return DCAMERA_BAD_VALUE;
     }
 
-    int32_t y2UvRatio = 2;
     uint8_t *srcUVPlane = srcImgInfo.imgData + srcImgInfo.chromaOffset;
     int32_t srcUVStride = srcImgInfo.alignedWidth;
     uint8_t *dstUPlane = dstImgInfo.imgData + dstImgInfo.chromaOffset;
-    int32_t dstUStride = dstImgInfo.alignedWidth / y2UvRatio;
-    uint8_t *dstVPlane = dstUPlane + (dstImgInfo.chromaOffset / y2UvRatio) / y2UvRatio;
-    int32_t dstVStride = dstImgInfo.alignedWidth / y2UvRatio;
-    int32_t width = srcImgInfo.width / y2UvRatio;
-    int32_t height = srcImgInfo.height / y2UvRatio;
+    int32_t dstUStride = dstImgInfo.alignedWidth / Y2UV_RATIO;
+    uint8_t *dstVPlane = dstUPlane + (dstImgInfo.chromaOffset / Y2UV_RATIO) / Y2UV_RATIO;
+    int32_t dstVStride = dstImgInfo.alignedWidth / Y2UV_RATIO;
+    int32_t width = srcImgInfo.width / Y2UV_RATIO;
+    int32_t height = srcImgInfo.height / Y2UV_RATIO;
     DHLOGD("srcUVStride %d, dstUStride %d, dstVStride %d, src half width %d, src half height %d.",
         srcUVStride, dstUStride, dstVStride, width, height);
 
@@ -170,7 +265,7 @@ int32_t ConvertNV12ToNV21::SeparateNV12UVPlane(const ImageUnitInfo& srcImgInfo, 
         dstVStride = -dstVStride;
     }
     /* No black border of srcImage and dstImage, and the strides of srcImage and dstImage are equal. */
-    if (srcUVStride == width * y2UvRatio && dstUStride == width && dstVStride == width) {
+    if (srcUVStride == width * Y2UV_RATIO && dstUStride == width && dstVStride == width) {
         SeparateUVPlaneByRow(srcUVPlane, dstUPlane, dstVPlane, width * height);
         return DCAMERA_OK;
     }
@@ -189,7 +284,7 @@ int32_t ConvertNV12ToNV21::SeparateNV12UVPlane(const ImageUnitInfo& srcImgInfo, 
 * converts the UVPlane memory arrangement of YUVI420 to the UV memory arrangement of NV12. Note that the
 * stride and width of the srcImage must be the same.
 */
-void ConvertNV12ToNV21::CombineUVPlaneByRow(const uint8_t *srcUPlane, const uint8_t *srcVPlane, uint8_t *dstUVPlane,
+void ColorFormatProcess::CombineUVPlaneByRow(const uint8_t *srcUPlane, const uint8_t *srcVPlane, uint8_t *dstUVPlane,
     int32_t dstHalfWidth)
 {
     int32_t memoryOffset0 = 0;
@@ -210,23 +305,21 @@ void ConvertNV12ToNV21::CombineUVPlaneByRow(const uint8_t *srcUPlane, const uint
     }
 }
 
-int32_t ConvertNV12ToNV21::CombineNV12UVPlane(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo)
+int32_t ColorFormatProcess::CombineNV12UVPlane(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo)
 {
-    int32_t ret = CheckColorConvertInfo(srcImgInfo, dstImgInfo);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("ColorConvert : CheckColorConvertInfo failed.");
-        return ret;
+    if (!CheckColorConvertInfo(srcImgInfo, dstImgInfo)) {
+        DHLOGE("ColorFormatProcess : CheckColorConvertInfo failed.");
+        return DCAMERA_BAD_VALUE;
     }
 
-    int32_t y2UvRatio = 2;
     uint8_t *srcVPlane = srcImgInfo.imgData + srcImgInfo.chromaOffset;
-    int32_t srcVStride = srcImgInfo.alignedWidth / y2UvRatio;
-    uint8_t *srcUPlane = srcVPlane + (srcImgInfo.chromaOffset / y2UvRatio) / y2UvRatio;
-    int32_t srcUStride = srcImgInfo.alignedWidth / y2UvRatio;
+    int32_t srcVStride = srcImgInfo.alignedWidth / Y2UV_RATIO;
+    uint8_t *srcUPlane = srcVPlane + (srcImgInfo.chromaOffset / Y2UV_RATIO) / Y2UV_RATIO;
+    int32_t srcUStride = srcImgInfo.alignedWidth / Y2UV_RATIO;
     uint8_t *dstUVPlane = dstImgInfo.imgData + dstImgInfo.chromaOffset;
     int32_t dstUVStride = dstImgInfo.alignedWidth;
-    int32_t width = dstImgInfo.width / y2UvRatio;
-    int32_t height = dstImgInfo.height / y2UvRatio;
+    int32_t width = dstImgInfo.width / Y2UV_RATIO;
+    int32_t height = dstImgInfo.height / Y2UV_RATIO;
     DHLOGD("srcUStride %d, srcVStride %d, dstUVStride %d, dst half width %d, dst half height %d.",
         srcUStride, srcVStride, dstUVStride, width, height);
 
@@ -237,7 +330,7 @@ int32_t ConvertNV12ToNV21::CombineNV12UVPlane(const ImageUnitInfo& srcImgInfo, c
         dstUVStride = -dstUVStride;
     }
     /* No black border of srcImage and dstImage, and the strides of srcImage and dstImage are equal. */
-    if (srcUStride == width && srcVStride == width && dstUVStride == width * y2UvRatio) {
+    if (srcUStride == width && srcVStride == width && dstUVStride == width * Y2UV_RATIO) {
         CombineUVPlaneByRow(srcUPlane, srcVPlane, dstUVPlane, width * height);
         return DCAMERA_OK;
     }
@@ -251,12 +344,11 @@ int32_t ConvertNV12ToNV21::CombineNV12UVPlane(const ImageUnitInfo& srcImgInfo, c
     return DCAMERA_OK;
 }
 
-int32_t ConvertNV12ToNV21::CopyYPlane(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo)
+int32_t ColorFormatProcess::CopyYPlane(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo)
 {
-    int32_t ret = CheckColorConvertInfo(srcImgInfo, dstImgInfo);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("ColorConvert : CheckColorConvertInfo failed.");
-        return ret;
+    if (!CheckColorConvertInfo(srcImgInfo, dstImgInfo)) {
+        DHLOGE("ColorFormatProcess : CheckColorConvertInfo failed.");
+        return DCAMERA_BAD_VALUE;
     }
 
     errno_t err = EOK;
@@ -290,14 +382,14 @@ int32_t ConvertNV12ToNV21::CopyYPlane(const ImageUnitInfo& srcImgInfo, const Ima
     return DCAMERA_OK;
 }
 
-int32_t ConvertNV12ToNV21::ColorConvertNV12ToNV21(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo)
+int32_t ColorFormatProcess::ColorConvertNV12ToNV21(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo)
 {
-    int32_t err = CheckColorConvertInfo(srcImgInfo, dstImgInfo);
-    if (err != DCAMERA_OK) {
-        DHLOGE("ColorConvertNV12ToNV21 : CheckColorConvertInfo failed.");
-        return err;
+    if (!CheckColorConvertInfo(srcImgInfo, dstImgInfo)) {
+        DHLOGE("ColorFormatProcess : CheckColorConvertInfo failed.");
+        return DCAMERA_BAD_VALUE;
     }
-    err = CopyYPlane(srcImgInfo, dstImgInfo);
+
+    int32_t err = CopyYPlane(srcImgInfo, dstImgInfo);
     if (err != DCAMERA_OK) {
         DHLOGE("ColorConvertNV12ToNV21 : CopyYPlane failed.");
         return err;
@@ -311,53 +403,73 @@ int32_t ConvertNV12ToNV21::ColorConvertNV12ToNV21(const ImageUnitInfo& srcImgInf
     return DCAMERA_OK;
 }
 
-std::shared_ptr<DataBuffer> ConvertNV12ToNV21::ProcessData(const std::shared_ptr<DataBuffer>& srcBuf,
-    const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig)
+int32_t ColorFormatProcess::ColorConvertNV12ToI420(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo)
 {
-    if (srcBuf == nullptr) {
-        DHLOGE("ColorConvertProcessData : srcBuf is null.");
-        return nullptr;
-    }
-    if (!IsConvertible(sourceConfig, targetConfig)) {
-        DHLOGE("ColorConvertProcessData : Only supported convert videoformat NV12 to NV21.");
-        DHLOGE("sourceConfig: Videoformat %d Width %d, Height %d, targetConfig: Videoformat %d Width %d, Height %d.",
-            sourceConfig.GetVideoformat(), sourceConfig.GetWidth(), sourceConfig.GetHeight(),
-            targetConfig.GetVideoformat(), targetConfig.GetWidth(), targetConfig.GetHeight());
-        return nullptr;
-    }
-    int64_t timeStamp = 0;
-    if (!(srcBuf->FindInt64("timeUs", timeStamp))) {
-        DHLOGE("ColorConvertProcessData : Find srcBuf timeStamp failed.");
-        return nullptr;
+    if (!CheckColorConvertInfo(srcImgInfo, dstImgInfo)) {
+        DHLOGE("ColorFormatProcess : CheckColorConvertInfo failed.");
+        return DCAMERA_BAD_VALUE;
     }
 
-    ImageUnitInfo srcImgInfo {Videoformat::YUVI420, 0, 0, 0, 0, 0, 0, nullptr};
-    if (GetImageUnitInfo(srcImgInfo, srcBuf) != DCAMERA_OK) {
-        DHLOGE("ColorConvertProcessData : Get srcImgInfo failed.");
-        return nullptr;
-    }
-    int32_t y2UvRatio = 2;
-    int32_t bytesPerPixel = 3;
-    size_t dstBufsize = sourceConfig.GetWidth() * sourceConfig.GetHeight() * bytesPerPixel / y2UvRatio;
-    std::shared_ptr<DataBuffer> dstBuf = std::make_shared<DataBuffer>(dstBufsize);
-    ImageUnitInfo dstImgInfo = { targetConfig.GetVideoformat(), static_cast<int32_t>(sourceConfig.GetWidth()),
-        static_cast<int32_t>(sourceConfig.GetHeight()), static_cast<int32_t>(sourceConfig.GetWidth()),
-        static_cast<int32_t>(sourceConfig.GetHeight()), sourceConfig.GetWidth() * sourceConfig.GetHeight(),
-        dstBuf->Size(), dstBuf->Data() };
-    int32_t err = ColorConvertNV12ToNV21(srcImgInfo, dstImgInfo);
+    int32_t err = CopyYPlane(srcImgInfo, dstImgInfo);
     if (err != DCAMERA_OK) {
-        return nullptr;
+        DHLOGE("ColorConvertNV12ToNV21 : CopyYPlane failed.");
+        return err;
     }
-    dstBuf->SetInt64("timeUs", timeStamp);
-    dstBuf->SetInt32("Videoformat", static_cast<int32_t>(targetConfig.GetVideoformat()));
-    dstBuf->SetInt32("alignedWidth", static_cast<int32_t>(sourceConfig.GetWidth()));
-    dstBuf->SetInt32("alignedHeight", static_cast<int32_t>(sourceConfig.GetHeight()));
-    dstBuf->SetInt32("width", static_cast<int32_t>(sourceConfig.GetWidth()));
-    dstBuf->SetInt32("height", static_cast<int32_t>(sourceConfig.GetHeight()));
-    DHLOGD("ColorConvert end, dstBuf Videoformat %d, width %d, height %d, alignedWidth %d, alignedHeight %d, " +
-        "ImgSize%d, timeUs %lld.", targetConfig.GetVideoformat(), sourceConfig.GetWidth(), sourceConfig.GetHeight(),
-        sourceConfig.GetWidth(), sourceConfig.GetHeight(), dstBuf->Size(), timeStamp);
-    return dstBuf;
+
+    SeparateNV12UVPlane(srcImgInfo, dstImgInfo);
+    return DCAMERA_OK;
+}
+
+int32_t ColorFormatProcess::ColorConvertByColorFormat(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo)
+{
+    int32_t ret;
+    switch (srcImgInfo.colorFormat) {
+        case Videoformat::NV12:
+            switch (dstImgInfo.colorFormat) {
+                case Videoformat::NV21:
+                    ret = ColorConvertNV12ToNV21(srcImgInfo, dstImgInfo);
+                    break;
+                case Videoformat::YUVI420:
+                    ret = ColorConvertNV12ToI420(srcImgInfo, dstImgInfo);
+                    break;
+                default:
+                    DHLOGE("Unsupport ColorConvert %d to %d.", srcImgInfo.colorFormat, dstImgInfo.colorFormat);
+                    return DCAMERA_BAD_OPERATE;
+            }
+            break;
+        case Videoformat::NV21:
+        case Videoformat::YUVI420:
+        case Videoformat::RGBA_8888:
+            DHLOGE("Unsupport ColorConvert %d to %d.", srcImgInfo.colorFormat, dstImgInfo.colorFormat);
+            return DCAMERA_BAD_OPERATE;
+    }
+    return ret;
+}
+
+int32_t ColorFormatProcess::ColorFormatDone(std::vector<std::shared_ptr<DataBuffer>>& outputBuffers)
+{
+    DHLOGD("ColorFormat Done.");
+    if (outputBuffers.empty()) {
+        DHLOGE("The received data buffers is empty.");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    if (nextDataProcess_ != nullptr) {
+        DHLOGD("Send to the next node of the decoder for processing.");
+        int32_t err = nextDataProcess_->ProcessData(outputBuffers);
+        if (err != DCAMERA_OK) {
+            DHLOGE("Someone node after the decoder processes failed.");
+        }
+        return err;
+    }
+    DHLOGD("The current node is the last node, and Output the processed video buffer");
+    std::shared_ptr<DCameraPipelineSource> targetPipelineSource = callbackPipelineSource_.lock();
+    if (targetPipelineSource == nullptr) {
+        DHLOGE("callbackPipelineSource_ is nullptr.");
+        return DCAMERA_BAD_VALUE;
+    }
+    targetPipelineSource->OnProcessedVideoBuffer(outputBuffers[0]);
+    return DCAMERA_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
