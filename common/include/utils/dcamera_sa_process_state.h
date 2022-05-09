@@ -22,4 +22,4 @@ void SetSinkProcessExit();
 void SetSourceProcessExit();
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // DCAMERA_SA_EXIT_STATE_H
+#endif // DCAMERA_SA_PROCESS_STATE_H
