@@ -68,6 +68,7 @@ bool DistributedCameraSourceService::Init()
         }
         registerToService_ = true;
     }
+    listener_ = std::make_shared<DCameraServiceStateListener>();
     DHLOGI("DistributedCameraSourceService init success");
     return true;
 }
@@ -77,6 +78,7 @@ void DistributedCameraSourceService::OnStop()
     DHLOGI("DistributedCameraSourceService OnStop service");
     state_ = DCameraServiceState::DCAMERA_SRV_STATE_NOT_START;
     registerToService_ = false;
+    listener_ = nullptr;
     DCameraSourceServiceIpc::GetInstance().UnInit();
 }
 
@@ -90,7 +92,7 @@ int32_t DistributedCameraSourceService::InitSource(const std::string& params,
         return ret;
     }
     sourceVer_ = params;
-    listener_ = std::make_shared<DCameraServiceStateListener>(callback);
+    listener_->SetCallback(callback);
     return DCAMERA_OK;
 }
 
@@ -102,7 +104,6 @@ int32_t DistributedCameraSourceService::ReleaseSource()
         DHLOGE("DistributedCameraSourceService ReleaseSource UnLoadHDF failed, ret: %d", ret);
         return ret;
     }
-    listener_ = nullptr;
     DHLOGI("check source sa state.");
     SetSourceProcessExit();
     return DCAMERA_OK;

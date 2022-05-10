@@ -25,8 +25,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-DCameraServiceStateListener::DCameraServiceStateListener(sptr<IDCameraSourceCallback> callback)
-    : callbackProxy_(callback)
+DCameraServiceStateListener::DCameraServiceStateListener()
 {
     DHLOGI("DCameraServiceStateListener Create");
 }
@@ -37,11 +36,19 @@ DCameraServiceStateListener::~DCameraServiceStateListener()
     callbackProxy_ = nullptr;
 }
 
+void DCameraServiceStateListener::SetCallback(sptr<IDCameraSourceCallback> callback)
+{
+    DHLOGI("DCameraServiceStateListener SetCallback");
+    std::lock_guard<std::mutex> autoLock(proxyMutex_);
+    callbackProxy_ = callback;
+}
+
 int32_t DCameraServiceStateListener::OnRegisterNotify(const std::string& devId, const std::string& dhId,
     const std::string& reqId, int32_t status, std::string& data)
 {
     DHLOGI("DCameraServiceStateListener OnRegisterNotify devId: %s, dhId: %s, status: %d",
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), status);
+    std::lock_guard<std::mutex> autoLock(proxyMutex_);
     if (callbackProxy_ == nullptr) {
         DHLOGE("DCameraServiceStateListener OnRegisterNotify callbackProxy_ is nullptr");
         return DCAMERA_BAD_VALUE;
@@ -73,6 +80,7 @@ int32_t DCameraServiceStateListener::OnUnregisterNotify(const std::string& devId
 {
     DHLOGI("DCameraServiceStateListener OnUnregisterNotify devId: %s, dhId: %s, status: %d",
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), status);
+    std::lock_guard<std::mutex> autoLock(proxyMutex_);
     if (callbackProxy_ == nullptr) {
         DHLOGE("DCameraServiceStateListener OnUnregisterNotify callbackProxy_ is nullptr");
         return DCAMERA_BAD_VALUE;
