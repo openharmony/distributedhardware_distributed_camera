@@ -16,6 +16,8 @@
 #ifndef OHOS_DCAMERA_SERVICE_STATE_LISTENER_H
 #define OHOS_DCAMERA_SERVICE_STATE_LISTENER_H
 
+#include <mutex>
+
 #include "icamera_state_listener.h"
 #include "idcamera_source_callback.h"
 
@@ -23,16 +25,17 @@ namespace OHOS {
 namespace DistributedHardware {
 class DCameraServiceStateListener : public ICameraStateListener {
 public:
-    explicit DCameraServiceStateListener(sptr<IDCameraSourceCallback> callback);
+    explicit DCameraServiceStateListener();
     ~DCameraServiceStateListener();
 
     int32_t OnRegisterNotify(const std::string& devId, const std::string& dhId, const std::string& reqId,
         int32_t status, std::string& data) override;
     int32_t OnUnregisterNotify(const std::string& devId, const std::string& dhId, const std::string& reqId,
         int32_t status, std::string& data) override;
-
+    void SetCallback(sptr<IDCameraSourceCallback> callback) override;
 private:
     sptr<IDCameraSourceCallback> callbackProxy_;
+    std::mutex proxyMutex_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

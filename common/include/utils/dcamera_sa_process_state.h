@@ -13,25 +13,13 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_ICAMERA_STATE_LISTENER_H
-#define OHOS_ICAMERA_STATE_LISTENER_H
-
-#include <cstdint>
-#include <string>
-
-#include "idcamera_source_callback.h"
+#ifndef DCAMERA_SA_PROCESS_STATE_H
+#define DCAMERA_SA_PROCESS_STATE_H
 
 namespace OHOS {
 namespace DistributedHardware {
-class ICameraStateListener {
-public:
-    virtual ~ICameraStateListener() {}
-    virtual int32_t OnRegisterNotify(const std::string& devId, const std::string& dhId, const std::string& reqId,
-        int32_t status, std::string& data) = 0;
-    virtual int32_t OnUnregisterNotify(const std::string& devId, const std::string& dhId, const std::string& reqId,
-        int32_t status, std::string& data) = 0;
-    virtual void SetCallback(sptr<IDCameraSourceCallback> callback) = 0;
-};
+void SetSinkProcessExit();
+void SetSourceProcessExit();
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_ICAMERA_STATE_LISTENER_H
+#endif // DCAMERA_SA_PROCESS_STATE_H

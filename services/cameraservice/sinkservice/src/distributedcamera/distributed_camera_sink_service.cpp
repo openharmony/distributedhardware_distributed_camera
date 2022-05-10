@@ -27,6 +27,7 @@
 #include "dcamera_sink_service_ipc.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
+#include "dcamera_sa_process_state.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -116,8 +117,8 @@ int32_t DistributedCameraSinkService::ReleaseSink()
         }
     }
     camerasMap_.clear();
-    DHLOGI("exit sink sa process.");
-    exit(0);
+    DHLOGI("check sink sa state.");
+    SetSinkProcessExit();
     return DCAMERA_OK;
 }
 
