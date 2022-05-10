@@ -38,6 +38,9 @@ public:
     {
         return DCAMERA_OK;
     }
+    void SetCallback(sptr<IDCameraSourceCallback> callback)
+    {
+    }
 };
 } // namespace DistributedHardware
 } // namespace OHOS
