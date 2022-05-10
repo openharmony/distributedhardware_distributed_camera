@@ -26,17 +26,17 @@ typedef enum {
     DCAMERA_SA_EXIT_STATE_STOP = 1
 } DCameraSAState;
 
-DCameraSAState sinkSAState_ = DCAMERA_SA_EXIT_STATE_START;
-DCameraSAState sourceSAState_ = DCAMERA_SA_EXIT_STATE_START;
-std::mutex saProcessState_;
+DCameraSAState g_sinkSAState = DCAMERA_SA_EXIT_STATE_START;
+DCameraSAState g_sourceSAState = DCAMERA_SA_EXIT_STATE_START;
+std::mutex g_saProcessState;
 
 void SetSinkProcessExit()
 {
     DHLOGI("set sink process exit.");
-    std::lock_guard<std::mutex> autoLock(saProcessState_);
-    sinkSAState_ = DCAMERA_SA_EXIT_STATE_STOP;
-    DHLOGI("sourceSAState_ = %d sinkSAState_ = %d", sourceSAState_, sinkSAState_);
-    if (sourceSAState_ == DCAMERA_SA_EXIT_STATE_START || sinkSAState_ == DCAMERA_SA_EXIT_STATE_START) {
+    std::lock_guard<std::mutex> autoLock(g_saProcessState);
+    g_sinkSAState = DCAMERA_SA_EXIT_STATE_STOP;
+    DHLOGI("g_sourceSAState = %d g_sinkSAState = %d", g_sourceSAState, g_sinkSAState);
+    if (g_sourceSAState == DCAMERA_SA_EXIT_STATE_START || g_sinkSAState == DCAMERA_SA_EXIT_STATE_START) {
         return;
     }
     DHLOGI("exit sa process success.");
@@ -46,10 +46,10 @@ void SetSinkProcessExit()
 void SetSourceProcessExit()
 {
     DHLOGI("set sources process exit.");
-    std::lock_guard<std::mutex> autoLock(saProcessState_);
-    sourceSAState_ = DCAMERA_SA_EXIT_STATE_STOP;
-    DHLOGI("sourceSAState_ = %d sinkSAState_ = %d", sourceSAState_, sinkSAState_);
-    if (sourceSAState_ == DCAMERA_SA_EXIT_STATE_START || sinkSAState_ == DCAMERA_SA_EXIT_STATE_START) {
+    std::lock_guard<std::mutex> autoLock(g_saProcessState);
+    g_sourceSAState = DCAMERA_SA_EXIT_STATE_STOP;
+    DHLOGI("g_sourceSAState = %d g_sinkSAState = %d", g_sourceSAState, g_sinkSAState);
+    if (g_sourceSAState == DCAMERA_SA_EXIT_STATE_START || g_sinkSAState == DCAMERA_SA_EXIT_STATE_START) {
         return;
     }
     DHLOGI("exit sa process success.");
