@@ -19,6 +19,8 @@
 #include <cstdint>
 #include <string>
 
+#include "idcamera_source_callback.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 class ICameraStateListener {
@@ -28,6 +30,7 @@ public:
         int32_t status, std::string& data) = 0;
     virtual int32_t OnUnregisterNotify(const std::string& devId, const std::string& dhId, const std::string& reqId,
         int32_t status, std::string& data) = 0;
+    virtual void SetCallback(sptr<IDCameraSourceCallback> callback) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
