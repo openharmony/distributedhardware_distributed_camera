@@ -14,6 +14,7 @@
  */
 
 #include "dcamera_device.h"
+#include "anonymous_string.h"
 #include <iostream>
 #include <iterator>
 #include <sstream>
@@ -112,7 +113,7 @@ CamRetCode DCameraDevice::UpdateSettings(const std::shared_ptr<CameraSetting> &s
     }
 
     if (!IsOpened()) {
-        DHLOGE("DCameraDevice::UpdateSettings, dcamera device %s already closed.", dCameraId_.c_str());
+        DHLOGE("DCameraDevice::UpdateSettings, dcamera device %s already closed.", GetAnonyString(dCameraId_).c_str());
         return CamRetCode::CAMERA_CLOSED;
     }
 
@@ -221,7 +222,7 @@ CamRetCode DCameraDevice::DisableResult(const std::vector<MetaType> &results)
 
 void DCameraDevice::Close()
 {
-    DHLOGI("DCameraDevice::Close distributed camera: %s", dCameraId_.c_str());
+    DHLOGI("DCameraDevice::Close distributed camera: %s", GetAnonyString(dCameraId_).c_str());
 
     std::shared_ptr<DCameraProvider> provider = DCameraProvider::GetInstance();
     if (provider != nullptr) {

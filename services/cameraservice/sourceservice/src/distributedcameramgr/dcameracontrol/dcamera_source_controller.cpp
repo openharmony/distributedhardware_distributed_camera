@@ -75,8 +75,8 @@ int32_t DCameraSourceController::StartCapture(std::vector<std::shared_ptr<DCamer
             GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
         return ret;
     }
-    DHLOGI("DCameraSourceController StartCapture devId: %s, dhId: %s captureJson: %s", GetAnonyString(devId).c_str(),
-        GetAnonyString(dhId).c_str(), jsonStr.c_str());
+    DHLOGI("DCameraSourceController StartCapture devId: %s, dhId: %s captureCommand: %s", GetAnonyString(devId).c_str(),
+        GetAnonyString(dhId).c_str(), cmd.command_.c_str());
     std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(jsonStr.length() + 1);
     ret = memcpy_s(buffer->Data(), buffer->Capacity(), (uint8_t *)jsonStr.c_str(), jsonStr.length());
     if (ret != EOK) {
@@ -150,8 +150,8 @@ int32_t DCameraSourceController::ChannelNeg(std::shared_ptr<DCameraChannelInfo>&
             GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
         return ret;
     }
-    DHLOGD("DCameraSourceController ChannelNeg devId: %s, dhId: %s channelNegJson: %s", GetAnonyString(devId).c_str(),
-        GetAnonyString(dhId).c_str(), jsonStr.c_str());
+    DHLOGD("DCameraSourceController ChannelNeg devId: %s, dhId: %s channelNegCommand: %s", GetAnonyString(devId).c_str(),
+        GetAnonyString(dhId).c_str(), cmd.command_.c_str());
     ret = camSinkSrv->ChannelNeg(dhId, jsonStr);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceController ChannelNeg rpc failed ret: %d, devId: %s, dhId: %s", ret,
@@ -289,15 +289,15 @@ int32_t DCameraSourceController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& o
         DHLOGE("DCameraSourceController Marshal OpenInfo failed %d", ret);
         return ret;
     }
-    DHLOGD("DCameraSourceController OpenChannel devId: %s, dhId: %s openJson: %s", GetAnonyString(devId).c_str(),
-        GetAnonyString(dhId).c_str(), jsonStr.c_str());
+    DHLOGD("DCameraSourceController OpenChannel devId: %s, dhId: %s openCommand: %s", GetAnonyString(devId).c_str(),
+        GetAnonyString(dhId).c_str(), cmd.command_.c_str());
     ret = camSinkSrv->OpenChannel(dhId, jsonStr);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceController SA OpenChannel failed %d", ret);
         return ret;
     }
     DHLOGD("DCameraSourceController OpenChannel devId: %s, dhId: %s success", GetAnonyString(devId).c_str(),
-        GetAnonyString(dhId).c_str(), jsonStr.c_str());
+        GetAnonyString(dhId).c_str());
 
     std::vector<DCameraIndex> indexs;
     indexs.push_back(DCameraIndex(devId, dhId));
