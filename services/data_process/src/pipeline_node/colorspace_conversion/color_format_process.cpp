@@ -96,7 +96,8 @@ int32_t ColorFormatProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>
         return DCAMERA_BAD_VALUE;
     }
 
-    size_t dstBufsize = sourceConfig_.GetWidth() * sourceConfig_.GetHeight() * YUV_BYTES_PER_PIXEL / Y2UV_RATIO;
+    size_t dstBufsize = static_cast<size_t>(sourceConfig_.GetWidth() * sourceConfig_.GetHeight() *
+        YUV_BYTES_PER_PIXEL / Y2UV_RATIO);
     std::shared_ptr<DataBuffer> dstBuf = std::make_shared<DataBuffer>(dstBufsize);
     ImageUnitInfo dstImgInfo = { processedConfig_.GetVideoformat(), processedConfig_.GetWidth(),
         processedConfig_.GetHeight(), processedConfig_.GetWidth(), processedConfig_.GetHeight(),
@@ -352,7 +353,7 @@ int32_t ColorFormatProcess::CopyYPlane(const ImageUnitInfo& srcImgInfo, const Im
     }
 
     errno_t err = EOK;
-    size_t totalCopyYPlaneSize = dstImgInfo.alignedWidth * dstImgInfo.height;
+    int32_t totalCopyYPlaneSize = dstImgInfo.alignedWidth * dstImgInfo.height;
     if (srcImgInfo.alignedWidth == dstImgInfo.width && dstImgInfo.alignedWidth == dstImgInfo.width) {
         /* No black border of srcImage and dstImage, and the strides of srcImage and dstImage are equal. */
         err = memcpy_s(dstImgInfo.imgData, totalCopyYPlaneSize, srcImgInfo.imgData, totalCopyYPlaneSize);
