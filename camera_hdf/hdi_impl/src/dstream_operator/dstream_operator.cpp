@@ -338,30 +338,35 @@ CamRetCode DStreamOperator::CancelCapture(int captureId)
     }
 
     halCaptureInfoMap_.erase(captureId);
-
-    bool hasContinuousCaptureInfo = false;
-    for (auto iter : halCaptureInfoMap_) {
-        for (auto id : iter.second->streamIds_) {
-            DHLOGI("DStreamOperator::CancelCapture, captureId=%d, streamId=%d.", captureId, id);
-            auto dcStreamInfo = dcStreamInfoMap_.find(id);
-            if (dcStreamInfo == dcStreamInfoMap_.end()) {
-                continue;
-            }
-            if (dcStreamInfo->second->type_ == DCStreamType::CONTINUOUS_FRAME) {
-                DHLOGI("DStreamOperator::CancelCapture, captureId=%d, stream %d is continuous stream.", captureId, id);
-                hasContinuousCaptureInfo = true;
-            }
-        }
-    }
-
-    DHLOGI("DStreamOperator::CancelCapture, captureId=%d, hasContinuousCaptureInfo=%d",
-        captureId, hasContinuousCaptureInfo);
-    if (!hasContinuousCaptureInfo) {
+    if (!HasContinuousCaptureInfo(captureId)) {
         SetCapturing(false);
         cachedDCaptureInfoList_.clear();
     }
     DHLOGI("DStreamOperator::CancelCapture success, captureId=%d.", captureId);
     return CamRetCode::NO_ERROR;
+}
+
+bool DStreamOperator::HasContinuousCaptureInfo(int captureId)
+{
+    bool flag = false;
+    for (auto iter : halCaptureInfoMap_) {
+        for (auto id : iter.second->streamIds_) {
+            auto dcStreamInfo = dcStreamInfoMap_.find(id);
+            if (dcStreamInfo == dcStreamInfoMap_.end()) {
+                continue;
+            }
+
+            DHLOGI("DStreamOperator::HasContinuousCaptureInfo, captureId=%d, streamId=%d, streamType=%d",
+                captureId, id, dcStreamInfo.second->type_);
+            if (dcStreamInfo.second->type_ == DCStreamType::CONTINUOUS_FRAME) {
+                DHLOGI("DStreamOperator::HasContinuousCaptureInfo, captureId=%d, stream %d is continuous stream.",
+                    captureId, id);
+                flag = true;
+                break;
+            }
+        }
+    }
+    return flag;
 }
 
 CamRetCode DStreamOperator::ChangeToOfflineStream(const std::vector<int>& streamIds,
@@ -654,10 +659,6 @@ void DStreamOperator::ConvertStreamInfo(std::shared_ptr<StreamInfo> &srcInfo, st
 DCamRetCode DStreamOperator::NegotiateSuitableCaptureInfo(const std::shared_ptr<CaptureInfo>& srcCaptureInfo,
     bool isStreaming)
 {
-    for (auto streamId : srcCaptureInfo->streamIds_) {
-        DHLOGI("DStreamOperator::NegotiateSuitableCaptureInfo, streamId=%d, isStreaming=%d", streamId, isStreaming);
-    }
-
     std::vector<std::shared_ptr<DCStreamInfo>> srcStreamInfo;
     for (auto &id : srcCaptureInfo->streamIds_) {
         auto iter = dcStreamInfoMap_.find(id);
@@ -707,17 +708,6 @@ DCamRetCode DStreamOperator::NegotiateSuitableCaptureInfo(const std::shared_ptr<
     cachedDCaptureInfoList_.push_back(inputCaptureInfo);
     if (appendCaptureInfo != nullptr) {
         cachedDCaptureInfoList_.push_back(appendCaptureInfo);
-    }
-
-    for (auto info : cachedDCaptureInfoList_) {
-        std::string idString = "";
-        for (auto id : info->streamIds_) {
-            idString += (std::to_string(id) + ", ");
-        }
-        DHLOGI("DStreamOperator::NegotiateSuitableCaptureInfo, cachedDCaptureInfo: " +
-            "ids=[%s], width=%d, height=%d, format=%d, type=%d, isCapture=%d",
-            idString.empty() ? idString.c_str() : (idString.substr(0, idString.length() - INGNORE_STR_LEN)).c_str(),
-            info->width_, info->height_, info->format_, info->type_, info->isCapture_);
     }
     return SUCCESS;
 }

@@ -61,7 +61,11 @@ public:
     {
         return DCAMERA_OK;
     }
-    int32_t ExecuteStopCapture()
+    int32_t ExecuteStopCapture(std::vector<int>& streamIds, bool& isAllStop)
+    {
+        return DCAMERA_OK;
+    }
+    int32_t ExecuteStopAllCapture()
     {
         return DCAMERA_OK;
     }

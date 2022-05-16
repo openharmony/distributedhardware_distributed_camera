@@ -227,8 +227,8 @@ int32_t DCameraStreamDataProcessProducer::FeedStreamToDriver(const std::shared_p
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamId_, retHdi);
         return DCAMERA_BAD_OPERATE;
     }
-    DHLOGD("LooperFeed end devId %s dhId %s streamSize: %d streamType: %d, streamId: %d", GetAnonyString(devId_).c_str(),
-        GetAnonyString(dhId_).c_str(), buffer->Size(), streamType_, streamId_);
+    DHLOGD("LooperFeed end devId %s dhId %s streamSize: %d streamType: %d, streamId: %d",
+        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), buffer->Size(), streamType_, streamId_);
     return ret;
 }
 } // namespace DistributedHardware
