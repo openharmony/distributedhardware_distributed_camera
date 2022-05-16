@@ -35,7 +35,7 @@ CamRetCode DStreamOperator::IsStreamsSupported(OperationMode mode,
     StreamSupportType &type)
 {
     (void)mode;
-    (void)type;
+    type = Camera::DYNAMIC_SUPPORTED;
 
     if (modeSetting == nullptr) {
         DHLOGE("Input invalid argument: modeSetting:%p.",
