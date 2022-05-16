@@ -55,7 +55,8 @@ int32_t ColorFormatProcess::InitNode(const VideoConfigParams& sourceConfig, cons
 
 bool ColorFormatProcess::IsConvertible(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig)
 {
-    return (sourceConfig.GetVideoformat() == Videoformat::NV12 && targetConfig.GetVideoformat() == Videoformat::NV21 &&
+    return ((sourceConfig.GetVideoformat() == targetConfig.GetVideoformat() ||
+        (sourceConfig.GetVideoformat() == Videoformat::NV12 && targetConfig.GetVideoformat() == Videoformat::NV21)) &&
         sourceConfig.GetWidth() == targetConfig.GetWidth() && sourceConfig.GetHeight() == targetConfig.GetHeight());
 }
 
