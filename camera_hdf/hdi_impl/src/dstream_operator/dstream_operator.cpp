@@ -357,8 +357,8 @@ bool DStreamOperator::HasContinuousCaptureInfo(int captureId)
             }
 
             DHLOGI("DStreamOperator::HasContinuousCaptureInfo, captureId=%d, streamId=%d, streamType=%d",
-                captureId, id, dcStreamInfo.second->type_);
-            if (dcStreamInfo.second->type_ == DCStreamType::CONTINUOUS_FRAME) {
+                captureId, id, dcStreamInfo->second->type_);
+            if (dcStreamInfo->second->type_ == DCStreamType::CONTINUOUS_FRAME) {
                 DHLOGI("DStreamOperator::HasContinuousCaptureInfo, captureId=%d, stream %d is continuous stream.",
                     captureId, id);
                 flag = true;
