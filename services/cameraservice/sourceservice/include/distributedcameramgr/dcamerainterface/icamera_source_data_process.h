@@ -59,7 +59,8 @@ public:
     virtual int32_t ConfigStreams(std::vector<std::shared_ptr<DCStreamInfo>>& streamInos) = 0;
     virtual int32_t ReleaseStreams(std::vector<int32_t>& streamIds) = 0;
     virtual int32_t StartCapture(std::shared_ptr<DCCaptureInfo>& captureInfo) = 0;
-    virtual int32_t StopCapture() = 0;
+    virtual int32_t StopCapture(std::vector<int32_t>& streamIds) = 0;
+    virtual int32_t GetProducerSize() = 0;
     virtual void GetAllStreamIds(std::vector<int32_t>& streamIds) = 0;
 };
 } // namespace DistributedHardware

@@ -75,9 +75,9 @@ int32_t DCameraSourceCaptureState::DoUnregisterTask(std::shared_ptr<DCameraSourc
         return ret;
     }
 
-    ret = camDev->ExecuteStopCapture();
+    ret = camDev->ExecuteStopAllCapture();
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceCaptureState DoUnregisterTask ExecuteStopCapture failed: %d", ret);
+        DHLOGE("DCameraSourceCaptureState DoUnregisterTask ExecuteStopAllCapture failed: %d", ret);
         return ret;
     }
 
@@ -120,9 +120,9 @@ int32_t DCameraSourceCaptureState::DoOpenTask(std::shared_ptr<DCameraSourceDev>&
 
 int32_t DCameraSourceCaptureState::DoCloseTask(std::shared_ptr<DCameraSourceDev>& camDev, DCameraSourceEvent& event)
 {
-    int32_t ret = camDev->ExecuteStopCapture();
+    int32_t ret = camDev->ExecuteStopAllCapture();
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceCaptureState ExecuteStopCapture failed, ret: %d", ret);
+        DHLOGE("DCameraSourceCaptureState ExecuteStopAllCapture failed, ret: %d", ret);
         return ret;
     }
 
@@ -166,17 +166,27 @@ int32_t DCameraSourceCaptureState::DoStartCaptureTask(std::shared_ptr<DCameraSou
 int32_t DCameraSourceCaptureState::DoStopCaptureTask(std::shared_ptr<DCameraSourceDev>& camDev,
     DCameraSourceEvent& event)
 {
-    int32_t ret = camDev->ExecuteStopCapture();
+    std::vector<int> streamIds;
+    int32_t ret = event.GetStreamIds(streamIds);
+    if (ret != DCAMERA_OK) {
+        return ret;
+    }
+
+    bool isAllStop = false;
+    ret = camDev->ExecuteStopCapture(streamIds, isAllStop);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceCaptureState ExecuteStopCapture failed, ret: %d", ret);
         return ret;
     }
-    std::shared_ptr<DCameraSourceStateMachine> stateMachine = stateMachine_.lock();
-    if (stateMachine == nullptr) {
-        DHLOGE("DCameraSourceCaptureState DoStopCaptureTask can not get stateMachine");
-        return DCAMERA_BAD_VALUE;
+
+    if (isAllStop) {
+        std::shared_ptr<DCameraSourceStateMachine> stateMachine = stateMachine_.lock();
+        if (stateMachine == nullptr) {
+            DHLOGE("DCameraSourceCaptureState DoStopCaptureTask can not get stateMachine");
+            return DCAMERA_BAD_VALUE;
+        }
+        stateMachine->UpdateState(DCAMERA_STATE_CONFIG_STREAM);
     }
-    stateMachine->UpdateState(DCAMERA_STATE_CONFIG_STREAM);
     return DCAMERA_OK;
 }
 

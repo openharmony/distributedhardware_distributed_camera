@@ -139,7 +139,8 @@ DCamRetCode DCameraProviderCallbackImpl::StartCapture(const std::shared_ptr<DHBa
     return SUCCESS;
 }
 
-DCamRetCode DCameraProviderCallbackImpl::StopCapture(const std::shared_ptr<DHBase>& dhBase)
+DCamRetCode DCameraProviderCallbackImpl::StopCapture(const std::shared_ptr<DHBase>& dhBase,
+    const std::vector<int>& streamIds)
 {
     DHLOGI("DCameraProviderCallbackImpl StopCapture devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
@@ -149,7 +150,7 @@ DCamRetCode DCameraProviderCallbackImpl::StopCapture(const std::shared_ptr<DHBas
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return FAILED;
     }
-    int32_t ret = sourceDev->StopCapture();
+    int32_t ret = sourceDev->StopCapture(streamIds);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraProviderCallbackImpl StopCapture failed, ret: %d, devId: %s, dhId: %s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());

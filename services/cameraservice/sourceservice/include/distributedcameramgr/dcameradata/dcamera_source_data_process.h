@@ -35,7 +35,8 @@ public:
     int32_t ConfigStreams(std::vector<std::shared_ptr<DCStreamInfo>>& streamInfos) override;
     int32_t ReleaseStreams(std::vector<int32_t>& streamIds) override;
     int32_t StartCapture(std::shared_ptr<DCCaptureInfo>& captureInfo) override;
-    int32_t StopCapture() override;
+    int32_t StopCapture(std::vector<int32_t>& streamIds) override;
+    int32_t GetProducerSize() override;
     void GetAllStreamIds(std::vector<int32_t>& streamIds) override;
 
 private:

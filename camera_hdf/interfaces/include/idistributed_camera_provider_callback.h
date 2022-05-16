@@ -136,7 +136,7 @@ public:
      * @since 1.0
      * @version 1.0
      */
-    virtual DCamRetCode StopCapture(const std::shared_ptr<DHBase> &dhBase) = 0;
+    virtual DCamRetCode StopCapture(const std::shared_ptr<DHBase> &dhBase, const std::vector<int> &streamIds) = 0;
 
     /**
      * @brief Updates distributed camera device control parameters.

@@ -36,7 +36,8 @@ public:
     int32_t ReleaseStreams(std::vector<int>& streamIds, bool& isAllRelease) override;
     int32_t ReleaseAllStreams() override;
     int32_t StartCapture(std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos) override;
-    int32_t StopCapture() override;
+    int32_t StopCapture(std::vector<int>& streamIds, bool& isAllStop) override;
+    int32_t StopAllCapture() override;
     int32_t OpenChannel(std::vector<DCameraIndex>& indexs) override;
     int32_t CloseChannel() override;
     int32_t Init() override;
@@ -57,8 +58,6 @@ private:
     std::shared_ptr<EventBus> eventBus_;
 
     bool isInit = false;
-    std::mutex inputMutex_;
-    bool isCapture_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -46,7 +46,7 @@ public:
     int32_t ConfigStreams(const std::vector<std::shared_ptr<DCStreamInfo>>& streamInfos);
     int32_t ReleaseStreams(const std::vector<int>& streamIds);
     int32_t StartCapture(const std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos);
-    int32_t StopCapture();
+    int32_t StopCapture(const std::vector<int>& streamIds);
     int32_t UpdateCameraSettings(const std::vector<std::shared_ptr<DCameraSettings>>& settings);
 
     void OnEvent(DCameraSourceEvent& event) override;
@@ -60,7 +60,8 @@ public:
     virtual int32_t ExecuteReleaseStreams(std::vector<int>& streamIds, bool& isAllRelease);
     virtual int32_t ExecuteReleaseAllStreams();
     virtual int32_t ExecuteStartCapture(std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos);
-    virtual int32_t ExecuteStopCapture();
+    virtual int32_t ExecuteStopCapture(std::vector<int>& streamIds, bool& isAllStop);
+    virtual int32_t ExecuteStopAllCapture();
     virtual int32_t ExecuteUpdateSettings(std::vector<std::shared_ptr<DCameraSettings>>& settings);
     virtual int32_t ExecuteCameraEventNotify(std::shared_ptr<DCameraEvent>& events);
 

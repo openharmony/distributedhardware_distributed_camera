@@ -201,7 +201,8 @@ DCamRetCode DCameraProviderCallbackProxy::StartCapture(const std::shared_ptr<DHB
     return static_cast<DCamRetCode>(reply.ReadInt32());
 }
 
-DCamRetCode DCameraProviderCallbackProxy::StopCapture(const std::shared_ptr<DHBase> &dhBase)
+DCamRetCode DCameraProviderCallbackProxy::StopCapture(const std::shared_ptr<DHBase> &dhBase,
+    const std::vector<int> &streamIds)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -215,6 +216,12 @@ DCamRetCode DCameraProviderCallbackProxy::StopCapture(const std::shared_ptr<DHBa
     if (!data.WriteString(dhBase->deviceId_) || !data.WriteString(dhBase->dhId_)) {
         DHLOGE("Write distributed camera base info or ability info failed.");
         return DCamRetCode::INVALID_ARGUMENT;
+    }
+
+    std::vector<int32_t> pxyStreamIds = streamIds;
+    if (!data.WriteInt32Vector(pxyStreamIds)) {
+        DHLOGE("Write streamId failed.");
+        return INVALID_ARGUMENT;
     }
 
     int32_t ret = Remote()->SendRequest(CMD_DISTRIBUTED_CAMERA_PROVIDER_CALLBACK_STOP_CAPTURE, data, reply, option);

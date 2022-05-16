@@ -128,10 +128,10 @@ int32_t DCameraSourceDataProcess::ReleaseStreams(std::vector<int32_t>& streamIds
 
 int32_t DCameraSourceDataProcess::StartCapture(std::shared_ptr<DCCaptureInfo>& captureInfo)
 {
-    DHLOGI("DCameraSourceDataProcess StartCapture devId %s dhId %s, info: width: %d, height: %d, format: %d,\
-        dataspace: %d, encodeType: %d streamType: %d", GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(),
-        captureInfo->width_, captureInfo->height_, captureInfo->format_, captureInfo->dataspace_,
-        captureInfo->encodeType_, captureInfo->type_);
+    DHLOGI("DCameraSourceDataProcess StartCapture devId %s dhId %s width: %d, height: %d, format: %d, isCapture: %d," +
+        "dataspace: %d, encodeType: %d, streamType: %d", GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(),
+        captureInfo->width_, captureInfo->height_, captureInfo->format_, captureInfo->isCapture_,
+        captureInfo->dataspace_, captureInfo->encodeType_, captureInfo->type_);
 
     std::shared_ptr<DCameraStreamConfig> streamConfig =
         std::make_shared<DCameraStreamConfig>(captureInfo->width_, captureInfo->height_, captureInfo->format_,
@@ -147,14 +147,32 @@ int32_t DCameraSourceDataProcess::StartCapture(std::shared_ptr<DCCaptureInfo>& c
     return DCAMERA_OK;
 }
 
-int32_t DCameraSourceDataProcess::StopCapture()
+int32_t DCameraSourceDataProcess::StopCapture(std::vector<int32_t>& streamIds)
 {
     DHLOGI("DCameraSourceDataProcess StopCapture devId %s dhId %s streamType: %d", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str(), streamType_);
+    std::set<int32_t> streamIdSet(streamIds.begin(), streamIds.end());
+    for (auto iterSet = streamIdSet.begin(); iterSet != streamIdSet.end(); iterSet++) {
+        DHLOGI("DCameraSourceDataProcess StopCapture devId %s dhId %s stream id: %d",
+            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), *iterSet);
+    }
     for (auto iter = streamProcess_.begin(); iter != streamProcess_.end(); iter++) {
-        (*iter)->StopCapture();
+        (*iter)->StopCapture(streamIdSet);
     }
     return DCAMERA_OK;
+}
+
+int32_t DCameraSourceDataProcess::GetProducerSize()
+{
+    int32_t ret = 0;
+    for (auto iter = streamProcess_.begin(); iter != streamProcess_.end(); iter++) {
+        std::shared_ptr<DCameraStreamDataProcess> streamDataProcess = *iter;
+        int32_t size = streamDataProcess->GetProducerSize();
+        ret += size;
+    }
+    DHLOGI("DCameraSourceDataProcess GetProducerSize devId %s dhId %s size %d",
+        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), ret);
+    return ret;
 }
 
 void DCameraSourceDataProcess::GetAllStreamIds(std::vector<int32_t>& streamIds)

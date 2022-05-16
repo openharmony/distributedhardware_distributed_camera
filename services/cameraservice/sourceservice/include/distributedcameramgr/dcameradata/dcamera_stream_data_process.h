@@ -16,6 +16,7 @@
 #ifndef OHOS_DCAMERA_STREAM_DATA_PROCESS_H
 #define OHOS_DCAMERA_STREAM_DATA_PROCESS_H
 
+#include <mutex>
 #include <set>
 
 #include "data_buffer.h"
@@ -36,8 +37,9 @@ public:
     void ConfigStreams(std::shared_ptr<DCameraStreamConfig>& dstConfig, std::set<int32_t>& streamIds);
     void ReleaseStreams(std::set<int32_t>& streamIds);
     void StartCapture(std::shared_ptr<DCameraStreamConfig>& srcConfig, std::set<int32_t>& streamIds);
-    void StopCapture();
+    void StopCapture(std::set<int32_t>& streamIds);
     void GetAllStreamIds(std::set<int32_t>& streamIds);
+    int32_t GetProducerSize();
 
     void OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult);
     void OnError(DataProcessErrorType errorType);
@@ -54,6 +56,9 @@ private:
     std::string devId_;
     std::string dhId_;
     DCStreamType streamType_;
+
+    std::mutex pipelineMutex_;
+    std::mutex producerMutex_;
 
     std::set<int32_t> streamIds_;
     std::shared_ptr<DCameraStreamConfig> srcConfig_;

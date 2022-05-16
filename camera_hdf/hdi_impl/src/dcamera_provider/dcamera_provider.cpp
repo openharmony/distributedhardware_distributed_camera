@@ -285,14 +285,15 @@ DCamRetCode DCameraProvider::StartCapture(const std::shared_ptr<DHBase> &dhBase,
         for (int id : info->streamIds_) {
             idString += (std::to_string(id) + ", ");
         }
-        DHLOGI("StartCapture: ids=[%s], width=%d, height=%d, format=%d, type=%d.",
+        DHLOGI("DCameraProvider::StartCapture: ids=[%s], width=%d, height=%d, format=%d, type=%d, isCapture=%d.",
             (idString.empty() ? idString.c_str() : (idString.substr(0, idString.length() - INGNORE_STR_LEN)).c_str()),
-            info->width_, info->height_, info->format_, info->type_);
+            info->width_, info->height_, info->format_, info->type_, info->isCapture_);
     }
     return callback->StartCapture(dhBase, captureInfos);
 }
 
-DCamRetCode DCameraProvider::StopCapture(const std::shared_ptr<DHBase> &dhBase)
+DCamRetCode DCameraProvider::StopCapture(const std::shared_ptr<DHBase> &dhBase,
+    const std::vector<int> &streamIds)
 {
     if (dhBase == nullptr) {
         DHLOGE("DCameraProvider::StopCapture, dhBase is null.");
@@ -307,7 +308,13 @@ DCamRetCode DCameraProvider::StopCapture(const std::shared_ptr<DHBase> &dhBase)
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
-    return callback->StopCapture(dhBase);
+    std::string idString = "";
+    for (int id : streamIds) {
+        idString += (std::to_string(id) + ", ");
+    }
+    DHLOGI("DCameraProvider::StopCapture: ids=[%s].",
+        idString.empty() ? idString.c_str() : (idString.substr(0, idString.length() - INGNORE_STR_LEN)).c_str());
+    return callback->StopCapture(dhBase, streamIds);
 }
 
 DCamRetCode DCameraProvider::UpdateSettings(const std::shared_ptr<DHBase> &dhBase,

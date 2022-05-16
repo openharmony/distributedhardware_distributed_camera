@@ -181,11 +181,11 @@ int32_t DCameraSourceDev::StartCapture(const std::vector<std::shared_ptr<DCCaptu
     return DCAMERA_OK;
 }
 
-int32_t DCameraSourceDev::StopCapture()
+int32_t DCameraSourceDev::StopCapture(const std::vector<int>& streamIds)
 {
     DHLOGI("DCameraSourceDev PostTask StopCapture devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
-    DCameraSourceEvent event(*this, DCAMERA_EVENT_STOP_CAPTURE);
+    DCameraSourceEvent event(*this, DCAMERA_EVENT_STOP_CAPTURE, streamIds);
     eventBus_->PostEvent<DCameraSourceEvent>(event);
     return DCAMERA_OK;
 }
@@ -436,19 +436,38 @@ int32_t DCameraSourceDev::ExecuteStartCapture(std::vector<std::shared_ptr<DCCapt
     return ret;
 }
 
-int32_t DCameraSourceDev::ExecuteStopCapture()
+int32_t DCameraSourceDev::ExecuteStopCapture(std::vector<int>& streamIds, bool& isAllStop)
 {
     DHLOGI("DCameraSourceDev Execute StopCapture devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
-    int32_t ret = input_->StopCapture();
+    int32_t ret = input_->StopCapture(streamIds, isAllStop);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev Execute StopCapture input StopCapture failed, ret: %d, devId: %s dhId: %s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     }
+    if (isAllStop) {
+        ret = controller_->StopCapture();
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCameraSourceDev Execute StopCapture controller StopCapture failed, ret: %d, devId: %s dhId: %s",
+                ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        }
+    }
+    return DCAMERA_OK;
+}
+
+int32_t DCameraSourceDev::ExecuteStopAllCapture()
+{
+    DHLOGI("DCameraSourceDev Execute StopAllCapture devId %s dhId %s", GetAnonyString(devId_).c_str(),
+        GetAnonyString(dhId_).c_str());
+    int32_t ret = input_->StopAllCapture();
+    if (ret != DCAMERA_OK) {
+        DHLOGE("DCameraSourceDev Execute StopAllCapture input StopAllCapture failed, ret: %d, devId: %s dhId: %s",
+            ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+    }
     ret = controller_->StopCapture();
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceDev Execute StopCapture controller StopCapture failed, ret: %d, devId: %s dhId: %s", ret,
-            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        DHLOGE("DCameraSourceDev Execute StopAllCapture controller StopAllCapture failed, ret: %d, devId: %s dhId: %s",
+            ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     }
     return DCAMERA_OK;
 }

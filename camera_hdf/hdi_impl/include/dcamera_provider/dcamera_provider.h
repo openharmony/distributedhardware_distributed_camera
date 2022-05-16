@@ -51,7 +51,7 @@ public:
     DCamRetCode ReleaseStreams(const std::shared_ptr<DHBase> &dhBase, const std::vector<int> &streamIds);
     DCamRetCode StartCapture(const std::shared_ptr<DHBase> &dhBase,
                              const std::vector<std::shared_ptr<DCCaptureInfo>> &captureInfos);
-    DCamRetCode StopCapture(const std::shared_ptr<DHBase> &dhBase);
+    DCamRetCode StopCapture(const std::shared_ptr<DHBase> &dhBase, const std::vector<int> &streamIds);
     DCamRetCode UpdateSettings(const std::shared_ptr<DHBase> &dhBase,
                                const std::vector<std::shared_ptr<DCameraSettings>> &settings);
 

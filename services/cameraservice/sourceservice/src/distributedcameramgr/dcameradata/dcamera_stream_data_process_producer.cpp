@@ -178,8 +178,8 @@ void DCameraStreamDataProcessProducer::LooperSnapShot()
 int32_t DCameraStreamDataProcessProducer::FeedStreamToDriver(const std::shared_ptr<DHBase>& dhBase,
     const std::shared_ptr<DataBuffer>& buffer)
 {
-    DHLOGD("LooperFeed devId %s dhId %s streamSize: %d streamType: %d", GetAnonyString(devId_).c_str(),
-        GetAnonyString(dhId_).c_str(), buffer->Size(), streamType_);
+    DHLOGD("LooperFeed devId %s dhId %s streamSize: %d streamType: %d, streamId: %d", GetAnonyString(devId_).c_str(),
+        GetAnonyString(dhId_).c_str(), buffer->Size(), streamType_, streamId_);
     sptr<IDCameraProvider> camHdiProvider = IDCameraProvider::Get();
     if (camHdiProvider == nullptr) {
         DHLOGI("camHdiProvider is nullptr");
@@ -227,8 +227,8 @@ int32_t DCameraStreamDataProcessProducer::FeedStreamToDriver(const std::shared_p
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamId_, retHdi);
         return DCAMERA_BAD_OPERATE;
     }
-    DHLOGD("LooperFeed end devId %s dhId %s streamSize: %d streamType: %d", GetAnonyString(devId_).c_str(),
-        GetAnonyString(dhId_).c_str(), buffer->Size(), streamType_);
+    DHLOGD("LooperFeed end devId %s dhId %s streamSize: %d streamType: %d, streamId: %d", GetAnonyString(devId_).c_str(),
+        GetAnonyString(dhId_).c_str(), buffer->Size(), streamType_, streamId_);
     return ret;
 }
 } // namespace DistributedHardware

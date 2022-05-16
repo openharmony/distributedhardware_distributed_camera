@@ -225,7 +225,10 @@ void DCameraDevice::Close()
 
     std::shared_ptr<DCameraProvider> provider = DCameraProvider::GetInstance();
     if (provider != nullptr) {
-        provider->StopCapture(dhBase_);
+        if (dCameraStreamOperator_ != nullptr) {
+            std::vector<int> streamIds = dCameraStreamOperator_->GetStreamIds();
+            provider->StopCapture(dhBase_, streamIds);
+        }
     }
     if (dCameraStreamOperator_ != nullptr) {
         dCameraStreamOperator_->Release();
@@ -394,7 +397,10 @@ DCamRetCode DCameraDevice::Notify(const std::shared_ptr<DCameraHDFEvent> &event)
             }
             std::shared_ptr<DCameraProvider> provider = DCameraProvider::GetInstance();
             if (provider != nullptr) {
-                provider->StopCapture(dhBase_);
+                if (dCameraStreamOperator_ != nullptr) {
+                    std::vector<int> streamIds = dCameraStreamOperator_->GetStreamIds();
+                    provider->StopCapture(dhBase_, streamIds);
+                }
             }
             if (dCameraStreamOperator_ != nullptr) {
                 dCameraStreamOperator_->Release();

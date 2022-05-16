@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 DCameraSourceInput::DCameraSourceInput(std::string devId, std::string dhId, std::shared_ptr<EventBus>& eventBus)
-    : devId_(devId), dhId_(dhId), eventBus_(eventBus), isInit(false), isCapture_(false)
+    : devId_(devId), dhId_(dhId), eventBus_(eventBus), isInit(false)
 {
     DHLOGI("DCameraSourceInput Constructor devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
@@ -148,29 +148,29 @@ int32_t DCameraSourceInput::StartCapture(std::vector<std::shared_ptr<DCCaptureIn
             return ret;
         }
     }
-    std::lock_guard<std::mutex> autoLock(inputMutex_);
-    isCapture_ = true;
     return DCAMERA_OK;
 }
 
-int32_t DCameraSourceInput::StopCapture()
+int32_t DCameraSourceInput::StopCapture(std::vector<int>& streamIds, bool& isAllStop)
 {
     DHLOGI("DCameraSourceInput StopCapture devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
-    std::lock_guard<std::mutex> autoLock(inputMutex_);
-    isCapture_ = false;
-    int32_t ret = dataProcess_[CONTINUOUS_FRAME]->StopCapture();
+    int32_t ret = dataProcess_[CONTINUOUS_FRAME]->StopCapture(streamIds);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceInput StopCapture continue ret: %d, devId: %s, dhId: %s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return ret;
     }
 
-    ret = dataProcess_[SNAPSHOT_FRAME]->StopCapture();
-    if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceInput StopCapture snapshot ret: %d, devId: %s, dhId: %s", ret,
-            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
-        return ret;
+    int32_t size = dataProcess_[CONTINUOUS_FRAME]->GetProducerSize();
+    if (size == 0) {
+        isAllStop = true;
+        ret = dataProcess_[SNAPSHOT_FRAME]->StopCapture(streamIds);
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCameraSourceInput StopCapture snapshot ret: %d, devId: %s, dhId: %s", ret,
+                GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+            return ret;
+        }
     }
     return DCAMERA_OK;
 }
@@ -337,12 +337,6 @@ void DCameraSourceInput::OnSessionError(DCStreamType streamType, int32_t eventTy
 
 void DCameraSourceInput::OnDataReceived(DCStreamType streamType, std::vector<std::shared_ptr<DataBuffer>>& buffers)
 {
-    std::lock_guard<std::mutex> autoLock(inputMutex_);
-    if (!isCapture_) {
-        DHLOGE("DCameraSourceInput OnDataReceived FeedStream %d stream capture stop, devId: %s, dhId: %s", streamType,
-            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
-        return;
-    }
     int32_t ret = dataProcess_[streamType]->FeedStream(buffers);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceInput OnDataReceived FeedStream %d stream failed ret: %d, devId: %s, dhId: %s", streamType,
@@ -368,6 +362,30 @@ int32_t DCameraSourceInput::ReleaseAllStreams()
     ret = dataProcess_[SNAPSHOT_FRAME]->ReleaseStreams(snapStreamIds);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceInput ReleaseAllStreams snapshot stream ReleaseStreams ret: %d, devId: %s, dhId: %s", ret,
+            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        return ret;
+    }
+    return DCAMERA_OK;
+}
+
+int32_t DCameraSourceInput::StopAllCapture()
+{
+    DHLOGI("DCameraSourceInput StopAllCapture devId %s dhId %s", GetAnonyString(devId_).c_str(),
+        GetAnonyString(dhId_).c_str());
+    std::vector<int> continueStreamIds;
+    dataProcess_[CONTINUOUS_FRAME]->GetAllStreamIds(continueStreamIds);
+    int32_t ret = dataProcess_[CONTINUOUS_FRAME]->StopCapture(continueStreamIds);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("DCameraSourceInput StopAllCapture continue ret: %d, devId: %s, dhId: %s", ret,
+            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        return ret;
+    }
+
+    std::vector<int> snapStreamIds;
+    dataProcess_[SNAPSHOT_FRAME]->GetAllStreamIds(snapStreamIds);
+    ret = dataProcess_[SNAPSHOT_FRAME]->StopCapture(snapStreamIds);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("DCameraSourceInput StopAllCapture snapshot ret: %d, devId: %s, dhId: %s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return ret;
     }

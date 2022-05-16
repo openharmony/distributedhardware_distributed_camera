@@ -218,7 +218,13 @@ int32_t DCameraProviderCallbackStub::DCProviderStopCaptureStub(MessageParcel &da
 
     std::shared_ptr<DHBase> dhBase = std::make_shared<DHBase>(data.ReadString(), data.ReadString());
 
-    DCamRetCode ret = StopCapture(dhBase);
+    std::vector<int> streamIds;
+    if (!data.ReadInt32Vector(&streamIds)) {
+        DHLOGE("Read streamIds failed.");
+        return HDF_FAILURE;
+    }
+
+    DCamRetCode ret = StopCapture(dhBase, streamIds);
     if (!reply.WriteInt32(static_cast<int32_t>(ret))) {
         DHLOGE("Write retcode failed.");
         return HDF_FAILURE;

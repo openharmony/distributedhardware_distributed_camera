@@ -51,7 +51,8 @@ DCamRetCode DCameraProviderCallback::StartCapture(const std::shared_ptr<DHBase> 
     return DCamRetCode::SUCCESS;
 }
 
-DCamRetCode DCameraProviderCallback::StopCapture(const std::shared_ptr<DHBase> &dhBase)
+DCamRetCode DCameraProviderCallback::StopCapture(const std::shared_ptr<DHBase> &dhBase,
+    const std::vector<int> &streamIds)
 {
     DHLOGW("DCameraProviderCallback::StopCapture enter.");
     return DCamRetCode::SUCCESS;

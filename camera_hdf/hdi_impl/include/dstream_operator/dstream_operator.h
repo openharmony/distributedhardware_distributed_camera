@@ -65,6 +65,7 @@ public:
     DCamRetCode SetDeviceCallback(function<void(ErrorType, int)> &errorCbk,
                                   function<void(uint64_t, std::shared_ptr<Camera::CameraMetadata>)> &resultCbk);
     void Release();
+    std::vector<int> GetStreamIds();
 
 private:
     bool IsCapturing();

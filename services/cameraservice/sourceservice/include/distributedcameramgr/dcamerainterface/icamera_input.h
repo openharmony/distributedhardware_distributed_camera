@@ -28,7 +28,8 @@ public:
     virtual int32_t ReleaseStreams(std::vector<int>& streamIds, bool& isAllRelease) = 0;
     virtual int32_t ReleaseAllStreams() = 0;
     virtual int32_t StartCapture(std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos) = 0;
-    virtual int32_t StopCapture() = 0;
+    virtual int32_t StopCapture(std::vector<int>& streamIds, bool& isAllStop) = 0;
+    virtual int32_t StopAllCapture() = 0;
     virtual int32_t OpenChannel(std::vector<DCameraIndex>& indexs) = 0;
     virtual int32_t CloseChannel() = 0;
     virtual int32_t Init() = 0;
