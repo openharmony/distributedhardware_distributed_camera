@@ -15,8 +15,6 @@
 
 #include "dcamera_source_hidumper.h"
 
-#include <iterator>
-
 #include "distributed_camera_errno.h"
 #include "distributed_camera_source_service.h"
 #include "distributed_hardware_log.h"
@@ -124,8 +122,7 @@ int32_t DcameraSourceHidumper::GetCurrentStateInfo(std::string& result)
     std::map<std::string, int32_t> devState = camDumpInfo_.curState;
     std::string deviceId;
     int32_t camState;
-    std::map<std::string, int32_t>::iterator it;
-    for (it = devState.begin(); it != devState.end(); it++) {
+    for (auto it = devState.begin(); it != devState.end(); it++) {
         deviceId = it->first;
         camState = it->second;
     }
@@ -160,7 +157,7 @@ void DcameraSourceHidumper::ShowHelp(std::string& result)
           .append("dump camera version in the system\n")
           .append("--registered      ")
           .append("dump number of registered cameras in the system\n")
-          .append("--currentState    ")
+          .append("--curState    ")
           .append("dump current state of the camera in the system\n");
 }
 

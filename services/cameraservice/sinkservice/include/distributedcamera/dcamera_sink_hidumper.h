@@ -36,7 +36,7 @@ enum class HidumpFlag {
 struct CameraDumpInfo {
     std::string version;
     int32_t camNumber;
-    std::string dhOpened;
+    std::vector<std::string> camIds;
 };
 
 class DcameraSinkHidumper {

@@ -156,5 +156,10 @@ int32_t DCameraSinkDev::CloseChannel()
     DHLOGI("DCameraSinkDev::CloseChannel dhId: %s", GetAnonyString(dhId_).c_str());
     return controller_->CloseChannel();
 }
+
+std::string DCameraSinkDev::GetDhid()
+{
+    return GetAnonyString(dhId_);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -106,8 +106,12 @@ int32_t DcameraSinkHidumper::GetLocalCameraNumber(std::string& result)
 int32_t DcameraSinkHidumper::GetOpenedCameraInfo(std::string& result)
 {
     DHLOGI("GetOpenedCameraInfo Dump.");
-    result.append("OpenedCamera\n")
-          .append(camDumpInfo_.dhOpened);
+    result.append("OpenedCamera\n");
+    std::vector<std::string> camIds = camDumpInfo_.camIds;
+    for (int i = 0; i < camIds.size(); i++) {
+        result.append(camIds[i]);
+        result.append("\n");
+    }
     return DCAMERA_OK;
 }
 

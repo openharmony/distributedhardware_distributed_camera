@@ -39,6 +39,7 @@ public:
     int32_t GetCameraInfo(std::string& cameraInfo);
     int32_t OpenChannel(std::string& openInfo);
     int32_t CloseChannel();
+    std::string GetDhid();
 
 private:
     bool isInit_;

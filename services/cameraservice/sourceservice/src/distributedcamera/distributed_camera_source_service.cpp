@@ -15,8 +15,6 @@
 
 #include "distributed_camera_source_service.h"
 
-#include <iterator>
-
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
 #include "ipc_types.h"
@@ -226,17 +224,14 @@ int DistributedCameraSourceService::Dump(int32_t fd, const std::vector<std::u16s
 void DistributedCameraSourceService::GetDumpInfo(CameraDumpInfo& camDump)
 {
     camDump.regNumber = camerasMap_.size();
-    DHLOGI("camDump 111111");
     std::map<std::string, int32_t> curState;
-    std::map<DCameraIndex, std::shared_ptr<DCameraSourceDev>>::iterator it;
-    for (it = camerasMap_.begin(); it != camerasMap_.end(); it++) {
+    for (auto it = camerasMap_.begin(); it != camerasMap_.end(); it++) {
         DCameraIndex cam = it->first;
         std::shared_ptr<DCameraSourceDev> camSourceDev = it->second;
         camDump.version = camSourceDev->GetVersion();
         std::string deviceId = GetAnonyString(cam.devId_);
         deviceId.append(cam.dhId_);
         int32_t devState = camSourceDev->GetStateInfo();
-        DHLOGI("camDump 111111 devState %d", devState);
         curState[deviceId] = devState;
     }
     camDump.curState = curState;

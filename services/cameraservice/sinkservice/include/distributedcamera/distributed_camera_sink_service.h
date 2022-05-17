@@ -52,11 +52,13 @@ protected:
 
 private:
     bool Init();
+    void GetCamIds();
     bool registerToService_ = false;
     DCameraServiceState state_ = DCameraServiceState::DCAMERA_SRV_STATE_NOT_START;
 
     std::string sinkVer_;
     std::map<std::string, std::shared_ptr<DCameraSinkDev>> camerasMap_;
+    static DistributedCameraSinkService* dcSinkService;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -34,9 +34,11 @@ namespace DistributedHardware {
 REGISTER_SYSTEM_ABILITY_BY_ID(DistributedCameraSinkService, DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, true);
 
 static CameraDumpInfo g_camDump;
+DistributedCameraSinkService* DistributedCameraSinkService::dcSinkService;
 DistributedCameraSinkService::DistributedCameraSinkService(int32_t saId, bool runOnCreate)
     : SystemAbility(saId, runOnCreate)
 {
+    dcSinkService = this;
 }
 
 void DistributedCameraSinkService::OnStart()
@@ -191,7 +193,6 @@ int32_t DistributedCameraSinkService::ChannelNeg(const std::string& dhId, std::s
         return DCAMERA_NOT_FOUND;
     }
 
-    g_camDump.dhOpened = GetAnonyString(dhId);
     std::shared_ptr<DCameraSinkDev> sinkDevice = iter->second;
     int32_t ret = sinkDevice->ChannelNeg(channelInfo);
     if (ret != DCAMERA_OK) {
@@ -282,8 +283,18 @@ int DistributedCameraSinkService::Dump(int32_t fd, const std::vector<std::u16str
     return DCAMERA_OK;
 }
 
+void DistributedCameraSinkService::GetCamIds()
+{
+    std::vector<std::string> camIds;
+    for (auto it = camerasMap_.begin(); it != camerasMap_.end(); it++) {
+        camIds.push_back(it->second->GetDhid());
+    }
+    g_camDump.camIds = camIds;
+}
+
 void DistributedCameraSinkService::GetCamDumpInfo(CameraDumpInfo& camDump)
 {
+    dcSinkService->GetCamIds();
     camDump = g_camDump;
 }
 } // namespace DistributedHardware
