@@ -157,7 +157,7 @@ void DcameraSourceHidumper::ShowHelp(std::string& result)
           .append("dump camera version in the system\n")
           .append("--registered      ")
           .append("dump number of registered cameras in the system\n")
-          .append("--curState    ")
+          .append("--curState        ")
           .append("dump current state of the camera in the system\n");
 }
 

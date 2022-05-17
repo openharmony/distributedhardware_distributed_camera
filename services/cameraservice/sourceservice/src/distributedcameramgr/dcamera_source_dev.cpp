@@ -552,7 +552,7 @@ void DCameraSourceDev::NotifyHalResult(DCAMERA_EVENT eventType, DCameraSourceEve
 
 int32_t DCameraSourceDev::GetStateInfo()
 {
-    DHLOGE("GetStateInfo In state %d", stateMachine_->GetCameraState());
+    DHLOGI("GetStateInfo In state %d", stateMachine_->GetCameraState());
     return stateMachine_->GetCameraState();
 }
 

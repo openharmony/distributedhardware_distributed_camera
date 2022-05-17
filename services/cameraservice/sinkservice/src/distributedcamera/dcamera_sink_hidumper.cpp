@@ -130,9 +130,9 @@ void DcameraSinkHidumper::ShowHelp(std::string& result)
           .append("Description:\n")
           .append("--version         ")
           .append("dump camera version in the system\n")
-          .append("--camNum      ")
+          .append("--camNum          ")
           .append("dump local camera numbers in the system\n")
-          .append("--opened    ")
+          .append("--opened          ")
           .append("dump the opened camera in the system\n");
 }
 
