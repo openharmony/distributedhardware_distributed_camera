@@ -47,7 +47,7 @@ bool DcameraSinkHidumper::Dump(const std::vector<std::string>& args, std::string
     DHLOGI("DcameraSinkHidumper Dump args.size():%d.", args.size());
     result.clear();
     int32_t argsSize = static_cast<int32_t>(args.size());
-    for (int i = 0; i < argsSize; i++) {
+    for (int32_t i = 0; i < argsSize; i++) {
         DHLOGI("DcameraSinkHidumper Dump args[%d]: %s.", i, args.at(i).c_str());
     }
 
@@ -108,7 +108,7 @@ int32_t DcameraSinkHidumper::GetOpenedCameraInfo(std::string& result)
     DHLOGI("GetOpenedCameraInfo Dump.");
     result.append("OpenedCamera\n");
     std::vector<std::string> camIds = camDumpInfo_.camIds;
-    for (int i = 0; i < camIds.size(); i++) {
+    for (size_t i = 0; i < camIds.size(); i++) {
         result.append(camIds[i]);
         result.append("\n");
     }

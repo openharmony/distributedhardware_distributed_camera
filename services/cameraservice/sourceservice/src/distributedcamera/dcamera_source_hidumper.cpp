@@ -60,7 +60,7 @@ bool DcameraSourceHidumper::Dump(const std::vector<std::string>& args, std::stri
     DHLOGI("DcameraSourceHidumper Dump args.size():%d.", args.size());
     result.clear();
     int32_t argsSize = static_cast<int32_t>(args.size());
-    for (int i = 0; i < argsSize; i++) {
+    for (int32_t i = 0; i < argsSize; i++) {
         DHLOGI("DcameraSourceHidumper Dump args[%d]: %s.", i, args.at(i).c_str());
     }
 
@@ -120,15 +120,15 @@ int32_t DcameraSourceHidumper::GetCurrentStateInfo(std::string& result)
 {
     DHLOGI("GetCurrentStateInfo Dump.");
     std::map<std::string, int32_t> devState = camDumpInfo_.curState;
-    std::string deviceId;
-    int32_t camState;
+    std::string deviceId("");
+    int32_t camState = 0;
     for (auto it = devState.begin(); it != devState.end(); it++) {
         deviceId = it->first;
         camState = it->second;
     }
     DHLOGI("GetCurrentStateInfo camState is %d.", camState);
     auto state = STATE_MAP.find(camState);
-    std::string curState;
+    std::string curState("");
     if (state != STATE_MAP.end()) {
         curState = state->second;
     }
