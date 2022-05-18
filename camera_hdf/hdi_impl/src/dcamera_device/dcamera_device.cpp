@@ -224,11 +224,9 @@ void DCameraDevice::Close()
     DHLOGI("DCameraDevice::Close distributed camera: %s", dCameraId_.c_str());
 
     std::shared_ptr<DCameraProvider> provider = DCameraProvider::GetInstance();
-    if (provider != nullptr) {
-        if (dCameraStreamOperator_ != nullptr) {
-            std::vector<int> streamIds = dCameraStreamOperator_->GetStreamIds();
-            provider->StopCapture(dhBase_, streamIds);
-        }
+    if ((provider != nullptr) && (dCameraStreamOperator_ != nullptr)) {
+        std::vector<int> streamIds = dCameraStreamOperator_->GetStreamIds();
+        provider->StopCapture(dhBase_, streamIds);
     }
     if (dCameraStreamOperator_ != nullptr) {
         dCameraStreamOperator_->Release();
@@ -396,11 +394,9 @@ DCamRetCode DCameraDevice::Notify(const std::shared_ptr<DCameraHDFEvent> &event)
                 dCameraDeviceCallback_->OnError(ErrorType::REQUEST_TIMEOUT, 0);
             }
             std::shared_ptr<DCameraProvider> provider = DCameraProvider::GetInstance();
-            if (provider != nullptr) {
-                if (dCameraStreamOperator_ != nullptr) {
-                    std::vector<int> streamIds = dCameraStreamOperator_->GetStreamIds();
-                    provider->StopCapture(dhBase_, streamIds);
-                }
+            if ((provider != nullptr) && (dCameraStreamOperator_ != nullptr)) {
+                std::vector<int> streamIds = dCameraStreamOperator_->GetStreamIds();
+                provider->StopCapture(dhBase_, streamIds);
             }
             if (dCameraStreamOperator_ != nullptr) {
                 dCameraStreamOperator_->Release();
