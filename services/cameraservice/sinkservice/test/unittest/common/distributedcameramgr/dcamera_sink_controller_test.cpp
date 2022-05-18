@@ -13,13 +13,14 @@
  * limitations under the License.
  */
 
+#include <chrono>
 #include <gtest/gtest.h>
 #include <memory>
+#include <thread>
+
 #define private public
 #include "dcamera_sink_controller.h"
 #undef private
-
-#include "distributed_hardware_log.h"
 
 #include "mock_camera_channel.h"
 #include "mock_camera_operator.h"
@@ -31,6 +32,7 @@
 #include "dcamera_sink_dev.h"
 #include "dcamera_utils_tools.h"
 #include "distributed_camera_errno.h"
+#include "distributed_hardware_log.h"
 
 using namespace testing::ext;
 
@@ -48,6 +50,7 @@ public:
 };
 std::string g_testDeviceIdController;
 
+const int32_t SLEEP_TIME_MS = 500;
 const std::string SESSION_FLAG_CONTINUE = "dataContinue";
 const std::string SESSION_FLAG_SNAPSHOT = "dataSnapshot";
 const std::string TEST_DEVICE_ID_EMPTY = "";
@@ -302,6 +305,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_010, TestSize.L
 HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_011, TestSize.Level1)
 {
     controller_->OnSessionState(DCAMERA_CHANNEL_STATE_DISCONNECTED);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_TIME_MS));
 
     DCameraInfoCmd cmd;
     cmd.value_ = std::make_shared<DCameraInfo>();
