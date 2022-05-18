@@ -13,8 +13,11 @@
  * limitations under the License.
  */
 
+#include <chrono>
 #include <fstream>
 #include <memory>
+#include <thread>
+
 #define private public
 #include "dcamera_sink_data_process.h"
 #undef private
@@ -42,9 +45,10 @@ public:
     std::shared_ptr<ICameraChannel> channel_;
 };
 
-const std::string TEST_STRING = "test_string";
+const int32_t SLEEP_TIME_MS = 500;
 const int32_t TEST_WIDTH = 1080;
 const int32_t TEST_HEIGHT = 1920;
+const std::string TEST_STRING = "test_string";
 
 std::shared_ptr<DCameraCaptureInfo> g_testCaptureInfoContinuousNotEncode;
 std::shared_ptr<DCameraCaptureInfo> g_testCaptureInfoContinuousNeedEncode;
@@ -169,6 +173,7 @@ HWTEST_F(DCameraSinkDataProcessTest, dcamera_sink_data_process_test_005, TestSiz
 {
     dataProcess_->captureInfo_ = g_testCaptureInfoContinuousNotEncode;
     int32_t ret = dataProcess_->FeedStream(g_testDataBuffer);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_TIME_MS));
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
@@ -182,6 +187,7 @@ HWTEST_F(DCameraSinkDataProcessTest, dcamera_sink_data_process_test_006, TestSiz
 {
     dataProcess_->captureInfo_ = g_testCaptureInfoContinuousNeedEncode;
     int32_t ret = dataProcess_->FeedStream(g_testDataBuffer);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_TIME_MS));
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
@@ -195,6 +201,7 @@ HWTEST_F(DCameraSinkDataProcessTest, dcamera_sink_data_process_test_007, TestSiz
 {
     dataProcess_->captureInfo_ = g_testCaptureInfoSnapshot;
     int32_t ret = dataProcess_->FeedStream(g_testDataBuffer);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_TIME_MS));
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 } // namespace DistributedHardware
