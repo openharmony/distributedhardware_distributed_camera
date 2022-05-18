@@ -59,7 +59,7 @@ CamRetCode DCameraHost::GetCameraIds(std::vector<std::string> &cameraIds)
 CamRetCode DCameraHost::GetCameraAbility(const std::string &cameraId,
     std::shared_ptr<CameraAbility> &ability)
 {
-    DHLOGE("DCameraHost::GetCameraAbility for cameraId: %s", cameraId.c_str());
+    DHLOGE("DCameraHost::GetCameraAbility for cameraId: %s", GetAnonyString(cameraId).c_str());
 
     if (IsCameraIdInvalid(cameraId)) {
         DHLOGE("DCameraHost::GetCameraAbility, invalid camera id.");
@@ -74,7 +74,7 @@ CamRetCode DCameraHost::OpenCamera(const std::string &cameraId,
     const OHOS::sptr<ICameraDeviceCallback> &callback,
     OHOS::sptr<ICameraDevice> &pDevice)
 {
-    DHLOGI("DCameraHost::OpenCamera for cameraId: %s", cameraId.c_str());
+    DHLOGI("DCameraHost::OpenCamera for cameraId: %s", GetAnonyString(cameraId).c_str());
 
     if (IsCameraIdInvalid(cameraId) || callback == nullptr) {
         DHLOGE("DCameraHost::OpenCamera, open camera id is empty or callback is null.");
@@ -94,7 +94,7 @@ CamRetCode DCameraHost::OpenCamera(const std::string &cameraId,
     }
 
     if (dcameraDevice->IsOpened()) {
-        DHLOGE("DCameraHost::OpenCamera, dcamera device %s already opened.", cameraId.c_str());
+        DHLOGE("DCameraHost::OpenCamera, dcamera device %s already opened.", GetAnonyString(cameraId).c_str());
         return CamRetCode::CAMERA_BUSY;
     }
 
@@ -105,7 +105,7 @@ CamRetCode DCameraHost::OpenCamera(const std::string &cameraId,
     }
     pDevice = dcameraDevice;
 
-    DHLOGI("DCameraHost::OpenCamera, open camera %s success.", cameraId.c_str());
+    DHLOGI("DCameraHost::OpenCamera, open camera %s success.", GetAnonyString(cameraId).c_str());
     return CamRetCode::NO_ERROR;
 }
 
@@ -122,7 +122,7 @@ DCamRetCode DCameraHost::AddDCameraDevice(const std::shared_ptr<DHBase> &dhBase,
     const sptr<IDCameraProviderCallback> &callback)
 {
     DHLOGI("DCameraHost::AddDCameraDevice for {devId: %s, dhId: %s}",
-        GetAnonyString(dhBase->deviceId_).c_str(), dhBase->dhId_.c_str());
+        GetAnonyString(dhBase->deviceId_).c_str(), GetAnonyString(dhBase->dhId_).c_str());
 
     OHOS::sptr<DCameraDevice> dcameraDevice = new (std::nothrow) DCameraDevice(dhBase, abilityInfo);
     if (dcameraDevice == nullptr) {
@@ -140,14 +140,15 @@ DCamRetCode DCameraHost::AddDCameraDevice(const std::shared_ptr<DHBase> &dhBase,
         dCameraHostCallback_->OnCameraEvent(dCameraId, CameraEvent::CAMERA_EVENT_DEVICE_ADD);
     }
 
-    DHLOGI("DCameraHost::AddDCameraDevice, create dcamera device success, dCameraId: %s", dCameraId.c_str());
+    DHLOGI("DCameraHost::AddDCameraDevice, create dcamera device success, dCameraId: %s",
+        GetAnonyString(dCameraId).c_str());
     return DCamRetCode::SUCCESS;
 }
 
 DCamRetCode DCameraHost::RemoveDCameraDevice(const std::shared_ptr<DHBase> &dhBase)
 {
     DHLOGI("DCameraHost::RemoveDCameraDevice for {devId: %s, dhId: %s}",
-        GetAnonyString(dhBase->deviceId_).c_str(), dhBase->dhId_.c_str());
+        GetAnonyString(dhBase->deviceId_).c_str(), GetAnonyString(dhBase->dhId_).c_str());
 
     std::string dCameraId = GetCameraIdByDHBase(dhBase);
     if (dCameraId.empty()) {
@@ -171,7 +172,8 @@ DCamRetCode DCameraHost::RemoveDCameraDevice(const std::shared_ptr<DHBase> &dhBa
         dCameraHostCallback_->OnCameraEvent(dCameraId, CameraEvent::CAMERA_EVENT_DEVICE_RMV);
     }
 
-    DHLOGI("DCameraHost::RemoveDCameraDevice, remove dcamera device success, dCameraId: %s", dCameraId.c_str());
+    DHLOGI("DCameraHost::RemoveDCameraDevice, remove dcamera device success, dCameraId: %s",
+        GetAnonyString(dCameraId).c_str());
     return DCamRetCode::SUCCESS;
 }
 
