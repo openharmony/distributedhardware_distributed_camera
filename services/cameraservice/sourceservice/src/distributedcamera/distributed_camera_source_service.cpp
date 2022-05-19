@@ -23,6 +23,7 @@
 #include "system_ability_definition.h"
 
 #include "anonymous_string.h"
+#include "dcamera_hdf_operate.h"
 #include "dcamera_service_state_listener.h"
 #include "dcamera_source_service_ipc.h"
 #include "distributed_camera_errno.h"
@@ -190,11 +191,25 @@ int32_t DistributedCameraSourceService::DCameraNotify(const std::string& devId, 
 
 int32_t DistributedCameraSourceService::LoadDCameraHDF()
 {
+    DHLOGI("load hdf driver start");
+    int32_t ret = DCameraHdfOperate::GetInstance().LoadDcameraHDFImpl();
+    if (ret != DCAMERA_OK) {
+        DHLOGE("load hdf driver failed, ret %d", ret);
+        return ret;
+    }
+    DHLOGI("load hdf driver end");
     return DCAMERA_OK;
 }
 
 int32_t DistributedCameraSourceService::UnLoadCameraHDF()
 {
+    DHLOGI("unload hdf driver start");
+    int32_t ret = DCameraHdfOperate::GetInstance().UnLoadDcameraHDFImpl();
+    if (ret != DCAMERA_OK) {
+        DHLOGE("unload hdf driver failed, ret %d", ret);
+        return ret;
+    }
+    DHLOGI("unload hdf driver end");
     return DCAMERA_OK;
 }
 } // namespace DistributedHardware
