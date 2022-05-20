@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -391,34 +391,44 @@ DCamRetCode DCameraDevice::Notify(const std::shared_ptr<DCameraHDFEvent> &event)
         }
         case DCameraEventResult::DCAMERA_EVENT_CONFIG_STREAMS_ERROR:
         case DCameraEventResult::DCAMERA_EVENT_START_CAPTURE_ERROR: {
-            if (dCameraDeviceCallback_ != nullptr) {
-                dCameraDeviceCallback_->OnError(ErrorType::REQUEST_TIMEOUT, 0);
-            }
-            std::shared_ptr<DCameraProvider> provider = DCameraProvider::GetInstance();
-            if ((provider != nullptr) && (dCameraStreamOperator_ != nullptr)) {
-                std::vector<int> streamIds = dCameraStreamOperator_->GetStreamIds();
-                provider->StopCapture(dhBase_, streamIds);
-            }
-            if (dCameraStreamOperator_ != nullptr) {
-                dCameraStreamOperator_->Release();
-            }
+            NotifyStartCaptureError();
             break;
         }
         case DCameraEventResult::DCAMERA_EVENT_CAMERA_ERROR: {
-            std::shared_ptr<DCameraHost> dCameraHost = DCameraHost::GetInstance();
-            if (dCameraHost != nullptr) {
-                dCameraHost->NotifyDCameraStatus(dhBase_, event->result_);
-            }
-            if (dCameraDeviceCallback_ != nullptr) {
-                dCameraDeviceCallback_->OnError(ErrorType::REQUEST_TIMEOUT, 0);
-                Close();
-            }
+            NotifyCameraError(event);
             break;
         }
         default:
             break;
     }
     return SUCCESS;
+}
+
+void DCameraDevice::NotifyStartCaptureError()
+{
+    if (dCameraDeviceCallback_ != nullptr) {
+        dCameraDeviceCallback_->OnError(ErrorType::REQUEST_TIMEOUT, 0);
+    }
+    std::shared_ptr<DCameraProvider> provider = DCameraProvider::GetInstance();
+    if ((provider != nullptr) && (dCameraStreamOperator_ != nullptr)) {
+        std::vector<int> streamIds = dCameraStreamOperator_->GetStreamIds();
+        provider->StopCapture(dhBase_, streamIds);
+    }
+    if (dCameraStreamOperator_ != nullptr) {
+        dCameraStreamOperator_->Release();
+    }
+}
+
+void DCameraDevice::NotifyCameraError(const std::shared_ptr<DCameraHDFEvent> &event)
+{
+    std::shared_ptr<DCameraHost> dCameraHost = DCameraHost::GetInstance();
+    if (dCameraHost != nullptr) {
+        dCameraHost->NotifyDCameraStatus(dhBase_, event->result_);
+    }
+    if (dCameraDeviceCallback_ != nullptr) {
+        dCameraDeviceCallback_->OnError(ErrorType::REQUEST_TIMEOUT, 0);
+        Close();
+    }
 }
 
 void DCameraDevice::SetProviderCallback(const OHOS::sptr<IDCameraProviderCallback> &callback)
