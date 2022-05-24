@@ -83,8 +83,8 @@ ohos_shared_library("distributed_camera_data_process") {
   ]
 
   external_deps = [
-    "hisysevent_native:libhisysevent",
     "eventhandler:libeventhandler",
+    "hisysevent_native:libhisysevent",
     "hiviewdfx_hilog_native:libhilog",
     "multimedia_media_standard:media_client",
   ]

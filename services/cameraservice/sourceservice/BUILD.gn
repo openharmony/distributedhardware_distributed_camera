@@ -104,10 +104,10 @@ ohos_shared_library("distributed_camera_source") {
   ]
 
   external_deps = [
-    "hisysevent_native:libhisysevent",
     "device_driver_framework:libhdf_utils",
     "device_driver_framework:libhdi",
     "eventhandler:libeventhandler",
+    "hisysevent_native:libhisysevent",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
