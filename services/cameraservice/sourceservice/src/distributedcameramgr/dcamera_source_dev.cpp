@@ -15,8 +15,6 @@
 
 #include "dcamera_source_dev.h"
 
-#include <unistd.h>
-
 #include "anonymous_string.h"
 #include "hisysevent.h"
 #include "distributed_camera_constants.h"

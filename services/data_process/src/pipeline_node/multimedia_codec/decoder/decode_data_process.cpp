@@ -15,8 +15,6 @@
 
 #include "decode_data_process.h"
 
-#include <unistd.h>
-
 #include "hisysevent.h"
 #include "distributed_hardware_log.h"
 #include "graphic_common_c.h"

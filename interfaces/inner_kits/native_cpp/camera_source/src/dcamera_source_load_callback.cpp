@@ -15,8 +15,6 @@
 
 #include "dcamera_source_load_callback.h"
 
-#include <unistd.h>
-
 #include "hisysevent.h"
 #include "dcamera_source_handler.h"
 #include "distributed_hardware_log.h"
