@@ -75,7 +75,7 @@ void DCameraStreamDataProcessProducer::FeedStream(const std::shared_ptr<DataBuff
 {
     DHLOGD("DCameraStreamDataProcessProducer FeedStream devId %s dhId %s streamType: %d streamSize: %d",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, buffer->Size());
-    std::unique_lock<std::mutex> lock(producerMutex_);
+    std::unique_lock<std::mutex> lock(bufferMutex_);
     if (buffers_.size() >= DCAMERA_PRODUCER_MAX_BUFFER_SIZE) {
         DHLOGD("DCameraStreamDataProcessProducer FeedStream OverSize devId %s dhId %s streamType: %d streamSize: %d",
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, buffer->Size());
@@ -98,7 +98,7 @@ void DCameraStreamDataProcessProducer::LooperContinue()
     while (state_ == DCAMERA_PRODUCER_STATE_START) {
         std::shared_ptr<DataBuffer> buffer = nullptr;
         {
-            std::unique_lock<std::mutex> lock(producerMutex_);
+            std::unique_lock<std::mutex> lock(bufferMutex_);
             producerCon_.wait_for(lock, std::chrono::milliseconds(interval_), [this] {
                 return (this->state_ == DCAMERA_PRODUCER_STATE_STOP);
             });
@@ -141,7 +141,7 @@ void DCameraStreamDataProcessProducer::LooperSnapShot()
     while (state_ == DCAMERA_PRODUCER_STATE_START) {
         std::shared_ptr<DataBuffer> buffer = nullptr;
         {
-            std::unique_lock<std::mutex> lock(producerMutex_);
+            std::unique_lock<std::mutex> lock(bufferMutex_);
             producerCon_.wait(lock, [this] {
                 return (!buffers_.empty() || state_ == DCAMERA_PRODUCER_STATE_STOP);
             });
@@ -167,7 +167,7 @@ void DCameraStreamDataProcessProducer::LooperSnapShot()
             continue;
         }
         {
-            std::unique_lock<std::mutex> lock(producerMutex_);
+            std::unique_lock<std::mutex> lock(bufferMutex_);
             buffers_.pop();
         }
     }

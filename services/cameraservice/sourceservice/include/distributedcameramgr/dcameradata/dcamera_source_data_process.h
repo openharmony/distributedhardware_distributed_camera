@@ -16,6 +16,7 @@
 #ifndef OHOS_DCAMERA_SOURCE_DATRA_PROCESS_H
 #define OHOS_DCAMERA_SOURCE_DATRA_PROCESS_H
 
+#include <mutex>
 #include <set>
 #include <string>
 
@@ -40,6 +41,7 @@ public:
     void GetAllStreamIds(std::vector<int32_t>& streamIds) override;
 
 private:
+    std::mutex streamMutex_;
     std::vector<std::shared_ptr<DCameraStreamDataProcess>> streamProcess_;
     std::set<int32_t> streamIds_;
     std::string devId_;

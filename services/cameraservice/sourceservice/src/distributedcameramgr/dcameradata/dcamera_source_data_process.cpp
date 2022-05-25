@@ -48,6 +48,7 @@ int32_t DCameraSourceDataProcess::FeedStream(std::vector<std::shared_ptr<DataBuf
     auto buffer = *(buffers.begin());
     DHLOGD("DCameraSourceDataProcess FeedStream devId %s dhId %s streamType %d streamSize: %d",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, buffer->Size());
+    std::lock_guard<std::mutex> autoLock(streamMutex_);
     for (auto iter = streamProcess_.begin(); iter != streamProcess_.end(); iter++) {
         (*iter)->FeedStream(buffer);
     }
@@ -102,6 +103,7 @@ int32_t DCameraSourceDataProcess::ReleaseStreams(std::vector<int32_t>& streamIds
 {
     DHLOGI("DCameraSourceDataProcess ReleaseStreams devId %s dhId %s streamType: %d", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str(), streamType_);
+    std::lock_guard<std::mutex> autoLock(streamMutex_);
     std::set<int32_t> streamIdSet(streamIds.begin(), streamIds.end());
     auto iter = streamProcess_.begin();
     while (iter != streamProcess_.end()) {

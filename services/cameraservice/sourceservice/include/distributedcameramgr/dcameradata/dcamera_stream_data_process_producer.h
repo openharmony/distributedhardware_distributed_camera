@@ -55,7 +55,7 @@ private:
 
     std::thread producerThread_;
     std::condition_variable producerCon_;
-    std::mutex producerMutex_;
+    std::mutex bufferMutex_;
     std::queue<std::shared_ptr<DataBuffer>> buffers_;
     DCameraProducerState state_;
     uint32_t interval_;
