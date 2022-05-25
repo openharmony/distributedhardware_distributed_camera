@@ -121,7 +121,8 @@ void DCameraStreamDataProcess::StartCapture(std::shared_ptr<DCameraStreamConfig>
             }
             DHLOGI("DCameraStreamDataProcess StartCapture CreateProducer devId %s dhId %s streamType: %d streamId: %d",
                 GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId);
-            producers_[streamId] = std::make_shared<DCameraStreamDataProcessProducer>(devId_, dhId_, streamId, streamType_);
+            producers_[streamId] =
+                std::make_shared<DCameraStreamDataProcessProducer>(devId_, dhId_, streamId, streamType_);
             producers_[streamId]->Start();
         }
     }
