@@ -165,7 +165,9 @@ int32_t DCameraSourceInput::StopCapture(std::vector<int>& streamIds, bool& isAll
     int32_t size = dataProcess_[CONTINUOUS_FRAME]->GetProducerSize();
     if (size == 0) {
         isAllStop = true;
-        ret = dataProcess_[SNAPSHOT_FRAME]->StopCapture(streamIds);
+        std::vector<int> snapStreamIds;
+        dataProcess_[SNAPSHOT_FRAME]->GetAllStreamIds(snapStreamIds);
+        ret = dataProcess_[SNAPSHOT_FRAME]->StopCapture(snapStreamIds);
         if (ret != DCAMERA_OK) {
             DHLOGE("DCameraSourceInput StopCapture snapshot ret: %d, devId: %s, dhId: %s", ret,
                 GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
