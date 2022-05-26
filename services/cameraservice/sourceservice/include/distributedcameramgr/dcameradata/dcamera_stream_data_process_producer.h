@@ -42,6 +42,7 @@ public:
     void UpdateInterval(uint32_t fps);
 
 private:
+    void StartEvent();
     void LooperContinue();
     void LooperSnapShot();
     int32_t FeedStreamToDriver(const std::shared_ptr<DHBase>& dhBase, const std::shared_ptr<DataBuffer>& buffer);
@@ -53,9 +54,12 @@ private:
     std::string devId_;
     std::string dhId_;
 
+    std::thread eventThread_;
     std::thread producerThread_;
+    std::condition_variable eventCon_;
     std::condition_variable producerCon_;
     std::mutex bufferMutex_;
+    std::mutex eventMutex_;
     std::queue<std::shared_ptr<DataBuffer>> buffers_;
     DCameraProducerState state_;
     uint32_t interval_;

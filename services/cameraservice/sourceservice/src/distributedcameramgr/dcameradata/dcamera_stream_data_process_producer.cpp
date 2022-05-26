@@ -27,7 +27,7 @@ namespace OHOS {
 namespace DistributedHardware {
 DCameraStreamDataProcessProducer::DCameraStreamDataProcessProducer(std::string devId, std::string dhId,
     int32_t streamId, DCStreamType streamType)
-    : devId_(devId), dhId_(dhId), streamId_(streamId), streamType_(streamType)
+    : devId_(devId), dhId_(dhId), streamId_(streamId), streamType_(streamType), eventHandler_(nullptr)
 {
     DHLOGI("DCameraStreamDataProcessProducer Constructor devId %s dhId %s streamType: %d streamId: %d",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_);
@@ -50,10 +50,12 @@ void DCameraStreamDataProcessProducer::Start()
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_);
     state_ = DCAMERA_PRODUCER_STATE_START;
     if (streamType_ == CONTINUOUS_FRAME) {
+        eventThread_ = std::thread(&DCameraStreamDataProcessProducer::StartEvent, this);
+        std::unique_lock<std::mutex> lock(eventMutex_);
+        eventCon_.wait(lock, [this] {
+            return eventHandler_ != nullptr;
+        });
         producerThread_ = std::thread(&DCameraStreamDataProcessProducer::LooperContinue, this);
-        std::string threadName = "DCameraProducer_" + std::to_string(streamType_) + "_" + std::to_string(streamId_);
-        auto runner = AppExecFwk::EventRunner::Create(threadName);
-        eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
     } else {
         producerThread_ = std::thread(&DCameraStreamDataProcessProducer::LooperSnapShot, this);
     }
@@ -66,7 +68,11 @@ void DCameraStreamDataProcessProducer::Stop()
     state_ = DCAMERA_PRODUCER_STATE_STOP;
     producerCon_.notify_one();
     producerThread_.join();
-    eventHandler_ = nullptr;
+    if (streamType_ == CONTINUOUS_FRAME) {
+        eventHandler_->GetEventRunner()->Stop();
+        eventThread_.join();
+        eventHandler_ = nullptr;
+    }
     DHLOGI("DCameraStreamDataProcessProducer Stop end devId: %s dhId: %s streamType: %d streamId: %d state: %d",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_, state_);
 }
@@ -85,6 +91,14 @@ void DCameraStreamDataProcessProducer::FeedStream(const std::shared_ptr<DataBuff
     if (streamType_ == SNAPSHOT_FRAME) {
         producerCon_.notify_one();
     }
+}
+
+void DCameraStreamDataProcessProducer::StartEvent()
+{
+    auto runner = AppExecFwk::EventRunner::Create(false);
+    eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
+    eventCon_.notify_one();
+    runner->Run();
 }
 
 void DCameraStreamDataProcessProducer::LooperContinue()
