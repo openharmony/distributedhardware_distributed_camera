@@ -29,6 +29,7 @@ ohos_shared_library("distributed_camera_source_sdk") {
     "include",
     "include/callback",
     "${common_path}/include/constants",
+    "${common_path}/include/utils",
   ]
 
   sources = [
@@ -41,6 +42,7 @@ ohos_shared_library("distributed_camera_source_sdk") {
   ]
 
   deps = [
+    "${common_path}:distributed_camera_utils",
     "${fwk_utils_path}:distributedhardwareutils",
     "//utils/native/base:utils",
   ]
@@ -52,7 +54,6 @@ ohos_shared_library("distributed_camera_source_sdk") {
   ]
 
   external_deps = [
-    "hisysevent_native:libhisysevent",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "samgr_standard:samgr_proxy",

@@ -16,13 +16,12 @@
 #include "encode_data_process.h"
 
 #include <cmath>
-#include <unistd.h>
 
 #include "display_type.h"
 #include "distributed_hardware_log.h"
 #include "graphic_common_c.h"
-#include "hisysevent.h"
 
+#include "dcamera_hisysevent_adapter.h"
 #include "dcamera_utils_tools.h"
 #include "encode_video_callback.h"
 
@@ -43,6 +42,9 @@ const std::map<int64_t, int32_t> EncodeDataProcess::ENCODER_BITRATE_TABLE = {
     std::map<int64_t, int32_t>::value_type(WIDTH_1280_HEIGHT_720, BITRATE_3400000),
     std::map<int64_t, int32_t>::value_type(WIDTH_1440_HEIGHT_1080, BITRATE_5000000),
     std::map<int64_t, int32_t>::value_type(WIDTH_1920_HEIGHT_1080, BITRATE_6000000),
+};
+const string ENUM_VIDEOFORMAT_STRINGS[] = {
+    "YUVI420", "NV12", "NV21", "RGBA_8888"
 };
 
 EncodeDataProcess::~EncodeDataProcess()
@@ -114,6 +116,9 @@ int32_t EncodeDataProcess::InitEncoder()
     ret = StartVideoEncoder();
     if (ret != DCAMERA_OK) {
         DHLOGE("Start Video encoder failed.");
+        ReportStartVideoEncoderFail(sourceConfig_.GetWidth(), sourceConfig_.GetHeight(),
+            ENUM_VIDEOFORMAT_STRINGS[static_cast<int32_t>(sourceConfig_.GetVideoformat())],
+            "start video encoder failed.");
         return ret;
     }
 
@@ -229,16 +234,6 @@ int32_t EncodeDataProcess::StartVideoEncoder()
     ret = videoEncoder_->Start();
     if (ret != Media::MediaServiceErrCode::MSERR_OK) {
         DHLOGE("Video encoder start failed. Error code %d.", ret);
-        int32_t retVal = OHOS::HiviewDFX::HiSysEvent::Write(
-            OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_CAMERA,
-            "VIDEO_ENCODER_ERROR",
-            OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
-            "PID", getpid(),
-            "UID", getuid(),
-            "MSG", "video encoder start failed.");
-        if (retVal != DCAMERA_OK) {
-            DHLOGE("Write HiSysEvent error, retVal:%d", retVal);
-        }
         return DCAMERA_INIT_ERR;
     }
     return DCAMERA_OK;
@@ -260,16 +255,6 @@ int32_t EncodeDataProcess::StopVideoEncoder()
     ret = videoEncoder_->Stop();
     if (ret != Media::MediaServiceErrCode::MSERR_OK) {
         DHLOGE("VideoEncoder stop failed. Error type: %d.", ret);
-        int32_t retVal = OHOS::HiviewDFX::HiSysEvent::Write(
-            OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_CAMERA,
-            "VIDEO_ENCODER_ERROR",
-            OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
-            "PID", getpid(),
-            "UID", getuid(),
-            "MSG", "video encoder stop failed.");
-        if (retVal != DCAMERA_OK) {
-            DHLOGE("Write HiSysEvent error, retVal:%d", retVal);
-        }
         isSuccess = isSuccess && false;
     }
 
@@ -293,6 +278,7 @@ void EncodeDataProcess::ReleaseVideoEncoder()
     int32_t ret = StopVideoEncoder();
     if (ret != DCAMERA_OK) {
         DHLOGE("StopVideoEncoder failed.");
+        ReportStopVideoEncoderFail("stop video encoder failed.");
     }
     ret = videoEncoder_->Release();
     if (ret != Media::MediaServiceErrCode::MSERR_OK) {

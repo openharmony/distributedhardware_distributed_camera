@@ -119,7 +119,6 @@ ohos_shared_library("distributed_camera_sink") {
 
   external_deps = [
     "eventhandler:libeventhandler",
-    "hisysevent_native:libhisysevent",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",

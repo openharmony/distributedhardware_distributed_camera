@@ -32,6 +32,7 @@ ohos_shared_library("distributed_camera_utils") {
 
   sources = [
     "src/utils/data_buffer.cpp",
+    "src/utils/dcamera_hisysevent_adapter.cpp",
     "src/utils/dcamera_sa_process_state.cpp",
     "src/utils/dcamera_utils_tools.cpp",
   ]
@@ -49,6 +50,7 @@ ohos_shared_library("distributed_camera_utils") {
 
   external_deps = [
     "dsoftbus_standard:softbus_client",
+    "hisysevent_native:libhisysevent",
     "hiviewdfx_hilog_native:libhilog",
   ]
 

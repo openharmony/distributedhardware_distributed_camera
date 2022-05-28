@@ -15,14 +15,13 @@
 
 #include "dcamera_softbus_adapter.h"
 
-#include <unistd.h>
 #include <securec.h>
 
-#include "hisysevent.h"
 #include "softbus_bus_center.h"
 #include "softbus_common.h"
 
 #include "anonymous_string.h"
+#include "dcamera_hisysevent_adapter.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -127,18 +126,7 @@ int32_t DCameraSoftbusAdapter::CreateSoftbusSessionServer(std::string sessionNam
     int32_t ret = CreateSessionServer(PKG_NAME.c_str(), sessionName.c_str(), &sessListeners_[role]);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSoftbusAdapter CreateSessionServer failed, ret: %d", ret);
-        int32_t retVal = OHOS::HiviewDFX::HiSysEvent::Write(
-            OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_CAMERA,
-            "SOFTBUS_SESSIONSERVER_ERROR",
-            OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
-            "PID", getpid(),
-            "UID", getuid(),
-            "PKGNAME", PKG_NAME.c_str(),
-            "SESSIONNAME", sessionName.c_str(),
-            "MSG", "create session server failed.");
-        if (retVal != DCAMERA_OK) {
-            DHLOGE("Write HiSysEvent error, retVal:%d", retVal);
-        }
+        ReportSoftbusSessionServerFail(PKG_NAME, sessionName, "create session server failed");
         return ret;
     }
     sessionTotal_[sessionName]++;
@@ -211,28 +199,10 @@ int32_t DCameraSoftbusAdapter::OpenSoftbusSession(std::string mySessName, std::s
     int32_t sessionId = OpenSession(mySessName.c_str(), peerSessName.c_str(), peerDevId.c_str(), "0", &attr);
     if (sessionId < 0) {
         DHLOGE("DCameraSoftbusAdapter OpenSoftbusSession failed %d", sessionId);
-        ReportSoftbusSessionFail(mySessName, peerSessName, peerDevId);
+        ReportSoftbusSessionFail(mySessName, peerSessName, peerDevId, "open softbus session failed.");
         return DCAMERA_BAD_OPERATE;
     }
     return DCAMERA_OK;
-}
-
-void DCameraSoftbusAdapter::ReportSoftbusSessionFail(std::string mySessName,
-    std::string peerSessName, std::string peerDevId)
-{
-    int32_t retVal = OHOS::HiviewDFX::HiSysEvent::Write(
-        OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_CAMERA,
-        "SOFTBUS_SESSION_ERROR",
-        OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
-        "PID", getpid(),
-        "UID", getuid(),
-        "MYSESSIONNAME", mySessName.c_str(),
-        "PEERSESSIONNAME", peerSessName.c_str(),
-        "PEERDEVID", peerDevId.c_str(),
-        "MSG", "open softbus session failed.");
-    if (retVal != DCAMERA_OK) {
-        DHLOGE("Write HiSysEvent error, retVal:%d", retVal);
-    }
 }
 
 int32_t DCameraSoftbusAdapter::CloseSoftbusSession(int32_t sessionId)

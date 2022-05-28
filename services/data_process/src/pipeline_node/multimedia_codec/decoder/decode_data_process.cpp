@@ -15,16 +15,20 @@
 
 #include "decode_data_process.h"
 
-#include "hisysevent.h"
 #include "distributed_hardware_log.h"
 #include "graphic_common_c.h"
 
+#include "dcamera_hisysevent_adapter.h"
 #include "dcamera_utils_tools.h"
 #include "decode_surface_listener.h"
 #include "decode_video_callback.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+const string ENUM_VIDEOFORMAT_STRINGS[] = {
+    "YUVI420", "NV12", "NV21", "RGBA_8888"
+};
+
 DecodeDataProcess::~DecodeDataProcess()
 {
     if (isDecoderProcess_.load()) {
@@ -107,6 +111,9 @@ int32_t DecodeDataProcess::InitDecoder()
     ret = StartVideoDecoder();
     if (ret != DCAMERA_OK) {
         DHLOGE("Start Video decoder failed.");
+        ReportStartVideoDecoderFail(sourceConfig_.GetWidth(), sourceConfig_.GetHeight(),
+            ENUM_VIDEOFORMAT_STRINGS[static_cast<int32_t>(sourceConfig_.GetVideoformat())],
+            "start video decoder failed.");
         return ret;
     }
     return DCAMERA_OK;
@@ -233,16 +240,6 @@ int32_t DecodeDataProcess::StartVideoDecoder()
     ret = videoDecoder_->Start();
     if (ret != Media::MediaServiceErrCode::MSERR_OK) {
         DHLOGE("Video decoder start failed. Error code %d.", ret);
-        int32_t retVal = OHOS::HiviewDFX::HiSysEvent::Write(
-            OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_CAMERA,
-            "VIDEO_DECODER_ERROR",
-            OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
-            "PID", getpid(),
-            "UID", getuid(),
-            "MSG", "video decoder start failed.");
-        if (retVal != DCAMERA_OK) {
-            DHLOGE("Write HiSysEvent error, retVal:%d", retVal);
-        }
         return DCAMERA_INIT_ERR;
     }
     return DCAMERA_OK;
@@ -264,16 +261,6 @@ int32_t DecodeDataProcess::StopVideoDecoder()
     ret = videoDecoder_->Stop();
     if (ret != Media::MediaServiceErrCode::MSERR_OK) {
         DHLOGE("VideoDecoder stop failed. Error type: %d.", ret);
-        int32_t retVal = OHOS::HiviewDFX::HiSysEvent::Write(
-            OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_CAMERA,
-            "VIDEO_DECODER_ERROR",
-            OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
-            "PID", getpid(),
-            "UID", getuid(),
-            "MSG", "video decoder stop failed.");
-        if (retVal != DCAMERA_OK) {
-            DHLOGE("Write HiSysEvent error, retVal:%d", retVal);
-        }
         isSuccess = isSuccess && false;
     }
     if (!isSuccess) {
@@ -294,6 +281,7 @@ void DecodeDataProcess::ReleaseVideoDecoder()
     int32_t ret = StopVideoDecoder();
     if (ret != DCAMERA_OK) {
         DHLOGE("StopVideoDecoder failed.");
+        ReportStopVideoDecoderFail("stop video decoder failed.");
     }
     ret = videoDecoder_->Release();
     if (ret != Media::MediaServiceErrCode::MSERR_OK) {

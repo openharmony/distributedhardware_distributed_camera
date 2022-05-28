@@ -15,10 +15,8 @@
 
 #include "dcamera_source_handler.h"
 
-#include <unistd.h>
-
 #include "anonymous_string.h"
-#include "hisysevent.h"
+#include "dcamera_hisysevent_adapter.h"
 #include "dcamera_source_callback.h"
 #include "dcamera_source_handler_ipc.h"
 #include "dcamera_source_load_callback.h"
@@ -46,16 +44,7 @@ int32_t DCameraSourceHandler::InitSource(const std::string& params)
         DHLOGE("GetSourceLocalDHMS GetSystemAbilityManager failed");
         return DCAMERA_INIT_ERR;
     }
-    int32_t retVal = OHOS::HiviewDFX::HiSysEvent::Write(
-        OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_CAMERA,
-        "INIT_SA_EVENT",
-        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
-        "PID", getpid(),
-        "UID", getuid(),
-        "MSG", "init source sa event.");
-    if (retVal != DCAMERA_OK) {
-        DHLOGE("Write HiSysEvent error, retVal:%d", retVal);
-    }
+    ReportInitSaEvent(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, "init source sa event.");
     sptr<DCameraSourceLoadCallback> loadCallback = new DCameraSourceLoadCallback(params);
     int32_t ret = sm->LoadSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, loadCallback);
     if (ret != DCAMERA_OK) {
@@ -111,16 +100,7 @@ int32_t DCameraSourceHandler::ReleaseSource()
         DHLOGE("DCameraSourceHandler ReleaseSource get Service failed");
         return DCAMERA_INIT_ERR;
     }
-    int32_t retVal = OHOS::HiviewDFX::HiSysEvent::Write(
-        OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_CAMERA,
-        "RELEASE_SA_EVENT",
-        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
-        "PID", getpid(),
-        "UID", getuid(),
-        "MSG", "release source sa event.");
-    if (retVal != DCAMERA_OK) {
-        DHLOGE("Write HiSysEvent error, retVal:%d", retVal);
-    }
+    ReportReleaseSaEvent("release source sa event.");
     dCameraSourceSrv->ReleaseSource();
     DCameraSourceHandlerIpc::GetInstance().UnInit();
     std::unique_lock<std::mutex> lock(producerMutex_);

@@ -70,7 +70,6 @@ private:
     int32_t DCameraSoftbusSourceGetSession(int32_t sessionId, std::shared_ptr<DCameraSoftbusSession>& session);
     int32_t DCameraSoftbusSinkGetSession(int32_t sessionId, std::shared_ptr<DCameraSoftbusSession>& session);
     int32_t DCameraSoftbusGetSessionById(int32_t sessionId, std::shared_ptr<DCameraSoftbusSession>& session);
-    void ReportSoftbusSessionFail(std::string mySessName, std::string peerSessName, std::string peerDevId);
 
 private:
     std::mutex optLock_;
