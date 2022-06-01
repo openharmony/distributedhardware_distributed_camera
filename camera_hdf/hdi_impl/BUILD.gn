@@ -72,8 +72,6 @@ ohos_shared_library("distributed_camera_hdf") {
   deps = [
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
     "//drivers/peripheral/camera/interfaces/metadata:metadata",
-    "//drivers/peripheral/display/hal:hdi_display_gralloc",
-    "//foundation/graphic/graphic/frameworks/surface:surface",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
   ]
