@@ -223,7 +223,7 @@ int32_t DCameraStreamDataProcessProducer::FeedStreamToDriver(const std::shared_p
             ret = DCAMERA_MEMORY_OPT_ERROR;
             break;
         }
-        int32_t ret = memcpy_s(sharedMemory->bufferHandle_->virAddr, sharedMemory->size_, buffer->Data(),
+        ret = memcpy_s(sharedMemory->bufferHandle_->virAddr, sharedMemory->size_, buffer->Data(),
             buffer->Size());
         if (ret != EOK) {
             DHLOGE("memcpy_s devId: %s dhId: %s streamId: %d bufSize: %d, addressSize: %d",

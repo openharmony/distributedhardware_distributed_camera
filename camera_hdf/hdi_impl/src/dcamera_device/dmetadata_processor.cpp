@@ -456,11 +456,11 @@ void DMetadataProcessor::ConvertToCameraMetadata(common_metadata_header_t *&inpu
     }
 }
 
-void DMetadataProcessor::ResizeMetadataHeader(common_metadata_header_t *header,
+void DMetadataProcessor::ResizeMetadataHeader(common_metadata_header_t *&header,
     uint32_t itemCapacity, uint32_t dataCapacity)
 {
     if (header) {
-        header = nullptr;
+        Camera::FreeCameraMetadataBuffer(header);
     }
     header = Camera::AllocateCameraMetadataBuffer(itemCapacity, dataCapacity);
 }

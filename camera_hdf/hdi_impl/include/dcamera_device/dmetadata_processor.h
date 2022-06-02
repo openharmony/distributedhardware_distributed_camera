@@ -56,7 +56,7 @@ private:
     DCamRetCode UpdateAbilityEntry(uint32_t tag, const void *data, size_t size);
     void ConvertToCameraMetadata(common_metadata_header_t *&input,
                                  std::shared_ptr<Camera::CameraMetadata> &output);
-    void ResizeMetadataHeader(common_metadata_header_t *header, uint32_t itemCapacity, uint32_t dataCapacity);
+    void ResizeMetadataHeader(common_metadata_header_t *&header, uint32_t itemCapacity, uint32_t dataCapacity);
     uint32_t GetDataSize(uint32_t type);
     std::map<int, std::vector<DCResolution>> GetDCameraSupportedFormats(const std::string &abilityInfo);
 
