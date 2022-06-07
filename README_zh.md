@@ -25,7 +25,7 @@
 ## **目录**
 
 ```
-/foundation/distributedhardware/distributedcamera
+/foundation/distributedhardware/distributed_camera
 ├── camera_hdf                             # 分布式相机HAL功能
 ├── common                                 # 分布式相机公共模块
 ├── interfaces                             # 分布式相机对外接口模块

@@ -14,7 +14,7 @@
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
 import(
-    "//foundation/distributedhardware/distributedcamera/distributedcamera.gni")
+    "//foundation/distributedhardware/distributed_camera/distributedcamera.gni")
 
 ohos_shared_library("distributed_camera_source") {
   include_dirs = [

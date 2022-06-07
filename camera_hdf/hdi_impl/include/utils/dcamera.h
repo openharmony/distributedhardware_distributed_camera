@@ -16,7 +16,7 @@
 #ifndef DISTRIBUTED_CAMERA_H
 #define DISTRIBUTED_CAMERA_H
 
-#include <foundation/distributedhardware/distributedcamera/camera_hdf/interfaces/include/types.h>
+#include <foundation/distributedhardware/distributed_camera/camera_hdf/interfaces/include/types.h>
 #include <drivers/peripheral/camera/interfaces/include/types.h>
 
 namespace OHOS {

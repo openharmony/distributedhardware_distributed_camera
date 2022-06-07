@@ -34,7 +34,7 @@
 #include "display_type.h"
 #include "distributed_hardware_log.h"
 #include "drivers/peripheral/camera/interfaces/include/types.h"
-#include "foundation/distributedhardware/distributedcamera/camera_hdf/interfaces/include/types.h"
+#include "foundation/distributedhardware/distributed_camera/camera_hdf/interfaces/include/types.h"
 #include "icamera_device.h"
 #include "icamera_host.h"
 #include "idistributed_hardware_source.h"

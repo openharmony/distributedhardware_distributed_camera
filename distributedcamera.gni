@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-distributedcamera_path = "//foundation/distributedhardware/distributedcamera"
+distributedcamera_path = "//foundation/distributedhardware/distributed_camera"
 
 distributedhardwarefwk_path =
     "//foundation/distributedhardware/distributedhardwarefwk"
