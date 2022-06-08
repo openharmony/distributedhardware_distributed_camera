@@ -265,7 +265,7 @@ int32_t DCameraSourceController::GetCameraInfo(std::shared_ptr<DCameraInfo>& cam
 
 int32_t DCameraSourceController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& openInfo)
 {
-    DcameraStartAsyncTrace(DCAMERA_OPEN_CHANNEL_START, DCAMERA_OPEN_CHANNEL_TASKID);
+    DcameraStartAsyncTrace(DCAMERA_OPEN_CHANNEL_CONTROL, DCAMERA_OPEN_CHANNEL_TASKID);
     if (indexs_.size() > DCAMERA_MAX_NUM) {
         DHLOGE("DCameraSourceController OpenChannel not support operate %d camera", indexs_.size());
         return DCAMERA_BAD_OPERATE;
@@ -383,7 +383,7 @@ void DCameraSourceController::OnSessionState(int32_t state)
     channelState_ = state;
     switch (state) {
         case DCAMERA_CHANNEL_STATE_CONNECTED: {
-            DcameraFinishAsyncTrace(DCAMERA_OPEN_CHANNEL_START, DCAMERA_OPEN_CHANNEL_TASKID);
+            DcameraFinishAsyncTrace(DCAMERA_OPEN_CHANNEL_CONTROL, DCAMERA_OPEN_CHANNEL_TASKID);
             stateMachine_->UpdateState(DCAMERA_STATE_OPENED);
             std::shared_ptr<DCameraEvent> camEvent = std::make_shared<DCameraEvent>();
             camEvent->eventType_ = DCAMERA_MESSAGE;

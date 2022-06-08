@@ -180,12 +180,12 @@ int32_t DCameraSourceInput::StopCapture(std::vector<int>& streamIds, bool& isAll
 
 int32_t DCameraSourceInput::OpenChannel(std::vector<DCameraIndex>& indexs)
 {
-    DcameraStartAsyncTrace(DCAMERA_INPUT_OPEN_START, DCAMERA_INPUT_OPEN_TASKID);
     DHLOGI("DCameraSourceInput OpenChannel devId %s dhId %s continue state: %d, snapshot state: %d",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), channelState_[CONTINUOUS_FRAME],
         channelState_[SNAPSHOT_FRAME]);
     int32_t ret = DCAMERA_OK;
     if (channelState_[CONTINUOUS_FRAME] == DCAMERA_CHANNEL_STATE_DISCONNECTED) {
+        DcameraStartAsyncTrace(DCAMERA_OPEN_DATA_CONTINUE, DCAMERA_OPEN_DATA_CONTINUE_TASKID);
         ret = channels_[CONTINUOUS_FRAME]->CreateSession(indexs, CONTINUE_SESSION_FLAG, DCAMERA_SESSION_MODE_VIDEO,
             listeners_[CONTINUOUS_FRAME]);
         if (ret != DCAMERA_OK) {
@@ -203,6 +203,7 @@ int32_t DCameraSourceInput::OpenChannel(std::vector<DCameraIndex>& indexs)
     }
 
     if (channelState_[SNAPSHOT_FRAME] == DCAMERA_CHANNEL_STATE_DISCONNECTED) {
+        DcameraStartAsyncTrace(DCAMERA_OPEN_DATA_SNAPSHOT, DCAMERA_OPEN_DATA_SNAPSHOT_TASKID);
         ret = channels_[SNAPSHOT_FRAME]->CreateSession(indexs, SNAP_SHOT_SESSION_FLAG, DCAMERA_SESSION_MODE_JPEG,
             listeners_[SNAPSHOT_FRAME]);
         if (ret != DCAMERA_OK) {
@@ -325,8 +326,16 @@ void DCameraSourceInput::OnSessionState(DCStreamType streamType, int32_t state)
             eventBus_->PostEvent<DCameraSourceEvent>(srcEvent);
             break;
         }
+        case DCAMERA_CHANNEL_STATE_CONNECTED: {
+            if (streamType == CONTINUOUS_FRAME) {
+                DcameraFinishAsyncTrace(DCAMERA_OPEN_DATA_CONTINUE, DCAMERA_OPEN_DATA_CONTINUE_TASKID);
+            } else if (streamType == SNAPSHOT_FRAME) {
+                DcameraFinishAsyncTrace(DCAMERA_OPEN_DATA_SNAPSHOT, DCAMERA_OPEN_DATA_SNAPSHOT_TASKID);
+            }
+            DHLOGI("DCameraSourceInput OnSessionState state %d", state);
+            break;
+        }
         default: {
-            DcameraFinishAsyncTrace(DCAMERA_INPUT_OPEN_START, DCAMERA_INPUT_OPEN_TASKID);
             DHLOGI("DCameraSourceInput OnSessionState state %d", state);
             break;
         }

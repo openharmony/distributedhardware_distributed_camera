@@ -406,7 +406,7 @@ int32_t DCameraSourceDev::ExecuteReleaseAllStreams()
 
 int32_t DCameraSourceDev::ExecuteStartCapture(std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos)
 {
-    DcameraStartAsyncTrace(DCAMERA_CAPTURE_FIRST_FRAME, DCAMERA_CAPTURE_FIRST_FRAM_TASKID);
+    HitraceAndHisyseventImpl(captureInfos);
     DHLOGI("DCameraSourceDev Execute StartCapture devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     int32_t ret = input_->StartCapture(captureInfos);
@@ -429,15 +429,6 @@ int32_t DCameraSourceDev::ExecuteStartCapture(std::vector<std::shared_ptr<DCCapt
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), (*iter)->captureSettings_.size(),
             capture->width_, capture->height_, capture->format_, capture->isCapture_ ? 1 : 0, capture->encodeType_,
             capture->streamType_);
-        EventCaptureInfo eventCaptureInfo = {
-            .width_ = capture->width_,
-            .height_ = capture->height_,
-            .format_ = capture->format_,
-            .isCapture_ = capture->isCapture_,
-            .encodeType_ = capture->encodeType_,
-            .type_ = capture->streamType_,
-        };
-        ReportStartCaptureEvent(START_CAPTURE_EVENT, eventCaptureInfo, "execute start capture event.");
         for (auto settingIter = (*iter)->captureSettings_.begin(); settingIter != (*iter)->captureSettings_.end();
             settingIter++) {
             std::shared_ptr<DCameraSettings> setting = std::make_shared<DCameraSettings>();
@@ -454,6 +445,27 @@ int32_t DCameraSourceDev::ExecuteStartCapture(std::vector<std::shared_ptr<DCCapt
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     }
     return ret;
+}
+
+void DCameraSourceDev::HitraceAndHisyseventImpl(std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos)
+{
+    for (auto iter = captureInfos.begin(); iter != captureInfos.end(); iter++) {
+        std::shared_ptr<DCCaptureInfo> capture = *iter;
+        EventCaptureInfo eventCaptureInfo = {
+            .width_ = capture->width_,
+            .height_ = capture->height_,
+            .format_ = capture->format_,
+            .isCapture_ = capture->isCapture_,
+            .encodeType_ = capture->encodeType_,
+            .type_ = capture->type_,
+        };
+        ReportStartCaptureEvent(START_CAPTURE_EVENT, eventCaptureInfo, "execute start capture event.");
+        if (capture->type_ == CONTINUOUS_FRAME && capture->isCapture_ == true) {
+            DcameraStartAsyncTrace(DCAMERA_CONTINUE_FIRST_FRAME, DCAMERA_CONTINUE_FIRST_FRAME_TASKID);
+        } else if (capture->type_ == SNAPSHOT_FRAME && capture->isCapture_ == true) {
+            DcameraStartAsyncTrace(DCAMERA_SNAPSHOT_FIRST_FRAME, DCAMERA_SNAPSHOT_FIRST_FRAME_TASKID);
+        }
+    }
 }
 
 int32_t DCameraSourceDev::ExecuteStopCapture(std::vector<int>& streamIds, bool& isAllStop)

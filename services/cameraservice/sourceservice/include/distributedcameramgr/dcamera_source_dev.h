@@ -75,6 +75,7 @@ private:
     void NotifyRegisterResult(DCAMERA_EVENT eventType, DCameraSourceEvent& event, int32_t result);
     void NotifyUnregisterResult(DCAMERA_EVENT eventType, DCameraSourceEvent& event, int32_t result);
     void NotifyHalResult(DCAMERA_EVENT eventType, DCameraSourceEvent& event, int32_t result);
+    void HitraceAndHisyseventImpl(std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos);
 
 private:
     std::string devId_;

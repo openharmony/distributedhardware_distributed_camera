@@ -176,7 +176,6 @@ void DCameraStreamDataProcessProducer::LooperSnapShot()
                 GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_, state_);
             continue;
         }
-        DcameraFinishAsyncTrace(DCAMERA_CAPTURE_FIRST_FRAME, DCAMERA_CAPTURE_FIRST_FRAM_TASKID);
         int32_t ret = FeedStreamToDriver(dhBase, buffer);
         if (ret != DCAMERA_OK) {
             std::this_thread::sleep_for(std::chrono::milliseconds(DCAMERA_PRODUCER_RETRY_SLEEP_MS));
