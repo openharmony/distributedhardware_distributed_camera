@@ -215,7 +215,7 @@ void DCameraSourceDev::OnEvent(DCameraSourceEvent& event)
 
 int32_t DCameraSourceDev::ExecuteRegister(std::shared_ptr<DCameraRegistParam>& param)
 {
-    DcameraSyncTrace();
+    DCAMERA_SYNC_TRACE;
     DHLOGI("DCameraSourceDev Execute Register devId: %s dhId: %s",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     ReportRegisterCameraEvent(REGIST_CAMERA_EVENT, GetAnonyString(devId_), dhId_,
@@ -261,7 +261,7 @@ int32_t DCameraSourceDev::ExecuteRegister(std::shared_ptr<DCameraRegistParam>& p
 
 int32_t DCameraSourceDev::ExecuteUnRegister(std::shared_ptr<DCameraRegistParam>& param)
 {
-    DcameraSyncTrace();
+    DCAMERA_SYNC_TRACE;
     DHLOGI("DCameraSourceDev Execute UnRegister devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     ReportRegisterCameraEvent(UNREGIST_CAMERA_EVENT, GetAnonyString(devId_), dhId_,

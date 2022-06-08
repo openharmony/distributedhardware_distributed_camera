@@ -20,6 +20,8 @@
 
 #include "hitrace_meter.h"
 
+#define DCAMERA_SYNC_TRACE HITRACE_METER(DCAMERA_HITRACE_LABEL)
+
 namespace OHOS {
 namespace DistributedHardware {
 constexpr uint64_t DCAMERA_HITRACE_LABEL = HITRACE_TAG_DISTRIBUTED_CAMERA;
@@ -32,7 +34,6 @@ enum DcameraTaskId {
     DCAMERA_CAPTURE_FIRST_FRAM_TASKID = 2,
 };
 
-void DcameraSyncTrace();
 void DcameraStartAsyncTrace(const std::string& str, int32_t taskId);
 void DcameraFinishAsyncTrace(const std::string& str, int32_t taskId);
 } // namespace DistributedHardware
