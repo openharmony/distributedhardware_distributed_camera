@@ -15,7 +15,7 @@
         "name":"distributed_camera",
         "subsystem":"distributedhardware",
         "syscap":[
-            "SystemCapability.distributedhardware.distributed_camera"
+            "SystemCapability.DistributedHardware.DistributedCamera"
         ],
         "features":[],
         "adapted_system_type":[
