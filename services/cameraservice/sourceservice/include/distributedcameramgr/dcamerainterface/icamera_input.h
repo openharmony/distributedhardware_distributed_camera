@@ -16,10 +16,11 @@
 #ifndef OHOS_ICAMERA_INPUT_H
 #define OHOS_ICAMERA_INPUT_H
 
-#include "types.h"
+#include "v1_0/dcamera_types.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+using namespace OHOS::HDI::DistributedCamera::V1_0;
 class ICameraInput {
 public:
     virtual ~ICameraInput() = default;

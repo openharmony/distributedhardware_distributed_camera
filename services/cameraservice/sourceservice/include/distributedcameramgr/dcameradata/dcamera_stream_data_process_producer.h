@@ -23,10 +23,11 @@
 
 #include "data_buffer.h"
 #include "event_handler.h"
-#include "idistributed_camera_provider.h"
+#include "v1_0/id_camera_provider.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+using namespace OHOS::HDI::DistributedCamera::V1_0;
 class DCameraStreamDataProcessProducer {
 public:
     typedef enum {
@@ -45,7 +46,8 @@ private:
     void StartEvent();
     void LooperContinue();
     void LooperSnapShot();
-    int32_t FeedStreamToDriver(const std::shared_ptr<DHBase>& dhBase, const std::shared_ptr<DataBuffer>& buffer);
+    int32_t FeedStreamToDriver(const DHBase& dhBase, const std::shared_ptr<DataBuffer>& buffer);
+    int32_t CheckSharedMemory(const DCameraBuffer& sharedMemory, const std::shared_ptr<DataBuffer>& buffer);
 
     const uint32_t DCAMERA_PRODUCER_MAX_BUFFER_SIZE = 30;
     const uint32_t DCAMERA_PRODUCER_RETRY_SLEEP_MS = 500;

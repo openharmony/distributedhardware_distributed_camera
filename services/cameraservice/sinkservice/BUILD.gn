@@ -50,7 +50,6 @@ ohos_shared_library("distributed_camera_sink") {
     "${innerkits_path}/native_cpp/camera_sink/include",
     "${innerkits_path}/native_cpp/camera_source/include",
     "${innerkits_path}/native_cpp/camera_source/include/callback",
-    "${distributedcamera_hdf_path}/interfaces/include",
     "${services_path}/cameraservice/base/include",
     "${services_path}/cameraservice/cameraoperator/client/include",
     "${services_path}/cameraservice/cameraoperator/client/include/callback",
@@ -118,6 +117,7 @@ ohos_shared_library("distributed_camera_sink") {
   ]
 
   external_deps = [
+    "distributed_camera_device_driver_interface:libdistributed_camera_provider_proxy_1.0",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",

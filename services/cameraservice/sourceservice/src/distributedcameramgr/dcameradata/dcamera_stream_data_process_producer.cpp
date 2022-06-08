@@ -19,6 +19,7 @@
 #include <securec.h>
 
 #include "anonymous_string.h"
+#include "dcamera_buffer_handle.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -105,9 +106,9 @@ void DCameraStreamDataProcessProducer::LooperContinue()
 {
     DHLOGI("LooperContinue producer devId: %s dhId: %s streamType: %d streamId: %d state: %d",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_, state_);
-    std::shared_ptr<DHBase> dhBase = std::make_shared<DHBase>();
-    dhBase->deviceId_ = devId_;
-    dhBase->dhId_ = dhId_;
+    DHBase dhBase;
+    dhBase.deviceId_ = devId_;
+    dhBase.dhId_ = dhId_;
 
     while (state_ == DCAMERA_PRODUCER_STATE_START) {
         std::shared_ptr<DataBuffer> buffer = nullptr;
@@ -148,9 +149,9 @@ void DCameraStreamDataProcessProducer::LooperSnapShot()
 {
     DHLOGI("LooperSnapShot producer devId: %s dhId: %s streamType: %d streamId: %d state: %d",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_, state_);
-    std::shared_ptr<DHBase> dhBase = std::make_shared<DHBase>();
-    dhBase->deviceId_ = devId_;
-    dhBase->dhId_ = dhId_;
+    DHBase dhBase;
+    dhBase.deviceId_ = devId_;
+    dhBase.dhId_ = dhId_;
 
     while (state_ == DCAMERA_PRODUCER_STATE_START) {
         std::shared_ptr<DataBuffer> buffer = nullptr;
@@ -189,61 +190,79 @@ void DCameraStreamDataProcessProducer::LooperSnapShot()
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_, state_);
 }
 
-int32_t DCameraStreamDataProcessProducer::FeedStreamToDriver(const std::shared_ptr<DHBase>& dhBase,
+int32_t DCameraStreamDataProcessProducer::FeedStreamToDriver(const DHBase& dhBase,
     const std::shared_ptr<DataBuffer>& buffer)
 {
     DHLOGD("LooperFeed devId %s dhId %s streamSize: %d streamType: %d, streamId: %d", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str(), buffer->Size(), streamType_, streamId_);
-    sptr<IDCameraProvider> camHdiProvider = IDCameraProvider::Get();
+    sptr<IDCameraProvider> camHdiProvider = IDCameraProvider::Get(HDF_DCAMERA_EXT_SERVICE);
     if (camHdiProvider == nullptr) {
         DHLOGI("camHdiProvider is nullptr");
         return DCAMERA_BAD_VALUE;
     }
-    std::shared_ptr<DCameraBuffer> sharedMemory;
-    DCamRetCode retHdi = camHdiProvider->AcquireBuffer(dhBase, streamId_, sharedMemory);
-    if (retHdi != SUCCESS) {
+    DCameraBuffer sharedMemory;
+    int32_t ret = camHdiProvider->AcquireBuffer(dhBase, streamId_, sharedMemory);
+    if (ret != SUCCESS) {
         DHLOGE("AcquireBuffer devId: %s dhId: %s streamId: %d ret: %d",
-            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamId_, retHdi);
+            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamId_, ret);
         return DCAMERA_BAD_OPERATE;
     }
 
-    int32_t ret = DCAMERA_OK;
     do {
-        if (sharedMemory == nullptr) {
-            DHLOGE("sharedMemory devId: %s dhId: %s streamId: %d, sharedMemory is null",
-                GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamId_);
+        ret = CheckSharedMemory(sharedMemory, buffer);
+        if (ret != DCAMERA_OK) {
+            DHLOGE("CheckSharedMemory failed devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
+                GetAnonyString(dhId_).c_str());
+            break;
+        }
+        sharedMemory.bufferHandle_->GetBufferHandle()->virAddr =
+            DCameraMemoryMap(sharedMemory.bufferHandle_->GetBufferHandle());
+        if (sharedMemory.bufferHandle_->GetBufferHandle()->virAddr == nullptr) {
+            DHLOGE("mmap failed devId: %s dhId: %s", GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
             ret = DCAMERA_MEMORY_OPT_ERROR;
             break;
         }
-
-        if (buffer->Size() > sharedMemory->size_) {
-            DHLOGE("sharedMemory devId: %s dhId: %s streamId: %d bufSize: %d, addressSize: %d",
-                GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamId_, buffer->Size(),
-                sharedMemory->size_);
-            ret = DCAMERA_MEMORY_OPT_ERROR;
-            break;
-        }
-        ret = memcpy_s(sharedMemory->bufferHandle_->virAddr, sharedMemory->size_, buffer->Data(),
+        ret = memcpy_s(sharedMemory.bufferHandle_->GetBufferHandle()->virAddr, sharedMemory.size_, buffer->Data(),
             buffer->Size());
         if (ret != EOK) {
             DHLOGE("memcpy_s devId: %s dhId: %s streamId: %d bufSize: %d, addressSize: %d",
                 GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamId_, buffer->Size(),
-                sharedMemory->size_);
+                sharedMemory.size_);
             ret = DCAMERA_MEMORY_OPT_ERROR;
             break;
         }
-        sharedMemory->size_ = buffer->Size();
+        sharedMemory.size_ = buffer->Size();
     } while (0);
 
-    retHdi = camHdiProvider->ShutterBuffer(dhBase, streamId_, sharedMemory);
-    if (retHdi != SUCCESS) {
+    ret = camHdiProvider->ShutterBuffer(dhBase, streamId_, sharedMemory);
+    DCameraMemoryUnmap(sharedMemory.bufferHandle_->GetBufferHandle());
+    if (ret != SUCCESS) {
         DHLOGE("ShutterBuffer devId: %s dhId: %s streamId: %d ret: %d",
-            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamId_, retHdi);
+            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamId_, ret);
         return DCAMERA_BAD_OPERATE;
     }
     DHLOGD("LooperFeed end devId %s dhId %s streamSize: %d streamType: %d, streamId: %d",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), buffer->Size(), streamType_, streamId_);
     return ret;
+}
+
+int32_t DCameraStreamDataProcessProducer::CheckSharedMemory(const DCameraBuffer& sharedMemory,
+    const std::shared_ptr<DataBuffer>& buffer)
+{
+    if (sharedMemory.bufferHandle_ == nullptr || sharedMemory.bufferHandle_->GetBufferHandle() == nullptr) {
+        DHLOGE("bufferHandle read failed devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
+            GetAnonyString(dhId_).c_str());
+        return DCAMERA_MEMORY_OPT_ERROR;
+    }
+
+    if (buffer->Size() > sharedMemory.size_) {
+        DHLOGE("sharedMemory devId: %s dhId: %s streamId: %d bufSize: %d, addressSize: %d",
+            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamId_, buffer->Size(),
+            sharedMemory.size_);
+        return DCAMERA_MEMORY_OPT_ERROR;
+    }
+
+    return DCAMERA_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

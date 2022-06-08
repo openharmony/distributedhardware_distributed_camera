@@ -40,7 +40,6 @@ config("module_private_config") {
   ]
 
   include_dirs += [
-    "${distributedcamera_hdf_path}/interfaces/include",
     "${common_path}/include/constants",
     "${common_path}/include/utils",
     "${services_path}/cameraservice/base/include",
@@ -73,6 +72,7 @@ ohos_unittest("DCameraClientTest") {
   ]
 
   external_deps = [
+    "distributed_camera_device_driver_interface:libdistributed_camera_provider_proxy_1.0",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",

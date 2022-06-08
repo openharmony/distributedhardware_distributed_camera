@@ -16,14 +16,14 @@
 #ifndef DISTRIBUTED_CAMERA_PROVIDER_H
 #define DISTRIBUTED_CAMERA_PROVIDER_H
 
-#include "dcamera.h"
-#include "idistributed_camera_provider_callback.h"
+#include "v1_0/id_camera_provider.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+using namespace OHOS::HDI::DistributedCamera::V1_0;
 class DCameraHost;
 class DCameraDevice;
-class DCameraProvider {
+class DCameraProvider : public IDCameraProvider {
 public:
     DCameraProvider() = default;
     virtual ~DCameraProvider() = default;
@@ -33,32 +33,27 @@ public:
     DCameraProvider& operator=(DCameraProvider &&other) = delete;
 
 public:
-    static std::shared_ptr<DCameraProvider> GetInstance();
-    DCamRetCode EnableDCameraDevice(const std::shared_ptr<DHBase> &dhBase, const std::string &abilitySet,
-                                    const sptr<IDCameraProviderCallback> &callback);
-    DCamRetCode DisableDCameraDevice(const std::shared_ptr<DHBase> &dhBase);
-    DCamRetCode AcquireBuffer(const std::shared_ptr<DHBase> &dhBase, int streamId,
-                              std::shared_ptr<DCameraBuffer> &buffer);
-    DCamRetCode ShutterBuffer(const std::shared_ptr<DHBase> &dhBase, int streamId,
-                              const std::shared_ptr<DCameraBuffer> &buffer);
-    DCamRetCode OnSettingsResult(const std::shared_ptr<DHBase> &dhBase, const std::shared_ptr<DCameraSettings> &result);
-    DCamRetCode Notify(const std::shared_ptr<DHBase> &dhBase, const std::shared_ptr<DCameraHDFEvent> &event);
+    static OHOS::sptr<DCameraProvider> GetInstance();
+    int32_t EnableDCameraDevice(const DHBase& dhBase, const std::string& abilityInfo,
+        const sptr<IDCameraProviderCallback>& callbackObj) override;
+    int32_t DisableDCameraDevice(const DHBase& dhBase) override;
+    int32_t AcquireBuffer(const DHBase& dhBase, int32_t streamId, DCameraBuffer& buffer) override;
+    int32_t ShutterBuffer(const DHBase& dhBase, int32_t streamId, const DCameraBuffer& buffer) override;
+    int32_t OnSettingsResult(const DHBase& dhBase, const DCameraSettings& result) override;
+    int32_t Notify(const DHBase& dhBase, const DCameraHDFEvent& event) override;
 
-    DCamRetCode OpenSession(const std::shared_ptr<DHBase> &dhBase);
-    DCamRetCode CloseSession(const std::shared_ptr<DHBase> &dhBase);
-    DCamRetCode ConfigureStreams(const std::shared_ptr<DHBase> &dhBase,
-                                 const std::vector<std::shared_ptr<DCStreamInfo>> &streamInfos);
-    DCamRetCode ReleaseStreams(const std::shared_ptr<DHBase> &dhBase, const std::vector<int> &streamIds);
-    DCamRetCode StartCapture(const std::shared_ptr<DHBase> &dhBase,
-                             const std::vector<std::shared_ptr<DCCaptureInfo>> &captureInfos);
-    DCamRetCode StopCapture(const std::shared_ptr<DHBase> &dhBase, const std::vector<int> &streamIds);
-    DCamRetCode UpdateSettings(const std::shared_ptr<DHBase> &dhBase,
-                               const std::vector<std::shared_ptr<DCameraSettings>> &settings);
+    int32_t OpenSession(const DHBase &dhBase);
+    int32_t CloseSession(const DHBase &dhBase);
+    int32_t ConfigureStreams(const DHBase &dhBase, const std::vector<DCStreamInfo> &streamInfos);
+    int32_t ReleaseStreams(const DHBase &dhBase, const std::vector<int> &streamIds);
+    int32_t StartCapture(const DHBase &dhBase, const std::vector<DCCaptureInfo> &captureInfos);
+    int32_t StopCapture(const DHBase &dhBase, const std::vector<int> &streamIds);
+    int32_t UpdateSettings(const DHBase &dhBase, const std::vector<DCameraSettings> &settings);
 
 private:
-    bool IsDhBaseInfoInvalid(const std::shared_ptr<DHBase> &dhBase);
-    sptr<IDCameraProviderCallback> GetCallbackBydhBase(const std::shared_ptr<DHBase> &dhBase);
-    OHOS::sptr<DCameraDevice> GetDCameraDevice(const std::shared_ptr<DHBase> &dhBase);
+    bool IsDhBaseInfoInvalid(const DHBase &dhBase);
+    sptr<IDCameraProviderCallback> GetCallbackBydhBase(const DHBase &dhBase);
+    OHOS::sptr<DCameraDevice> GetDCameraDevice(const DHBase &dhBase);
 
 private:
     class AutoRelease {
@@ -72,7 +67,7 @@ private:
         }
     };
     static AutoRelease autoRelease_;
-    static std::shared_ptr<DCameraProvider> instance_;
+    static OHOS::sptr<DCameraProvider> instance_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

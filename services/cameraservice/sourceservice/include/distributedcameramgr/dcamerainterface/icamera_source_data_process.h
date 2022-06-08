@@ -19,10 +19,11 @@
 #include <vector>
 
 #include "data_buffer.h"
-#include "types.h"
+#include "v1_0/dcamera_types.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+using namespace OHOS::HDI::DistributedCamera::V1_0;
 class DCameraStreamConfig {
 public:
     DCameraStreamConfig(int32_t width, int32_t height, int32_t format, int32_t dataspace,

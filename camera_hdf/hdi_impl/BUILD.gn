@@ -23,12 +23,10 @@ ohos_shared_library("distributed_camera_hdf") {
     "include/dcamera_provider",
     "include/dstream_operator",
     "include/utils",
-    "../interfaces/include",
     "../interfaces/hdi_ipc",
     "../interfaces/hdi_ipc/server/device",
     "../interfaces/hdi_ipc/server/host",
     "../interfaces/hdi_ipc/server/operator",
-    "../interfaces/hdi_ipc/server/provider",
     "//utils/native/base/include",
     "//utils/system/safwk/native/include",
     "${display_hdf_path}/interfaces/include",
@@ -53,8 +51,6 @@ ohos_shared_library("distributed_camera_hdf") {
     "../interfaces/hdi_ipc/server/operator/doffline_stream_operator_stub.cpp",
     "../interfaces/hdi_ipc/server/operator/dstream_operator_callback_proxy.cpp",
     "../interfaces/hdi_ipc/server/operator/dstream_operator_stub.cpp",
-    "../interfaces/hdi_ipc/server/provider/dcamera_provider_callback_proxy.cpp",
-    "../interfaces/hdi_ipc/server/provider/dcamera_provider_stub.cpp",
     "src/dcamera_device/dcamera_device.cpp",
     "src/dcamera_device/dmetadata_processor.cpp",
     "src/dcamera_host/dcamera_host.cpp",
@@ -68,6 +64,8 @@ ohos_shared_library("distributed_camera_hdf") {
     "src/utils/dcamera.cpp",
     "src/utils/dh_log.cpp",
   ]
+
+  public_deps = [ "//drivers/interface/distributed_camera/v1_0:libdistributed_camera_provider_stub_1.0" ]
 
   deps = [
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
@@ -83,10 +81,12 @@ ohos_shared_library("distributed_camera_hdf") {
   ]
 
   external_deps = [
+    "device_driver_framework:libhdf_utils",
     "graphic_chipsetsdk:buffer_handle",
     "graphic_chipsetsdk:surface",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
+    "utils_base:utils",
   ]
 
   subsystem_name = "distributedhardware"

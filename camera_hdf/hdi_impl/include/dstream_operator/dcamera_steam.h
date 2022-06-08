@@ -19,14 +19,15 @@
 #include "surface.h"
 #include "dimage_buffer.h"
 #include "dbuffer_manager.h"
+#include "v1_0/dcamera_types.h"
 
-#include <foundation/distributedhardware/distributed_camera/camera_hdf/interfaces/include/types.h>
 #include <drivers/peripheral/camera/interfaces/include/types.h>
 
 namespace OHOS {
 namespace DistributedHardware {
 using namespace std;
 using namespace OHOS::Camera;
+using namespace OHOS::HDI::DistributedCamera::V1_0;
 class DCameraStream {
 public:
     DCameraStream() = default;
@@ -42,8 +43,8 @@ public:
     DCamRetCode SetDCameraBufferQueue(const OHOS::sptr<OHOS::IBufferProducer> producer);
     DCamRetCode ReleaseDCameraBufferQueue();
     DCamRetCode GetDCameraStreamAttribute(shared_ptr<StreamAttribute> &attribute);
-    DCamRetCode GetDCameraBuffer(shared_ptr<DCameraBuffer> &buffer);
-    DCamRetCode ReturnDCameraBuffer(const shared_ptr<DCameraBuffer> &buffer);
+    DCamRetCode GetDCameraBuffer(DCameraBuffer &buffer);
+    DCamRetCode ReturnDCameraBuffer(const DCameraBuffer &buffer);
     DCamRetCode FlushDCameraBuffer();
     DCamRetCode FinishCommitStream();
     bool HasBufferQueue();

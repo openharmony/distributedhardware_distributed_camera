@@ -24,15 +24,12 @@ ohos_executable("dcamera_hdi_sample") {
   ]
 
   include_dirs = [
-    "${distributedcamera_hdf_path}/interfaces/include",
     "${distributedcamera_hdf_path}/interfaces/hdi_ipc/client/device",
     "${distributedcamera_hdf_path}/interfaces/hdi_ipc/client/host",
     "${distributedcamera_hdf_path}/interfaces/hdi_ipc/client/operator",
-    "${distributedcamera_hdf_path}/interfaces/hdi_ipc/client/provider",
     "${distributedcamera_hdf_path}/interfaces/hdi_ipc/server/device",
     "${distributedcamera_hdf_path}/interfaces/hdi_ipc/server/host",
     "${distributedcamera_hdf_path}/interfaces/hdi_ipc/server/operator",
-    "${distributedcamera_hdf_path}/interfaces/hdi_ipc/server/provider",
     "${distributedcamera_hdf_path}/hdi_impl/include/dcamera_device",
     "${distributedcamera_hdf_path}/hdi_impl/include/dcamera_host",
     "${distributedcamera_hdf_path}/hdi_impl/include/dcamera_provider",
@@ -62,7 +59,6 @@ ohos_executable("dcamera_hdi_sample") {
   ]
 
   deps = [
-    "${distributedcamera_hdf_path}/interfaces/hdi_ipc/client:distributed_camera_hdf_client",
     "${fwk_utils_path}:distributedhardwareutils",
     "${fwk_utils_path}:distributedhardwareutils",
     "${hdf_uhdf_path}/hdi:libhdi",
@@ -73,6 +69,7 @@ ohos_executable("dcamera_hdi_sample") {
   ]
 
   external_deps = [
+    "distributed_camera_device_driver_interface:libdistributed_camera_provider_proxy_1.0",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "samgr_standard:samgr_proxy",

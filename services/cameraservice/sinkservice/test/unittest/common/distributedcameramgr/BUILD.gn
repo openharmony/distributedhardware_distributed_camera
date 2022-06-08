@@ -44,7 +44,6 @@ config("module_private_config") {
     "${services_path}/data_process/include/utils",
     "${common_path}/include/constants",
     "${common_path}/include/utils",
-    "${distributedcamera_hdf_path}/interfaces/include",
     "${innerkits_path}/native_cpp/camera_source/include",
     "${innerkits_path}/native_cpp/camera_source/include/callback",
 
@@ -86,6 +85,7 @@ ohos_unittest("DCameraSinkMgrTest") {
   ]
 
   external_deps = [
+    "distributed_camera_device_driver_interface:libdistributed_camera_provider_proxy_1.0",
     "eventhandler:libeventhandler",
     "ipc:ipc_core",
     "multimedia_media_standard:media_client",

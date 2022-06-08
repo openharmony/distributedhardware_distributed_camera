@@ -46,7 +46,6 @@ config("module_private_config") {
     "${fwk_utils_path}/include/eventbus",
     "${fwk_common_path}/utils/include",
     "${fwk_common_path}/log/include",
-    "${distributedcamera_hdf_path}/interfaces/include",
     "${distributedcamera_hdf_path}/interfaces/hdi_ipc/client/provider",
     "//utils/native/base/include",
     "//utils/system/safwk/native/include",
@@ -73,6 +72,7 @@ ohos_unittest("DCameraSourceMgrTest") {
   ]
 
   external_deps = [
+    "distributed_camera_device_driver_interface:libdistributed_camera_provider_proxy_1.0",
     "dsoftbus_standard:softbus_client",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",

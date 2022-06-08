@@ -24,7 +24,7 @@
 #include "event_bus.h"
 #include "icamera_channel.h"
 
-#include "idistributed_camera_provider.h"
+#include "v1_0/id_camera_provider.h"
 
 namespace OHOS {
 namespace DistributedHardware {

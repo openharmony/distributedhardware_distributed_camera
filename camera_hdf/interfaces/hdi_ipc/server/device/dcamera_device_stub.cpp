@@ -97,7 +97,7 @@ int32_t DCameraDeviceStub::DCDeviceStubGetStreamOperator(MessageParcel& data, Me
     bool nullFlag = (streamOperator != nullptr);
     if (!reply.WriteBool(nullFlag)) {
         DHLOGE("Write stream operator flag failed.");
-        return INVALID_ARGUMENT;
+        return HDF_FAILURE;
     }
 
     if (nullFlag && !reply.WriteRemoteObject(streamOperator->AsObject())) {

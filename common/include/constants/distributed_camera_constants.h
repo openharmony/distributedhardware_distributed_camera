@@ -94,6 +94,7 @@ const std::string CAMERA_FORMAT_VIDEO = "Video";
 const std::string CAMERA_FORMAT_PHOTO = "Photo";
 const std::string CAMERA_RESOLUTION_KEY = "Resolution";
 const std::string CAMERA_SURFACE_FORMAT = "CAMERA_SURFACE_FORMAT";
+const std::string HDF_DCAMERA_EXT_SERVICE = "distributed_camera_provider_service";
 
 const int32_t RESOLUTION_MAX_WIDTH_SNAPSHOT = 4096;
 const int32_t RESOLUTION_MAX_HEIGHT_SNAPSHOT = 3072;

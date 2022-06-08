@@ -42,7 +42,6 @@ config("module_private_config") {
   include_dirs += [
     "${common_path}/include/constants",
     "${common_path}/include/utils",
-    "${distributedcamera_hdf_path}/interfaces/include",
     "${innerkits_path}/native_cpp/camera_sink/include",
     "${services_path}/cameraservice/base/include",
     "${services_path}/cameraservice/cameraoperator/handler/include",
@@ -70,6 +69,7 @@ ohos_unittest("DistributedCameraSinkServiceTest") {
   ]
 
   external_deps = [
+    "distributed_camera_device_driver_interface:libdistributed_camera_provider_proxy_1.0",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",

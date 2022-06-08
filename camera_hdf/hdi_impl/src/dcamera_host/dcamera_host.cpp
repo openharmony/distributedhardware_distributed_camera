@@ -118,11 +118,11 @@ CamRetCode DCameraHost::SetFlashlight(const std::string &cameraId,  bool &isEnab
     return CamRetCode::METHOD_NOT_SUPPORTED;
 }
 
-DCamRetCode DCameraHost::AddDCameraDevice(const std::shared_ptr<DHBase> &dhBase, const std::string &abilityInfo,
+DCamRetCode DCameraHost::AddDCameraDevice(const DHBase &dhBase, const std::string &abilityInfo,
     const sptr<IDCameraProviderCallback> &callback)
 {
     DHLOGI("DCameraHost::AddDCameraDevice for {devId: %s, dhId: %s}",
-        GetAnonyString(dhBase->deviceId_).c_str(), GetAnonyString(dhBase->dhId_).c_str());
+        GetAnonyString(dhBase.deviceId_).c_str(), GetAnonyString(dhBase.dhId_).c_str());
 
     OHOS::sptr<DCameraDevice> dcameraDevice = new (std::nothrow) DCameraDevice(dhBase, abilityInfo);
     if (dcameraDevice == nullptr) {
@@ -132,8 +132,8 @@ DCamRetCode DCameraHost::AddDCameraDevice(const std::shared_ptr<DHBase> &dhBase,
 
     std::string dCameraId = dcameraDevice->GetDCameraId();
     dCameraDeviceMap_[dCameraId] = dcameraDevice;
-    DHBase dhBaseKey(dhBase->deviceId_, dhBase->dhId_);
-    dhBaseHashDCamIdMap_.emplace(dhBaseKey, dCameraId);
+    DCameraBase dcameraBase(dhBase.deviceId_, dhBase.dhId_);
+    dhBaseHashDCamIdMap_.emplace(dcameraBase, dCameraId);
     dcameraDevice->SetProviderCallback(callback);
 
     if (dCameraHostCallback_ != nullptr) {
@@ -145,10 +145,10 @@ DCamRetCode DCameraHost::AddDCameraDevice(const std::shared_ptr<DHBase> &dhBase,
     return DCamRetCode::SUCCESS;
 }
 
-DCamRetCode DCameraHost::RemoveDCameraDevice(const std::shared_ptr<DHBase> &dhBase)
+DCamRetCode DCameraHost::RemoveDCameraDevice(const DHBase &dhBase)
 {
     DHLOGI("DCameraHost::RemoveDCameraDevice for {devId: %s, dhId: %s}",
-        GetAnonyString(dhBase->deviceId_).c_str(), GetAnonyString(dhBase->dhId_).c_str());
+        GetAnonyString(dhBase.deviceId_).c_str(), GetAnonyString(dhBase.dhId_).c_str());
 
     std::string dCameraId = GetCameraIdByDHBase(dhBase);
     if (dCameraId.empty()) {
@@ -164,8 +164,8 @@ DCamRetCode DCameraHost::RemoveDCameraDevice(const std::shared_ptr<DHBase> &dhBa
         dcameraDevice->SetProviderCallback(nullptr);
     }
 
-    DHBase dhBaseKey(dhBase->deviceId_, dhBase->dhId_);
-    dhBaseHashDCamIdMap_.erase(dhBaseKey);
+    DCameraBase dcameraBase(dhBase.deviceId_, dhBase.dhId_);
+    dhBaseHashDCamIdMap_.erase(dcameraBase);
     dCameraDeviceMap_.erase(dCameraId);
 
     if (dCameraHostCallback_ != nullptr) {
@@ -193,17 +193,17 @@ bool DCameraHost::IsCameraIdInvalid(const std::string &cameraId)
     return true;
 }
 
-std::string DCameraHost::GetCameraIdByDHBase(const std::shared_ptr<DHBase> &dhBase)
+std::string DCameraHost::GetCameraIdByDHBase(const DHBase &dhBase)
 {
-    DHBase dhBaseKey(dhBase->deviceId_, dhBase->dhId_);
-    auto iter = dhBaseHashDCamIdMap_.find(dhBaseKey);
+    DCameraBase dcameraBase(dhBase.deviceId_, dhBase.dhId_);
+    auto iter = dhBaseHashDCamIdMap_.find(dcameraBase);
     if (iter == dhBaseHashDCamIdMap_.end()) {
         return "";
     }
     return iter->second;
 }
 
-OHOS::sptr<DCameraDevice> DCameraHost::GetDCameraDeviceByDHBase(const std::shared_ptr<DHBase> &dhBase)
+OHOS::sptr<DCameraDevice> DCameraHost::GetDCameraDeviceByDHBase(const DHBase &dhBase)
 {
     std::string dCameraId = GetCameraIdByDHBase(dhBase);
     if (dCameraId.empty()) {
@@ -219,7 +219,7 @@ OHOS::sptr<DCameraDevice> DCameraHost::GetDCameraDeviceByDHBase(const std::share
     return iter->second;
 }
 
-void DCameraHost::NotifyDCameraStatus(const std::shared_ptr<DHBase> &dhBase, int32_t result)
+void DCameraHost::NotifyDCameraStatus(const DHBase &dhBase, int32_t result)
 {
     std::string dCameraId = GetCameraIdByDHBase(dhBase);
     if (dCameraId.empty()) {

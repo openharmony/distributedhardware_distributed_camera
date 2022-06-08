@@ -24,8 +24,8 @@
 #include "icamera_state_listener.h"
 #include "icamera_input.h"
 
-#include "idistributed_camera_provider_callback.h"
-#include "idistributed_camera_provider.h"
+#include "v1_0/id_camera_provider_callback.h"
+#include "v1_0/id_camera_provider.h"
 
 namespace OHOS {
 namespace DistributedHardware {

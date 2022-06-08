@@ -21,13 +21,14 @@
 #include <vector>
 #include "constants.h"
 #include "dcamera.h"
+#include "v1_0/dcamera_types.h"
 
-#include <foundation/distributedhardware/distributed_camera/camera_hdf/interfaces/include/types.h>
 #include <drivers/peripheral/camera/interfaces/include/types.h>
 
 namespace OHOS {
 namespace DistributedHardware {
 using namespace OHOS::Camera;
+using namespace OHOS::HDI::DistributedCamera::V1_0;
 class DMetadataProcessor {
 public:
     DMetadataProcessor() = default;

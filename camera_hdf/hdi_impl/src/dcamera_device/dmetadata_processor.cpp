@@ -248,7 +248,7 @@ DCamRetCode DMetadataProcessor::AddAbilityEntry(uint32_t tag, const void *data, 
 {
     if (dCameraAbility_ == nullptr) {
         DHLOGE("Distributed camera abilily is null.");
-        return INVALID_ARGUMENT;
+        return DCamRetCode::INVALID_ARGUMENT;
     }
 
     camera_metadata_item_t item;
@@ -266,7 +266,7 @@ DCamRetCode DMetadataProcessor::UpdateAbilityEntry(uint32_t tag, const void *dat
 {
     if (dCameraAbility_ == nullptr) {
         DHLOGE("Distributed camera abilily is null.");
-        return INVALID_ARGUMENT;
+        return DCamRetCode::INVALID_ARGUMENT;
     }
 
     camera_metadata_item_t item;
@@ -295,7 +295,7 @@ DCamRetCode DMetadataProcessor::SetMetadataResultMode(const ResultCallbackMode &
 {
     if (mode < ResultCallbackMode::PER_FRAME || mode > ResultCallbackMode::ON_CHANGED) {
         DHLOGE("Invalid result callback mode.");
-        return INVALID_ARGUMENT;
+        return DCamRetCode::INVALID_ARGUMENT;
     }
     metaResultMode_ = mode;
     return SUCCESS;
@@ -429,18 +429,18 @@ DCamRetCode DMetadataProcessor::SaveResultMetadata(std::string resultStr)
 {
     if (resultStr.empty()) {
         DHLOGE("Input result string is null.");
-        return INVALID_ARGUMENT;
+        return DCamRetCode::INVALID_ARGUMENT;
     }
 
     latestProducerResultMetadata_ = Camera::MetadataUtils::DecodeFromString(resultStr)->get();
     if (latestProducerResultMetadata_ == nullptr) {
         DHLOGE("Failed to decode metadata setting from string.");
-        return INVALID_ARGUMENT;
+        return DCamRetCode::INVALID_ARGUMENT;
     }
 
     if (!Camera::GetCameraMetadataItemCount(latestProducerResultMetadata_)) {
         DHLOGE("Input result metadata item is empty.");
-        return INVALID_ARGUMENT;
+        return DCamRetCode::INVALID_ARGUMENT;
     }
 
     return SUCCESS;

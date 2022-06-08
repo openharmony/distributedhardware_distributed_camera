@@ -19,13 +19,14 @@
 #include <variant>
 
 #include "event.h"
-#include "types.h"
+#include "v1_0/dcamera_types.h"
 
 #include "dcamera_event_cmd.h"
 #include "dcamera_index.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+using namespace OHOS::HDI::DistributedCamera::V1_0;
 typedef enum {
     DCAMERA_EVENT_REGIST = 0,
     DCAMERA_EVENT_UNREGIST = 1,
