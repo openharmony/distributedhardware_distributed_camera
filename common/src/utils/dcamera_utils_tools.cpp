@@ -23,9 +23,15 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-const int OFFSET2 = 2;
-const int OFFSET4 = 4;
-const int OFFSET6 = 6;
+const uint32_t OFFSET2 = 2;
+const uint32_t OFFSET4 = 4;
+const uint32_t OFFSET6 = 6;
+const uint8_t PARAM_FC = 0xfc;
+const uint8_t PARAM_03 = 0x03;
+const uint8_t PARAM_F0 = 0xf0;
+const uint8_t PARAM_0F = 0x0f;
+const uint8_t PARAM_C0 = 0xc0;
+const uint8_t PARAM_3F = 0x3f;
 const int INDEX_FIRST = 0;
 const int INDEX_SECOND = 1;
 const int INDEX_THIRD = 2;
@@ -77,12 +83,12 @@ std::string Base64Encode(const unsigned char *toEncode, unsigned int len)
     while (len--) {
         charArray3[i++] = *(toEncode++);
         if (i == sizeof(charArray3)) {
-            charArray4[INDEX_FIRST] = (charArray3[INDEX_FIRST] & 0xfc) >> OFFSET2;
-            charArray4[INDEX_SECOND] = ((charArray3[INDEX_FIRST] & 0x03) << OFFSET4) +
-                ((charArray3[INDEX_SECOND] & 0xf0) >> OFFSET4);
-            charArray4[INDEX_THIRD] = ((charArray3[INDEX_SECOND] & 0x0f) << OFFSET2) +
-                ((charArray3[INDEX_THIRD] & 0xc0) >> OFFSET6);
-            charArray4[INDEX_FORTH] = charArray3[INDEX_THIRD] & 0x3f;
+            charArray4[INDEX_FIRST] = (charArray3[INDEX_FIRST] & PARAM_FC) >> OFFSET2;
+            charArray4[INDEX_SECOND] = ((charArray3[INDEX_FIRST] & PARAM_03) << OFFSET4) +
+                ((charArray3[INDEX_SECOND] & PARAM_F0) >> OFFSET4);
+            charArray4[INDEX_THIRD] = ((charArray3[INDEX_SECOND] & PARAM_0F) << OFFSET2) +
+                ((charArray3[INDEX_THIRD] & PARAM_C0) >> OFFSET6);
+            charArray4[INDEX_FORTH] = charArray3[INDEX_THIRD] & PARAM_3F;
             for (i = 0; i < sizeof(charArray4); i++) {
                 ret += BASE_64_CHARS[charArray4[i]];
             }
@@ -95,12 +101,12 @@ std::string Base64Encode(const unsigned char *toEncode, unsigned int len)
         for (j = i; j < sizeof(charArray3); j++) {
             charArray3[j] = '\0';
         }
-        charArray4[INDEX_FIRST] = (charArray3[INDEX_FIRST] & 0xfc) >> OFFSET2;
-        charArray4[INDEX_SECOND] = ((charArray3[INDEX_FIRST] & 0x03) << OFFSET4) +
-            ((charArray3[INDEX_SECOND] & 0xf0) >> OFFSET4);
-        charArray4[INDEX_THIRD] = ((charArray3[INDEX_SECOND] & 0x0f) << OFFSET2) +
-            ((charArray3[INDEX_THIRD] & 0xc0) >> OFFSET6);
-        charArray4[INDEX_FORTH] = charArray3[INDEX_THIRD] & 0x3f;
+        charArray4[INDEX_FIRST] = (charArray3[INDEX_FIRST] & PARAM_FC) >> OFFSET2;
+        charArray4[INDEX_SECOND] = ((charArray3[INDEX_FIRST] & PARAM_03) << OFFSET4) +
+            ((charArray3[INDEX_SECOND] & PARAM_F0) >> OFFSET4);
+        charArray4[INDEX_THIRD] = ((charArray3[INDEX_SECOND] & PARAM_0F) << OFFSET2) +
+            ((charArray3[INDEX_THIRD] & PARAM_C0) >> OFFSET6);
+        charArray4[INDEX_FORTH] = charArray3[INDEX_THIRD] & PARAM_3F;
         for (j = 0; j < i + 1; j++) {
             ret += BASE_64_CHARS[charArray4[j]];
         }
