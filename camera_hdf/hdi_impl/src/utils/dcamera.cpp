@@ -110,7 +110,7 @@ std::string Base64Encode(const unsigned char *toEncode, unsigned int len)
         charArray3[i++] = *(toEncode++);
         if (i == sizeof(charArray3)) {
             charArray4[INDEX_FIRST] = (charArray3[INDEX_FIRST] & PARAM_FC) >> OFFSET2;
-            charArray4[INDEX_SECOND] = ((charArray3[INDEX_FIRST] & PARAM_03 << OFFSET4) +
+            charArray4[INDEX_SECOND] = ((charArray3[INDEX_FIRST] & PARAM_03) << OFFSET4) +
                 ((charArray3[INDEX_SECOND] & PARAM_F0) >> OFFSET4);
             charArray4[INDEX_THIRD] = ((charArray3[INDEX_SECOND] & PARAM_0F) << OFFSET2) +
                 ((charArray3[INDEX_THIRD] & PARAM_C0) >> OFFSET6);
