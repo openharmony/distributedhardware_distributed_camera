@@ -40,7 +40,9 @@ DCameraSourceDataProcess::~DCameraSourceDataProcess()
 
 int32_t DCameraSourceDataProcess::FeedStream(std::vector<std::shared_ptr<DataBuffer>>& buffers)
 {
+    DHLOGI("cmh*** FeedStream isFirstContStream_: %d, streamType_ %d", isFirstContStream_, streamType_);
     if (isFirstContStream_ && streamType_ == CONTINUOUS_FRAME) {
+        DHLOGI("cmh***11 FeedStream isFirstContStream_: %d, streamType_ %d", isFirstContStream_, streamType_);
         DcameraFinishAsyncTrace(DCAMERA_CONTINUE_FIRST_FRAME, DCAMERA_CONTINUE_FIRST_FRAME_TASKID);
         isFirstContStream_ = false;
     } else if (streamType_ == SNAPSHOT_FRAME) {
