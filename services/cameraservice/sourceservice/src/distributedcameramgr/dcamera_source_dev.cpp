@@ -310,10 +310,12 @@ int32_t DCameraSourceDev::ExecuteOpenCamera()
         return ret;
     }
 
+    DcameraStartAsyncTrace(DCAMERA_OPEN_CHANNEL_CONTROL, DCAMERA_OPEN_CHANNEL_TASKID);
     ret = controller_->OpenChannel(openInfo);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev Execute OpenCamera OpenChannel failed, ret: %d, devId: %s dhId: %s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        DcameraFinishAsyncTrace(DCAMERA_OPEN_CHANNEL_CONTROL, DCAMERA_OPEN_CHANNEL_TASKID);
         return DCAMERA_OPEN_CONFLICT;
     }
     return DCAMERA_OK;
@@ -413,6 +415,8 @@ int32_t DCameraSourceDev::ExecuteStartCapture(std::vector<std::shared_ptr<DCCapt
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev input StartCapture failed ret: %d, devId: %s, dhId: %s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        DcameraFinishAsyncTrace(DCAMERA_CONTINUE_FIRST_FRAME, DCAMERA_CONTINUE_FIRST_FRAME_TASKID);
+        DcameraFinishAsyncTrace(DCAMERA_SNAPSHOT_FIRST_FRAME, DCAMERA_SNAPSHOT_FIRST_FRAME_TASKID);
         return ret;
     }
     std::vector<std::shared_ptr<DCameraCaptureInfo>> captures;
@@ -443,6 +447,8 @@ int32_t DCameraSourceDev::ExecuteStartCapture(std::vector<std::shared_ptr<DCCapt
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev Execute StartCapture StartCapture failed, ret: %d, devId: %s dhId: %s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        DcameraFinishAsyncTrace(DCAMERA_CONTINUE_FIRST_FRAME, DCAMERA_CONTINUE_FIRST_FRAME_TASKID);
+        DcameraFinishAsyncTrace(DCAMERA_SNAPSHOT_FIRST_FRAME, DCAMERA_SNAPSHOT_FIRST_FRAME_TASKID);
     }
     return ret;
 }

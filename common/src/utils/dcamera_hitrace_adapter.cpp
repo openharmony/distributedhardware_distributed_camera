@@ -20,7 +20,7 @@ namespace OHOS {
 namespace DistributedHardware {
 void DcameraStartAsyncTrace(const std::string& str, int32_t taskId)
 {
-    DHLOGI("cmh++ DcameraFinishAsyncTrace str: %s, taskId %d", str.c_str(), taskId);
+    DHLOGI("cmh++ DcameraStartAsyncTrace str: %s, taskId %d", str.c_str(), taskId);
     StartAsyncTrace(DCAMERA_HITRACE_LABEL, str, taskId, -1);
 }
 

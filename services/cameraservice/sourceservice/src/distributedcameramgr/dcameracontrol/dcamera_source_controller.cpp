@@ -166,6 +166,10 @@ int32_t DCameraSourceController::ChannelNeg(std::shared_ptr<DCameraChannelInfo>&
 
 int32_t DCameraSourceController::DCameraNotify(std::shared_ptr<DCameraEvent>& events)
 {
+    if (events->eventResult_ == DCAMERA_EVENT_CAMERA_ERROR) {
+        DcameraFinishAsyncTrace(DCAMERA_CONTINUE_FIRST_FRAME, DCAMERA_CONTINUE_FIRST_FRAME_TASKID);
+        DcameraFinishAsyncTrace(DCAMERA_SNAPSHOT_FIRST_FRAME, DCAMERA_SNAPSHOT_FIRST_FRAME_TASKID);
+    }
     sptr<IDCameraProvider> camHdiProvider = IDCameraProvider::Get();
     if (camHdiProvider == nullptr) {
         DHLOGI("DCameraNotify camHdiProvider is nullptr devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
@@ -265,7 +269,6 @@ int32_t DCameraSourceController::GetCameraInfo(std::shared_ptr<DCameraInfo>& cam
 
 int32_t DCameraSourceController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& openInfo)
 {
-    DcameraStartAsyncTrace(DCAMERA_OPEN_CHANNEL_CONTROL, DCAMERA_OPEN_CHANNEL_TASKID);
     if (indexs_.size() > DCAMERA_MAX_NUM) {
         DHLOGE("DCameraSourceController OpenChannel not support operate %d camera", indexs_.size());
         return DCAMERA_BAD_OPERATE;
@@ -393,6 +396,7 @@ void DCameraSourceController::OnSessionState(int32_t state)
             break;
         }
         case DCAMERA_CHANNEL_STATE_DISCONNECTED: {
+            DcameraFinishAsyncTrace(DCAMERA_OPEN_CHANNEL_CONTROL, DCAMERA_OPEN_CHANNEL_TASKID);
             DHLOGI("DCameraSourceDev PostTask Controller CloseSession OnClose devId %s dhId %s",
                 GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
             DCameraIndex camIndex(devId_, dhId_);

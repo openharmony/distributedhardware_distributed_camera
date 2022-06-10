@@ -49,6 +49,9 @@ public:
     void OnDataReceived(DCStreamType streamType, std::vector<std::shared_ptr<DataBuffer>>& buffers);
 
 private:
+    void FinshFrameAsyncTrace(DCStreamType streamType);
+
+private:
     std::map<DCStreamType, std::shared_ptr<ICameraChannel>> channels_;
     std::map<DCStreamType, std::shared_ptr<ICameraChannelListener>> listeners_;
     std::map<DCStreamType, std::shared_ptr<ICameraSourceDataProcess>> dataProcess_;

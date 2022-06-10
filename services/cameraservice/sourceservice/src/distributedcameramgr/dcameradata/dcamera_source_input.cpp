@@ -191,6 +191,7 @@ int32_t DCameraSourceInput::OpenChannel(std::vector<DCameraIndex>& indexs)
         if (ret != DCAMERA_OK) {
             DHLOGE("DCameraSourceInput CreateSession continue failed ret: %d, devId: %s, dhId: %s", ret,
                 GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+            DcameraFinishAsyncTrace(DCAMERA_OPEN_DATA_CONTINUE, DCAMERA_OPEN_DATA_CONTINUE_TASKID);
             return ret;
         }
 
@@ -198,6 +199,7 @@ int32_t DCameraSourceInput::OpenChannel(std::vector<DCameraIndex>& indexs)
         if (ret != DCAMERA_OK) {
             DHLOGE("DCameraSourceInput OpenChannel continue stream failed ret: %d, devId: %s, dhId: %s", ret,
                 GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+            DcameraFinishAsyncTrace(DCAMERA_OPEN_DATA_CONTINUE, DCAMERA_OPEN_DATA_CONTINUE_TASKID);
             return ret;
         }
     }
@@ -209,6 +211,7 @@ int32_t DCameraSourceInput::OpenChannel(std::vector<DCameraIndex>& indexs)
         if (ret != DCAMERA_OK) {
             DHLOGE("DCameraSourceInput Init CreateSession snapshot failed ret: %d, devId: %s, dhId: %s", ret,
                 GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+            DcameraFinishAsyncTrace(DCAMERA_OPEN_DATA_SNAPSHOT, DCAMERA_OPEN_DATA_SNAPSHOT_TASKID);
             return ret;
         }
 
@@ -216,6 +219,7 @@ int32_t DCameraSourceInput::OpenChannel(std::vector<DCameraIndex>& indexs)
         if (ret != DCAMERA_OK) {
             DHLOGE("DCameraSourceInput OpenChannel snapshot stream failed ret: %d, devId: %s, dhId: %s", ret,
                 GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+            DcameraFinishAsyncTrace(DCAMERA_OPEN_DATA_SNAPSHOT, DCAMERA_OPEN_DATA_SNAPSHOT_TASKID);
             return ret;
         }
     }
@@ -314,6 +318,7 @@ void DCameraSourceInput::OnSessionState(DCStreamType streamType, int32_t state)
     channelState_[streamType] = (DCameraChannelState)state;
     switch (state) {
         case DCAMERA_CHANNEL_STATE_DISCONNECTED: {
+            FinshFrameAsyncTrace(streamType);
             DHLOGI("DCameraSourceDev PostTask CloseSession Input OnClose devId %s dhId %s",
                 GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
             DCameraIndex camIndex(devId_, dhId_);
@@ -327,11 +332,7 @@ void DCameraSourceInput::OnSessionState(DCStreamType streamType, int32_t state)
             break;
         }
         case DCAMERA_CHANNEL_STATE_CONNECTED: {
-            if (streamType == CONTINUOUS_FRAME) {
-                DcameraFinishAsyncTrace(DCAMERA_OPEN_DATA_CONTINUE, DCAMERA_OPEN_DATA_CONTINUE_TASKID);
-            } else if (streamType == SNAPSHOT_FRAME) {
-                DcameraFinishAsyncTrace(DCAMERA_OPEN_DATA_SNAPSHOT, DCAMERA_OPEN_DATA_SNAPSHOT_TASKID);
-            }
+            FinshFrameAsyncTrace(streamType);
             DHLOGI("DCameraSourceInput OnSessionState state %d", state);
             break;
         }
@@ -339,6 +340,15 @@ void DCameraSourceInput::OnSessionState(DCStreamType streamType, int32_t state)
             DHLOGI("DCameraSourceInput OnSessionState state %d", state);
             break;
         }
+    }
+}
+
+void DCameraSourceInput::FinshFrameAsyncTrace(DCStreamType streamType)
+{
+    if (streamType == CONTINUOUS_FRAME) {
+        DcameraFinishAsyncTrace(DCAMERA_OPEN_DATA_CONTINUE, DCAMERA_OPEN_DATA_CONTINUE_TASKID);
+    } else if (streamType == SNAPSHOT_FRAME) {
+        DcameraFinishAsyncTrace(DCAMERA_OPEN_DATA_SNAPSHOT, DCAMERA_OPEN_DATA_SNAPSHOT_TASKID);
     }
 }
 

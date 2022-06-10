@@ -163,7 +163,7 @@ int32_t DCameraSourceDataProcess::StartCapture(std::shared_ptr<DCCaptureInfo>& c
 
 int32_t DCameraSourceDataProcess::StopCapture(std::vector<int32_t>& streamIds)
 {
-    if (streamType_ == CONTINUOUS_FRAME) {
+    if (streamType_ == CONTINUOUS_FRAME && GetProducerSize() == 0) {
         DHLOGI("cmh--- StopCapture streamType_ %d", streamType_);
         isFirstContStream_ = true;
     }
