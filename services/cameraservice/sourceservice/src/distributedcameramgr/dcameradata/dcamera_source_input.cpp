@@ -351,7 +351,7 @@ void DCameraSourceInput::OnSessionError(DCStreamType streamType, int32_t eventTy
 
 void DCameraSourceInput::OnDataReceived(DCStreamType streamType, std::vector<std::shared_ptr<DataBuffer>>& buffers)
 {
-    DHLOGI("cmh*** OnDataReceived streamType_ %d", streamType_);
+    DHLOGI("cmh*** OnDataReceived streamType %d", streamType);
     int32_t ret = dataProcess_[streamType]->FeedStream(buffers);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceInput OnDataReceived FeedStream %d stream failed ret: %d, devId: %s, dhId: %s", streamType,
