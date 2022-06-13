@@ -168,7 +168,6 @@ int32_t DCameraSourceDataProcess::StopCapture(std::vector<int32_t>& streamIds)
     for (auto iter = streamProcess_.begin(); iter != streamProcess_.end(); iter++) {
         (*iter)->StopCapture(streamIdSet);
     }
-    int32_t temp = GetProducerSize();
     if (streamType_ == CONTINUOUS_FRAME && GetProducerSize() == 0) {
         isFirstContStream_ = true;
     }
