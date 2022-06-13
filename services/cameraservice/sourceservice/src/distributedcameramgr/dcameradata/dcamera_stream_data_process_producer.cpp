@@ -37,8 +37,8 @@ DCameraStreamDataProcessProducer::DCameraStreamDataProcessProducer(std::string d
 
 DCameraStreamDataProcessProducer::~DCameraStreamDataProcessProducer()
 {
-    DHLOGI("DCameraStreamDataProcessProducer Destructor devId %s dhId %s state: %d streamType: %d",
-        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), state_, streamType_);
+    DHLOGI("DCameraStreamDataProcessProducer Destructor devId %s dhId %s state: %d streamType: %d streamId: %d",
+        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), state_, streamType_, streamId_);
     if (state_ == DCAMERA_PRODUCER_STATE_START) {
         Stop();
     }
@@ -65,7 +65,10 @@ void DCameraStreamDataProcessProducer::Stop()
 {
     DHLOGI("DCameraStreamDataProcessProducer Stop devId: %s dhId: %s streamType: %d streamId: %d state: %d",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_, state_);
-    state_ = DCAMERA_PRODUCER_STATE_STOP;
+    {
+        std::lock_guard<std::mutex> lock(bufferMutex_);
+        state_ = DCAMERA_PRODUCER_STATE_STOP;
+    }
     producerCon_.notify_one();
     producerThread_.join();
     if (streamType_ == CONTINUOUS_FRAME) {
@@ -79,8 +82,8 @@ void DCameraStreamDataProcessProducer::Stop()
 
 void DCameraStreamDataProcessProducer::FeedStream(const std::shared_ptr<DataBuffer>& buffer)
 {
-    DHLOGD("DCameraStreamDataProcessProducer FeedStream devId %s dhId %s streamType: %d streamSize: %d",
-        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, buffer->Size());
+    DHLOGD("DCameraStreamDataProcessProducer FeedStream devId %s dhId %s streamId: %d streamType: %d streamSize: %d",
+        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamId_, streamType_, buffer->Size());
     std::unique_lock<std::mutex> lock(bufferMutex_);
     if (buffers_.size() >= DCAMERA_PRODUCER_MAX_BUFFER_SIZE) {
         DHLOGD("DCameraStreamDataProcessProducer FeedStream OverSize devId %s dhId %s streamType: %d streamSize: %d",
@@ -96,7 +99,10 @@ void DCameraStreamDataProcessProducer::FeedStream(const std::shared_ptr<DataBuff
 void DCameraStreamDataProcessProducer::StartEvent()
 {
     auto runner = AppExecFwk::EventRunner::Create(false);
-    eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
+    {
+        std::lock_guard<std::mutex> lock(eventMutex_);
+        eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
+    }
     eventCon_.notify_one();
     runner->Run();
 }
@@ -123,13 +129,13 @@ void DCameraStreamDataProcessProducer::LooperContinue()
             buffer = buffers_.front();
             if (buffers_.size() > 1) {
                 buffers_.pop();
-                DHLOGD("common devId %s dhId %s streamSize: %d bufferSize: %d streamType: %d",
+                DHLOGD("common devId %s dhId %s streamSize: %d bufferSize: %d streamType: %d streamId: %d",
                     GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), buffer->Size(), buffers_.size(),
-                    streamType_);
+                    streamType_, streamId_);
             } else {
-                DHLOGD("repeat devId %s dhId %s streamSize: %d bufferSize: %d streamType: %d",
+                DHLOGD("repeat devId %s dhId %s streamSize: %d bufferSize: %d streamType: %d streamId: %d",
                     GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), buffer->Size(), buffers_.size(),
-                    streamType_);
+                    streamType_, streamId_);
             }
         }
 
