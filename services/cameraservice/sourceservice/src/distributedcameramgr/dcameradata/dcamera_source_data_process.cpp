@@ -40,16 +40,11 @@ DCameraSourceDataProcess::~DCameraSourceDataProcess()
 
 int32_t DCameraSourceDataProcess::FeedStream(std::vector<std::shared_ptr<DataBuffer>>& buffers)
 {
-    DHLOGI("cmh*** FeedStream isFirstContStream_: %d, streamType_ %d", isFirstContStream_, streamType_);
     if (isFirstContStream_ && streamType_ == CONTINUOUS_FRAME) {
-        DHLOGI("cmh***11 FeedStream isFirstContStream_: %d, streamType_ %d", isFirstContStream_, streamType_);
-        isFirstContStream_ = false;
-        DHLOGI("cmh***1122 FeedStream isFirstContStream_: %d, streamType_ %d", isFirstContStream_, streamType_);
         DcameraFinishAsyncTrace(DCAMERA_CONTINUE_FIRST_FRAME, DCAMERA_CONTINUE_FIRST_FRAME_TASKID);
+        isFirstContStream_ = false;
     } else if (streamType_ == SNAPSHOT_FRAME) {
-        DHLOGI("cmh***22 FeedStream isFirstContStream_: %d, streamType_ %d", isFirstContStream_, streamType_);
         DcameraFinishAsyncTrace(DCAMERA_SNAPSHOT_FIRST_FRAME, DCAMERA_SNAPSHOT_FIRST_FRAME_TASKID);
-        DHLOGI("cmh***2233 FeedStream isFirstContStream_: %d, streamType_ %d", isFirstContStream_, streamType_);
     }
     if (buffers.size() > DCAMERA_MAX_NUM) {
         DHLOGI("DCameraSourceDataProcess FeedStream devId %s dhId %s size: %d over flow",
@@ -174,9 +169,7 @@ int32_t DCameraSourceDataProcess::StopCapture(std::vector<int32_t>& streamIds)
         (*iter)->StopCapture(streamIdSet);
     }
     int32_t temp = GetProducerSize();
-    DHLOGI("cmh--- StopCapture GetProducerSize %d", temp);
     if (streamType_ == CONTINUOUS_FRAME && GetProducerSize() == 0) {
-        DHLOGI("cmh--- StopCapture streamType_ %d", streamType_);
         isFirstContStream_ = true;
     }
     return DCAMERA_OK;
