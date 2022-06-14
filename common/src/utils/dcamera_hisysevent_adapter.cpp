@@ -135,7 +135,6 @@ void ReportStartCaptureEvent(const std::string eventName, EventCaptureInfo& capt
 
 std::string CreateMsg(const char *format, ...)
 {
-    DHLOGE("cmh CreateMsg enter.....");
     va_list args;
     (void)memset_s(&args, sizeof(va_list), 0, sizeof(va_list));
     va_start(args, format);
@@ -146,7 +145,6 @@ std::string CreateMsg(const char *format, ...)
         return "";
     }
     va_end(args);
-    DHLOGE("cmh CreateMsg end.....");
     return msg;
 }
 } // namespace DistributedHardware

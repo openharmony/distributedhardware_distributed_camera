@@ -53,7 +53,7 @@ DCAMERA_REGISTER_FAIL:
 
 DCAMERA_OPT_FAIL:
   __BASE: {type: FAULT, level: CRITICAL, desc: dcamera operate error occured}
-  ERRCODE: {type: STRING, desc: dcamera init process fail error code}
+  ERRCODE: {type: INT32, desc: dcamera init process fail error code}
   MSG: {type: STRING, desc: dcamera init process error info}
 
 DCAMERA_INIT:

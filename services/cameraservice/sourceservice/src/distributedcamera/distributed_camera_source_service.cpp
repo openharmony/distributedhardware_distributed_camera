@@ -141,6 +141,8 @@ int32_t DistributedCameraSourceService::RegisterDistributedHardware(const std::s
     }
 
     ret = camDev->RegisterDistributedHardware(devId, dhId, reqId, param.version, param.attrs);
+    ReportRegisterCameraFail(DCAMERA_REGISTER_FAIL, GetAnonyString(devId), dhId, param.version,
+            "dcamera source RegisterDistributedHardware fail.");
     if (ret != DCAMERA_OK) {
         DHLOGE("DistributedCameraSourceService RegisterDistributedHardware failed, ret: %d", ret);
         ReportRegisterCameraFail(DCAMERA_REGISTER_FAIL, GetAnonyString(devId), dhId, param.version,
