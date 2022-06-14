@@ -141,8 +141,6 @@ int32_t DistributedCameraSourceService::RegisterDistributedHardware(const std::s
     }
 
     ret = camDev->RegisterDistributedHardware(devId, dhId, reqId, param.version, param.attrs);
-    ReportRegisterCameraFail(DCAMERA_REGISTER_FAIL, GetAnonyString(devId), dhId, param.version,
-            "dcamera source RegisterDistributedHardware fail.");
     if (ret != DCAMERA_OK) {
         DHLOGE("DistributedCameraSourceService RegisterDistributedHardware failed, ret: %d", ret);
         ReportRegisterCameraFail(DCAMERA_REGISTER_FAIL, GetAnonyString(devId), dhId, param.version,
@@ -198,7 +196,6 @@ int32_t DistributedCameraSourceService::LoadDCameraHDF()
 {
     DHLOGI("load hdf driver start");
     int32_t ret = DCameraHdfOperate::GetInstance().LoadDcameraHDFImpl();
-    ReportDcamerInitFail(DCAMERA_INIT_FAIL, DCAMERA_HDF_ERROR, CreateMsg("dcamera load hdf driver fail."));
     if (ret != DCAMERA_OK) {
         DHLOGE("load hdf driver failed, ret %d", ret);
         ReportDcamerInitFail(DCAMERA_INIT_FAIL, DCAMERA_HDF_ERROR, CreateMsg("dcamera load hdf driver fail."));

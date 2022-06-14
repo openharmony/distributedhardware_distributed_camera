@@ -44,8 +44,6 @@ int32_t DCameraSourceHandler::InitSource(const std::string& params)
         DHLOGE("GetSourceLocalDHMS GetSystemAbilityManager failed");
         return DCAMERA_INIT_ERR;
     }
-    ReportDcamerInitFail(DCAMERA_INIT_FAIL, DCAMERA_SA_ERROR,
-        CreateMsg("dcamera source OnLoadSystemAbilityFail, systemAbilityId: %d", DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID));
     ReportSaEvent(INIT_SA_EVENT, DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, "init source sa event.");
     sptr<DCameraSourceLoadCallback> loadCallback = new DCameraSourceLoadCallback(params);
     int32_t ret = sm->LoadSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, loadCallback);
