@@ -336,14 +336,14 @@ void DCameraSinkController::OnSessionState(int32_t state)
                 DHLOGI("DCameraSinkController::OnSessionState %s new thread session state: %d",
                     GetAnonyString(dhId_).c_str(), sessionState_);
                 std::lock_guard<std::mutex> autoLock(autoLock_);
-                int32_t ret = StopCapture();
-                if (ret != DCAMERA_OK) {
-                    DHLOGE("DCameraSinkController::OnSessionState session state: %d, %s stop capture failed, ret: %d",
-                        sessionState_, GetAnonyString(dhId_).c_str(), ret);
-                }
-                ret = CloseChannel();
+                int32_t ret = CloseChannel();
                 if (ret != DCAMERA_OK) {
                     DHLOGE("DCameraSinkController::OnSessionState session state: %d, %s close channel failed, ret: %d",
+                        sessionState_, GetAnonyString(dhId_).c_str(), ret);
+                }
+                ret = StopCapture();
+                if (ret != DCAMERA_OK) {
+                    DHLOGE("DCameraSinkController::OnSessionState session state: %d, %s stop capture failed, ret: %d",
                         sessionState_, GetAnonyString(dhId_).c_str(), ret);
                 }
             }).detach();

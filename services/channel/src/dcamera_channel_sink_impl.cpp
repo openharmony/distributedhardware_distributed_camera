@@ -101,7 +101,7 @@ int32_t DCameraChannelSinkImpl::ReleaseSession()
     if (softbusSession_ == nullptr) {
         return DCAMERA_OK;
     }
-    DCameraSoftbusAdapter::GetInstance().sourceSessions_.erase(softbusSession_->GetMySessionName());
+    DCameraSoftbusAdapter::GetInstance().sinkSessions_.erase(softbusSession_->GetMySessionName());
     int32_t ret = DCameraSoftbusAdapter::GetInstance().DestroySoftbusSessionServer(softbusSession_->GetMySessionName());
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraChannelSinkImpl ReleaseSession %s failed, ret: %d", mySessionName_.c_str(), ret);
