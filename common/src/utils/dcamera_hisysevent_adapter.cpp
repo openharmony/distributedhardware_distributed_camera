@@ -15,7 +15,6 @@
 
 #include "dcamera_hisysevent_adapter.h"
 
-#include "constants.h"
 #include "hisysevent.h"
 #include "securec.h"
 
@@ -25,6 +24,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
+constexpr int32_t MSG_MAX_LEN = 2048;
 using HiSysEventNameSpace = OHOS::HiviewDFX::HiSysEvent;
 const std::string DOMAIN_STR = std::string(HiSysEventNameSpace::Domain::DISTRIBUTED_CAMERA);
 const std::string ENUM_STREAMTYPE_STRINGS[] = {
@@ -138,7 +138,7 @@ std::string CreateMsg(const char *format, ...)
     va_list args;
     (void)memset_s(&args, sizeof(va_list), 0, sizeof(va_list));
     va_start(args, format);
-    char msg[LOG_MAX_LEN] = {0};
+    char msg[MSG_MAX_LEN] = {0};
     if (vsnprintf_s(msg, sizeof(msg), sizeof(msg) - 1, format, args) < 0) {
         DHLOGE("failed to call vsnprintf_s");
         va_end(args);
