@@ -20,14 +20,9 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-const std::string SA_ERROR = "DCAMERA_SA_START_FAIL";
-const std::string HDF_ERROR = "DCAMERA_HDF_START_FAIL";
-const std::string REGISTER_CAMERA_ERROR = "DCAMERA_REGISTER_FAIL";
-const std::string SOFTBUS_SESSIONSERVER_ERROR = "DCAMERA_CREATE_SESSIONSVR_FAIL";
-const std::string SOFTBUS_SESSION_ERROR = "DCAMERA_OPEN_SESSION_FAIL";
-const std::string SINK_OPEN_CAMERA_ERROR = "DCAMERA_SINK_OPEN_CAM_FAIL";
-const std::string START_VIDEO_ENCODER_ERROR = "DCAMERA_ENCODE_FAIL";
-const std::string START_VIDEO_DECODER_ERROR = "DCAMERA_DECODE_FAIL";
+const std::string DCAMERA_INIT_FAIL = "DCAMERA_INIT_FAIL";
+const std::string DCAMERA_REGISTER_FAIL = "DCAMERA_REGISTER_FAIL";
+const std::string DCAMERA_OPT_FAIL = "DCAMERA_OPT_FAIL";
 
 const std::string INIT_SA_EVENT = "DCAMERA_INIT";
 const std::string RELEASE_SA_EVENT = "DCAMERA_EXIT";
@@ -36,6 +31,16 @@ const std::string UNREGIST_CAMERA_EVENT = "DCAMERA_UNREGISTER";
 const std::string OPEN_CAMERA_EVENT = "DCAMERA_OPEN";
 const std::string CLOSE_CAMERA_EVENT = "DCAMERA_CLOSE";
 const std::string START_CAPTURE_EVENT = "DCAMERA_CAPTURE";
+
+enum DcameraHisyseventErrno {
+    DCAMERA_SA_ERROR = 0,
+    DCAMERA_HDF_ERROR = 1,
+    DCAMERA_CREATE_SESSIONSVR_ERROR = 2,
+    DCAMERA_OPEN_SESSION_ERROR = 3,
+    DCAMERA_SINK_OPEN_CAM_ERROR = 4,
+    DCAMERA_ENCODE_ERROR = 5,
+    DCAMERA_DECODE_ERROR = 6,
+};
 
 using EventCaptureInfo = struct _EventCaptureInfo {
     int32_t width_;
@@ -46,19 +51,10 @@ using EventCaptureInfo = struct _EventCaptureInfo {
     int32_t type_;
 };
 
-void ReportStartSaFail(const std::string eventName, int32_t saId, const std::string& errMsg);
-void ReportStartHDFFail(const std::string eventName, const std::string& errMsg);
+void ReportDcamerInitFail(const std::string eventName, int32_t errCode, const std::string& errMsg);
 void ReportRegisterCameraFail(const std::string eventName, const std::string& devId, const std::string& dhId,
     std::string version, const std::string& errMsg);
-void ReportSoftbusSessionServerFail(const std::string eventName, const std::string& pkgName,
-    std::string sessionName, const std::string& errMsg);
-void ReportSoftbusSessionFail(const std::string eventName, std::string mySessName,
-    std::string peerSessName, std::string peerDevId, const std::string& errMsg);
-void ReportSinkOpenCamFail(const std::string eventName, const std::string& dhId, const std::string& errMsg);
-void ReportStartVideoEncoderFail(const std::string eventName, int32_t width, int32_t height,
-    std::string format, const std::string& errMsg);
-void ReportStartVideoDecoderFail(const std::string eventName, int32_t width, int32_t height,
-    std::string format, const std::string& errMsg);
+void ReportDcamerOptFail(const std::string eventName, int32_t errCode, const std::string& errMsg);
 
 void ReportSaEvent(const std::string eventName, int32_t saId, const std::string& errMsg);
 void ReportRegisterCameraEvent(const std::string eventName, const std::string& devId, const std::string& dhId,
@@ -66,6 +62,8 @@ void ReportRegisterCameraEvent(const std::string eventName, const std::string& d
 void ReportCameraOperaterEvent(const std::string eventName, const std::string& devId, const std::string& dhId,
     const std::string& errMsg);
 void ReportStartCaptureEvent(const std::string eventName, EventCaptureInfo& capture, const std::string& errMsg);
+
+std::string CreateMsg(const char *format, ...);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DCAMERA_HISYSEVENT_ADAPTER_H

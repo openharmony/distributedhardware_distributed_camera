@@ -126,8 +126,8 @@ int32_t DCameraSoftbusAdapter::CreateSoftbusSessionServer(std::string sessionNam
     int32_t ret = CreateSessionServer(PKG_NAME.c_str(), sessionName.c_str(), &sessListeners_[role]);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSoftbusAdapter CreateSessionServer failed, ret: %d", ret);
-        ReportSoftbusSessionServerFail(SOFTBUS_SESSIONSERVER_ERROR, PKG_NAME,
-            sessionName, "create session server failed");
+        ReportDcamerOptFail(DCAMERA_OPT_FAIL, DCAMERA_CREATE_SESSIONSVR_ERROR,
+            CreateMsg("create session server failed, sessionName %s", sessionName.c_str()));
         return ret;
     }
     sessionTotal_[sessionName]++;
@@ -198,10 +198,14 @@ int32_t DCameraSoftbusAdapter::OpenSoftbusSession(std::string mySessName, std::s
     }
     attr.attr.streamAttr.streamType = (StreamType)streamType;
     int32_t sessionId = OpenSession(mySessName.c_str(), peerSessName.c_str(), peerDevId.c_str(), "0", &attr);
+    ReportDcamerOptFail(DCAMERA_OPT_FAIL, DCAMERA_OPEN_SESSION_ERROR,
+            CreateMsg("open softbus session failed, mySessName %s, peerSessName %s, peerDevId %s",
+            mySessName.c_str(), peerSessName.c_str(), peerDevId.c_str()));
     if (sessionId < 0) {
         DHLOGE("DCameraSoftbusAdapter OpenSoftbusSession failed %d", sessionId);
-        ReportSoftbusSessionFail(SOFTBUS_SESSION_ERROR, mySessName, peerSessName,
-            peerDevId, "open softbus session failed.");
+        ReportDcamerOptFail(DCAMERA_OPT_FAIL, DCAMERA_OPEN_SESSION_ERROR,
+            CreateMsg("open softbus session failed, mySessName %s, peerSessName %s, peerDevId %s",
+            mySessName.c_str(), peerSessName.c_str(), peerDevId.c_str()));
         return DCAMERA_BAD_OPERATE;
     }
     return DCAMERA_OK;

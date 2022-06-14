@@ -109,11 +109,16 @@ int32_t DecodeDataProcess::InitDecoder()
     }
 
     ret = StartVideoDecoder();
+    ReportDcamerOptFail(DCAMERA_OPT_FAIL, DCAMERA_DECODE_ERROR,
+            CreateMsg("start video decoder failed, width %d, height %d, format %s", sourceConfig_.GetWidth(),
+            sourceConfig_.GetHeight(),
+            ENUM_VIDEOFORMAT_STRINGS[static_cast<int32_t>(sourceConfig_.GetVideoformat())].c_str()));
     if (ret != DCAMERA_OK) {
         DHLOGE("Start Video decoder failed.");
-        ReportStartVideoDecoderFail(START_VIDEO_DECODER_ERROR, sourceConfig_.GetWidth(), sourceConfig_.GetHeight(),
-            ENUM_VIDEOFORMAT_STRINGS[static_cast<int32_t>(sourceConfig_.GetVideoformat())],
-            "start video decoder failed.");
+        ReportDcamerOptFail(DCAMERA_OPT_FAIL, DCAMERA_DECODE_ERROR,
+            CreateMsg("start video decoder failed, width %d, height %d, format %s", sourceConfig_.GetWidth(),
+            sourceConfig_.GetHeight(),
+            ENUM_VIDEOFORMAT_STRINGS[static_cast<int32_t>(sourceConfig_.GetVideoformat())].c_str()));
         return ret;
     }
     return DCAMERA_OK;

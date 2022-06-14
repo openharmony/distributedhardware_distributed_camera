@@ -39,14 +39,10 @@
 
 domain: DISTCAMERA
 
-DCAMERA_SA_START_FAIL:
-  __BASE: {type: FAULT, level: CRITICAL, desc: dcamera sa start error occured}
-  SAID: {type: INT32, desc: dcamera SAID}
-  MSG: {type: STRING, desc: dcamera sa error info}
-
-DCAMERA_HDF_START_FAIL:
-  __BASE: {type: FAULT, level: CRITICAL, desc: dcamera hdf start error occured}
-  MSG: {type: STRING, desc: dcamera hdf error info}
+DCAMERA_INIT_FAIL:
+  __BASE: {type: FAULT, level: CRITICAL, desc: dcamera init process error occured}
+  ERRCODE: {type: INT32, desc: dcamera init process fail error code}
+  MSG: {type: STRING, desc: dcamera init process error info}
 
 DCAMERA_REGISTER_FAIL:
   __BASE: {type: FAULT, level: CRITICAL, desc: dcamera register error occured}
@@ -55,37 +51,10 @@ DCAMERA_REGISTER_FAIL:
   VERSION: {type: STRING, desc: dcamera version}
   MSG: {type: STRING, desc: register dcamera error info}
 
-DCAMERA_CREATE_SESSIONSVR_FAIL:
-  __BASE: {type: FAULT, level: CRITICAL, desc: dcamera softbus sessionserver error occured}
-  PKGNAME: {type: STRING, desc: softbus package name}
-  SESSIONNAME: {type: STRING, desc: softbus session name}
-  MSG: {type: STRING, desc: dcamera softbus sessionserver error info}
-
-DCAMERA_OPEN_SESSION_FAIL:
-  __BASE: {type: FAULT, level: CRITICAL, desc: dcamera softbus session error occured}
-  MYSESSIONNAME: {type: STRING, desc: softbus my session name}
-  PEERSESSIONNAME: {type: STRING, desc: softbus peer session name}
-  PEERDEVID: {type: STRING, desc: peer network id}
-  MSG: {type: STRING, desc: dcamera softbus session error info}
-
-DCAMERA_SINK_OPEN_CAM_FAIL:
-  __BASE: {type: FAULT, level: CRITICAL, desc: dcamera sink open camera error occured}
-  DHID: {type: STRING, desc: dcamera dhId}
-  MSG: {type: STRING, desc: dcamera sink open camera error info}
-
-DCAMERA_ENCODE_FAIL:
-  __BASE: {type: FAULT, level: CRITICAL, desc: dcamera video encoder error occured}
-  WIDTH: {type: INT32, desc: dcamera width}
-  HEIGHT: {type: INT32, desc: dcamera height}
-  FORMAT: {type: STRING, desc: dcamera FORMAT}
-  MSG: {type: STRING, desc: dcamera video encoder error info}
-
-DCAMERA_DECODE_FAIL:
-  __BASE: {type: FAULT, level: CRITICAL, desc: dcamera video decoder error occured}
-  WIDTH: {type: INT32, desc: dcamera width}
-  HEIGHT: {type: INT32, desc: dcamera height}
-  FORMAT: {type: STRING, desc: dcamera format}
-  MSG: {type: STRING, desc: dcamera video decoder error info}
+DCAMERA_OPT_FAIL:
+  __BASE: {type: FAULT, level: CRITICAL, desc: dcamera operate error occured}
+  ERRCODE: {type: STRING, desc: dcamera init process fail error code}
+  MSG: {type: STRING, desc: dcamera init process error info}
 
 DCAMERA_INIT:
   __BASE: {type: BEHAVIOR, level: MINOR, desc: dcamera init sa event}
