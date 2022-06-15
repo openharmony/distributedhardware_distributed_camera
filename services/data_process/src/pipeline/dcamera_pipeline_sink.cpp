@@ -36,7 +36,7 @@ int32_t DCameraPipelineSink::CreateDataProcessPipeline(PipelineType piplineType,
     const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig,
     const std::shared_ptr<DataProcessListener>& listener)
 {
-    DCAMERA_SYNC_TRACE;
+    DCAMERA_SYNC_TRACE(DCAMERA_SINK_CREATE_PIPELINE);
     DHLOGD("Create sink data process pipeline.");
     switch (piplineType) {
         case PipelineType::VIDEO:
@@ -148,7 +148,7 @@ int32_t DCameraPipelineSink::ProcessData(std::vector<std::shared_ptr<DataBuffer>
 
 void DCameraPipelineSink::DestroyDataProcessPipeline()
 {
-    DCAMERA_SYNC_TRACE;
+    DCAMERA_SYNC_TRACE(DCAMERA_SINK_DESTORY_PIPELINE);
     DHLOGD("Destroy sink data process pipeline start.");
     isProcess_ = false;
     if (pipelineHead_ != nullptr) {
