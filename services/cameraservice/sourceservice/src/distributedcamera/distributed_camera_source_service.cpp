@@ -195,7 +195,7 @@ int32_t DistributedCameraSourceService::DCameraNotify(const std::string& devId, 
 
 int32_t DistributedCameraSourceService::LoadDCameraHDF()
 {
-    DCAMERA_SYNC_TRACE;
+    DCAMERA_SYNC_TRACE(DCAMERA_LOAD_HDF);
     DHLOGI("load hdf driver start");
     int32_t ret = DCameraHdfOperate::GetInstance().LoadDcameraHDFImpl();
     if (ret != DCAMERA_OK) {
