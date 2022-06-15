@@ -237,7 +237,7 @@ int32_t DCameraSourceDev::ExecuteRegister(std::shared_ptr<DCameraRegistParam>& p
         return ret;
     }
 
-    sptr<IDCameraProvider> camHdiProvider = IDCameraProvider::Get();
+    sptr<IDCameraProvider> camHdiProvider = IDCameraProvider::Get(HDF_DCAMERA_EXT_SERVICE);
     if (camHdiProvider == nullptr) {
         DHLOGI("ExecuteRegister camHdiProvider is nullptr devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
             GetAnonyString(dhId_).c_str());
@@ -245,10 +245,10 @@ int32_t DCameraSourceDev::ExecuteRegister(std::shared_ptr<DCameraRegistParam>& p
         input_->UnInit();
         return DCAMERA_BAD_OPERATE;
     }
-    std::shared_ptr<DHBase> dhBase = std::make_shared<DHBase>();
-    dhBase->deviceId_ = param->devId_;
-    dhBase->dhId_ = param->dhId_;
-    DCamRetCode retHdi = camHdiProvider->EnableDCameraDevice(dhBase, param->param_, hdiCallback_);
+    DHBase dhBase;
+    dhBase.deviceId_ = param->devId_;
+    dhBase.dhId_ = param->dhId_;
+    int32_t retHdi = camHdiProvider->EnableDCameraDevice(dhBase, param->param_, hdiCallback_);
     DHLOGI("DCameraSourceDev Execute Register register hal, ret: %d, devId: %s dhId: %s", retHdi,
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     if (retHdi != SUCCESS) {
@@ -278,17 +278,17 @@ int32_t DCameraSourceDev::ExecuteUnRegister(std::shared_ptr<DCameraRegistParam>&
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     }
 
-    sptr<IDCameraProvider> camHdiProvider = IDCameraProvider::Get();
+    sptr<IDCameraProvider> camHdiProvider = IDCameraProvider::Get(HDF_DCAMERA_EXT_SERVICE);
     if (camHdiProvider == nullptr) {
         DHLOGI("ExecuteUnRegister camHdiProvider is nullptr devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
             GetAnonyString(dhId_).c_str());
         return DCAMERA_BAD_OPERATE;
     }
 
-    std::shared_ptr<DHBase> dhBase = std::make_shared<DHBase>();
-    dhBase->deviceId_ = param->devId_;
-    dhBase->dhId_ = param->dhId_;
-    DCamRetCode retHdi = camHdiProvider->DisableDCameraDevice(dhBase);
+    DHBase dhBase;
+    dhBase.deviceId_ = param->devId_;
+    dhBase.dhId_ = param->dhId_;
+    int32_t retHdi = camHdiProvider->DisableDCameraDevice(dhBase);
     DHLOGI("DCameraSourceDev Execute UnRegister unregister hal, ret: %d, devId: %s dhId: %s", retHdi,
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     if (retHdi != SUCCESS) {
@@ -436,8 +436,8 @@ int32_t DCameraSourceDev::ExecuteStartCapture(std::vector<std::shared_ptr<DCCapt
         for (auto settingIter = (*iter)->captureSettings_.begin(); settingIter != (*iter)->captureSettings_.end();
             settingIter++) {
             std::shared_ptr<DCameraSettings> setting = std::make_shared<DCameraSettings>();
-            setting->type_ = (*settingIter)->type_;
-            setting->value_ = (*settingIter)->value_;
+            setting->type_ = settingIter->type_;
+            setting->value_ = settingIter->value_;
             capture->captureSettings_.push_back(setting);
         }
         captures.push_back(capture);

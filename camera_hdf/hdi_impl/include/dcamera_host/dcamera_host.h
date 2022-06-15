@@ -17,16 +17,18 @@
 #define DISTRIBUTED_CAMERA_HOST_H
 
 #include "dcamera.h"
+#include "dcamera_base.h"
 #include "dcamera_device.h"
 #include "icamera_device.h"
 #include "icamera_host_callback.h"
 #include "icamera_device_callback.h"
+#include "v1_0/dcamera_types.h"
 
-#include <foundation/distributedhardware/distributed_camera/camera_hdf/interfaces/include/types.h>
 #include <drivers/peripheral/camera/interfaces/include/types.h>
 
 namespace OHOS {
 namespace DistributedHardware {
+using namespace OHOS::HDI::DistributedCamera::V1_0;
 class DCameraHost {
 public:
     DCameraHost() = default;
@@ -45,15 +47,15 @@ public:
                           OHOS::sptr<ICameraDevice> &pDevice);
     CamRetCode SetFlashlight(const std::string &cameraId,  bool &isEnable);
 
-    DCamRetCode AddDCameraDevice(const std::shared_ptr<DHBase> &dhBase, const std::string &abilityInfo,
-                                 const sptr<IDCameraProviderCallback> &callback);
-    DCamRetCode RemoveDCameraDevice(const std::shared_ptr<DHBase> &dhBase);
-    OHOS::sptr<DCameraDevice> GetDCameraDeviceByDHBase(const std::shared_ptr<DHBase> &dhBase);
-    void NotifyDCameraStatus(const std::shared_ptr<DHBase> &dhBase, int32_t result);
+    DCamRetCode AddDCameraDevice(const DHBase &dhBase, const std::string &abilityInfo,
+        const sptr<IDCameraProviderCallback> &callback);
+    DCamRetCode RemoveDCameraDevice(const DHBase &dhBase);
+    OHOS::sptr<DCameraDevice> GetDCameraDeviceByDHBase(const DHBase &dhBase);
+    void NotifyDCameraStatus(const DHBase &dhBase, int32_t result);
 
 private:
     bool IsCameraIdInvalid(const std::string &cameraId);
-    std::string GetCameraIdByDHBase(const std::shared_ptr<DHBase> &dhBase);
+    std::string GetCameraIdByDHBase(const DHBase &dhBase);
 
 private:
     class AutoRelease {
@@ -70,7 +72,7 @@ private:
     static std::shared_ptr<DCameraHost> instance_;
 
     OHOS::sptr<ICameraHostCallback> dCameraHostCallback_;
-    std::map<DHBase, std::string> dhBaseHashDCamIdMap_;
+    std::map<DCameraBase, std::string> dhBaseHashDCamIdMap_;
     std::map<std::string, OHOS::sptr<DCameraDevice>> dCameraDeviceMap_;
 };
 } // namespace DistributedHardware

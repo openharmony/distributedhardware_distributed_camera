@@ -25,10 +25,11 @@
 #include "camera_manager.h"
 #include "json/json.h"
 #include "single_instance.h"
-#include "types.h"
+#include "v1_0/dcamera_types.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+using namespace OHOS::HDI::DistributedCamera::V1_0;
 struct ConfigInfo {
     DCStreamType type;
     std::string formatKey;

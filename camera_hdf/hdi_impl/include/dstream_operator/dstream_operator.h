@@ -27,6 +27,8 @@
 #include "constants.h"
 #include "dcamera_steam.h"
 
+#include "json/json.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 using namespace std;
@@ -58,9 +60,9 @@ public:
     CamRetCode ChangeToOfflineStream(const std::vector<int>& streamIds, OHOS::sptr<IStreamOperatorCallback>& callback,
                                      OHOS::sptr<IOfflineStreamOperator>& offlineOperator) override;
 
-    DCamRetCode InitOutputConfigurations(const std::shared_ptr<DHBase> &dhBase, const std::string &abilityInfo);
-    DCamRetCode AcquireBuffer(int streamId, std::shared_ptr<DCameraBuffer> &buffer);
-    DCamRetCode ShutterBuffer(int streamId, const std::shared_ptr<DCameraBuffer> &buffer);
+    DCamRetCode InitOutputConfigurations(const DHBase &dhBase, const std::string &abilityInfo);
+    DCamRetCode AcquireBuffer(int streamId, DCameraBuffer &buffer);
+    DCamRetCode ShutterBuffer(int streamId, const DCameraBuffer &buffer);
     DCamRetCode SetCallBack(OHOS::sptr<IStreamOperatorCallback> const &callback);
     DCamRetCode SetDeviceCallback(function<void(ErrorType, int)> &errorCbk,
                                   function<void(uint64_t, std::shared_ptr<Camera::CameraMetadata>)> &resultCbk);
@@ -85,6 +87,9 @@ private:
         std::vector<std::shared_ptr<DCStreamInfo>> &srcStreamInfo);
     void SnapShotStreamOnCaptureEnded(int32_t captureId, int streamId);
     bool HasContinuousCaptureInfo(int captureId);
+    void ExtractStreamInfo(DCStreamInfo &dstStreamInfo, const std::shared_ptr<DCStreamInfo> &srcStreamInfo);
+    void ExtractCaptureInfo(std::vector<DCCaptureInfo> &captureInfos);
+    void ExtractCameraAttr(Json::Value &rootValue, std::set<int> &allFormats, std::vector<int> &photoFormats);
 
 private:
     std::shared_ptr<DMetadataProcessor> dMetadataProcessor_;
@@ -92,7 +97,7 @@ private:
     function<void(ErrorType, int)> errorCallback_;
     function<void(uint64_t, std::shared_ptr<Camera::CameraMetadata>)> resultCallback_;
 
-    std::shared_ptr<DHBase> dhBase_;
+    DHBase dhBase_;
     std::vector<DCEncodeType> dcSupportedCodecType_;
     std::map<DCSceneType, std::vector<int>> dcSupportedFormatMap_;
     std::map<int, std::vector<DCResolution>> dcSupportedResolutionMap_;

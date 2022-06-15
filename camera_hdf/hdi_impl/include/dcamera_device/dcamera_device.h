@@ -22,14 +22,14 @@
 #include "dmetadata_processor.h"
 #include "dstream_operator.h"
 #include "icamera_device_callback.h"
-#include "idistributed_camera_provider_callback.h"
 #include "types.h"
+#include "v1_0/id_camera_provider_callback.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 class DCameraDevice : public DCameraDeviceStub {
 public:
-    DCameraDevice(const std::shared_ptr<DHBase> &dhBase, const std::string &abilityInfo);
+    DCameraDevice(const DHBase &dhBase, const std::string &abilityInfo);
     DCameraDevice() = default;
     virtual ~DCameraDevice() = default;
     DCameraDevice(const DCameraDevice &other) = delete;
@@ -49,8 +49,8 @@ public:
 
     CamRetCode OpenDCamera(const OHOS::sptr<ICameraDeviceCallback> &callback);
     CamRetCode GetDCameraAbility(std::shared_ptr<CameraAbility> &ability);
-    DCamRetCode AcquireBuffer(int streamId, std::shared_ptr<DCameraBuffer> &buffer);
-    DCamRetCode ShutterBuffer(int streamId, const std::shared_ptr<DCameraBuffer> &buffer);
+    DCamRetCode AcquireBuffer(int streamId, DCameraBuffer &buffer);
+    DCamRetCode ShutterBuffer(int streamId, const DCameraBuffer &buffer);
     DCamRetCode OnSettingsResult(const std::shared_ptr<DCameraSettings> &result);
     DCamRetCode Notify(const std::shared_ptr<DCameraHDFEvent> &event);
     void SetProviderCallback(const OHOS::sptr<IDCameraProviderCallback> &callback);
@@ -61,13 +61,13 @@ public:
 private:
     void Init(const std::string &abilityInfo);
     DCamRetCode CreateDStreamOperator();
-    std::string GenerateCameraId(const std::shared_ptr<DHBase> &dhBase);
+    std::string GenerateCameraId(const DHBase &dhBase);
     void NotifyStartCaptureError();
     void NotifyCameraError(const std::shared_ptr<DCameraHDFEvent> &event);
 private:
     bool isOpened_;
     std::string dCameraId_;
-    std::shared_ptr<DHBase> dhBase_;
+    DHBase dhBase_;
     std::string dCameraAbilityInfo_;
     OHOS::sptr<ICameraDeviceCallback> dCameraDeviceCallback_;
     OHOS::sptr<IDCameraProviderCallback> dCameraProviderCallback_;

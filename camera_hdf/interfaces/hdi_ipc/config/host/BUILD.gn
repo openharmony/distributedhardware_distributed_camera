@@ -18,7 +18,6 @@ import(
 
 ohos_shared_library("distributed_camera_host_config") {
   include_dirs = [
-    "${distributedcamera_hdf_path}/interfaces/include",
     "${distributedcamera_hdf_path}/interfaces/hdi_ipc/server/host",
     "${distributedcamera_hdf_path}/interfaces/hdi_ipc/server/device",
     "${distributedcamera_hdf_path}/interfaces/hdi_ipc/server/operator",
@@ -39,6 +38,7 @@ ohos_shared_library("distributed_camera_host_config") {
     "${hdf_uhdf_path}/ipc/include",
     "${hdf_uhdf_path}/include/host",
     "//drivers/peripheral/camera/interfaces/metadata/include",
+    "//third_party/jsoncpp/include",
   ]
 
   sources = [ "dcamera_host_config.cpp" ]
@@ -47,6 +47,8 @@ ohos_shared_library("distributed_camera_host_config") {
     "${distributedcamera_hdf_path}/hdi_impl:distributed_camera_hdf",
     "//utils/native/base:utils",
   ]
+
+  public_deps = [ "//drivers/interface/distributed_camera/v1_0:libdistributed_camera_provider_stub_1.0" ]
 
   defines = [
     "HI_LOG_ENABLE",

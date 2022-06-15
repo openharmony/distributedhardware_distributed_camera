@@ -24,8 +24,11 @@
 #include "dimage_buffer.h"
 #include "surface.h"
 
+#include "v1_0/dcamera_types.h"
+
 namespace OHOS {
 namespace DistributedHardware {
+using namespace OHOS::HDI::DistributedCamera::V1_0;
 class DBufferManager {
 public:
     DBufferManager() = default;
@@ -41,9 +44,9 @@ public:
     RetCode RemoveBuffer(std::shared_ptr<DImageBuffer>& buffer);
     void NotifyStop(bool state);
     static RetCode SurfaceBufferToDImageBuffer(const OHOS::sptr<OHOS::SurfaceBuffer> &surfaceBuffer,
-                                                   const std::shared_ptr<DImageBuffer> &buffer);
+        const std::shared_ptr<DImageBuffer> &buffer);
     static RetCode DImageBufferToDCameraBuffer(const std::shared_ptr<DImageBuffer> &imageBuffer,
-                                                   std::shared_ptr<DCameraBuffer> &buffer);
+        DCameraBuffer &buffer);
     static uint64_t CameraUsageToGrallocUsage(const uint64_t cameraUsage);
     static uint32_t PixelFormatToDCameraFormat(const PixelFormat format);
 

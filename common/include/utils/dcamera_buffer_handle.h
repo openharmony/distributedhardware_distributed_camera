@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,24 +13,15 @@
  * limitations under the License.
  */
 
-#ifndef DISTRIBUTED_CAMERA_DEVICE_CALLBACK_CLIENT_STUB_H
-#define DISTRIBUTED_CAMERA_DEVICE_CALLBACK_CLIENT_STUB_H
+#ifndef OHOS_DCAMERA_BUFFER_HANDLE_H
+#define OHOS_DCAMERA_BUFFER_HANDLE_H
 
-#include "icamera_device_callback.h"
-#include "iremote_stub.h"
-#include "message_parcel.h"
-#include "parcel.h"
+#include "buffer_handle.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-using namespace OHOS::Camera;
-class DCameraDeviceCallbackStub : public IRemoteStub<ICameraDeviceCallback> {
-public:
-    virtual ~DCameraDeviceCallbackStub() = default;
-
-    int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
-                            MessageOption &option) override;
-};
+void* DCameraMemoryMap(const BufferHandle *buffer);
+void DCameraMemoryUnmap(BufferHandle *buffer);
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // DISTRIBUTED_CAMERA_DEVICE_CALLBACK_CLIENT_STUB_H
+#endif // OHOS_DCAMERA_BUFFER_HANDLE_H

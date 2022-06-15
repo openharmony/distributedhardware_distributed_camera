@@ -12,20 +12,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef OHOS_DCAMERA_BASE_H
+#define OHOS_DCAMERA_BASE_H
 
-#include "dcamera_device_callback.h"
-#include "distributed_hardware_log.h"
+#include <string>
 
 namespace OHOS {
 namespace DistributedHardware {
-void DCameraDeviceCallback::OnError(ErrorType type, int32_t errorMsg)
-{
-    DHLOGW("DCameraDeviceCallback::OnError enter.");
-}
+class DCameraBase {
+public:
+    DCameraBase() = default;
+    explicit DCameraBase(std::string deviceId, std::string dhId) : deviceId_(deviceId), dhId_(dhId) {}
+    ~DCameraBase() = default;
 
-void DCameraDeviceCallback::OnResult(uint64_t timestamp, const std::shared_ptr<Camera::CameraMetadata> &result)
-{
-    DHLOGW("DCameraDeviceCallback::OnResult enter.");
-}
+    bool operator == (const DCameraBase& index) const
+    {
+        return this->deviceId_ == index.deviceId_ && this->dhId_ == index.dhId_;
+    }
+
+    bool operator < (const DCameraBase& index) const
+    {
+        return (this->deviceId_ + this->dhId_) < (index.deviceId_ + index.dhId_);
+    }
+
+    std::string deviceId_;
+    std::string dhId_;
+};
 } // namespace DistributedHardware
 } // namespace OHOS
+#endif // OHOS_DCAMERA_BASE_H

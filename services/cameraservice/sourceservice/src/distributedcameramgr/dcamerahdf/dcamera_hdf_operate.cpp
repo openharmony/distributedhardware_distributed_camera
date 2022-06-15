@@ -20,7 +20,6 @@
 #include "anonymous_string.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
-#include "types.h"
 
 namespace OHOS {
 namespace DistributedHardware {

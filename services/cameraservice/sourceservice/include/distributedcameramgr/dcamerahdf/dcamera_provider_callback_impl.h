@@ -16,26 +16,24 @@
 #ifndef OHOS_DCAMERA_PROVIDER_CALLBACK_IMPL_H
 #define OHOS_DCAMERA_PROVIDER_CALLBACK_IMPL_H
 
-#include "dcamera_provider_callback.h"
+#include "v1_0/id_camera_provider_callback.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+using namespace OHOS::HDI::DistributedCamera::V1_0;
 class DCameraSourceDev;
-class DCameraProviderCallbackImpl : public DCameraProviderCallback {
+class DCameraProviderCallbackImpl : public IDCameraProviderCallback {
 public:
     DCameraProviderCallbackImpl(std::string devId, std::string dhId, std::shared_ptr<DCameraSourceDev>& sourceDev);
     ~DCameraProviderCallbackImpl();
 
-    DCamRetCode OpenSession(const std::shared_ptr<DHBase>& dhBase) override;
-    DCamRetCode CloseSession(const std::shared_ptr<DHBase>& dhBase) override;
-    DCamRetCode ConfigureStreams(const std::shared_ptr<DHBase>& dhBase,
-        const std::vector<std::shared_ptr<DCStreamInfo>>& streamInfos) override;
-    DCamRetCode ReleaseStreams(const std::shared_ptr<DHBase>& dhBase, const std::vector<int>& streamIds) override;
-    DCamRetCode StartCapture(const std::shared_ptr<DHBase>& dhBase,
-        const std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos) override;
-    DCamRetCode StopCapture(const std::shared_ptr<DHBase>& dhBase, const std::vector<int>& streamIds) override;
-    DCamRetCode UpdateSettings(const std::shared_ptr<DHBase>& dhBase,
-        const std::vector<std::shared_ptr<DCameraSettings>>& settings) override;
+    int32_t OpenSession(const DHBase& dhBase) override;
+    int32_t CloseSession(const DHBase& dhBase) override;
+    int32_t ConfigureStreams(const DHBase& dhBase, const std::vector<DCStreamInfo>& streamInfos) override;
+    int32_t ReleaseStreams(const DHBase& dhBase, const std::vector<int>& streamIds) override;
+    int32_t StartCapture(const DHBase& dhBase, const std::vector<DCCaptureInfo>& captureInfos) override;
+    int32_t StopCapture(const DHBase& dhBase, const std::vector<int>& streamIds) override;
+    int32_t UpdateSettings(const DHBase& dhBase, const std::vector<DCameraSettings>& settings) override;
 
 private:
     std::string devId_;

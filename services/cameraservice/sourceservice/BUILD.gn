@@ -42,8 +42,6 @@ ohos_shared_library("distributed_camera_source") {
     "${innerkits_path}/native_cpp/camera_source/include",
     "${innerkits_path}/native_cpp/camera_sink/include",
     "${innerkits_path}/native_cpp/camera_source/include/callback",
-    "${distributedcamera_hdf_path}/interfaces/include",
-    "${distributedcamera_hdf_path}/interfaces/hdi_ipc/client/provider",
     "${services_path}/cameraservice/base/include",
     "${services_path}/channel/include",
     "${services_path}/data_process/include/eventbus",
@@ -89,7 +87,6 @@ ohos_shared_library("distributed_camera_source") {
 
   deps = [
     "${common_path}:distributed_camera_utils",
-    "${distributedcamera_hdf_path}/interfaces/hdi_ipc/client:distributed_camera_hdf_client",
     "${fwk_utils_path}:distributedhardwareutils",
     "${services_path}/channel:distributed_camera_channel",
     "${services_path}/data_process:distributed_camera_data_process",
@@ -106,6 +103,7 @@ ohos_shared_library("distributed_camera_source") {
   external_deps = [
     "device_driver_framework:libhdf_utils",
     "device_driver_framework:libhdi",
+    "distributed_camera_device_driver_interface:libdistributed_camera_provider_proxy_1.0",
     "eventhandler:libeventhandler",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",

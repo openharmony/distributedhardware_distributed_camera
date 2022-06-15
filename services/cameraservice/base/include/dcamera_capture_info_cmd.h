@@ -18,10 +18,11 @@
 
 #include "distributed_camera_constants.h"
 #include "json/json.h"
-#include "types.h"
+#include "v1_0/dcamera_types.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+using namespace OHOS::HDI::DistributedCamera::V1_0;
 class DCameraCaptureInfo {
 public:
     int32_t width_;

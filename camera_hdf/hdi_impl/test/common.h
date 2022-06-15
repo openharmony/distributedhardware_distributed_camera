@@ -34,7 +34,6 @@
 #include "display_type.h"
 #include "distributed_hardware_log.h"
 #include "drivers/peripheral/camera/interfaces/include/types.h"
-#include "foundation/distributedhardware/distributed_camera/camera_hdf/interfaces/include/types.h"
 #include "icamera_device.h"
 #include "icamera_host.h"
 #include "idistributed_hardware_source.h"
@@ -51,9 +50,11 @@
 #include "dcamera_host_callback.h"
 #include "dcamera_host_proxy.h"
 #include "dstream_operator_callback.h"
+#include "v1_0/dcamera_types.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+using namespace OHOS::HDI::DistributedCamera::V1_0;
 class Test {
 public:
     void Init();

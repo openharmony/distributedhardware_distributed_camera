@@ -210,7 +210,7 @@ DCamRetCode DCameraStream::GetNextRequest()
         DHLOGE("Add buffer to buffer manager failed. [streamId = %d]", dcStreamInfo_->streamId_);
         return DCamRetCode::EXCEED_MAX_NUMBER;
     }
-    DHLOGI("Add new image buffer success: index = %d, fence = %d", imageBuffer->GetIndex(), fence);
+    DHLOGD("Add new image buffer success: index = %d, fence = %d", imageBuffer->GetIndex(), fence);
 
     auto itr = bufferConfigMap_.find(imageBuffer);
     if (itr == bufferConfigMap_.end()) {
@@ -221,7 +221,7 @@ DCamRetCode DCameraStream::GetNextRequest()
     return DCamRetCode::SUCCESS;
 }
 
-DCamRetCode DCameraStream::GetDCameraBuffer(shared_ptr<DCameraBuffer> &buffer)
+DCamRetCode DCameraStream::GetDCameraBuffer(DCameraBuffer &buffer)
 {
     DCamRetCode retCode = GetNextRequest();
     if (retCode != DCamRetCode::SUCCESS && retCode != DCamRetCode::EXCEED_MAX_NUMBER) {
@@ -242,28 +242,23 @@ DCamRetCode DCameraStream::GetDCameraBuffer(shared_ptr<DCameraBuffer> &buffer)
     }
     captureBufferCount_++;
 
-    DHLOGI("Get buffer success. address = %p, index = %d, size = %d", buffer->bufferHandle_->virAddr,
-        buffer->index_, buffer->size_);
+    DHLOGD("Get buffer success. address = %p, index = %d, size = %d", buffer.bufferHandle_->GetBufferHandle()->virAddr,
+        buffer.index_, buffer.size_);
     return DCamRetCode::SUCCESS;
 }
 
-DCamRetCode DCameraStream::ReturnDCameraBuffer(const shared_ptr<DCameraBuffer> &buffer)
+DCamRetCode DCameraStream::ReturnDCameraBuffer(const DCameraBuffer &buffer)
 {
-    if (buffer == nullptr) {
-        DHLOGE("result buffer is null. [streamId = %d]", dcStreamInfo_->streamId_);
-        return DCamRetCode::INVALID_ARGUMENT;
-    }
-
     shared_ptr<DImageBuffer> imageBuffer = nullptr;
     map<shared_ptr<DImageBuffer>, tuple<OHOS::sptr<OHOS::SurfaceBuffer>, int, int>>::iterator iter;
     for (iter = bufferConfigMap_.begin(); iter != bufferConfigMap_.end(); ++iter) {
-        if (buffer->index_ == iter->first->GetIndex()) {
+        if (buffer.index_ == iter->first->GetIndex()) {
             imageBuffer = iter->first;
             break;
         }
     }
     if (imageBuffer == nullptr) {
-        DHLOGE("Cannot found image buffer, buffer index = %d.", buffer->index_);
+        DHLOGE("Cannot found image buffer, buffer index = %d.", buffer.index_);
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
@@ -275,7 +270,7 @@ DCamRetCode DCameraStream::ReturnDCameraBuffer(const shared_ptr<DCameraBuffer> &
     auto bufCfg = bufferConfigMap_.find(imageBuffer);
     if (bufCfg == bufferConfigMap_.end()) {
         DHLOGE("Cannot get bufferConfig.");
-        return INVALID_ARGUMENT;
+        return DCamRetCode::INVALID_ARGUMENT;
     }
     auto surfaceBuffer = std::get<0>(bufCfg->second);
     int32_t fence = std::get<1>(bufCfg->second);

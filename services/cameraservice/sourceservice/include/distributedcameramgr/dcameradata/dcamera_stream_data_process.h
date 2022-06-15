@@ -23,12 +23,13 @@
 #include "icamera_source_data_process.h"
 #include "idata_process_pipeline.h"
 #include "image_common_type.h"
-#include "types.h"
+#include "v1_0/dcamera_types.h"
 
 #include "dcamera_stream_data_process_producer.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+using namespace OHOS::HDI::DistributedCamera::V1_0;
 class DCameraStreamDataProcess : public std::enable_shared_from_this<DCameraStreamDataProcess> {
 public:
     DCameraStreamDataProcess(std::string devId, std::string dhId, DCStreamType streamType);

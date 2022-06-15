@@ -26,7 +26,7 @@ std::shared_ptr<DImageBuffer> DBufferManager::AcquireBuffer()
     if (!idleList_.empty()) {
         auto it = idleList_.begin();
         busyList_.splice(busyList_.begin(), idleList_, it);
-        DHLOGI("Acquire buffer success, index = %d", (*it)->GetIndex());
+        DHLOGD("Acquire buffer success, index = %d", (*it)->GetIndex());
         return *it;
     }
     return nullptr;
@@ -140,7 +140,7 @@ uint32_t DBufferManager::PixelFormatToDCameraFormat(const PixelFormat format)
 }
 
 RetCode DBufferManager::DImageBufferToDCameraBuffer(const std::shared_ptr<DImageBuffer> &imageBuffer,
-    std::shared_ptr<DCameraBuffer> &buffer)
+    DCameraBuffer &buffer)
 {
     BufferHandle *bufHandle = imageBuffer->GetBufferHandle();
     if (bufHandle == nullptr) {
@@ -151,10 +151,9 @@ RetCode DBufferManager::DImageBufferToDCameraBuffer(const std::shared_ptr<DImage
         DHLOGE("Convert image surface buffer failed, BufferHandle is invalid.");
         return RC_ERROR;
     }
-    buffer->index_ = imageBuffer->GetIndex();
-    buffer->size_ = imageBuffer->GetSize();
-    buffer->bufferHandle_ = bufHandle;
-
+    buffer.index_ = imageBuffer->GetIndex();
+    buffer.size_ = imageBuffer->GetSize();
+    buffer.bufferHandle_ = new BufferHandleSequenceable(bufHandle);
     return RC_OK;
 }
 } // namespace DistributedHardware

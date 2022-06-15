@@ -42,7 +42,6 @@ ohos_shared_library("distributed_camera_handler") {
     "include",
     "${common_path}/include/constants",
     "${common_path}/include/utils",
-    "${distributedcamera_hdf_path}/interfaces/include",
     "${services_path}/cameraservice/cameraoperator/client/include/callback",
   ]
 
@@ -71,6 +70,7 @@ ohos_shared_library("distributed_camera_handler") {
   ]
 
   external_deps = [
+    "distributed_camera_device_driver_interface:libdistributed_camera_provider_proxy_1.0",
     "hiviewdfx_hilog_native:libhilog",
     "multimedia_media_standard:media_client",
   ]
