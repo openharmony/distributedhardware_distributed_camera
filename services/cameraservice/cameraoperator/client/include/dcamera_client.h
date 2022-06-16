@@ -57,6 +57,7 @@ private:
     int32_t StartVideoOutput();
     void SetQualityAndGpsLocation(const std::shared_ptr<Camera::CameraMetadata>& cameraMetadata,
         std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSettings);
+    void ReleasCaptureSession();
 
     bool isInit_;
     std::string cameraId_;
