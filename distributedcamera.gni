@@ -16,7 +16,7 @@ distributedcamera_path = "//foundation/distributedhardware/distributed_camera"
 distributedhardwarefwk_path =
     "//foundation/distributedhardware/distributed_hardware_fwk"
 
-hdf_framework_path = "//drivers/framework"
+hdf_framework_path = "//drivers/hdf_core/framework"
 
 camera_hdf_path = "//drivers/peripheral"
 

@@ -13,7 +13,5 @@
 
 group("camera_client_test") {
   testonly = true
-  deps = [
-    "common/cameraoperator:dcamera_client_test",
-  ]
+  deps = [ "common/cameraoperator:dcamera_client_test" ]
 }
