@@ -207,7 +207,7 @@ void DCameraClient::ReleasCaptureSession()
     int32_t ret = captureSession_->Stop();
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraClient::StopCapture captureSession stop failed, cameraId: %s, ret: %d",
-              GetAnonyString(cameraId_).c_str(), ret);
+               GetAnonyString(cameraId_).c_str(), ret);
     }
     DHLOGI("DCameraClient::StopCapture %s release captureSession", GetAnonyString(cameraId_).c_str());
     captureSession_->Release();
