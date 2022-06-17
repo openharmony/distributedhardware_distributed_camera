@@ -200,17 +200,18 @@ int32_t DCameraClient::StopCapture()
 
 void DCameraClient::ReleasCaptureSession()
 {
-    if (captureSession_ != nullptr) {
-        DHLOGI("DCameraClient::StopCapture %s stop captureSession", GetAnonyString(cameraId_).c_str());
-        int32_t ret = captureSession_->Stop();
-        if (ret != DCAMERA_OK) {
-            DHLOGE("DCameraClient::StopCapture captureSession stop failed, cameraId: %s, ret: %d",
-                   GetAnonyString(cameraId_).c_str(), ret);
-        }
-        DHLOGI("DCameraClient::StopCapture %s release captureSession", GetAnonyString(cameraId_).c_str());
-        captureSession_->Release();
-        captureSession_ = nullptr;
+    if (captureSession_ == nullptr) {
+        return;
     }
+    DHLOGI("DCameraClient::StopCapture %s stop captureSession", GetAnonyString(cameraId_).c_str());
+    int32_t ret = captureSession_->Stop();
+    if (ret != DCAMERA_OK) {
+        DHLOGE("DCameraClient::StopCapture captureSession stop failed, cameraId: %s, ret: %d",
+                GetAnonyString(cameraId_).c_str(), ret);
+    }
+    DHLOGI("DCameraClient::StopCapture %s release captureSession", GetAnonyString(cameraId_).c_str());
+    captureSession_->Release();
+    captureSession_ = nullptr;
 }
 
 int32_t DCameraClient::SetStateCallback(std::shared_ptr<StateCallback>& callback)
