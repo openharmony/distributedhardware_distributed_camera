@@ -146,17 +146,7 @@ int32_t DCameraClient::StartCapture(std::vector<std::shared_ptr<DCameraCaptureIn
 int32_t DCameraClient::StopCapture()
 {
     DHLOGI("DCameraClientCommon::StopCapture cameraId: %s", GetAnonyString(cameraId_).c_str());
-    if (captureSession_ != nullptr) {
-        DHLOGI("DCameraClientCommon::StopCapture %s stop captureSession", GetAnonyString(cameraId_).c_str());
-        int32_t ret = captureSession_->Stop();
-        if (ret != DCAMERA_OK) {
-            DHLOGE("DCameraClientCommon::StopCapture captureSession stop failed, cameraId: %s, ret: %d",
-                   GetAnonyString(cameraId_).c_str(), ret);
-        }
-        DHLOGI("DCameraClientCommon::StopCapture %s release captureSession", GetAnonyString(cameraId_).c_str());
-        captureSession_->Release();
-        captureSession_ = nullptr;
-    }
+    ReleasCaptureSession();
 
     if (cameraInput_ != nullptr) {
         DHLOGI("DCameraClientCommon::StopCapture %s release cameraInput", GetAnonyString(cameraId_).c_str());
@@ -192,6 +182,22 @@ int32_t DCameraClient::StopCapture()
     previewOutput_ = nullptr;
     DHLOGI("DCameraClientCommon::StopCapture %s success", GetAnonyString(cameraId_).c_str());
     return DCAMERA_OK;
+}
+
+void DCameraClient::ReleasCaptureSession()
+{
+    if (captureSession_ == nullptr) {
+        return;
+    }
+    DHLOGI("DCameraClientCommon::StopCapture %s stop captureSession", GetAnonyString(cameraId_).c_str());
+    int32_t ret = captureSession_->Stop();
+    if (ret != DCAMERA_OK) {
+        DHLOGE("DCameraClientCommon::StopCapture captureSession stop failed, cameraId: %s, ret: %d",
+               GetAnonyString(cameraId_).c_str(), ret);
+    }
+    DHLOGI("DCameraClientCommon::StopCapture %s release captureSession", GetAnonyString(cameraId_).c_str());
+    captureSession_->Release();
+    captureSession_ = nullptr;
 }
 
 int32_t DCameraClient::SetStateCallback(std::shared_ptr<StateCallback>& callback)

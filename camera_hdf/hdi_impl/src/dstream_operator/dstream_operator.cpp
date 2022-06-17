@@ -699,12 +699,7 @@ DCamRetCode DStreamOperator::NegotiateSuitableCaptureInfo(const std::shared_ptr<
     bool isStreaming)
 {
     std::vector<std::shared_ptr<DCStreamInfo>> srcStreamInfo;
-    for (auto &id : srcCaptureInfo->streamIds_) {
-        auto iter = dcStreamInfoMap_.find(id);
-        if (iter != dcStreamInfoMap_.end()) {
-            srcStreamInfo.push_back(iter->second);
-        }
-    }
+    SetSrcStreamInfo(srcCaptureInfo, srcStreamInfo);
     if (srcStreamInfo.empty()) {
         DHLOGE("Input source stream info vector is empty.");
         return DCamRetCode::INVALID_ARGUMENT;
@@ -749,6 +744,17 @@ DCamRetCode DStreamOperator::NegotiateSuitableCaptureInfo(const std::shared_ptr<
         cachedDCaptureInfoList_.push_back(appendCaptureInfo);
     }
     return SUCCESS;
+}
+
+void DStreamOperator::SetSrcStreamInfo(const std::shared_ptr<CaptureInfo>& srcCaptureInfo,
+    std::vector<std::shared_ptr<DCStreamInfo>>& srcStreamInfo)
+{
+    for (auto &id : srcCaptureInfo->streamIds_) {
+        auto iter = dcStreamInfoMap_.find(id);
+        if (iter != dcStreamInfoMap_.end()) {
+            srcStreamInfo.push_back(iter->second);
+        }
+    }
 }
 
 std::shared_ptr<DCCaptureInfo> DStreamOperator::BuildSuitableCaptureInfo(const shared_ptr<CaptureInfo>& srcCaptureInfo,
