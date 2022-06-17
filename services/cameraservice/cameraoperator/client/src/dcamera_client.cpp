@@ -477,11 +477,11 @@ void DCameraClient::SetQualityAndGpsLocation(const std::shared_ptr<Camera::Camer
         }
         DHLOGI("DCameraClient::SetQualityAndGpsLocation %s photo capture settings set "
             "gpsCoordinates[0]: %f, gpsCoordinates[1]: %f, gpsCoordinates[2]: %f",
-            GetAnonyString(cameraId_).c_str(), gpsCoordinates[0], gpsCoordinates[1], gpsCoordinates[2]);
+            GetAnonyString(cameraId_).c_str(), gpsCoordinates[0], gpsCoordinates[1], gpsCoordinates[2]); // 2:index
         std::unique_ptr<CameraStandard::Location> location = std::make_unique<CameraStandard::Location>();
         location->latitude = gpsCoordinates[0];
         location->longitude = gpsCoordinates[1];
-        location->altitude = gpsCoordinates[2];
+        location->altitude = gpsCoordinates[2]; // 2:inedx
         photoCaptureSettings->SetLocation(location);
     }
     return;
