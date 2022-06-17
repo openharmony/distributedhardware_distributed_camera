@@ -31,6 +31,10 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+const int32_t LATITUDE = 0;
+const int32_t LONGITUDE = 1;
+const int32_t ALTITUDE = 2;
+
 DCameraClient::DCameraClient(const std::string& dhId)
 {
     DHLOGI("DCameraClient Constructor dhId: %s", GetAnonyString(dhId).c_str());
@@ -476,12 +480,13 @@ void DCameraClient::SetQualityAndGpsLocation(const std::shared_ptr<Camera::Camer
             return;
         }
         DHLOGI("DCameraClient::SetQualityAndGpsLocation %s photo capture settings set "
-            "gpsCoordinates[0]: %f, gpsCoordinates[1]: %f, gpsCoordinates[2]: %f",
-            GetAnonyString(cameraId_).c_str(), gpsCoordinates[0], gpsCoordinates[1], gpsCoordinates[2]); // 2:index
+            "gpsCoordinates[LATITUDE]: %f, gpsCoordinates[LONGITUDE]: %f,  gpsCoordinates[ALTITUDE]: %f",
+            GetAnonyString(cameraId_).c_str(), gpsCoordinates[LATITUDE],
+            gpsCoordinates[LONGITUDE], gpsCoordinates[ALTITUDE]);
         std::unique_ptr<CameraStandard::Location> location = std::make_unique<CameraStandard::Location>();
-        location->latitude = gpsCoordinates[0];
-        location->longitude = gpsCoordinates[1];
-        location->altitude = gpsCoordinates[2]; // 2:inedx
+        location->latitude = gpsCoordinates[LATITUDE];
+        location->longitude = gpsCoordinates[LONGITUDE];
+        location->altitude = gpsCoordinates[ALTITUDE];
         photoCaptureSettings->SetLocation(location);
     }
     return;
