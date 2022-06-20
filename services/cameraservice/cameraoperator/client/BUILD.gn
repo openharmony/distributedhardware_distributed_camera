@@ -86,7 +86,7 @@ ohos_shared_library("distributed_camera_client") {
   ]
 
   external_deps = [
-    "distributed_camera_device_driver_interface:libdistributed_camera_provider_proxy_1.0",
+    "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "hiviewdfx_hilog_native:libhilog",
     "multimedia_media_standard:media_client",
   ]
