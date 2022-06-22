@@ -53,10 +53,10 @@ bool DcameraSinkHidumper::Dump(const std::vector<std::string>& args, std::string
 
     if (args.empty()) {
         ShowHelp(result);
-        return DCAMERA_OK;
+        return true;
     } else if (args.size() > 1) {
         ShowIllegalInfomation(result);
-        return DCAMERA_OK;
+        return true;
     }
 
     if (ProcessDump(args[0], result) != DCAMERA_OK) {
@@ -106,7 +106,7 @@ int32_t DcameraSinkHidumper::ProcessDump(const std::string& args, std::string& r
 int32_t DcameraSinkHidumper::GetLocalCameraNumber(std::string& result)
 {
     DHLOGI("GetLocalCameraNumber Dump.");
-    result.append("CameraNumber\n")
+    result.append("CameraNumber: ")
           .append(std::to_string(camDumpInfo_.camNumber));
     return DCAMERA_OK;
 }
@@ -126,7 +126,7 @@ int32_t DcameraSinkHidumper::GetOpenedCameraInfo(std::string& result)
 int32_t DcameraSinkHidumper::GetVersionInfo(std::string& result)
 {
     DHLOGI("GetVersionInfo Dump.");
-    result.append("CameraVersion\n")
+    result.append("CameraVersion: ")
           .append(camDumpInfo_.version);
     return DCAMERA_OK;
 }
@@ -136,12 +136,14 @@ void DcameraSinkHidumper::ShowHelp(std::string& result)
     DHLOGI("ShowHelp Dump.");
     result.append("Usage:dump  <command> [options]\n")
           .append("Description:\n")
-          .append("--version         ")
-          .append("dump camera version in the system\n")
-          .append("--camNum          ")
-          .append("dump local camera numbers in the system\n")
-          .append("--opened          ")
-          .append("dump the opened camera in the system\n");
+          .append("-h           ")
+          .append(": show help\n")
+          .append("--version    ")
+          .append(": dump camera version in the system\n")
+          .append("--camNum     ")
+          .append(": dump local camera numbers in the system\n")
+          .append("--opened     ")
+          .append(": dump the opened camera in the system\n");
 }
 
 int32_t DcameraSinkHidumper::ShowIllegalInfomation(std::string& result)

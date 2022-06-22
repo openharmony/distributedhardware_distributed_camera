@@ -66,10 +66,10 @@ bool DcameraSourceHidumper::Dump(const std::vector<std::string>& args, std::stri
 
     if (args.empty()) {
         ShowHelp(result);
-        return DCAMERA_OK;
+        return true;
     } else if (args.size() > 1) {
         ShowIllegalInfomation(result);
-        return DCAMERA_OK;
+        return true;
     }
 
     if (ProcessDump(args[0], result) != DCAMERA_OK) {
@@ -119,7 +119,7 @@ int32_t DcameraSourceHidumper::ProcessDump(const std::string& args, std::string&
 int32_t DcameraSourceHidumper::GetRegisteredInfo(std::string& result)
 {
     DHLOGI("GetRegisteredInfo Dump.");
-    result.append("CameraNumber\n")
+    result.append("CameraNumber: ")
           .append(std::to_string(camDumpInfo_.regNumber));
     return DCAMERA_OK;
 }
@@ -151,7 +151,7 @@ int32_t DcameraSourceHidumper::GetCurrentStateInfo(std::string& result)
 int32_t DcameraSourceHidumper::GetVersionInfo(std::string& result)
 {
     DHLOGI("GetVersionInfo Dump.");
-    result.append("CameraVersion\n")
+    result.append("CameraVersion: ")
           .append(camDumpInfo_.version);
     return DCAMERA_OK;
 }
@@ -161,12 +161,14 @@ void DcameraSourceHidumper::ShowHelp(std::string& result)
     DHLOGI("ShowHelp Dump.");
     result.append("Usage:dump  <command> [options]\n")
           .append("Description:\n")
-          .append("--version         ")
-          .append("dump camera version in the system\n")
-          .append("--registered      ")
-          .append("dump number of registered cameras in the system\n")
-          .append("--curState        ")
-          .append("dump current state of the camera in the system\n");
+          .append("-h           ")
+          .append(": show help\n")
+          .append("--version    ")
+          .append(": dump camera version in the system\n")
+          .append("--registered ")
+          .append(": dump number of registered cameras in the system\n")
+          .append("--curState   ")
+          .append(": dump current state of the camera in the system\n");
 }
 
 int32_t DcameraSourceHidumper::ShowIllegalInfomation(std::string& result)
