@@ -108,7 +108,7 @@ CamRetCode DStreamOperator::ReleaseStreams(const std::vector<int>& streamIds)
                 DHLOGE("Release distributed camera buffer queue for stream %d failed.", id);
                 return MapToExternalRetCode(ret);
             } else {
-                DHLOGI("Release distributed camera buffer queue for stream %d successs.", id);
+                DHLOGI("Release distributed camera buffer queue for stream %d success.", id);
             }
             stream = nullptr;
             halStreamMap_.erase(id);
