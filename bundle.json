@@ -41,7 +41,8 @@
                 "multimedia_camera_standard",
                 "multimedia_media_standard",
                 "hdf",
-                "hidl_adapter"
+                "hidl_adapter",
+                "drivers_interface_distributed_camera"
             ],
             "third_party":[
                 "jsoncpp",

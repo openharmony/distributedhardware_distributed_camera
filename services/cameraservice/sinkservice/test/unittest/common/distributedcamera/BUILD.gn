@@ -69,7 +69,7 @@ ohos_unittest("DistributedCameraSinkServiceTest") {
   ]
 
   external_deps = [
-    "distributed_camera_device_driver_interface:libdistributed_camera_provider_proxy_1.0",
+    "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
