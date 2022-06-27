@@ -250,8 +250,7 @@ DCamRetCode DCameraStream::GetDCameraBuffer(DCameraBuffer &buffer)
 DCamRetCode DCameraStream::ReturnDCameraBuffer(const DCameraBuffer &buffer)
 {
     shared_ptr<DImageBuffer> imageBuffer = nullptr;
-    map<shared_ptr<DImageBuffer>, tuple<OHOS::sptr<OHOS::SurfaceBuffer>, int, int>>::iterator iter;
-    for (iter = bufferConfigMap_.begin(); iter != bufferConfigMap_.end(); ++iter) {
+    for (auto iter = bufferConfigMap_.begin(); iter != bufferConfigMap_.end(); ++iter) {
         if (buffer.index_ == iter->first->GetIndex()) {
             imageBuffer = iter->first;
             break;
