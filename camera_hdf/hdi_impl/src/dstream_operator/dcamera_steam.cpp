@@ -250,8 +250,7 @@ DCamRetCode DCameraStream::GetDCameraBuffer(DCameraBuffer &buffer)
 DCamRetCode DCameraStream::ReturnDCameraBuffer(const DCameraBuffer &buffer)
 {
     shared_ptr<DImageBuffer> imageBuffer = nullptr;
-    map<shared_ptr<DImageBuffer>, tuple<OHOS::sptr<OHOS::SurfaceBuffer>, int, int>>::iterator iter;
-    for (iter = bufferConfigMap_.begin(); iter != bufferConfigMap_.end(); ++iter) {
+    for (auto iter = bufferConfigMap_.begin(); iter != bufferConfigMap_.end(); ++iter) {
         if (buffer.index_ == iter->first->GetIndex()) {
             imageBuffer = iter->first;
             break;
@@ -279,9 +278,14 @@ DCamRetCode DCameraStream::ReturnDCameraBuffer(const DCameraBuffer &buffer)
         .timestamp = 0
     };
     if (dcStreamProducer_ != nullptr) {
+        int64_t timeStamp = static_cast<int64_t>(GetCurrentLocalTimeStamp());
         if (dcStreamInfo_->intent_ == StreamIntent::VIDEO) {
             int32_t size = (dcStreamInfo_->width_) * (dcStreamInfo_->height_) * YUV_WIDTH_RATIO / YUV_HEIGHT_RATIO;
-            int64_t timeStamp = static_cast<int64_t>(GetCurrentLocalTimeStamp());
+            surfaceBuffer->GetExtraData()->ExtraSet("dataSize", size);
+            surfaceBuffer->GetExtraData()->ExtraSet("isKeyFrame", (int32_t)0);
+            surfaceBuffer->GetExtraData()->ExtraSet("timeStamp", timeStamp);
+        } else if (dcStreamInfo_->intent_ == StreamIntent::STILL_CAPTURE) {
+            int32_t size = buffer.size_;
             surfaceBuffer->GetExtraData()->ExtraSet("dataSize", size);
             surfaceBuffer->GetExtraData()->ExtraSet("isKeyFrame", (int32_t)0);
             surfaceBuffer->GetExtraData()->ExtraSet("timeStamp", timeStamp);

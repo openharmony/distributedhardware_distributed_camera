@@ -48,7 +48,11 @@ void DCameraPhotoSurfaceListener::OnBufferAvailable()
 
     do {
         char *address = static_cast<char *>(buffer->GetVirAddr());
-        int32_t size = static_cast<int32_t>(buffer->GetSize());
+        int32_t size = -1;
+        buffer->GetExtraData()->ExtraGet("dataSize", size);
+        if (size <= 0) {
+            size = static_cast<int32_t>(buffer->GetSize());
+        }
         if ((address == nullptr) || (size <= 0)) {
             DHLOGE("DCameraPhotoSurfaceListener invalid params, size: %d", size);
             break;
