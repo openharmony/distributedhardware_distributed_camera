@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -58,6 +58,7 @@ private:
     void SetQualityAndGpsLocation(const std::shared_ptr<Camera::CameraMetadata>& cameraMetadata,
         std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSettings);
     void ReleasCaptureSession();
+	int32_t CameraServiceErrorType(const int32_t errorType);
 
     bool isInit_;
     std::string cameraId_;

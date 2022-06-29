@@ -377,26 +377,15 @@ DCamRetCode DCameraDevice::Notify(const std::shared_ptr<DCameraHDFEvent> &event)
     }
     switch (event->result_) {
         case DCameraEventResult::DCAMERA_EVENT_CHANNEL_CONNECTED: {
-            {
-                unique_lock<mutex> lock(isOpenSessFailedlock_);
-                isOpenSessFailed_ = false;
-            }
-            openSessCV_.notify_one();
+            IsOpenSessFailedState(false);
             break;
         }
         case DCameraEventResult::DCAMERA_EVENT_OPEN_CHANNEL_ERROR: {
-            {
-                unique_lock<mutex> lock(isOpenSessFailedlock_);
-                isOpenSessFailed_ = true;
-            }
-            openSessCV_.notify_one();
+            IsOpenSessFailedState(true);
             break;
         }
         case DCameraEventResult::DCAMERA_EVENT_CHANNEL_DISCONNECTED: {
-            if (dCameraDeviceCallback_ != nullptr) {
-                dCameraDeviceCallback_->OnError(ErrorType::FATAL_ERROR, 0);
-                Close();
-            }
+            NotifyCameraError(ErrorType::DEVICE_DISCONNECT);
             break;
         }
         case DCameraEventResult::DCAMERA_EVENT_CONFIG_STREAMS_ERROR:
@@ -404,14 +393,35 @@ DCamRetCode DCameraDevice::Notify(const std::shared_ptr<DCameraHDFEvent> &event)
             NotifyStartCaptureError();
             break;
         }
-        case DCameraEventResult::DCAMERA_EVENT_CAMERA_ERROR: {
-            NotifyCameraError(event);
+        case DCameraEventResult::DCAMERA_EVENT_DEVICE_ERROR: {
+            NotifyCameraError(ErrorType::DRIVER_ERROR);
+            break;
+        }
+        case DCameraEventResult::DCAMERA_EVENT_DEVICE_PREEMPT: {
+            NotifyCameraError(ErrorType::DEVICE_PREEMPT);
+            break;
+        }
+        case DCameraEventResult::DCAMERA_EVENT_DEVICE_IN_USE: {
+            NotifyCameraError(ErrorType::DCAMERA_ERROR_DEVICE_IN_USE);
+            break;
+        }
+        case DCameraEventResult::DCAMERA_EVENT_NO_PERMISSION: {
+            NotifyCameraError(ErrorType::DCAMERA_ERROR_NO_PERMISSION);
             break;
         }
         default:
             break;
     }
     return SUCCESS;
+}
+
+void DCameraDevice::IsOpenSessFailedState(bool state)
+{
+    {
+        unique_lock<mutex> lock(isOpenSessFailedlock_);
+        isOpenSessFailed_ = state;
+    }
+    openSessCV_.notify_one();
 }
 
 void DCameraDevice::NotifyStartCaptureError()
@@ -429,14 +439,10 @@ void DCameraDevice::NotifyStartCaptureError()
     }
 }
 
-void DCameraDevice::NotifyCameraError(const std::shared_ptr<DCameraHDFEvent> &event)
+void DCameraDevice::NotifyCameraError(const ErrorType type)
 {
-    std::shared_ptr<DCameraHost> dCameraHost = DCameraHost::GetInstance();
-    if (dCameraHost != nullptr) {
-        dCameraHost->NotifyDCameraStatus(dhBase_, event->result_);
-    }
     if (dCameraDeviceCallback_ != nullptr) {
-        dCameraDeviceCallback_->OnError(ErrorType::REQUEST_TIMEOUT, 0);
+        dCameraDeviceCallback_->OnError(type, 0);
         Close();
     }
 }

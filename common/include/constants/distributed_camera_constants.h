@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -58,6 +58,10 @@ typedef enum {
     DCAMERA_EVENT_START_CAPTURE_ERROR = -6,
     DCAMERA_EVENT_STOP_CAPTURE_ERROR = -7,
     DCAMERA_EVENT_UPDATE_SETTINGS_ERROR = -8,
+    DCAMERA_EVENT_DEVICE_ERROR = -9,
+    DCAMERA_EVENT_DEVICE_PREEMPT = -10,
+    DCAMERA_EVENT_DEVICE_IN_USE = -11,
+    DCAMERA_EVENT_NO_PERMISSION = -12,
 } DCameraEventResult;
 
 typedef enum {

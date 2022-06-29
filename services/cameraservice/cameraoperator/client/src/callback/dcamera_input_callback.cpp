@@ -36,7 +36,7 @@ void DCameraInputCallback::OnError(const int32_t errorType, const int32_t errorM
 
     std::shared_ptr<DCameraEvent> event = std::make_shared<DCameraEvent>();
     event->eventType_ = DCAMERA_MESSAGE;
-    event->eventResult_ = DCAMERA_EVENT_CAMERA_ERROR;
+    event->eventResult_ = DCAMERA_EVENT_DEVICE_ERROR;
     callback_->OnStateChanged(event);
 }
 

@@ -17,6 +17,7 @@
 
 #include <securec.h>
 #include "anonymous_string.h"
+#include "camera_util.h"
 #include "camera_metadata_operator.h"
 #include "dcamera_input_callback.h"
 #include "dcamera_manager_callback.h"
@@ -152,7 +153,7 @@ int32_t DCameraClient::StartCapture(std::vector<std::shared_ptr<DCameraCaptureIn
         if (ret != DCAMERA_OK) {
             DHLOGE("DCameraClient::StartCapture config capture session failed, cameraId: %s, ret: %d",
                    GetAnonyString(cameraId_).c_str(), ret);
-            return ret;
+            return CameraServiceErrorType(ret);
         }
     }
 
@@ -163,11 +164,21 @@ int32_t DCameraClient::StartCapture(std::vector<std::shared_ptr<DCameraCaptureIn
         int32_t ret = StartCaptureInner(info);
         if (ret != DCAMERA_OK) {
             DHLOGE("DCameraClient::StartCapture failed, cameraId: %s, ret: %d", GetAnonyString(cameraId_).c_str(), ret);
-            return ret;
+            return CameraServiceErrorType(ret);
         }
     }
     DHLOGI("DCameraClient::StartCapture %s success", GetAnonyString(cameraId_).c_str());
     return DCAMERA_OK;
+}
+
+int32_t DCameraClient::CameraServiceErrorType(const int32_t errorType)
+{
+    if (errorType == CameraStandard::CamServiceError::CAMERA_ALLOC_ERROR) {
+        return DCAMERA_ALLOC_ERROR;
+    } else if (errorType == CameraStandard::CamServiceError::CAMERA_DEVICE_BUSY) {
+        return DCAMERA_DEVICE_BUSY;
+    }
+    return errorType;
 }
 
 int32_t DCameraClient::StopCapture()

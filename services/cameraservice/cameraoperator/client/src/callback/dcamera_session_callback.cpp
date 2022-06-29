@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,7 +34,7 @@ void DCameraSessionCallback::OnError(int32_t errorCode)
 
     std::shared_ptr<DCameraEvent> event = std::make_shared<DCameraEvent>();
     event->eventType_ = DCAMERA_MESSAGE;
-    event->eventResult_ = DCAMERA_EVENT_CAMERA_ERROR;
+    event->eventResult_ = DCAMERA_EVENT_DEVICE_ERROR;
     callback_->OnStateChanged(event);
 }
 } // namespace DistributedHardware

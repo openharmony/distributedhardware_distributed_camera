@@ -63,7 +63,8 @@ private:
     DCamRetCode CreateDStreamOperator();
     std::string GenerateCameraId(const DHBase &dhBase);
     void NotifyStartCaptureError();
-    void NotifyCameraError(const std::shared_ptr<DCameraHDFEvent> &event);
+    void NotifyCameraError(const ErrorType type);
+    void IsOpenSessFailedState(bool state);
 private:
     bool isOpened_;
     std::string dCameraId_;
