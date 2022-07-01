@@ -20,52 +20,96 @@ using namespace OHOS::Camera;
 using namespace OHOS::CameraStandard;
 using namespace OHOS::DistributedHardware;
 
+static sptr<Surface> g_photoSurface = nullptr;
+static sptr<Surface> g_previewSurface = nullptr;
+static sptr<Surface> g_videoSurface = nullptr;
+static sptr<CaptureOutput> g_photoOutput = nullptr;
+static sptr<CaptureOutput> g_previewOutput = nullptr;
+static sptr<CaptureOutput> g_videoOutput = nullptr;
+static std::shared_ptr<DCameraPhotoSurfaceListener> g_photoListener = nullptr;
+static std::shared_ptr<DCameraVideoSurfaceListener> g_previewListener = nullptr;
+static std::shared_ptr<DCameraVideoSurfaceListener> g_videoListener = nullptr;
+static std::shared_ptr<ResultCallback> g_photoResultCallback = nullptr;
+static std::shared_ptr<ResultCallback> g_previewResultCallback = nullptr;
+static std::shared_ptr<ResultCallback> g_videoResultCallback = nullptr;
+
 static sptr<CameraInfo> GetCameraInfo(sptr<CameraManager> cameraManager)
 {
     std::vector<sptr<CameraInfo>> cameraObjList = cameraManager->GetCameras();
     for (auto& info : cameraObjList) {
-        DHLOGI("Distributed Camera Demo: %s position: %d, camera type: %d, connection type: %d",
-            info->GetID().c_str(), info->GetPosition(), info->GetCameraType(), info->GetConnectionType());
+        DHLOGI("Distributed Camera Demo: %s, position: %d, camera type: %d, connection type: %d",
+            GetAnonyString(info->GetID()).c_str(), info->GetPosition(), info->GetCameraType(),
+            info->GetConnectionType());
     }
 
     return cameraObjList.back();
 }
 
-static void InitCaptureInfo(std::shared_ptr<DCameraCaptureInfo>& captureInfo)
+static void InitPhotoInfo(std::shared_ptr<DCameraCaptureInfo>& photoInfo)
 {
-    captureInfo->width_ = CAPTURE_WIDTH;
-    captureInfo->height_ = CAPTURE_HEIGTH;
-    captureInfo->format_ = 1;
+    photoInfo->width_ = CAPTURE_WIDTH;
+    photoInfo->height_ = CAPTURE_HEIGTH;
+    photoInfo->format_ = PHOTO_FORMAT;
 }
 
-static void SetPhotoSurface(sptr<Surface>& photoSurface, std::shared_ptr<DCameraCaptureInfo> photoInfo)
+static void InitPreviewInfo(std::shared_ptr<DCameraCaptureInfo>& previewInfo)
 {
-    std::shared_ptr<ResultCallback> photoResultCallback = std::make_shared<DCameraDemoPhotoResultCallback>();
-    photoSurface->SetDefaultWidthAndHeight(photoInfo->width_, photoInfo->height_);
-    photoSurface->SetUserData(CAMERA_SURFACE_FORMAT, std::to_string(photoInfo->format_));
-    std::shared_ptr<DCameraPhotoSurfaceListener> photoListener =
-        std::make_shared<DCameraPhotoSurfaceListener>(photoSurface, photoResultCallback);
-    photoSurface->RegisterConsumerListener((sptr<IBufferConsumerListener> &)photoListener);
+    previewInfo->width_ = CAPTURE_WIDTH;
+    previewInfo->height_ = CAPTURE_HEIGTH;
+    previewInfo->format_ = VIDEO_FORMAT;
 }
 
-static void SetPreviewSurface(sptr<Surface>& previewSurface, std::shared_ptr<DCameraCaptureInfo> previewInfo)
+static void InitVideoInfo(std::shared_ptr<DCameraCaptureInfo>& videoInfo)
 {
-    std::shared_ptr<ResultCallback> previewResultCallback = std::make_shared<DCameraDemoPreviewResultCallback>();
-    previewSurface->SetDefaultWidthAndHeight(previewInfo->width_, previewInfo->height_);
-    previewSurface->SetUserData(CAMERA_SURFACE_FORMAT, std::to_string(previewInfo->format_));
-    std::shared_ptr<DCameraVideoSurfaceListener> previewListener =
-        std::make_shared<DCameraVideoSurfaceListener>(previewSurface, previewResultCallback);
-    previewSurface->RegisterConsumerListener((sptr<IBufferConsumerListener> &)previewListener);
+    videoInfo->width_ = CAPTURE_WIDTH;
+    videoInfo->height_ = CAPTURE_HEIGTH;
+    videoInfo->format_ = VIDEO_FORMAT;
 }
 
-static void SetVideoSurface(sptr<Surface>& videoSurface, std::shared_ptr<DCameraCaptureInfo> videoInfo)
+static void SetPhotoOutput(sptr<CameraManager>& cameraManager, std::shared_ptr<DCameraCaptureInfo>& photoInfo,
+    std::shared_ptr<StateCallback>& stateCallback)
 {
-    std::shared_ptr<ResultCallback> videoResultCallback = std::make_shared<DCameraDemoVideoResultCallback>();
-    videoSurface->SetDefaultWidthAndHeight(videoInfo->width_, videoInfo->height_);
-    videoSurface->SetUserData(CAMERA_SURFACE_FORMAT, std::to_string(videoInfo->format_));
-    std::shared_ptr<DCameraVideoSurfaceListener> videoListener =
-        std::make_shared<DCameraVideoSurfaceListener>(videoSurface, videoResultCallback);
-    videoSurface->RegisterConsumerListener((sptr<IBufferConsumerListener> &)videoListener);
+    DHLOGI("Distributed Camera Demo: Create PhotoOutput, width = %d, height = %d, format = %d",
+        photoInfo->width_, photoInfo->height_, photoInfo->format_);
+    g_photoSurface = Surface::CreateSurfaceAsConsumer();
+    g_photoResultCallback = std::make_shared<DCameraDemoPhotoResultCallback>();
+    g_photoSurface->SetDefaultWidthAndHeight(photoInfo->width_, photoInfo->height_);
+    g_photoSurface->SetUserData(CAMERA_SURFACE_FORMAT, std::to_string(photoInfo->format_));
+    g_photoListener = std::make_shared<DCameraPhotoSurfaceListener>(g_photoSurface, g_photoResultCallback);
+    g_photoSurface->RegisterConsumerListener((sptr<IBufferConsumerListener> &)g_photoListener);
+    g_photoOutput = cameraManager->CreatePhotoOutput(g_photoSurface);
+    ((sptr<PhotoOutput> &)g_photoOutput)->SetCallback(std::make_shared<DemoDCameraPhotoCallback>(stateCallback));
+}
+
+static void SetPreviewOutput(sptr<CameraManager>& cameraManager, std::shared_ptr<DCameraCaptureInfo>& previewInfo,
+    std::shared_ptr<StateCallback>& stateCallback)
+{
+    DHLOGI("Distributed Camera Demo: Create PreviewOutput, width = %d, height = %d, format = %d",
+        previewInfo->width_, previewInfo->height_, previewInfo->format_);
+    g_previewSurface = Surface::CreateSurfaceAsConsumer();
+    g_previewResultCallback = std::make_shared<DCameraDemoPreviewResultCallback>();
+    g_previewSurface->SetDefaultWidthAndHeight(previewInfo->width_, previewInfo->height_);
+    g_previewSurface->SetUserData(CAMERA_SURFACE_FORMAT, std::to_string(previewInfo->format_));
+    g_previewListener = std::make_shared<DCameraVideoSurfaceListener>(g_previewSurface, g_previewResultCallback);
+    g_previewSurface->RegisterConsumerListener((sptr<IBufferConsumerListener> &)g_previewListener);
+    g_previewOutput = cameraManager->CreateCustomPreviewOutput(g_previewSurface,
+        previewInfo->width_, previewInfo->height_);
+    ((sptr<PreviewOutput> &)g_previewOutput)->SetCallback(std::make_shared<DemoDCameraPreviewCallback>(stateCallback));
+}
+
+static void SetVideoOutput(sptr<CameraManager>& cameraManager, std::shared_ptr<DCameraCaptureInfo>& videoInfo,
+    std::shared_ptr<StateCallback>& stateCallback)
+{
+    DHLOGI("Distributed Camera Demo: Create VideoOutput, width = %d, height = %d, format = %d",
+        videoInfo->width_, videoInfo->height_, videoInfo->format_);
+    g_videoSurface = Surface::CreateSurfaceAsConsumer();
+    g_videoResultCallback = std::make_shared<DCameraDemoVideoResultCallback>();
+    g_videoSurface->SetDefaultWidthAndHeight(videoInfo->width_, videoInfo->height_);
+    g_videoSurface->SetUserData(CAMERA_SURFACE_FORMAT, std::to_string(videoInfo->format_));
+    g_videoListener = std::make_shared<DCameraVideoSurfaceListener>(g_videoSurface, g_videoResultCallback);
+    g_videoSurface->RegisterConsumerListener((sptr<IBufferConsumerListener> &)g_videoListener);
+    g_videoOutput = cameraManager->CreateVideoOutput(g_videoSurface);
+    ((sptr<VideoOutput> &)g_videoOutput)->SetCallback(std::make_shared<DemoDCameraVideoCallback>(stateCallback));
 }
 
 static void SetCaptureSettings(std::shared_ptr<PhotoCaptureSetting>& photoCaptureSettings)
@@ -78,11 +122,10 @@ static void SetCaptureSettings(std::shared_ptr<PhotoCaptureSetting>& photoCaptur
     PhotoCaptureSetting::QualityLevel quality = PhotoCaptureSetting::QualityLevel::HIGH_QUALITY;
     photoCaptureSettings->SetQuality(quality);
     // gps coordinates
-    double gpsCoordinates[3] = { 33.52256, 56.32586, 22.665132 };
     std::unique_ptr<Location> location = std::make_unique<Location>();
-    location->latitude = gpsCoordinates[LATITUDE];
-    location->longitude = gpsCoordinates[LONGITUDE];
-    location->altitude = gpsCoordinates[ALTITUDE];
+    location->latitude = 22.306; // 22.306: latitude
+    location->longitude = 52.12; // 52.12:longitude
+    location->altitude = 2.365; // 2.365: altitude
     photoCaptureSettings->SetLocation(location);
 }
 
@@ -97,23 +140,22 @@ static void SetFocusAndExposure(sptr<CaptureInput>& cameraInput)
         DHLOGI("Distributed Camera Demo: biasRange.size(): %d", biasRange.size());
         exposureValue = biasRange[0];
     }
-    ((sptr<CameraInput> &)cameraInput)->SetFocusMode(focusMode); // 对焦模式
-    ((sptr<CameraInput> &)cameraInput)->SetExposureMode(exposureMode); // 曝光模式
-    ((sptr<CameraInput> &)cameraInput)->SetExposureBias(exposureValue); // 曝光补偿
+    ((sptr<CameraInput> &)cameraInput)->SetFocusMode(focusMode);
+    ((sptr<CameraInput> &)cameraInput)->SetExposureMode(exposureMode);
+    ((sptr<CameraInput> &)cameraInput)->SetExposureBias(exposureValue);
     ((sptr<CameraInput> &)cameraInput)->UnlockForControl();
 }
 
-int main() {
+int main()
+{
     DHLOGI("========== Distributed Camera Demo Start ==========");
     std::shared_ptr<StateCallback> stateCallback = std::make_shared<DCameraDemoStateCallback>();
 
-    DHLOGI("Distributed Camera Demo: Create CameraManager and CaptureSession");
     sptr<CameraManager> cameraManager = CameraManager::GetInstance();
-    cameraManager->SetCallback(std::make_shared<DCameraManagerCallback>());
+    cameraManager->SetCallback(std::make_shared<DemoDCameraManagerCallback>());
     sptr<CaptureSession> captureSession = cameraManager->CreateCaptureSession();
-    captureSession->SetCallback(std::make_shared<DCameraSessionCallback>(stateCallback));
+    captureSession->SetCallback(std::make_shared<DemoDCameraSessionCallback>(stateCallback));
 
-    DHLOGI("Distributed Camera Demo: Create CameraInfo and CaptureInput");
     sptr<CameraInfo> cameraInfo = GetCameraInfo(cameraManager);
     sptr<CaptureInput> cameraInput = cameraManager->CreateCameraInput(cameraInfo);
     std::shared_ptr<DemoDCameraInputCallback> inputCallback = std::make_shared<DemoDCameraInputCallback>(stateCallback);
@@ -121,43 +163,27 @@ int main() {
     ((sptr<CameraInput> &)cameraInput)->SetFocusCallback(inputCallback);
 
     std::shared_ptr<DCameraCaptureInfo> photoInfo = std::make_shared<DCameraCaptureInfo>();
-    InitCaptureInfo(photoInfo);
+    InitPhotoInfo(photoInfo);
 
     std::shared_ptr<DCameraCaptureInfo> previewInfo = std::make_shared<DCameraCaptureInfo>();
-    InitCaptureInfo(previewInfo);
+    InitPreviewInfo(previewInfo);
 
     std::shared_ptr<DCameraCaptureInfo> videoInfo = std::make_shared<DCameraCaptureInfo>();
-    InitCaptureInfo(videoInfo);
+    InitVideoInfo(videoInfo);
 
-    DHLOGI("Distributed Camera Demo: Create PhotoOutput, width = %d, height = %d, format = %d",
-        photoInfo->width_, photoInfo->height_, photoInfo->format_);
-    sptr<Surface> photoSurface = Surface::CreateSurfaceAsConsumer();
-    SetPhotoSurface(photoSurface, photoInfo);
-    sptr<CaptureOutput> photoOutput = cameraManager->CreatePhotoOutput(photoSurface);
-    ((sptr<PhotoOutput> &)photoOutput)->SetCallback(std::make_shared<DemoDCameraPhotoCallback>(stateCallback));
+    SetPhotoOutput(cameraManager, photoInfo, stateCallback);
 
     std::shared_ptr<PhotoCaptureSetting> photoCaptureSettings = std::make_shared<PhotoCaptureSetting>();
     SetCaptureSettings(photoCaptureSettings);
 
-    DHLOGI("Distributed Camera Demo: Create PreviewOutput, width = %d, height = %d, format = %d",
-        previewInfo->width_, previewInfo->height_, previewInfo->format_);
-    sptr<Surface> previewSurface = Surface::CreateSurfaceAsConsumer();
-    SetPreviewSurface(previewSurface, previewInfo);
-    sptr<CaptureOutput> previewOutput = cameraManager->CreateCustomPreviewOutput(previewSurface,
-        previewInfo->width_, previewInfo->height_);
-    ((sptr<PreviewOutput> &)previewOutput)->SetCallback(std::make_shared<DemoDCameraPreviewCallback>(stateCallback));
+    SetPreviewOutput(cameraManager, previewInfo, stateCallback);
 
-    DHLOGI("Distributed Camera Demo: Create VideoOutput, width = %d, height = %d, format = %d",
-        videoInfo->width_, videoInfo->height_, videoInfo->format_);
-    sptr<Surface> videoSurface = Surface::CreateSurfaceAsConsumer();
-    SetVideoSurface(videoSurface, videoInfo);
-    sptr<CaptureOutput> videoOutput = cameraManager->CreateVideoOutput(videoSurface);
-    ((sptr<VideoOutput> &)videoOutput)->SetCallback(std::make_shared<DemoDCameraVideoCallback>(stateCallback));
+    SetVideoOutput(cameraManager, videoInfo, stateCallback);
 
     captureSession->BeginConfig();
     captureSession->AddInput(cameraInput);
-    captureSession->AddOutput(photoOutput);
-    captureSession->AddOutput(previewOutput);
+    captureSession->AddOutput(g_photoOutput);
+    captureSession->AddOutput(g_previewOutput);
     captureSession->CommitConfig();
     captureSession->Start();
     sleep(SLEEP_FIVE_SECOND);
@@ -165,7 +191,7 @@ int main() {
     SetFocusAndExposure(cameraInput);
     sleep(SLEEP_FIVE_SECOND);
 
-    ((sptr<PhotoOutput> &)photoOutput)->Capture(photoCaptureSettings);
+    ((sptr<PhotoOutput> &)g_photoOutput)->Capture(photoCaptureSettings);
     sleep(SLEEP_TWENTY_SECOND);
 
     captureSession->Stop();

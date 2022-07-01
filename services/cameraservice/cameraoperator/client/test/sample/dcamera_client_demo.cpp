@@ -20,7 +20,9 @@ using namespace OHOS::Camera;
 using namespace OHOS::CameraStandard;
 using namespace OHOS::DistributedHardware;
 
-const std::map<camera_focus_state_t, FocusCallback::FocusState> METADATA_FOCUS_STATE_MAP = {
+namespace OHOS {
+namespace DistributedHardware {
+static const std::map<camera_focus_state_t, FocusCallback::FocusState> METADATA_FOCUS_STATE_MAP = {
     { OHOS_CAMERA_FOCUS_STATE_SCAN, FocusCallback::SCAN },
     { OHOS_CAMERA_FOCUS_STATE_FOCUSED, FocusCallback::FOCUSED },
     { OHOS_CAMERA_FOCUS_STATE_UNFOCUSED, FocusCallback::UNFOCUSED }
@@ -139,3 +141,5 @@ void DCameraDemoVideoResultCallback::OnVideoResult(std::shared_ptr<DataBuffer>& 
     close(fd);
     return;
 }
+} // namespace DistributedHardware
+} // namespace OHOS

@@ -23,39 +23,39 @@
 #include <unistd.h>
 
 #include "camera_device_ability_items.h"
+#include "camera_input.h"
+#include "camera_manager.h"
 #include "camera_metadata_info.h"
 #include "capture_input.h"
 #include "capture_output.h"
-
+#include "capture_session.h"
+#include "preview_output.h"
+#include "video_output.h"
 #include "anonymous_string.h"
-#include "dcamera_input_callback.h"
-#include "dcamera_manager_callback.h"
-#include "dcamera_photo_callback.h"
 #include "dcamera_photo_surface_listener.h"
-#include "dcamera_preview_callback.h"
-#include "dcamera_session_callback.h"
 #include "dcamera_utils_tools.h"
-#include "dcamera_video_callback.h"
 #include "dcamera_video_surface_listener.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
 #include "metadata_utils.h"
 
-static int32_t FILE_PERMISSIONS_FLAG = 00766;
-const uint32_t CAPTURE_WIDTH = 640;
-const uint32_t CAPTURE_HEIGTH = 480;
-const int32_t LATITUDE = 0;
-const int32_t LONGITUDE = 1;
-const int32_t ALTITUDE = 2;
-const int32_t SLEEP_FIVE_SECOND = 5;
-const int32_t SLEEP_TWENTY_SECOND = 20;
+constexpr int32_t FILE_PERMISSIONS_FLAG = 00766;
+constexpr uint32_t CAPTURE_WIDTH = 640;
+constexpr uint32_t CAPTURE_HEIGTH = 480;
+constexpr int32_t LATITUDE = 0;
+constexpr int32_t LONGITUDE = 1;
+constexpr int32_t ALTITUDE = 2;
+constexpr int32_t SLEEP_FIVE_SECOND = 5;
+constexpr int32_t SLEEP_TWENTY_SECOND = 20;
+constexpr int32_t PHOTO_FORMAT = 4;
+constexpr int32_t VIDEO_FORMAT = 3;
 
 namespace OHOS {
 namespace DistributedHardware {
 class DemoDCameraPhotoCallback : public CameraStandard::PhotoCallback {
 public:
-    DemoDCameraPhotoCallback(const std::shared_ptr<StateCallback>& callback): callback_(callback)
+    explicit DemoDCameraPhotoCallback(const std::shared_ptr<StateCallback>& callback): callback_(callback)
     {
     }
     void OnCaptureStarted(const int32_t captureID) const
@@ -81,16 +81,19 @@ private:
 
 class DemoDCameraPreviewCallback : public CameraStandard::PreviewCallback {
 public:
-    DemoDCameraPreviewCallback(const std::shared_ptr<StateCallback>& callback) : callback_(callback)
+    explicit DemoDCameraPreviewCallback(const std::shared_ptr<StateCallback>& callback) : callback_(callback)
     {
     }
-    void OnFrameStarted() const {
+    void OnFrameStarted() const
+    {
         DHLOGI("DemoDCameraPreviewCallback::OnFrameStarted.");
     }
-    void OnFrameEnded(const int32_t frameCount) const  {
+    void OnFrameEnded(const int32_t frameCount) const
+    {
         DHLOGI("DemoDCameraPreviewCallback::OnFrameEnded frameCount: %d", frameCount);
     }
-    void OnError(const int32_t errorCode) const {
+    void OnError(const int32_t errorCode) const
+    {
         DHLOGI("DemoDCameraPreviewCallback::OnError errorCode: %d", errorCode);
     }
 
@@ -100,16 +103,19 @@ private:
 
 class DemoDCameraVideoCallback : public CameraStandard::VideoCallback {
 public:
-    DemoDCameraVideoCallback(const std::shared_ptr<StateCallback>& callback) : callback_(callback)
+    explicit DemoDCameraVideoCallback(const std::shared_ptr<StateCallback>& callback) : callback_(callback)
     {
     }
-    void OnFrameStarted() const {
+    void OnFrameStarted() const
+    {
         DHLOGI("DemoDCameraVideoCallback::OnFrameStarted.");
     }
-    void OnFrameEnded(const int32_t frameCount) const  {
+    void OnFrameEnded(const int32_t frameCount) const
+    {
         DHLOGI("DemoDCameraVideoCallback::OnFrameEnded frameCount: %d", frameCount);
     }
-    void OnError(const int32_t errorCode) const {
+    void OnError(const int32_t errorCode) const
+    {
         DHLOGI("DemoDCameraVideoCallback::OnError errorCode: %d", errorCode);
     }
 
@@ -121,7 +127,6 @@ class DemoDCameraInputCallback : public CameraStandard::ErrorCallback, public Ca
 public:
     explicit DemoDCameraInputCallback(const std::shared_ptr<StateCallback>& callback) : callback_(callback)
     {
-
     }
     void OnError(const int32_t errorType, const int32_t errorMsg) const
     {
@@ -130,6 +135,31 @@ public:
     void OnFocusState(FocusState state)
     {
     }
+private:
+    std::shared_ptr<StateCallback> callback_;
+};
+
+class DemoDCameraManagerCallback : public CameraStandard::CameraManagerCallback {
+public:
+    void OnCameraStatusChanged(const CameraStandard::CameraStatusInfo &cameraStatusInfo) const
+    {
+    }
+    void OnFlashlightStatusChanged(const std::string &cameraID,
+        const CameraStandard::FlashlightStatus flashStatus) const
+    {
+    }
+};
+
+class DemoDCameraSessionCallback : public CameraStandard::SessionCallback {
+public:
+    explicit DemoDCameraSessionCallback(const std::shared_ptr<StateCallback>& callback) : callback_(callback)
+    {
+    }
+    void OnError(int32_t errorCode)
+    {
+        DHLOGI("DemoDCameraSessionCallback::OnError errorCode: %d", errorCode);
+    }
+
 private:
     std::shared_ptr<StateCallback> callback_;
 };
