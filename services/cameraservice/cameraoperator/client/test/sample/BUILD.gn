@@ -13,7 +13,8 @@
 
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
-import("//foundation/distributedhardware/distributed_camera/distributedcamera.gni")
+import(
+    "//foundation/distributedhardware/distributed_camera/distributedcamera.gni")
 
 config("module_private_config") {
   include_dirs = [
@@ -62,15 +63,15 @@ ohos_executable("dcamera_client_demo") {
   configs = [ ":module_private_config" ]
 
   deps = [
+    "${camerastandard_path}/frameworks/native/camera:camera_framework",
+    "${common_path}:distributed_camera_utils",
+    "${fwk_utils_path}:distributedhardwareutils",
+    "${graphicstandard_path}:libsurface",
+    "${services_path}/cameraservice/cameraoperator/client:distributed_camera_client",
+    "${services_path}/cameraservice/sinkservice:distributed_camera_sink",
+    "//drivers/peripheral/camera/interfaces/metadata:metadata",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
-    "${fwk_utils_path}:distributedhardwareutils",
-    "${common_path}:distributed_camera_utils",
-    "${graphicstandard_path}:libsurface",
-    "${camerastandard_path}/frameworks/native/camera:camera_framework",
-    "//drivers/peripheral/camera/interfaces/metadata:metadata",
-    "${services_path}/cameraservice/cameraoperator/client:distributed_camera_client",
-    "${services_path}/cameraservice/sinkservice:distributed_camera_sink"
   ]
 
   public_deps = [ "//drivers/interface/distributed_camera/v1_0:libdistributed_camera_provider_stub_1.0" ]
@@ -79,10 +80,10 @@ ohos_executable("dcamera_client_demo") {
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "multimedia_media_standard:media_client",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
     "startup_l2:syspara",
-    "multimedia_media_standard:media_client",
   ]
 
   defines = [
