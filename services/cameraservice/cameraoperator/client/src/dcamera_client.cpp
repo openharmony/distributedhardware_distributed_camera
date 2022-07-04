@@ -113,18 +113,14 @@ int32_t DCameraClient::UpdateSettings(std::vector<std::shared_ptr<DCameraSetting
                 std::shared_ptr<Camera::CameraMetadata> cameraMetadata =
                     Camera::MetadataUtils::DecodeFromString(metadataStr);
                 int32_t ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_CONTROL_FOCUS_MODE, &item);
-                if (ret != CAM_META_SUCCESS) {
-                    DHLOGE("DCameraClient::UpdateSettings camera metadata find focus mode failed, ret: %d", ret);
-                    return ret;
+                if (ret == CAM_META_SUCCESS) {
+                    DHLOGI("DCameraClient::UpdateSettings focus mode: %d", item.data.u8[0]);
                 }
-                DHLOGI("DCameraClient::UpdateSettings focus mode: %d", item.data.u8[0]);
 
                 ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_CONTROL_EXPOSURE_MODE, &item);
-                if (ret != CAM_META_SUCCESS) {
-                    DHLOGE("DCameraClient::UpdateSettings camera metadata find exposure mode failed, ret: %d", ret);
-                    return ret;
+                if (ret == CAM_META_SUCCESS) {
+                    DHLOGI("DCameraClient::UpdateSettings exposure mode: %d", item.data.u8[0]);
                 }
-                DHLOGI("DCameraClient::UpdateSettings exposure mode: %d", item.data.u8[0]);
 
                 ret = ((sptr<CameraStandard::CameraInput> &)cameraInput_)->SetCameraSettings(metadataStr);
                 if (ret != DCAMERA_OK) {
