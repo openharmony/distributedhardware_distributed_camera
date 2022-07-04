@@ -15,6 +15,7 @@
 
 #include "dcamera_input_callback.h"
 
+#include "camera_util.h"
 #include "dcamera_utils_tools.h"
 #include "distributed_camera_constants.h"
 #include "distributed_hardware_log.h"
@@ -36,7 +37,11 @@ void DCameraInputCallback::OnError(const int32_t errorType, const int32_t errorM
 
     std::shared_ptr<DCameraEvent> event = std::make_shared<DCameraEvent>();
     event->eventType_ = DCAMERA_MESSAGE;
-    event->eventResult_ = DCAMERA_EVENT_DEVICE_ERROR;
+    if (errorType == CameraStandard::CamServiceError::CAMERA_DEVICE_PREEMPTED) {
+        event->eventResult_ = DCAMERA_EVENT_DEVICE_PREEMPT;
+    } else {
+        event->eventResult_ = DCAMERA_EVENT_DEVICE_ERROR;
+    }
     callback_->OnStateChanged(event);
 }
 
