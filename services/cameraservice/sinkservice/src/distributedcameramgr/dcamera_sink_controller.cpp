@@ -310,7 +310,7 @@ void DCameraSinkController::OnStateChanged(std::shared_ptr<DCameraEvent>& event)
 {
     DHLOGI("DCameraSinkController::OnStateChanged dhId: %s, result: %d",
            GetAnonyString(dhId_).c_str(), event->eventResult_);
-    if (event->eventType_ == DCAMERA_EVENT_DEVICE_PREEMPT) {
+    if (event->eventResult_ == DCAMERA_EVENT_DEVICE_PREEMPT) {
         DCameraNotifyInner(DCAMERA_MESSAGE, DCAMERA_EVENT_DEVICE_PREEMPT, std::string("camera device preempted"));
     } else {
         DCameraNotifyInner(DCAMERA_MESSAGE, DCAMERA_EVENT_DEVICE_ERROR, std::string("camera error"));
