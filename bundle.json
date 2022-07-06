@@ -33,7 +33,7 @@
                 "eventhandler",
                 "multimedia_camera_standard",
                 "multimedia_media_standard",
-                "graphic_standard",
+                "graphic_graphic_2d",
                 "distributed_hardware_fwk",
                 "hdf_core",
                 "drivers_interface_distributed_camera",
