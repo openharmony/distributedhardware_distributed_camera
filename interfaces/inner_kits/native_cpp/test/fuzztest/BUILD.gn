@@ -15,10 +15,16 @@ group("fuzztest") {
   testonly = true
 
   deps = [
-    "dcamerasinkhandleripc_fuzzer:fuzztest",
-    "dcamerasinkloadcallback_fuzzer:fuzztest",
-    "dcamerasinkproxy_fuzzer:fuzztest",
-    "dcamerasourcehandleripc_fuzzer:fuzztest",
-    "dcamerasourceloadcallback_fuzzer:fuzztest",
+    "onsourcelocaldmsdied_fuzzer:fuzztest",
+    "sourcehandlerconfigdistributedhardware_fuzzer:fuzztest",
+    "sourcehandlerinitsource_fuzzer:fuzztest",
+    "sourcehandlerregisterdistributedhardware_fuzzer:fuzztest",
+    "sourcehandlerunregisterdistributedhardware_fuzzer:fuzztest",
+    "sourceonloadsystemabilityfail_fuzzer:fuzztest",
+    "sourceonloadsystemabilitysuccess_fuzzer:fuzztest",
+    "sourceproxydcameranotify_fuzzer:fuzztest",
+    "sourceproxyinitsource_fuzzer:fuzztest",
+    "sourceproxyregisterdistributedhardware_fuzzer:fuzztest",
+    "sourceproxyunregisterdistributedhardware_fuzzer:fuzztest",
   ]
 }
