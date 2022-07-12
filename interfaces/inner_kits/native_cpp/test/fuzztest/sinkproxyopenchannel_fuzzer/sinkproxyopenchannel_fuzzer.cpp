@@ -13,33 +13,34 @@
  * limitations under the License.
  */
 
-#include "sourceproxydcameranotify_fuzzer.h"
+#include "sinkproxyopenchannel_fuzzer.h"
 
-#include "dcamera_source_callback.h"
+#include <cstddef>
+#include <cstdint>
+
 #include "distributed_camera_constants.h"
-#include "distributed_camera_source_proxy.h"
+#include "distributed_camera_sink_proxy.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-void SourceProxyDCameraNotifyFuzzTest(const uint8_t* data, size_t size)
+void SinkProxyOpenChannelFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size <= 0)) {
         return;
     }
 
     std::string dhId(reinterpret_cast<const char*>(data), size);
-    std::string devId(reinterpret_cast<const char*>(data), size);
-    std::string events(reinterpret_cast<const char*>(data), size);
+    std::string openInfo(reinterpret_cast<const char*>(data), size);
 
     sptr<ISystemAbilityManager> samgr =
             SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID);
-    std::shared_ptr<DistributedCameraSourceProxy> dCSourceProxy =
-        std::make_shared<DistributedCameraSourceProxy>(remoteObject);
-    sptr<IDCameraSourceCallback> callback = new DCameraSourceCallback();
-    dCSourceProxy->DCameraNotify(devId, dhId, events);
+    sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID);
+    std::shared_ptr<DistributedCameraSinkProxy> dCSinkProxy =
+        std::make_shared<DistributedCameraSinkProxy>(remoteObject);
+
+    dCSinkProxy->OpenChannel(dhId, openInfo);
 }
 }
 }
@@ -48,7 +49,7 @@ void SourceProxyDCameraNotifyFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::SourceProxyDCameraNotifyFuzzTest(data, size);
+    OHOS::DistributedHardware::SinkProxyOpenChannelFuzzTest(data, size);
     return 0;
 }
 
