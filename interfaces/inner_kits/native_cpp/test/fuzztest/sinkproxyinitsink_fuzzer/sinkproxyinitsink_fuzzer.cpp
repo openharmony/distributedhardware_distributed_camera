@@ -13,32 +13,33 @@
  * limitations under the License.
  */
 
-#include "onsourcelocaldmsdied_fuzzer.h"
+#include "sinkproxyinitsink_fuzzer.h"
 
 #include <cstddef>
 #include <cstdint>
 
-#include "dcamera_source_handler.h"
-#include "dcamera_source_handler_ipc.h"
 #include "distributed_camera_constants.h"
+#include "distributed_camera_sink_proxy.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-void OnSourceLocalDmsDiedFuzzTest(const uint8_t* data, size_t size)
+void SinkProxyInitSinkFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < (sizeof(int32_t)))) {
+    if ((data == nullptr) || (size <= 0)) {
         return;
     }
 
-    int32_t saId = *(reinterpret_cast<const int32_t*>(data));
+    std::string param(reinterpret_cast<const char*>(data), size);
+
     sptr<ISystemAbilityManager> samgr =
             SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(saId);
-    wptr<IRemoteObject> remote (remoteObject);
+    sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID);
+    std::shared_ptr<DistributedCameraSinkProxy> dCSinkProxy =
+        std::make_shared<DistributedCameraSinkProxy>(remoteObject);
 
-    DCameraSourceHandlerIpc::GetInstance().OnSourceLocalDmsDied(remote);
+    dCSinkProxy->InitSink(param);
 }
 }
 }
@@ -47,6 +48,7 @@ void OnSourceLocalDmsDiedFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::OnSourceLocalDmsDiedFuzzTest(data, size);
+    OHOS::DistributedHardware::SinkProxyInitSinkFuzzTest(data, size);
     return 0;
 }
+

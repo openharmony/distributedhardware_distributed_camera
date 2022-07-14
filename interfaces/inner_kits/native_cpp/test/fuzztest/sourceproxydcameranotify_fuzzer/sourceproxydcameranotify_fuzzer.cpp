@@ -30,15 +30,8 @@ void SourceProxyDCameraNotifyFuzzTest(const uint8_t* data, size_t size)
     }
 
     std::string dhId(reinterpret_cast<const char*>(data), size);
-    std::string params(reinterpret_cast<const char*>(data), size);
     std::string devId(reinterpret_cast<const char*>(data), size);
-    std::string reqId(reinterpret_cast<const char*>(data), size);
     std::string events(reinterpret_cast<const char*>(data), size);
-    std::string version(reinterpret_cast<const char*>(data), size);
-    std::string attrs(reinterpret_cast<const char*>(data), size);
-    EnableParam param;
-    param.version = version;
-    param.attrs = attrs;
 
     sptr<ISystemAbilityManager> samgr =
             SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
