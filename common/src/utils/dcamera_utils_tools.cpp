@@ -15,6 +15,9 @@
 
 #include "dcamera_utils_tools.h"
 
+#include <chrono>
+#include <string>
+
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"

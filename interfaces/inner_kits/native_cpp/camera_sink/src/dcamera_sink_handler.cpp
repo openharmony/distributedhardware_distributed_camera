@@ -15,6 +15,10 @@
 
 #include "dcamera_sink_handler.h"
 
+#include <chrono>
+#include <new>
+#include <string>
+
 #include "anonymous_string.h"
 #include "dcamera_hisysevent_adapter.h"
 #include "dcamera_sink_handler_ipc.h"
@@ -24,6 +28,9 @@
 #include "distributed_hardware_log.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
+#include "idistributed_camera_sink.h"
+#include "isystem_ability_load_callback.h"
+#include "refbase.h"
 
 namespace OHOS {
 namespace DistributedHardware {

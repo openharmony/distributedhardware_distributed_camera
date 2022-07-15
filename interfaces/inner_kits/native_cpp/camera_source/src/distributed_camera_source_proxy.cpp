@@ -15,11 +15,12 @@
 
 #include "distributed_camera_source_proxy.h"
 
-#include "parcel.h"
-
 #include "anonymous_string.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
+#include "iremote_object.h"
+#include "message_option.h"
+#include "message_parcel.h"
 
 namespace OHOS {
 namespace DistributedHardware {

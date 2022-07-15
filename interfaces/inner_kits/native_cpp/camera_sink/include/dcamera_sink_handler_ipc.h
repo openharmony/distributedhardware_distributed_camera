@@ -16,8 +16,12 @@
 #ifndef OHOS_DCAMERA_SINK_HANDLER_IPC_H
 #define OHOS_DCAMERA_SINK_HANDLER_IPC_H
 
-#include "idistributed_camera_sink.h"
+#include <mutex>
+
 #include "single_instance.h"
+#include "iremote_object.h"
+#include "refbase.h"
+#include "idistributed_camera_sink.h"
 
 namespace OHOS {
 namespace DistributedHardware {

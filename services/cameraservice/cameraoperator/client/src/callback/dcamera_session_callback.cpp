@@ -17,6 +17,7 @@
 
 #include "distributed_camera_constants.h"
 #include "distributed_hardware_log.h"
+#include "dcamera_event_cmd.h"
 
 namespace OHOS {
 namespace DistributedHardware {

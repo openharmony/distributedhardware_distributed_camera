@@ -18,6 +18,9 @@
 
 #include "event.h"
 
+#include <memory>
+#include <string>
+
 #include "data_buffer.h"
 
 namespace OHOS {

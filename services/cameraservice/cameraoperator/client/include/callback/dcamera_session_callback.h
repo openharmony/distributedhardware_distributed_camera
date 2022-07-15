@@ -16,9 +16,11 @@
 #ifndef OHOS_DCAMERA_SESSION_CALLBACK_H
 #define OHOS_DCAMERA_SESSION_CALLBACK_H
 
-#include "capture_session.h"
+#include <cstdint>
+#include <memory>
 
 #include "icamera_operator.h"
+#include "capture_session.h"
 
 namespace OHOS {
 namespace DistributedHardware {

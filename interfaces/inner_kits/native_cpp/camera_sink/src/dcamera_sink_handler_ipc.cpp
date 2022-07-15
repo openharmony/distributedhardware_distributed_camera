@@ -15,13 +15,14 @@
 
 #include "dcamera_sink_handler_ipc.h"
 
+#include <cstdint>
+#include <new>
+
+#include "distributed_camera_constants.h"
+#include "distributed_hardware_log.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
-
-#include "anonymous_string.h"
-#include "distributed_camera_constants.h"
-#include "distributed_camera_errno.h"
-#include "distributed_hardware_log.h"
+#include "iremote_broker.h"
 
 namespace OHOS {
 namespace DistributedHardware {

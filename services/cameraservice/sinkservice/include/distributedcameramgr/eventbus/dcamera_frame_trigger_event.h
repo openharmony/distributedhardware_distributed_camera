@@ -16,6 +16,7 @@
 #ifndef OHOS_DCAMERA_FRAME_TRIGER_EVENT_H
 #define OHOS_DCAMERA_FRAME_TRIGER_EVENT_H
 
+#include <string>
 #include "event.h"
 
 namespace OHOS {

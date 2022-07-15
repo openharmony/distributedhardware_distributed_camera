@@ -16,6 +16,7 @@
 #ifndef OHOS_DCAMERA_HITRACE_ADAPTER_H
 #define OHOS_DCAMERA_HITRACE_ADAPTER_H
 
+#include <cstdint>
 #include <string>
 
 #include "hitrace_meter.h"

@@ -20,8 +20,9 @@
 #include "iremote_proxy.h"
 #include "iremote_broker.h"
 #include "refbase.h"
-
 #include "idistributed_camera_source.h"
+#include "idistributed_hardware_source.h"
+namespace OHOS { class IRemoteObject; }
 
 namespace OHOS {
 namespace DistributedHardware {

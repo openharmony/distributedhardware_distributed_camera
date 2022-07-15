@@ -19,6 +19,7 @@
 #include "dcamera_source_handler.h"
 #include "distributed_hardware_log.h"
 #include "distributed_camera_constants.h"
+namespace OHOS { class IRemoteObject; }
 
 namespace OHOS {
 namespace DistributedHardware {

@@ -16,7 +16,11 @@
 #ifndef OHOS_DCAMERA_SOURCE_HANDLER_IPC_H
 #define OHOS_DCAMERA_SOURCE_HANDLER_IPC_H
 
+#include <mutex>
+
 #include "idistributed_camera_source.h"
+#include "iremote_object.h"
+#include "refbase.h"
 #include "single_instance.h"
 
 namespace OHOS {

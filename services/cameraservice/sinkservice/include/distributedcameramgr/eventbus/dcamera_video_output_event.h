@@ -16,8 +16,9 @@
 #ifndef OHOS_DCAMERA_VIDEO_OUTPUT_EVENT_H
 #define OHOS_DCAMERA_VIDEO_OUTPUT_EVENT_H
 
-#include "event.h"
+#include <memory>
 
+#include "event.h"
 #include "data_buffer.h"
 
 namespace OHOS {

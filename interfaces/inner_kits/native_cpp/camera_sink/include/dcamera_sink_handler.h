@@ -16,6 +16,7 @@
 #ifndef OHOS_DCAMERA_SINK_HANDLER_H
 #define OHOS_DCAMERA_SINK_HANDLER_H
 
+#include <cstdint>
 #include <mutex>
 #include <condition_variable>
 

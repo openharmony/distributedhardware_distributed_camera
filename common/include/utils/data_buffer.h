@@ -18,6 +18,8 @@
 
 #include <map>
 #include <string>
+#include <cstddef>
+#include <cstdint>
 
 using std::string;
 using std::map;

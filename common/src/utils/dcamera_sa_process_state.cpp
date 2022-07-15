@@ -16,6 +16,7 @@
 #include "dcamera_sa_process_state.h"
 
 #include <mutex>
+#include <cstdlib>
 
 #include "distributed_hardware_log.h"
 

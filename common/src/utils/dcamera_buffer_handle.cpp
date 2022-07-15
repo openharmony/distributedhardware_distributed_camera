@@ -16,6 +16,8 @@
 #include "dcamera_buffer_handle.h"
 
 #include <cerrno>
+#include <cstddef>
+#include <string>
 #include <sys/mman.h>
 
 #include "buffer_handle_utils.h"

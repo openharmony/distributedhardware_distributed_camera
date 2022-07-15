@@ -18,7 +18,6 @@
 
 #include <cstdint>
 #include <string>
-#include <chrono>
 
 namespace OHOS {
 namespace DistributedHardware {

@@ -14,7 +14,6 @@
  */
 
 #include "dcamera_hitrace_adapter.h"
-#include "distributed_hardware_log.h"
 
 namespace OHOS {
 namespace DistributedHardware {

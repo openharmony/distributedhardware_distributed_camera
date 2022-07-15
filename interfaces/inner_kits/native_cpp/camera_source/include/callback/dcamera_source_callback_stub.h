@@ -16,10 +16,14 @@
 #ifndef OHOS_DCAMERA_SOURCE_CALLBACK_STUB_H
 #define OHOS_DCAMERA_SOURCE_CALLBACK_STUB_H
 
+#include <cstdint>
 #include <map>
-#include "iremote_stub.h"
 
+#include "iremote_stub.h"
 #include "idcamera_source_callback.h"
+#include "refbase.h"
+namespace OHOS { class MessageOption; }
+namespace OHOS { class MessageParcel; }
 
 namespace OHOS {
 namespace DistributedHardware {

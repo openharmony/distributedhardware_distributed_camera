@@ -16,6 +16,10 @@
 #include "dcamera_source_callback_stub.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
+#include "ipc_object_stub.h"
+#include "ipc_types.h"
+#include "message_parcel.h"
+namespace OHOS { class MessageOption; }
 
 namespace OHOS {
 namespace DistributedHardware {

@@ -16,9 +16,11 @@
 #ifndef OHOS_DCAMERA_PREVIEW_CALLBACK_H
 #define OHOS_DCAMERA_PREVIEW_CALLBACK_H
 
-#include "preview_output.h"
+#include <cstdint>
+#include <memory>
 
 #include "icamera_operator.h"
+#include "preview_output.h"
 
 namespace OHOS {
 namespace DistributedHardware {
