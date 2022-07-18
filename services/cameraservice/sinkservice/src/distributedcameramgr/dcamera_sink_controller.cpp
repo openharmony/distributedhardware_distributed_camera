@@ -248,7 +248,7 @@ int32_t DCameraSinkController::Init(std::vector<DCameraIndex>& indexs)
     }
 
     channel_ = std::make_shared<DCameraChannelSinkImpl>();
-    eventBus_ = std::make_shared<EventBus>();
+    eventBus_ = std::make_shared<EventBus>("SinkCtlHandler");
     DCameraFrameTriggerEvent triggerEvent(*this);
     DCameraPostAuthorizationEvent authEvent(*this);
     eventBus_->AddHandler<DCameraFrameTriggerEvent>(triggerEvent.GetType(), *this);

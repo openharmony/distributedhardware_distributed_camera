@@ -83,7 +83,7 @@ bool DCameraPipelineSource::IsInRange(const VideoConfigParams& curConfig)
 void DCameraPipelineSource::InitDCameraPipEvent()
 {
     DHLOGD("Init source DCamera pipeline event to asynchronously process data.");
-    eventBusSource_ = std::make_shared<EventBus>();
+    eventBusSource_ = std::make_shared<EventBus>("PipelineSrcHandler");
     DCameraPipelineEvent pipelineEvent(*this, std::make_shared<PipelineConfig>());
     eventBusSource_->AddHandler<DCameraPipelineEvent>(pipelineEvent.GetType(), *this);
 }

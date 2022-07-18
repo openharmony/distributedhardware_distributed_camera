@@ -29,7 +29,7 @@ DCameraSinkDataProcess::DCameraSinkDataProcess(const std::string& dhId, std::sha
     : dhId_(dhId), channel_(channel)
 {
     DHLOGI("DCameraSinkDataProcess Constructor dhId: %s", GetAnonyString(dhId_).c_str());
-    eventBus_ = std::make_shared<EventBus>();
+    eventBus_ = std::make_shared<EventBus>("SinkDPHandler");
     DCameraPhotoOutputEvent photoEvent(*this);
     DCameraVideoOutputEvent videoEvent(*this);
     eventBus_->AddHandler<DCameraPhotoOutputEvent>(photoEvent.GetType(), *this);

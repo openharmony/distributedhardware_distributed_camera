@@ -76,7 +76,7 @@ int32_t DCameraSourceDev::InitDCameraSourceDev()
 {
     DHLOGI("DCameraSourceDev InitDCameraSourceDev devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
-    eventBus_ = std::make_shared<EventBus>();
+    eventBus_ = std::make_shared<EventBus>("SrcDevHandler");
     DCameraSourceEvent event(*this);
     eventBus_->AddHandler<DCameraSourceEvent>(event.GetType(), *this);
     auto cameraSourceDev = std::shared_ptr<DCameraSourceDev>(shared_from_this());

@@ -91,7 +91,7 @@ bool DecodeDataProcess::IsConvertible(const VideoConfigParams& sourceConfig, con
 void DecodeDataProcess::InitCodecEvent()
 {
     DHLOGD("Init DecodeNode eventBus, and add handler for it.");
-    eventBusDecode_ = std::make_shared<EventBus>();
+    eventBusDecode_ = std::make_shared<EventBus>("DeDtProcHandler");
     DCameraCodecEvent codecEvent(*this, std::make_shared<CodecPacket>());
     eventBusRegHandleDecode_ = eventBusDecode_->AddHandler<DCameraCodecEvent>(codecEvent.GetType(), *this);
 
