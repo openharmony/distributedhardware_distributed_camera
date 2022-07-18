@@ -44,7 +44,8 @@ public:
     int32_t UnLoadDcameraHDFImpl();
 
 private:
-    int32_t WaitLoadService(const uint16_t& servStatus, const std::string& servName);
+    int32_t WaitLoadCameraService();
+    int32_t WaitLoadProviderService();
 
 private:
     OHOS::sptr<IDeviceManager> devmgr_;
