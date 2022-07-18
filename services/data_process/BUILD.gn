@@ -18,6 +18,7 @@ import(
 
 ohos_shared_library("distributed_camera_data_process") {
   include_dirs = [
+    "//third_party/ffmpeg/",
     "//utils/native/base/include",
     "//utils/system/safwk/native/include",
     "//foundation/graphic/graphic_2d/interfaces/innerkits/common",
@@ -40,6 +41,7 @@ ohos_shared_library("distributed_camera_data_process") {
     "include/pipeline_node/multimedia_codec/encoder",
     "include/pipeline_node/colorspace_conversion",
     "include/pipeline_node/fpscontroller",
+    "include/pipeline_node/scale_conversion",
     "${common_path}/include/constants",
     "${common_path}/include/utils",
     "${innerkits_path}/native_cpp/camera_source/include",
@@ -54,6 +56,7 @@ ohos_shared_library("distributed_camera_data_process") {
     "src/pipeline_node/multimedia_codec/decoder/decode_surface_listener.cpp",
     "src/pipeline_node/multimedia_codec/decoder/decode_video_callback.cpp",
     "src/pipeline_node/multimedia_codec/encoder/encode_video_callback.cpp",
+    "src/pipeline_node/scale_conversion/scale_convert_process.cpp",
     "src/utils/image_common_type.cpp",
   ]
 
@@ -88,6 +91,8 @@ ohos_shared_library("distributed_camera_data_process") {
     "hiviewdfx_hilog_native:libhilog",
     "multimedia_player_framework:media_client",
   ]
+
+  public_deps = [ "//third_party/ffmpeg:libohosffmpeg" ]
 
   subsystem_name = "distributedhardware"
 

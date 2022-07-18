@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -171,7 +171,19 @@ int32_t DCameraSourceDataProcess::StopCapture(std::vector<int32_t>& streamIds)
     for (auto iter = streamProcess_.begin(); iter != streamProcess_.end(); iter++) {
         (*iter)->StopCapture(streamIdSet);
     }
+    if ((streamType_ == CONTINUOUS_FRAME) && (GetProducerSize() == 0)) {
+        DestroyPipeline();
+    }
     return DCAMERA_OK;
+}
+
+void DCameraSourceDataProcess::DestroyPipeline()
+{
+    DHLOGI("DCameraSourceDataProcess DestroyPipeline devId %s dhId %s streamType: %d", GetAnonyString(devId_).c_str(),
+        GetAnonyString(dhId_).c_str(), streamType_);
+    for (auto iter = streamProcess_.begin(); iter != streamProcess_.end(); iter++) {
+        (*iter)->DestroyPipeline();
+    }
 }
 
 int32_t DCameraSourceDataProcess::GetProducerSize()
