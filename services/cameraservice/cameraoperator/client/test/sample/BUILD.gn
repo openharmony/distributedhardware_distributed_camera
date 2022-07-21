@@ -20,7 +20,7 @@ config("module_private_config") {
   include_dirs = [
     "//drivers/peripheral/camera/interfaces/metadata/include",
     "//third_party/jsoncpp/include",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//utils/system/safwk/native/include",
     "${graphicstandard_path}/frameworks/surface/include",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include",
@@ -66,10 +66,10 @@ ohos_executable("dcamera_client_demo") {
     "${services_path}/cameraservice/sinkservice:distributed_camera_sink",
     "//drivers/peripheral/camera/interfaces/metadata:metadata",
     "//third_party/jsoncpp:jsoncpp",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
+    "c_utils:utils",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "hiviewdfx_hilog_native:libhilog",
     "multimedia_player_framework:media_client",

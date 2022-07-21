@@ -18,7 +18,7 @@ import(
 
 ohos_shared_library("distributed_camera_source") {
   include_dirs = [
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//utils/system/safwk/native/include",
     "${fwk_common_path}/log/include",
     "${fwk_common_path}/utils/include",
@@ -91,7 +91,6 @@ ohos_shared_library("distributed_camera_source") {
     "${services_path}/channel:distributed_camera_channel",
     "${services_path}/data_process:distributed_camera_data_process",
     "//third_party/jsoncpp:jsoncpp",
-    "//utils/native/base:utils",
   ]
 
   defines = [
@@ -101,6 +100,7 @@ ohos_shared_library("distributed_camera_source") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "eventhandler:libeventhandler",
     "hdf_core:libhdf_utils",

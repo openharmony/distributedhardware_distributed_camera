@@ -17,7 +17,7 @@ import(
 
 ohos_shared_library("distributed_camera_sink_sdk") {
   include_dirs = [
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//utils/system/safwk/native/include",
     "${fwk_utils_path}/include/log",
     "${fwk_utils_path}/include",
@@ -41,7 +41,6 @@ ohos_shared_library("distributed_camera_sink_sdk") {
   deps = [
     "${common_path}:distributed_camera_utils",
     "${fwk_utils_path}:distributedhardwareutils",
-    "//utils/native/base:utils",
   ]
 
   defines = [
@@ -51,6 +50,7 @@ ohos_shared_library("distributed_camera_sink_sdk") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "samgr_standard:samgr_proxy",

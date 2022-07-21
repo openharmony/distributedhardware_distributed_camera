@@ -50,7 +50,6 @@ ohos_fuzztest("SourceHandlerConfigDistributedHardwareFuzzTest") {
     "${fwk_services_path}/distributedhardwarefwkserviceimpl/:distributedhardwarefwksvr_impl",
     "${fwk_utils_path}:distributedhardwareutils",
     "${innerkits_path}/native_cpp/camera_source:distributed_camera_source_sdk",
-    "//utils/native/base:utils",
   ]
 
   defines = [
@@ -60,6 +59,7 @@ ohos_fuzztest("SourceHandlerConfigDistributedHardwareFuzzTest") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
