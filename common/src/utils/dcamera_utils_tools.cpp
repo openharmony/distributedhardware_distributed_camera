@@ -99,7 +99,7 @@ std::string Base64Encode(const unsigned char *toEncode, unsigned int len)
         }
     }
 
-    if (i) {
+    if (i > 0) {
         uint32_t j = 0;
         for (j = i; j < sizeof(charArray3); j++) {
             charArray3[j] = '\0';
@@ -148,7 +148,7 @@ std::string Base64Decode(const std::string& basicString)
         }
     }
 
-    if (i) {
+    if (i > 0) {
         uint32_t j = 0;
         for (j = i; j < sizeof(charArray4); j++) {
             charArray4[j] = 0;

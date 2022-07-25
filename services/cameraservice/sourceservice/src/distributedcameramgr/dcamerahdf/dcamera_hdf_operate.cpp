@@ -71,7 +71,6 @@ int32_t DCameraHdfOperate::LoadDcameraHDFImpl()
         return DCAMERA_BAD_OPERATE;
     }
     if (WaitLoadCameraService() != DCAMERA_OK) {
-        DHLOGE("Wait load camera service failed!");
         return DCAMERA_BAD_OPERATE;
     }
 
@@ -81,7 +80,6 @@ int32_t DCameraHdfOperate::LoadDcameraHDFImpl()
         return DCAMERA_BAD_OPERATE;
     }
     if (WaitLoadProviderService() != DCAMERA_OK) {
-        DHLOGE("Wait load provider service failed!");
         return DCAMERA_BAD_OPERATE;
     }
 

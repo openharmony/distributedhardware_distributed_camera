@@ -70,11 +70,11 @@ private:
     constexpr static int32_t YUV_BYTES_PER_PIXEL = 3;
     constexpr static int32_t Y2UV_RATIO = 2;
 
-    uint8_t *srcData_[DATA_LEN];
-    uint8_t *dstData_[DATA_LEN];
-    int32_t srcLineSize_[DATA_LEN];
-    int32_t dstLineSize_[DATA_LEN];
-    int32_t dstBuffSize_;
+    uint8_t *srcData_[DATA_LEN] = { nullptr };
+    uint8_t *dstData_[DATA_LEN] = { nullptr };
+    int32_t srcLineSize_[DATA_LEN] = { 0 };
+    int32_t dstLineSize_[DATA_LEN] = { 0 };
+    int32_t dstBuffSize_ = 0;
     SwsContext *swsContext_ = nullptr;
     VideoConfigParams sourceConfig_;
     VideoConfigParams targetConfig_;
