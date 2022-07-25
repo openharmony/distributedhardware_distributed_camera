@@ -36,7 +36,7 @@ ohos_fuzztest("OnSourceLocalDmsDiedFuzzTest") {
     "${common_path}/include/constants",
     "${innerkits_path}/native_cpp/camera_source/include",
     "${innerkits_path}/native_cpp/camera_source/include/callback",
-    "${fwk_services_path}/distributedhardwarefwkserviceimpl/include/componentmanager",
+    "${fwk_services_path}/distributedhardwarefwkservice/include/componentmanager",
   ]
 
   cflags = [
