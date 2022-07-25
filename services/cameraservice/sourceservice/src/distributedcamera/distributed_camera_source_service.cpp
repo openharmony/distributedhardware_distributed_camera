@@ -136,9 +136,9 @@ int32_t DistributedCameraSourceService::RegisterDistributedHardware(const std::s
         }
         camerasMap_.emplace(camIndex, camDev);
     } else {
-        DHLOGI("DistributedCameraSourceService RegisterDistributedHardware exist devId: %s, dhId: %s, version: %s",
+        DHLOGE("DistributedCameraSourceService RegisterDistributedHardware exist devId: %s, dhId: %s, version: %s",
             GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), param.version.c_str());
-        camDev = iter->second;
+        return DCAMERA_ALREADY_EXISTS;
     }
 
     ret = camDev->RegisterDistributedHardware(devId, dhId, reqId, param.version, param.attrs);
