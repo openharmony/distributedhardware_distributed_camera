@@ -65,21 +65,21 @@ int32_t DCameraHdfOperate::LoadDcameraHDFImpl()
         return DCAMERA_BAD_VALUE;
     }
 
+    DHLOGI("Load camera service.");
     if (devmgr_->LoadDevice(CAMERA_SERVICE_NAME) != 0) {
         DHLOGE("Load camera service failed!");
         return DCAMERA_BAD_OPERATE;
     }
-    if (WaitLoadService(cameraServStatus_, CAMERA_SERVICE_NAME) != DCAMERA_OK) {
-        DHLOGE("Wait load camera service failed!");
+    if (WaitLoadCameraService() != DCAMERA_OK) {
         return DCAMERA_BAD_OPERATE;
     }
 
+    DHLOGI("Load provider service.");
     if (devmgr_->LoadDevice(PROVIDER_SERVICE_NAME) != 0) {
         DHLOGE("Load provider service failed!");
         return DCAMERA_BAD_OPERATE;
     }
-    if (WaitLoadService(providerServStatus_, PROVIDER_SERVICE_NAME) != DCAMERA_OK) {
-        DHLOGE("Wait load provider service failed!");
+    if (WaitLoadProviderService() != DCAMERA_OK) {
         return DCAMERA_BAD_OPERATE;
     }
 
@@ -89,15 +89,32 @@ int32_t DCameraHdfOperate::LoadDcameraHDFImpl()
     return DCAMERA_OK;
 }
 
-int32_t DCameraHdfOperate::WaitLoadService(const uint16_t& servStatus, const std::string& servName)
+int32_t DCameraHdfOperate::WaitLoadCameraService()
 {
+    DHLOGI("wait Load camera service.");
     std::unique_lock<std::mutex> lock(hdfOperateMutex_);
-    hdfOperateCon_.wait_for(lock, std::chrono::milliseconds(WAIT_TIME), [servStatus] {
-        return (servStatus == OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START);
+    hdfOperateCon_.wait_for(lock, std::chrono::milliseconds(WAIT_TIME), [this] {
+        return (this->cameraServStatus_ == OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START);
     });
 
-    if (servStatus != OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START) {
-        DHLOGE("wait load service %s failed, status %d", servName.c_str(), servStatus);
+    if (cameraServStatus_ != OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START) {
+        DHLOGE("wait load cameraService failed, status %d", cameraServStatus_);
+        return DCAMERA_BAD_OPERATE;
+    }
+
+    return DCAMERA_OK;
+}
+
+int32_t DCameraHdfOperate::WaitLoadProviderService()
+{
+    DHLOGI("wait Load provider service.");
+    std::unique_lock<std::mutex> lock(hdfOperateMutex_);
+    hdfOperateCon_.wait_for(lock, std::chrono::milliseconds(WAIT_TIME), [this] {
+        return (this->providerServStatus_ == OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START);
+    });
+
+    if (providerServStatus_ != OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START) {
+        DHLOGE("wait load providerService failed, status %d", providerServStatus_);
         return DCAMERA_BAD_OPERATE;
     }
 
