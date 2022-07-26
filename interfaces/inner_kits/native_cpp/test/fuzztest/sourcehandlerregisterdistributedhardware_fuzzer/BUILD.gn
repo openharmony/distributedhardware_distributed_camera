@@ -35,7 +35,7 @@ ohos_fuzztest("SourceHandlerRegisterDistributedHardwareFuzzTest") {
     "${common_path}/include/constants",
     "${innerkits_path}/native_cpp/camera_source/include",
     "${innerkits_path}/native_cpp/camera_source/include/callback",
-    "${fwk_services_path}/distributedhardwarefwkserviceimpl/include/componentmanager",
+    "${fwk_services_path}/distributedhardwarefwkservice/include/componentmanager",
   ]
 
   cflags = [
@@ -48,7 +48,7 @@ ohos_fuzztest("SourceHandlerRegisterDistributedHardwareFuzzTest") {
   sources = [ "sourcehandlerregisterdistributedhardware_fuzzer.cpp" ]
 
   deps = [
-    "${fwk_services_path}/distributedhardwarefwkserviceimpl/:distributedhardwarefwksvr_impl",
+    "${fwk_services_path}/distributedhardwarefwkservice/:distributedhardwarefwksvr",
     "${fwk_utils_path}:distributedhardwareutils",
     "${innerkits_path}/native_cpp/camera_source:distributed_camera_source_sdk",
     "//utils/native/base:utils",
