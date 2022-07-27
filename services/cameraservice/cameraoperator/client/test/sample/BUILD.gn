@@ -50,12 +50,18 @@ config("module_private_config") {
 ohos_executable("dcamera_client_demo") {
   install_enable = false
 
-  sources = [
-    "dcamera_client_demo.cpp",
-    "main.cpp",
-  ]
+  sources = [ "main.cpp" ]
 
   configs = [ ":module_private_config" ]
+
+  cflags = [
+    "-fPIC",
+    "-Wall",
+  ]
+
+  if (!distributed_camera_common) {
+    cflags += [ "-DPRODUCT_M40" ]
+  }
 
   deps = [
     "${camerastandard_path}/frameworks/native/camera:camera_framework",
@@ -80,6 +86,8 @@ ohos_executable("dcamera_client_demo") {
     "DH_LOG_TAG=\"DCameraClientDemo\"",
     "LOG_DOMAIN=0xD004100",
   ]
+
+  cflags_cc = cflags
 
   subsystem_name = "distributedhardware"
 
