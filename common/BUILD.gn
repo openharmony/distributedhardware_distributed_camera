@@ -35,7 +35,7 @@ ohos_shared_library("distributed_camera_utils") {
     "-Wall",
   ]
 
-  if ("${product_name}" == "m40") {
+  if (!distributed_camera_common) {
     cflags += [ "-DPRODUCT_M40" ]
   }
 
