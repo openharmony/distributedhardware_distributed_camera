@@ -20,7 +20,7 @@ module_out_path = "distributed_camera/dcamera_protocol_test"
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//utils/system/safwk/native/include",
     "//drivers/peripheral/base",
     "${fwk_common_path}/log/include",
@@ -52,10 +52,10 @@ ohos_unittest("DCameraProtocolTest") {
     "${services_path}/cameraservice/sourceservice:distributed_camera_source",
     "//third_party/googletest:gtest_main",
     "//third_party/jsoncpp:jsoncpp",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
+    "c_utils:utils",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "dsoftbus:softbus_client",
     "hiviewdfx_hilog_native:libhilog",

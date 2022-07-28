@@ -17,7 +17,7 @@ import(
 
 ohos_shared_library("distributed_camera_utils") {
   include_dirs = [
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//utils/system/safwk/native/include",
     "${fwk_common_path}/log/include",
     "${fwk_common_path}/utils/include/",
@@ -48,10 +48,7 @@ ohos_shared_library("distributed_camera_utils") {
     "src/utils/dcamera_utils_tools.cpp",
   ]
 
-  deps = [
-    "${fwk_utils_path}:distributedhardwareutils",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "${fwk_utils_path}:distributedhardwareutils" ]
 
   defines = [
     "HI_LOG_ENABLE",
@@ -60,6 +57,7 @@ ohos_shared_library("distributed_camera_utils") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "dsoftbus:softbus_client",
     "graphic_chipsetsdk:buffer_handle",
     "hisysevent_native:libhisysevent",

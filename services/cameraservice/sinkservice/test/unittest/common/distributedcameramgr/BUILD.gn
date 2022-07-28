@@ -81,10 +81,10 @@ ohos_unittest("DCameraSinkMgrTest") {
     "${services_path}/channel:distributed_camera_channel",
     "//drivers/peripheral/camera/interfaces/metadata:metadata",
     "//third_party/jsoncpp:jsoncpp",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
+    "c_utils:utils",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "eventhandler:libeventhandler",
     "ipc:ipc_core",

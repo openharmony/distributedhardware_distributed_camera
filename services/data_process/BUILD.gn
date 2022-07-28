@@ -19,7 +19,7 @@ import(
 ohos_shared_library("distributed_camera_data_process") {
   include_dirs = [
     "//third_party/ffmpeg/",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//utils/system/safwk/native/include",
     "//foundation/graphic/graphic_2d/interfaces/innerkits/common",
     "//foundation/graphic/graphic_2d/interfaces/innerkits/surface",
@@ -76,7 +76,6 @@ ohos_shared_library("distributed_camera_data_process") {
     "${common_path}:distributed_camera_utils",
     "${fwk_utils_path}:distributedhardwareutils",
     "//foundation/graphic/graphic_2d/frameworks/surface:surface",
-    "//utils/native/base:utils",
   ]
 
   defines = [
@@ -86,6 +85,7 @@ ohos_shared_library("distributed_camera_data_process") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "eventhandler:libeventhandler",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",

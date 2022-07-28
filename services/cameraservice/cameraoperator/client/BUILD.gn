@@ -21,7 +21,7 @@ ohos_shared_library("distributed_camera_client") {
     "${camera_hdf_path}/camera/interfaces/metadata/include",
     "${camera_hdf_path}/camera/interfaces/include",
     "${camera_hdf_path}/camera/interfaces/hdi_ipc",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//utils/system/safwk/native/include",
     "${graphicstandard_path}/frameworks/surface/include",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include",
@@ -78,7 +78,6 @@ ohos_shared_library("distributed_camera_client") {
     "${graphicstandard_path}:libsurface",
     "//drivers/peripheral/camera/interfaces/metadata:metadata",
     "//third_party/jsoncpp:jsoncpp",
-    "//utils/native/base:utils",
   ]
 
   defines = [
@@ -88,6 +87,7 @@ ohos_shared_library("distributed_camera_client") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "hiviewdfx_hilog_native:libhilog",
     "multimedia_player_framework:media_client",

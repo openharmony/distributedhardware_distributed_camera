@@ -25,7 +25,7 @@ ohos_fuzztest("OnSinkLocalDmsDiedFuzzTest") {
       "${innerkits_path}/native_cpp/test/fuzztest/onsinklocaldmsdied_fuzzer"
 
   include_dirs = [
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//utils/system/safwk/native/include",
     "${fwk_utils_path}/include/log",
     "${fwk_utils_path}/include",
@@ -52,7 +52,6 @@ ohos_fuzztest("OnSinkLocalDmsDiedFuzzTest") {
   deps = [
     "${fwk_utils_path}:distributedhardwareutils",
     "${innerkits_path}/native_cpp/camera_sink:distributed_camera_sink_sdk",
-    "//utils/native/base:utils",
   ]
 
   defines = [
@@ -62,6 +61,7 @@ ohos_fuzztest("OnSinkLocalDmsDiedFuzzTest") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
