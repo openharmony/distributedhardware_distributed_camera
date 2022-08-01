@@ -92,11 +92,6 @@ int32_t DCameraClient::UnInit()
 int32_t DCameraClient::UpdateSettings(std::vector<std::shared_ptr<DCameraSettings>>& settings)
 {
     DHLOGI("DCameraClientCommon::UpdateSettings cameraId: %s", GetAnonyString(cameraId_).c_str());
-    if (cameraInput_ == nullptr) {
-        DHLOGI("DCameraClientCommon::UpdateSettings cameraInput is null, cameraId: %s",
-            GetAnonyString(cameraId_).c_str());
-        return DCAMERA_BAD_VALUE;
-    }
     for (auto& setting : settings) {
         switch (setting->type_) {
             case UPDATE_METADATA: {
@@ -104,10 +99,17 @@ int32_t DCameraClient::UpdateSettings(std::vector<std::shared_ptr<DCameraSetting
                     GetAnonyString(cameraId_).c_str());
                 std::string dcSettingValue = setting->value_;
                 std::string metadataStr = Base64Decode(dcSettingValue);
+
+                if (cameraInput_ == nullptr) {
+                    DHLOGE("DCameraClientCommon::UpdateSettings %s cameraInput is null",
+                        GetAnonyString(cameraId_).c_str());
+                    return DCAMERA_BAD_VALUE;
+                }
+
                 int32_t ret = ((sptr<CameraStandard::CameraInput> &)cameraInput_)->SetCameraSettings(metadataStr);
                 if (ret != DCAMERA_OK) {
                     DHLOGE("DCameraClientCommon::UpdateSettings %s update metadata settings failed, ret: %d",
-                           GetAnonyString(cameraId_).c_str(), ret);
+                        GetAnonyString(cameraId_).c_str(), ret);
                     return ret;
                 }
                 break;
@@ -120,6 +122,11 @@ int32_t DCameraClient::UpdateSettings(std::vector<std::shared_ptr<DCameraSetting
     }
     DHLOGI("DCameraClientCommon::UpdateSettings %s success", GetAnonyString(cameraId_).c_str());
     return DCAMERA_OK;
+}
+
+void DCameraClient::FindCameraMetadata(const std::string& metadataStr)
+{
+    DHLOGI("DCameraClient::FindCameraMetadata cameraId: %s", GetAnonyString(cameraId_).c_str());
 }
 
 int32_t DCameraClient::StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos)

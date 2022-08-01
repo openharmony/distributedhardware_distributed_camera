@@ -92,34 +92,23 @@ int32_t DCameraClient::UnInit()
 int32_t DCameraClient::UpdateSettings(std::vector<std::shared_ptr<DCameraSettings>>& settings)
 {
     DHLOGI("DCameraClient::UpdateSettings cameraId: %s", GetAnonyString(cameraId_).c_str());
-    if (cameraInput_ == nullptr) {
-        DHLOGI("DCameraClient::UpdateSettings cameraInput is null, cameraId: %s", GetAnonyString(cameraId_).c_str());
-        return DCAMERA_BAD_VALUE;
-    }
     for (auto& setting : settings) {
         switch (setting->type_) {
             case UPDATE_METADATA: {
                 DHLOGI("DCameraClient::UpdateSettings %s update metadata settings", GetAnonyString(cameraId_).c_str());
                 std::string dcSettingValue = setting->value_;
                 std::string metadataStr = Base64Decode(dcSettingValue);
+                FindCameraMetadata(metadataStr);
 
-                camera_metadata_item_t item;
-                std::shared_ptr<Camera::CameraMetadata> cameraMetadata =
-                    Camera::MetadataUtils::DecodeFromString(metadataStr);
-                int32_t ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_CONTROL_FOCUS_MODE, &item);
-                if (ret == CAM_META_SUCCESS) {
-                    DHLOGI("DCameraClient::UpdateSettings focus mode: %d", item.data.u8[0]);
+                if (cameraInput_ == nullptr) {
+                    DHLOGE("DCameraClient::UpdateSettings %s cameraInput is null", GetAnonyString(cameraId_).c_str());
+                    return DCAMERA_BAD_VALUE;
                 }
 
-                ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_CONTROL_EXPOSURE_MODE, &item);
-                if (ret == CAM_META_SUCCESS) {
-                    DHLOGI("DCameraClient::UpdateSettings exposure mode: %d", item.data.u8[0]);
-                }
-
-                ret = ((sptr<CameraStandard::CameraInput> &)cameraInput_)->SetCameraSettings(metadataStr);
+                int32_t ret = ((sptr<CameraStandard::CameraInput> &)cameraInput_)->SetCameraSettings(metadataStr);
                 if (ret != DCAMERA_OK) {
                     DHLOGE("DCameraClient::UpdateSettings %s update metadata settings failed, ret: %d",
-                           GetAnonyString(cameraId_).c_str(), ret);
+                        GetAnonyString(cameraId_).c_str(), ret);
                     return ret;
                 }
                 break;
@@ -132,6 +121,37 @@ int32_t DCameraClient::UpdateSettings(std::vector<std::shared_ptr<DCameraSetting
     }
     DHLOGI("DCameraClient::UpdateSettings %s success", GetAnonyString(cameraId_).c_str());
     return DCAMERA_OK;
+}
+
+void DCameraClient::FindCameraMetadata(const std::string& metadataStr)
+{
+    std::shared_ptr<Camera::CameraMetadata> cameraMetadata = Camera::MetadataUtils::DecodeFromString(metadataStr);
+    camera_metadata_item_t focusItem;
+    int32_t ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_CONTROL_FOCUS_MODE, &focusItem);
+    if (ret == CAM_META_SUCCESS) {
+        DHLOGI("DCameraClient::FindCameraMetadata focus mode: %d", focusItem.data.u8[0]);
+    } else {
+        DHLOGE("DCameraClient::FindCameraMetadata %s find focus mode failed, ret: %d",
+            GetAnonyString(cameraId_).c_str(), ret);
+    }
+
+    camera_metadata_item_t exposureItem;
+    ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_CONTROL_EXPOSURE_MODE, &exposureItem);
+    if (ret == CAM_META_SUCCESS) {
+        DHLOGI("DCameraClient::FindCameraMetadata exposure mode: %d", exposureItem.data.u8[0]);
+    } else {
+        DHLOGE("DCameraClient::FindCameraMetadata %s find exposure mode failed, ret: %d",
+            GetAnonyString(cameraId_).c_str(), ret);
+    }
+
+    camera_metadata_item_t stabilityItem;
+    ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_CONTROL_VIDEO_STABILIZATION_MODE, &stabilityItem);
+    if (ret == CAM_META_SUCCESS) {
+        DHLOGI("DCameraClient::FindCameraMetadata stabilization mode: %d", stabilityItem.data.u8[0]);
+    } else {
+        DHLOGE("DCameraClient::FindCameraMetadata %s find stabilization mode failed, ret: %d",
+            GetAnonyString(cameraId_).c_str(), ret);
+    }
 }
 
 int32_t DCameraClient::StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos)
