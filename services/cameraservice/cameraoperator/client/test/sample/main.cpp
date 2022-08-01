@@ -200,6 +200,12 @@ int main()
     g_captureSession->Start();
     sleep(SLEEP_FIVE_SECOND);
 
+    std::vector<VideoStabilizationMode> stabilizationModes = g_captureSession->GetSupportedStabilizationMode();
+    for (auto mode : stabilizationModes) {
+        DHLOGI("Distributed Camera Demo: video stabilization mode %d", mode);
+    }
+    g_captureSession->SetVideoStabilizationMode(stabilizationModes.back());
+
     ((sptr<VideoOutput> &)g_videoOutput)->Start();
     sleep(SLEEP_FIVE_SECOND);
 
