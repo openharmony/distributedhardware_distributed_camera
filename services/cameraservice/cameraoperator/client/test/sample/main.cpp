@@ -142,6 +142,22 @@ static void InitVideoOutput()
     ((sptr<VideoOutput> &)g_videoOutput)->SetCallback(std::make_shared<DemoDCameraVideoCallback>());
 }
 
+static void ConfigCaptureSession()
+{
+    g_captureSession->BeginConfig();
+    g_captureSession->AddInput(g_cameraInput);
+    g_captureSession->AddOutput(g_previewOutput);
+    g_captureSession->AddOutput(g_videoOutput);
+    g_captureSession->AddOutput(g_photoOutput);
+    g_captureSession->CommitConfig();
+
+    std::vector<VideoStabilizationMode> stabilizationModes = g_captureSession->GetSupportedStabilizationMode();
+    for (auto mode : stabilizationModes) {
+        DHLOGI("Distributed Camera Demo: video stabilization mode %d", mode);
+    }
+    g_captureSession->SetVideoStabilizationMode(stabilizationModes.back());
+}
+
 static void ConfigFocusAndExposure()
 {
     ((sptr<CameraInput> &)g_cameraInput)->LockForControl();
@@ -190,21 +206,10 @@ int main()
     InitPhotoOutput();
     InitPreviewOutput();
     InitVideoOutput();
+    ConfigCaptureSession();
 
-    g_captureSession->BeginConfig();
-    g_captureSession->AddInput(g_cameraInput);
-    g_captureSession->AddOutput(g_previewOutput);
-    g_captureSession->AddOutput(g_videoOutput);
-    g_captureSession->AddOutput(g_photoOutput);
-    g_captureSession->CommitConfig();
     g_captureSession->Start();
     sleep(SLEEP_FIVE_SECOND);
-
-    std::vector<VideoStabilizationMode> stabilizationModes = g_captureSession->GetSupportedStabilizationMode();
-    for (auto mode : stabilizationModes) {
-        DHLOGI("Distributed Camera Demo: video stabilization mode %d", mode);
-    }
-    g_captureSession->SetVideoStabilizationMode(stabilizationModes.back());
 
     ((sptr<VideoOutput> &)g_videoOutput)->Start();
     sleep(SLEEP_FIVE_SECOND);
