@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -86,7 +86,7 @@ int32_t DCameraSinkDataProcess::StopCapture()
 int32_t DCameraSinkDataProcess::FeedStream(std::shared_ptr<DataBuffer>& dataBuffer)
 {
     DCStreamType type = captureInfo_->streamType_;
-    DHLOGI("DCameraSinkDataProcess::FeedStream dhId: %s, stream type: %d", GetAnonyString(dhId_).c_str(), type);
+    DHLOGD("DCameraSinkDataProcess::FeedStream dhId: %s, stream type: %d", GetAnonyString(dhId_).c_str(), type);
     switch (type) {
         case CONTINUOUS_FRAME: {
             int32_t ret = FeedStreamInner(dataBuffer);
@@ -108,7 +108,6 @@ int32_t DCameraSinkDataProcess::FeedStream(std::shared_ptr<DataBuffer>& dataBuff
             break;
         }
     }
-    DHLOGI("DCameraSinkDataProcess::FeedStream %s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
 }
 
@@ -116,14 +115,18 @@ void DCameraSinkDataProcess::OnEvent(DCameraPhotoOutputEvent& event)
 {
     std::shared_ptr<DataBuffer> buffer = event.GetParam();
     int32_t ret = channel_->SendData(buffer);
-    DHLOGI("DCameraSinkDataProcess::OnEvent %s send photo output data ret: %d", GetAnonyString(dhId_).c_str(), ret);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("DCameraSinkDataProcess::OnEvent %s send photo output data ret: %d", GetAnonyString(dhId_).c_str(), ret);
+    }
 }
 
 void DCameraSinkDataProcess::OnEvent(DCameraVideoOutputEvent& event)
 {
     std::shared_ptr<DataBuffer> buffer = event.GetParam();
     int32_t ret = channel_->SendData(buffer);
-    DHLOGI("DCameraSinkDataProcess::OnEvent %s send video output data ret: %d", GetAnonyString(dhId_).c_str(), ret);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("DCameraSinkDataProcess::OnEvent %s send video output data ret: %d", GetAnonyString(dhId_).c_str(), ret);
+    }
 }
 
 void DCameraSinkDataProcess::OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult)
@@ -140,7 +143,6 @@ void DCameraSinkDataProcess::OnError(DataProcessErrorType errorType)
 
 int32_t DCameraSinkDataProcess::FeedStreamInner(std::shared_ptr<DataBuffer>& dataBuffer)
 {
-    DHLOGI("DCameraSinkDataProcess::FeedStreamInner dhId: %s", GetAnonyString(dhId_).c_str());
     std::vector<std::shared_ptr<DataBuffer>> buffers;
     buffers.push_back(dataBuffer);
     int32_t ret = pipeline_->ProcessData(buffers);
@@ -149,7 +151,6 @@ int32_t DCameraSinkDataProcess::FeedStreamInner(std::shared_ptr<DataBuffer>& dat
                GetAnonyString(dhId_).c_str(), ret);
         return ret;
     }
-    DHLOGI("DCameraSinkDataProcess::FeedStreamInner %s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
 }
 
