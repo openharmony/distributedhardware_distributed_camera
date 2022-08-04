@@ -19,8 +19,6 @@ import(
 ohos_shared_library("distributed_camera_client") {
   include_dirs = [
     "${camera_hdf_path}/camera/interfaces/metadata/include",
-    "${camera_hdf_path}/camera/interfaces/include",
-    "${camera_hdf_path}/camera/interfaces/hdi_ipc",
     "//commonlibrary/c_utils/base/include",
     "//utils/system/safwk/native/include",
     "${graphicstandard_path}/frameworks/surface/include",
@@ -88,6 +86,7 @@ ohos_shared_library("distributed_camera_client") {
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_camera:libcamera_proxy_1.0",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "hiviewdfx_hilog_native:libhilog",
     "multimedia_player_framework:media_client",
