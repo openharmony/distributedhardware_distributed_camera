@@ -102,7 +102,13 @@ int32_t DCameraClient::UpdateSettings(std::vector<std::shared_ptr<DCameraSetting
 
                 if (cameraInput_ == nullptr) {
                     DHLOGE("DCameraClient::UpdateSettings %s cameraInput is null", GetAnonyString(cameraId_).c_str());
-                    return DCAMERA_BAD_VALUE;
+                    if (cameraMetadatas_.size() == DCAMERA_MAX_METADATA_SIZE) {
+                        DHLOGE("DCameraClient::UpdateSettings %s camera metadata oversize",
+                            GetAnonyString(cameraId_).c_str());
+                        cameraMetadatas_.pop();
+                    }
+                    cameraMetadatas_.push(metadataStr);
+                    return DCAMERA_OK;
                 }
 
                 int32_t ret = ((sptr<CameraStandard::CameraInput> &)cameraInput_)->SetCameraSettings(metadataStr);
@@ -294,6 +300,18 @@ int32_t DCameraClient::ConfigCaptureSession(std::vector<std::shared_ptr<DCameraC
     std::shared_ptr<DCameraInputCallback> inputCallback = std::make_shared<DCameraInputCallback>(stateCallback_);
     ((sptr<CameraStandard::CameraInput> &)cameraInput_)->SetErrorCallback(inputCallback);
     ((sptr<CameraStandard::CameraInput> &)cameraInput_)->SetFocusCallback(inputCallback);
+
+    while (!cameraMetadatas_.empty()) {
+        std::string metadataStr = cameraMetadatas_.front();
+        FindCameraMetadata(metadataStr);
+        int32_t ret = ((sptr<CameraStandard::CameraInput> &)cameraInput_)->SetCameraSettings(metadataStr);
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCameraClient::ConfigCaptureSession %s set camera settings failed, ret: %d",
+                GetAnonyString(cameraId_).c_str(), ret);
+            return ret;
+        }
+        cameraMetadatas_.pop();
+    }
 
     captureSession_ = cameraManager_->CreateCaptureSession();
     if (captureSession_ == nullptr) {

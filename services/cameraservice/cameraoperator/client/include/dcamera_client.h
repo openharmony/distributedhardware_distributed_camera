@@ -18,6 +18,8 @@
 
 #include "icamera_operator.h"
 
+#include <queue>
+
 #include "camera_info.h"
 #include "camera_input.h"
 #include "camera_manager.h"
@@ -65,8 +67,12 @@ private:
     void ReleaseCaptureSession();
     int32_t CameraServiceErrorType(const int32_t errorType);
 
+private:
+    constexpr static uint32_t DCAMERA_MAX_METADATA_SIZE = 20;
+
     bool isInit_;
     std::string cameraId_;
+    std::queue<std::string> cameraMetadatas_;
     sptr<Surface> photoSurface_;
     sptr<Surface> videoSurface_;
     sptr<CameraStandard::CameraInfo> cameraInfo_;
