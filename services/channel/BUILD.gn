@@ -20,10 +20,7 @@ ohos_shared_library("distributed_camera_channel") {
   include_dirs = [
     "//commonlibrary/c_utils/base/include",
     "//utils/system/safwk/native/include",
-    "${fwk_common_path}/log/include",
     "${fwk_common_path}/utils/include",
-    "${fwk_utils_path}/include/log",
-    "${fwk_utils_path}/include",
   ]
 
   include_dirs += [
@@ -41,7 +38,6 @@ ohos_shared_library("distributed_camera_channel") {
 
   deps = [
     "${common_path}:distributed_camera_utils",
-    "${fwk_utils_path}:distributedhardwareutils",
   ]
 
   defines = [

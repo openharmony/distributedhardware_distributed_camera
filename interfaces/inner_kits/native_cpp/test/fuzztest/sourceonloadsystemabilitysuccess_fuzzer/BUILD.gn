@@ -46,7 +46,6 @@ ohos_fuzztest("SourceOnLoadSystemAbilitySuccessFuzzTest") {
   sources = [ "sourceonloadsystemabilitysuccess_fuzzer.cpp" ]
 
   deps = [
-    "${fwk_utils_path}:distributedhardwareutils",
     "${innerkits_path}/native_cpp/camera_source:distributed_camera_source_sdk",
   ]
 
