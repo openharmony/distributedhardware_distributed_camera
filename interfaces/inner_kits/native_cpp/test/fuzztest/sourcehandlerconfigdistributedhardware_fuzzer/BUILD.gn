@@ -23,14 +23,13 @@ ohos_fuzztest("SourceHandlerConfigDistributedHardwareFuzzTest") {
 
   fuzz_config_file = "${innerkits_path}/native_cpp/test/fuzztest/sourcehandlerconfigdistributedhardware_fuzzer"
 
-  include_dirs = [
-    "//utils/system/safwk/native/include",
-  ]
+  include_dirs = [ "//utils/system/safwk/native/include" ]
 
   include_dirs += [
     "include",
     "${common_path}/include",
     "${common_path}/include/constants",
+    "${fwk_common_path}/utils/include",
     "${innerkits_path}/native_cpp/camera_source/include",
     "${innerkits_path}/native_cpp/camera_source/include/callback",
   ]

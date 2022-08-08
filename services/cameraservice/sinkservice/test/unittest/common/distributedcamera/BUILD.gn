@@ -38,6 +38,7 @@ config("module_private_config") {
   include_dirs += [
     "${common_path}/include/constants",
     "${common_path}/include/utils",
+    "${fwk_common_path}/utils/include",
     "${innerkits_path}/native_cpp/camera_sink/include",
     "${services_path}/cameraservice/base/include",
     "${services_path}/cameraservice/cameraoperator/handler/include",

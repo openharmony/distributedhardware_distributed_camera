@@ -20,8 +20,7 @@
 
 #include "dcamera_source_handler.h"
 #include "distributed_camera_constants.h"
-#include "component_enable.h"
-#include "component_disable.h"
+#include "mock_component_disable.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "refbase.h"
@@ -35,7 +34,7 @@ void SourceHandlerUnregisterDistributedHardwareFuzzTest(const uint8_t* data, siz
     }
     std::string devId(reinterpret_cast<const char*>(data), size);
     std::string dhId(reinterpret_cast<const char*>(data), size);
-    std::shared_ptr<UnregisterCallback> uncallback = std::make_shared<ComponentDisable>();
+    std::shared_ptr<UnregisterCallback> uncallback = std::make_shared<MockComponentDisable>();
 
     DCameraSourceHandler::GetInstance().UnregisterDistributedHardware(devId, dhId, uncallback);
 }

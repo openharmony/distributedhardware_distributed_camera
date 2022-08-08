@@ -34,8 +34,6 @@ fwk_utils_path = "${distributedhardwarefwk_path}/utils"
 
 fwk_common_path = "${distributedhardwarefwk_path}/common"
 
-fwk_services_path = "${distributedhardwarefwk_path}/services"
-
 build_flags = [ "-Werror" ]
 
 declare_args() {

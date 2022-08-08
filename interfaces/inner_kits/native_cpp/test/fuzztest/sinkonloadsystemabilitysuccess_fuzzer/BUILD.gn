@@ -44,9 +44,8 @@ ohos_fuzztest("SinkOnLoadSystemAbilitySuccessFuzzTest") {
 
   sources = [ "sinkonloadsystemabilitysuccess_fuzzer.cpp" ]
 
-  deps = [
-    "${innerkits_path}/native_cpp/camera_sink:distributed_camera_sink_sdk",
-  ]
+  deps =
+      [ "${innerkits_path}/native_cpp/camera_sink:distributed_camera_sink_sdk" ]
 
   defines = [
     "HI_LOG_ENABLE",

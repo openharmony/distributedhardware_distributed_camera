@@ -41,11 +41,9 @@ config("module_private_config") {
     "${innerkits_path}/native_cpp/camera_source/include/callback",
     "${innerkits_path}/native_cpp/camera_sink/include",
 
-    "${fwk_utils_path}/include/log",
     "${fwk_utils_path}/include",
     "${fwk_utils_path}/include/eventbus",
     "${fwk_common_path}/utils/include",
-    "${fwk_common_path}/log/include",
     "//commonlibrary/c_utils/base/include",
     "//utils/system/safwk/native/include",
     "//third_party/jsoncpp/include",
@@ -62,7 +60,6 @@ ohos_unittest("DCameraSourceMgrTest") {
 
   deps = [
     "${common_path}:distributed_camera_utils",
-    "${fwk_utils_path}:distributedhardwareutils",
     "${services_path}/cameraservice/sourceservice:distributed_camera_source",
     "${services_path}/channel:distributed_camera_channel",
     "//third_party/googletest:gtest_main",

@@ -47,6 +47,7 @@ config("module_private_config") {
     "${innerkits_path}/native_cpp/camera_source/include",
     "${innerkits_path}/native_cpp/camera_source/include/callback",
 
+    "${fwk_common_path}/utils/include",
     "${fwk_utils_path}/include/eventbus",
     "//drivers/peripheral/base",
     "//drivers/peripheral/camera/interfaces/metadata/include",

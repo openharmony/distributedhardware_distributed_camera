@@ -47,7 +47,9 @@ ohos_fuzztest("OnSourceLocalDmsDiedFuzzTest") {
 
   sources = [ "onsourcelocaldmsdied_fuzzer.cpp" ]
 
-  deps = [ "${innerkits_path}/native_cpp/camera_source:distributed_camera_source_sdk" ]
+  deps = [
+    "${innerkits_path}/native_cpp/camera_source:distributed_camera_source_sdk",
+  ]
 
   defines = [
     "HI_LOG_ENABLE",

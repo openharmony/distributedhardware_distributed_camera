@@ -20,11 +20,6 @@
 
 #include "dcamera_source_handler.h"
 #include "distributed_camera_constants.h"
-#include "component_enable.h"
-#include "component_disable.h"
-#include "if_system_ability_manager.h"
-#include "iservice_registry.h"
-#include "refbase.h"
 
 namespace OHOS {
 namespace DistributedHardware {
