@@ -20,7 +20,6 @@
 #include "dcamera_source_callback.h"
 #include "dcamera_source_handler_ipc.h"
 #include "dcamera_source_load_callback.h"
-#include "dh_utils_tool.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"

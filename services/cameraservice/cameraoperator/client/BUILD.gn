@@ -30,10 +30,6 @@ ohos_shared_library("distributed_camera_client") {
     "${camerastandard_path}/services/camera_service/binder/client/include",
     "${camerastandard_path}/services/camera_service/binder/server/include",
     "${camerastandard_path}/services/camera_service/include",
-    "${fwk_common_path}/log/include",
-    "${fwk_common_path}/utils/include",
-    "${fwk_utils_path}/include/log",
-    "${fwk_utils_path}/include",
   ]
 
   include_dirs += [
@@ -72,7 +68,6 @@ ohos_shared_library("distributed_camera_client") {
   deps = [
     "${camerastandard_path}/frameworks/native/camera:camera_framework",
     "${common_path}:distributed_camera_utils",
-    "${fwk_utils_path}:distributedhardwareutils",
     "${graphicstandard_path}:libsurface",
     "//drivers/peripheral/camera/interfaces/metadata:metadata",
     "//third_party/jsoncpp:jsoncpp",

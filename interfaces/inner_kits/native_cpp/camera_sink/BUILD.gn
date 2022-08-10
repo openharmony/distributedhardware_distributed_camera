@@ -19,9 +19,6 @@ ohos_shared_library("distributed_camera_sink_sdk") {
   include_dirs = [
     "//commonlibrary/c_utils/base/include",
     "//utils/system/safwk/native/include",
-    "${fwk_utils_path}/include/log",
-    "${fwk_utils_path}/include",
-    "${fwk_common_path}/log/include",
     "${fwk_common_path}/utils/include",
   ]
 
@@ -38,10 +35,7 @@ ohos_shared_library("distributed_camera_sink_sdk") {
     "src/distributed_camera_sink_proxy.cpp",
   ]
 
-  deps = [
-    "${common_path}:distributed_camera_utils",
-    "${fwk_utils_path}:distributedhardwareutils",
-  ]
+  deps = [ "${common_path}:distributed_camera_utils" ]
 
   defines = [
     "HI_LOG_ENABLE",
