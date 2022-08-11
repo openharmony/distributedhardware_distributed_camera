@@ -60,7 +60,7 @@ ohos_executable("dcamera_client_demo") {
   ]
 
   if (!distributed_camera_common) {
-    cflags += [ "-DPRODUCT_M40" ]
+    cflags += [ "-DDCAMERA_YUV" ]
   }
 
   deps = [

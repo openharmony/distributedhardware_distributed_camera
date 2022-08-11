@@ -36,7 +36,6 @@ ohos_fuzztest("OnSourceLocalDmsDiedFuzzTest") {
     "${common_path}/include/constants",
     "${innerkits_path}/native_cpp/camera_source/include",
     "${innerkits_path}/native_cpp/camera_source/include/callback",
-    "${fwk_services_path}/distributedhardwarefwkservice/include/componentmanager",
   ]
 
   cflags = [
@@ -49,7 +48,6 @@ ohos_fuzztest("OnSourceLocalDmsDiedFuzzTest") {
   sources = [ "onsourcelocaldmsdied_fuzzer.cpp" ]
 
   deps = [
-    "${fwk_utils_path}:distributedhardwareutils",
     "${innerkits_path}/native_cpp/camera_source:distributed_camera_source_sdk",
   ]
 
