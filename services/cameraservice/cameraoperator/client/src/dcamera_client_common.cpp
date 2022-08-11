@@ -103,6 +103,7 @@ int32_t DCameraClient::UpdateSettings(std::vector<std::shared_ptr<DCameraSetting
                 if (cameraInput_ == nullptr) {
                     DHLOGE("DCameraClientCommon::UpdateSettings %s cameraInput is null",
                         GetAnonyString(cameraId_).c_str());
+                    UpdateSettingCache(metadataStr);
                     return DCAMERA_BAD_VALUE;
                 }
 
@@ -122,6 +123,11 @@ int32_t DCameraClient::UpdateSettings(std::vector<std::shared_ptr<DCameraSetting
     }
     DHLOGI("DCameraClientCommon::UpdateSettings %s success", GetAnonyString(cameraId_).c_str());
     return DCAMERA_OK;
+}
+
+void DCameraClient::UpdateSettingCache(const std::string& metadataStr)
+{
+    DHLOGE("DCameraClientCommon::UpdateSettingCache metadataStr %s", GetAnonyString(metadataStr).c_str());
 }
 
 void DCameraClient::FindCameraMetadata(const std::string& metadataStr)
