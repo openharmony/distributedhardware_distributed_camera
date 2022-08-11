@@ -102,12 +102,7 @@ int32_t DCameraClient::UpdateSettings(std::vector<std::shared_ptr<DCameraSetting
 
                 if (cameraInput_ == nullptr) {
                     DHLOGE("DCameraClient::UpdateSettings %s cameraInput is null", GetAnonyString(cameraId_).c_str());
-                    if (cameraMetadatas_.size() == DCAMERA_MAX_METADATA_SIZE) {
-                        DHLOGE("DCameraClient::UpdateSettings %s camera metadata oversize",
-                            GetAnonyString(cameraId_).c_str());
-                        cameraMetadatas_.pop();
-                    }
-                    cameraMetadatas_.push(metadataStr);
+                    UpdateSettingCache(metadataStr);
                     return DCAMERA_OK;
                 }
 
@@ -127,6 +122,16 @@ int32_t DCameraClient::UpdateSettings(std::vector<std::shared_ptr<DCameraSetting
     }
     DHLOGI("DCameraClient::UpdateSettings %s success", GetAnonyString(cameraId_).c_str());
     return DCAMERA_OK;
+}
+
+void DCameraClient::UpdateSettingCache(const std::string& metadataStr)
+{
+    if (cameraMetadatas_.size() == DCAMERA_MAX_METADATA_SIZE) {
+        DHLOGE("DCameraClient::UpdateSettings %s camera metadata oversize",
+            GetAnonyString(cameraId_).c_str());
+        cameraMetadatas_.pop();
+    }
+    cameraMetadatas_.push(metadataStr);
 }
 
 void DCameraClient::FindCameraMetadata(const std::string& metadataStr)

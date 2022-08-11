@@ -66,6 +66,7 @@ private:
         std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSetting);
     void ReleaseCaptureSession();
     int32_t CameraServiceErrorType(const int32_t errorType);
+    void UpdateSettingCache(const std::string& metadataStr);
 
 private:
     constexpr static uint32_t DCAMERA_MAX_METADATA_SIZE = 20;
