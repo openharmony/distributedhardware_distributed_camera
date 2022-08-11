@@ -29,7 +29,7 @@ ohos_shared_library("distributed_camera_utils") {
   ]
 
   if (!distributed_camera_common) {
-    cflags += [ "-DPRODUCT_M40" ]
+    cflags += [ "-DDCAMERA_MMAP_RESERVE" ]
   }
 
   sources = [
