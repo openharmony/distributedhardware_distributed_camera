@@ -127,7 +127,7 @@ int32_t DCameraClient::UpdateSettings(std::vector<std::shared_ptr<DCameraSetting
 void DCameraClient::UpdateSettingCache(const std::string& metadataStr)
 {
     if (cameraMetadatas_.size() == DCAMERA_MAX_METADATA_SIZE) {
-        DHLOGE("DCameraClient::UpdateSettings %s camera metadata oversize",
+        DHLOGE("DCameraClient::UpdateSettingCache %s camera metadata oversize",
             GetAnonyString(cameraId_).c_str());
         cameraMetadatas_.pop();
     }
