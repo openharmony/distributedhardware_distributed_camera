@@ -17,6 +17,7 @@
 
 #include "anonymous_string.h"
 #include "camera_util.h"
+#include "camera_metadata_operator.h"
 #include "dcamera_input_callback.h"
 #include "dcamera_manager_callback.h"
 #include "dcamera_photo_callback.h"
@@ -99,12 +100,13 @@ int32_t DCameraClient::UpdateSettings(std::vector<std::shared_ptr<DCameraSetting
                     GetAnonyString(cameraId_).c_str());
                 std::string dcSettingValue = setting->value_;
                 std::string metadataStr = Base64Decode(dcSettingValue);
+                FindCameraMetadata(metadataStr);
 
                 if (cameraInput_ == nullptr) {
                     DHLOGE("DCameraClientCommon::UpdateSettings %s cameraInput is null",
                         GetAnonyString(cameraId_).c_str());
                     UpdateSettingCache(metadataStr);
-                    return DCAMERA_BAD_VALUE;
+                    return DCAMERA_OK;
                 }
 
                 int32_t ret = ((sptr<CameraStandard::CameraInput> &)cameraInput_)->SetCameraSettings(metadataStr);
@@ -127,12 +129,43 @@ int32_t DCameraClient::UpdateSettings(std::vector<std::shared_ptr<DCameraSetting
 
 void DCameraClient::UpdateSettingCache(const std::string& metadataStr)
 {
-    DHLOGE("DCameraClientCommon::UpdateSettingCache metadataStr %s", GetAnonyString(metadataStr).c_str());
+    if (cameraMetadatas_.size() == DCAMERA_MAX_METADATA_SIZE) {
+        DHLOGE("DCameraClientCommon::UpdateSettingCache %s camera metadata oversize",
+            GetAnonyString(cameraId_).c_str());
+        cameraMetadatas_.pop();
+    }
+    cameraMetadatas_.push(metadataStr);
 }
 
 void DCameraClient::FindCameraMetadata(const std::string& metadataStr)
 {
-    DHLOGI("DCameraClient::FindCameraMetadata cameraId: %s", GetAnonyString(cameraId_).c_str());
+    std::shared_ptr<Camera::CameraMetadata> cameraMetadata = Camera::MetadataUtils::DecodeFromString(metadataStr);
+    camera_metadata_item_t focusItem;
+    int32_t ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_CONTROL_FOCUS_MODE, &focusItem);
+    if (ret == CAM_META_SUCCESS) {
+        DHLOGI("DCameraClientCommon::FindCameraMetadata focus mode: %d", focusItem.data.u8[0]);
+    } else {
+        DHLOGE("DCameraClientCommon::FindCameraMetadata %s find focus mode failed, ret: %d",
+            GetAnonyString(cameraId_).c_str(), ret);
+    }
+
+    camera_metadata_item_t exposureItem;
+    ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_CONTROL_EXPOSURE_MODE, &exposureItem);
+    if (ret == CAM_META_SUCCESS) {
+        DHLOGI("DCameraClientCommon::FindCameraMetadata exposure mode: %d", exposureItem.data.u8[0]);
+    } else {
+        DHLOGE("DCameraClientCommon::FindCameraMetadata %s find exposure mode failed, ret: %d",
+            GetAnonyString(cameraId_).c_str(), ret);
+    }
+
+    camera_metadata_item_t stabilityItem;
+    ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_CONTROL_VIDEO_STABILIZATION_MODE, &stabilityItem);
+    if (ret == CAM_META_SUCCESS) {
+        DHLOGI("DCameraClientCommon::FindCameraMetadata stabilization mode: %d", stabilityItem.data.u8[0]);
+    } else {
+        DHLOGE("DCameraClientCommon::FindCameraMetadata %s find stabilization mode failed, ret: %d",
+            GetAnonyString(cameraId_).c_str(), ret);
+    }
 }
 
 int32_t DCameraClient::StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos)
@@ -264,6 +297,18 @@ int32_t DCameraClient::ConfigCaptureSession(std::vector<std::shared_ptr<DCameraC
     std::shared_ptr<DCameraInputCallback> inputCallback = std::make_shared<DCameraInputCallback>(stateCallback_);
     ((sptr<CameraStandard::CameraInput> &)cameraInput_)->SetErrorCallback(inputCallback);
     ((sptr<CameraStandard::CameraInput> &)cameraInput_)->SetFocusCallback(inputCallback);
+
+    while (!cameraMetadatas_.empty()) {
+        std::string metadataStr = cameraMetadatas_.front();
+        FindCameraMetadata(metadataStr);
+        int32_t ret = ((sptr<CameraStandard::CameraInput> &)cameraInput_)->SetCameraSettings(metadataStr);
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCameraClientCommon::ConfigCaptureSession %s set camera settings failed, ret: %d",
+                GetAnonyString(cameraId_).c_str(), ret);
+            return ret;
+        }
+        cameraMetadatas_.pop();
+    }
 
     captureSession_ = cameraManager_->CreateCaptureSession();
     if (captureSession_ == nullptr) {
@@ -432,7 +477,36 @@ int32_t DCameraClient::StartPhotoOutput(std::shared_ptr<DCameraCaptureInfo>& inf
         DHLOGE("DCameraClientCommon::StartPhotoOutput photoOutput is null");
         return DCAMERA_BAD_VALUE;
     }
-    int32_t ret = ((sptr<CameraStandard::PhotoOutput> &)photoOutput_)->Capture();
+
+    std::vector<std::shared_ptr<DCameraSettings>> captureSettings = info->captureSettings_;
+    std::string metadataSetting;
+    for (auto& setting : captureSettings) {
+        if (setting->type_ == UPDATE_METADATA) {
+            DHLOGI("DCameraClientCommon::StartPhotoOutput %s update metadata settings",
+                GetAnonyString(cameraId_).c_str());
+            metadataSetting = setting->value_;
+        }
+    }
+
+    if (metadataSetting.empty()) {
+        DHLOGE("DCameraClientCommon::StartPhotoOutput no metadata settings to update");
+        int32_t ret = ((sptr<CameraStandard::PhotoOutput> &)photoOutput_)->Capture();
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCameraClientCommon::StartPhotoOutput %s photoOutput capture failed, ret: %d",
+                GetAnonyString(cameraId_).c_str(), ret);
+            return ret;
+        }
+        return DCAMERA_OK;
+    }
+
+    std::string metadataStr = Base64Decode(metadataSetting);
+    std::shared_ptr<Camera::CameraMetadata> cameraMetadata = Camera::MetadataUtils::DecodeFromString(metadataStr);
+    std::shared_ptr<CameraStandard::PhotoCaptureSetting> photoCaptureSetting =
+        std::make_shared<CameraStandard::PhotoCaptureSetting>();
+    SetPhotoCaptureRotation(cameraMetadata, photoCaptureSetting);
+    SetPhotoCaptureQuality(cameraMetadata, photoCaptureSetting);
+    SetPhotoCaptureLocation(cameraMetadata, photoCaptureSetting);
+    int32_t ret = ((sptr<CameraStandard::PhotoOutput> &)photoOutput_)->Capture(photoCaptureSetting);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraClientCommon::StartPhotoOutput %s photoOutput capture failed, ret: %d",
             GetAnonyString(cameraId_).c_str(), ret);
@@ -444,19 +518,52 @@ int32_t DCameraClient::StartPhotoOutput(std::shared_ptr<DCameraCaptureInfo>& inf
 void DCameraClient::SetPhotoCaptureRotation(const std::shared_ptr<Camera::CameraMetadata>& cameraMetadata,
     std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSetting)
 {
-    DHLOGI("DCameraClientCommon::SetPhotoCaptureRotation cameraId: %s", GetAnonyString(cameraId_).c_str());
+    uint32_t rotationCount = 1;
+    camera_metadata_item_t item;
+    int32_t ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_JPEG_ORIENTATION, &item);
+    if ((ret == CAM_META_SUCCESS) && (rotationCount == item.count)) {
+        CameraStandard::PhotoCaptureSetting::RotationConfig rotation =
+            static_cast<CameraStandard::PhotoCaptureSetting::RotationConfig>(item.data.i32[0]);
+        photoCaptureSetting->SetRotation(rotation);
+        DHLOGI("DCameraClientCommon::SetPhotoCaptureRotation %s photo capture settings set %d rotation: %d",
+            GetAnonyString(cameraId_).c_str(), item.count, rotation);
+    }
 }
 
 void DCameraClient::SetPhotoCaptureQuality(const std::shared_ptr<Camera::CameraMetadata>& cameraMetadata,
     std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSetting)
 {
-    DHLOGI("DCameraClientCommon::SetPhotoCaptureQuality cameraId: %s", GetAnonyString(cameraId_).c_str());
+    uint32_t qualityCount = 1;
+    camera_metadata_item_t item;
+    int32_t ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_JPEG_QUALITY, &item);
+    if ((ret == CAM_META_SUCCESS) && (qualityCount == item.count)) {
+        CameraStandard::PhotoCaptureSetting::QualityLevel quality =
+            static_cast<CameraStandard::PhotoCaptureSetting::QualityLevel>(item.data.u8[0]);
+        photoCaptureSetting->SetQuality(quality);
+        DHLOGI("DCameraClientCommon::SetPhotoCaptureQuality %s photo capture settings set %d quality: %d",
+            GetAnonyString(cameraId_).c_str(), item.count, quality);
+    }
 }
 
 void DCameraClient::SetPhotoCaptureLocation(const std::shared_ptr<Camera::CameraMetadata>& cameraMetadata,
     std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSetting)
 {
-    DHLOGI("DCameraClientCommon::SetPhotoCaptureLocation cameraId: %s", GetAnonyString(cameraId_).c_str());
+    uint32_t locationCount = 3;
+    camera_metadata_item_t item;
+    int32_t ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_JPEG_GPS_COORDINATES, &item);
+    if ((ret == CAM_META_SUCCESS) && (locationCount == item.count)) {
+        int32_t latitudeIndex = 0;
+        int32_t longitudeIndex = 1;
+        int32_t altitudeIndex = 2;
+        std::unique_ptr<CameraStandard::Location> location = std::make_unique<CameraStandard::Location>();
+        location->latitude = item.data.d[latitudeIndex];
+        location->longitude = item.data.d[longitudeIndex];
+        location->altitude = item.data.d[altitudeIndex];
+        photoCaptureSetting->SetLocation(location);
+        DHLOGI("DCameraClientCommon::SetPhotoCaptureLocation %s photo capture settings set %d location: " +
+            "latitude=%f, longitude=%f, altitude=%f", GetAnonyString(cameraId_).c_str(), item.count,
+            item.data.d[latitudeIndex], item.data.d[longitudeIndex], item.data.d[altitudeIndex]);
+    }
 }
 
 int32_t DCameraClient::StartVideoOutput()
