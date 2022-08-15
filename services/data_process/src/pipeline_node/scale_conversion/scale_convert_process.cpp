@@ -82,18 +82,22 @@ void ScaleConvertProcess::ReleaseProcessNode()
 {
     DHLOGI("Start release [%d] node : ScaleConvertNode.", nodeRank_);
     isScaleConvert_.store(false);
+
+    {
+        std::lock_guard<std::mutex> autoLock(scaleMutex_);
+        if (swsContext_ != nullptr) {
+            av_freep(&srcData_[0]);
+            av_freep(&dstData_[0]);
+            sws_freeContext(swsContext_);
+            swsContext_ = nullptr;
+        }
+    }
+
     if (nextDataProcess_ != nullptr) {
         nextDataProcess_->ReleaseProcessNode();
         nextDataProcess_ = nullptr;
     }
-
-    std::lock_guard<std::mutex> autoLock(scaleMutex_);
-    if (swsContext_ != nullptr) {
-        av_freep(&srcData_[0]);
-        av_freep(&dstData_[0]);
-        sws_freeContext(swsContext_);
-        swsContext_ = nullptr;
-    }
+    DHLOGI("Release [%d] node : ScaleConvertNode end.", nodeRank_);
 }
 
 int ScaleConvertProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& inputBuffers)

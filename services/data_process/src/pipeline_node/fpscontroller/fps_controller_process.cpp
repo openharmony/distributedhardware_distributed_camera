@@ -50,10 +50,6 @@ int32_t FpsControllerProcess::InitNode(const VideoConfigParams& sourceConfig, co
 void FpsControllerProcess::ReleaseProcessNode()
 {
     DHLOGD("Start release [%d] node : FPS controller.", nodeRank_);
-    if (nextDataProcess_ != nullptr) {
-        nextDataProcess_->ReleaseProcessNode();
-    }
-
     isFpsControllerProcess_ = false;
     isFirstFrame_ = false;
     targetFrameRate_ = 0;
@@ -67,6 +63,12 @@ void FpsControllerProcess::ReleaseProcessNode()
     for (int i = 0; i < INCOME_FRAME_TIME_HISTORY_WINDOWS_SIZE; i++) {
         incomingFrameTimesMs_[i] = 0;
     }
+
+    if (nextDataProcess_ != nullptr) {
+        nextDataProcess_->ReleaseProcessNode();
+        nextDataProcess_ = nullptr;
+    }
+    DHLOGD("Release [%d] node : FPS controller end.", nodeRank_);
 }
 
 int32_t FpsControllerProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& inputBuffers)

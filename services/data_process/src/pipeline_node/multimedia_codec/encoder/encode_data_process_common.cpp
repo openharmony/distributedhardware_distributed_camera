@@ -293,16 +293,17 @@ void EncodeDataProcess::ReleaseProcessNode()
 {
     DHLOGD("Start release [%d] node : EncodeNode.", nodeRank_);
     isEncoderProcess_.store(false);
-    if (nextDataProcess_ != nullptr) {
-        nextDataProcess_->ReleaseProcessNode();
-    }
-
     ReleaseVideoEncoder();
 
     waitEncoderOutputCount_ = 0;
     lastFeedEncoderInputBufferTimeUs_ = 0;
     inputTimeStampUs_ = 0;
     processType_ = "";
+
+    if (nextDataProcess_ != nullptr) {
+        nextDataProcess_->ReleaseProcessNode();
+        nextDataProcess_ = nullptr;
+    }
     DHLOGD("Release [%d] node : EncodeNode end.", nodeRank_);
 }
 
