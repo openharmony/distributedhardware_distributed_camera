@@ -37,7 +37,7 @@
                 "distributed_hardware_fwk",
                 "hdf_core",
                 "drivers_interface_distributed_camera",
-                "utils_base",
+                "c_utils",
                 "dsoftbus",
                 "hisysevent_native",
                 "jsoncpp",
