@@ -326,13 +326,9 @@ void DecodeDataProcess::ReleaseProcessNode()
 {
     DHLOGD("Start release [%d] node : DecodeNode.", nodeRank_);
     isDecoderProcess_.store(false);
-    if (nextDataProcess_ != nullptr) {
-        nextDataProcess_->ReleaseProcessNode();
-    }
-
-    ReleaseCodecEvent();
     ReleaseVideoDecoder();
     ReleaseDecoderSurface();
+    ReleaseCodecEvent();
 
     processType_ = "";
     std::queue<std::shared_ptr<DataBuffer>>().swap(inputBuffersQueue_);
@@ -341,6 +337,11 @@ void DecodeDataProcess::ReleaseProcessNode()
     lastFeedDecoderInputBufferTimeUs_ = 0;
     outputTimeStampUs_ = 0;
     alignedHeight_ = 0;
+
+    if (nextDataProcess_ != nullptr) {
+        nextDataProcess_->ReleaseProcessNode();
+        nextDataProcess_ = nullptr;
+    }
     DHLOGD("Release [%d] node : DecodeNode end.", nodeRank_);
 }
 

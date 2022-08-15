@@ -67,8 +67,9 @@ void ColorFormatProcess::ReleaseProcessNode()
 
     if (nextDataProcess_ != nullptr) {
         nextDataProcess_->ReleaseProcessNode();
+        nextDataProcess_ = nullptr;
     }
-    nextDataProcess_ = nullptr;
+    DHLOGD("Release [%d] node : ColorFormatNode end.", nodeRank_);
 }
 
 int32_t ColorFormatProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& inputBuffers)
