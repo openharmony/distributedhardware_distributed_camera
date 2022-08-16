@@ -443,22 +443,18 @@ sptr<SurfaceBuffer> EncodeDataProcess::GetEncoderInputSurfaceBuffer()
 
 int64_t EncodeDataProcess::GetEncoderTimeStamp()
 {
-    int64_t TimeIntervalStampUs = 0;
+    if (inputTimeStampUs_ != 0) {
+        lastFeedEncoderInputBufferTimeUs_ = inputTimeStampUs_;
+    }
     const int64_t nsPerUs = 1000L;
     int64_t nowTimeUs = GetNowTimeStampUs() * nsPerUs;
-    if (lastFeedEncoderInputBufferTimeUs_ == 0) {
-        lastFeedEncoderInputBufferTimeUs_ = nowTimeUs;
-        return TimeIntervalStampUs;
-    }
-    TimeIntervalStampUs = nowTimeUs - lastFeedEncoderInputBufferTimeUs_;
-    lastFeedEncoderInputBufferTimeUs_ = nowTimeUs;
-    return TimeIntervalStampUs;
+    return nowTimeUs;
 }
 
 void EncodeDataProcess::IncreaseWaitEncodeCnt()
 {
     std::lock_guard<std::mutex> lck(mtxHoldCount_);
-    if (inputTimeStampUs_ == 0) {
+    if (lastFeedEncoderInputBufferTimeUs_ == 0) {
         waitEncoderOutputCount_ += FIRST_FRAME_OUTPUT_NUM;
     } else {
         waitEncoderOutputCount_++;
