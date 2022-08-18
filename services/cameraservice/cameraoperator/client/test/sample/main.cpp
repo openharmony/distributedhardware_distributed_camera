@@ -43,7 +43,7 @@ static std::shared_ptr<DCameraCaptureInfo> g_photoInfo = nullptr;
 static std::shared_ptr<DCameraCaptureInfo> g_previewInfo = nullptr;
 static std::shared_ptr<DCameraCaptureInfo> g_videoInfo = nullptr;
 
-#ifdef PRODUCT_M40
+#ifdef DCAMERA_YUV
     constexpr int32_t PHOTO_FORMAT = camera_format_t::OHOS_CAMERA_FORMAT_JPEG;
     constexpr int32_t PREVIEW_FORMAT = camera_format_t::OHOS_CAMERA_FORMAT_YCRCB_420_SP;
     constexpr int32_t VIDEO_FORMAT = camera_format_t::OHOS_CAMERA_FORMAT_YCRCB_420_SP;

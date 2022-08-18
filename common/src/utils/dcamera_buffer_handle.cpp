@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-#ifdef PRODUCT_M40
+#ifdef DCAMERA_MMAP_RESERVE
 void* DCameraMemoryMap(const BufferHandle *buffer)
 {
     if (buffer == nullptr) {
