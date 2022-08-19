@@ -140,7 +140,7 @@ void DCameraSinkOutputTest::TearDown(void)
  * @tc.name: dcamera_sink_output_test_001
  * @tc.desc: Verify the UnInit function.
  * @tc.type: FUNC
- * @tc.require: AR000GK6MV
+ * @tc.require: I5N1JI
  */
 HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_001, TestSize.Level1)
 {
@@ -157,7 +157,7 @@ HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_001, TestSize.Level1)
  * @tc.name: dcamera_sink_output_test_002
  * @tc.desc: Verify the StartCapture function.
  * @tc.type: FUNC
- * @tc.require: AR000GK6MU
+ * @tc.require: I5N1JI
  */
 HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_002, TestSize.Level1)
 {
@@ -172,7 +172,7 @@ HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_002, TestSize.Level1)
  * @tc.name: dcamera_sink_output_test_003
  * @tc.desc: Verify the StartCapture function.
  * @tc.type: FUNC
- * @tc.require: AR000GK6MU
+ * @tc.require: I5N1JI
  */
 HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_003, TestSize.Level1)
 {
@@ -187,7 +187,7 @@ HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_003, TestSize.Level1)
  * @tc.name: dcamera_sink_output_test_004
  * @tc.desc: Verify the StartCapture function.
  * @tc.type: FUNC
- * @tc.require: AR000GK6MU
+ * @tc.require: I5N1JI
  */
 HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_004, TestSize.Level1)
 {
@@ -202,7 +202,7 @@ HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_004, TestSize.Level1)
  * @tc.name: dcamera_sink_output_test_005
  * @tc.desc: Verify the StopCapture function.
  * @tc.type: FUNC
- * @tc.require: AR000GK6N1
+ * @tc.require: I5N1JI
  */
 HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_005, TestSize.Level1)
 {
@@ -220,7 +220,7 @@ HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_005, TestSize.Level1)
  * @tc.name: dcamera_sink_output_test_006
  * @tc.desc: Verify the OpenChannel function.
  * @tc.type: FUNC
- * @tc.require: AR000GK6N1
+ * @tc.require: I5N1JI
  */
 HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_006, TestSize.Level1)
 {
@@ -232,7 +232,7 @@ HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_006, TestSize.Level1)
  * @tc.name: dcamera_sink_output_test_007
  * @tc.desc: Verify the CloseChannel function.
  * @tc.type: FUNC
- * @tc.require: AR000GK6N1
+ * @tc.require: I5N1JI
  */
 HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_007, TestSize.Level1)
 {
