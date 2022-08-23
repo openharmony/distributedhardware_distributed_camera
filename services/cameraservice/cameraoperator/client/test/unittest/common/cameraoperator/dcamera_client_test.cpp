@@ -57,7 +57,6 @@ const int32_t TEST_WIDTH = 1920;
 const int32_t TEST_HEIGHT = 1080;
 const int32_t TEST_FORMAT_3 = 3;
 const int32_t TEST_FORMAT_4 = 4;
-const int32_t TEST_SLEEP_SEC = 2;
 
 class DCameraClientTest : public testing::Test {
 public:
@@ -201,15 +200,6 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_004, TestSize.Level1)
     ret = client_->Init();
     EXPECT_EQ(DCAMERA_OK, ret);
 
-    DHLOGI("DCameraClientTest dcamera_client_test_004: video width: %d, height: %d, format: %d, isCapture: %d",
-        videoInfo_true_->width_, videoInfo_true_->height_, videoInfo_true_->format_, videoInfo_true_->isCapture_);
-    std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos;
-    captureInfos.push_back(videoInfo_true_);
-    ret = client_->StartCapture(captureInfos);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    sleep(TEST_SLEEP_SEC);
-
     ret = client_->StopCapture();
     EXPECT_EQ(DCAMERA_OK, ret);
 
@@ -236,30 +226,6 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_005, TestSize.Level1)
 
     ret = client_->Init();
     EXPECT_EQ(DCAMERA_OK, ret);
-
-    DHLOGI("DCameraClientTest dcamera_client_test_005: video width: %d, height: %d, format: %d, isCapture: %d",
-        videoInfo_true_->width_, videoInfo_true_->height_, videoInfo_true_->format_, videoInfo_true_->isCapture_);
-    DHLOGI("DCameraClientTest dcamera_client_test_005: photo width: %d, height: %d, format: %d, isCapture: %d",
-        photoInfo_false_->width_, photoInfo_false_->height_, photoInfo_false_->format_, photoInfo_false_->isCapture_);
-    std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos;
-    captureInfos.push_back(videoInfo_true_);
-    captureInfos.push_back(photoInfo_false_);
-    ret = client_->StartCapture(captureInfos);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    sleep(TEST_SLEEP_SEC);
-
-    DHLOGI("DCameraClientTest dcamera_client_test_005: video width: %d, height: %d, format: %d, isCapture: %d",
-        videoInfo_false_->width_, videoInfo_false_->height_, videoInfo_false_->format_, videoInfo_false_->isCapture_);
-    DHLOGI("DCameraClientTest dcamera_client_test_005: photo width: %d, height: %d, format: %d, isCapture: %d",
-        photoInfo_true_->width_, photoInfo_true_->height_, photoInfo_true_->format_, photoInfo_true_->isCapture_);
-    captureInfos.clear();
-    captureInfos.push_back(videoInfo_false_);
-    captureInfos.push_back(photoInfo_true_);
-    ret = client_->StartCapture(captureInfos);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    sleep(TEST_SLEEP_SEC);
 
     ret = client_->StopCapture();
     EXPECT_EQ(DCAMERA_OK, ret);
