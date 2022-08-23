@@ -45,7 +45,7 @@ private:
         DCAMERA_SA_STATE_STOP = 0,
         DCAMERA_SA_STATE_START = 1,
     } DCameraSAState;
-    DCameraSourceHandler() = default;
+    DCameraSourceHandler();
     ~DCameraSourceHandler();
     void FinishStartSA(const std::string &params);
     void FinishStartSAFailed(int32_t systemAbilityId);
