@@ -30,6 +30,12 @@ namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(DCameraSourceHandler);
 
+DCameraSourceHandler::DCameraSourceHandler()
+{
+    DHLOGI("DCameraSourceHandler construct.");
+    callback_ = new DCameraSourceCallback();
+}
+
 DCameraSourceHandler::~DCameraSourceHandler()
 {
     DHLOGI("~DCameraSourceHandler");
@@ -72,11 +78,6 @@ void DCameraSourceHandler::FinishStartSA(const std::string &params)
         return;
     }
 
-    callback_ = new DCameraSourceCallback();
-    if (callback_ == nullptr) {
-        DHLOGE("DCameraSourceHandler InitSource init callback failed");
-        return;
-    }
     dCameraSourceSrv->InitSource(params, callback_);
     std::unique_lock<std::mutex> lock(producerMutex_);
     state_ = DCAMERA_SA_STATE_START;
@@ -122,10 +123,6 @@ int32_t DCameraSourceHandler::RegisterDistributedHardware(const std::string& dev
     std::lock_guard<std::mutex> autoLock(optLock_);
     std::string reqId = GetRandomID();
 
-    if (callback_ == nullptr) {
-        DHLOGE("DCameraSourceHandler RegisterDistributedHardware DCameraSourceCallback is null.");
-        return DCAMERA_BAD_VALUE;
-    }
     callback_->PushRegCallback(reqId, callback);
     int32_t ret = dCameraSourceSrv->RegisterDistributedHardware(devId, dhId, reqId, param);
     if (ret != DCAMERA_OK) {
@@ -150,10 +147,6 @@ int32_t DCameraSourceHandler::UnregisterDistributedHardware(const std::string& d
     std::lock_guard<std::mutex> autoLock(optLock_);
     std::string reqId = GetRandomID();
 
-    if (callback_ == nullptr) {
-        DHLOGE("DCameraSourceHandler RegisterDistributedHardware DCameraSourceCallback is null.");
-        return DCAMERA_BAD_VALUE;
-    }
     callback_->PushUnregCallback(reqId, callback);
     int32_t ret = dCameraSourceSrv->UnregisterDistributedHardware(devId, dhId, reqId);
     if (ret != DCAMERA_OK) {
