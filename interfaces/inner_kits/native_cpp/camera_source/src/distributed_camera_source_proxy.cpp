@@ -35,7 +35,7 @@ int32_t DistributedCameraSourceProxy::InitSource(const std::string& params,
     }
     MessageParcel data;
     MessageParcel reply;
-    MessageOption option = { MessageOption::TF_ASYNC };
+    MessageOption option;
     if (!data.WriteInterfaceToken(DistributedCameraSourceProxy::GetDescriptor())) {
         DHLOGE("DistributedCameraSourceProxy InitSource write token failed");
         return DCAMERA_BAD_VALUE;
