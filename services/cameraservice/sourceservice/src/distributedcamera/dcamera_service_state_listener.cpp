@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -49,10 +49,6 @@ int32_t DCameraServiceStateListener::OnRegisterNotify(const std::string& devId, 
     DHLOGI("DCameraServiceStateListener OnRegisterNotify devId: %s, dhId: %s, status: %d",
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), status);
     std::lock_guard<std::mutex> autoLock(proxyMutex_);
-    if (callbackProxy_ == nullptr) {
-        DHLOGE("DCameraServiceStateListener OnRegisterNotify callbackProxy_ is nullptr");
-        return DCAMERA_BAD_VALUE;
-    }
 
     if (status != DCAMERA_OK) {
         std::thread([=]() mutable {
@@ -60,13 +56,20 @@ int32_t DCameraServiceStateListener::OnRegisterNotify(const std::string& devId, 
                 GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
             DCameraIndex camIndex(devId, dhId);
             DistributedCameraSourceService::camerasMap_.erase(camIndex);
-
+            if (callbackProxy_ == nullptr) {
+                DHLOGE("DCameraServiceStateListener OnRegisterNotify callbackProxy_ is nullptr");
+                return;
+            }
             int32_t ret = callbackProxy_->OnNotifyRegResult(devId, dhId, reqId, status, data);
             if (ret != DCAMERA_OK) {
                 DHLOGE("DCameraServiceStateListener OnRegisterNotify OnNotifyRegResult failed: %d", ret);
             }
         }).detach();
     } else {
+        if (callbackProxy_ == nullptr) {
+            DHLOGE("DCameraServiceStateListener OnRegisterNotify callbackProxy_ is nullptr");
+            return DCAMERA_BAD_VALUE;
+        }
         int32_t ret = callbackProxy_->OnNotifyRegResult(devId, dhId, reqId, status, data);
         if (ret != DCAMERA_OK) {
             DHLOGE("DCameraServiceStateListener OnRegisterNotify OnNotifyRegResult failed: %d", ret);

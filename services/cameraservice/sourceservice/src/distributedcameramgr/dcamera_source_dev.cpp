@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -353,7 +353,7 @@ int32_t DCameraSourceDev::ExecuteConfigStreams(std::vector<std::shared_ptr<DCStr
     std::shared_ptr<DCameraChannelInfo> chanInfo = std::make_shared<DCameraChannelInfo>();
     ret = GetLocalDeviceNetworkId(chanInfo->sourceDevId_);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceDev getMyId failed ret: %d, devId: %s, dhId: %s", ret,
+        DHLOGE("DCameraSourceDev getLocalNetworkId failed ret: %d, devId: %s, dhId: %s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return ret;
     }
