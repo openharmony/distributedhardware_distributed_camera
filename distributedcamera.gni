@@ -18,7 +18,7 @@ distributedhardwarefwk_path =
 
 camera_hdf_path = "//drivers/peripheral"
 
-camerastandard_path = "//foundation/multimedia/camera_standard"
+camerastandard_path = "//foundation/multimedia/camera_framework"
 
 mediastandard_path = "//foundation/multimedia/player_framework"
 

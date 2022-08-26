@@ -31,7 +31,7 @@
                 "ipc",
                 "graphic_chipsetsdk",
                 "eventhandler",
-                "multimedia_camera_standard",
+                "multimedia_camera_framework",
                 "multimedia_player_framework",
                 "graphic_standard",
                 "distributed_hardware_fwk",
