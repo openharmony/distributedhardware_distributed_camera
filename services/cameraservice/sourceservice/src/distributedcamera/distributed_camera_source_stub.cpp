@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,7 +36,7 @@ DistributedCameraSourceStub::~DistributedCameraSourceStub()
 int32_t DistributedCameraSourceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
-    DHLOGI("DistributedCameraSourceStub OnRemoteRequest code: %u", code);
+    DHLOGD("DistributedCameraSourceStub OnRemoteRequest code: %u", code);
     std::u16string desc = DistributedCameraSourceStub::GetDescriptor();
     std::u16string remoteDesc = data.ReadInterfaceToken();
     if (desc != remoteDesc) {
@@ -54,7 +54,7 @@ int32_t DistributedCameraSourceStub::OnRemoteRequest(uint32_t code, MessageParce
 
 int32_t DistributedCameraSourceStub::InitSourceInner(MessageParcel &data, MessageParcel &reply)
 {
-    DHLOGI("DistributedCameraSourceStub InitSourceInner");
+    DHLOGD("DistributedCameraSourceStub InitSourceInner");
     int32_t ret = DCAMERA_OK;
     do {
         std::string params = data.ReadString();
@@ -80,7 +80,7 @@ int32_t DistributedCameraSourceStub::InitSourceInner(MessageParcel &data, Messag
 
 int32_t DistributedCameraSourceStub::ReleaseSourceInner(MessageParcel &data, MessageParcel &reply)
 {
-    DHLOGI("DistributedCameraSourceStub ReleaseSourceInner");
+    DHLOGD("DistributedCameraSourceStub ReleaseSourceInner");
     (void)data;
     int32_t ret = ReleaseSource();
     reply.WriteInt32(ret);
@@ -89,7 +89,7 @@ int32_t DistributedCameraSourceStub::ReleaseSourceInner(MessageParcel &data, Mes
 
 int32_t DistributedCameraSourceStub::RegisterDistributedHardwareInner(MessageParcel &data, MessageParcel &reply)
 {
-    DHLOGI("DistributedCameraSourceStub RegisterDistributedHardwareInner");
+    DHLOGD("DistributedCameraSourceStub RegisterDistributedHardwareInner");
     int32_t ret = DCAMERA_OK;
     do {
         std::string devId = data.ReadString();
@@ -107,7 +107,7 @@ int32_t DistributedCameraSourceStub::RegisterDistributedHardwareInner(MessagePar
 
 int32_t DistributedCameraSourceStub::UnregisterDistributedHardwareInner(MessageParcel &data, MessageParcel &reply)
 {
-    DHLOGI("DistributedCameraSourceStub UnregisterDistributedHardwareInner");
+    DHLOGD("DistributedCameraSourceStub UnregisterDistributedHardwareInner");
     int32_t ret = DCAMERA_OK;
     do {
         std::string devId = data.ReadString();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,7 +38,7 @@ DistributedCameraSinkStub::~DistributedCameraSinkStub()
 int32_t DistributedCameraSinkStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
-    DHLOGI("DistributedCameraSinkStub::OnRemoteRequest code: %d", code);
+    DHLOGD("DistributedCameraSinkStub::OnRemoteRequest code: %d", code);
     std::u16string desc = DistributedCameraSinkStub::GetDescriptor();
     std::u16string remoteDesc = data.ReadInterfaceToken();
     if (desc != remoteDesc) {
@@ -56,7 +56,7 @@ int32_t DistributedCameraSinkStub::OnRemoteRequest(uint32_t code, MessageParcel 
 
 int32_t DistributedCameraSinkStub::InitSinkInner(MessageParcel &data, MessageParcel &reply)
 {
-    DHLOGI("DistributedCameraSinkStub::InitSinkInner");
+    DHLOGD("DistributedCameraSinkStub::InitSinkInner");
     std::string params = data.ReadString();
     int32_t ret = InitSink(params);
     reply.WriteInt32(ret);
@@ -65,7 +65,7 @@ int32_t DistributedCameraSinkStub::InitSinkInner(MessageParcel &data, MessagePar
 
 int32_t DistributedCameraSinkStub::ReleaseSinkInner(MessageParcel &data, MessageParcel &reply)
 {
-    DHLOGI("DistributedCameraSinkStub::ReleaseSinkInner");
+    DHLOGD("DistributedCameraSinkStub::ReleaseSinkInner");
     int32_t ret = ReleaseSink();
     reply.WriteInt32(ret);
     return ret;
@@ -73,7 +73,7 @@ int32_t DistributedCameraSinkStub::ReleaseSinkInner(MessageParcel &data, Message
 
 int32_t DistributedCameraSinkStub::SubscribeLocalHardwareInner(MessageParcel &data, MessageParcel &reply)
 {
-    DHLOGI("DistributedCameraSinkStub::SubscribeLocalHardwareInner");
+    DHLOGD("DistributedCameraSinkStub::SubscribeLocalHardwareInner");
     std::string dhId = data.ReadString();
     std::string parameters = data.ReadString();
     int32_t ret = SubscribeLocalHardware(dhId, parameters);
@@ -83,7 +83,7 @@ int32_t DistributedCameraSinkStub::SubscribeLocalHardwareInner(MessageParcel &da
 
 int32_t DistributedCameraSinkStub::UnsubscribeLocalHardwareInner(MessageParcel &data, MessageParcel &reply)
 {
-    DHLOGI("DistributedCameraSinkStub::UnsubscribeLocalHardwareInner");
+    DHLOGD("DistributedCameraSinkStub::UnsubscribeLocalHardwareInner");
     std::string dhId = data.ReadString();
     int32_t ret = UnsubscribeLocalHardware(dhId);
     reply.WriteInt32(ret);
@@ -92,7 +92,7 @@ int32_t DistributedCameraSinkStub::UnsubscribeLocalHardwareInner(MessageParcel &
 
 int32_t DistributedCameraSinkStub::StopCaptureInner(MessageParcel &data, MessageParcel &reply)
 {
-    DHLOGI("DistributedCameraSinkStub::StopCaptureInner");
+    DHLOGD("DistributedCameraSinkStub::StopCaptureInner");
     std::string dhId = data.ReadString();
     int32_t ret = StopCapture(dhId);
     reply.WriteInt32(ret);
@@ -101,7 +101,7 @@ int32_t DistributedCameraSinkStub::StopCaptureInner(MessageParcel &data, Message
 
 int32_t DistributedCameraSinkStub::ChannelNegInner(MessageParcel &data, MessageParcel &reply)
 {
-    DHLOGI("DistributedCameraSinkStub::ChannelNegInner");
+    DHLOGD("DistributedCameraSinkStub::ChannelNegInner");
     std::string dhId = data.ReadString();
     std::string channelInfo = data.ReadString();
     int32_t ret = ChannelNeg(dhId, channelInfo);
@@ -111,7 +111,7 @@ int32_t DistributedCameraSinkStub::ChannelNegInner(MessageParcel &data, MessageP
 
 int32_t DistributedCameraSinkStub::GetCameraInfoInner(MessageParcel &data, MessageParcel &reply)
 {
-    DHLOGI("DistributedCameraSinkStub::GetCameraInfoInner");
+    DHLOGD("DistributedCameraSinkStub::GetCameraInfoInner");
     std::string dhId = data.ReadString();
     std::string cameraInfo = data.ReadString();
     int32_t ret = GetCameraInfo(dhId, cameraInfo);
@@ -121,7 +121,7 @@ int32_t DistributedCameraSinkStub::GetCameraInfoInner(MessageParcel &data, Messa
 
 int32_t DistributedCameraSinkStub::OpenChannelInner(MessageParcel &data, MessageParcel &reply)
 {
-    DHLOGI("DistributedCameraSinkStub::OpenChannelInner");
+    DHLOGD("DistributedCameraSinkStub::OpenChannelInner");
     std::string dhId = data.ReadString();
     std::string openInfo = data.ReadString();
     int32_t ret = OpenChannel(dhId, openInfo);
@@ -131,7 +131,7 @@ int32_t DistributedCameraSinkStub::OpenChannelInner(MessageParcel &data, Message
 
 int32_t DistributedCameraSinkStub::CloseChannelInner(MessageParcel &data, MessageParcel &reply)
 {
-    DHLOGI("DistributedCameraSinkStub::CloseChannelInner");
+    DHLOGD("DistributedCameraSinkStub::CloseChannelInner");
     std::string dhId = data.ReadString();
     int32_t ret = CloseChannel(dhId);
     reply.WriteInt32(ret);
