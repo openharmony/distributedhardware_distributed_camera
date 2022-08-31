@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,14 +30,14 @@ DECLARE_SINGLE_INSTANCE_BASE(DCameraSinkServiceIpc);
 public:
     void Init();
     void UnInit();
-    sptr<IDistributedCameraSource> GetSourceRemoteDHMS(const std::string& deviceId);
-    void OnSourceRemoteDmsDied(const wptr<IRemoteObject>& remote);
-    void DeleteSourceRemoteDhms(const std::string& deviceId);
+    sptr<IDistributedCameraSource> GetSourceRemoteCamSrv(const std::string& deviceId);
+    void OnSourceRemoteCamSrvDied(const wptr<IRemoteObject>& remote);
+    void DeleteSourceRemoteCamSrv(const std::string& deviceId);
 
 private:
     DCameraSinkServiceIpc();
     ~DCameraSinkServiceIpc();
-    void ClearSourceRemoteDhms();
+    void ClearSourceRemoteCamSrv();
 
     class SourceRemoteRecipient : public IRemoteObject::DeathRecipient {
     public:
@@ -45,10 +45,10 @@ private:
     };
     sptr<SourceRemoteRecipient> sourceRemoteRecipient_;
     std::map<std::string, sptr<IDistributedCameraSource>> remoteSources_;
-    std::mutex sourceRemoteDmsLock_;
+    std::mutex sourceRemoteCamSrvLock_;
 
     bool isInit_;
-    std::mutex initDmsLock_;
+    std::mutex initCamSrvLock_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

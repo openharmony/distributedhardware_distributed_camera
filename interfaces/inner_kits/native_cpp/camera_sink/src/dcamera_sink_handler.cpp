@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -46,7 +46,7 @@ int32_t DCameraSinkHandler::InitSink(const std::string& params)
     DHLOGI("DCameraSinkHandler::InitSink");
     sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sm == nullptr) {
-        DHLOGE("GetSourceLocalDHMS GetSystemAbilityManager failed");
+        DHLOGE("GetSourceLocalCamSrv GetSystemAbilityManager failed");
         return DCAMERA_INIT_ERR;
     }
     ReportSaEvent(INIT_SA_EVENT, DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, "init sink sa event.");
@@ -72,7 +72,7 @@ int32_t DCameraSinkHandler::InitSink(const std::string& params)
 void DCameraSinkHandler::FinishStartSA(const std::string& params)
 {
     DCameraSinkHandlerIpc::GetInstance().Init();
-    sptr<IDistributedCameraSink> dCameraSinkSrv = DCameraSinkHandlerIpc::GetInstance().GetSinkLocalDHMS();
+    sptr<IDistributedCameraSink> dCameraSinkSrv = DCameraSinkHandlerIpc::GetInstance().GetSinkLocalCamSrv();
     if (dCameraSinkSrv == nullptr) {
         DHLOGE("DCameraSinkHandler::InitSink get Service failed");
         return;
@@ -94,7 +94,7 @@ void DCameraSinkHandler::FinishStartSAFailed(int32_t systemAbilityId)
 int32_t DCameraSinkHandler::ReleaseSink()
 {
     DHLOGI("DCameraSinkHandler::ReleaseSink");
-    sptr<IDistributedCameraSink> dCameraSinkSrv = DCameraSinkHandlerIpc::GetInstance().GetSinkLocalDHMS();
+    sptr<IDistributedCameraSink> dCameraSinkSrv = DCameraSinkHandlerIpc::GetInstance().GetSinkLocalCamSrv();
     if (dCameraSinkSrv == nullptr) {
         DHLOGE("DCameraSinkHandler::ReleaseSink get Service failed");
         return DCAMERA_BAD_VALUE;
@@ -117,7 +117,7 @@ int32_t DCameraSinkHandler::ReleaseSink()
 int32_t DCameraSinkHandler::SubscribeLocalHardware(const std::string& dhId, const std::string& parameters)
 {
     DHLOGI("DCameraSinkHandler::SubscribeLocalHardware dhId: %s", GetAnonyString(dhId).c_str());
-    sptr<IDistributedCameraSink> dCameraSinkSrv = DCameraSinkHandlerIpc::GetInstance().GetSinkLocalDHMS();
+    sptr<IDistributedCameraSink> dCameraSinkSrv = DCameraSinkHandlerIpc::GetInstance().GetSinkLocalCamSrv();
     if (dCameraSinkSrv == nullptr) {
         DHLOGE("DCameraSinkHandler::SubscribeLocalHardware get Service failed");
         return DCAMERA_BAD_VALUE;
@@ -128,7 +128,7 @@ int32_t DCameraSinkHandler::SubscribeLocalHardware(const std::string& dhId, cons
 int32_t DCameraSinkHandler::UnsubscribeLocalHardware(const std::string& dhId)
 {
     DHLOGI("DCameraSinkHandler::UnsubscribeLocalHardware dhId: %s", GetAnonyString(dhId).c_str());
-    sptr<IDistributedCameraSink> dCameraSinkSrv = DCameraSinkHandlerIpc::GetInstance().GetSinkLocalDHMS();
+    sptr<IDistributedCameraSink> dCameraSinkSrv = DCameraSinkHandlerIpc::GetInstance().GetSinkLocalCamSrv();
     if (dCameraSinkSrv == nullptr) {
         DHLOGE("DCameraSinkHandler::UnsubscribeLocalHardware get Service failed");
         return DCAMERA_BAD_VALUE;

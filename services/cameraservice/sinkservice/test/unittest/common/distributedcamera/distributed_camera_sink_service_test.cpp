@@ -60,7 +60,7 @@ void DistributedCameraSinkServiceTest::SetUpTestCase(void)
     g_dhId = DCameraHandler::GetInstance().GetCameras().front();
 
     DCameraSinkHandler::GetInstance().InitSink(g_testParams);
-    g_service = DCameraSinkHandlerIpc::GetInstance().GetSinkLocalDHMS();
+    g_service = DCameraSinkHandlerIpc::GetInstance().GetSinkLocalCamSrv();
 }
 
 void DistributedCameraSinkServiceTest::TearDownTestCase(void)

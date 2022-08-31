@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,7 +40,7 @@ IMPLEMENT_SINGLE_INSTANCE(DCameraSourceServiceIpc);
 
 void DCameraSourceServiceIpc::Init()
 {
-    std::lock_guard<std::mutex> autoLock(initDmsLock_);
+    std::lock_guard<std::mutex> autoLock(initCamSrvLock_);
     DHLOGI("DCameraSourceServiceIpc Init Start");
     if (isInit_) {
         DHLOGI("DCameraSourceServiceIpc has already init");
@@ -53,74 +53,74 @@ void DCameraSourceServiceIpc::Init()
 
 void DCameraSourceServiceIpc::UnInit()
 {
-    std::lock_guard<std::mutex> autoLock(initDmsLock_);
+    std::lock_guard<std::mutex> autoLock(initCamSrvLock_);
     DHLOGI("DCameraSourceServiceIpc UnInit Start");
     if (!isInit_) {
         DHLOGI("DCameraSourceServiceIpc has already UnInit");
         return;
     }
-    ClearSinkRemoteDhms();
+    ClearSinkRemoteCamSrv();
     DHLOGI("DCameraSourceServiceIpc UnInit Start free recipient");
     sinkRemoteRecipient_ = nullptr;
     isInit_ = false;
     DHLOGI("DCameraSourceServiceIpc UnInit End");
 }
 
-sptr<IDistributedCameraSink> DCameraSourceServiceIpc::GetSinkRemoteDHMS(const std::string& deviceId)
+sptr<IDistributedCameraSink> DCameraSourceServiceIpc::GetSinkRemoteCamSrv(const std::string& deviceId)
 {
     if (deviceId.empty()) {
-        DHLOGE("GetSinkRemoteDHMS deviceId is empty");
+        DHLOGE("GetSinkRemoteCamSrv deviceId is empty");
         return nullptr;
     }
     {
-        std::lock_guard<std::mutex> autoLock(sinkRemoteDmsLock_);
+        std::lock_guard<std::mutex> autoLock(sinkRemoteCamSrvLock_);
         auto iter = remoteSinks_.find(deviceId);
         if (iter != remoteSinks_.end()) {
             auto object = iter->second;
             if (object != nullptr) {
-                DHLOGI("DCameraSourceServiceIpc GetSinkRemoteDHMS from cache devId: %s",
+                DHLOGI("DCameraSourceServiceIpc GetSinkRemoteCamSrv from cache devId: %s",
                     GetAnonyString(deviceId).c_str());
                 return object;
             }
         }
     }
-    DHLOGI("GetSinkRemoteDHMS remote deviceid is %s", GetAnonyString(deviceId).c_str());
+    DHLOGI("GetSinkRemoteCamSrv remote deviceid is %s", GetAnonyString(deviceId).c_str());
     auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgr == nullptr) {
-        DHLOGE("GetSinkRemoteDHMS failed to connect to systemAbilityMgr!");
+        DHLOGE("GetSinkRemoteCamSrv failed to connect to systemAbilityMgr!");
         return nullptr;
     }
 
     auto object = samgr->CheckSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, deviceId);
     if (object == nullptr) {
-        DHLOGE("GetSinkRemoteDHMS failed get remote DHMS %s", GetAnonyString(deviceId).c_str());
+        DHLOGE("GetSinkRemoteCamSrv failed get remote CamSrv %s", GetAnonyString(deviceId).c_str());
         return nullptr;
     }
     int32_t ret = object->AddDeathRecipient(sinkRemoteRecipient_);
-    sptr<IDistributedCameraSink> remoteDmsObj = iface_cast<IDistributedCameraSink>(object);
-    if (remoteDmsObj == nullptr) {
-        DHLOGI("GetSinkRemoteDHMS failed, remoteDmsObj is null ret: %d", ret);
+    sptr<IDistributedCameraSink> remoteCamSrvObj = iface_cast<IDistributedCameraSink>(object);
+    if (remoteCamSrvObj == nullptr) {
+        DHLOGI("GetSinkRemoteCamSrv failed, remoteCamSrvObj is null ret: %d", ret);
         return nullptr;
     }
     {
-        std::lock_guard<std::mutex> autoLock(sinkRemoteDmsLock_);
+        std::lock_guard<std::mutex> autoLock(sinkRemoteCamSrvLock_);
         auto iter = remoteSinks_.find(deviceId);
         if (iter != remoteSinks_.end()) {
             iter->second->AsObject()->RemoveDeathRecipient(sinkRemoteRecipient_);
         }
-        remoteSinks_[deviceId] = remoteDmsObj;
+        remoteSinks_[deviceId] = remoteCamSrvObj;
     }
-    DHLOGI("GetSinkRemoteDHMS success, AddDeathRecipient ret: %d", ret);
-    return remoteDmsObj;
+    DHLOGI("GetSinkRemoteCamSrv success, AddDeathRecipient ret: %d", ret);
+    return remoteCamSrvObj;
 }
 
-void DCameraSourceServiceIpc::DeleteSinkRemoteDhms(const std::string& deviceId)
+void DCameraSourceServiceIpc::DeleteSinkRemoteCamSrv(const std::string& deviceId)
 {
-    DHLOGI("DeleteSinkRemoteDhms devId: %s", GetAnonyString(deviceId).c_str());
-    std::lock_guard<std::mutex> autoLock(sinkRemoteDmsLock_);
+    DHLOGI("DeleteSinkRemoteCamSrv devId: %s", GetAnonyString(deviceId).c_str());
+    std::lock_guard<std::mutex> autoLock(sinkRemoteCamSrvLock_);
     auto item = remoteSinks_.find(deviceId);
     if (item == remoteSinks_.end()) {
-        DHLOGI("DeleteSinkRemoteDhms not found device: %s", GetAnonyString(deviceId).c_str());
+        DHLOGI("DeleteSinkRemoteCamSrv not found device: %s", GetAnonyString(deviceId).c_str());
         return;
     }
 
@@ -130,32 +130,32 @@ void DCameraSourceServiceIpc::DeleteSinkRemoteDhms(const std::string& deviceId)
     remoteSinks_.erase(item);
 }
 
-void DCameraSourceServiceIpc::ClearSinkRemoteDhms()
+void DCameraSourceServiceIpc::ClearSinkRemoteCamSrv()
 {
-    DHLOGI("ClearSinkRemoteDhms Start");
-    std::lock_guard<std::mutex> autoLock(sinkRemoteDmsLock_);
+    DHLOGI("ClearSinkRemoteCamSrv Start");
+    std::lock_guard<std::mutex> autoLock(sinkRemoteCamSrvLock_);
     for (auto iter = remoteSinks_.begin(); iter != remoteSinks_.end(); iter++) {
         if (iter->second != nullptr) {
             iter->second->AsObject()->RemoveDeathRecipient(sinkRemoteRecipient_);
         }
     }
     remoteSinks_.clear();
-    DHLOGI("ClearSinkRemoteDhms end");
+    DHLOGI("ClearSinkRemoteCamSrv end");
 }
 
 void DCameraSourceServiceIpc::SinkRemoteRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
 {
     DHLOGI("SinkRemoteRecipient OnRemoteDied received died notify!");
-    DCameraSourceServiceIpc::GetInstance().OnSinkRemoteDmsDied(remote);
+    DCameraSourceServiceIpc::GetInstance().OnSinkRemoteCamSrvDied(remote);
 }
 
-void DCameraSourceServiceIpc::OnSinkRemoteDmsDied(const wptr<IRemoteObject>& remote)
+void DCameraSourceServiceIpc::OnSinkRemoteCamSrvDied(const wptr<IRemoteObject>& remote)
 {
-    DHLOGI("OnSinkRemoteDmsDied delete diedRemoted");
-    std::lock_guard<std::mutex> autoLock(sinkRemoteDmsLock_);
+    DHLOGI("OnSinkRemoteCamSrvDied delete diedRemoted");
+    std::lock_guard<std::mutex> autoLock(sinkRemoteCamSrvLock_);
     sptr<IRemoteObject> diedRemoted = remote.promote();
     if (diedRemoted == nullptr) {
-        DHLOGE("OnSinkRemoteDmsDied promote failed!");
+        DHLOGE("OnSinkRemoteCamSrvDied promote failed!");
         return;
     }
     auto iter = std::find_if(remoteSinks_.begin(), remoteSinks_.end(), [&](
@@ -163,11 +163,11 @@ void DCameraSourceServiceIpc::OnSinkRemoteDmsDied(const wptr<IRemoteObject>& rem
             return item.second->AsObject() == diedRemoted;
         });
     if (iter == remoteSinks_.end()) {
-        DHLOGI("OnSinkRemoteDmsDied not found remote object");
+        DHLOGI("OnSinkRemoteCamSrvDied not found remote object");
         return;
     }
 
-    DHLOGI("OnSinkRemoteDmsDied remote.devId: %s", GetAnonyString(iter->first).c_str());
+    DHLOGI("OnSinkRemoteCamSrvDied remote.devId: %s", GetAnonyString(iter->first).c_str());
     if (iter->second != nullptr) {
         iter->second->AsObject()->RemoveDeathRecipient(sinkRemoteRecipient_);
     }

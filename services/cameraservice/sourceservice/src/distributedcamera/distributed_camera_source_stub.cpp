@@ -75,7 +75,7 @@ int32_t DistributedCameraSourceStub::InitSourceInner(MessageParcel &data, Messag
         ret = InitSource(params, callbackProxy);
     } while (0);
     reply.WriteInt32(ret);
-    return ret;
+    return DCAMERA_OK;
 }
 
 int32_t DistributedCameraSourceStub::ReleaseSourceInner(MessageParcel &data, MessageParcel &reply)
@@ -84,7 +84,7 @@ int32_t DistributedCameraSourceStub::ReleaseSourceInner(MessageParcel &data, Mes
     (void)data;
     int32_t ret = ReleaseSource();
     reply.WriteInt32(ret);
-    return ret;
+    return DCAMERA_OK;
 }
 
 int32_t DistributedCameraSourceStub::RegisterDistributedHardwareInner(MessageParcel &data, MessageParcel &reply)
@@ -102,7 +102,7 @@ int32_t DistributedCameraSourceStub::RegisterDistributedHardwareInner(MessagePar
         DHLOGI("DistributedCameraSourceStub RegisterDistributedHardware %d", ret);
     } while (0);
     reply.WriteInt32(ret);
-    return ret;
+    return DCAMERA_OK;
 }
 
 int32_t DistributedCameraSourceStub::UnregisterDistributedHardwareInner(MessageParcel &data, MessageParcel &reply)
@@ -116,7 +116,7 @@ int32_t DistributedCameraSourceStub::UnregisterDistributedHardwareInner(MessageP
         ret = UnregisterDistributedHardware(devId, dhId, reqId);
     } while (0);
     reply.WriteInt32(ret);
-    return ret;
+    return DCAMERA_OK;
 }
 
 int32_t DistributedCameraSourceStub::DCameraNotifyInner(MessageParcel &data, MessageParcel &reply)
@@ -129,7 +129,7 @@ int32_t DistributedCameraSourceStub::DCameraNotifyInner(MessageParcel &data, Mes
         ret = DCameraNotify(devId, dhId, events);
     } while (0);
     reply.WriteInt32(ret);
-    return ret;
+    return DCAMERA_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

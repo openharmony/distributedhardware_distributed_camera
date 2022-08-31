@@ -118,7 +118,7 @@ int32_t DCameraSinkController::DCameraNotify(std::shared_ptr<DCameraEvent>& even
         return DCAMERA_BAD_VALUE;
     }
 
-    sptr<IDistributedCameraSource> sourceSA = DCameraSinkServiceIpc::GetInstance().GetSourceRemoteDHMS(srcDevId_);
+    sptr<IDistributedCameraSource> sourceSA = DCameraSinkServiceIpc::GetInstance().GetSourceRemoteCamSrv(srcDevId_);
     if (sourceSA == nullptr) {
         DHLOGE("DCameraSinkController::DCameraNotify sourceSA is null");
         return DCAMERA_BAD_VALUE;
@@ -206,7 +206,7 @@ int32_t DCameraSinkController::CloseChannel()
 {
     DHLOGI("DCameraSinkController::CloseChannel dhId: %s", GetAnonyString(dhId_).c_str());
     std::lock_guard<std::mutex> autoLock(channelLock_);
-    DCameraSinkServiceIpc::GetInstance().DeleteSourceRemoteDhms(srcDevId_);
+    DCameraSinkServiceIpc::GetInstance().DeleteSourceRemoteCamSrv(srcDevId_);
     srcDevId_.clear();
     int32_t ret = channel_->ReleaseSession();
     if (ret != DCAMERA_OK) {

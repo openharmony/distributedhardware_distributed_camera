@@ -18,11 +18,11 @@ import(
     "//foundation/distributedhardware/distributed_camera/distributedcamera.gni")
 
 ##############################fuzztest##########################################
-ohos_fuzztest("OnSinkLocalDmsDiedFuzzTest") {
-  module_out_path = "distributed_camera/onsinklocaldmsdied"
+ohos_fuzztest("OnSinkLocalCamSrvDiedFuzzTest") {
+  module_out_path = "distributed_camera/onsinklocalcamsrvdied"
 
   fuzz_config_file =
-      "${innerkits_path}/native_cpp/test/fuzztest/onsinklocaldmsdied_fuzzer"
+      "${innerkits_path}/native_cpp/test/fuzztest/onsinklocalcamsrvdied_fuzzer"
 
   include_dirs = [
     "//commonlibrary/c_utils/base/include",
@@ -45,7 +45,7 @@ ohos_fuzztest("OnSinkLocalDmsDiedFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
-  sources = [ "onsinklocaldmsdied_fuzzer.cpp" ]
+  sources = [ "onsinklocalcamsrvdied_fuzzer.cpp" ]
 
   deps = [
     "${common_path}:distributed_camera_utils",
@@ -54,7 +54,7 @@ ohos_fuzztest("OnSinkLocalDmsDiedFuzzTest") {
 
   defines = [
     "HI_LOG_ENABLE",
-    "DH_LOG_TAG=\"OnSinkLocalDmsDiedFuzzTest\"",
+    "DH_LOG_TAG=\"OnSinkLocalCamSrvDiedFuzzTest\"",
     "LOG_DOMAIN=0xD004100",
   ]
 
@@ -71,6 +71,6 @@ ohos_fuzztest("OnSinkLocalDmsDiedFuzzTest") {
 ###############################################################################
 group("fuzztest") {
   testonly = true
-  deps = [ ":OnSinkLocalDmsDiedFuzzTest" ]
+  deps = [ ":OnSinkLocalCamSrvDiedFuzzTest" ]
 }
 ###############################################################################

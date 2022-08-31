@@ -13,20 +13,20 @@
  * limitations under the License.
  */
 
-#include "onsourcelocaldmsdied_fuzzer.h"
+#include "onsinklocalcamsrvdied_fuzzer.h"
 
 #include <cstddef>
 #include <cstdint>
 
-#include "dcamera_source_handler.h"
-#include "dcamera_source_handler_ipc.h"
+#include "dcamera_sink_handler.h"
+#include "dcamera_sink_handler_ipc.h"
 #include "distributed_camera_constants.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-void OnSourceLocalDmsDiedFuzzTest(const uint8_t* data, size_t size)
+void OnSinkLocalCamSrvDiedFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size < (sizeof(int32_t)))) {
         return;
@@ -38,7 +38,7 @@ void OnSourceLocalDmsDiedFuzzTest(const uint8_t* data, size_t size)
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(saId);
     wptr<IRemoteObject> remote (remoteObject);
 
-    DCameraSourceHandlerIpc::GetInstance().OnSourceLocalDmsDied(remote);
+    DCameraSinkHandlerIpc::GetInstance().OnSinkLocalCamSrvDied(remote);
 }
 }
 }
@@ -47,6 +47,7 @@ void OnSourceLocalDmsDiedFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::OnSourceLocalDmsDiedFuzzTest(data, size);
+    OHOS::DistributedHardware::OnSinkLocalCamSrvDiedFuzzTest(data, size);
     return 0;
 }
+

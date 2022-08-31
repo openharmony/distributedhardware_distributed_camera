@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,7 +41,7 @@ IMPLEMENT_SINGLE_INSTANCE(DCameraSinkHandlerIpc);
 
 void DCameraSinkHandlerIpc::Init()
 {
-    std::lock_guard<std::mutex> autoLock(initDmsLock_);
+    std::lock_guard<std::mutex> autoLock(initCamSrvLock_);
     DHLOGI("DCameraSinkHandlerIpc Init Start");
     if (isInit_) {
         DHLOGI("DCameraSinkHandlerIpc has already init");
@@ -54,93 +54,93 @@ void DCameraSinkHandlerIpc::Init()
 
 void DCameraSinkHandlerIpc::UnInit()
 {
-    std::lock_guard<std::mutex> autoLock(initDmsLock_);
+    std::lock_guard<std::mutex> autoLock(initCamSrvLock_);
     DHLOGI("DCameraSinkHandlerIpc UnInit Start");
     if (!isInit_) {
         DHLOGI("DCameraSinkHandlerIpc has already UnInit");
         return;
     }
-    DeleteSinkLocalDhms();
+    DeleteSinkLocalCamSrv();
     DHLOGI("DCameraSinkHandlerIpc Start free recipient");
     sinkLocalRecipient_ = nullptr;
     isInit_ = false;
     DHLOGI("DCameraSinkHandlerIpc UnInit End");
 }
 
-sptr<IDistributedCameraSink> DCameraSinkHandlerIpc::GetSinkLocalDHMS()
+sptr<IDistributedCameraSink> DCameraSinkHandlerIpc::GetSinkLocalCamSrv()
 {
     {
-        std::lock_guard<std::mutex> autoLock(sinkLocalDmsLock_);
+        std::lock_guard<std::mutex> autoLock(sinkLocalCamSrvLock_);
         if (localSink_ != nullptr) {
-            DHLOGI("DCameraSinkHandlerIpc GetSinkLocalDHMS from cache");
+            DHLOGI("DCameraSinkHandlerIpc GetSinkLocalCamSrv from cache");
             return localSink_;
         }
     }
-    DHLOGI("GetSinkLocalDHMS Start");
+    DHLOGI("GetSinkLocalCamSrv Start");
     sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sm == nullptr) {
-        DHLOGE("GetSinkLocalDHMS GetSystemAbilityManager failed");
+        DHLOGE("GetSinkLocalCamSrv GetSystemAbilityManager failed");
         return nullptr;
     }
 
     sptr<IRemoteObject> object = sm->GetSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID);
     if (object == nullptr) {
-        DHLOGE("GetSinkLocalDHMS GetSystemAbility failed");
+        DHLOGE("GetSinkLocalCamSrv GetSystemAbility failed");
         return nullptr;
     }
     int32_t ret = object->AddDeathRecipient(sinkLocalRecipient_);
     sptr<IDistributedCameraSink> localSink = iface_cast<IDistributedCameraSink>(object);
     if (localSink == nullptr) {
-        DHLOGI("GetSinkLocalDHMS failed, localSink is null ret: %d", ret);
+        DHLOGI("GetSinkLocalCamSrv failed, localSink is null ret: %d", ret);
         return nullptr;
     }
     {
-        std::lock_guard<std::mutex> autoLock(sinkLocalDmsLock_);
+        std::lock_guard<std::mutex> autoLock(sinkLocalCamSrvLock_);
         if (localSink_ != nullptr) {
             localSink_->AsObject()->RemoveDeathRecipient(sinkLocalRecipient_);
         }
         localSink_ = localSink;
     }
-    DHLOGI("GetSinkLocalDHMS success, AddDeathRecipient ret: %d", ret);
+    DHLOGI("GetSinkLocalCamSrv success, AddDeathRecipient ret: %d", ret);
     return localSink;
 }
 
-void DCameraSinkHandlerIpc::DeleteSinkLocalDhms()
+void DCameraSinkHandlerIpc::DeleteSinkLocalCamSrv()
 {
-    DHLOGI("DeleteSinkLocalDhms start");
-    std::lock_guard<std::mutex> autoLock(sinkLocalDmsLock_);
+    DHLOGI("DeleteSinkLocalCamSrv start");
+    std::lock_guard<std::mutex> autoLock(sinkLocalCamSrvLock_);
     if (localSink_ != nullptr) {
         localSink_->AsObject()->RemoveDeathRecipient(sinkLocalRecipient_);
     }
     localSink_ = nullptr;
-    DHLOGI("DeleteSinkLocalDhms end");
+    DHLOGI("DeleteSinkLocalCamSrv end");
 }
 
 void DCameraSinkHandlerIpc::SinkLocalRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
 {
     DHLOGI("SinkLocalRecipient OnRemoteDied received died notify!");
-    DCameraSinkHandlerIpc::GetInstance().OnSinkLocalDmsDied(remote);
+    DCameraSinkHandlerIpc::GetInstance().OnSinkLocalCamSrvDied(remote);
 }
 
-void DCameraSinkHandlerIpc::OnSinkLocalDmsDied(const wptr<IRemoteObject>& remote)
+void DCameraSinkHandlerIpc::OnSinkLocalCamSrvDied(const wptr<IRemoteObject>& remote)
 {
-    DHLOGI("OnSinkLocalDmsDied delete diedRemoted");
-    std::lock_guard<std::mutex> autoLock(sinkLocalDmsLock_);
+    DHLOGI("OnSinkLocalCamSrvDied delete diedRemoted");
+    std::lock_guard<std::mutex> autoLock(sinkLocalCamSrvLock_);
     if (localSink_ == nullptr) {
-        DHLOGE("DCameraSinkHandlerIpc::OnSinkLocalDmsDied, localSink is null.");
+        DHLOGE("DCameraSinkHandlerIpc::OnSinkLocalCamSrvDied, localSink is null.");
         return;
     }
     sptr<IRemoteObject> diedRemoted = remote.promote();
     if (diedRemoted == nullptr) {
-        DHLOGE("OnSinkLocalDmsDied promote failed!");
+        DHLOGE("OnSinkLocalCamSrvDied promote failed!");
         return;
     }
     if (localSink_->AsObject() != diedRemoted) {
-        DHLOGI("OnSinkLocalDmsDied not found remote object.");
+        DHLOGI("OnSinkLocalCamSrvDied not found remote object.");
         return;
     }
 
-    DHLOGI("OnSinkLocalDmsDied Clear");
+    DHLOGI("OnSinkLocalCamSrvDied Clear");
     localSink_->AsObject()->RemoveDeathRecipient(sinkLocalRecipient_);
     localSink_ = nullptr;
 }
