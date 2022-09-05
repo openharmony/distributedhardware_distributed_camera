@@ -64,7 +64,7 @@ int32_t DCameraSourceCallbackStub::NotifyRegResultInner(MessageParcel &data, Mes
         ret = OnNotifyRegResult(devId, dhId, reqId, status, result);
     } while (0);
     reply.WriteInt32(ret);
-    return ret;
+    return DCAMERA_OK;
 }
 
 int32_t DCameraSourceCallbackStub::NotifyUnregResultInner(MessageParcel &data, MessageParcel &reply)
@@ -80,7 +80,7 @@ int32_t DCameraSourceCallbackStub::NotifyUnregResultInner(MessageParcel &data, M
         ret = OnNotifyUnregResult(devId, dhId, reqId, status, result);
     } while (0);
     reply.WriteInt32(ret);
-    return ret;
+    return DCAMERA_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

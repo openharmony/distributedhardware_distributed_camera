@@ -15,8 +15,8 @@ group("fuzztest") {
   testonly = true
 
   deps = [
-    "onsinklocaldmsdied_fuzzer:fuzztest",
-    "onsourcelocaldmsdied_fuzzer:fuzztest",
+    "onsinklocalcamsrvdied_fuzzer:fuzztest",
+    "onsourcelocalcamsrvdied_fuzzer:fuzztest",
     "sinkhandlerinitsink_fuzzer:fuzztest",
     "sinkhandlersubscribelocalhardware_fuzzer:fuzztest",
     "sinkhandlerunsubscribelocalhardware_fuzzer:fuzztest",

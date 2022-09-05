@@ -60,7 +60,7 @@ int32_t DistributedCameraSinkStub::InitSinkInner(MessageParcel &data, MessagePar
     std::string params = data.ReadString();
     int32_t ret = InitSink(params);
     reply.WriteInt32(ret);
-    return ret;
+    return DCAMERA_OK;
 }
 
 int32_t DistributedCameraSinkStub::ReleaseSinkInner(MessageParcel &data, MessageParcel &reply)
@@ -68,7 +68,7 @@ int32_t DistributedCameraSinkStub::ReleaseSinkInner(MessageParcel &data, Message
     DHLOGD("DistributedCameraSinkStub::ReleaseSinkInner");
     int32_t ret = ReleaseSink();
     reply.WriteInt32(ret);
-    return ret;
+    return DCAMERA_OK;
 }
 
 int32_t DistributedCameraSinkStub::SubscribeLocalHardwareInner(MessageParcel &data, MessageParcel &reply)
@@ -78,7 +78,7 @@ int32_t DistributedCameraSinkStub::SubscribeLocalHardwareInner(MessageParcel &da
     std::string parameters = data.ReadString();
     int32_t ret = SubscribeLocalHardware(dhId, parameters);
     reply.WriteInt32(ret);
-    return ret;
+    return DCAMERA_OK;
 }
 
 int32_t DistributedCameraSinkStub::UnsubscribeLocalHardwareInner(MessageParcel &data, MessageParcel &reply)
@@ -87,7 +87,7 @@ int32_t DistributedCameraSinkStub::UnsubscribeLocalHardwareInner(MessageParcel &
     std::string dhId = data.ReadString();
     int32_t ret = UnsubscribeLocalHardware(dhId);
     reply.WriteInt32(ret);
-    return ret;
+    return DCAMERA_OK;
 }
 
 int32_t DistributedCameraSinkStub::StopCaptureInner(MessageParcel &data, MessageParcel &reply)
@@ -96,7 +96,7 @@ int32_t DistributedCameraSinkStub::StopCaptureInner(MessageParcel &data, Message
     std::string dhId = data.ReadString();
     int32_t ret = StopCapture(dhId);
     reply.WriteInt32(ret);
-    return ret;
+    return DCAMERA_OK;
 }
 
 int32_t DistributedCameraSinkStub::ChannelNegInner(MessageParcel &data, MessageParcel &reply)
@@ -106,7 +106,7 @@ int32_t DistributedCameraSinkStub::ChannelNegInner(MessageParcel &data, MessageP
     std::string channelInfo = data.ReadString();
     int32_t ret = ChannelNeg(dhId, channelInfo);
     reply.WriteInt32(ret);
-    return ret;
+    return DCAMERA_OK;
 }
 
 int32_t DistributedCameraSinkStub::GetCameraInfoInner(MessageParcel &data, MessageParcel &reply)
@@ -116,7 +116,7 @@ int32_t DistributedCameraSinkStub::GetCameraInfoInner(MessageParcel &data, Messa
     std::string cameraInfo = data.ReadString();
     int32_t ret = GetCameraInfo(dhId, cameraInfo);
     reply.WriteInt32(ret);
-    return ret;
+    return DCAMERA_OK;
 }
 
 int32_t DistributedCameraSinkStub::OpenChannelInner(MessageParcel &data, MessageParcel &reply)
@@ -126,7 +126,7 @@ int32_t DistributedCameraSinkStub::OpenChannelInner(MessageParcel &data, Message
     std::string openInfo = data.ReadString();
     int32_t ret = OpenChannel(dhId, openInfo);
     reply.WriteInt32(ret);
-    return ret;
+    return DCAMERA_OK;
 }
 
 int32_t DistributedCameraSinkStub::CloseChannelInner(MessageParcel &data, MessageParcel &reply)
@@ -135,7 +135,7 @@ int32_t DistributedCameraSinkStub::CloseChannelInner(MessageParcel &data, Messag
     std::string dhId = data.ReadString();
     int32_t ret = CloseChannel(dhId);
     reply.WriteInt32(ret);
-    return ret;
+    return DCAMERA_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
