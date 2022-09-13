@@ -86,7 +86,7 @@ int32_t DCameraSinkOutput::OpenChannel(std::shared_ptr<DCameraChannelInfo>& info
     for (auto iter = info->detail_.begin(); iter != info->detail_.end(); iter++) {
         if (sessionState_[iter->streamType_] != DCAMERA_CHANNEL_STATE_DISCONNECTED) {
             DHLOGE("DCameraSinkOutput::OpenChannel wrong state, sessionState: %d", sessionState_[iter->streamType_]);
-            return DCAMERA_WRONG_STATE;
+            return DCAMERA_OK;
         }
         auto iterCh = channels_.find(iter->streamType_);
         if (iterCh == channels_.end()) {

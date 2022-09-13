@@ -52,6 +52,7 @@ const std::string SESSION_FLAG_CONTINUE = "dataContinue";
 const std::string SESSION_FLAG_SNAPSHOT = "dataSnapshot";
 const int32_t TEST_WIDTH = 1080;
 const int32_t TEST_HEIGHT = 1920;
+const int32_t TEST_TWENTY_MS = 20000;
 
 std::string g_testDeviceIdOutput;
 DCameraChannelDetail g_testDetailOutput;
@@ -119,12 +120,6 @@ void DCameraSinkOutputTest::SetUp(void)
     std::vector<std::string> cameras = DCameraHandler::GetInstance().GetCameras();
     operator_ = std::make_shared<MockCameraOperator>();
     output_ = std::make_shared<DCameraSinkOutput>(cameras[0], operator_);
-    channel_ = std::make_shared<MockCameraChannel>();
-    dataProcess_ = std::make_shared<MockDCameraSinkDataProcess>(channel_);
-    output_->channels_.emplace(SNAPSHOT_FRAME, channel_);
-    output_->channels_.emplace(CONTINUOUS_FRAME, channel_);
-    output_->dataProcesses_.emplace(SNAPSHOT_FRAME, dataProcess_);
-    output_->dataProcesses_.emplace(CONTINUOUS_FRAME, dataProcess_);
 }
 
 void DCameraSinkOutputTest::TearDown(void)
@@ -147,7 +142,7 @@ HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_001, TestSize.Level1)
     int32_t ret = output_->Init();
     EXPECT_EQ(DCAMERA_OK, ret);
     EXPECT_EQ(true, output_->isInit_);
-
+    usleep(TEST_TWENTY_MS);
     ret = output_->UnInit();
     EXPECT_EQ(DCAMERA_OK, ret);
     EXPECT_EQ(false, output_->isInit_);
@@ -161,6 +156,12 @@ HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_001, TestSize.Level1)
  */
 HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_002, TestSize.Level1)
 {
+    channel_ = std::make_shared<MockCameraChannel>();
+    dataProcess_ = std::make_shared<MockDCameraSinkDataProcess>(channel_);
+    output_->channels_.emplace(SNAPSHOT_FRAME, channel_);
+    output_->channels_.emplace(CONTINUOUS_FRAME, channel_);
+    output_->dataProcesses_.emplace(SNAPSHOT_FRAME, dataProcess_);
+    output_->dataProcesses_.emplace(CONTINUOUS_FRAME, dataProcess_);
     g_testCaptureInfosOutput.push_back(g_testCaptureInfoOutputContinuousNotEncode);
     int32_t ret = output_->StartCapture(g_testCaptureInfosOutput);
     EXPECT_EQ(DCAMERA_OK, ret);
@@ -176,6 +177,12 @@ HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_002, TestSize.Level1)
  */
 HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_003, TestSize.Level1)
 {
+    channel_ = std::make_shared<MockCameraChannel>();
+    dataProcess_ = std::make_shared<MockDCameraSinkDataProcess>(channel_);
+    output_->channels_.emplace(SNAPSHOT_FRAME, channel_);
+    output_->channels_.emplace(CONTINUOUS_FRAME, channel_);
+    output_->dataProcesses_.emplace(SNAPSHOT_FRAME, dataProcess_);
+    output_->dataProcesses_.emplace(CONTINUOUS_FRAME, dataProcess_);
     g_testCaptureInfosOutput.push_back(g_testCaptureInfoOutputContinuousNeedEncode);
     int32_t ret = output_->StartCapture(g_testCaptureInfosOutput);
     EXPECT_EQ(DCAMERA_OK, ret);
@@ -191,6 +198,12 @@ HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_003, TestSize.Level1)
  */
 HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_004, TestSize.Level1)
 {
+    channel_ = std::make_shared<MockCameraChannel>();
+    dataProcess_ = std::make_shared<MockDCameraSinkDataProcess>(channel_);
+    output_->channels_.emplace(SNAPSHOT_FRAME, channel_);
+    output_->channels_.emplace(CONTINUOUS_FRAME, channel_);
+    output_->dataProcesses_.emplace(SNAPSHOT_FRAME, dataProcess_);
+    output_->dataProcesses_.emplace(CONTINUOUS_FRAME, dataProcess_);
     g_testCaptureInfosOutput.push_back(g_testCaptureInfoOutputSnapshot);
     int32_t ret = output_->StartCapture(g_testCaptureInfosOutput);
     EXPECT_EQ(DCAMERA_OK, ret);
@@ -206,6 +219,12 @@ HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_004, TestSize.Level1)
  */
 HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_005, TestSize.Level1)
 {
+    channel_ = std::make_shared<MockCameraChannel>();
+    dataProcess_ = std::make_shared<MockDCameraSinkDataProcess>(channel_);
+    output_->channels_.emplace(SNAPSHOT_FRAME, channel_);
+    output_->channels_.emplace(CONTINUOUS_FRAME, channel_);
+    output_->dataProcesses_.emplace(SNAPSHOT_FRAME, dataProcess_);
+    output_->dataProcesses_.emplace(CONTINUOUS_FRAME, dataProcess_);
     g_testCaptureInfosOutput.push_back(g_testCaptureInfoOutputContinuousNotEncode);
     int32_t ret = output_->StartCapture(g_testCaptureInfosOutput);
     EXPECT_EQ(DCAMERA_OK, ret);
@@ -224,6 +243,9 @@ HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_005, TestSize.Level1)
  */
 HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_006, TestSize.Level1)
 {
+    channel_ = std::make_shared<MockCameraChannel>();
+    output_->channels_.emplace(SNAPSHOT_FRAME, channel_);
+    output_->channels_.emplace(CONTINUOUS_FRAME, channel_);
     int32_t ret = output_->OpenChannel(g_testChannelInfo);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
@@ -236,6 +258,9 @@ HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_006, TestSize.Level1)
  */
 HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_007, TestSize.Level1)
 {
+    channel_ = std::make_shared<MockCameraChannel>();
+    output_->channels_.emplace(SNAPSHOT_FRAME, channel_);
+    output_->channels_.emplace(CONTINUOUS_FRAME, channel_);
     int32_t ret = output_->CloseChannel();
     EXPECT_EQ(DCAMERA_OK, ret);
 }
