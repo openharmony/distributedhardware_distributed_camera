@@ -225,7 +225,6 @@ int32_t DCameraStreamDataProcessProducer::FeedStreamToDriver(const DHBase& dhBas
             DCameraMemoryMap(sharedMemory.bufferHandle_->GetBufferHandle());
         if (sharedMemory.bufferHandle_->GetBufferHandle()->virAddr == nullptr) {
             DHLOGE("mmap failed devId: %s dhId: %s", GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
-            ret = DCAMERA_MEMORY_OPT_ERROR;
             break;
         }
         ret = memcpy_s(sharedMemory.bufferHandle_->GetBufferHandle()->virAddr, sharedMemory.size_, buffer->Data(),
@@ -234,7 +233,6 @@ int32_t DCameraStreamDataProcessProducer::FeedStreamToDriver(const DHBase& dhBas
             DHLOGE("memcpy_s devId: %s dhId: %s streamId: %d bufSize: %d, addressSize: %d",
                 GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamId_, buffer->Size(),
                 sharedMemory.size_);
-            ret = DCAMERA_MEMORY_OPT_ERROR;
             break;
         }
         sharedMemory.size_ = buffer->Size();
