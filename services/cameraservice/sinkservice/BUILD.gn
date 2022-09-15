@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -101,7 +101,6 @@ ohos_shared_library("distributed_camera_sink") {
     "${services_path}/cameraservice/cameraoperator/handler:distributed_camera_handler",
     "${services_path}/channel:distributed_camera_channel",
     "${services_path}/data_process:distributed_camera_data_process",
-    "//drivers/peripheral/camera/interfaces/metadata:metadata",
     "//third_party/jsoncpp:jsoncpp",
   ]
 
@@ -115,7 +114,6 @@ ohos_shared_library("distributed_camera_sink") {
     "c_utils:utils",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "eventhandler:libeventhandler",
-    "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",

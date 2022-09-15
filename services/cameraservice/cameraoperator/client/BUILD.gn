@@ -70,7 +70,6 @@ ohos_shared_library("distributed_camera_client") {
     "${common_path}:distributed_camera_utils",
     "${graphicstandard_path}:libsurface",
     "//drivers/peripheral/camera/interfaces/metadata:metadata",
-    "//third_party/jsoncpp:jsoncpp",
   ]
 
   defines = [
@@ -83,9 +82,7 @@ ohos_shared_library("distributed_camera_client") {
     "c_utils:utils",
     "drivers_interface_camera:libcamera_proxy_1.0",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
-    "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "multimedia_player_framework:media_client",
   ]
 
   subsystem_name = "distributedhardware"
