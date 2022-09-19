@@ -61,6 +61,11 @@ int32_t DCameraSourceCallbackStub::NotifyRegResultInner(MessageParcel &data, Mes
         std::string reqId = data.ReadString();
         int32_t status = data.ReadInt32();
         std::string result = data.ReadString();
+        if (!CheckParams(devId, dhId, reqId, result)) {
+            DHLOGE("DCameraSourceCallbackStub NotifyRegResultInner input is invalid");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
         ret = OnNotifyRegResult(devId, dhId, reqId, status, result);
     } while (0);
     reply.WriteInt32(ret);
@@ -77,10 +82,30 @@ int32_t DCameraSourceCallbackStub::NotifyUnregResultInner(MessageParcel &data, M
         std::string reqId = data.ReadString();
         int32_t status = data.ReadInt32();
         std::string result = data.ReadString();
+        if (!CheckParams(devId, dhId, reqId, result)) {
+            DHLOGE("DCameraSourceCallbackStub NotifyUnregResultInner input is invalid");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
         ret = OnNotifyUnregResult(devId, dhId, reqId, status, result);
     } while (0);
     reply.WriteInt32(ret);
     return DCAMERA_OK;
+}
+
+bool DCameraSourceCallbackStub::CheckParams(const std::string& devId, const std::string& dhId, const std::string& reqId,
+    const std::string& result)
+{
+    if (devId.empty() || devId.size() > DID_MAX_SIZE || dhId.empty() || dhId.size() > DID_MAX_SIZE) {
+        DHLOGE("DCameraSourceCallbackStub CheckParams devId or dhId is invalid");
+        return false;
+    }
+
+    if (reqId.empty() || reqId.size() > DID_MAX_SIZE || result.size() > PARAM_MAX_SIZE) {
+        DHLOGE("DCameraSourceCallbackStub CheckParams reqId or result is invalid");
+        return false;
+    }
+    return true;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -35,9 +35,15 @@ private:
     int32_t RegisterDistributedHardwareInner(MessageParcel &data, MessageParcel &reply);
     int32_t UnregisterDistributedHardwareInner(MessageParcel &data, MessageParcel &reply);
     int32_t DCameraNotifyInner(MessageParcel &data, MessageParcel &reply);
+    bool CheckRegParams(const std::string& devId, const std::string& dhId,
+        const std::string& reqId, const EnableParam& param);
+    bool CheckUnregParams(const std::string& devId, const std::string& dhId, const std::string& reqId);
+    bool CheckNotifyParams(const std::string& devId, const std::string& dhId, std::string& events);
 
     using DCameraFunc = int32_t (DistributedCameraSourceStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, DCameraFunc> memberFuncMap_;
+    const size_t PARAM_MAX_SIZE = 50 * 1024 * 1024;
+    const size_t DID_MAX_SIZE = 256;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

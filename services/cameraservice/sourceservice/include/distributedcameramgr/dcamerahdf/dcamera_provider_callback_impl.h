@@ -36,9 +36,17 @@ public:
     int32_t UpdateSettings(const DHBase& dhBase, const std::vector<DCameraSettings>& settings) override;
 
 private:
+    bool CheckDHBase(const DHBase& dhBase);
+    bool CheckStreamInfo(const DCStreamInfo& stream);
+    bool CheckCaptureInfo(const DCCaptureInfo& captureInfo);
+
     std::string devId_;
     std::string dhId_;
     std::weak_ptr<DCameraSourceDev> sourceDev_;
+    const size_t PARAM_MAX_SIZE = 50 * 1024 * 1024;
+    const size_t DID_MAX_SIZE = 256;
+    const int32_t RESOLUTION_MAX_WIDTH = 10000;
+    const int32_t RESOLUTION_MAX_HEIGHT = 10000;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

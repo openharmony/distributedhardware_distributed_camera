@@ -266,6 +266,10 @@ int32_t DistributedCameraSinkService::CloseChannel(const std::string& dhId)
 int DistributedCameraSinkService::Dump(int32_t fd, const std::vector<std::u16string>& args)
 {
     DHLOGI("DistributedCameraSinkService Dump.");
+    if (args.size() > DUMP_MAX_SIZE) {
+        DHLOGE("DistributedCameraSinkService Dump input is invalid");
+        return DCAMERA_BAD_VALUE;
+    }
     std::string result;
     std::vector<std::string> argsStr;
     for (auto item : args) {

@@ -67,6 +67,8 @@ private:
 
     std::shared_ptr<ICameraStateListener> listener_;
     std::string sourceVer_;
+    const size_t MAX_CAMERAS_NUMBER = 32;
+    const size_t DUMP_MAX_SIZE = 10 * 1024;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
