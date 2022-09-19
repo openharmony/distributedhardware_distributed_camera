@@ -54,18 +54,18 @@ public:
     std::string GetVersion();
 
 public:
-    virtual int32_t ExecuteRegister(std::shared_ptr<DCameraRegistParam>& param);
-    virtual int32_t ExecuteUnRegister(std::shared_ptr<DCameraRegistParam>& param);
-    virtual int32_t ExecuteOpenCamera();
-    virtual int32_t ExecuteCloseCamera();
-    virtual int32_t ExecuteConfigStreams(std::vector<std::shared_ptr<DCStreamInfo>>& streamInfos);
-    virtual int32_t ExecuteReleaseStreams(std::vector<int>& streamIds, bool& isAllRelease);
-    virtual int32_t ExecuteReleaseAllStreams();
-    virtual int32_t ExecuteStartCapture(std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos);
-    virtual int32_t ExecuteStopCapture(std::vector<int>& streamIds, bool& isAllStop);
-    virtual int32_t ExecuteStopAllCapture();
-    virtual int32_t ExecuteUpdateSettings(std::vector<std::shared_ptr<DCameraSettings>>& settings);
-    virtual int32_t ExecuteCameraEventNotify(std::shared_ptr<DCameraEvent>& events);
+    virtual int32_t Register(std::shared_ptr<DCameraRegistParam>& param);
+    virtual int32_t UnRegister(std::shared_ptr<DCameraRegistParam>& param);
+    virtual int32_t OpenCamera();
+    virtual int32_t CloseCamera();
+    virtual int32_t ConfigStreams(std::vector<std::shared_ptr<DCStreamInfo>>& streamInfos);
+    virtual int32_t ReleaseStreams(std::vector<int>& streamIds, bool& isAllRelease);
+    virtual int32_t ReleaseAllStreams();
+    virtual int32_t StartCapture(std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos);
+    virtual int32_t StopCapture(std::vector<int>& streamIds, bool& isAllStop);
+    virtual int32_t StopAllCapture();
+    virtual int32_t UpdateSettings(std::vector<std::shared_ptr<DCameraSettings>>& settings);
+    virtual int32_t CameraEventNotify(std::shared_ptr<DCameraEvent>& events);
 
 private:
     using DCameraNotifyFunc = void (DCameraSourceDev::*)(DCAMERA_EVENT eventType, DCameraSourceEvent& event,
@@ -73,7 +73,6 @@ private:
 
     void NotifyResult(DCAMERA_EVENT eventType, DCameraSourceEvent& event, int32_t result);
     void NotifyRegisterResult(DCAMERA_EVENT eventType, DCameraSourceEvent& event, int32_t result);
-    void NotifyUnregisterResult(DCAMERA_EVENT eventType, DCameraSourceEvent& event, int32_t result);
     void NotifyHalResult(DCAMERA_EVENT eventType, DCameraSourceEvent& event, int32_t result);
     void HitraceAndHisyseventImpl(std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos);
 

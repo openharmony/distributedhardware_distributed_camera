@@ -58,7 +58,7 @@ int32_t DCameraSourceInitState::DoRegisterTask(std::shared_ptr<DCameraSourceDev>
     if (ret != DCAMERA_OK) {
         return ret;
     }
-    ret = camDev->ExecuteRegister(param);
+    ret = camDev->Register(param);
     if (ret != DCAMERA_OK) {
         return ret;
     }
