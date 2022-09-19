@@ -68,7 +68,7 @@ int32_t DCameraSourceRegistState::DoUnregisterTask(std::shared_ptr<DCameraSource
     if (ret != DCAMERA_OK) {
         return ret;
     }
-    ret = camDev->ExecuteUnRegister(param);
+    ret = camDev->UnRegister(param);
     if (ret != DCAMERA_OK) {
         return ret;
     }
@@ -83,9 +83,9 @@ int32_t DCameraSourceRegistState::DoUnregisterTask(std::shared_ptr<DCameraSource
 
 int32_t DCameraSourceRegistState::DoOpenTask(std::shared_ptr<DCameraSourceDev>& camDev, DCameraSourceEvent& event)
 {
-    int32_t ret = camDev->ExecuteOpenCamera();
+    int32_t ret = camDev->OpenCamera();
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceRegistState ExecuteOpenCamera failed, ret: %d", ret);
+        DHLOGE("DCameraSourceRegistState OpenCamera failed, ret: %d", ret);
         return ret;
     }
     return DCAMERA_OK;
@@ -106,9 +106,9 @@ int32_t DCameraSourceRegistState::DoEventNofityTask(std::shared_ptr<DCameraSourc
         return ret;
     }
 
-    ret = camDev->ExecuteCameraEventNotify(camEvent);
+    ret = camDev->CameraEventNotify(camEvent);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceRegistState DoEventNofityTask ExecuteCameraEventNotify failed, ret: %d", ret);
+        DHLOGE("DCameraSourceRegistState DoEventNofityTask CameraEventNotify failed, ret: %d", ret);
         return ret;
     }
     return DCAMERA_OK;

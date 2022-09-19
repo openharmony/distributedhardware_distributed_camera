@@ -29,53 +29,53 @@ public:
         : DCameraSourceDev(devId, dhId, stateLisener) {};
     ~MockDCameraSourceDev() = default;
 
-    int32_t ExecuteRegister(std::shared_ptr<DCameraRegistParam>& param)
+    int32_t Register(std::shared_ptr<DCameraRegistParam>& param)
     {
         return DCAMERA_OK;
     }
-    int32_t ExecuteUnRegister(std::shared_ptr<DCameraRegistParam>& param)
+    int32_t UnRegister(std::shared_ptr<DCameraRegistParam>& param)
     {
         return DCAMERA_OK;
     }
-    int32_t ExecuteOpenCamera()
+    int32_t OpenCamera()
     {
         return DCAMERA_OK;
     }
-    int32_t ExecuteCloseCamera()
+    int32_t CloseCamera()
     {
         return DCAMERA_OK;
     }
-    int32_t ExecuteConfigStreams(std::vector<std::shared_ptr<DCStreamInfo>>& streamInfos)
+    int32_t ConfigStreams(std::vector<std::shared_ptr<DCStreamInfo>>& streamInfos)
     {
         return DCAMERA_OK;
     }
-    int32_t ExecuteReleaseStreams(std::vector<int>& streamIds, bool& isAllRelease)
+    int32_t ReleaseStreams(std::vector<int>& streamIds, bool& isAllRelease)
     {
         isAllRelease = true;
         return DCAMERA_OK;
     }
-    int32_t ExecuteReleaseAllStreams()
+    int32_t ReleaseAllStreams()
     {
         return DCAMERA_OK;
     }
-    int32_t ExecuteStartCapture(std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos)
+    int32_t StartCapture(std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos)
     {
         return DCAMERA_OK;
     }
-    int32_t ExecuteStopCapture(std::vector<int>& streamIds, bool& isAllStop)
+    int32_t StopCapture(std::vector<int>& streamIds, bool& isAllStop)
     {
         isAllStop = true;
         return DCAMERA_OK;
     }
-    int32_t ExecuteStopAllCapture()
+    int32_t StopAllCapture()
     {
         return DCAMERA_OK;
     }
-    int32_t ExecuteUpdateSettings(std::vector<std::shared_ptr<DCameraSettings>>& settings)
+    int32_t UpdateSettings(std::vector<std::shared_ptr<DCameraSettings>>& settings)
     {
         return DCAMERA_OK;
     }
-    int32_t ExecuteCameraEventNotify(std::shared_ptr<DCameraEvent>& events)
+    int32_t CameraEventNotify(std::shared_ptr<DCameraEvent>& events)
     {
         return DCAMERA_OK;
     }

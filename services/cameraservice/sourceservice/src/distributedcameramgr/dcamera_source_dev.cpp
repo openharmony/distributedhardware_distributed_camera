@@ -37,7 +37,7 @@ DCameraSourceDev::DCameraSourceDev(std::string devId, std::string dhId,
     DHLOGI("DCameraSourceDev Construct devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     memberFuncMap_[DCAMERA_EVENT_REGIST] = &DCameraSourceDev::NotifyRegisterResult;
-    memberFuncMap_[DCAMERA_EVENT_UNREGIST] = &DCameraSourceDev::NotifyUnregisterResult;
+    memberFuncMap_[DCAMERA_EVENT_UNREGIST] = &DCameraSourceDev::NotifyRegisterResult;
     memberFuncMap_[DCAMERA_EVENT_OPEN] = &DCameraSourceDev::NotifyHalResult;
     memberFuncMap_[DCAMERA_EVENT_CLOSE] = &DCameraSourceDev::NotifyHalResult;
     memberFuncMap_[DCAMERA_EVENT_CONFIG_STREAMS] = &DCameraSourceDev::NotifyHalResult;
@@ -213,7 +213,7 @@ void DCameraSourceDev::OnEvent(DCameraSourceEvent& event)
     NotifyResult(event.GetEventType(), event, ret);
 }
 
-int32_t DCameraSourceDev::ExecuteRegister(std::shared_ptr<DCameraRegistParam>& param)
+int32_t DCameraSourceDev::Register(std::shared_ptr<DCameraRegistParam>& param)
 {
     DCAMERA_SYNC_TRACE(DCAMERA_REGISTER_CAMERA);
     DHLOGI("DCameraSourceDev Execute Register devId: %s dhId: %s",
@@ -239,7 +239,7 @@ int32_t DCameraSourceDev::ExecuteRegister(std::shared_ptr<DCameraRegistParam>& p
 
     sptr<IDCameraProvider> camHdiProvider = IDCameraProvider::Get(HDF_DCAMERA_EXT_SERVICE);
     if (camHdiProvider == nullptr) {
-        DHLOGI("ExecuteRegister camHdiProvider is nullptr devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
+        DHLOGI("Register camHdiProvider is nullptr devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
             GetAnonyString(dhId_).c_str());
         controller_->UnInit();
         input_->UnInit();
@@ -259,7 +259,7 @@ int32_t DCameraSourceDev::ExecuteRegister(std::shared_ptr<DCameraRegistParam>& p
     return DCAMERA_OK;
 }
 
-int32_t DCameraSourceDev::ExecuteUnRegister(std::shared_ptr<DCameraRegistParam>& param)
+int32_t DCameraSourceDev::UnRegister(std::shared_ptr<DCameraRegistParam>& param)
 {
     DCAMERA_SYNC_TRACE(DCAMERA_UNREGISTER_CAMERA);
     DHLOGI("DCameraSourceDev Execute UnRegister devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
@@ -280,7 +280,7 @@ int32_t DCameraSourceDev::ExecuteUnRegister(std::shared_ptr<DCameraRegistParam>&
 
     sptr<IDCameraProvider> camHdiProvider = IDCameraProvider::Get(HDF_DCAMERA_EXT_SERVICE);
     if (camHdiProvider == nullptr) {
-        DHLOGI("ExecuteUnRegister camHdiProvider is nullptr devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
+        DHLOGI("UnRegister camHdiProvider is nullptr devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
             GetAnonyString(dhId_).c_str());
         return DCAMERA_BAD_OPERATE;
     }
@@ -297,7 +297,7 @@ int32_t DCameraSourceDev::ExecuteUnRegister(std::shared_ptr<DCameraRegistParam>&
     return DCAMERA_OK;
 }
 
-int32_t DCameraSourceDev::ExecuteOpenCamera()
+int32_t DCameraSourceDev::OpenCamera()
 {
     DHLOGI("DCameraSourceDev Execute OpenCamera devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
@@ -321,7 +321,7 @@ int32_t DCameraSourceDev::ExecuteOpenCamera()
     return DCAMERA_OK;
 }
 
-int32_t DCameraSourceDev::ExecuteCloseCamera()
+int32_t DCameraSourceDev::CloseCamera()
 {
     DHLOGI("DCameraSourceDev Execute CloseCamera devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
@@ -339,7 +339,7 @@ int32_t DCameraSourceDev::ExecuteCloseCamera()
     return DCAMERA_OK;
 }
 
-int32_t DCameraSourceDev::ExecuteConfigStreams(std::vector<std::shared_ptr<DCStreamInfo>>& streamInfos)
+int32_t DCameraSourceDev::ConfigStreams(std::vector<std::shared_ptr<DCStreamInfo>>& streamInfos)
 {
     DHLOGI("DCameraSourceDev Execute ConfigStreams devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
@@ -380,7 +380,7 @@ int32_t DCameraSourceDev::ExecuteConfigStreams(std::vector<std::shared_ptr<DCStr
     return DCAMERA_OK;
 }
 
-int32_t DCameraSourceDev::ExecuteReleaseStreams(std::vector<int>& streamIds, bool& isAllRelease)
+int32_t DCameraSourceDev::ReleaseStreams(std::vector<int>& streamIds, bool& isAllRelease)
 {
     DHLOGI("DCameraSourceDev Execute ReleaseStreams devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
@@ -393,7 +393,7 @@ int32_t DCameraSourceDev::ExecuteReleaseStreams(std::vector<int>& streamIds, boo
     return DCAMERA_OK;
 }
 
-int32_t DCameraSourceDev::ExecuteReleaseAllStreams()
+int32_t DCameraSourceDev::ReleaseAllStreams()
 {
     DHLOGI("DCameraSourceDev Execute ReleaseAllStreams devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
@@ -406,7 +406,7 @@ int32_t DCameraSourceDev::ExecuteReleaseAllStreams()
     return DCAMERA_OK;
 }
 
-int32_t DCameraSourceDev::ExecuteStartCapture(std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos)
+int32_t DCameraSourceDev::StartCapture(std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos)
 {
     HitraceAndHisyseventImpl(captureInfos);
     DHLOGI("DCameraSourceDev Execute StartCapture devId %s dhId %s", GetAnonyString(devId_).c_str(),
@@ -429,7 +429,7 @@ int32_t DCameraSourceDev::ExecuteStartCapture(std::vector<std::shared_ptr<DCCapt
         capture->isCapture_ = (*iter)->isCapture_;
         capture->encodeType_ = (*iter)->encodeType_;
         capture->streamType_ = (*iter)->type_;
-        DHLOGI("ExecuteStartCapture devId %s dhId %s settings size: %d w: %d h: %d fmt: %d isC: %d enc: %d streamT: %d",
+        DHLOGI("StartCapture devId %s dhId %s settings size: %d w: %d h: %d fmt: %d isC: %d enc: %d streamT: %d",
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), (*iter)->captureSettings_.size(),
             capture->width_, capture->height_, capture->format_, capture->isCapture_ ? 1 : 0, capture->encodeType_,
             capture->streamType_);
@@ -474,7 +474,7 @@ void DCameraSourceDev::HitraceAndHisyseventImpl(std::vector<std::shared_ptr<DCCa
     }
 }
 
-int32_t DCameraSourceDev::ExecuteStopCapture(std::vector<int>& streamIds, bool& isAllStop)
+int32_t DCameraSourceDev::StopCapture(std::vector<int>& streamIds, bool& isAllStop)
 {
     DHLOGI("DCameraSourceDev Execute StopCapture devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
@@ -493,7 +493,7 @@ int32_t DCameraSourceDev::ExecuteStopCapture(std::vector<int>& streamIds, bool& 
     return DCAMERA_OK;
 }
 
-int32_t DCameraSourceDev::ExecuteStopAllCapture()
+int32_t DCameraSourceDev::StopAllCapture()
 {
     DHLOGI("DCameraSourceDev Execute StopAllCapture devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
@@ -510,7 +510,7 @@ int32_t DCameraSourceDev::ExecuteStopAllCapture()
     return DCAMERA_OK;
 }
 
-int32_t DCameraSourceDev::ExecuteUpdateSettings(std::vector<std::shared_ptr<DCameraSettings>>& settings)
+int32_t DCameraSourceDev::UpdateSettings(std::vector<std::shared_ptr<DCameraSettings>>& settings)
 {
     DHLOGI("DCameraSourceDev Execute UpdateSettings devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
@@ -529,7 +529,7 @@ int32_t DCameraSourceDev::ExecuteUpdateSettings(std::vector<std::shared_ptr<DCam
     return DCAMERA_OK;
 }
 
-int32_t DCameraSourceDev::ExecuteCameraEventNotify(std::shared_ptr<DCameraEvent>& events)
+int32_t DCameraSourceDev::CameraEventNotify(std::shared_ptr<DCameraEvent>& events)
 {
     DHLOGI("DCameraSourceDev Execute CameraEventNotify devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
@@ -569,23 +569,11 @@ void DCameraSourceDev::NotifyRegisterResult(DCAMERA_EVENT eventType, DCameraSour
         DHLOGE("DCameraSourceDev can not get listener");
         return;
     }
-    stateListener_->OnRegisterNotify(param->devId_, param->dhId_, param->reqId_, result, data);
-}
-
-void DCameraSourceDev::NotifyUnregisterResult(DCAMERA_EVENT eventType, DCameraSourceEvent& event, int32_t result)
-{
-    std::string data = "";
-    std::shared_ptr<DCameraRegistParam> param;
-    int32_t ret = event.GetDCameraRegistParam(param);
-    if (ret != DCAMERA_OK) {
-        return;
+    if (eventType == DCAMERA_EVENT_REGIST) {
+        stateListener_->OnRegisterNotify(param->devId_, param->dhId_, param->reqId_, result, data);
+    } else {
+        stateListener_->OnUnregisterNotify(param->devId_, param->dhId_, param->reqId_, result, data);
     }
-
-    if (stateListener_ == nullptr) {
-        DHLOGE("DCameraSourceDev can not get listener");
-        return;
-    }
-    stateListener_->OnUnregisterNotify(param->devId_, param->dhId_, param->reqId_, result, data);
 }
 
 void DCameraSourceDev::NotifyHalResult(DCAMERA_EVENT eventType, DCameraSourceEvent& event, int32_t result)
@@ -603,7 +591,7 @@ void DCameraSourceDev::NotifyHalResult(DCAMERA_EVENT eventType, DCameraSourceEve
         return;
     }
     events->eventResult_ = iter->second;
-    ExecuteCameraEventNotify(events);
+    CameraEventNotify(events);
     return;
 }
 

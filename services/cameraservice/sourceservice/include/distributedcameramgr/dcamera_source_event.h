@@ -113,9 +113,13 @@ public:
     DCAMERA_EVENT GetEventType();
 
 private:
-    using EventParam = std::variant<std::monostate, DCameraIndex, std::shared_ptr<DCameraRegistParam>,
-        std::vector<std::shared_ptr<DCStreamInfo>>, std::vector<std::shared_ptr<DCCaptureInfo>>,
-        std::vector<std::shared_ptr<DCameraSettings>>, std::vector<int>, std::shared_ptr<DCameraEvent>>;
+    using EventParam = std::variant<std::monostate,
+        DCameraIndex,
+        std::shared_ptr<DCameraRegistParam>,
+        std::vector<std::shared_ptr<DCStreamInfo>>,
+        std::vector<std::shared_ptr<DCCaptureInfo>>,
+        std::vector<std::shared_ptr<DCameraSettings>>,
+        std::vector<int>, std::shared_ptr<DCameraEvent>>;
 
 private:
     DCAMERA_EVENT eventType_;
