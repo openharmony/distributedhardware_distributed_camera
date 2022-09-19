@@ -35,7 +35,7 @@ const std::string ENUM_ENCODETYPE_STRINGS[] = {
 };
 }
 
-void ReportDcamerInitFail(const std::string eventName, int32_t errCode, const std::string& errMsg)
+void ReportDcamerInitFail(const std::string& eventName, int32_t errCode, const std::string& errMsg)
 {
     int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
         eventName,
@@ -47,7 +47,7 @@ void ReportDcamerInitFail(const std::string eventName, int32_t errCode, const st
     }
 }
 
-void ReportRegisterCameraFail(const std::string eventName, const std::string& devId, const std::string& dhId,
+void ReportRegisterCameraFail(const std::string& eventName, const std::string& devId, const std::string& dhId,
     std::string version, const std::string& errMsg)
 {
     int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
@@ -63,7 +63,7 @@ void ReportRegisterCameraFail(const std::string eventName, const std::string& de
     }
 }
 
-void ReportDcamerOptFail(const std::string eventName, int32_t errCode, const std::string& errMsg)
+void ReportDcamerOptFail(const std::string& eventName, int32_t errCode, const std::string& errMsg)
 {
     int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
         eventName,
@@ -75,7 +75,7 @@ void ReportDcamerOptFail(const std::string eventName, int32_t errCode, const std
     }
 }
 
-void ReportSaEvent(const std::string eventName, int32_t saId, const std::string& errMsg)
+void ReportSaEvent(const std::string& eventName, int32_t saId, const std::string& errMsg)
 {
     int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
         eventName,
@@ -87,7 +87,7 @@ void ReportSaEvent(const std::string eventName, int32_t saId, const std::string&
     }
 }
 
-void ReportRegisterCameraEvent(const std::string eventName, const std::string& devId, const std::string& dhId,
+void ReportRegisterCameraEvent(const std::string& eventName, const std::string& devId, const std::string& dhId,
     std::string version, const std::string& errMsg)
 {
     int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
@@ -102,7 +102,7 @@ void ReportRegisterCameraEvent(const std::string eventName, const std::string& d
     }
 }
 
-void ReportCameraOperaterEvent(const std::string eventName, const std::string& devId, const std::string& dhId,
+void ReportCameraOperaterEvent(const std::string& eventName, const std::string& devId, const std::string& dhId,
     const std::string& errMsg)
 {
     int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
@@ -116,7 +116,7 @@ void ReportCameraOperaterEvent(const std::string eventName, const std::string& d
     }
 }
 
-void ReportStartCaptureEvent(const std::string eventName, EventCaptureInfo& capture, const std::string& errMsg)
+void ReportStartCaptureEvent(const std::string& eventName, EventCaptureInfo& capture, const std::string& errMsg)
 {
     int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
         eventName,
