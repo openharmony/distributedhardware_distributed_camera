@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,7 +20,6 @@
 #include "dcamera_source_callback.h"
 #include "dcamera_source_handler_ipc.h"
 #include "dcamera_source_load_callback.h"
-#include "dh_utils_tool.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -30,6 +29,12 @@
 namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(DCameraSourceHandler);
+
+DCameraSourceHandler::DCameraSourceHandler()
+{
+    DHLOGI("DCameraSourceHandler construct.");
+    callback_ = new DCameraSourceCallback();
+}
 
 DCameraSourceHandler::~DCameraSourceHandler()
 {
@@ -41,14 +46,14 @@ int32_t DCameraSourceHandler::InitSource(const std::string& params)
     DHLOGI("DCameraSourceHandler InitSource Start");
     sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sm == nullptr) {
-        DHLOGE("GetSourceLocalDHMS GetSystemAbilityManager failed");
+        DHLOGE("GetSourceLocalCamSrv GetSystemAbilityManager failed");
         return DCAMERA_INIT_ERR;
     }
     ReportSaEvent(INIT_SA_EVENT, DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, "init source sa event.");
     sptr<DCameraSourceLoadCallback> loadCallback = new DCameraSourceLoadCallback(params);
     int32_t ret = sm->LoadSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, loadCallback);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("systemAbilityId: %d load filed,result code: %d.", DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, ret);
+    if (ret != ERR_OK) {
+        DHLOGE("systemAbilityId: %d load failed,result code: %d.", DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, ret);
         return DCAMERA_INIT_ERR;
     }
     uint32_t interval = 1;
@@ -67,24 +72,19 @@ int32_t DCameraSourceHandler::InitSource(const std::string& params)
 void DCameraSourceHandler::FinishStartSA(const std::string &params)
 {
     DCameraSourceHandlerIpc::GetInstance().Init();
-    sptr<IDistributedCameraSource> dCameraSourceSrv = DCameraSourceHandlerIpc::GetInstance().GetSourceLocalDHMS();
+    sptr<IDistributedCameraSource> dCameraSourceSrv = DCameraSourceHandlerIpc::GetInstance().GetSourceLocalCamSrv();
     if (dCameraSourceSrv == nullptr) {
         DHLOGE("DCameraSourceHandler InitSource get Service failed");
         return;
     }
 
-    callback_ = new DCameraSourceCallback();
-    if (callback_ == nullptr) {
-        DHLOGE("DCameraSourceHandler InitSource init callback failed");
-        return;
-    }
     dCameraSourceSrv->InitSource(params, callback_);
-    std::unique_lock<std::mutex> lock(producerMutex_);
+    std::lock_guard<std::mutex> lock(producerMutex_);
     state_ = DCAMERA_SA_STATE_START;
     producerCon_.notify_one();
 }
 
-void DCameraSourceHandler::FinishStartSAFailed(int32_t systemAbilityId)
+void DCameraSourceHandler::FinishStartSAFailed(const int32_t systemAbilityId)
 {
     DHLOGE("SourceSA Start failed, systemAbilityId: %d.", systemAbilityId);
     std::unique_lock<std::mutex> lock(producerMutex_);
@@ -95,7 +95,7 @@ void DCameraSourceHandler::FinishStartSAFailed(int32_t systemAbilityId)
 int32_t DCameraSourceHandler::ReleaseSource()
 {
     DHLOGI("DCameraSourceHandler ReleaseSource Start");
-    sptr<IDistributedCameraSource> dCameraSourceSrv = DCameraSourceHandlerIpc::GetInstance().GetSourceLocalDHMS();
+    sptr<IDistributedCameraSource> dCameraSourceSrv = DCameraSourceHandlerIpc::GetInstance().GetSourceLocalCamSrv();
     if (dCameraSourceSrv == nullptr) {
         DHLOGE("DCameraSourceHandler ReleaseSource get Service failed");
         return DCAMERA_INIT_ERR;
@@ -114,19 +114,19 @@ int32_t DCameraSourceHandler::RegisterDistributedHardware(const std::string& dev
 {
     DHLOGI("DCameraSourceHandler RegisterDistributedHardware devId: %s dhId: %s", GetAnonyString(devId).c_str(),
         GetAnonyString(dhId).c_str());
-    sptr<IDistributedCameraSource> dCameraSourceSrv = DCameraSourceHandlerIpc::GetInstance().GetSourceLocalDHMS();
+    if (callback == nullptr) {
+        DHLOGI("DCameraSourceHandler RegisterDistributedHardware RegisterCallback is null.");
+        return DCAMERA_BAD_VALUE;
+    }
+    sptr<IDistributedCameraSource> dCameraSourceSrv = DCameraSourceHandlerIpc::GetInstance().GetSourceLocalCamSrv();
     if (dCameraSourceSrv == nullptr) {
         DHLOGE("DCameraSourceHandler RegisterDistributedHardware get Service failed");
         return DCAMERA_BAD_VALUE;
     }
 
-    std::lock_guard<std::mutex> autoLock(optLock_);
     std::string reqId = GetRandomID();
-
-    if (callback_ == nullptr) {
-        DHLOGE("DCameraSourceHandler RegisterDistributedHardware DCameraSourceCallback is null.");
-        return DCAMERA_BAD_VALUE;
-    }
+    std::lock_guard<std::mutex> autoLock(optLock_);
+    
     callback_->PushRegCallback(reqId, callback);
     int32_t ret = dCameraSourceSrv->RegisterDistributedHardware(devId, dhId, reqId, param);
     if (ret != DCAMERA_OK) {
@@ -142,19 +142,19 @@ int32_t DCameraSourceHandler::UnregisterDistributedHardware(const std::string& d
 {
     DHLOGI("DCameraSourceHandler UnregisterDistributedHardware devId: %s dhId: %s", GetAnonyString(devId).c_str(),
         GetAnonyString(dhId).c_str());
-    sptr<IDistributedCameraSource> dCameraSourceSrv = DCameraSourceHandlerIpc::GetInstance().GetSourceLocalDHMS();
+    if (callback == nullptr) {
+        DHLOGI("DCameraSourceHandler RegisterDistributedHardware UnregisterCallback is null.");
+        return DCAMERA_BAD_VALUE;
+    }
+    sptr<IDistributedCameraSource> dCameraSourceSrv = DCameraSourceHandlerIpc::GetInstance().GetSourceLocalCamSrv();
     if (dCameraSourceSrv == nullptr) {
         DHLOGE("DCameraSourceHandler UnregisterDistributedHardware get Service failed");
         return DCAMERA_BAD_VALUE;
     }
 
-    std::lock_guard<std::mutex> autoLock(optLock_);
     std::string reqId = GetRandomID();
+    std::lock_guard<std::mutex> autoLock(optLock_);
 
-    if (callback_ == nullptr) {
-        DHLOGE("DCameraSourceHandler RegisterDistributedHardware DCameraSourceCallback is null.");
-        return DCAMERA_BAD_VALUE;
-    }
     callback_->PushUnregCallback(reqId, callback);
     int32_t ret = dCameraSourceSrv->UnregisterDistributedHardware(devId, dhId, reqId);
     if (ret != DCAMERA_OK) {

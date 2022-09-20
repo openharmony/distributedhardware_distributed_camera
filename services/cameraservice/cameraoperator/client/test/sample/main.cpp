@@ -15,6 +15,9 @@
 
 #include "dcamera_client_demo.h"
 
+#include "nativetoken_kit.h"
+#include "token_setproc.h"
+
 using namespace OHOS;
 using namespace OHOS::Camera;
 using namespace OHOS::CameraStandard;
@@ -43,7 +46,7 @@ static std::shared_ptr<DCameraCaptureInfo> g_photoInfo = nullptr;
 static std::shared_ptr<DCameraCaptureInfo> g_previewInfo = nullptr;
 static std::shared_ptr<DCameraCaptureInfo> g_videoInfo = nullptr;
 
-#ifdef PRODUCT_M40
+#ifdef DCAMERA_YUV
     constexpr int32_t PHOTO_FORMAT = camera_format_t::OHOS_CAMERA_FORMAT_JPEG;
     constexpr int32_t PREVIEW_FORMAT = camera_format_t::OHOS_CAMERA_FORMAT_YCRCB_420_SP;
     constexpr int32_t VIDEO_FORMAT = camera_format_t::OHOS_CAMERA_FORMAT_YCRCB_420_SP;
@@ -195,6 +198,23 @@ static std::shared_ptr<PhotoCaptureSetting> ConfigPhotoCaptureSetting()
 
 int main()
 {
+    uint64_t tokenId;
+    const char *perms[2];
+    perms[0] = "ohos.permission.DISTRIBUTED_DATASYNC";
+    perms[1] = "ohos.permission.CAMERA";
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = 2,
+        .aclsNum = 0,
+        .dcaps = NULL,
+        .perms = perms,
+        .acls = NULL,
+        .processName = "dcamera_client_demo",
+        .aplStr = "system_basic",
+    };
+    tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
+
     DHLOGI("========== Distributed Camera Demo Start ==========");
     int32_t ret = InitCameraStandard();
     if (ret != DCAMERA_OK) {

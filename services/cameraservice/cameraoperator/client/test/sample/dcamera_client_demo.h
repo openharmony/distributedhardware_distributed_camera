@@ -70,7 +70,7 @@ public:
         address_ = static_cast<char *>(buffer->GetVirAddr());
         buffer->GetExtraData()->ExtraGet("dataSize", dataSize_);
 
-#ifdef PRODUCT_M40
+#ifdef DCAMERA_YUV
         actualSize_ = width_ * height_ * YUV_BYTES_PER_PIXEL / Y2UV_RATIO;
 #else
         actualSize_ = width_ * height_ * RGB_BYTES_PER_PIXEL;

@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef ONSOURCELOCALDMSDIED_FUZZER_H
-#define ONSOURCELOCALDMSDIED_FUZZER_H
+#ifndef ONSOURCELOCALCAMSRVDIED_FUZZER_H
+#define ONSOURCELOCALCAMSRVDIED_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "onsourcelocaldmsdied_fuzzer"
+#define FUZZ_PROJECT_NAME "onsourcelocalcamsrvdied_fuzzer"
 
 #endif

@@ -18,7 +18,7 @@ distributedhardwarefwk_path =
 
 camera_hdf_path = "//drivers/peripheral"
 
-camerastandard_path = "//foundation/multimedia/camera_standard"
+camerastandard_path = "//foundation/multimedia/camera_framework"
 
 mediastandard_path = "//foundation/multimedia/player_framework"
 
@@ -33,8 +33,6 @@ innerkits_path = "${distributedcamera_path}/interfaces/inner_kits"
 fwk_utils_path = "${distributedhardwarefwk_path}/utils"
 
 fwk_common_path = "${distributedhardwarefwk_path}/common"
-
-fwk_services_path = "${distributedhardwarefwk_path}/services"
 
 build_flags = [ "-Werror" ]
 

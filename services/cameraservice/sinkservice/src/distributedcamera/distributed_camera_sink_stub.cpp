@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,7 +38,7 @@ DistributedCameraSinkStub::~DistributedCameraSinkStub()
 int32_t DistributedCameraSinkStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
-    DHLOGI("DistributedCameraSinkStub::OnRemoteRequest code: %d", code);
+    DHLOGD("DistributedCameraSinkStub::OnRemoteRequest code: %d", code);
     std::u16string desc = DistributedCameraSinkStub::GetDescriptor();
     std::u16string remoteDesc = data.ReadInterfaceToken();
     if (desc != remoteDesc) {
@@ -56,86 +56,154 @@ int32_t DistributedCameraSinkStub::OnRemoteRequest(uint32_t code, MessageParcel 
 
 int32_t DistributedCameraSinkStub::InitSinkInner(MessageParcel &data, MessageParcel &reply)
 {
-    DHLOGI("DistributedCameraSinkStub::InitSinkInner");
-    std::string params = data.ReadString();
-    int32_t ret = InitSink(params);
+    DHLOGD("DistributedCameraSinkStub::InitSinkInner");
+    int32_t ret = DCAMERA_OK;
+    do {
+        std::string params = data.ReadString();
+        if (params.empty() || params.size() > PARAM_MAX_SIZE) {
+            DHLOGE("DistributedCameraSinkStub::InitSinkInner params is invalid");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
+        ret = InitSink(params);
+    } while (0);
     reply.WriteInt32(ret);
-    return ret;
+    return DCAMERA_OK;
 }
 
 int32_t DistributedCameraSinkStub::ReleaseSinkInner(MessageParcel &data, MessageParcel &reply)
 {
-    DHLOGI("DistributedCameraSinkStub::ReleaseSinkInner");
+    DHLOGD("DistributedCameraSinkStub::ReleaseSinkInner");
     int32_t ret = ReleaseSink();
     reply.WriteInt32(ret);
-    return ret;
+    return DCAMERA_OK;
 }
 
 int32_t DistributedCameraSinkStub::SubscribeLocalHardwareInner(MessageParcel &data, MessageParcel &reply)
 {
-    DHLOGI("DistributedCameraSinkStub::SubscribeLocalHardwareInner");
-    std::string dhId = data.ReadString();
-    std::string parameters = data.ReadString();
-    int32_t ret = SubscribeLocalHardware(dhId, parameters);
+    DHLOGD("DistributedCameraSinkStub::SubscribeLocalHardwareInner");
+    int32_t ret = DCAMERA_OK;
+    do {
+        std::string dhId = data.ReadString();
+        std::string parameters = data.ReadString();
+        if (parameters.empty() || parameters.size() > PARAM_MAX_SIZE || dhId.empty() ||
+            dhId.size() > DID_MAX_SIZE) {
+            DHLOGE("DistributedCameraSinkStub::SubscribeLocalHardwareInner params is invalid");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
+        ret = SubscribeLocalHardware(dhId, parameters);
+    } while (0);
     reply.WriteInt32(ret);
-    return ret;
+    return DCAMERA_OK;
 }
 
 int32_t DistributedCameraSinkStub::UnsubscribeLocalHardwareInner(MessageParcel &data, MessageParcel &reply)
 {
-    DHLOGI("DistributedCameraSinkStub::UnsubscribeLocalHardwareInner");
-    std::string dhId = data.ReadString();
-    int32_t ret = UnsubscribeLocalHardware(dhId);
+    DHLOGD("DistributedCameraSinkStub::UnsubscribeLocalHardwareInner");
+    int32_t ret = DCAMERA_OK;
+    do {
+        std::string dhId = data.ReadString();
+        if (dhId.empty() || dhId.size() > DID_MAX_SIZE) {
+            DHLOGE("DistributedCameraSinkStub::UnsubscribeLocalHardwareInner params is invalid");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
+        ret = UnsubscribeLocalHardware(dhId);
+    } while (0);
     reply.WriteInt32(ret);
-    return ret;
+    return DCAMERA_OK;
 }
 
 int32_t DistributedCameraSinkStub::StopCaptureInner(MessageParcel &data, MessageParcel &reply)
 {
-    DHLOGI("DistributedCameraSinkStub::StopCaptureInner");
-    std::string dhId = data.ReadString();
-    int32_t ret = StopCapture(dhId);
+    DHLOGD("DistributedCameraSinkStub::StopCaptureInner");
+    int32_t ret = DCAMERA_OK;
+    do {
+        std::string dhId = data.ReadString();
+        if (dhId.empty() || dhId.size() > DID_MAX_SIZE) {
+            DHLOGE("DistributedCameraSinkStub::StopCaptureInner params is invalid");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
+        ret = StopCapture(dhId);
+    } while (0);
     reply.WriteInt32(ret);
-    return ret;
+    return DCAMERA_OK;
 }
 
 int32_t DistributedCameraSinkStub::ChannelNegInner(MessageParcel &data, MessageParcel &reply)
 {
-    DHLOGI("DistributedCameraSinkStub::ChannelNegInner");
-    std::string dhId = data.ReadString();
-    std::string channelInfo = data.ReadString();
-    int32_t ret = ChannelNeg(dhId, channelInfo);
+    DHLOGD("DistributedCameraSinkStub::ChannelNegInner");
+    int32_t ret = DCAMERA_OK;
+    do {
+        std::string dhId = data.ReadString();
+        std::string channelInfo = data.ReadString();
+        if (dhId.empty() || dhId.size() > DID_MAX_SIZE || channelInfo.empty() ||
+            channelInfo.size() > PARAM_MAX_SIZE) {
+            DHLOGE("DistributedCameraSinkStub::ChannelNegInner params is invalid");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
+        ret = ChannelNeg(dhId, channelInfo);
+    } while (0);
     reply.WriteInt32(ret);
-    return ret;
+    return DCAMERA_OK;
 }
 
 int32_t DistributedCameraSinkStub::GetCameraInfoInner(MessageParcel &data, MessageParcel &reply)
 {
-    DHLOGI("DistributedCameraSinkStub::GetCameraInfoInner");
-    std::string dhId = data.ReadString();
-    std::string cameraInfo = data.ReadString();
-    int32_t ret = GetCameraInfo(dhId, cameraInfo);
+    DHLOGD("DistributedCameraSinkStub::GetCameraInfoInner");
+    int32_t ret = DCAMERA_OK;
+    do {
+        std::string dhId = data.ReadString();
+        std::string cameraInfo = data.ReadString();
+        if (dhId.empty() || dhId.size() > DID_MAX_SIZE || cameraInfo.empty() ||
+            cameraInfo.size() > PARAM_MAX_SIZE) {
+            DHLOGE("DistributedCameraSinkStub::GetCameraInfoInner params is invalid");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
+        ret = GetCameraInfo(dhId, cameraInfo);
+    } while (0);
     reply.WriteInt32(ret);
-    return ret;
+    return DCAMERA_OK;
 }
 
 int32_t DistributedCameraSinkStub::OpenChannelInner(MessageParcel &data, MessageParcel &reply)
 {
-    DHLOGI("DistributedCameraSinkStub::OpenChannelInner");
-    std::string dhId = data.ReadString();
-    std::string openInfo = data.ReadString();
-    int32_t ret = OpenChannel(dhId, openInfo);
+    DHLOGD("DistributedCameraSinkStub::OpenChannelInner");
+    int32_t ret = DCAMERA_OK;
+    do {
+        std::string dhId = data.ReadString();
+        std::string openInfo = data.ReadString();
+        if (dhId.empty() || dhId.size() > DID_MAX_SIZE || openInfo.empty()||
+            openInfo.size() > PARAM_MAX_SIZE) {
+            DHLOGE("DistributedCameraSinkStub::OpenChannelInner params is invalid");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
+        ret = OpenChannel(dhId, openInfo);
+    } while (0);
     reply.WriteInt32(ret);
-    return ret;
+    return DCAMERA_OK;
 }
 
 int32_t DistributedCameraSinkStub::CloseChannelInner(MessageParcel &data, MessageParcel &reply)
 {
-    DHLOGI("DistributedCameraSinkStub::CloseChannelInner");
-    std::string dhId = data.ReadString();
-    int32_t ret = CloseChannel(dhId);
+    DHLOGD("DistributedCameraSinkStub::CloseChannelInner");
+    int32_t ret = DCAMERA_OK;
+    do {
+        std::string dhId = data.ReadString();
+        if (dhId.empty() || dhId.size() > DID_MAX_SIZE) {
+            DHLOGE("DistributedCameraSinkStub::CloseChannelInner params is invalid");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
+        ret = CloseChannel(dhId);
+    } while (0);
     reply.WriteInt32(ret);
-    return ret;
+    return DCAMERA_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

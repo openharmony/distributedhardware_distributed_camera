@@ -321,16 +321,17 @@ void EncodeDataProcess::ReleaseProcessNode()
 {
     DHLOGD("Start release [%d] node : EncodeNode.", nodeRank_);
     isEncoderProcess_.store(false);
-    if (nextDataProcess_ != nullptr) {
-        nextDataProcess_->ReleaseProcessNode();
-    }
-
     ReleaseVideoEncoder();
 
     waitEncoderOutputCount_ = 0;
     lastFeedEncoderInputBufferTimeUs_ = 0;
     inputTimeStampUs_ = 0;
     processType_ = "";
+
+    if (nextDataProcess_ != nullptr) {
+        nextDataProcess_->ReleaseProcessNode();
+        nextDataProcess_ = nullptr;
+    }
     DHLOGD("Release [%d] node : EncodeNode end.", nodeRank_);
 }
 
@@ -442,22 +443,18 @@ sptr<SurfaceBuffer> EncodeDataProcess::GetEncoderInputSurfaceBuffer()
 
 int64_t EncodeDataProcess::GetEncoderTimeStamp()
 {
-    int64_t TimeIntervalStampUs = 0;
+    if (inputTimeStampUs_ != 0) {
+        lastFeedEncoderInputBufferTimeUs_ = inputTimeStampUs_;
+    }
     const int64_t nsPerUs = 1000L;
     int64_t nowTimeUs = GetNowTimeStampUs() * nsPerUs;
-    if (lastFeedEncoderInputBufferTimeUs_ == 0) {
-        lastFeedEncoderInputBufferTimeUs_ = nowTimeUs;
-        return TimeIntervalStampUs;
-    }
-    TimeIntervalStampUs = nowTimeUs - lastFeedEncoderInputBufferTimeUs_;
-    lastFeedEncoderInputBufferTimeUs_ = nowTimeUs;
-    return TimeIntervalStampUs;
+    return nowTimeUs;
 }
 
 void EncodeDataProcess::IncreaseWaitEncodeCnt()
 {
     std::lock_guard<std::mutex> lck(mtxHoldCount_);
-    if (inputTimeStampUs_ == 0) {
+    if (lastFeedEncoderInputBufferTimeUs_ == 0) {
         waitEncoderOutputCount_ += FIRST_FRAME_OUTPUT_NUM;
     } else {
         waitEncoderOutputCount_++;
@@ -488,7 +485,7 @@ int32_t EncodeDataProcess::GetEncoderOutputBuffer(uint32_t index, Media::AVCodec
         return DCAMERA_BAD_OPERATE;
     }
 
-    if (info.size <= 0) {
+    if (info.size <= 0 || info.size > DATABUFF_MAX_SIZE) {
         DHLOGE("AVCodecBufferInfo error, buffer size : %d", info.size);
         return DCAMERA_BAD_VALUE;
     }

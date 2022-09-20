@@ -79,6 +79,7 @@ private:
 
     const std::string SESSION_FLAG = "control";
     const std::string SRC_TYPE = "camera";
+    const size_t DATABUFF_MAX_SIZE = 100 * 1024 * 1024;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

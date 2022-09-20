@@ -30,10 +30,6 @@ ohos_shared_library("distributed_camera_client") {
     "${camerastandard_path}/services/camera_service/binder/client/include",
     "${camerastandard_path}/services/camera_service/binder/server/include",
     "${camerastandard_path}/services/camera_service/include",
-    "${fwk_common_path}/log/include",
-    "${fwk_common_path}/utils/include",
-    "${fwk_utils_path}/include/log",
-    "${fwk_utils_path}/include",
   ]
 
   include_dirs += [
@@ -72,10 +68,8 @@ ohos_shared_library("distributed_camera_client") {
   deps = [
     "${camerastandard_path}/frameworks/native/camera:camera_framework",
     "${common_path}:distributed_camera_utils",
-    "${fwk_utils_path}:distributedhardwareutils",
     "${graphicstandard_path}:libsurface",
     "//drivers/peripheral/camera/interfaces/metadata:metadata",
-    "//third_party/jsoncpp:jsoncpp",
   ]
 
   defines = [
@@ -88,8 +82,7 @@ ohos_shared_library("distributed_camera_client") {
     "c_utils:utils",
     "drivers_interface_camera:libcamera_proxy_1.0",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
-    "hiviewdfx_hilog_native:libhilog",
-    "multimedia_player_framework:media_client",
+    "ipc:ipc_core",
   ]
 
   subsystem_name = "distributedhardware"

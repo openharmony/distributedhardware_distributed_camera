@@ -13,25 +13,16 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DCAMERA_PHOTO_SURFACE_LISTENER_H
-#define OHOS_DCAMERA_PHOTO_SURFACE_LISTENER_H
+#ifndef OHOS_DCAMERA_ANONYMOUS_STRING_H
+#define OHOS_DCAMERA_ANONYMOUS_STRING_H
 
-#include "surface.h"
-#include "icamera_operator.h"
+#include <string>
 
 namespace OHOS {
 namespace DistributedHardware {
-class DCameraPhotoSurfaceListener : public IBufferConsumerListener {
-public:
-    DCameraPhotoSurfaceListener(const sptr<Surface>& surface,
-                                const std::shared_ptr<ResultCallback>& callback);
-    void OnBufferAvailable() override;
-
-private:
-    sptr<Surface> surface_;
-    std::shared_ptr<ResultCallback> callback_;
-    const int32_t SURFACE_BUFFER_MAX_SIZE = 10 * 1024 * 1024;
-};
+std::string GetRandomID();
+std::string GetAnonyString(const std::string &value);
+std::string GetAnonyInt32(const int32_t value);
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DCAMERA_PHOTO_SURFACE_LISTENER_H
+#endif // OHOS_DCAMERA_ANONYMOUS_STRING_H

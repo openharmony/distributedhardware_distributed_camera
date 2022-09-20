@@ -25,11 +25,8 @@ ohos_shared_library("distributed_camera_data_process") {
     "//foundation/graphic/graphic_2d/interfaces/innerkits/surface",
     "//drivers/peripheral/display/interfaces/include",
     "//foundation/multimedia/player_framework/interfaces/innerkits/native/media/include",
-    "${fwk_common_path}/log/include",
     "${fwk_common_path}/utils/include",
-    "${fwk_utils_path}/include/log",
     "${fwk_utils_path}/include/eventbus",
-    "${fwk_utils_path}/include",
   ]
 
   include_dirs += [
@@ -74,8 +71,8 @@ ohos_shared_library("distributed_camera_data_process") {
 
   deps = [
     "${common_path}:distributed_camera_utils",
-    "${fwk_utils_path}:distributedhardwareutils",
     "//foundation/graphic/graphic_2d/frameworks/surface:surface",
+    "//third_party/ffmpeg:libohosffmpeg",
   ]
 
   defines = [
@@ -88,11 +85,8 @@ ohos_shared_library("distributed_camera_data_process") {
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "hitrace_native:hitrace_meter",
-    "hiviewdfx_hilog_native:libhilog",
     "multimedia_player_framework:media_client",
   ]
-
-  public_deps = [ "//third_party/ffmpeg:libohosffmpeg" ]
 
   subsystem_name = "distributedhardware"
 

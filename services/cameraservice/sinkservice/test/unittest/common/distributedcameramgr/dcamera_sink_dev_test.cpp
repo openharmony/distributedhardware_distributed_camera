@@ -45,6 +45,7 @@ public:
     std::shared_ptr<DCameraSinkDev> dev_;
 };
 
+const int32_t TEST_TWENTY_MS = 20000;
 const std::string TEST_PARAMETER = "";
 std::string g_testCameraInfo = "";
 
@@ -86,6 +87,7 @@ void DCameraSinkDevTest::SetUp(void)
 
 void DCameraSinkDevTest::TearDown(void)
 {
+    usleep(TEST_TWENTY_MS);
     dev_ = nullptr;
 }
 

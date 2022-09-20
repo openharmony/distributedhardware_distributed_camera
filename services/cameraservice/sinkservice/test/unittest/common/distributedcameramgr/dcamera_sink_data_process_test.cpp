@@ -49,6 +49,7 @@ const int32_t SLEEP_TIME_MS = 500;
 const int32_t TEST_WIDTH = 1080;
 const int32_t TEST_HEIGHT = 1920;
 const std::string TEST_STRING = "test_string";
+const int32_t TEST_TWENTY_MS = 20000;
 
 std::shared_ptr<DCameraCaptureInfo> g_testCaptureInfoContinuousNotEncode;
 std::shared_ptr<DCameraCaptureInfo> g_testCaptureInfoContinuousNeedEncode;
@@ -111,6 +112,7 @@ void DCameraSinkDataProcessTest::SetUp(void)
 
 void DCameraSinkDataProcessTest::TearDown(void)
 {
+    usleep(TEST_TWENTY_MS);
     channel_ = nullptr;
     dataProcess_ = nullptr;
 }

@@ -73,7 +73,7 @@ private:
     float frameRateCorrectionFactor_ = 0.0;
     /* modify the frame rate controller argument */
     int32_t frameRateOvershootMdf_ = 0;
-    int64_t incomingFrameTimesMs_[INCOME_FRAME_TIME_HISTORY_WINDOWS_SIZE];
+    int64_t incomingFrameTimesMs_[INCOME_FRAME_TIME_HISTORY_WINDOWS_SIZE] = { 0 };
 };
 } // namespace DistributedHardware
 } // namespace OHOS
