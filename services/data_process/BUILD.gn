@@ -23,7 +23,6 @@ ohos_shared_library("distributed_camera_data_process") {
     "//utils/system/safwk/native/include",
     "//foundation/graphic/graphic_2d/interfaces/innerkits/common",
     "//foundation/graphic/graphic_2d/interfaces/innerkits/surface",
-    "//drivers/peripheral/display/interfaces/include",
     "//foundation/multimedia/player_framework/interfaces/innerkits/native/media/include",
     "${fwk_common_path}/utils/include",
     "${fwk_utils_path}/include/eventbus",

@@ -17,7 +17,6 @@
 
 #include <cmath>
 
-#include "display_type.h"
 #include "distributed_hardware_log.h"
 #include "graphic_common_c.h"
 
@@ -388,7 +387,7 @@ sptr<SurfaceBuffer> EncodeDataProcess::GetEncoderInputSurfaceBuffer()
     BufferRequestConfig requestConfig;
     requestConfig.width = sourceConfig_.GetWidth();
     requestConfig.height = sourceConfig_.GetHeight();
-    requestConfig.usage = HBM_USE_CPU_READ | HBM_USE_CPU_WRITE | HBM_USE_MEM_DMA;
+    requestConfig.usage = BUFFER_USAGE_CPU_READ | BUFFER_USAGE_CPU_WRITE | BUFFER_USAGE_MEM_DMA;
     requestConfig.timeout = 0;
     requestConfig.strideAlignment = ENCODER_STRIDE_ALIGNMENT;
     requestConfig.format = PixelFormat::PIXEL_FMT_RGBA_8888;
