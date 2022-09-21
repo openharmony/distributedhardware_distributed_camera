@@ -1,8 +1,8 @@
-# **分布式相机组件**
+# **分布式相机部件**
 
 ## **简介**
 
-分布式相机是多个设备的相机同时协同使用的能力。分布式相机组件是为分布式硬件子系统提供这一能力的组件。本组件不直接对接应用，只向分布式硬件框架子系统提供C++接口。应用可以通过相机框架的接口使用分布式相机组件操作其他设备的Camera，使用方式与本地相机一致。
+分布式相机是多个设备的相机同时协同使用的能力。分布式相机部件是为分布式硬件子系统提供这一能力的部件。本部件不直接对接应用，只向分布式硬件框架子系统提供C++接口。应用可以通过相机框架的接口使用分布式相机部件操作其他设备的Camera，使用方式与本地相机一致。
 
 其系统架构图如下图所示：
 
@@ -40,9 +40,9 @@
 ```
 
 ## **约束**
-**语言限制**：C++语言。  
-**组网环境**：必须确保设备在同一个局域网中。  
-**操作系统限制**：OpenHarmony操作系统。  
+**语言限制**：C++语言。
+**组网环境**：必须确保设备在同一个局域网中。
+**操作系统限制**：OpenHarmony操作系统。
 
 ## **说明**
 ### **概念说明**
@@ -66,18 +66,18 @@
 #### **3. 设备下线**
 设备下线后，分布式硬件管理框架去使能下线设备的相机硬件，本地移除分布式相机驱动并通知到相机框架，此时下线设备的分布式相机不可用。
 
-## **涉及仓**
+## **相关仓**
 ****
-**分布式硬件子系统：**  
+**分布式硬件子系统：**
 
 设备管理
-[device_manager](https://gitee.com/openharmony/device_manager)
+[device_manager](https://gitee.com/openharmony/distributedhardware_device_manager)
 
 分步式硬件管理框架
-[distributed_hardware_fwk](https://gitee.com/openharmony/distributed_hardware_fwk)
+[distributed_hardware_fwk](https://gitee.com/openharmony/distributedhardware_distributed_hardware_fwk)
 
 **分布式相机
-[distributed_camera](https://gitee.com/openharmony/distributed_camera)**
+[distributed_camera](https://gitee.com/openharmony/distributedhardware_distributed_camera)**
 
 分布式屏幕
-[distributed_screen](https://gitee.com/openharmony/distributed_screen)
+[distributed_screen](https://gitee.com/openharmony/distributedhardware_distributed_screen)
