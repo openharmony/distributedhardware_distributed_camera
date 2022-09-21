@@ -401,6 +401,10 @@ void DCameraSinkController::OnDataReceived(std::vector<std::shared_ptr<DataBuffe
 {
     DHLOGI("DCameraSinkController::OnReceivedData %s control channel receive data", GetAnonyString(dhId_).c_str());
     for (auto& buffer : buffers) {
+        if (buffer->Size() <= 0 || buffer->Size() > DATABUFF_MAX_SIZE) {
+            DHLOGI("DCameraSinkController::OnDataReceived buffer is invalid");
+            return;
+        }
         HandleReceivedData(buffer);
     }
 }

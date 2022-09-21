@@ -42,6 +42,9 @@ private:
 
     using DCameraFunc = int32_t (DistributedCameraSinkStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, DCameraFunc> memberFuncMap_;
+
+    const size_t DID_MAX_SIZE = 256;
+    const size_t PARAM_MAX_SIZE = 50 * 1024 * 1024;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

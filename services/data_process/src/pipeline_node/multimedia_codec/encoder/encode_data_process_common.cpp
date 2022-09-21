@@ -441,7 +441,7 @@ int32_t EncodeDataProcess::GetEncoderOutputBuffer(uint32_t index, Media::AVCodec
         return DCAMERA_BAD_OPERATE;
     }
 
-    if (info.size <= 0) {
+    if (info.size <= 0 || info.size > DATABUFF_MAX_SIZE) {
         DHLOGE("AVCodecBufferInfo error, buffer size : %d", info.size);
         return DCAMERA_BAD_VALUE;
     }
