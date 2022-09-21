@@ -30,6 +30,7 @@ public:
 private:
     sptr<Surface> surface_;
     std::shared_ptr<ResultCallback> callback_;
+    const int32_t SURFACE_BUFFER_MAX_SIZE = 10 * 1024 * 1024;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
