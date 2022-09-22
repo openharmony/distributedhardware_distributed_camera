@@ -180,9 +180,9 @@ int32_t DCameraSoftbusAdapter::OpenSoftbusSession(std::string mySessName, std::s
     attr.dataType = static_cast<int32_t>(dataType);
     attr.linkTypeNum = DCAMERA_LINK_TYPE_MAX;
     LinkType linkTypeList[DCAMERA_LINK_TYPE_MAX] = {
-        LINK_TYPE_WIFI_P2P,
-        LINK_TYPE_WIFI_WLAN_5G,
         LINK_TYPE_WIFI_WLAN_2G,
+        LINK_TYPE_WIFI_WLAN_5G,
+        LINK_TYPE_WIFI_P2P,
         LINK_TYPE_BR,
     };
 
