@@ -51,17 +51,17 @@ using EventCaptureInfo = struct _EventCaptureInfo {
     int32_t type_;
 };
 
-void ReportDcamerInitFail(const std::string eventName, int32_t errCode, const std::string& errMsg);
-void ReportRegisterCameraFail(const std::string eventName, const std::string& devId, const std::string& dhId,
+void ReportDcamerInitFail(const std::string& eventName, int32_t errCode, const std::string& errMsg);
+void ReportRegisterCameraFail(const std::string& eventName, const std::string& devId, const std::string& dhId,
     std::string version, const std::string& errMsg);
-void ReportDcamerOptFail(const std::string eventName, int32_t errCode, const std::string& errMsg);
+void ReportDcamerOptFail(const std::string& eventName, int32_t errCode, const std::string& errMsg);
 
-void ReportSaEvent(const std::string eventName, int32_t saId, const std::string& errMsg);
-void ReportRegisterCameraEvent(const std::string eventName, const std::string& devId, const std::string& dhId,
+void ReportSaEvent(const std::string& eventName, int32_t saId, const std::string& errMsg);
+void ReportRegisterCameraEvent(const std::string& eventName, const std::string& devId, const std::string& dhId,
     std::string version, const std::string& errMsg);
-void ReportCameraOperaterEvent(const std::string eventName, const std::string& devId, const std::string& dhId,
+void ReportCameraOperaterEvent(const std::string& eventName, const std::string& devId, const std::string& dhId,
     const std::string& errMsg);
-void ReportStartCaptureEvent(const std::string eventName, EventCaptureInfo& capture, const std::string& errMsg);
+void ReportStartCaptureEvent(const std::string& eventName, EventCaptureInfo& capture, const std::string& errMsg);
 
 std::string CreateMsg(const char *format, ...);
 } // namespace DistributedHardware
