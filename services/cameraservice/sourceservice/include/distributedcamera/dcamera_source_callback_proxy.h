@@ -37,7 +37,12 @@ public:
     int32_t OnNotifyUnregResult(const std::string& devId, const std::string& dhId, const std::string& reqId,
         int32_t status, std::string& data) override;
 private:
+    bool CheckParams(const std::string& devId, const std::string& dhId,
+        const std::string& reqId, std::string& data);
+
     static inline BrokerDelegator<DCameraSourceCallbackProxy> delegator_;
+    const size_t PARAM_MAX_SIZE = 50 * 1024 * 1024;
+    const size_t DID_MAX_SIZE = 256;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

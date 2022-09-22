@@ -28,6 +28,10 @@ int32_t DistributedCameraSourceProxy::InitSource(const std::string& params,
     const sptr<IDCameraSourceCallback>& callback)
 {
     DHLOGI("DistributedCameraSourceProxy InitSource");
+    if (params.empty() || params.size() > PARAM_MAX_SIZE) {
+        DHLOGE("DistributedCameraSourceProxy InitSource params is invalid");
+        return DCAMERA_BAD_VALUE;
+    }
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
         DHLOGE("DistributedCameraSourceProxy remote service null");
@@ -81,6 +85,10 @@ int32_t DistributedCameraSourceProxy::RegisterDistributedHardware(const std::str
 {
     DHLOGI("DistributedCameraSourceProxy RegisterDistributedHardware devId: %s dhId: %s",
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
+    if (!CheckRegParams(devId, dhId, reqId, param)) {
+        DHLOGE("DistributedCameraSourceProxy RegisterDistributedHardware input is invalid");
+        return DCAMERA_BAD_VALUE;
+    }
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
         DHLOGE("DistributedCameraSourceProxy remote service null");
@@ -104,11 +112,36 @@ int32_t DistributedCameraSourceProxy::RegisterDistributedHardware(const std::str
     return result;
 }
 
+bool DistributedCameraSourceProxy::CheckRegParams(const std::string& devId, const std::string& dhId,
+    const std::string& reqId, const EnableParam& param)
+{
+    if (devId.empty() || devId.size() > DID_MAX_SIZE || dhId.empty() || dhId.size() > DID_MAX_SIZE) {
+        DHLOGE("DistributedCameraSourceProxy CheckRegParams devId or dhId is invalid");
+        return false;
+    }
+
+    if (reqId.empty() || reqId.size() > DID_MAX_SIZE) {
+        DHLOGE("DistributedCameraSourceProxy CheckRegParams reqId is invalid");
+        return false;
+    }
+
+    if (param.version.empty() || param.version.size() > PARAM_MAX_SIZE ||
+        param.attrs.empty() || param.attrs.size() > PARAM_MAX_SIZE) {
+        DHLOGE("DistributedCameraSourceProxy CheckRegParams param is invalid");
+        return false;
+    }
+    return true;
+}
+
 int32_t DistributedCameraSourceProxy::UnregisterDistributedHardware(const std::string& devId, const std::string& dhId,
     const std::string& reqId)
 {
     DHLOGI("DistributedCameraSourceProxy UnregisterDistributedHardware devId: %s dhId: %s",
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
+    if (!CheckUnregParams(devId, dhId, reqId)) {
+        DHLOGE("DistributedCameraSourceProxy UnregisterDistributedHardware input is invalid");
+        return DCAMERA_BAD_VALUE;
+    }
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
         DHLOGE("DistributedCameraSourceProxy remote service null");
@@ -131,11 +164,30 @@ int32_t DistributedCameraSourceProxy::UnregisterDistributedHardware(const std::s
     return result;
 }
 
+bool DistributedCameraSourceProxy::CheckUnregParams(const std::string& devId, const std::string& dhId,
+    const std::string& reqId)
+{
+    if (devId.empty() || devId.size() > DID_MAX_SIZE || dhId.empty() || dhId.size() > DID_MAX_SIZE) {
+        DHLOGE("DistributedCameraSourceProxy CheckUnregParams devId or dhId is invalid");
+        return false;
+    }
+
+    if (reqId.empty() || reqId.size() > DID_MAX_SIZE) {
+        DHLOGE("DistributedCameraSourceProxy CheckUnregParams reqId is invalid");
+        return false;
+    }
+    return true;
+}
+
 int32_t DistributedCameraSourceProxy::DCameraNotify(const std::string& devId, const std::string& dhId,
     std::string& events)
 {
     DHLOGI("DCameraNotify devId: %s dhId: %s events: %s",
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), events.c_str());
+    if (!CheckNotifyParams(devId, dhId, events)) {
+        DHLOGE("DistributedCameraSourceProxy DCameraNotify input is invalid");
+        return DCAMERA_BAD_VALUE;
+    }
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
         DHLOGE("DistributedCameraSourceProxy remote service null");
@@ -156,6 +208,21 @@ int32_t DistributedCameraSourceProxy::DCameraNotify(const std::string& devId, co
     remote->SendRequest(CAMERA_NOTIFY, data, reply, option);
     int32_t result = reply.ReadInt32();
     return result;
+}
+
+bool DistributedCameraSourceProxy::CheckNotifyParams(const std::string& devId, const std::string& dhId,
+    std::string& events)
+{
+    if (devId.empty() || devId.size() > DID_MAX_SIZE || dhId.empty() || dhId.size() > DID_MAX_SIZE) {
+        DHLOGE("DistributedCameraSourceProxy CheckNotifyParams devId or dhId is invalid");
+        return false;
+    }
+
+    if (events.empty() || events.size() > PARAM_MAX_SIZE) {
+        DHLOGE("DistributedCameraSourceProxy CheckNotifyParams events is invalid");
+        return false;
+    }
+    return true;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

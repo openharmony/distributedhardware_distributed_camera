@@ -213,6 +213,7 @@ void DCameraSoftbusSession::AssembleFrag(std::shared_ptr<DataBuffer>& buffer, Se
     if (headerPara.fragFlag == FRAG_MID || headerPara.fragFlag == FRAG_END) {
         int32_t ret = CheckUnPackBuffer(headerPara);
         if (ret != DCAMERA_OK) {
+            ResetAssembleFrag();
             return;
         }
 

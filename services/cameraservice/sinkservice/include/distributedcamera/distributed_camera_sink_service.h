@@ -59,6 +59,7 @@ private:
     std::string sinkVer_;
     std::map<std::string, std::shared_ptr<DCameraSinkDev>> camerasMap_;
     static DistributedCameraSinkService* dcSinkService;
+    const size_t DUMP_MAX_SIZE = 10 * 1024;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

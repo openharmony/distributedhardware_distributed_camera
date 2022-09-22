@@ -43,7 +43,14 @@ public:
     int32_t DCameraNotify(const std::string& devId, const std::string& dhId, std::string& events) override;
 
 private:
+    bool CheckRegParams(const std::string& devId, const std::string& dhId,
+        const std::string& reqId, const EnableParam& param);
+    bool CheckUnregParams(const std::string& devId, const std::string& dhId, const std::string& reqId);
+    bool CheckNotifyParams(const std::string& devId, const std::string& dhId, std::string& events);
+
     static inline BrokerDelegator<DistributedCameraSourceProxy> delegator_;
+    const size_t PARAM_MAX_SIZE = 50 * 1024 * 1024;
+    const size_t DID_MAX_SIZE = 256;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
