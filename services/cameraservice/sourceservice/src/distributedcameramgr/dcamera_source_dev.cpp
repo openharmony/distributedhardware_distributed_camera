@@ -156,7 +156,7 @@ int32_t DCameraSourceDev::CloseSession(DCameraIndex& camIndex)
     return DCAMERA_OK;
 }
 
-int32_t DCameraSourceDev::ConfigStreams(const std::vector<std::shared_ptr<DCStreamInfo>>& streamInfos)
+int32_t DCameraSourceDev::ConfigCameraStreams(const std::vector<std::shared_ptr<DCStreamInfo>>& streamInfos)
 {
     DHLOGI("DCameraSourceDev PostTask ConfigStreams devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
@@ -165,7 +165,7 @@ int32_t DCameraSourceDev::ConfigStreams(const std::vector<std::shared_ptr<DCStre
     return DCAMERA_OK;
 }
 
-int32_t DCameraSourceDev::ReleaseStreams(const std::vector<int>& streamIds)
+int32_t DCameraSourceDev::ReleaseCameraStreams(const std::vector<int>& streamIds)
 {
     DHLOGI("DCameraSourceDev PostTask ReleaseStreams devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
@@ -174,7 +174,7 @@ int32_t DCameraSourceDev::ReleaseStreams(const std::vector<int>& streamIds)
     return DCAMERA_OK;
 }
 
-int32_t DCameraSourceDev::StartCapture(const std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos)
+int32_t DCameraSourceDev::StartCameraCapture(const std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos)
 {
     DHLOGI("DCameraSourceDev PostTask StartCapture devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
@@ -183,7 +183,7 @@ int32_t DCameraSourceDev::StartCapture(const std::vector<std::shared_ptr<DCCaptu
     return DCAMERA_OK;
 }
 
-int32_t DCameraSourceDev::StopCapture(const std::vector<int>& streamIds)
+int32_t DCameraSourceDev::StopCameraCapture(const std::vector<int>& streamIds)
 {
     DHLOGI("DCameraSourceDev PostTask StopCapture devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
