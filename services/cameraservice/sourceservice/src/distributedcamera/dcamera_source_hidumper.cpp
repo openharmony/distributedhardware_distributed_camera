@@ -128,10 +128,10 @@ int32_t DcameraSourceHidumper::GetCurrentStateInfo(std::string& result)
 {
     DHLOGI("GetCurrentStateInfo Dump.");
     std::map<std::string, int32_t> devState = camDumpInfo_.curState;
-    std::string deviceId("");
-    int32_t camState = 0;
     result.append("CameraId\tState\n");
     for (auto it = devState.begin(); it != devState.end(); it++) {
+        std::string deviceId("");
+        int32_t camState = 0;
         deviceId = it->first;
         camState = it->second;
         DHLOGI("GetCurrentStateInfo camState is %d.", camState);
