@@ -117,6 +117,10 @@ int32_t DistributedCameraSourceService::RegisterDistributedHardware(const std::s
 {
     DHLOGI("DistributedCameraSourceService RegisterDistributedHardware devId: %s, dhId: %s, version: %s",
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), param.version.c_str());
+    if (camerasMap_.size() > MAX_CAMERAS_NUMBER) {
+        DHLOGE("DistributedCameraSourceService RegisterDistributedHardware cameras exceed the upper limit");
+        return DCAMERA_BAD_VALUE;
+    }
     DCameraIndex camIndex(devId, dhId);
     std::shared_ptr<DCameraSourceDev> camDev = nullptr;
     int32_t ret = DCAMERA_OK;
@@ -222,6 +226,10 @@ int32_t DistributedCameraSourceService::UnLoadCameraHDF()
 int DistributedCameraSourceService::Dump(int32_t fd, const std::vector<std::u16string>& args)
 {
     DHLOGI("DistributedCameraSourceService Dump.");
+    if (args.size() > DUMP_MAX_SIZE) {
+        DHLOGE("DistributedCameraSourceService Dump input is invalid");
+        return DCAMERA_BAD_VALUE;
+    }
     std::string result;
     std::vector<std::string> argsStr;
     for (auto item : args) {

@@ -482,6 +482,10 @@ void DecodeDataProcess::GetDecoderOutputBuffer(const sptr<Surface>& surface)
         return;
     }
     int32_t alignedWidth = surfaceBuffer->GetStride();
+    if (surfaceBuffer->GetSize() > BUFFER_MAX_SIZE || alignedWidth > ALIGNED_WIDTH_MAX_SIZE) {
+        DHLOGE("surface buffer size or alignedWidth too long");
+        return;
+    }
     int32_t alignedHeight = alignedHeight_;
     DHLOGD("OutputBuffer alignedWidth %d, alignedHeight %d, TimeUs %lld.", alignedWidth, alignedHeight, timeStampUs);
     CopyDecodedImage(surfaceBuffer, timeStampUs, alignedWidth, alignedHeight);

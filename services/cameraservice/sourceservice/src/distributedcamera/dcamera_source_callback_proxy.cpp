@@ -26,6 +26,10 @@ namespace DistributedHardware {
 int32_t DCameraSourceCallbackProxy::OnNotifyRegResult(const std::string& devId, const std::string& dhId,
     const std::string& reqId, int32_t status, std::string& data)
 {
+    if (!CheckParams(devId, dhId, reqId, data)) {
+        DHLOGE("DCameraSourceCallbackProxy OnNotifyRegResult input is invalid");
+        return DCAMERA_BAD_VALUE;
+    }
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
         DHLOGE("DCameraSourceCallbackProxy remote service null");
@@ -52,6 +56,10 @@ int32_t DCameraSourceCallbackProxy::OnNotifyRegResult(const std::string& devId, 
 int32_t DCameraSourceCallbackProxy::OnNotifyUnregResult(const std::string& devId, const std::string& dhId,
     const std::string& reqId, int32_t status, std::string& data)
 {
+    if (!CheckParams(devId, dhId, reqId, data)) {
+        DHLOGE("DCameraSourceCallbackProxy OnNotifyUnregResult input is invalid");
+        return DCAMERA_BAD_VALUE;
+    }
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
         DHLOGE("DCameraSourceCallbackProxy remote service null");
@@ -73,6 +81,21 @@ int32_t DCameraSourceCallbackProxy::OnNotifyUnregResult(const std::string& devId
     remote->SendRequest(NOTIFY_UNREG_RESULT, req, reply, option);
     int32_t result = reply.ReadInt32();
     return result;
+}
+
+bool DCameraSourceCallbackProxy::CheckParams(const std::string& devId, const std::string& dhId,
+    const std::string& reqId, std::string& data)
+{
+    if (devId.empty() || devId.size() > DID_MAX_SIZE || dhId.empty() || dhId.size() > DID_MAX_SIZE) {
+        DHLOGE("DCameraSourceCallbackProxy CheckParams devId or dhId is invalid");
+        return false;
+    }
+
+    if (reqId.empty() || reqId.size() > DID_MAX_SIZE || data.size() > PARAM_MAX_SIZE) {
+        DHLOGE("DCameraSourceCallbackProxy CheckParams reqId or data is invalid");
+        return false;
+    }
+    return true;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

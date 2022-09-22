@@ -47,9 +47,6 @@ bool DcameraSinkHidumper::Dump(const std::vector<std::string>& args, std::string
     DHLOGI("DcameraSinkHidumper Dump args.size():%d.", args.size());
     result.clear();
     int32_t argsSize = static_cast<int32_t>(args.size());
-    for (int32_t i = 0; i < argsSize; i++) {
-        DHLOGI("DcameraSinkHidumper Dump args[%d]: %s.", i, args.at(i).c_str());
-    }
 
     if (args.empty()) {
         ShowHelp(result);
@@ -57,6 +54,10 @@ bool DcameraSinkHidumper::Dump(const std::vector<std::string>& args, std::string
     } else if (args.size() > 1) {
         ShowIllegalInfomation(result);
         return true;
+    }
+
+    for (int32_t i = 0; i < argsSize; i++) {
+        DHLOGI("DcameraSinkHidumper Dump args[%d]: %s.", i, args.at(i).c_str());
     }
 
     if (ProcessDump(args[0], result) != DCAMERA_OK) {
