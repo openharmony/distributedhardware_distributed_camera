@@ -43,10 +43,10 @@ public:
 
     int32_t OpenSession(DCameraIndex& camIndex);
     int32_t CloseSession(DCameraIndex& camIndex);
-    int32_t ConfigStreams(const std::vector<std::shared_ptr<DCStreamInfo>>& streamInfos);
-    int32_t ReleaseStreams(const std::vector<int>& streamIds);
-    int32_t StartCapture(const std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos);
-    int32_t StopCapture(const std::vector<int>& streamIds);
+    int32_t ConfigCameraStreams(const std::vector<std::shared_ptr<DCStreamInfo>>& streamInfos);
+    int32_t ReleaseCameraStreams(const std::vector<int>& streamIds);
+    int32_t StartCameraCapture(const std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos);
+    int32_t StopCameraCapture(const std::vector<int>& streamIds);
     int32_t UpdateCameraSettings(const std::vector<std::shared_ptr<DCameraSettings>>& settings);
 
     void OnEvent(DCameraSourceEvent& event) override;

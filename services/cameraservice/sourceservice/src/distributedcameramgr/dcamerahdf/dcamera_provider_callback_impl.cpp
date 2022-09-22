@@ -101,7 +101,7 @@ int32_t DCameraProviderCallbackImpl::ConfigureStreams(const DHBase& dhBase,
         stream->type_ = iter->type_;
         streams.push_back(stream);
     }
-    int32_t ret = sourceDev->ConfigStreams(streams);
+    int32_t ret = sourceDev->ConfigCameraStreams(streams);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraProviderCallbackImpl CloseSession failed, ret: %d, devId: %s, dhId: %s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
@@ -120,7 +120,7 @@ int32_t DCameraProviderCallbackImpl::ReleaseStreams(const DHBase& dhBase, const 
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return FAILED;
     }
-    int32_t ret = sourceDev->ReleaseStreams(streamIds);
+    int32_t ret = sourceDev->ReleaseCameraStreams(streamIds);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraProviderCallbackImpl ReleaseStreams failed, ret: %d, devId: %s, dhId: %s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
@@ -155,7 +155,7 @@ int32_t DCameraProviderCallbackImpl::StartCapture(const DHBase& dhBase, const st
         capture->captureSettings_.assign(iter->captureSettings_.begin(), iter->captureSettings_.end());
         captures.push_back(capture);
     }
-    int32_t ret = sourceDev->StartCapture(captures);
+    int32_t ret = sourceDev->StartCameraCapture(captures);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraProviderCallbackImpl StartCapture failed, ret: %d, devId: %s, dhId: %s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
@@ -174,7 +174,7 @@ int32_t DCameraProviderCallbackImpl::StopCapture(const DHBase& dhBase, const std
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return FAILED;
     }
-    int32_t ret = sourceDev->StopCapture(streamIds);
+    int32_t ret = sourceDev->StopCameraCapture(streamIds);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraProviderCallbackImpl StopCapture failed, ret: %d, devId: %s, dhId: %s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
