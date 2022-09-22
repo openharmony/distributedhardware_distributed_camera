@@ -36,9 +36,13 @@ public:
 private:
     int32_t NotifyRegResultInner(MessageParcel &data, MessageParcel &reply);
     int32_t NotifyUnregResultInner(MessageParcel &data, MessageParcel &reply);
+    bool CheckParams(const std::string& devId, const std::string& dhId, const std::string& reqId,
+        const std::string& result);
 
     using DCameraFunc = int32_t (DCameraSourceCallbackStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, DCameraFunc> memberFuncMap_;
+    const size_t PARAM_MAX_SIZE = 50 * 1024 * 1024;
+    const size_t DID_MAX_SIZE = 256;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

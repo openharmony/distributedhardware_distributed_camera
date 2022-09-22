@@ -58,6 +58,11 @@ int32_t DistributedCameraSourceStub::InitSourceInner(MessageParcel &data, Messag
     int32_t ret = DCAMERA_OK;
     do {
         std::string params = data.ReadString();
+        if (params.empty() || params.size() > PARAM_MAX_SIZE) {
+            DHLOGE("DistributedCameraSourceStub InitSourceInner input params is invalid");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
         sptr<IRemoteObject> remoteObj = data.ReadRemoteObject();
         if (remoteObj == nullptr) {
             DHLOGE("DistributedCameraSourceStub initSource read object failed");
@@ -98,11 +103,37 @@ int32_t DistributedCameraSourceStub::RegisterDistributedHardwareInner(MessagePar
         EnableParam params;
         params.version = data.ReadString();
         params.attrs = data.ReadString();
+        if (!CheckRegParams(devId, dhId, reqId, params)) {
+            DHLOGE("DistributedCameraSourceStub RegisterDistributedHardwareInner input is invalid");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
         ret = RegisterDistributedHardware(devId, dhId, reqId, params);
         DHLOGI("DistributedCameraSourceStub RegisterDistributedHardware %d", ret);
     } while (0);
     reply.WriteInt32(ret);
     return DCAMERA_OK;
+}
+
+bool DistributedCameraSourceStub::CheckRegParams(const std::string& devId, const std::string& dhId,
+    const std::string& reqId, const EnableParam& param)
+{
+    if (devId.empty() || devId.size() > DID_MAX_SIZE || dhId.empty() || dhId.size() > DID_MAX_SIZE) {
+        DHLOGE("DistributedCameraSourceStub CheckRegParams devId or dhId is invalid");
+        return false;
+    }
+
+    if (reqId.empty() || reqId.size() > DID_MAX_SIZE) {
+        DHLOGE("DistributedCameraSourceStub CheckRegParams reqId is invalid");
+        return false;
+    }
+
+    if (param.version.empty() || param.version.size() > PARAM_MAX_SIZE ||
+        param.attrs.empty() || param.attrs.size() > PARAM_MAX_SIZE) {
+        DHLOGE("DistributedCameraSourceStub CheckRegParams param is invalid");
+        return false;
+    }
+    return true;
 }
 
 int32_t DistributedCameraSourceStub::UnregisterDistributedHardwareInner(MessageParcel &data, MessageParcel &reply)
@@ -113,10 +144,30 @@ int32_t DistributedCameraSourceStub::UnregisterDistributedHardwareInner(MessageP
         std::string devId = data.ReadString();
         std::string dhId = data.ReadString();
         std::string reqId = data.ReadString();
+        if (!CheckUnregParams(devId, dhId, reqId)) {
+            DHLOGE("DistributedCameraSourceService UnregisterDistributedHardware input is invalid");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
         ret = UnregisterDistributedHardware(devId, dhId, reqId);
     } while (0);
     reply.WriteInt32(ret);
     return DCAMERA_OK;
+}
+
+bool DistributedCameraSourceStub::CheckUnregParams(const std::string& devId, const std::string& dhId,
+    const std::string& reqId)
+{
+    if (devId.empty() || devId.size() > DID_MAX_SIZE || dhId.empty() || dhId.size() > DID_MAX_SIZE) {
+        DHLOGE("DistributedCameraSourceStub CheckUnregParams devId or dhId is invalid");
+        return false;
+    }
+
+    if (reqId.empty() || reqId.size() > DID_MAX_SIZE) {
+        DHLOGE("DistributedCameraSourceStub CheckUnregParams reqId is invalid");
+        return false;
+    }
+    return true;
 }
 
 int32_t DistributedCameraSourceStub::DCameraNotifyInner(MessageParcel &data, MessageParcel &reply)
@@ -126,10 +177,30 @@ int32_t DistributedCameraSourceStub::DCameraNotifyInner(MessageParcel &data, Mes
         std::string devId = data.ReadString();
         std::string dhId = data.ReadString();
         std::string events = data.ReadString();
+        if (!CheckNotifyParams(devId, dhId, events)) {
+            DHLOGE("DistributedCameraSourceStub DCameraNotifyInner input is invalid");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
         ret = DCameraNotify(devId, dhId, events);
     } while (0);
     reply.WriteInt32(ret);
     return DCAMERA_OK;
+}
+
+bool DistributedCameraSourceStub::CheckNotifyParams(const std::string& devId, const std::string& dhId,
+    std::string& events)
+{
+    if (devId.empty() || devId.size() > DID_MAX_SIZE || dhId.empty() || dhId.size() > DID_MAX_SIZE) {
+        DHLOGE("DistributedCameraSourceStub CheckNotifyParams devId or dhId is invalid");
+        return false;
+    }
+
+    if (events.empty() || events.size() > PARAM_MAX_SIZE) {
+        DHLOGE("DistributedCameraSourceStub CheckNotifyParams events is invalid");
+        return false;
+    }
+    return true;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
