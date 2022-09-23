@@ -55,7 +55,7 @@ int32_t DCameraServiceStateListener::OnRegisterNotify(const std::string& devId, 
             DHLOGI("DCameraServiceStateListener OnRegisterNotify thread delete devId: %s dhId: %s",
                 GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
             DCameraIndex camIndex(devId, dhId);
-            DistributedCameraSourceService::camerasMap_.erase(camIndex);
+            DistributedCameraSourceService::CamDevErase(camIndex);
             if (callbackProxy_ == nullptr) {
                 DHLOGE("DCameraServiceStateListener OnRegisterNotify callbackProxy_ is nullptr");
                 return;
@@ -94,7 +94,7 @@ int32_t DCameraServiceStateListener::OnUnregisterNotify(const std::string& devId
             DHLOGI("DCameraServiceStateListener OnUnregisterNotify thread delete devId: %s dhId: %s",
                 GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
             DCameraIndex camIndex(devId, dhId);
-            DistributedCameraSourceService::camerasMap_.erase(camIndex);
+            DistributedCameraSourceService::CamDevErase(camIndex);
 
             int32_t ret = callbackProxy_->OnNotifyUnregResult(devId, dhId, reqId, status, data);
             if (ret != DCAMERA_OK) {
