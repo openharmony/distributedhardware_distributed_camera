@@ -50,7 +50,10 @@ public:
     int Dump(int32_t fd, const std::vector<std::u16string>& args) override;
     static void GetDumpInfo(CameraDumpInfo& camDump);
 
-    static std::map<DCameraIndex, std::shared_ptr<DCameraSourceDev>> camerasMap_;
+    static void CamDevInsert(DCameraIndex& index, std::shared_ptr<DCameraSourceDev>& camDev);
+    static std::shared_ptr<DCameraSourceDev> GetCamDevByIndex(DCameraIndex& index);
+    static void CamDevErase(DCameraIndex& index);
+    static uint32_t GetCamDevNum();
 
 protected:
     void OnStart() override;
@@ -69,6 +72,9 @@ private:
     std::string sourceVer_;
     const size_t MAX_CAMERAS_NUMBER = 32;
     const size_t DUMP_MAX_SIZE = 10 * 1024;
+
+    static std::map<DCameraIndex, std::shared_ptr<DCameraSourceDev>> camerasMap_;
+    static std::mutex camDevMutex_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
