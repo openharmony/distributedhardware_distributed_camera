@@ -88,7 +88,7 @@ int32_t DCameraProviderCallbackImpl::CloseSession(const DHBase& dhBase)
 bool DCameraProviderCallbackImpl::CheckDHBase(const DHBase& dhBase)
 {
     if (dhBase.deviceId_.empty() || dhBase.deviceId_.size() > DID_MAX_SIZE ||
-        dhBase.dhId_.empty() || dhBase.dhId_.size() > DID_MAX_SIZE ) {
+        dhBase.dhId_.empty() || dhBase.dhId_.size() > DID_MAX_SIZE) {
         DHLOGE("DCameraProviderCallbackImpl CheckDHBase dhBase is invalid");
         return false;
     }
