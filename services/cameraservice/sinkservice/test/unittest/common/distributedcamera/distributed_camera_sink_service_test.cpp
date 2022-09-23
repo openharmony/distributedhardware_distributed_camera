@@ -37,7 +37,7 @@ public:
 static std::string g_dhId;
 static sptr<IDistributedCameraSink> g_service;
 
-std::string g_testParams = "";
+std::string g_testParams = "TestParams";
 std::string g_testCameraInfo = "";
 std::string g_testChannelInfoContinue = R"({
     "Type": "OPERATION",

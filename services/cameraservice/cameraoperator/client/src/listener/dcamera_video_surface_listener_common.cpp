@@ -51,7 +51,8 @@ void DCameraVideoSurfaceListener::OnBufferAvailable()
         int32_t size = width * height * 4;
         char *address = static_cast<char *>(buffer->GetVirAddr());
         if ((address == nullptr) || (size <= 0) || (size > SURFACE_BUFFER_MAX_SIZE)) {
-            DHLOGE("DCameraVideoSurfaceListenerCommon invalid params, width: %d, height: %d, size: %d", width, height, size);
+            DHLOGE("DCameraVideoSurfaceListenerCommon invalid params, width: %d, height: %d, size: %d",
+                width, height, size);
             break;
         }
         DHLOGI("DCameraVideoSurfaceListenerCommon size: %d", size);
