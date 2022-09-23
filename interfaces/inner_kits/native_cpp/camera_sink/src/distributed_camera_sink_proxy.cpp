@@ -195,8 +195,7 @@ int32_t DistributedCameraSinkProxy::ChannelNeg(const std::string& dhId, std::str
 int32_t DistributedCameraSinkProxy::GetCameraInfo(const std::string& dhId, std::string& cameraInfo)
 {
     DHLOGI("DistributedCameraSinkProxy::GetCameraInfo dhId: %s", GetAnonyString(dhId).c_str());
-    if (dhId.empty() || dhId.size() > DID_MAX_SIZE || cameraInfo.empty() ||
-        cameraInfo.size() > PARAM_MAX_SIZE) {
+    if (dhId.empty() || dhId.size() > DID_MAX_SIZE) {
         DHLOGE("DistributedCameraSinkProxy::GetCameraInfo parmas is invalid");
         return DCAMERA_BAD_VALUE;
     }
