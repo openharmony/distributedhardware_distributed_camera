@@ -564,7 +564,7 @@ void DCameraClient::SetPhotoCaptureLocation(const std::shared_ptr<Camera::Camera
         location->longitude = item.data.d[longitudeIndex];
         location->altitude = item.data.d[altitudeIndex];
         photoCaptureSetting->SetLocation(location);
-        DHLOGI("DCameraClient::SetPhotoCaptureLocation %s photo capture settings set %d location success" , 
+        DHLOGI("DCameraClient::SetPhotoCaptureLocation %s photo capture settings set %d location success",
             GetAnonyString(cameraId_).c_str(), item.count);
     }
 }

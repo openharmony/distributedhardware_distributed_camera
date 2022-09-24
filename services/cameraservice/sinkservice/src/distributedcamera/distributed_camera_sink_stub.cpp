@@ -158,8 +158,7 @@ int32_t DistributedCameraSinkStub::GetCameraInfoInner(MessageParcel &data, Messa
     do {
         std::string dhId = data.ReadString();
         std::string cameraInfo = data.ReadString();
-        if (dhId.empty() || dhId.size() > DID_MAX_SIZE || cameraInfo.empty() ||
-            cameraInfo.size() > PARAM_MAX_SIZE) {
+        if (dhId.empty() || dhId.size() > DID_MAX_SIZE) {
             DHLOGE("DistributedCameraSinkStub::GetCameraInfoInner params is invalid");
             ret = DCAMERA_BAD_VALUE;
             break;
