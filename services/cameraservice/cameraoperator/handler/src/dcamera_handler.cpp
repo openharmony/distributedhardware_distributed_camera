@@ -64,13 +64,10 @@ std::vector<DHItem> DCameraHandler::Query()
             DHLOGI("DCameraHandler::Query connection type: %d", info->GetConnectionType());
             continue;
         }
-        if ((info->GetPosition() == OHOS_CAMERA_POSITION_OTHER) ||
-            (info->GetPosition() == OHOS_CAMERA_POSITION_FRONT) ||
-            (info->GetPosition() == OHOS_CAMERA_POSITION_BACK &&
-             info->GetCameraType() == OHOS_CAMERA_TYPE_LOGICAL)) {
-            DHItem item = CreateDHItem(info);
-            itemList.emplace_back(item);
-        }
+        DHLOGI("DCameraHandler::Query get %s, position: %d, cameraType: %d",
+            GetAnonyString(info->GetID()).c_str(), info->GetPosition(), info->GetCameraType());
+        DHItem item = CreateDHItem(info);
+        itemList.emplace_back(item);
     }
     DHLOGI("DCameraHandler::Query success, get %d items", itemList.size());
     return itemList;
@@ -118,13 +115,10 @@ std::vector<std::string> DCameraHandler::GetCameras()
             DHLOGI("DCameraHandler::GetCameras connection type: %d", info->GetConnectionType());
             continue;
         }
-        if ((info->GetPosition() == OHOS_CAMERA_POSITION_OTHER) ||
-            (info->GetPosition() == OHOS_CAMERA_POSITION_FRONT) ||
-            (info->GetPosition() == OHOS_CAMERA_POSITION_BACK &&
-             info->GetCameraType() == OHOS_CAMERA_TYPE_LOGICAL)) {
-            std::string dhId = CAMERA_ID_PREFIX + info->GetID();
-            cameras.emplace_back(dhId);
-        }
+        DHLOGI("DCameraHandler::GetCameras get %s, position: %d, cameraType: %d",
+            GetAnonyString(info->GetID()).c_str(), info->GetPosition(), info->GetCameraType());
+        std::string dhId = CAMERA_ID_PREFIX + info->GetID();
+        cameras.emplace_back(dhId);
     }
     DHLOGI("DCameraHandler::GetCameras success, get %d items", cameras.size());
     return cameras;
