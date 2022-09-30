@@ -41,7 +41,7 @@ void SetSinkProcessExit()
         return;
     }
     DHLOGI("exit sa process success.");
-    exit(0);
+    _Exit(0);
 }
 
 void SetSourceProcessExit()
@@ -54,7 +54,7 @@ void SetSourceProcessExit()
         return;
     }
     DHLOGI("exit sa process success.");
-    exit(0);
+    _Exit(0);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

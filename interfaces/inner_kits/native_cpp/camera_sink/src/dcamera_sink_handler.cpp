@@ -44,6 +44,13 @@ DCameraSinkHandler::~DCameraSinkHandler()
 int32_t DCameraSinkHandler::InitSink(const std::string& params)
 {
     DHLOGI("DCameraSinkHandler::InitSink");
+    {
+        std::lock_guard<std::mutex> autoLock(producerMutex_);
+        if (state_ == DCAMERA_SA_STATE_START) {
+            return DCAMERA_OK;
+        }
+    }
+
     sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sm == nullptr) {
         DHLOGE("GetSourceLocalCamSrv GetSystemAbilityManager failed");
@@ -53,17 +60,19 @@ int32_t DCameraSinkHandler::InitSink(const std::string& params)
     sptr<DCameraSinkLoadCallback> loadCallback = new DCameraSinkLoadCallback(params);
     int32_t ret = sm->LoadSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, loadCallback);
     if (ret != DCAMERA_OK) {
-        DHLOGE("systemAbilityId: %d load filed,result code: %d.", DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, ret);
+        DHLOGE("systemAbilityId: %d load filed, result code: %d.", DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, ret);
         return DCAMERA_INIT_ERR;
     }
     uint32_t interval = 1;
-    std::unique_lock<std::mutex> lock(producerMutex_);
-    producerCon_.wait_for(lock, std::chrono::minutes(interval), [this] {
-        return (this->state_ == DCAMERA_SA_STATE_START);
-    });
-    if (state_ == DCAMERA_SA_STATE_STOP) {
-        DHLOGE("SinkSA Start failed!");
-        return DCAMERA_INIT_ERR;
+    {
+        std::unique_lock<std::mutex> lock(producerMutex_);
+        producerCon_.wait_for(lock, std::chrono::minutes(interval), [this] {
+            return (this->state_ == DCAMERA_SA_STATE_START);
+        });
+        if (state_ == DCAMERA_SA_STATE_STOP) {
+            DHLOGE("SinkSA Start failed!");
+            return DCAMERA_INIT_ERR;
+        }
     }
     DHLOGI("DCameraSinkHandler InitSink end, result: %d", ret);
     return DCAMERA_OK;
