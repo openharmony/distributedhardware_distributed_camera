@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-class DCameraPhotoCallback : public CameraStandard::PhotoCallback {
+class DCameraPhotoCallback : public CameraStandard::PhotoStateCallback {
 public:
     explicit DCameraPhotoCallback(const std::shared_ptr<StateCallback>& callback);
     void OnCaptureStarted(const int32_t captureID) const override;

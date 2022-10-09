@@ -53,14 +53,14 @@ int32_t DCameraHandler::Initialize()
 std::vector<DHItem> DCameraHandler::Query()
 {
     std::vector<DHItem> itemList;
-    std::vector<sptr<CameraStandard::CameraInfo>> cameraList = cameraManager_->GetCameras();
+    std::vector<sptr<CameraStandard::CameraDevice>> cameraList = cameraManager_->GetSupportedCameras();
     DHLOGI("DCameraHandlerCommon::Query get %d cameras", cameraList.size());
     if (cameraList.empty()) {
         DHLOGE("DCameraHandlerCommon::Query no camera device");
         return itemList;
     }
     for (auto& info : cameraList) {
-        if (info->GetConnectionType() != OHOS_CAMERA_CONNECTION_TYPE_BUILTIN) {
+        if (info->GetConnectionType() != CameraStandard::ConnectionType::CAMERA_CONNECTION_BUILT_IN) {
             DHLOGI("DCameraHandlerCommon::Query connection type: %d", info->GetConnectionType());
             continue;
         }
@@ -104,14 +104,14 @@ void DCameraHandler::UnRegisterPluginListener()
 std::vector<std::string> DCameraHandler::GetCameras()
 {
     std::vector<std::string> cameras;
-    std::vector<sptr<CameraStandard::CameraInfo>> cameraList = cameraManager_->GetCameras();
+    std::vector<sptr<CameraStandard::CameraDevice>> cameraList = cameraManager_->GetSupportedCameras();
     DHLOGI("DCameraHandlerCommon::GetCameras get %d cameras", cameraList.size());
     if (cameraList.empty()) {
         DHLOGE("DCameraHandlerCommon::GetCameras no camera device");
         return cameras;
     }
     for (auto& info : cameraList) {
-        if (info->GetConnectionType() != OHOS_CAMERA_CONNECTION_TYPE_BUILTIN) {
+        if (info->GetConnectionType() != CameraStandard::ConnectionType::CAMERA_CONNECTION_BUILT_IN) {
             DHLOGI("DCameraHandlerCommon::GetCameras connection type: %d", info->GetConnectionType());
             continue;
         }
@@ -124,7 +124,7 @@ std::vector<std::string> DCameraHandler::GetCameras()
     return cameras;
 }
 
-DHItem DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraInfo>& info)
+DHItem DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraDevice>& info)
 {
     DHItem item;
     std::string id = info->GetID();
@@ -142,27 +142,12 @@ DHItem DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraInfo>& info)
         return item;
     }
 
-    Json::Value outputFormat;
-    Json::Value resolution;
-    std::set<camera_format_t> formatSet;
+    sptr<CameraStandard::CameraOutputCapability> capability = cameraManager_->GetSupportedOutputCapability(info);
+    std::vector<CameraStandard::Profile> photoProfiles = capability->GetPhotoProfiles();
+    ConfigFormatAndResolution(SNAPSHOT_FRAME, root, photoProfiles);
 
-    std::vector<camera_format_t> videoFormats;
-    videoFormats.emplace_back(camera_format_t::OHOS_CAMERA_FORMAT_RGBA_8888);
-    ConfigInfo videoConfig = {CONTINUOUS_FRAME, CAMERA_FORMAT_VIDEO, cameraInput};
-    ConfigFormatAndResolution(videoConfig, outputFormat,  resolution, videoFormats, formatSet);
-
-    std::vector<camera_format_t> previewFormats;
-    previewFormats.emplace_back(camera_format_t::OHOS_CAMERA_FORMAT_RGBA_8888);
-    ConfigInfo previewInfo = {CONTINUOUS_FRAME, CAMERA_FORMAT_PREVIEW, cameraInput};
-    ConfigFormatAndResolution(previewInfo, outputFormat, resolution, previewFormats, formatSet);
-
-    std::vector<camera_format_t> photoFormats;
-    photoFormats.emplace_back(camera_format_t::OHOS_CAMERA_FORMAT_RGBA_8888);
-    ConfigInfo photoConfig = {SNAPSHOT_FRAME, CAMERA_FORMAT_PHOTO, cameraInput};
-    ConfigFormatAndResolution(photoConfig, outputFormat, resolution, photoFormats, formatSet);
-
-    root[CAMERA_FORMAT_KEY] = outputFormat;
-    root[CAMERA_RESOLUTION_KEY] = resolution;
+    std::vector<CameraStandard::Profile> previewProfiles = capability->GetPreviewProfiles();
+    ConfigFormatAndResolution(CONTINUOUS_FRAME, root, previewProfiles);
 
     std::hash<std::string> h;
     std::string abilityString = cameraInput->GetCameraSettings();
@@ -180,20 +165,20 @@ DHItem DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraInfo>& info)
     return item;
 }
 
-std::string DCameraHandler::GetCameraPosition(camera_position_enum_t position)
+std::string DCameraHandler::GetCameraPosition(CameraStandard::CameraPosition position)
 {
     DHLOGI("DCameraHandler::GetCameraPosition position: %d", position);
     std::string ret = "";
     switch (position) {
-        case OHOS_CAMERA_POSITION_BACK: {
+        case CameraStandard::CameraPosition::CAMERA_POSITION_BACK: {
             ret = CAMERA_POSITION_BACK;
             break;
         }
-        case OHOS_CAMERA_POSITION_FRONT: {
+        case CameraStandard::CameraPosition::CAMERA_POSITION_FRONT: {
             ret = CAMERA_POSITION_FRONT;
             break;
         }
-        case OHOS_CAMERA_POSITION_OTHER: {
+        case CameraStandard::CameraPosition::CAMERA_POSITION_UNSPECIFIED: {
             ret = CAMERA_POSITION_UNSPECIFIED;
             break;
         }
@@ -206,21 +191,60 @@ std::string DCameraHandler::GetCameraPosition(camera_position_enum_t position)
     return ret;
 }
 
-void DCameraHandler::ConfigFormatAndResolution(ConfigInfo& info, Json::Value& outputFormat, Json::Value& resolution,
-    std::vector<camera_format_t>& formatList, std::set<camera_format_t>& formatSet)
+void DCameraHandler::ConfigFormatAndResolution(const DCStreamType type, Json::Value& root,
+    std::vector<CameraStandard::Profile>& profileList)
 {
-    DHLOGI("DCameraHandlerCommon::ConfigFormatAndResolution camera format size: %d", formatList.size());
-    for (auto& format : formatList) {
-        DHLOGI("DCameraHandlerCommon::ConfigFormatAndResolution %s format: %d", info.formatKey.c_str(), format);
-        outputFormat[info.formatKey].append(format);
-        if (formatSet.insert(format).second) {
-            std::string keyName = std::to_string(format);
-            resolution[keyName].append("640*480");
+    DHLOGI("DCameraHandler::ConfigFormatAndResolution camera Profile size: %d", profileList.size());
+    std::set<int32_t> formatSet;
+    for (auto& profile : profileList) {
+        CameraStandard::CameraFormat format = profile.GetCameraFormat();
+        format = CameraStandard::CameraFormat::CAMERA_FORMAT_RGBA_8888;
+        int32_t dformat = CovertToDcameraFormat(format);
+        formatSet.insert(dformat);
+        std::string formatName = std::to_string(dformat);
+        if (type == SNAPSHOT_FRAME) {
+            root[CAMERA_FORMAT_PHOTO][CAMERA_RESOLUTION_KEY][formatName].append("640*480");
+        } else if (type == CONTINUOUS_FRAME) {
+            root[CAMERA_FORMAT_PREVIEW][CAMERA_RESOLUTION_KEY][formatName].append("640*480");
+            root[CAMERA_FORMAT_VIDEO][CAMERA_RESOLUTION_KEY][formatName].append("640*480");
+        }
+    }
+
+    for (auto format : formatSet) {
+        if (type == SNAPSHOT_FRAME) {
+            root[CAMERA_FORMAT_PHOTO][CAMERA_FORMAT_KEY].append(format);
+        } else if (type == CONTINUOUS_FRAME) {
+            root[CAMERA_FORMAT_PREVIEW][CAMERA_FORMAT_KEY].append(format);
+            root[CAMERA_FORMAT_VIDEO][CAMERA_FORMAT_KEY].append(format);
         }
     }
 }
 
-bool DCameraHandler::IsValid(const DCStreamType type, const CameraStandard::CameraPicSize& size)
+int32_t DCameraHandler::CovertToDcameraFormat(CameraStandard::CameraFormat format)
+{
+    DHLOGI("DCameraHandler::CovertToDcameraFormat format: %d", format);
+    int32_t ret = -1;
+    switch (format) {
+        case CameraStandard::CameraFormat::CAMERA_FORMAT_RGBA_8888:
+            ret = camera_format_t::OHOS_CAMERA_FORMAT_RGBA_8888;
+            break;
+        case CameraStandard::CameraFormat::CAMERA_FORMAT_YCBCR_420_888:
+            ret = camera_format_t::OHOS_CAMERA_FORMAT_YCBCR_420_888;
+            break;
+        case CameraStandard::CameraFormat::CAMERA_FORMAT_YUV_420_SP:
+            ret = camera_format_t::OHOS_CAMERA_FORMAT_YCRCB_420_SP;
+            break;
+        case CameraStandard::CameraFormat::CAMERA_FORMAT_JPEG:
+            ret = camera_format_t::OHOS_CAMERA_FORMAT_JPEG;
+            break;
+        default:
+            DHLOGE("DCameraHandler::CovertToDcameraFormat invalid camera format");
+            break;
+    }
+    return ret;
+}
+
+bool DCameraHandler::IsValid(const DCStreamType type, const CameraStandard::Size& size)
 {
     bool ret = false;
     switch (type) {

@@ -24,7 +24,7 @@ class DCameraManagerCallback : public CameraStandard::CameraManagerCallback {
 public:
     void OnCameraStatusChanged(const CameraStandard::CameraStatusInfo &cameraStatusInfo) const override;
     void OnFlashlightStatusChanged(const std::string &cameraID,
-                                   const CameraStandard::FlashlightStatus flashStatus) const override;
+                                   const CameraStandard::FlashStatus flashStatus) const override;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

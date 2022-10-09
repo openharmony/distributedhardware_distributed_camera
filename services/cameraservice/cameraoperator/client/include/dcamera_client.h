@@ -23,6 +23,7 @@
 #include "camera_info.h"
 #include "camera_input.h"
 #include "camera_manager.h"
+#include "camera_output_capability.h"
 #include "capture_input.h"
 #include "capture_output.h"
 #include "capture_session.h"
@@ -66,6 +67,7 @@ private:
         std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSetting);
     void ReleaseCaptureSession();
     int32_t CameraServiceErrorType(const int32_t errorType);
+    CameraStandard::CameraFormat ConvertToCameraFormat(int32_t format);
     void UpdateSettingCache(const std::string& metadataStr);
 
 private:
@@ -76,7 +78,7 @@ private:
     std::queue<std::string> cameraMetadatas_;
     sptr<Surface> photoSurface_;
     sptr<Surface> videoSurface_;
-    sptr<CameraStandard::CameraInfo> cameraInfo_;
+    sptr<CameraStandard::CameraDevice> cameraInfo_;
     sptr<CameraStandard::CameraManager> cameraManager_;
     sptr<CameraStandard::CaptureSession> captureSession_;
     sptr<CameraStandard::CaptureInput> cameraInput_;

@@ -20,10 +20,10 @@
 
 #include "anonymous_string.h"
 #include "camera_device_ability_items.h"
-#include "camera_info.h"
 #include "camera_input.h"
 #include "camera_manager.h"
 #include "camera_metadata_operator.h"
+#include "camera_output_capability.h"
 #include "capture_input.h"
 #include "capture_output.h"
 #include "capture_session.h"
@@ -192,7 +192,7 @@ protected:
     }
 };
 
-class DemoDCameraPhotoCallback : public CameraStandard::PhotoCallback {
+class DemoDCameraPhotoCallback : public CameraStandard::PhotoStateCallback {
 public:
     void OnCaptureStarted(const int32_t captureID) const
     {
@@ -215,7 +215,7 @@ public:
     }
 };
 
-class DemoDCameraPreviewCallback : public CameraStandard::PreviewCallback {
+class DemoDCameraPreviewCallback : public CameraStandard::PreviewStateCallback {
 public:
     void OnFrameStarted() const
     {
@@ -233,7 +233,7 @@ public:
     }
 };
 
-class DemoDCameraVideoCallback : public CameraStandard::VideoCallback {
+class DemoDCameraVideoCallback : public CameraStandard::VideoStateCallback {
 public:
     void OnFrameStarted() const
     {
@@ -251,16 +251,11 @@ public:
     }
 };
 
-class DemoDCameraInputCallback : public CameraStandard::ErrorCallback, public CameraStandard::FocusCallback {
+class DemoDCameraInputCallback : public CameraStandard::ErrorCallback {
 public:
     void OnError(const int32_t errorType, const int32_t errorMsg) const
     {
         DHLOGI("DemoDCameraInputCallback::OnError errorType: %d errorMsg: %d", errorType, errorMsg);
-    }
-
-    void OnFocusState(FocusState state)
-    {
-        DHLOGI("DemoDCameraInputCallback::OnFocusState state: %d", state);
     }
 };
 
@@ -272,18 +267,23 @@ public:
     }
 
     void OnFlashlightStatusChanged(const std::string &cameraID,
-        const CameraStandard::FlashlightStatus flashStatus) const
+        const CameraStandard::FlashStatus flashStatus) const
     {
         DHLOGI("DemoDCameraManagerCallback::OnFlashlightStatusChanged cameraID: %s, flashStatus: %d",
             GetAnonyString(cameraID).c_str(), flashStatus);
     }
 };
 
-class DemoDCameraSessionCallback : public CameraStandard::SessionCallback {
+class DemoDCameraSessionCallback : public CameraStandard::SessionCallback, public CameraStandard::FocusCallback {
 public:
     void OnError(int32_t errorCode)
     {
         DHLOGI("DemoDCameraSessionCallback::OnError errorCode: %d", errorCode);
+    }
+
+    void OnFocusState(FocusState state)
+    {
+        DHLOGI("DemoDCameraSessionCallback::OnFocusState state: %d", state);
     }
 };
 } // namespace DistributedHardware
