@@ -15,6 +15,7 @@
 
 #include "dcamera_client_demo.h"
 
+#include "accesstoken_kit.h"
 #include "nativetoken_kit.h"
 #include "token_setproc.h"
 
@@ -214,6 +215,7 @@ int main()
     };
     tokenId = GetAccessTokenId(&infoInstance);
     SetSelfTokenID(tokenId);
+    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 
     DHLOGI("========== Distributed Camera Demo Start ==========");
     int32_t ret = InitCameraStandard();
