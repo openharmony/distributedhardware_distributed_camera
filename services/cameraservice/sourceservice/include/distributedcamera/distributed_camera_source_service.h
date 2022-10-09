@@ -44,7 +44,10 @@ public:
         const std::string& reqId) override;
     int32_t DCameraNotify(const std::string& devId, const std::string& dhId, std::string& events) override;
 
-    static std::map<DCameraIndex, std::shared_ptr<DCameraSourceDev>> camerasMap_;
+    static void CamDevInsert(DCameraIndex& index, std::shared_ptr<DCameraSourceDev>& camDev);
+    static std::shared_ptr<DCameraSourceDev> GetCamDevByIndex(DCameraIndex& index);
+    static void CamDevErase(DCameraIndex& index);
+    static uint32_t GetCamDevNum();
 
 protected:
     void OnStart() override;
@@ -61,6 +64,9 @@ private:
 
     sptr<IDCameraSourceCallback> callbackProxy_;
     std::string sourceVer_;
+    const size_t MAX_CAMERAS_NUMBER = 32;
+    static std::map<DCameraIndex, std::shared_ptr<DCameraSourceDev>> camerasMap_;
+    static std::mutex camDevMutex_;
 };
 }
 }

@@ -33,6 +33,7 @@ namespace DistributedHardware {
 REGISTER_SYSTEM_ABILITY_BY_ID(DistributedCameraSourceService, DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, true);
 
 std::map<DCameraIndex, std::shared_ptr<DCameraSourceDev>> DistributedCameraSourceService::camerasMap_;
+std::mutex DistributedCameraSourceService::camDevMutex_;
 
 DistributedCameraSourceService::DistributedCameraSourceService(int32_t saId, bool runOnCreate)
     : SystemAbility(saId, runOnCreate)
@@ -110,11 +111,14 @@ int32_t DistributedCameraSourceService::RegisterDistributedHardware(const std::s
 {
     DHLOGI("DistributedCameraSourceService RegisterDistributedHardware devId: %s, dhId: %s, version: %s",
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), param.version.c_str());
+    if (GetCamDevNum() > MAX_CAMERAS_NUMBER) {
+        DHLOGE("DistributedCameraSourceService RegisterDistributedHardware cameras exceed the upper limit");
+        return DCAMERA_BAD_VALUE;
+    }
     DCameraIndex camIndex(devId, dhId);
-    std::shared_ptr<DCameraSourceDev> camDev = nullptr;
     int32_t ret = DCAMERA_OK;
-    auto iter = camerasMap_.find(camIndex);
-    if (iter == camerasMap_.end()) {
+    std::shared_ptr<DCameraSourceDev> camDev = GetCamDevByIndex(camIndex);
+    if (camDev == nullptr) {
         DHLOGI("DistributedCameraSourceService RegisterDistributedHardware new dev devId: %s, dhId: %s, version: %s",
             GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), param.version.c_str());
         std::shared_ptr<ICameraStateListener> listener = std::make_shared<DCameraServiceStateListener>(callbackProxy_);
@@ -128,17 +132,17 @@ int32_t DistributedCameraSourceService::RegisterDistributedHardware(const std::s
                 ret, GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
             return ret;
         }
-        camerasMap_.emplace(camIndex, camDev);
+        CamDevInsert(camIndex, camDev);
     } else {
-        DHLOGI("DistributedCameraSourceService RegisterDistributedHardware exist devId: %s, dhId: %s, version: %s",
+        DHLOGE("DistributedCameraSourceService RegisterDistributedHardware exist devId: %s, dhId: %s, version: %s",
             GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), param.version.c_str());
-        camDev = iter->second;
+        return DCAMERA_ALREADY_EXISTS;
     }
 
     ret = camDev->RegisterDistributedHardware(devId, dhId, reqId, param.version, param.attrs);
     if (ret != DCAMERA_OK) {
         DHLOGE("DistributedCameraSourceService RegisterDistributedHardware failed, ret: %d", ret);
-        camerasMap_.erase(camIndex);
+        CamDevErase(camIndex);
     }
     DHLOGI("DistributedCameraSourceService RegisterDistributedHardware end devId: %s, dhId: %s, version: %s",
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), param.version.c_str());
@@ -151,13 +155,12 @@ int32_t DistributedCameraSourceService::UnregisterDistributedHardware(const std:
     DHLOGI("DistributedCameraSourceService UnregisterDistributedHardware devId: %s, dhId: %s",
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
     DCameraIndex camIndex(devId, dhId);
-    auto iter = camerasMap_.find(camIndex);
-    if (iter == camerasMap_.end()) {
+    std::shared_ptr<DCameraSourceDev> camDev = GetCamDevByIndex(camIndex);
+    if (camDev == nullptr) {
         DHLOGE("DistributedCameraSourceService UnregisterDistributedHardware not found device");
         return DCAMERA_NOT_FOUND;
     }
 
-    std::shared_ptr<DCameraSourceDev> camDev = iter->second;
     int32_t ret = camDev->UnRegisterDistributedHardware(devId, dhId, reqId);
     if (ret != DCAMERA_OK) {
         DHLOGE("DistributedCameraSourceService UnregisterDistributedHardware failed, ret: %d", ret);
@@ -171,13 +174,12 @@ int32_t DistributedCameraSourceService::DCameraNotify(const std::string& devId, 
     DHLOGI("DistributedCameraSourceService DCameraNotify devId: %s, dhId: %s", GetAnonyString(devId).c_str(),
         GetAnonyString(dhId).c_str());
     DCameraIndex camIndex(devId, dhId);
-    auto iter = camerasMap_.find(camIndex);
-    if (iter == camerasMap_.end()) {
+    std::shared_ptr<DCameraSourceDev> camDev = GetCamDevByIndex(camIndex);
+    if (camDev == nullptr) {
         DHLOGE("DistributedCameraSourceService DCameraNotify not found device");
         return DCAMERA_NOT_FOUND;
     }
 
-    std::shared_ptr<DCameraSourceDev> camDev = iter->second;
     int32_t ret = camDev->DCameraNotify(events);
     if (ret != DCAMERA_OK) {
         DHLOGE("DistributedCameraSourceService DCameraNotify failed, ret: %d", ret);
@@ -193,6 +195,34 @@ int32_t DistributedCameraSourceService::LoadDCameraHDF()
 int32_t DistributedCameraSourceService::UnLoadCameraHDF()
 {
     return DCAMERA_OK;
+}
+
+void DistributedCameraSourceService::CamDevInsert(DCameraIndex& index, std::shared_ptr<DCameraSourceDev>& camDev)
+{
+    std::lock_guard<std::mutex> camLock(camDevMutex_);
+    camerasMap_.emplace(index, camDev);
+}
+
+std::shared_ptr<DCameraSourceDev> DistributedCameraSourceService::GetCamDevByIndex(DCameraIndex& index)
+{
+    std::lock_guard<std::mutex> camLock(camDevMutex_);
+    auto iter = camerasMap_.find(index);
+    if (iter == camerasMap_.end()) {
+        return nullptr;
+    }
+    return iter->second;
+}
+
+void DistributedCameraSourceService::CamDevErase(DCameraIndex& index)
+{
+    std::lock_guard<std::mutex> camLock(camDevMutex_);
+    camerasMap_.erase(index);
+}
+
+uint32_t DistributedCameraSourceService::GetCamDevNum()
+{
+    std::lock_guard<std::mutex> camLock(camDevMutex_);
+    return camerasMap_.size();
 }
 }
 }
