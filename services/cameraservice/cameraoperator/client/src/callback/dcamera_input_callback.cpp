@@ -16,10 +16,8 @@
 #include "dcamera_input_callback.h"
 
 #include "camera_util.h"
-#include "dcamera_utils_tools.h"
 #include "distributed_camera_constants.h"
 #include "distributed_hardware_log.h"
-#include "metadata_utils.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -43,43 +41,6 @@ void DCameraInputCallback::OnError(const int32_t errorType, const int32_t errorM
         event->eventResult_ = DCAMERA_EVENT_DEVICE_ERROR;
     }
     callback_->OnStateChanged(event);
-}
-
-void DCameraInputCallback::OnFocusState(FocusState state)
-{
-    DHLOGI("DCameraInputCallback::OnFocusState, state: %d", state);
-    if (callback_ == nullptr) {
-        DHLOGE("DCameraInputCallback::OnFocusState StateCallback is null");
-        return;
-    }
-
-    auto iter = focusStateMap_.find(state);
-    if (iter == focusStateMap_.end()) {
-        DHLOGE("DCameraInputCallback::OnFocusState focusStateMap find %d state failed", state);
-        return;
-    }
-
-    int32_t itemCapacity = 10;
-    int32_t dataCapacity = 100;
-    int32_t dataCount = 1;
-    uint8_t focusState = iter->second;
-    std::shared_ptr<Camera::CameraMetadata> cameraMetadata =
-        std::make_shared<Camera::CameraMetadata>(itemCapacity, dataCapacity);
-    if (!cameraMetadata->addEntry(OHOS_CONTROL_FOCUS_STATE, &focusState, dataCount)) {
-        DHLOGE("DCameraInputCallback::OnFocusState cameraMetadata add entry failed");
-        return;
-    }
-
-    std::string abilityString = Camera::MetadataUtils::EncodeToString(cameraMetadata);
-    std::string encodeString = Base64Encode(reinterpret_cast<const unsigned char *>(abilityString.c_str()),
-        abilityString.length());
-
-    std::shared_ptr<DCameraSettings> dcSetting = std::make_shared<DCameraSettings>();
-    dcSetting->type_ = DCSettingsType::METADATA_RESULT;
-    dcSetting->value_ = encodeString;
-    std::vector<std::shared_ptr<DCameraSettings>> settings;
-    settings.push_back(dcSetting);
-    callback_->OnMetadataResult(settings);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

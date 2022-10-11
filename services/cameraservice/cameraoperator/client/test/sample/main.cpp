@@ -15,8 +15,10 @@
 
 #include "dcamera_client_demo.h"
 
+#include "access_token.h"
 #include "accesstoken_kit.h"
-#include "nativetoken_kit.h"
+#include "hap_token_info.h"
+#include "ipc_skeleton.h"
 #include "token_setproc.h"
 
 using namespace OHOS;
@@ -36,7 +38,7 @@ constexpr int32_t VIDEO_HEIGTH = 480;
 constexpr int32_t SLEEP_FIVE_SECOND = 5;
 constexpr int32_t SLEEP_TWENTY_SECOND = 20;
 
-static sptr<CameraInfo> g_cameraInfo = nullptr;
+static sptr<CameraDevice> g_cameraInfo = nullptr;
 static sptr<CameraManager> g_cameraManager = nullptr;
 static sptr<CaptureInput> g_cameraInput = nullptr;
 static sptr<CaptureOutput> g_photoOutput = nullptr;
@@ -65,13 +67,13 @@ static int32_t InitCameraStandard()
     g_captureSession = g_cameraManager->CreateCaptureSession();
     g_captureSession->SetCallback(std::make_shared<DemoDCameraSessionCallback>());
 
-    std::vector<sptr<CameraInfo>> cameraObjList = g_cameraManager->GetCameras();
+    std::vector<sptr<CameraDevice>> cameraObjList = g_cameraManager->GetSupportedCameras();
     for (auto info : cameraObjList) {
         DHLOGI("Camera: %s, position: %d, camera type: %d, connection type: %d", GetAnonyString(info->GetID()).c_str(),
             info->GetPosition(), info->GetCameraType(), info->GetConnectionType());
         // OHOS_CAMERA_POSITION_FRONT or OHOS_CAMERA_POSITION_BACK
-        if ((info->GetPosition() == OHOS_CAMERA_POSITION_FRONT) &&
-            (info->GetConnectionType() == OHOS_CAMERA_CONNECTION_TYPE_REMOTE)) {
+        if ((info->GetPosition() == CameraPosition::CAMERA_POSITION_FRONT) &&
+            (info->GetConnectionType() == ConnectionType::CAMERA_CONNECTION_REMOTE)) {
             g_cameraInfo = info;
             break;
         }
@@ -83,9 +85,10 @@ static int32_t InitCameraStandard()
     }
 
     g_cameraInput = g_cameraManager->CreateCameraInput(g_cameraInfo);
+    ((sptr<CameraInput> &)g_cameraInput)->Open();
     std::shared_ptr<DemoDCameraInputCallback> inputCallback = std::make_shared<DemoDCameraInputCallback>();
     ((sptr<CameraInput> &)g_cameraInput)->SetErrorCallback(inputCallback);
-    ((sptr<CameraInput> &)g_cameraInput)->SetFocusCallback(inputCallback);
+    g_captureSession->SetFocusCallback(std::make_shared<DemoDCameraSessionCallback>());
     return DCAMERA_OK;
 }
 
@@ -107,6 +110,29 @@ static void InitCaptureInfo()
     g_videoInfo->format_ = VIDEO_FORMAT;
 }
 
+static CameraFormat ConvertToCameraFormat(int32_t format)
+{
+    CameraFormat ret = CameraFormat::CAMERA_FORMAT_INVALID;
+    DCameraFormat df = static_cast<DCameraFormat>(format);
+    switch (df) {
+        case DCameraFormat::OHOS_CAMERA_FORMAT_RGBA_8888:
+            ret = CameraFormat::CAMERA_FORMAT_RGBA_8888;
+            break;
+        case DCameraFormat::OHOS_CAMERA_FORMAT_YCBCR_420_888:
+            ret = CameraFormat::CAMERA_FORMAT_YCBCR_420_888;
+            break;
+        case DCameraFormat::OHOS_CAMERA_FORMAT_YCRCB_420_SP:
+            ret = CameraFormat::CAMERA_FORMAT_YUV_420_SP;
+            break;
+        case DCameraFormat::OHOS_CAMERA_FORMAT_JPEG:
+            ret = CameraFormat::CAMERA_FORMAT_JPEG;
+            break;
+        default:
+            break;
+    }
+    return ret;
+}
+
 static void InitPhotoOutput()
 {
     DHLOGI("Distributed Camera Demo: Create PhotoOutput, width = %d, height = %d, format = %d",
@@ -116,7 +142,10 @@ static void InitPhotoOutput()
     photoSurface->SetDefaultWidthAndHeight(g_photoInfo->width_, g_photoInfo->height_);
     photoSurface->SetUserData(CAMERA_SURFACE_FORMAT, std::to_string(g_photoInfo->format_));
     photoSurface->RegisterConsumerListener(photoListener);
-    g_photoOutput = g_cameraManager->CreatePhotoOutput(photoSurface);
+    CameraFormat photoFormat = ConvertToCameraFormat(g_photoInfo->format_);
+    Size photoSize = {g_photoInfo->width_, g_photoInfo->height_};
+    Profile photoProfile(photoFormat, photoSize);
+    g_photoOutput = g_cameraManager->CreatePhotoOutput(photoProfile, photoSurface);
     ((sptr<PhotoOutput> &)g_photoOutput)->SetCallback(std::make_shared<DemoDCameraPhotoCallback>());
 }
 
@@ -129,7 +158,10 @@ static void InitPreviewOutput()
     previewSurface->SetDefaultWidthAndHeight(g_previewInfo->width_, g_previewInfo->height_);
     previewSurface->SetUserData(CAMERA_SURFACE_FORMAT, std::to_string(g_previewInfo->format_));
     previewSurface->RegisterConsumerListener(previewListener);
-    g_previewOutput = g_cameraManager->CreatePreviewOutput(previewSurface);
+    CameraFormat previewFormat = ConvertToCameraFormat(g_previewInfo->format_);
+    Size previewSize = {g_previewInfo->width_, g_previewInfo->height_};
+    Profile previewProfile(previewFormat, previewSize);
+    g_previewOutput = g_cameraManager->CreatePreviewOutput(previewProfile, previewSurface);
     ((sptr<PreviewOutput> &)g_previewOutput)->SetCallback(std::make_shared<DemoDCameraPreviewCallback>());
 }
 
@@ -142,7 +174,11 @@ static void InitVideoOutput()
     videoSurface->SetDefaultWidthAndHeight(g_videoInfo->width_, g_videoInfo->height_);
     videoSurface->SetUserData(CAMERA_SURFACE_FORMAT, std::to_string(g_videoInfo->format_));
     videoSurface->RegisterConsumerListener(videoListener);
-    g_videoOutput = g_cameraManager->CreateVideoOutput(videoSurface);
+    CameraFormat videoFormat = ConvertToCameraFormat(g_videoInfo->format_);
+    Size videoSize = {g_videoInfo->width_, g_videoInfo->height_};
+    std::vector<int32_t> framerates = {};
+    VideoProfile videoProfile(videoFormat, videoSize, framerates);
+    g_videoOutput = g_cameraManager->CreateVideoOutput(videoProfile, videoSurface);
     ((sptr<VideoOutput> &)g_videoOutput)->SetCallback(std::make_shared<DemoDCameraVideoCallback>());
 }
 
@@ -164,19 +200,19 @@ static void ConfigCaptureSession()
 
 static void ConfigFocusAndExposure()
 {
-    ((sptr<CameraInput> &)g_cameraInput)->LockForControl();
-    camera_focus_mode_enum_t focusMode = OHOS_CAMERA_FOCUS_MODE_AUTO;
-    camera_exposure_mode_enum_t exposureMode = OHOS_CAMERA_EXPOSURE_MODE_AUTO;
+    g_captureSession->LockForControl();
+    FocusMode focusMode = FOCUS_MODE_CONTINUOUS_AUTO;
+    ExposureMode exposureMode = EXPOSURE_MODE_AUTO;
     int32_t exposureValue = 0;
-    std::vector<int32_t> biasRange = ((sptr<CameraInput> &)g_cameraInput)->GetExposureBiasRange();
+    std::vector<int32_t> biasRange = g_captureSession->GetExposureBiasRange();
     if (!biasRange.empty()) {
         DHLOGI("Distributed Camera Demo: get %d exposure compensation range", biasRange.size());
         exposureValue = biasRange[0];
     }
-    ((sptr<CameraInput> &)g_cameraInput)->SetFocusMode(focusMode);
-    ((sptr<CameraInput> &)g_cameraInput)->SetExposureMode(exposureMode);
-    ((sptr<CameraInput> &)g_cameraInput)->SetExposureBias(exposureValue);
-    ((sptr<CameraInput> &)g_cameraInput)->UnlockForControl();
+    g_captureSession->SetFocusMode(focusMode);
+    g_captureSession->SetExposureMode(exposureMode);
+    g_captureSession->SetExposureBias(exposureValue);
+    g_captureSession->UnlockForControl();
 }
 
 static std::shared_ptr<PhotoCaptureSetting> ConfigPhotoCaptureSetting()
@@ -186,7 +222,7 @@ static std::shared_ptr<PhotoCaptureSetting> ConfigPhotoCaptureSetting()
     PhotoCaptureSetting::RotationConfig rotation = PhotoCaptureSetting::RotationConfig::Rotation_0;
     photoCaptureSettings->SetRotation(rotation);
     // QualityLevel
-    PhotoCaptureSetting::QualityLevel quality = PhotoCaptureSetting::QualityLevel::HIGH_QUALITY;
+    PhotoCaptureSetting::QualityLevel quality = PhotoCaptureSetting::QualityLevel::QUALITY_LEVEL_HIGH;
     photoCaptureSettings->SetQuality(quality);
     // Location
     std::unique_ptr<Location> location = std::make_unique<Location>();
@@ -197,25 +233,86 @@ static std::shared_ptr<PhotoCaptureSetting> ConfigPhotoCaptureSetting()
     return photoCaptureSettings;
 }
 
+static std::string permissionName = "ohos.permission.CAMERA";
+static OHOS::Security::AccessToken::HapInfoParams g_infoManagerTestInfoParms = {
+    .userID = 1,
+    .bundleName = permissionName,
+    .instIndex = 0,
+    .appIDDesc = "testtesttesttest"
+};
+
+static OHOS::Security::AccessToken::PermissionDef g_infoManagerTestPermDef1 = {
+    .permissionName = "ohos.permission.CAMERA",
+    .bundleName = "ohos.permission.CAMERA",
+    .grantMode = 1,
+    .availableLevel = OHOS::Security::AccessToken::ATokenAplEnum::APL_NORMAL,
+    .label = "label",
+    .labelId = 1,
+    .description = "dcamera client test",
+    .descriptionId = 1
+};
+
+static OHOS::Security::AccessToken::PermissionStateFull g_infoManagerTestState1 = {
+    .permissionName = "ohos.permission.CAMERA",
+    .isGeneral = true,
+    .resDeviceID = {"local"},
+    .grantStatus = {OHOS::Security::AccessToken::PermissionState::PERMISSION_GRANTED},
+    .grantFlags = {1}
+};
+
+static OHOS::Security::AccessToken::HapPolicyParams g_infoManagerTestPolicyPrams = {
+    .apl = OHOS::Security::AccessToken::ATokenAplEnum::APL_NORMAL,
+    .domain = "test.domain",
+    .permList = {g_infoManagerTestPermDef1},
+    .permStateList = {g_infoManagerTestState1}
+};
+
 int main()
 {
-    uint64_t tokenId;
-    const char *perms[2];
-    perms[0] = "ohos.permission.DISTRIBUTED_DATASYNC";
-    perms[1] = "ohos.permission.CAMERA";
-    NativeTokenInfoParams infoInstance = {
-        .dcapsNum = 0,
-        .permsNum = 2,
-        .aclsNum = 0,
-        .dcaps = NULL,
-        .perms = perms,
-        .acls = NULL,
-        .processName = "dcamera_client_demo",
-        .aplStr = "system_basic",
-    };
-    tokenId = GetAccessTokenId(&infoInstance);
-    SetSelfTokenID(tokenId);
-    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
+    /* Grant the permission so that create camera test can be success */
+    int32_t rc = -1;
+    OHOS::Security::AccessToken::AccessTokenIDEx tokenIdEx = {0};
+    tokenIdEx = OHOS::Security::AccessToken::AccessTokenKit::AllocHapToken(
+        g_infoManagerTestInfoParms,
+        g_infoManagerTestPolicyPrams);
+    if (tokenIdEx.tokenIdExStruct.tokenID == 0) {
+        unsigned int tokenIdOld = 0;
+        DHLOGI("Alloc TokenID failure, cleaning the old token ID \n");
+        tokenIdOld = OHOS::Security::AccessToken::AccessTokenKit::GetHapTokenID(
+            1, permissionName, 0);
+        if (tokenIdOld == 0) {
+            DHLOGI("Unable to get the Old Token ID, need to reflash the board");
+            return 0;
+        }
+        rc = OHOS::Security::AccessToken::AccessTokenKit::DeleteToken(tokenIdOld);
+        if (rc != 0) {
+            DHLOGI("Unable to delete the Old Token ID, need to reflash the board");
+            return 0;
+        }
+
+        /* Retry the token allocation again */
+        tokenIdEx = OHOS::Security::AccessToken::AccessTokenKit::AllocHapToken(
+            g_infoManagerTestInfoParms,
+            g_infoManagerTestPolicyPrams);
+        if (tokenIdEx.tokenIdExStruct.tokenID == 0) {
+            DHLOGI("Alloc TokenID failure, need to reflash the board \n");
+            return 0;
+        }
+    }
+
+    (void)SetSelfTokenID(tokenIdEx.tokenIdExStruct.tokenID);
+
+    rc = Security::AccessToken::AccessTokenKit::GrantPermission(
+        tokenIdEx.tokenIdExStruct.tokenID,
+        permissionName, OHOS::Security::AccessToken::PERMISSION_USER_FIXED);
+    if (rc != 0) {
+        DHLOGI("GrantPermission() failed");
+        (void)OHOS::Security::AccessToken::AccessTokenKit::DeleteToken(
+            tokenIdEx.tokenIdExStruct.tokenID);
+        return 0;
+    } else {
+        DHLOGI("GrantPermission() success");
+    }
 
     DHLOGI("========== Distributed Camera Demo Start ==========");
     int32_t ret = InitCameraStandard();
@@ -246,6 +343,7 @@ int main()
     sleep(SLEEP_FIVE_SECOND);
 
     g_captureSession->Stop();
+    g_cameraInput->Close();
     g_captureSession->Release();
     g_cameraInput->Release();
     DHLOGI("========== Distributed Camera Demo End ==========");

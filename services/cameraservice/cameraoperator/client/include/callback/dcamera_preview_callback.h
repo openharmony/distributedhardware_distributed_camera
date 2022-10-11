@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-class DCameraPreviewCallback : public CameraStandard::PreviewCallback {
+class DCameraPreviewCallback : public CameraStandard::PreviewStateCallback {
 public:
     explicit DCameraPreviewCallback(const std::shared_ptr<StateCallback>& callback);
     void OnFrameStarted() const override;

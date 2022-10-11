@@ -24,13 +24,19 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-class DCameraSessionCallback : public CameraStandard::SessionCallback {
+class DCameraSessionCallback : public CameraStandard::SessionCallback, public CameraStandard::FocusCallback {
 public:
     explicit DCameraSessionCallback(const std::shared_ptr<StateCallback>& callback);
     void OnError(int32_t errorCode) override;
+    void OnFocusState(FocusState state) override;
 
 private:
     std::shared_ptr<StateCallback> callback_;
+    const std::map<FocusCallback::FocusState, camera_focus_state_t> focusStateMap_ = {
+        {FocusCallback::SCAN, OHOS_CAMERA_FOCUS_STATE_SCAN},
+        {FocusCallback::FOCUSED, OHOS_CAMERA_FOCUS_STATE_FOCUSED},
+        {FocusCallback::UNFOCUSED, OHOS_CAMERA_FOCUS_STATE_UNFOCUSED}
+    };
 };
 } // namespace DistributedHardware
 } // namespace OHOS

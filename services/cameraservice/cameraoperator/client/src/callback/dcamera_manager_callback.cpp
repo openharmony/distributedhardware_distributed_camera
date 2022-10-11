@@ -27,7 +27,7 @@ void DCameraManagerCallback::OnCameraStatusChanged(const CameraStandard::CameraS
 }
 
 void DCameraManagerCallback::OnFlashlightStatusChanged(const std::string &cameraID,
-                                                       const CameraStandard::FlashlightStatus flashStatus) const
+                                                       const CameraStandard::FlashStatus flashStatus) const
 {
     DHLOGI("DCameraManagerCallback::OnFlashlightStatusChanged, cameraID: %s, flashStatus: %d",
            GetAnonyString(cameraID).c_str(), flashStatus);

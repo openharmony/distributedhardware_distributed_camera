@@ -23,6 +23,7 @@
 #include "camera_info.h"
 #include "camera_input.h"
 #include "camera_manager.h"
+#include "camera_output_capability.h"
 #include "json/json.h"
 #include "single_instance.h"
 #include "v1_0/dcamera_types.h"
@@ -30,11 +31,6 @@
 namespace OHOS {
 namespace DistributedHardware {
 using namespace OHOS::HDI::DistributedCamera::V1_0;
-struct ConfigInfo {
-    DCStreamType type;
-    std::string formatKey;
-    sptr<CameraStandard::CameraInput> cameraInput;
-};
 
 class DCameraHandler : public IHardwareHandler {
 DECLARE_SINGLE_INSTANCE_BASE(DCameraHandler);
@@ -53,11 +49,12 @@ private:
     ~DCameraHandler();
 
 private:
-    DHItem CreateDHItem(sptr<CameraStandard::CameraInfo>& info);
-    std::string GetCameraPosition(camera_position_enum_t position);
-    void ConfigFormatAndResolution(ConfigInfo& info, Json::Value& outputFormat, Json::Value& resolution,
-                                   std::vector<camera_format_t>& formatList, std::set<camera_format_t>& formatSet);
-    bool IsValid(const DCStreamType type, const CameraStandard::CameraPicSize& size);
+    DHItem CreateDHItem(sptr<CameraStandard::CameraDevice>& info);
+    std::string GetCameraPosition(CameraStandard::CameraPosition position);
+    void ConfigFormatAndResolution(const DCStreamType type, Json::Value& root,
+        std::vector<CameraStandard::Profile>& profileList);
+    bool IsValid(const DCStreamType type, const CameraStandard::Size& size);
+    int32_t CovertToDcameraFormat(CameraStandard::CameraFormat format);
 
     sptr<CameraStandard::CameraManager> cameraManager_;
     std::shared_ptr<PluginListener> pluginListener_;
