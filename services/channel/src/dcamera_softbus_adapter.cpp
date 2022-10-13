@@ -227,7 +227,7 @@ int32_t DCameraSoftbusAdapter::SendSofbusBytes(int32_t sessionId, std::shared_pt
 
 int32_t DCameraSoftbusAdapter::SendSofbusStream(int32_t sessionId, std::shared_ptr<DataBuffer>& buffer)
 {
-    StreamData streamData = { (char *)buffer->Data(), buffer->Size() };
+    StreamData streamData = { reinterpret_cast<char *>(buffer->Data()), buffer->Size() };
     StreamData ext = { 0 };
     StreamFrameInfo param = { 0 };
     return SendStream(sessionId, &streamData, &ext, &param);
@@ -362,7 +362,7 @@ void DCameraSoftbusAdapter::OnSourceStreamReceived(int32_t sessionId, const Stre
     }
 
     std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(data->bufLen);
-    ret = memcpy_s(buffer->Data(), buffer->Capacity(), (uint8_t *)data->buf, data->bufLen);
+    ret = memcpy_s(buffer->Data(), buffer->Capacity(), reinterpret_cast<uint8_t *>(data->buf), data->bufLen);
     if (ret != EOK) {
         DHLOGE("DCameraSoftbusAdapter OnSourceStreamReceived memcpy_s failed ret: %d", ret);
         return;
@@ -477,7 +477,7 @@ void DCameraSoftbusAdapter::OnSinkStreamReceived(int32_t sessionId, const Stream
     }
 
     std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(data->bufLen);
-    ret = memcpy_s(buffer->Data(), buffer->Capacity(), (uint8_t *)data->buf, data->bufLen);
+    ret = memcpy_s(buffer->Data(), buffer->Capacity(), reinterpret_cast<uint8_t *>(data->buf), data->bufLen);
     if (ret != EOK) {
         DHLOGE("DCameraSoftbusAdapter OnSinkStreamReceived memcpy_s failed ret: %d", ret);
         return;

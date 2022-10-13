@@ -129,9 +129,6 @@ int32_t DistributedCameraSourceService::RegisterDistributedHardware(const std::s
         DHLOGI("DistributedCameraSourceService RegisterDistributedHardware new dev devId: %s, dhId: %s, version: %s",
             GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), param.version.c_str());
         camDev = std::make_shared<DCameraSourceDev>(devId, dhId, listener_);
-        if (camDev == nullptr) {
-            return DCAMERA_MEMORY_OPT_ERROR;
-        }
         ret = camDev->InitDCameraSourceDev();
         if (ret != DCAMERA_OK) {
             DHLOGE("DistributedCameraSourceService RegisterDistributedHardware failed %d InitDev devId: %s, dhId: %s",

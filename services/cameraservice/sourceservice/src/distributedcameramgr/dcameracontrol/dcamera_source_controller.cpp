@@ -79,7 +79,8 @@ int32_t DCameraSourceController::StartCapture(std::vector<std::shared_ptr<DCamer
     DHLOGI("DCameraSourceController StartCapture devId: %s, dhId: %s captureCommand: %s", GetAnonyString(devId).c_str(),
         GetAnonyString(dhId).c_str(), cmd.command_.c_str());
     std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(jsonStr.length() + 1);
-    ret = memcpy_s(buffer->Data(), buffer->Capacity(), (uint8_t *)jsonStr.c_str(), jsonStr.length());
+    ret = memcpy_s(buffer->Data(), buffer->Capacity(), reinterpret_cast<uint8_t *>(const_cast<char *>(jsonStr.c_str())),
+        jsonStr.length());
     if (ret != EOK) {
         DHLOGE("DCameraSourceController StartCapture memcpy_s failed %d, devId: %s, dhId: %s", ret,
             GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
@@ -217,7 +218,8 @@ int32_t DCameraSourceController::UpdateSettings(std::vector<std::shared_ptr<DCam
         return ret;
     }
     std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(jsonStr.length() + 1);
-    ret = memcpy_s(buffer->Data(), buffer->Capacity(), (uint8_t *)jsonStr.c_str(), jsonStr.length());
+    ret = memcpy_s(buffer->Data(), buffer->Capacity(), reinterpret_cast<uint8_t *>(const_cast<char *>(jsonStr.c_str())),
+        jsonStr.length());
     if (ret != EOK) {
         DHLOGE("DCameraSourceController UpdateSettings memcpy_s failed %d, devId: %s, dhId: %s", ret,
             GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
@@ -430,7 +432,7 @@ void DCameraSourceController::OnDataReceived(std::vector<std::shared_ptr<DataBuf
         return;
     }
     std::shared_ptr<DataBuffer> buffer = *(buffers.begin());
-    std::string jsonStr((char *)buffer->Data());
+    std::string jsonStr(reinterpret_cast<char *>(buffer->Data()));
     JSONCPP_STRING errs;
     Json::CharReaderBuilder readerBuilder;
     Json::Value rootValue;
