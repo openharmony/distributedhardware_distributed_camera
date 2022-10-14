@@ -337,7 +337,8 @@ void DCameraSinkController::OnMetadataResult(std::vector<std::shared_ptr<DCamera
         return;
     }
     std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(jsonStr.length() + 1);
-    ret = memcpy_s(buffer->Data(), buffer->Capacity(), (uint8_t *)jsonStr.c_str(), jsonStr.length());
+    ret = memcpy_s(buffer->Data(), buffer->Capacity(), reinterpret_cast<uint8_t *>(const_cast<char *>(jsonStr.c_str())),
+        jsonStr.length());
     if (ret != EOK) {
         DHLOGE("DCameraSinkController::OnMetadataResult memcpy_s failed, dhId: %s ret: %d",
             GetAnonyString(dhId_).c_str(), ret);
@@ -462,7 +463,7 @@ int32_t DCameraSinkController::HandleReceivedData(std::shared_ptr<DataBuffer>& d
 {
     DHLOGI("DCameraSinkController::HandleReceivedData dhId: %s", GetAnonyString(dhId_).c_str());
     uint8_t *data = dataBuffer->Data();
-    std::string jsonStr((const char *)data, dataBuffer->Capacity());
+    std::string jsonStr(reinterpret_cast<const char *>(data), dataBuffer->Capacity());
 
     JSONCPP_STRING errs;
     Json::CharReaderBuilder readerBuilder;

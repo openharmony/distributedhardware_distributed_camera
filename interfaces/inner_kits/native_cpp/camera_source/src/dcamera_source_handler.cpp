@@ -62,8 +62,8 @@ int32_t DCameraSourceHandler::InitSource(const std::string& params)
         DHLOGE("systemAbilityId: %d load failed, result code: %d.", DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, ret);
         return DCAMERA_INIT_ERR;
     }
-    uint32_t interval = 1;
     {
+        uint32_t interval = 1;
         std::unique_lock<std::mutex> lock(producerMutex_);
         producerCon_.wait_for(lock, std::chrono::minutes(interval), [this] {
             return (this->state_ == DCAMERA_SA_STATE_START);
