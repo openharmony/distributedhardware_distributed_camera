@@ -56,10 +56,18 @@ public:
     }
 };
 
-const int32_t TEST_WIDTH = 1920;
-const int32_t TEST_HEIGHT = 1080;
-const int32_t TEST_FORMAT_3 = 3;
-const int32_t TEST_FORMAT_4 = 4;
+#ifdef DCAMERA_YUV
+        const int32_t TEST_WIDTH = 1920;
+        const int32_t TEST_HEIGHT = 1080;
+        const int32_t TEST_FORMAT_VIDEO = OHOS_CAMERA_FORMAT_YCRCB_420_SP;
+        const int32_t TEST_FORMAT_PHOTO = OHOS_CAMERA_FORMAT_JPEG;
+#else
+        const int32_t TEST_WIDTH = 640;
+        const int32_t TEST_HEIGHT = 480;
+        const int32_t TEST_FORMAT_VIDEO = OHOS_CAMERA_FORMAT_RGBA_8888;
+        const int32_t TEST_FORMAT_PHOTO = OHOS_CAMERA_FORMAT_RGBA_8888;
+#endif
+
 const int32_t TEST_SLEEP_SEC = 2;
 
 class DCameraClientTest : public testing::Test {
@@ -97,28 +105,28 @@ void DCameraClientTest::SetUp(void)
     photoInfo_false_ = std::make_shared<DCameraCaptureInfo>();
     photoInfo_false_->width_ = TEST_WIDTH;
     photoInfo_false_->height_ = TEST_HEIGHT;
-    photoInfo_false_->format_ = TEST_FORMAT_4;
+    photoInfo_false_->format_ = TEST_FORMAT_PHOTO;
     photoInfo_false_->isCapture_ = false;
     photoInfo_false_->streamType_ = SNAPSHOT_FRAME;
 
     videoInfo_false_ = std::make_shared<DCameraCaptureInfo>();
     videoInfo_false_->width_ = TEST_WIDTH;
     videoInfo_false_->height_ = TEST_HEIGHT;
-    videoInfo_false_->format_ = TEST_FORMAT_3;
+    videoInfo_false_->format_ = TEST_FORMAT_VIDEO;
     videoInfo_false_->isCapture_ = false;
     videoInfo_false_->streamType_ = CONTINUOUS_FRAME;
 
     photoInfo_true_ = std::make_shared<DCameraCaptureInfo>();
     photoInfo_true_->width_ = TEST_WIDTH;
     photoInfo_true_->height_ = TEST_HEIGHT;
-    photoInfo_true_->format_ = TEST_FORMAT_4;
+    photoInfo_true_->format_ = TEST_FORMAT_PHOTO;
     photoInfo_true_->isCapture_ = true;
     photoInfo_true_->streamType_ = SNAPSHOT_FRAME;
 
     videoInfo_true_ = std::make_shared<DCameraCaptureInfo>();
     videoInfo_true_->width_ = TEST_WIDTH;
     videoInfo_true_->height_ = TEST_HEIGHT;
-    videoInfo_true_->format_ = TEST_FORMAT_3;
+    videoInfo_true_->format_ = TEST_FORMAT_VIDEO;
     videoInfo_true_->isCapture_ = true;
     videoInfo_true_->streamType_ = CONTINUOUS_FRAME;
 }
