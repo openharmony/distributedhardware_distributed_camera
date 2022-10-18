@@ -79,6 +79,15 @@ ohos_unittest("DCameraClientTest") {
     "samgr:samgr_proxy",
   ]
 
+  cflags = [
+    "-fPIC",
+    "-Wall",
+  ]
+
+  if (!distributed_camera_common) {
+    cflags += [ "-DDCAMERA_YUV" ]
+  }
+
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"DCameraClientTest\"",
