@@ -195,27 +195,17 @@ void DCameraHandler::ConfigFormatAndResolution(const DCStreamType type, Json::Va
     std::vector<CameraStandard::Profile>& profileList)
 {
     DHLOGI("DCameraHandler::ConfigFormatAndResolution camera Profile size: %d", profileList.size());
-    std::set<int32_t> formatSet;
-    for (auto& profile : profileList) {
-        CameraStandard::CameraFormat format = CameraStandard::CameraFormat::CAMERA_FORMAT_RGBA_8888;
-        int32_t dformat = CovertToDcameraFormat(format);
-        formatSet.insert(dformat);
-        std::string formatName = std::to_string(dformat);
-        if (type == SNAPSHOT_FRAME) {
-            root[CAMERA_FORMAT_PHOTO][CAMERA_RESOLUTION_KEY][formatName].append("640*480");
-        } else if (type == CONTINUOUS_FRAME) {
-            root[CAMERA_FORMAT_PREVIEW][CAMERA_RESOLUTION_KEY][formatName].append("640*480");
-            root[CAMERA_FORMAT_VIDEO][CAMERA_RESOLUTION_KEY][formatName].append("640*480");
-        }
-    }
-
-    for (auto format : formatSet) {
-        if (type == SNAPSHOT_FRAME) {
-            root[CAMERA_FORMAT_PHOTO][CAMERA_FORMAT_KEY].append(format);
-        } else if (type == CONTINUOUS_FRAME) {
-            root[CAMERA_FORMAT_PREVIEW][CAMERA_FORMAT_KEY].append(format);
-            root[CAMERA_FORMAT_VIDEO][CAMERA_FORMAT_KEY].append(format);
-        }
+    CameraStandard::CameraFormat format = CameraStandard::CameraFormat::CAMERA_FORMAT_RGBA_8888; 
+    int32_t dformat = CovertToDcameraFormat(format);
+    std::string formatName = std::to_string(dformat);
+    if (type == SNAPSHOT_FRAME) {
+        root[CAMERA_FORMAT_PHOTO][CAMERA_RESOLUTION_KEY][formatName].append("640*480");
+        root[CAMERA_FORMAT_PHOTO][CAMERA_FORMAT_KEY].append(format);
+    } else if (type == CONTINUOUS_FRAME) {
+        root[CAMERA_FORMAT_PREVIEW][CAMERA_RESOLUTION_KEY][formatName].append("640*480");
+        root[CAMERA_FORMAT_VIDEO][CAMERA_RESOLUTION_KEY][formatName].append("640*480");
+        root[CAMERA_FORMAT_PREVIEW][CAMERA_FORMAT_KEY].append(format);
+        root[CAMERA_FORMAT_VIDEO][CAMERA_FORMAT_KEY].append(format);
     }
 }
 
