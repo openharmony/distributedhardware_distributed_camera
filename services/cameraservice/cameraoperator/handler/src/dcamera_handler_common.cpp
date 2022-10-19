@@ -197,8 +197,7 @@ void DCameraHandler::ConfigFormatAndResolution(const DCStreamType type, Json::Va
     DHLOGI("DCameraHandler::ConfigFormatAndResolution camera Profile size: %d", profileList.size());
     std::set<int32_t> formatSet;
     for (auto& profile : profileList) {
-        CameraStandard::CameraFormat format = profile.GetCameraFormat();
-        format = CameraStandard::CameraFormat::CAMERA_FORMAT_RGBA_8888;
+        CameraStandard::CameraFormat format = CameraStandard::CameraFormat::CAMERA_FORMAT_RGBA_8888;
         int32_t dformat = CovertToDcameraFormat(format);
         formatSet.insert(dformat);
         std::string formatName = std::to_string(dformat);
