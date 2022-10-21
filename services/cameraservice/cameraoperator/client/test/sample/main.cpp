@@ -65,7 +65,9 @@ static int32_t InitCameraStandard()
     g_cameraManager->SetCallback(std::make_shared<DemoDCameraManagerCallback>());
 
     g_captureSession = g_cameraManager->CreateCaptureSession();
-    g_captureSession->SetCallback(std::make_shared<DemoDCameraSessionCallback>());
+    std::shared_ptr<DemoDCameraSessionCallback> sessionCallback = std::make_shared<DemoDCameraSessionCallback>();
+    g_captureSession->SetCallback(sessionCallback);
+    g_captureSession->SetFocusCallback(sessionCallback);
 
     std::vector<sptr<CameraDevice>> cameraObjList = g_cameraManager->GetSupportedCameras();
     for (auto info : cameraObjList) {
@@ -88,7 +90,6 @@ static int32_t InitCameraStandard()
     ((sptr<CameraInput> &)g_cameraInput)->Open();
     std::shared_ptr<DemoDCameraInputCallback> inputCallback = std::make_shared<DemoDCameraInputCallback>();
     ((sptr<CameraInput> &)g_cameraInput)->SetErrorCallback(inputCallback);
-    g_captureSession->SetFocusCallback(std::make_shared<DemoDCameraSessionCallback>());
     return DCAMERA_OK;
 }
 
@@ -139,8 +140,6 @@ static void InitPhotoOutput()
         g_photoInfo->width_, g_photoInfo->height_, g_photoInfo->format_);
     sptr<Surface> photoSurface = Surface::CreateSurfaceAsConsumer();
     sptr<IBufferConsumerListener> photoListener = new DemoDCameraPhotoSurfaceListener(photoSurface);
-    photoSurface->SetDefaultWidthAndHeight(g_photoInfo->width_, g_photoInfo->height_);
-    photoSurface->SetUserData(CAMERA_SURFACE_FORMAT, std::to_string(g_photoInfo->format_));
     photoSurface->RegisterConsumerListener(photoListener);
     CameraFormat photoFormat = ConvertToCameraFormat(g_photoInfo->format_);
     Size photoSize = {g_photoInfo->width_, g_photoInfo->height_};
@@ -155,8 +154,6 @@ static void InitPreviewOutput()
         g_previewInfo->width_, g_previewInfo->height_, g_previewInfo->format_);
     sptr<Surface> previewSurface = Surface::CreateSurfaceAsConsumer();
     sptr<IBufferConsumerListener> previewListener = new DemoDCameraPreviewSurfaceListener(previewSurface);
-    previewSurface->SetDefaultWidthAndHeight(g_previewInfo->width_, g_previewInfo->height_);
-    previewSurface->SetUserData(CAMERA_SURFACE_FORMAT, std::to_string(g_previewInfo->format_));
     previewSurface->RegisterConsumerListener(previewListener);
     CameraFormat previewFormat = ConvertToCameraFormat(g_previewInfo->format_);
     Size previewSize = {g_previewInfo->width_, g_previewInfo->height_};
@@ -171,8 +168,6 @@ static void InitVideoOutput()
         g_videoInfo->width_, g_videoInfo->height_, g_videoInfo->format_);
     sptr<Surface> videoSurface = Surface::CreateSurfaceAsConsumer();
     sptr<IBufferConsumerListener> videoListener = new DemoDCameraVideoSurfaceListener(videoSurface);
-    videoSurface->SetDefaultWidthAndHeight(g_videoInfo->width_, g_videoInfo->height_);
-    videoSurface->SetUserData(CAMERA_SURFACE_FORMAT, std::to_string(g_videoInfo->format_));
     videoSurface->RegisterConsumerListener(videoListener);
     CameraFormat videoFormat = ConvertToCameraFormat(g_videoInfo->format_);
     Size videoSize = {g_videoInfo->width_, g_videoInfo->height_};
