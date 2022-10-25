@@ -66,8 +66,10 @@ std::vector<DHItem> DCameraHandler::Query()
         }
         DHLOGI("DCameraHandlerCommon::Query get %s, position: %d, cameraType: %d",
             GetAnonyString(info->GetID()).c_str(), info->GetPosition(), info->GetCameraType());
-        DHItem item = CreateDHItem(info);
-        itemList.emplace_back(item);
+        DHItem item;
+        if (CreateDHItem(info, item) == DCAMERA_OK) {
+            itemList.emplace_back(item);
+        }
     }
     DHLOGI("DCameraHandlerCommon::Query success, get %d items", itemList.size());
     return itemList;
@@ -111,6 +113,11 @@ std::vector<std::string> DCameraHandler::GetCameras()
         return cameras;
     }
     for (auto& info : cameraList) {
+        sptr<CameraStandard::CameraOutputCapability> capability = cameraManager_->GetSupportedOutputCapability(info);
+        if (capability == nullptr) {
+            DHLOGI("DCameraHandlerCommon::GetCameras get supported capability is null");
+            continue;
+        }
         if (info->GetConnectionType() != CameraStandard::ConnectionType::CAMERA_CONNECTION_BUILT_IN) {
             DHLOGI("DCameraHandlerCommon::GetCameras connection type: %d", info->GetConnectionType());
             continue;
@@ -124,9 +131,8 @@ std::vector<std::string> DCameraHandler::GetCameras()
     return cameras;
 }
 
-DHItem DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraDevice>& info)
+int32_t DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraDevice>& info, DHItem& item)
 {
-    DHItem item;
     std::string id = info->GetID();
     item.dhId = CAMERA_ID_PREFIX + id;
     DHLOGI("DCameraHandlerCommon::CreateDHItem camera id: %s", GetAnonyString(id).c_str());
@@ -139,10 +145,14 @@ DHItem DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraDevice>& info)
     sptr<CameraStandard::CameraInput> cameraInput = cameraManager_->CreateCameraInput(info);
     if (cameraInput == nullptr) {
         DHLOGE("DCameraHandlerCommon::CreateDHItem create cameraInput failed");
-        return item;
+        return DCAMERA_BAD_VALUE;
     }
 
     sptr<CameraStandard::CameraOutputCapability> capability = cameraManager_->GetSupportedOutputCapability(info);
+    if (capability == nullptr) {
+        DHLOGI("DCameraHandlerCommon::CreateDHItem get supported capability is null");
+        return DCAMERA_BAD_VALUE;
+    }
     std::vector<CameraStandard::Profile> photoProfiles = capability->GetPhotoProfiles();
     ConfigFormatAndResolution(SNAPSHOT_FRAME, root, photoProfiles);
 
@@ -162,7 +172,7 @@ DHItem DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraDevice>& info)
 
     item.attrs = root.toStyledString();
     cameraInput->Release();
-    return item;
+    return DCAMERA_OK;
 }
 
 std::string DCameraHandler::GetCameraPosition(CameraStandard::CameraPosition position)

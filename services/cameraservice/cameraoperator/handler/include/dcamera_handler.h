@@ -49,7 +49,7 @@ private:
     ~DCameraHandler();
 
 private:
-    DHItem CreateDHItem(sptr<CameraStandard::CameraDevice>& info);
+    int32_t CreateDHItem(sptr<CameraStandard::CameraDevice>& info, DHItem& item);
     std::string GetCameraPosition(CameraStandard::CameraPosition position);
     void ConfigFormatAndResolution(const DCStreamType type, Json::Value& root,
         std::vector<CameraStandard::Profile>& profileList);
