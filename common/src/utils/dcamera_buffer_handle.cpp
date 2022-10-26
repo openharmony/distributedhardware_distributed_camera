@@ -32,11 +32,12 @@ void* DCameraMemoryMap(const BufferHandle *buffer)
         DHLOGE("mmap the buffer handle is NULL");
         return nullptr;
     }
+    void* virAddr = nullptr;
     if (buffer->reserveFds <= 0) {
-        DHLOGE("invalid file descriptor num : %d", buffer->reserveFds);
-        return nullptr;
+        virAddr = mmap(NULL, buffer->size, PROT_READ | PROT_WRITE, MAP_SHARED, buffer->fd, 0);
+    } else {
+        virAddr = mmap(NULL, buffer->size, PROT_READ | PROT_WRITE, MAP_SHARED, buffer->reserve[0], 0);
     }
-    void* virAddr = mmap(NULL, buffer->size, PROT_READ | PROT_WRITE, MAP_SHARED, buffer->reserve[0], 0);
     if (virAddr == MAP_FAILED) {
         DHLOGE("mmap failed errno %s, fd : %d", strerror(errno), buffer->fd);
         return nullptr;
