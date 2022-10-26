@@ -15,9 +15,12 @@
 
 #include <gtest/gtest.h>
 
+#include "accesstoken_kit.h"
 #include "dcamera_handler.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
+#include "nativetoken_kit.h"
+#include "token_setproc.h"
 
 using namespace testing::ext;
 
@@ -29,6 +32,7 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
+    void SetTokenID();
 };
 
 void DCameraHandlerTest::SetUpTestCase(void)
@@ -49,6 +53,27 @@ void DCameraHandlerTest::SetUp(void)
 void DCameraHandlerTest::TearDown(void)
 {
     DHLOGI("DCameraHandlerTest::TearDown");
+}
+
+void DCameraHandlerTest::SetTokenID()
+{
+    uint64_t tokenId;
+    const char *perms[2];
+    perms[0] = "ohos.permission.DISTRIBUTED_DATASYNC";
+    perms[1] = "ohos.permission.CAMERA";
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = 2,
+        .aclsNum = 0,
+        .dcaps = NULL,
+        .perms = perms,
+        .acls = NULL,
+        .processName = "dcamera_client_demo",
+        .aplStr = "system_basic",
+    };
+    tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
+    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 }
 
 /**
@@ -83,6 +108,7 @@ HWTEST_F(DCameraHandlerTest, dcamera_handler_test_002, TestSize.Level1)
  */
 HWTEST_F(DCameraHandlerTest, dcamera_handler_test_003, TestSize.Level1)
 {
+    SetTokenID();
     int32_t ret = DCameraHandler::GetInstance().Query().size();
     EXPECT_GT(ret, DCAMERA_OK);
 }
