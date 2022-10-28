@@ -19,6 +19,7 @@
 #include "accesstoken_kit.h"
 #include "hap_token_info.h"
 #include "ipc_skeleton.h"
+#include "nativetoken_kit.h"
 #include "token_setproc.h"
 
 using namespace OHOS;
@@ -228,86 +229,25 @@ static std::shared_ptr<PhotoCaptureSetting> ConfigPhotoCaptureSetting()
     return photoCaptureSettings;
 }
 
-static std::string permissionName = "ohos.permission.CAMERA";
-static OHOS::Security::AccessToken::HapInfoParams g_infoManagerTestInfoParms = {
-    .userID = 1,
-    .bundleName = permissionName,
-    .instIndex = 0,
-    .appIDDesc = "testtesttesttest"
-};
-
-static OHOS::Security::AccessToken::PermissionDef g_infoManagerTestPermDef1 = {
-    .permissionName = "ohos.permission.CAMERA",
-    .bundleName = "ohos.permission.CAMERA",
-    .grantMode = 1,
-    .availableLevel = OHOS::Security::AccessToken::ATokenAplEnum::APL_NORMAL,
-    .label = "label",
-    .labelId = 1,
-    .description = "dcamera client test",
-    .descriptionId = 1
-};
-
-static OHOS::Security::AccessToken::PermissionStateFull g_infoManagerTestState1 = {
-    .permissionName = "ohos.permission.CAMERA",
-    .isGeneral = true,
-    .resDeviceID = {"local"},
-    .grantStatus = {OHOS::Security::AccessToken::PermissionState::PERMISSION_GRANTED},
-    .grantFlags = {1}
-};
-
-static OHOS::Security::AccessToken::HapPolicyParams g_infoManagerTestPolicyPrams = {
-    .apl = OHOS::Security::AccessToken::ATokenAplEnum::APL_NORMAL,
-    .domain = "test.domain",
-    .permList = {g_infoManagerTestPermDef1},
-    .permStateList = {g_infoManagerTestState1}
-};
-
 int main()
 {
-    /* Grant the permission so that create camera test can be success */
-    int32_t rc = -1;
-    OHOS::Security::AccessToken::AccessTokenIDEx tokenIdEx = {0};
-    tokenIdEx = OHOS::Security::AccessToken::AccessTokenKit::AllocHapToken(
-        g_infoManagerTestInfoParms,
-        g_infoManagerTestPolicyPrams);
-    if (tokenIdEx.tokenIdExStruct.tokenID == 0) {
-        unsigned int tokenIdOld = 0;
-        DHLOGI("Alloc TokenID failure, cleaning the old token ID \n");
-        tokenIdOld = OHOS::Security::AccessToken::AccessTokenKit::GetHapTokenID(
-            1, permissionName, 0);
-        if (tokenIdOld == 0) {
-            DHLOGI("Unable to get the Old Token ID, need to reflash the board");
-            return 0;
-        }
-        rc = OHOS::Security::AccessToken::AccessTokenKit::DeleteToken(tokenIdOld);
-        if (rc != 0) {
-            DHLOGI("Unable to delete the Old Token ID, need to reflash the board");
-            return 0;
-        }
-
-        /* Retry the token allocation again */
-        tokenIdEx = OHOS::Security::AccessToken::AccessTokenKit::AllocHapToken(
-            g_infoManagerTestInfoParms,
-            g_infoManagerTestPolicyPrams);
-        if (tokenIdEx.tokenIdExStruct.tokenID == 0) {
-            DHLOGI("Alloc TokenID failure, need to reflash the board \n");
-            return 0;
-        }
-    }
-
-    (void)SetSelfTokenID(tokenIdEx.tokenIdExStruct.tokenID);
-
-    rc = Security::AccessToken::AccessTokenKit::GrantPermission(
-        tokenIdEx.tokenIdExStruct.tokenID,
-        permissionName, OHOS::Security::AccessToken::PERMISSION_USER_FIXED);
-    if (rc != 0) {
-        DHLOGI("GrantPermission() failed");
-        (void)OHOS::Security::AccessToken::AccessTokenKit::DeleteToken(
-            tokenIdEx.tokenIdExStruct.tokenID);
-        return 0;
-    } else {
-        DHLOGI("GrantPermission() success");
-    }
+    uint64_t tokenId;
+    const char *perms[2];
+    perms[0] = "ohos.permission.DISTRIBUTED_DATASYNC";
+    perms[1] = "ohos.permission.CAMERA";
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = 2,
+        .aclsNum = 0,
+        .dcaps = NULL,
+        .perms = perms,
+        .acls = NULL,
+        .processName = "dcamera_client_demo",
+        .aplStr = "system_basic",
+    };
+    tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
+    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 
     DHLOGI("========== Distributed Camera Demo Start ==========");
     int32_t ret = InitCameraStandard();
