@@ -182,5 +182,23 @@ void DCameraPipelineSink::OnProcessedVideoBuffer(const std::shared_ptr<DataBuffe
     }
     processListener_->OnProcessedVideoBuffer(videoResult);
 }
+
+int32_t DCameraPipelineSink::GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier)
+{
+    if (pipelineHead_ == nullptr) {
+        DHLOGD("DCameraPipelineSink::GetProperty: pipelineHead is nullptr.");
+        return DCAMERA_BAD_VALUE;
+    }
+    std::shared_ptr<AbstractDataProcess> cur = pipelineHead_;
+    while (cur) {
+        int32_t ret = cur->GetProperty(propertyName, propertyCarrier);
+        if (ret != DCAMERA_OK) {
+            DHLOGD("DCameraPipelineSink::GetProperty: get dataProcess property fail.");
+            return DCAMERA_BAD_VALUE;
+        }
+        cur = cur->nextDataProcess_;
+    }
+    return DCAMERA_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

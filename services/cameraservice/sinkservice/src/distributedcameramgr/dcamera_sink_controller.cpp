@@ -430,8 +430,13 @@ int32_t DCameraSinkController::StartCaptureInner(std::vector<std::shared_ptr<DCa
         DCameraNotifyInner(DCAMERA_MESSAGE, DCAMERA_EVENT_DEVICE_ERROR, std::string("output start capture failed"));
         return ret;
     }
-
-    ret = operator_->StartCapture(captureInfos);
+    PropertyCarrier carrier;
+    ret = output_->GetProperty(SURFACE, carrier);
+    if (ret != DCAMERA_OK) {
+        DHLOGD("DCameraSinkController::StartCaptureInner: get property fail.");
+        return DCAMERA_BAD_VALUE;
+    }
+    ret = operator_->StartCapture(captureInfos, carrier.surface_);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSinkController::StartCaptureInner camera client start capture failed, dhId: %s, ret: %d",
                GetAnonyString(dhId_).c_str(), ret);

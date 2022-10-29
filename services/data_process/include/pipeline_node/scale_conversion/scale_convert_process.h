@@ -48,6 +48,8 @@ public:
     int32_t ProcessData(std::vector<std::shared_ptr<DataBuffer>>& inputBuffers) override;
     void ReleaseProcessNode() override;
 
+    int32_t GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier) override;
+
 private:
     bool IsConvertible(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig);
     bool IsCorrectImageUnitInfo(const ImageUnitInfo& imgInfo);

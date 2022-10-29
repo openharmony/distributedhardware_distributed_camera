@@ -24,6 +24,8 @@
 #include "icamera_operator.h"
 #include "icamera_sink_data_process.h"
 
+#include "property_carrier.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 class DCameraSinkOutput : public ICameraSinkOutput, public std::enable_shared_from_this<DCameraSinkOutput> {
@@ -44,6 +46,8 @@ public:
     void OnSessionState(DCStreamType type, int32_t state);
     void OnSessionError(DCStreamType type, int32_t eventType, int32_t eventReason, std::string detail);
     void OnDataReceived(DCStreamType type, std::vector<std::shared_ptr<DataBuffer>>& dataBuffers);
+
+    int32_t GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier) override;
 
 private:
     void InitInner(DCStreamType type);

@@ -26,6 +26,8 @@
 #include "dcamera_event_cmd.h"
 #include "v1_0/dcamera_types.h"
 
+#include "surface.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 using namespace OHOS::HDI::DistributedCamera::V1_0;
@@ -55,7 +57,8 @@ public:
     virtual int32_t Init() = 0;
     virtual int32_t UnInit() = 0;
     virtual int32_t UpdateSettings(std::vector<std::shared_ptr<DCameraSettings>>& settings) = 0;
-    virtual int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos) = 0;
+    virtual int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos,
+        sptr<Surface>& surface) = 0;
     virtual int32_t StopCapture() = 0;
     virtual int32_t SetStateCallback(std::shared_ptr<StateCallback>& callback) = 0;
     virtual int32_t SetResultCallback(std::shared_ptr<ResultCallback>& callback) = 0;

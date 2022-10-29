@@ -23,6 +23,8 @@
 #include "image_common_type.h"
 #include "distributed_camera_errno.h"
 
+#include "property_carrier.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 class AbstractDataProcess {
@@ -35,9 +37,12 @@ public:
         VideoConfigParams& processedConfig) = 0;
     virtual int32_t ProcessData(std::vector<std::shared_ptr<DataBuffer>>& inputBuffers) = 0;
     virtual void ReleaseProcessNode() = 0;
+    virtual int32_t GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier) = 0;
+
+public:
+    std::shared_ptr<AbstractDataProcess> nextDataProcess_ = nullptr;
 
 protected:
-    std::shared_ptr<AbstractDataProcess> nextDataProcess_ = nullptr;
     size_t nodeRank_;
 };
 } // namespace DistributedHardware

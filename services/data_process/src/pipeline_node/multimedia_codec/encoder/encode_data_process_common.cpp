@@ -337,8 +337,6 @@ int32_t EncodeDataProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>&
         DHLOGE("Feed encoder input Buffer fail.");
         return err;
     }
-
-    IncreaseWaitEncodeCnt();
     return DCAMERA_OK;
 }
 
@@ -530,8 +528,6 @@ void EncodeDataProcess::OnOutputBufferAvailable(uint32_t index, Media::AVCodecBu
         DHLOGE("Get encode output Buffer fail.");
         return;
     }
-    ReduceWaitEncodeCnt();
-
     if (videoEncoder_ == nullptr) {
         DHLOGE("The video encoder does not exist before release output buffer index.");
         return;
@@ -549,6 +545,18 @@ VideoConfigParams EncodeDataProcess::GetSourceConfig() const
 VideoConfigParams EncodeDataProcess::GetTargetConfig() const
 {
     return targetConfig_;
+}
+
+int32_t EncodeDataProcess::GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier)
+{
+    if (propertyName != surfaceStr_) {
+        return DCAMERA_OK;
+    }
+    if (encodeProducerSurface_ == nullptr) {
+        DHLOGD("EncodeDataProcess::GetProperty: encode dataProcess get property fail, encode surface is nullptr.");
+        return DCAMERA_BAD_VALUE;
+    }
+    return propertyCarrier.carrySurfaceProperty(encodeProducerSurface_);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

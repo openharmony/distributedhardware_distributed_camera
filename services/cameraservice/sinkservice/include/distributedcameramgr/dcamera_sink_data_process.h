@@ -45,6 +45,8 @@ public:
     void OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult);
     void OnError(DataProcessErrorType errorType);
 
+    int32_t GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier) override;
+
 private:
     int32_t FeedStreamInner(std::shared_ptr<DataBuffer>& dataBuffer);
     VideoCodecType GetPipelineCodecType(DCEncodeType encodeType);

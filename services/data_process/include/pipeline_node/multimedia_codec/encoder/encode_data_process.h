@@ -57,6 +57,8 @@ public:
     VideoConfigParams GetSourceConfig() const;
     VideoConfigParams GetTargetConfig() const;
 
+    int32_t GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier) override;
+
 private:
     bool IsInEncoderRange(const VideoConfigParams& curConfig);
     bool IsConvertible(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig);
@@ -128,6 +130,7 @@ private:
     std::string processType_;
     Media::Format metadataFormat_;
     Media::Format encodeOutputFormat_;
+    std::string surfaceStr_ = "surface";
 };
 } // namespace DistributedHardware
 } // namespace OHOS

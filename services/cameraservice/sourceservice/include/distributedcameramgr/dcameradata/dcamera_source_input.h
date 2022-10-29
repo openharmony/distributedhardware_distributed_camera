@@ -50,6 +50,10 @@ public:
 
 private:
     void FinshFrameAsyncTrace(DCStreamType streamType);
+    void PostChannelDisconnectedEvent();
+    int32_t WaitforSessionResult();
+    int32_t EstablishContinuousFrameSession(std::vector<DCameraIndex>& indexs);
+    int32_t EstablishSnapshotFrameSession(std::vector<DCameraIndex>& indexs);
 
 private:
     std::map<DCStreamType, std::shared_ptr<ICameraChannel>> channels_;
@@ -61,6 +65,11 @@ private:
     std::shared_ptr<EventBus> eventBus_;
 
     bool isInit = false;
+
+    static constexpr uint8_t CHANNEL_REL_SECONDS = 5;
+    std::atomic<bool> isChannelConnected_ = false;
+    std::mutex channelMtx_;
+    std::condition_variable channelCond_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

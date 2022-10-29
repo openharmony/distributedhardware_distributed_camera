@@ -671,5 +671,10 @@ VideoConfigParams DecodeDataProcess::GetTargetConfig() const
 {
     return targetConfig_;
 }
+
+int32_t DecodeDataProcess::GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier)
+{
+    return DCAMERA_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

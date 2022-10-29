@@ -27,6 +27,8 @@
 #include "icamera_sink_output.h"
 #include <mutex>
 
+#include "property_carrier.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 class DCameraSinkController : public ICameraController, public EventSender,

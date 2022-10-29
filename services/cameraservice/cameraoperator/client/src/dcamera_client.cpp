@@ -169,11 +169,17 @@ void DCameraClient::FindCameraMetadata(const std::string& metadataStr)
     }
 }
 
-int32_t DCameraClient::StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos)
+int32_t DCameraClient::StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos,
+    sptr<Surface>& surface)
 {
     DHLOGI("DCameraClient::StartCapture cameraId: %s", GetAnonyString(cameraId_).c_str());
     if ((photoOutput_ == nullptr) && (videoOutput_ == nullptr)) {
         DHLOGI("DCameraClient::StartCapture %s config capture session", GetAnonyString(cameraId_).c_str());
+        if (surface == nullptr) {
+            DHLOGE("DCameraClient::StartCapture: input surface is nullptr.");
+            return DCAMERA_BAD_VALUE;
+        }
+        videoSurface_ = surface;
         int32_t ret = ConfigCaptureSession(captureInfos);
         if (ret != DCAMERA_OK) {
             DHLOGE("DCameraClient::StartCapture config capture session failed, cameraId: %s, ret: %d",
@@ -453,9 +459,6 @@ int32_t DCameraClient::CreateVideoOutput(std::shared_ptr<DCameraCaptureInfo>& in
     DHLOGI("DCameraClient::CreateVideoOutput camId: %s, width: %d, height: %d, format: %d, stream: %d, isCapture: %d",
            GetAnonyString(cameraId_).c_str(), info->width_, info->height_, info->format_,
            info->streamType_, info->isCapture_);
-    videoSurface_ = Surface::CreateSurfaceAsConsumer();
-    videoListener_ = new DCameraVideoSurfaceListener(videoSurface_, resultCallback_);
-    videoSurface_->RegisterConsumerListener((sptr<IBufferConsumerListener> &)videoListener_);
     CameraStandard::CameraFormat videoFormat = ConvertToCameraFormat(info->format_);
     CameraStandard::Size videoSize = {info->width_, info->height_};
     std::vector<int32_t> framerates = {};

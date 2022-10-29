@@ -44,7 +44,8 @@ public:
     int32_t Init() override;
     int32_t UnInit() override;
     int32_t UpdateSettings(std::vector<std::shared_ptr<DCameraSettings>>& settings) override;
-    int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos) override;
+    int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos,
+        sptr<Surface>& surface) override;
     int32_t StopCapture() override;
     int32_t SetStateCallback(std::shared_ptr<StateCallback>& callback) override;
     int32_t SetResultCallback(std::shared_ptr<ResultCallback>& callback) override;

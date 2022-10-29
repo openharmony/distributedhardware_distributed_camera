@@ -175,5 +175,14 @@ Videoformat DCameraSinkDataProcess::GetPipelineFormat(int32_t format)
 {
     return Videoformat::NV21;
 }
+
+int32_t DCameraSinkDataProcess::GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier)
+{
+    if (pipeline_ == nullptr) {
+        DHLOGD("DCameraSinkDataProcess::GetProperty: pipeline is nullptr.");
+        return DCAMERA_BAD_VALUE;
+    }
+    return pipeline_->GetProperty(propertyName, propertyCarrier);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
