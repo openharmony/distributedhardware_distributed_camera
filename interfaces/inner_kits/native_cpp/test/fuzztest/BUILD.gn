@@ -15,6 +15,9 @@ group("fuzztest") {
   testonly = true
 
   deps = [
+    "callbackonnotifyregresult_fuzzer:fuzztest",
+    "callbackonnotifyunregresult_fuzzer:fuzztest",
+    "callbackonremoterequest_fuzzer:fuzztest",
     "onsinklocalcamsrvdied_fuzzer:fuzztest",
     "onsourcelocalcamsrvdied_fuzzer:fuzztest",
     "sinkhandlerinitsink_fuzzer:fuzztest",
