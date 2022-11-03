@@ -188,10 +188,12 @@ static void ConfigCaptureSession()
     g_captureSession->CommitConfig();
 
     std::vector<VideoStabilizationMode> stabilizationModes = g_captureSession->GetSupportedStabilizationMode();
-    for (auto mode : stabilizationModes) {
-        DHLOGI("Distributed Camera Demo: video stabilization mode %d", mode);
+    if (!stabilizationModes.empty()) {
+        for (auto mode : stabilizationModes) {
+            DHLOGI("Distributed Camera Demo: video stabilization mode %d", mode);
+        }
+        g_captureSession->SetVideoStabilizationMode(stabilizationModes.back());
     }
-    g_captureSession->SetVideoStabilizationMode(stabilizationModes.back());
 }
 
 static void ConfigFocusAndExposure()
