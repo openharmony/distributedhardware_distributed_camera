@@ -31,7 +31,7 @@ namespace DistributedHardware {
 class DCameraSinkOutput : public ICameraSinkOutput, public std::enable_shared_from_this<DCameraSinkOutput> {
 public:
     DCameraSinkOutput(const std::string& dhId, std::shared_ptr<ICameraOperator>& cameraOperator);
-    ~DCameraSinkOutput();
+    ~DCameraSinkOutput() override;
 
     int32_t Init() override;
     int32_t UnInit() override;

@@ -180,6 +180,7 @@ VideoCodecType DCameraSinkDataProcess::GetPipelineCodecType(DCEncodeType encodeT
 
 Videoformat DCameraSinkDataProcess::GetPipelineFormat(int32_t format)
 {
+    (void)format;
     return Videoformat::NV21;
 }
 

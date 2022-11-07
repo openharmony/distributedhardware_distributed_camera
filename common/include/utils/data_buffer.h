@@ -21,9 +21,6 @@
 #include <cstddef>
 #include <cstdint>
 
-using std::string;
-using std::map;
-
 namespace OHOS {
 namespace DistributedHardware {
 class DataBuffer {
@@ -36,12 +33,12 @@ public:
     uint8_t *Data() const;
     int32_t SetRange(size_t offset, size_t size);
 
-    void SetInt32(const string name, int32_t value);
-    void SetInt64(const string name, int64_t value);
-    void SetString(const string name, string value);
-    bool FindInt32(const string& name, int32_t& value);
-    bool FindInt64(const string& name, int64_t& value);
-    bool FindString(const string& name, string& value);
+    void SetInt32(const std::string name, int32_t value);
+    void SetInt64(const std::string name, int64_t value);
+    void SetString(const std::string name, std::string value);
+    bool FindInt32(const std::string& name, int32_t& value);
+    bool FindInt64(const std::string& name, int64_t& value);
+    bool FindString(const std::string& name, std::string& value);
 
     virtual ~DataBuffer();
 
@@ -51,9 +48,9 @@ private:
     size_t rangeLength_ = 0;
     uint8_t *data_ = nullptr;
 
-    map<string, int32_t> int32Map_;
-    map<string, int64_t> int64Map_;
-    map<string, string> stringMap_;
+    std::map<std::string, int32_t> int32Map_;
+    std::map<std::string, int64_t> int64Map_;
+    std::map<std::string, std::string> stringMap_;
 
     DataBuffer(const DataBuffer &) = delete;
     DataBuffer &operator = (const DataBuffer &) = delete;

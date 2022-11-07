@@ -283,7 +283,7 @@ int32_t ScaleConvertProcess::ScaleConvert(const ImageUnitInfo& srcImgInfo, const
             return DCAMERA_BAD_VALUE;
     }
 
-    sws_scale(swsContext_, (const uint8_t * const *)srcData_, srcLineSize_, 0, srcImgInfo.alignedHeight,
+    sws_scale(swsContext_, static_cast<const uint8_t * const *>(srcData_), srcLineSize_, 0, srcImgInfo.alignedHeight,
         dstData_, dstLineSize_);
     int32_t ret = memcpy_s(dstImgInfo.imgData, dstImgInfo.imgSize, dstData_[0], dstBuffSize_);
     if (ret != EOK) {

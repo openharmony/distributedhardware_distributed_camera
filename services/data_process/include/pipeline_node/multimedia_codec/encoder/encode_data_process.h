@@ -43,7 +43,7 @@ class EncodeDataProcess : public AbstractDataProcess, public std::enable_shared_
 public:
     explicit EncodeDataProcess(const std::weak_ptr<DCameraPipelineSink>& callbackPipSink)
         : callbackPipelineSink_(callbackPipSink) {}
-    ~EncodeDataProcess();
+    ~EncodeDataProcess() override;
 
     int32_t InitNode(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig,
         VideoConfigParams& processedConfig) override;

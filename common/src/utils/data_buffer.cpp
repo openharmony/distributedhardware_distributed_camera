@@ -60,22 +60,22 @@ int32_t DataBuffer::SetRange(size_t offset, size_t size)
     return DCAMERA_OK;
 }
 
-void DataBuffer::SetInt32(const string name, int32_t value)
+void DataBuffer::SetInt32(const std::string name, int32_t value)
 {
     int32Map_[name] = value;
 }
 
-void DataBuffer::SetInt64(const string name, int64_t value)
+void DataBuffer::SetInt64(const std::string name, int64_t value)
 {
     int64Map_[name] = value;
 }
 
-void DataBuffer::SetString(const string name, string value)
+void DataBuffer::SetString(const std::string name, std::string value)
 {
     stringMap_[name] = value;
 }
 
-bool DataBuffer::FindInt32(const string& name, int32_t& value)
+bool DataBuffer::FindInt32(const std::string& name, int32_t& value)
 {
     if (int32Map_.count(name) != 0) {
         value = int32Map_[name];
@@ -86,7 +86,7 @@ bool DataBuffer::FindInt32(const string& name, int32_t& value)
     }
 }
 
-bool DataBuffer::FindInt64(const string& name, int64_t& value)
+bool DataBuffer::FindInt64(const std::string& name, int64_t& value)
 {
     if (int64Map_.count(name) != 0) {
         value = int64Map_[name];
@@ -97,7 +97,7 @@ bool DataBuffer::FindInt64(const string& name, int64_t& value)
     }
 }
 
-bool DataBuffer::FindString(const string& name, string& value)
+bool DataBuffer::FindString(const std::string& name, std::string& value)
 {
     if (stringMap_.count(name) != 0) {
         value = stringMap_[name];

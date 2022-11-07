@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-const string ENUM_VIDEOFORMAT_STRINGS[] = {
+const std::string ENUM_VIDEOFORMAT_STRINGS[] = {
     "YUVI420", "NV12", "NV21", "RGBA_8888"
 };
 
@@ -185,7 +185,7 @@ int32_t DecodeDataProcess::SetDecoderOutputSurface()
         DHLOGE("Creat the decode consumer surface fail.");
         return DCAMERA_INIT_ERR;
     }
-    decodeConsumerSurface_->SetDefaultWidthAndHeight((int32_t)sourceConfig_.GetWidth(),
+    decodeConsumerSurface_->SetDefaultWidthAndHeight(static_cast<int32_t>(sourceConfig_.GetWidth()),
         (int32_t)sourceConfig_.GetHeight());
     decodeSurfaceListener_ = new DecodeSurfaceListener(decodeConsumerSurface_, shared_from_this());
     if (decodeConsumerSurface_->RegisterConsumerListener(decodeSurfaceListener_) !=

@@ -39,7 +39,7 @@ class DecodeDataProcess;
 class DCameraPipelineSource : public EventSender, public EventBusHandler<DCameraPipelineEvent>,
     public IDataProcessPipeline, public std::enable_shared_from_this<DCameraPipelineSource> {
 public:
-    ~DCameraPipelineSource();
+    ~DCameraPipelineSource() override;
 
     int32_t CreateDataProcessPipeline(PipelineType piplineType, const VideoConfigParams& sourceConfig,
         const VideoConfigParams& targetConfig, const std::shared_ptr<DataProcessListener>& listener) override;

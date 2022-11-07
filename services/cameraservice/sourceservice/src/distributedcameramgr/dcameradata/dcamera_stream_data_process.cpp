@@ -219,7 +219,7 @@ void DCameraStreamDataProcess::OnProcessedVideoBuffer(const std::shared_ptr<Data
     }
 }
 
-void DCameraStreamDataProcess::OnError(DataProcessErrorType errorType)
+void DCameraStreamDataProcess::OnError(const DataProcessErrorType errorType)
 {
     DHLOGE("DCameraStreamDataProcess OnError pipeline errorType: %d", errorType);
 }
@@ -278,6 +278,7 @@ VideoCodecType DCameraStreamDataProcess::GetPipelineCodecType(DCEncodeType encod
 
 Videoformat DCameraStreamDataProcess::GetPipelineFormat(int32_t format)
 {
+    (void)format;
     return Videoformat::NV21;
 }
 } // namespace DistributedHardware
