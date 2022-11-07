@@ -284,20 +284,17 @@ int32_t DCameraSourceController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& o
         DHLOGE("DCameraSourceController can not get service, devId: %s", GetAnonyString(devId).c_str());
         return DCAMERA_BAD_OPERATE;
     }
-
+    std::string jsonStr;
     DCameraOpenInfoCmd cmd;
     cmd.type_ = DCAMERA_PROTOCOL_TYPE_MESSAGE;
     cmd.dhId_ = dhId;
     cmd.command_ = DCAMERA_PROTOCOL_CMD_OPEN_CHANNEL;
     cmd.value_ = openInfo;
-    std::string jsonStr;
     int32_t ret = cmd.Marshal(jsonStr);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceController Marshal OpenInfo failed %d", ret);
         return ret;
     }
-    DHLOGD("DCameraSourceController OpenChannel devId: %s, dhId: %s openCommand: %s", GetAnonyString(devId).c_str(),
-        GetAnonyString(dhId).c_str(), cmd.command_.c_str());
     ret = camSinkSrv->OpenChannel(dhId, jsonStr);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceController SA OpenChannel failed %d", ret);
@@ -315,11 +312,11 @@ int32_t DCameraSourceController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& o
     }
     ret = channel_->OpenSession();
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceController OpenChannel OpenChannel failed %d", ret);
+        DHLOGE("DCameraSourceController OpenSession failed.");
+        PostChannelDisconnectedEvent();
         return ret;
     }
-
-    return DCAMERA_OK;
+    return WaitforSessionResult();
 }
 
 int32_t DCameraSourceController::CloseChannel()
@@ -379,6 +376,7 @@ int32_t DCameraSourceController::UnInit()
     DHLOGI("DCameraSourceController UnInit");
     indexs_.clear();
     isInit = false;
+    isChannelConnected_.store(false);
     return DCAMERA_OK;
 }
 
@@ -389,6 +387,8 @@ void DCameraSourceController::OnSessionState(int32_t state)
     switch (state) {
         case DCAMERA_CHANNEL_STATE_CONNECTED: {
             DcameraFinishAsyncTrace(DCAMERA_OPEN_CHANNEL_CONTROL, DCAMERA_OPEN_CHANNEL_TASKID);
+            isChannelConnected_.store(true);
+            channelCond_.notify_all();
             stateMachine_->UpdateState(DCAMERA_STATE_OPENED);
             std::shared_ptr<DCameraEvent> camEvent = std::make_shared<DCameraEvent>();
             camEvent->eventType_ = DCAMERA_MESSAGE;
@@ -401,14 +401,8 @@ void DCameraSourceController::OnSessionState(int32_t state)
             DcameraFinishAsyncTrace(DCAMERA_OPEN_CHANNEL_CONTROL, DCAMERA_OPEN_CHANNEL_TASKID);
             DHLOGI("DCameraSourceDev PostTask Controller CloseSession OnClose devId %s dhId %s",
                 GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
-            DCameraIndex camIndex(devId_, dhId_);
-            DCameraSourceEvent event(*this, DCAMERA_EVENT_CLOSE, camIndex);
-            eventBus_->PostEvent<DCameraSourceEvent>(event);
-            std::shared_ptr<DCameraEvent> camEvent = std::make_shared<DCameraEvent>();
-            camEvent->eventType_ = DCAMERA_MESSAGE;
-            camEvent->eventResult_ = DCAMERA_EVENT_CHANNEL_DISCONNECTED;
-            DCameraSourceEvent eventNotify(*this, DCAMERA_EVENT_NOFIFY, camEvent);
-            eventBus_->PostEvent<DCameraSourceEvent>(eventNotify);
+            isChannelConnected_.store(false);
+            PostChannelDisconnectedEvent();
             break;
         }
         default: {
@@ -479,6 +473,34 @@ void DCameraSourceController::HandleMetaDataResult(std::string& jsonStr)
         DHLOGI("OnSettingsResult hal, ret: %d, devId: %s dhId: %s", retHdi, GetAnonyString(devId_).c_str(),
             GetAnonyString(dhId_).c_str());
     }
+}
+
+int32_t DCameraSourceController::WaitforSessionResult()
+{
+    isChannelConnected_.store(false);
+    std::unique_lock<std::mutex> lck(channelMtx_);
+    DHLOGD("DCameraSourceController::WaitforSessionResult: wait for channel session callback notify.");
+    bool isChannelConnected = channelCond_.wait_for(lck, std::chrono::seconds(CHANNEL_REL_SECONDS),
+        [this]() { return isChannelConnected_.load(); });
+    if (!isChannelConnected) {
+        DHLOGE("DCameraSourceController::WaitforSessionResult: wait for channel session callback timeout(%ds).",
+            CHANNEL_REL_SECONDS);
+        PostChannelDisconnectedEvent();
+        return DCAMERA_BAD_VALUE;
+    }
+    return DCAMERA_OK;
+}
+
+void DCameraSourceController::PostChannelDisconnectedEvent()
+{
+    DCameraIndex camIndex(devId_, dhId_);
+    DCameraSourceEvent event(*this, DCAMERA_EVENT_CLOSE, camIndex);
+    eventBus_->PostEvent<DCameraSourceEvent>(event);
+    std::shared_ptr<DCameraEvent> camEvent = std::make_shared<DCameraEvent>();
+    camEvent->eventType_ = DCAMERA_MESSAGE;
+    camEvent->eventResult_ = DCAMERA_EVENT_CHANNEL_DISCONNECTED;
+    DCameraSourceEvent eventNotify(*this, DCAMERA_EVENT_NOFIFY, camEvent);
+    eventBus_->PostEvent<DCameraSourceEvent>(eventNotify);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

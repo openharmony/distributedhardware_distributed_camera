@@ -402,5 +402,10 @@ AVPixelFormat ScaleConvertProcess::GetAVPixelFormat(Videoformat colorFormat)
     }
     return format;
 }
+
+int32_t ScaleConvertProcess::GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier)
+{
+    return DCAMERA_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

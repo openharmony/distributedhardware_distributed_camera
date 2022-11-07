@@ -36,6 +36,8 @@ public:
     int32_t ProcessData(std::vector<std::shared_ptr<DataBuffer>>& inputBuffers) override;
     void ReleaseProcessNode() override;
 
+    int32_t GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier) override;
+
 private:
     void UpdateFPSControllerInfo(int64_t nowMs);
     void UpdateFrameRateCorrectionFactor(int64_t nowMs);

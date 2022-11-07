@@ -474,5 +474,10 @@ int32_t ColorFormatProcess::ColorFormatDone(std::vector<std::shared_ptr<DataBuff
     targetPipelineSource->OnProcessedVideoBuffer(outputBuffers[0]);
     return DCAMERA_OK;
 }
+
+int32_t ColorFormatProcess::GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier)
+{
+    return DCAMERA_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

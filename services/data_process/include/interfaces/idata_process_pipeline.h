@@ -24,6 +24,8 @@
 #include "distributed_camera_errno.h"
 #include "data_process_listener.h"
 
+#include "property_carrier.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 class IDataProcessPipeline {
@@ -34,6 +36,7 @@ public:
         const VideoConfigParams& targetConfig, const std::shared_ptr<DataProcessListener>& listener) = 0;
     virtual int32_t ProcessData(std::vector<std::shared_ptr<DataBuffer>>& dataBuffers) = 0;
     virtual void DestroyDataProcessPipeline() = 0;
+    virtual int32_t GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

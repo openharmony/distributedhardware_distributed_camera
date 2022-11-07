@@ -48,6 +48,7 @@ config("module_private_config") {
     "//utils/system/safwk/native/include",
     "//third_party/jsoncpp/include",
     "//drivers/peripheral/base/",
+    "${graphicstandard_path}/frameworks/surface/include",
   ]
 }
 
@@ -64,6 +65,7 @@ ohos_unittest("DCameraSourceMgrTest") {
 
   deps = [
     "${common_path}:distributed_camera_utils",
+    "${graphicstandard_path}:libsurface",
     "${services_path}/cameraservice/sourceservice:distributed_camera_source",
     "${services_path}/channel:distributed_camera_channel",
     "//third_party/googletest:gtest_main",

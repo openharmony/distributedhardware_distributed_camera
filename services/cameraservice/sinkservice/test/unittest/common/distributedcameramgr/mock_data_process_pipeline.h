@@ -49,6 +49,11 @@ public:
     void DestroyDataProcessPipeline()
     {
     }
+
+    int32_t GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier)
+    {
+        return DCAMERA_OK;
+    }
 };
 } // namespace DistributedHardware
 } // namespace OHOS

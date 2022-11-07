@@ -22,6 +22,7 @@
 
 #include "dcamera_capture_info_cmd.h"
 #include "dcamera_channel_info_cmd.h"
+#include "property_carrier.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -36,6 +37,7 @@ public:
     virtual int32_t StopCapture() = 0;
     virtual int32_t OpenChannel(std::shared_ptr<DCameraChannelInfo>& info) = 0;
     virtual int32_t CloseChannel() = 0;
+    virtual int32_t GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

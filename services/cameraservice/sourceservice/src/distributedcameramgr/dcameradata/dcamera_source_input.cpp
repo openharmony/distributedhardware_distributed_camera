@@ -183,43 +183,19 @@ int32_t DCameraSourceInput::OpenChannel(std::vector<DCameraIndex>& indexs)
     DHLOGI("DCameraSourceInput OpenChannel devId %s dhId %s continue state: %d, snapshot state: %d",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), channelState_[CONTINUOUS_FRAME],
         channelState_[SNAPSHOT_FRAME]);
-    int32_t ret = DCAMERA_OK;
     if (channelState_[CONTINUOUS_FRAME] == DCAMERA_CHANNEL_STATE_DISCONNECTED) {
-        DcameraStartAsyncTrace(DCAMERA_OPEN_DATA_CONTINUE, DCAMERA_OPEN_DATA_CONTINUE_TASKID);
-        ret = channels_[CONTINUOUS_FRAME]->CreateSession(indexs, CONTINUE_SESSION_FLAG, DCAMERA_SESSION_MODE_VIDEO,
-            listeners_[CONTINUOUS_FRAME]);
+        int32_t ret = EstablishContinuousFrameSession(indexs);
         if (ret != DCAMERA_OK) {
-            DHLOGE("DCameraSourceInput CreateSession continue failed ret: %d, devId: %s, dhId: %s", ret,
-                GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
-            DcameraFinishAsyncTrace(DCAMERA_OPEN_DATA_CONTINUE, DCAMERA_OPEN_DATA_CONTINUE_TASKID);
-            return ret;
-        }
-
-        ret = channels_[CONTINUOUS_FRAME]->OpenSession();
-        if (ret != DCAMERA_OK) {
-            DHLOGE("DCameraSourceInput OpenChannel continue stream failed ret: %d, devId: %s, dhId: %s", ret,
-                GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
-            DcameraFinishAsyncTrace(DCAMERA_OPEN_DATA_CONTINUE, DCAMERA_OPEN_DATA_CONTINUE_TASKID);
+            DHLOGE("DCameraSourceInput::OpenChannel: esdablish continuous frame failed ret: %d,"+
+                "devId: %s, dhId: %s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
             return ret;
         }
     }
-
     if (channelState_[SNAPSHOT_FRAME] == DCAMERA_CHANNEL_STATE_DISCONNECTED) {
-        DcameraStartAsyncTrace(DCAMERA_OPEN_DATA_SNAPSHOT, DCAMERA_OPEN_DATA_SNAPSHOT_TASKID);
-        ret = channels_[SNAPSHOT_FRAME]->CreateSession(indexs, SNAP_SHOT_SESSION_FLAG, DCAMERA_SESSION_MODE_JPEG,
-            listeners_[SNAPSHOT_FRAME]);
+        int32_t ret = EstablishSnapshotFrameSession(indexs);
         if (ret != DCAMERA_OK) {
-            DHLOGE("DCameraSourceInput Init CreateSession snapshot failed ret: %d, devId: %s, dhId: %s", ret,
-                GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
-            DcameraFinishAsyncTrace(DCAMERA_OPEN_DATA_SNAPSHOT, DCAMERA_OPEN_DATA_SNAPSHOT_TASKID);
-            return ret;
-        }
-
-        ret = channels_[SNAPSHOT_FRAME]->OpenSession();
-        if (ret != DCAMERA_OK) {
-            DHLOGE("DCameraSourceInput OpenChannel snapshot stream failed ret: %d, devId: %s, dhId: %s", ret,
-                GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
-            DcameraFinishAsyncTrace(DCAMERA_OPEN_DATA_SNAPSHOT, DCAMERA_OPEN_DATA_SNAPSHOT_TASKID);
+            DHLOGE("DCameraSourceInput::OpenChannel: esdablish snapshot frame failed ret: %d,"+
+                "devId: %s, dhId: %s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
             return ret;
         }
     }
@@ -303,6 +279,7 @@ int32_t DCameraSourceInput::UnInit()
     dataProcess_.clear();
     channelState_.clear();
     isInit = false;
+    isChannelConnected_.store(false);
     return DCAMERA_OK;
 }
 
@@ -321,18 +298,14 @@ void DCameraSourceInput::OnSessionState(DCStreamType streamType, int32_t state)
             FinshFrameAsyncTrace(streamType);
             DHLOGI("DCameraSourceDev PostTask CloseSession Input OnClose devId %s dhId %s",
                 GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
-            DCameraIndex camIndex(devId_, dhId_);
-            DCameraSourceEvent event(*this, DCAMERA_EVENT_CLOSE, camIndex);
-            eventBus_->PostEvent<DCameraSourceEvent>(event);
-            std::shared_ptr<DCameraEvent> camEvent = std::make_shared<DCameraEvent>();
-            camEvent->eventType_ = DCAMERA_MESSAGE;
-            camEvent->eventResult_ = DCAMERA_EVENT_CHANNEL_DISCONNECTED;
-            DCameraSourceEvent srcEvent(*this, DCAMERA_EVENT_NOFIFY, camEvent);
-            eventBus_->PostEvent<DCameraSourceEvent>(srcEvent);
+            isChannelConnected_.store(false);
+            PostChannelDisconnectedEvent();
             break;
         }
         case DCAMERA_CHANNEL_STATE_CONNECTED: {
             FinshFrameAsyncTrace(streamType);
+            isChannelConnected_.store(true);
+            channelCond_.notify_one();
             DHLOGI("DCameraSourceInput OnSessionState state %d", state);
             break;
         }
@@ -411,6 +384,97 @@ int32_t DCameraSourceInput::StopAllCapture()
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceInput StopAllCapture snapshot ret: %d, devId: %s, dhId: %s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        return ret;
+    }
+    return DCAMERA_OK;
+}
+
+void DCameraSourceInput::PostChannelDisconnectedEvent()
+{
+    DCameraIndex camIndex(devId_, dhId_);
+    DCameraSourceEvent event(*this, DCAMERA_EVENT_CLOSE, camIndex);
+    eventBus_->PostEvent<DCameraSourceEvent>(event);
+    std::shared_ptr<DCameraEvent> camEvent = std::make_shared<DCameraEvent>();
+    camEvent->eventType_ = DCAMERA_MESSAGE;
+    camEvent->eventResult_ = DCAMERA_EVENT_CHANNEL_DISCONNECTED;
+    DCameraSourceEvent eventNotify(*this, DCAMERA_EVENT_NOFIFY, camEvent);
+    eventBus_->PostEvent<DCameraSourceEvent>(eventNotify);
+}
+
+int32_t DCameraSourceInput::WaitforSessionResult()
+{
+    isChannelConnected_.store(false);
+    std::unique_lock<std::mutex> lck(channelMtx_);
+    DHLOGD("DCameraSourceInput::WaitforSessionResult: wait for channel session callback notify.");
+    bool isChannelConnected = channelCond_.wait_for(lck, std::chrono::seconds(CHANNEL_REL_SECONDS),
+        [this]() { return isChannelConnected_.load(); });
+    if (!isChannelConnected) {
+        DHLOGE("DCameraSourceInput::WaitforSessionResult: wait for channel session callback timeout(%ds).",
+            CHANNEL_REL_SECONDS);
+        PostChannelDisconnectedEvent();
+        return DCAMERA_BAD_VALUE;
+    }
+    return DCAMERA_OK;
+}
+
+int32_t DCameraSourceInput::EstablishContinuousFrameSession(std::vector<DCameraIndex>& indexs)
+{
+    DcameraStartAsyncTrace(DCAMERA_OPEN_DATA_CONTINUE, DCAMERA_OPEN_DATA_CONTINUE_TASKID);
+    int32_t ret = channels_[CONTINUOUS_FRAME]->CreateSession(indexs, CONTINUE_SESSION_FLAG, DCAMERA_SESSION_MODE_VIDEO,
+        listeners_[CONTINUOUS_FRAME]);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("DCameraSourceInput::EstablishContinuousFrameSession: Create Session failed ret: %d,"+
+            "devId: %s, dhId: %s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        DcameraFinishAsyncTrace(DCAMERA_OPEN_DATA_CONTINUE, DCAMERA_OPEN_DATA_CONTINUE_TASKID);
+        return ret;
+    }
+
+    ret = channels_[CONTINUOUS_FRAME]->OpenSession();
+    if (ret != DCAMERA_OK) {
+        DHLOGE("DCameraSourceInput::EstablishContinuousFrameSession: open session failed ret: %d,"+
+            "devId: %s, dhId: %s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        PostChannelDisconnectedEvent();
+        DcameraFinishAsyncTrace(DCAMERA_OPEN_DATA_CONTINUE, DCAMERA_OPEN_DATA_CONTINUE_TASKID);
+        return ret;
+    }
+
+    ret = WaitforSessionResult();
+    if (ret != DCAMERA_OK) {
+        DHLOGE("DCameraSourceInput::EstablishContinuousFrameSession: waitfor session result failed ret: %d,"+
+            "devId: %s, dhId: %s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        DcameraFinishAsyncTrace(DCAMERA_OPEN_DATA_CONTINUE, DCAMERA_OPEN_DATA_CONTINUE_TASKID);
+        return ret;
+    }
+    DcameraFinishAsyncTrace(DCAMERA_OPEN_DATA_CONTINUE, DCAMERA_OPEN_DATA_CONTINUE_TASKID);
+    return DCAMERA_OK;
+}
+
+int32_t DCameraSourceInput::EstablishSnapshotFrameSession(std::vector<DCameraIndex>& indexs)
+{
+    DcameraStartAsyncTrace(DCAMERA_OPEN_DATA_SNAPSHOT, DCAMERA_OPEN_DATA_SNAPSHOT_TASKID);
+    int32_t ret = channels_[SNAPSHOT_FRAME]->CreateSession(indexs, SNAP_SHOT_SESSION_FLAG, DCAMERA_SESSION_MODE_JPEG,
+        listeners_[SNAPSHOT_FRAME]);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("DCameraSourceInput::EstablishSnapshotFrameSession create session failed ret: %d,"+
+            "devId: %s, dhId: %s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        DcameraFinishAsyncTrace(DCAMERA_OPEN_DATA_SNAPSHOT, DCAMERA_OPEN_DATA_SNAPSHOT_TASKID);
+        return ret;
+    }
+
+    ret = channels_[SNAPSHOT_FRAME]->OpenSession();
+    if (ret != DCAMERA_OK) {
+        DHLOGE("DCameraSourceInput::EstablishSnapshotFrameSession: open session failed ret: %d,"+
+            "devId: %s, dhId: %s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+            PostChannelDisconnectedEvent();
+        DcameraFinishAsyncTrace(DCAMERA_OPEN_DATA_SNAPSHOT, DCAMERA_OPEN_DATA_SNAPSHOT_TASKID);
+        return ret;
+    }
+
+    ret = WaitforSessionResult();
+    if (ret != DCAMERA_OK) {
+        DHLOGE("DCameraSourceInput::EstablishSnapshotFrameSession: waitfor session result failed ret: %d,"+
+            "devId: %s, dhId: %s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        DcameraFinishAsyncTrace(DCAMERA_OPEN_DATA_SNAPSHOT, DCAMERA_OPEN_DATA_SNAPSHOT_TASKID);
         return ret;
     }
     return DCAMERA_OK;

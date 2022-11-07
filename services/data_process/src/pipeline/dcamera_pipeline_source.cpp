@@ -224,5 +224,10 @@ void DCameraPipelineSource::OnProcessedVideoBuffer(const std::shared_ptr<DataBuf
     }
     processListener_->OnProcessedVideoBuffer(videoResult);
 }
+
+int32_t DCameraPipelineSource::GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier)
+{
+    return DCAMERA_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

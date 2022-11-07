@@ -51,6 +51,8 @@ public:
 
 private:
     void HandleMetaDataResult(std::string& jsonStr);
+    void PostChannelDisconnectedEvent();
+    int32_t WaitforSessionResult();
 
 private:
     std::string devId_;
@@ -64,6 +66,11 @@ private:
 
     bool isInit;
     const std::string SESSION_FLAG = "control";
+
+    static constexpr uint8_t CHANNEL_REL_SECONDS = 5;
+    std::atomic<bool> isChannelConnected_ = false;
+    std::mutex channelMtx_;
+    std::condition_variable channelCond_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

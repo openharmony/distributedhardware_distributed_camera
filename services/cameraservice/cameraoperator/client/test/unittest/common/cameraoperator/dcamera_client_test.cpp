@@ -24,6 +24,7 @@
 #include "distributed_hardware_log.h"
 #include "nativetoken_kit.h"
 #include "token_setproc.h"
+#include "surface.h"
 
 using namespace testing::ext;
 
@@ -77,7 +78,8 @@ public:
     void SetUp();
     void TearDown();
     void SetTokenID();
-
+    
+    sptr<Surface> surface_;
     std::shared_ptr<DCameraClient> client_;
     std::shared_ptr<DCameraCaptureInfo> photoInfo_false_;
     std::shared_ptr<DCameraCaptureInfo> videoInfo_false_;
@@ -101,6 +103,7 @@ void DCameraClientTest::SetUp(void)
     DCameraHandler::GetInstance().Initialize();
     std::vector<std::string> cameras = DCameraHandler::GetInstance().GetCameras();
     client_ = std::make_shared<DCameraClient>(cameras[0]);
+    surface_ = Surface::CreateSurfaceAsConsumer();
 
     photoInfo_false_ = std::make_shared<DCameraCaptureInfo>();
     photoInfo_false_->width_ = TEST_WIDTH;
@@ -239,7 +242,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_004, TestSize.Level1)
         videoInfo_true_->width_, videoInfo_true_->height_, videoInfo_true_->format_, videoInfo_true_->isCapture_);
     std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos;
     captureInfos.push_back(videoInfo_true_);
-    ret = client_->StartCapture(captureInfos);
+    ret = client_->StartCapture(captureInfos, surface_);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     sleep(TEST_SLEEP_SEC);
@@ -279,7 +282,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_005, TestSize.Level1)
     std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos;
     captureInfos.push_back(videoInfo_true_);
     captureInfos.push_back(photoInfo_false_);
-    ret = client_->StartCapture(captureInfos);
+    ret = client_->StartCapture(captureInfos, surface_);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     sleep(TEST_SLEEP_SEC);
@@ -291,7 +294,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_005, TestSize.Level1)
     captureInfos.clear();
     captureInfos.push_back(videoInfo_false_);
     captureInfos.push_back(photoInfo_true_);
-    ret = client_->StartCapture(captureInfos);
+    ret = client_->StartCapture(captureInfos, surface_);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     sleep(TEST_SLEEP_SEC);

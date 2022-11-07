@@ -335,5 +335,10 @@ int32_t FpsControllerProcess::FpsControllerDone(std::vector<std::shared_ptr<Data
     targetPipelineSource->OnProcessedVideoBuffer(outputBuffers[0]);
     return DCAMERA_OK;
 }
+
+int32_t FpsControllerProcess::GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier)
+{
+    return DCAMERA_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

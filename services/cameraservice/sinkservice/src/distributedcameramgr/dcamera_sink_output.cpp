@@ -235,5 +235,14 @@ void DCameraSinkOutput::OnSessionError(DCStreamType type, int32_t eventType, int
 void DCameraSinkOutput::OnDataReceived(DCStreamType type, std::vector<std::shared_ptr<DataBuffer>>& dataBuffers)
 {
 }
+
+int32_t DCameraSinkOutput::GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier)
+{
+    if (dataProcesses_[CONTINUOUS_FRAME] == nullptr) {
+        DHLOGD("DCameraSinkOutput::GetProperty: continuous frame is nullptr.");
+        return DCAMERA_BAD_VALUE;
+    }
+    return dataProcesses_[CONTINUOUS_FRAME]->GetProperty(propertyName, propertyCarrier);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

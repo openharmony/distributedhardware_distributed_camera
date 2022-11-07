@@ -56,7 +56,8 @@ public:
         return DCAMERA_OK;
     }
 
-    int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos)
+    int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos,
+        sptr<Surface>& surface)
     {
         return DCAMERA_OK;
     }
