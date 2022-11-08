@@ -60,6 +60,8 @@ DCameraStateType DCameraSourceOpenedState::GetStateType()
 int32_t DCameraSourceOpenedState::DoRegisterTask(std::shared_ptr<DCameraSourceDev>& camDev, DCameraSourceEvent& event)
 {
     DHLOGI("DCameraSourceOpenedState DoRegisterTask Idempotent");
+    (void)camDev;
+    (void)event;
     return DCAMERA_OK;
 }
 
@@ -126,6 +128,8 @@ int32_t DCameraSourceOpenedState::DoReleaseStreamsTask(std::shared_ptr<DCameraSo
     DCameraSourceEvent& event)
 {
     DHLOGI("DCameraSourceOpenedState DoReleaseStreamsTask Idempotent");
+    (void)camDev;
+    (void)event;
     return DCAMERA_OK;
 }
 
@@ -149,6 +153,8 @@ int32_t DCameraSourceOpenedState::DoUpdateSettingsTask(std::shared_ptr<DCameraSo
 int32_t DCameraSourceOpenedState::DoOpenTask(std::shared_ptr<DCameraSourceDev>& camDev, DCameraSourceEvent& event)
 {
     DHLOGI("DCameraSourceOpenedState DoOpenTask Idempotent");
+    (void)camDev;
+    (void)event;
     return DCAMERA_OK;
 }
 

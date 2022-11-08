@@ -74,6 +74,7 @@ int32_t DCameraSinkDev::UnInit()
 int32_t DCameraSinkDev::SubscribeLocalHardware(const std::string& parameters)
 {
     DHLOGI("DCameraSinkDev::SubscribeLocalHardware");
+    (void)parameters;
     return DCAMERA_OK;
 }
 

@@ -38,7 +38,7 @@ class EncodeDataProcess;
 
 class DCameraPipelineSink : public IDataProcessPipeline, public std::enable_shared_from_this<DCameraPipelineSink> {
 public:
-    ~DCameraPipelineSink();
+    ~DCameraPipelineSink() override;
 
     int32_t CreateDataProcessPipeline(PipelineType piplineType, const VideoConfigParams& sourceConfig,
         const VideoConfigParams& targetConfig, const std::shared_ptr<DataProcessListener>& listener) override;

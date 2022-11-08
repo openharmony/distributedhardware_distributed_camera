@@ -31,7 +31,7 @@ using namespace OHOS::HDI::DistributedCamera::V1_0;
 class DCameraSourceDataProcess : public ICameraSourceDataProcess {
 public:
     DCameraSourceDataProcess(std::string devId, std::string dhId, DCStreamType streamType);
-    ~DCameraSourceDataProcess();
+    ~DCameraSourceDataProcess() override;
 
     int32_t FeedStream(std::vector<std::shared_ptr<DataBuffer>>& buffers) override;
     int32_t ConfigStreams(std::vector<std::shared_ptr<DCStreamInfo>>& streamInfos) override;

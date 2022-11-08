@@ -330,6 +330,7 @@ void DCameraSourceInput::OnSessionError(DCStreamType streamType, int32_t eventTy
 {
     DHLOGI("DCameraSourceInput OnSessionError devId: %s, dhId: %s, eventType: %d, eventReason: %d, detail %s",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), eventType, eventReason, detail.c_str());
+	(void)streamType;
 }
 
 void DCameraSourceInput::OnDataReceived(DCStreamType streamType, std::vector<std::shared_ptr<DataBuffer>>& buffers)

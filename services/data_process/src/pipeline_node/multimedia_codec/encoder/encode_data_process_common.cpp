@@ -42,7 +42,7 @@ const std::map<int64_t, int32_t> EncodeDataProcess::ENCODER_BITRATE_TABLE = {
     std::map<int64_t, int32_t>::value_type(WIDTH_1440_HEIGHT_1080, BITRATE_5000000),
     std::map<int64_t, int32_t>::value_type(WIDTH_1920_HEIGHT_1080, BITRATE_6000000),
 };
-const string ENUM_VIDEOFORMAT_STRINGS[] = {
+const std::string ENUM_VIDEOFORMAT_STRINGS[] = {
     "YUVI420", "NV12", "NV21", "RGBA_8888"
 };
 

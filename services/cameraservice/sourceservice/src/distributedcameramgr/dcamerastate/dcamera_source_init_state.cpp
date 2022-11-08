@@ -74,6 +74,8 @@ int32_t DCameraSourceInitState::DoRegisterTask(std::shared_ptr<DCameraSourceDev>
 int32_t DCameraSourceInitState::DoUnregisterTask(std::shared_ptr<DCameraSourceDev>& camDev, DCameraSourceEvent& event)
 {
     DHLOGI("DCameraSourceInitState DoUnregisterTask Idempotent");
+    (void)camDev;
+    (void)event;
     return DCAMERA_OK;
 }
 } // namespace DistributedHardware

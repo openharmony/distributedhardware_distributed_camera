@@ -339,6 +339,9 @@ void DCameraSoftbusAdapter::OnSourceBytesReceived(int32_t sessionId, const void 
 
 void DCameraSoftbusAdapter::OnSourceMessageReceived(int32_t sessionId, const void *data, uint32_t dataLen)
 {
+    (void)sessionId;
+    (void)data;
+    (void)dataLen;
     return;
 }
 
@@ -465,7 +468,7 @@ void DCameraSoftbusAdapter::OnSinkStreamReceived(int32_t sessionId, const Stream
         return;
     }
     int32_t dataLen = data->bufLen;
-    if (dataLen <= 0 || dataLen > (int32_t)DCAMERA_MAX_RECV_DATA_LEN) {
+    if (dataLen <= 0 || dataLen > static_cast<int32_t>(DCAMERA_MAX_RECV_DATA_LEN)) {
         DHLOGE("DCameraSoftbusAdapter OnSinkStreamReceived dataLen: %d sessionId: %d", dataLen, sessionId);
         return;
     }

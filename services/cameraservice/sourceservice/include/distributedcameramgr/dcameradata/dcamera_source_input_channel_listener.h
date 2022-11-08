@@ -28,7 +28,7 @@ class DCameraSourceInput;
 class DCameraSourceInputChannelListener : public ICameraChannelListener {
 public:
     DCameraSourceInputChannelListener(std::shared_ptr<DCameraSourceInput>& Input, DCStreamType streamType);
-    ~DCameraSourceInputChannelListener();
+    ~DCameraSourceInputChannelListener() override;
     void OnSessionState(int32_t state) override;
     void OnSessionError(int32_t eventType, int32_t eventReason, std::string detail) override;
     void OnDataReceived(std::vector<std::shared_ptr<DataBuffer>>& buffers) override;

@@ -73,9 +73,9 @@ private:
 
 private:
     std::mutex optLock_;
-    const string PKG_NAME = "ohos.dhardware.dcamera";
+    const std::string PKG_NAME = "ohos.dhardware.dcamera";
     static const uint32_t DCAMERA_SESSION_NAME_MAX_LEN = 128;
-    map<DCAMERA_CHANNEL_ROLE, ISessionListener> sessListeners_;
+    std::map<DCAMERA_CHANNEL_ROLE, ISessionListener> sessListeners_;
     std::map<std::string, uint32_t> sessionTotal_;
     static const uint32_t DCAMERA_LINK_TYPE_MAX = 4;
     static const uint32_t DCAMERA_LINK_TYPE_INDEX_2 = 2;

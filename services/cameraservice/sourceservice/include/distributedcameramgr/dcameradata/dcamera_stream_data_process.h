@@ -43,7 +43,7 @@ public:
     int32_t GetProducerSize();
 
     void OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult);
-    void OnError(DataProcessErrorType errorType);
+    void OnError(const DataProcessErrorType errorType);
     void DestroyPipeline();
 
 private:
