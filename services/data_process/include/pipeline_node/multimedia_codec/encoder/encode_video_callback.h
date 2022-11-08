@@ -30,7 +30,7 @@ class EncodeVideoCallback : public Media::AVCodecCallback {
 public:
     explicit EncodeVideoCallback(const std::weak_ptr<EncodeDataProcess>& encodeVideoNode)
         : encodeVideoNode_(encodeVideoNode) {}
-    ~EncodeVideoCallback() = default;
+    ~EncodeVideoCallback() override = default;
 
     void OnError(Media::AVCodecErrorType errorType, int32_t errorCode) override;
     void OnInputBufferAvailable(uint32_t index) override;

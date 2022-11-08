@@ -54,7 +54,7 @@ public:
     DecodeDataProcess(const std::shared_ptr<EventBus>& eventBusPipeline,
         const std::weak_ptr<DCameraPipelineSource>& callbackPipSource)
         : eventBusPipeline_(eventBusPipeline), callbackPipelineSource_(callbackPipSource) {}
-    ~DecodeDataProcess();
+    ~DecodeDataProcess() override;
 
     int32_t InitNode(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig,
         VideoConfigParams& processedConfig) override;

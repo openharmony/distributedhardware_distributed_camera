@@ -25,7 +25,7 @@ namespace DistributedHardware {
 class DCameraSinkControllerStateCallback : public StateCallback {
 public:
     explicit DCameraSinkControllerStateCallback(std::shared_ptr<DCameraSinkController>& controller);
-    ~DCameraSinkControllerStateCallback() = default;
+    ~DCameraSinkControllerStateCallback() override = default;
 
     void OnStateChanged(std::shared_ptr<DCameraEvent>& event) override;
     void OnMetadataResult(std::vector<std::shared_ptr<DCameraSettings>>& settings) override;

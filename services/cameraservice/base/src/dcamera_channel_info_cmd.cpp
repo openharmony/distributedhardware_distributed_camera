@@ -98,7 +98,7 @@ int32_t DCameraChannelInfoCmd::Unmarshal(const std::string& jsonStr)
             return DCAMERA_BAD_VALUE;
         }
         channelDetail.dataSessionFlag_ = detailJson["DataSessionFlag"].asString();
-        channelDetail.streamType_ = (DCStreamType)detailJson["StreamType"].asInt();
+        channelDetail.streamType_ = static_cast<DCStreamType>(detailJson["StreamType"].asInt());
         channelInfo->detail_.push_back(channelDetail);
     }
     value_ = channelInfo;

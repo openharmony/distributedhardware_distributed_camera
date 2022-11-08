@@ -24,7 +24,7 @@ namespace DistributedHardware {
 class DCameraSourceCaptureState : public DCameraSourceState {
 public:
     explicit DCameraSourceCaptureState(std::shared_ptr<DCameraSourceStateMachine>& stateMachine);
-    ~DCameraSourceCaptureState() {}
+    ~DCameraSourceCaptureState() override {}
 
     int32_t Execute(std::shared_ptr<DCameraSourceDev>& camDev, DCAMERA_EVENT eventType,
         DCameraSourceEvent& event) override;

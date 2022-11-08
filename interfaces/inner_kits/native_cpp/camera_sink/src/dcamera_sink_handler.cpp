@@ -92,7 +92,7 @@ void DCameraSinkHandler::FinishStartSA(const std::string& params)
     producerCon_.notify_one();
 }
 
-void DCameraSinkHandler::FinishStartSAFailed(int32_t systemAbilityId)
+void DCameraSinkHandler::FinishStartSAFailed(const int32_t systemAbilityId)
 {
     DHLOGI("SinkSA Start failed, systemAbilityId: %d.", systemAbilityId);
     std::unique_lock<std::mutex> lock(producerMutex_);

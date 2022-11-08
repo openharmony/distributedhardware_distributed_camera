@@ -26,7 +26,7 @@ namespace DistributedHardware {
 class DCameraServiceStateListener : public ICameraStateListener {
 public:
     explicit DCameraServiceStateListener();
-    ~DCameraServiceStateListener();
+    ~DCameraServiceStateListener() override;
 
     int32_t OnRegisterNotify(const std::string& devId, const std::string& dhId, const std::string& reqId,
         int32_t status, std::string& data) override;

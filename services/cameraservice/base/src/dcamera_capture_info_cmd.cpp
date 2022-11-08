@@ -160,7 +160,7 @@ int32_t DCameraCaptureInfoCmd::UmarshalSettings(Json::Value& valueJson,
             return DCAMERA_BAD_VALUE;
         }
         std::shared_ptr<DCameraSettings> setting = std::make_shared<DCameraSettings>();
-        setting->type_ = (DCSettingsType)settingJson["SettingType"].asInt();
+        setting->type_ = static_cast<DCSettingsType>(settingJson["SettingType"].asInt());
         setting->value_ = settingJson["SettingValue"].asString();
         captureInfo->captureSettings_.push_back(setting);
     }

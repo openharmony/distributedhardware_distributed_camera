@@ -57,6 +57,8 @@ DCameraStateType DCameraSourceRegistState::GetStateType()
 int32_t DCameraSourceRegistState::DoRegisterTask(std::shared_ptr<DCameraSourceDev>& camDev, DCameraSourceEvent& event)
 {
     DHLOGI("DCameraSourceRegistState DoRegisterTask Idempotent");
+    (void)camDev;
+    (void)event;
     return DCAMERA_OK;
 }
 

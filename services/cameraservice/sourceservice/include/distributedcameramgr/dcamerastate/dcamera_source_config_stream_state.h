@@ -25,7 +25,7 @@ class DCameraSourceConfigStreamState : public DCameraSourceState {
 public:
     explicit DCameraSourceConfigStreamState(std::shared_ptr<DCameraSourceStateMachine>& stateMachine);
     DCameraSourceConfigStreamState() {}
-    ~DCameraSourceConfigStreamState() {}
+    ~DCameraSourceConfigStreamState() override {}
 
     int32_t Execute(std::shared_ptr<DCameraSourceDev>& camDev, DCAMERA_EVENT eventType,
         DCameraSourceEvent& event) override;

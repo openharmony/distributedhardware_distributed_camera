@@ -30,7 +30,7 @@ class DCameraSourceInput : public ICameraInput, public EventSender,
     public std::enable_shared_from_this<DCameraSourceInput> {
 public:
     DCameraSourceInput(std::string devId, std::string dhId, std::shared_ptr<EventBus>& eventBus);
-    ~DCameraSourceInput();
+    ~DCameraSourceInput() override;
 
     int32_t ConfigStreams(std::vector<std::shared_ptr<DCStreamInfo>>& streamInfos) override;
     int32_t ReleaseStreams(std::vector<int>& streamIds, bool& isAllRelease) override;

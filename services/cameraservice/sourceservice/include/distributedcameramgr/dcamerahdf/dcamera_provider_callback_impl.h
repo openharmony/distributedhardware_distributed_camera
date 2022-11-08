@@ -25,7 +25,7 @@ class DCameraSourceDev;
 class DCameraProviderCallbackImpl : public IDCameraProviderCallback {
 public:
     DCameraProviderCallbackImpl(std::string devId, std::string dhId, std::shared_ptr<DCameraSourceDev>& sourceDev);
-    ~DCameraProviderCallbackImpl();
+    ~DCameraProviderCallbackImpl() override;
 
     int32_t OpenSession(const DHBase& dhBase) override;
     int32_t CloseSession(const DHBase& dhBase) override;

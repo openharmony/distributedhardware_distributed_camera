@@ -39,7 +39,7 @@ namespace DistributedHardware {
 class DCameraClient : public ICameraOperator {
 public:
     explicit DCameraClient(const std::string& dhId);
-    ~DCameraClient();
+    ~DCameraClient() override;
 
     int32_t Init() override;
     int32_t UnInit() override;

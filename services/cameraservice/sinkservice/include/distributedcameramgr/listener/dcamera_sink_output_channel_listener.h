@@ -25,7 +25,7 @@ namespace DistributedHardware {
 class DCameraSinkOutputChannelListener : public ICameraChannelListener {
 public:
     DCameraSinkOutputChannelListener(DCStreamType type, std::shared_ptr<DCameraSinkOutput>& output);
-    ~DCameraSinkOutputChannelListener() = default;
+    ~DCameraSinkOutputChannelListener() override = default;
 
     void OnSessionState(int32_t state) override;
     void OnSessionError(int32_t eventType, int32_t eventReason, std::string detail) override;

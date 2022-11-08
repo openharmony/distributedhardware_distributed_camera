@@ -25,7 +25,7 @@ namespace DistributedHardware {
 class DCameraChannelSourceImpl : public ICameraChannel {
 public:
     DCameraChannelSourceImpl();
-    ~DCameraChannelSourceImpl();
+    ~DCameraChannelSourceImpl() override;
     int32_t OpenSession() override;
     int32_t CloseSession() override;
     int32_t CreateSession(std::vector<DCameraIndex>& camIndexs, std::string sessionFlag, DCameraSessionMode sessionMode,

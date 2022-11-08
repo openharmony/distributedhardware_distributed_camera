@@ -27,7 +27,7 @@ class DCameraStreamDataProcess;
 class DCameraStreamDataProcessPipelineListener : public DataProcessListener {
 public:
     explicit DCameraStreamDataProcessPipelineListener(std::shared_ptr<DCameraStreamDataProcess>& process);
-    ~DCameraStreamDataProcessPipelineListener();
+    ~DCameraStreamDataProcessPipelineListener() override;
 
     void OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult) override;
     void OnError(DataProcessErrorType errorType) override;

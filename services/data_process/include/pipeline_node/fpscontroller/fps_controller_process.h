@@ -29,7 +29,7 @@ class FpsControllerProcess : public AbstractDataProcess {
 public:
     explicit FpsControllerProcess(const std::weak_ptr<DCameraPipelineSource>& callbackPipSource)
         : callbackPipelineSource_(callbackPipSource) {}
-    ~FpsControllerProcess();
+    ~FpsControllerProcess() override;
 
     int32_t InitNode(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig,
         VideoConfigParams& processedConfig) override;

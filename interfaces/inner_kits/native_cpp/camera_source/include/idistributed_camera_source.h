@@ -34,7 +34,7 @@ public:
         CAMERA_NOTIFY = 4,
     };
 
-    virtual ~IDistributedCameraSource() {}
+    ~IDistributedCameraSource() override {}
     virtual int32_t InitSource(const std::string& params, const sptr<IDCameraSourceCallback>& callback) = 0;
     virtual int32_t ReleaseSource() = 0;
     virtual int32_t RegisterDistributedHardware(const std::string& devId, const std::string& dhId,

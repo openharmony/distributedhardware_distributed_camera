@@ -40,7 +40,7 @@ private:
     DCameraSinkHandler() = default;
     ~DCameraSinkHandler();
     void FinishStartSA(const std::string &params);
-    void FinishStartSAFailed(int32_t systemAbilityId);
+    void FinishStartSAFailed(const int32_t systemAbilityId);
 private:
     std::condition_variable producerCon_;
     std::mutex producerMutex_;

@@ -29,7 +29,7 @@ class ColorFormatProcess : public AbstractDataProcess {
 public:
     explicit ColorFormatProcess(const std::weak_ptr<DCameraPipelineSource>& callbackPipSource)
         : callbackPipelineSource_(callbackPipSource) {}
-    ~ColorFormatProcess();
+    ~ColorFormatProcess() override;
 
     int32_t InitNode(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig,
         VideoConfigParams& processedConfig) override;
