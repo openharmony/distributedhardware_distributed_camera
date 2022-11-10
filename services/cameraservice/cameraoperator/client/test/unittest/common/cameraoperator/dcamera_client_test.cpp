@@ -19,6 +19,7 @@
 #include "anonymous_string.h"
 #include "dcamera_client.h"
 #include "dcamera_handler.h"
+#include "dcamera_video_surface_listener.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -85,6 +86,7 @@ public:
     std::shared_ptr<DCameraCaptureInfo> videoInfo_false_;
     std::shared_ptr<DCameraCaptureInfo> photoInfo_true_;
     std::shared_ptr<DCameraCaptureInfo> videoInfo_true_;
+    sptr<DCameraVideoSurfaceListener> videoListener_;
 };
 
 void DCameraClientTest::SetUpTestCase(void)
@@ -103,7 +105,6 @@ void DCameraClientTest::SetUp(void)
     DCameraHandler::GetInstance().Initialize();
     std::vector<std::string> cameras = DCameraHandler::GetInstance().GetCameras();
     client_ = std::make_shared<DCameraClient>(cameras[0]);
-    surface_ = Surface::CreateSurfaceAsConsumer();
 
     photoInfo_false_ = std::make_shared<DCameraCaptureInfo>();
     photoInfo_false_->width_ = TEST_WIDTH;
@@ -233,7 +234,9 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_004, TestSize.Level1)
     std::shared_ptr<ResultCallback> resultCallback = std::make_shared<DCameraClientTestResultCallback>();
     ret = client_->SetResultCallback(resultCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
-
+    surface_ = Surface::CreateSurfaceAsConsumer();
+    videoListener_ = new DCameraVideoSurfaceListener(surface_, resultCallback);
+    surface_->RegisterConsumerListener((sptr<IBufferConsumerListener> &)videoListener_);
     ret = client_->Init();
     EXPECT_EQ(DCAMERA_OK, ret);
 
@@ -270,7 +273,9 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_005, TestSize.Level1)
     std::shared_ptr<ResultCallback> resultCallback = std::make_shared<DCameraClientTestResultCallback>();
     ret = client_->SetResultCallback(resultCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
-
+    surface_ = Surface::CreateSurfaceAsConsumer();
+    videoListener_ = new DCameraVideoSurfaceListener(surface_, resultCallback);
+    surface_->RegisterConsumerListener((sptr<IBufferConsumerListener> &)videoListener_);
     ret = client_->Init();
     EXPECT_EQ(DCAMERA_OK, ret);
 
