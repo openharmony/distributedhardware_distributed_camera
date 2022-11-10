@@ -13,5 +13,8 @@
 
 group("data_process_test") {
   testonly = true
-  deps = [ "common/pipeline:dcamera_pipeline_test" ]
+  deps = [
+    "common/pipeline:dcamera_pipeline_test",
+    "common/pipeline_node:dcamera_pipeline_node_test",
+  ]
 }
