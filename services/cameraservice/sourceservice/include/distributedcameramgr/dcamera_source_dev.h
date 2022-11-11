@@ -33,7 +33,7 @@ class DCameraSourceDev : public EventSender, public DistributedHardware::EventBu
     public std::enable_shared_from_this<DCameraSourceDev> {
 public:
     explicit DCameraSourceDev(std::string devId, std::string dhId, std::shared_ptr<ICameraStateListener>& stateLisener);
-    virtual ~DCameraSourceDev();
+    ~DCameraSourceDev() override;
 
     int32_t InitDCameraSourceDev();
     int32_t RegisterDistributedHardware(const std::string& devId, const std::string& dhId, const std::string& reqId,

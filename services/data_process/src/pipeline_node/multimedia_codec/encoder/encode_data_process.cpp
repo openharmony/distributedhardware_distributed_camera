@@ -600,7 +600,7 @@ int32_t EncodeDataProcess::GetProperty(const std::string& propertyName, Property
         DHLOGD("EncodeDataProcess::GetProperty: encode dataProcess get property fail, encode surface is nullptr.");
         return DCAMERA_BAD_VALUE;
     }
-    return propertyCarrier.carrySurfaceProperty(encodeProducerSurface_);
+    return propertyCarrier.CarrySurfaceProperty(encodeProducerSurface_);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

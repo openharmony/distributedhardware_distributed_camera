@@ -23,14 +23,14 @@ PropertyCarrier::~PropertyCarrier()
     surface_ = nullptr;
 }
 
-int32_t PropertyCarrier::carrySurfaceProperty(sptr<Surface>& surface)
+int32_t PropertyCarrier::CarrySurfaceProperty(sptr<Surface>& surface)
 {
     if (surface == nullptr) {
-        DHLOGD("PropertyCarrier::carrySurfaceProperty: carry surface fail, input surface is nullptr.");
+        DHLOGD("PropertyCarrier::CarrySurfaceProperty: carry surface fail, input surface is nullptr.");
         return DCAMERA_BAD_VALUE;
     }
     surface_ = surface;
-    DHLOGD("PropertyCarrier::carrySurfaceProperty: carry surface success.");
+    DHLOGD("PropertyCarrier::CarrySurfaceProperty: carry surface success.");
     return DCAMERA_OK;
 }
 } // namespace DistributedHardware

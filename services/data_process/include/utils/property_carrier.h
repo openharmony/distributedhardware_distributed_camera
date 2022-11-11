@@ -27,7 +27,7 @@ class PropertyCarrier {
 public:
     ~PropertyCarrier();
 
-    int32_t carrySurfaceProperty(sptr<Surface>& surface);
+    int32_t CarrySurfaceProperty(sptr<Surface>& surface);
 public:
     sptr<Surface> surface_;
 };
