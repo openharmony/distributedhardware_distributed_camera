@@ -37,7 +37,7 @@ class DCameraSinkController : public ICameraController, public EventSender,
     public std::enable_shared_from_this<DCameraSinkController> {
 public:
     explicit DCameraSinkController(std::shared_ptr<ICameraSinkAccessControl>& accessControl);
-    ~DCameraSinkController();
+    ~DCameraSinkController() override;
 
     int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos) override;
     int32_t StopCapture() override;

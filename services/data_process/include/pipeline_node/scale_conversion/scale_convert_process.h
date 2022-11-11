@@ -41,7 +41,7 @@ class ScaleConvertProcess : public AbstractDataProcess {
 public:
     explicit ScaleConvertProcess(const std::weak_ptr<DCameraPipelineSource>& callbackPipeSource)
         : callbackPipelineSource_(callbackPipeSource) {}
-    ~ScaleConvertProcess();
+    ~ScaleConvertProcess() override;
 
     int32_t InitNode(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig,
         VideoConfigParams& processedConfig) override;

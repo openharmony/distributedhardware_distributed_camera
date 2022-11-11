@@ -196,7 +196,7 @@ int32_t DCameraSoftbusAdapter::OpenSoftbusSession(std::string mySessName, std::s
         DHLOGE("DCameraSoftbusAdapter OpenSoftbusSession memcpy_s failed %d", ret);
         return DCAMERA_BAD_VALUE;
     }
-    attr.attr.streamAttr.streamType = (StreamType)streamType;
+    attr.attr.streamAttr.streamType = static_cast<StreamType>(streamType);
     int32_t sessionId = OpenSession(mySessName.c_str(), peerSessName.c_str(), peerDevId.c_str(), "0", &attr);
     if (sessionId < 0) {
         DHLOGE("DCameraSoftbusAdapter OpenSoftbusSession failed %d", sessionId);
@@ -353,7 +353,7 @@ void DCameraSoftbusAdapter::OnSourceStreamReceived(int32_t sessionId, const Stre
         return;
     }
     int32_t dataLen = data->bufLen;
-    if (dataLen <= 0 || dataLen > (int32_t)DCAMERA_MAX_RECV_DATA_LEN) {
+    if (dataLen <= 0 || dataLen > static_cast<int32_t>(DCAMERA_MAX_RECV_DATA_LEN)) {
         DHLOGE("DCameraSoftbusAdapter OnSourceStreamReceived dataLen: %d, sessionId: %d", dataLen, sessionId);
         return;
     }

@@ -38,7 +38,7 @@ DECLARE_SYSTEM_ABILITY(DistributedCameraSourceService);
 
 public:
     DistributedCameraSourceService(int32_t saId, bool runOnCreate);
-    ~DistributedCameraSourceService() = default;
+    ~DistributedCameraSourceService() override = default;
 
     int32_t InitSource(const std::string& params, const sptr<IDCameraSourceCallback>& callback) override;
     int32_t ReleaseSource() override;

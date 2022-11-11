@@ -23,7 +23,7 @@ namespace DistributedHardware {
 class DCameraSinkAccessControl : public ICameraSinkAccessControl {
 public:
     DCameraSinkAccessControl() = default;
-    ~DCameraSinkAccessControl() = default;
+    ~DCameraSinkAccessControl() override = default;
 
     bool IsSensitiveSrcAccess(const std::string& srcType) override;
     bool NotifySensitiveSrc(const std::string& srcType) override;

@@ -25,7 +25,7 @@ namespace DistributedHardware {
 class DCameraSinkOutputResultCallback : public ResultCallback {
 public:
     explicit DCameraSinkOutputResultCallback(std::shared_ptr<DCameraSinkOutput>& output);
-    ~DCameraSinkOutputResultCallback() = default;
+    ~DCameraSinkOutputResultCallback() override = default;
 
     void OnPhotoResult(std::shared_ptr<DataBuffer>& buffer) override;
     void OnVideoResult(std::shared_ptr<DataBuffer>& buffer) override;

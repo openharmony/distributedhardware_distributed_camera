@@ -62,7 +62,7 @@ public:
     explicit DCameraHdfServStatListener(StatusCallback callback) : callback_(std::move(callback))
     {
     }
-    ~DCameraHdfServStatListener() = default;
+    ~DCameraHdfServStatListener() override = default;
     void OnReceive(const ServiceStatus& status) override;
 
 private:

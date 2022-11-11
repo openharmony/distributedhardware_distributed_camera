@@ -26,7 +26,7 @@ namespace DistributedHardware {
 class DCameraSourceCallback : public DCameraSourceCallbackStub {
 public:
     DCameraSourceCallback() = default;
-    ~DCameraSourceCallback();
+    ~DCameraSourceCallback() override;
 
     int32_t OnNotifyRegResult(const std::string& devId, const std::string& dhId, const std::string& reqId,
         int32_t status, std::string& data) override;

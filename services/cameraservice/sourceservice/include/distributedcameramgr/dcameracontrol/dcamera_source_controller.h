@@ -33,7 +33,7 @@ class DCameraSourceController : public ICameraController, public EventSender,
 public:
     DCameraSourceController(std::string devId, std::string dhId,
         std::shared_ptr<DCameraSourceStateMachine>& stateMachine, std::shared_ptr<EventBus>& eventBus);
-    ~DCameraSourceController();
+    ~DCameraSourceController() override;
     int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos) override;
     int32_t StopCapture() override;
     int32_t ChannelNeg(std::shared_ptr<DCameraChannelInfo>& info) override;

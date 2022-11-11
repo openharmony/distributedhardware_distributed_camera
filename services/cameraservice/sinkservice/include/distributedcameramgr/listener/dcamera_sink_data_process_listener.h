@@ -25,7 +25,7 @@ namespace DistributedHardware {
 class DCameraSinkDataProcessListener : public DataProcessListener {
 public:
     explicit DCameraSinkDataProcessListener(std::shared_ptr<DCameraSinkDataProcess>& dataProcess);
-    ~DCameraSinkDataProcessListener() = default;
+    ~DCameraSinkDataProcessListener() override = default;
 
     void OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult) override;
     void OnError(DataProcessErrorType errorType) override;

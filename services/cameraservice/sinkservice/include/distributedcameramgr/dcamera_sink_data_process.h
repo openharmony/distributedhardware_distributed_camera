@@ -33,7 +33,7 @@ class DCameraSinkDataProcess : public ICameraSinkDataProcess, public EventSender
     public std::enable_shared_from_this<DCameraSinkDataProcess> {
 public:
     DCameraSinkDataProcess(const std::string& dhId, std::shared_ptr<ICameraChannel>& channel);
-    ~DCameraSinkDataProcess() = default;
+    ~DCameraSinkDataProcess() override = default;
 
     int32_t StartCapture(std::shared_ptr<DCameraCaptureInfo>& captureInfo) override;
     int32_t StopCapture() override;

@@ -48,7 +48,7 @@ private:
     DCameraSourceHandler();
     ~DCameraSourceHandler();
     void FinishStartSA(const std::string &params);
-    void FinishStartSAFailed(int32_t systemAbilityId);
+    void FinishStartSAFailed(const int32_t systemAbilityId);
 private:
     std::mutex optLock_;
     sptr<DCameraSourceCallback> callback_;

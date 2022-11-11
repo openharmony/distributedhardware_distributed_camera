@@ -29,7 +29,7 @@ class DecodeSurfaceListener : public IBufferConsumerListener {
 public:
     DecodeSurfaceListener(sptr<Surface> surface, std::weak_ptr<DecodeDataProcess> decodeVideoNode)
         : surface_(surface), decodeVideoNode_(decodeVideoNode) {}
-    ~DecodeSurfaceListener();
+    ~DecodeSurfaceListener() override;
 
     void OnBufferAvailable() override;
     void SetSurface(const sptr<Surface>& surface);

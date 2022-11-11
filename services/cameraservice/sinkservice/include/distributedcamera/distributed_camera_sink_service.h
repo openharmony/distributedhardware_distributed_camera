@@ -31,7 +31,7 @@ DECLARE_SYSTEM_ABILITY(DistributedCameraSinkService);
 
 public:
     DistributedCameraSinkService(int32_t saId, bool runOnCreate);
-    ~DistributedCameraSinkService() = default;
+    ~DistributedCameraSinkService() override = default;
 
     int32_t InitSink(const std::string& params) override;
     int32_t ReleaseSink() override;
