@@ -519,7 +519,7 @@ int32_t DCameraClient::StartPhotoOutput(std::shared_ptr<DCameraCaptureInfo>& inf
 
     std::vector<std::shared_ptr<DCameraSettings>> captureSettings = info->captureSettings_;
     std::string metadataSetting;
-    for (auto& setting : captureSettings) {
+    for (const auto& setting : captureSettings) {
         if (setting->type_ == UPDATE_METADATA) {
             DHLOGI("DCameraClient::StartPhotoOutput %s update metadata settings", GetAnonyString(cameraId_).c_str());
             metadataSetting = setting->value_;
