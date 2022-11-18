@@ -109,9 +109,9 @@ int32_t DCameraSinkOutput::OpenChannel(std::shared_ptr<DCameraChannelInfo>& info
 int32_t DCameraSinkOutput::CloseChannel()
 {
     DHLOGI("DCameraSinkOutput::CloseChannel dhId: %s", GetAnonyString(dhId_).c_str());
-    int32_t ret = DCAMERA_OK;
     auto iterCon = channels_.find(CONTINUOUS_FRAME);
     if (iterCon != channels_.end()) {
+        int32_t ret = DCAMERA_OK;
         ret = iterCon->second->ReleaseSession();
         if (ret != DCAMERA_OK) {
             DHLOGI("DCameraSinkOutput UnInit release continue session failed, dhId: %s, ret: %d",
@@ -122,6 +122,7 @@ int32_t DCameraSinkOutput::CloseChannel()
 
     auto iterSnap = channels_.find(SNAPSHOT_FRAME);
     if (iterSnap != channels_.end()) {
+        int32_t ret = DCAMERA_OK;
         ret = iterSnap->second->ReleaseSession();
         if (ret != DCAMERA_OK) {
             DHLOGI("DCameraSinkOutput UnInit release snapshot session failed, dhId: %s, ret: %d",
