@@ -557,10 +557,10 @@ int32_t DecodeDataProcess::CopyYUVPlaneByRow(const ImageUnitInfo& srcImgInfo, co
     }
 
     /* Copy YPlane by Row */
-    errno_t err = EOK;
     int32_t srcDataOffset = 0;
     int32_t dstDataOffset = 0;
     for (int32_t yh = 0; yh < dstImgInfo.height; yh++) {
+        errno_t err = EOK;
         err = memcpy_s(dstImgInfo.imgData + dstDataOffset, dstImgInfo.chromaOffset - dstDataOffset,
             srcImgInfo.imgData + srcDataOffset, dstImgInfo.width);
         if (err != EOK) {
@@ -577,6 +577,7 @@ int32_t DecodeDataProcess::CopyYUVPlaneByRow(const ImageUnitInfo& srcImgInfo, co
     dstDataOffset = dstImgInfo.chromaOffset;
     srcDataOffset = srcImgInfo.chromaOffset;
     for (int32_t uvh = 0; uvh < dstImgInfo.height / Y2UV_RATIO; uvh++) {
+        errno_t err = EOK;
         err = memcpy_s(dstImgInfo.imgData + dstDataOffset, dstImgInfo.imgSize - dstDataOffset,
             srcImgInfo.imgData + srcDataOffset, dstImgInfo.width);
         if (err != EOK) {
