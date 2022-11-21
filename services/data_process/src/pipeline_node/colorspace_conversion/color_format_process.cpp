@@ -354,10 +354,10 @@ int32_t ColorFormatProcess::CopyYPlane(const ImageUnitInfo& srcImgInfo, const Im
         return DCAMERA_BAD_VALUE;
     }
 
-    errno_t err = EOK;
     int32_t totalCopyYPlaneSize = dstImgInfo.alignedWidth * dstImgInfo.height;
     if (srcImgInfo.alignedWidth == dstImgInfo.width && dstImgInfo.alignedWidth == dstImgInfo.width) {
         /* No black border of srcImage and dstImage, and the strides of srcImage and dstImage are equal. */
+        errno_t err = EOK;
         err = memcpy_s(dstImgInfo.imgData, totalCopyYPlaneSize, srcImgInfo.imgData, totalCopyYPlaneSize);
         if (err != EOK) {
             DHLOGE("ColorConvert : memcpy_s CopyYPlaner failed by Coalesce rows.");
@@ -365,6 +365,7 @@ int32_t ColorFormatProcess::CopyYPlane(const ImageUnitInfo& srcImgInfo, const Im
         }
     } else {
         /* Black borders exist in srcImage or dstImage. */
+        errno_t err = EOK;
         int32_t srcDataOffset = 0;
         int32_t dstDataOffset = 0;
         for (int32_t yh = 0; yh < dstImgInfo.height; yh++) {

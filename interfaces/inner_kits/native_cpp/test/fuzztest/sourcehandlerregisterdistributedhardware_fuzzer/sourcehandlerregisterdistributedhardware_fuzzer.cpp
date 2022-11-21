@@ -29,7 +29,7 @@ namespace OHOS {
 namespace DistributedHardware {
 void SourceHandlerRegisterDistributedHardwareFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < 0)) {
+    if ((data == nullptr) || (size == 0)) {
         return;
     }
     std::string devId(reinterpret_cast<const char*>(data), size);
