@@ -274,9 +274,9 @@ void DecodeDataProcess::ReleaseVideoDecoder()
 {
     std::lock_guard<std::mutex> lck(mtxDecoderState_);
     DHLOGD("Start release videoDecoder.");
+    decodeVideoCallback_ = nullptr;
     if (videoDecoder_ == nullptr) {
         DHLOGE("The video decoder does not exist before ReleaseVideoDecoder.");
-        decodeVideoCallback_ = nullptr;
         return;
     }
     int32_t ret = StopVideoDecoder();
@@ -288,7 +288,6 @@ void DecodeDataProcess::ReleaseVideoDecoder()
         DHLOGE("VideoDecoder release failed. Error type: %d.", ret);
     }
     videoDecoder_ = nullptr;
-    decodeVideoCallback_ = nullptr;
 }
 
 void DecodeDataProcess::ReleaseDecoderSurface()
@@ -726,7 +725,9 @@ void DecodeDataProcess::OnError()
 {
     DHLOGD("DecodeDataProcess : OnError.");
     isDecoderProcess_.store(false);
-    videoDecoder_->Stop();
+    if (videoDecoder_ != nullptr) {
+        videoDecoder_->Stop();
+    }
     std::shared_ptr<DCameraPipelineSource> targetPipelineSource = callbackPipelineSource_.lock();
     if (targetPipelineSource == nullptr) {
         DHLOGE("callbackPipelineSource_ is nullptr.");
