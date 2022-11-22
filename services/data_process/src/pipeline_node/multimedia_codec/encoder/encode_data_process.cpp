@@ -296,13 +296,12 @@ void EncodeDataProcess::ReleaseVideoEncoder()
 {
     std::lock_guard<std::mutex> lck(mtxEncoderState_);
     DHLOGD("Start release videoEncoder.");
+    encodeProducerSurface_ = nullptr;
+    encodeVideoCallback_ = nullptr;
     if (videoEncoder_ == nullptr) {
         DHLOGE("The video encoder does not exist before ReleaseVideoEncoder.");
-        encodeProducerSurface_ = nullptr;
-        encodeVideoCallback_ = nullptr;
         return;
     }
-
     int32_t ret = StopVideoEncoder();
     if (ret != DCAMERA_OK) {
         DHLOGE("StopVideoEncoder failed.");
@@ -311,9 +310,7 @@ void EncodeDataProcess::ReleaseVideoEncoder()
     if (ret != Media::MediaServiceErrCode::MSERR_OK) {
         DHLOGE("VideoEncoder release failed. Error type: %d.", ret);
     }
-    encodeProducerSurface_ = nullptr;
     videoEncoder_ = nullptr;
-    encodeVideoCallback_ = nullptr;
 }
 
 void EncodeDataProcess::ReleaseProcessNode()
@@ -535,8 +532,10 @@ void EncodeDataProcess::OnError()
 {
     DHLOGD("EncodeDataProcess : OnError.");
     isEncoderProcess_.store(false);
-    videoEncoder_->Flush();
-    videoEncoder_->Stop();
+    if (videoEncoder_ != nullptr) {
+        videoEncoder_->Flush();
+        videoEncoder_->Stop();
+    }
     std::shared_ptr<DCameraPipelineSink> targetPipelineSink = callbackPipelineSink_.lock();
     if (targetPipelineSink == nullptr) {
         DHLOGE("callbackPipelineSink_ is nullptr.");
