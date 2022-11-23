@@ -73,7 +73,7 @@ HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_001, TestSize.Level
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
                                 TEST_HEIGTH);
-    VideoConfigParams destParams(VideoCodecType::CODEC_H265,
+    VideoConfigParams destParams(VideoCodecType::CODEC_H264,
                                  Videoformat::NV21,
                                  DCAMERA_PRODUCER_FPS_DEFAULT,
                                  TEST_WIDTH,
@@ -98,19 +98,12 @@ HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_002, TestSize.Level
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
                                 TEST_HEIGTH);
-    VideoConfigParams destParams(VideoCodecType::CODEC_H265,
+    VideoConfigParams destParams(VideoCodecType::CODEC_H264,
                                  Videoformat::NV21,
                                  DCAMERA_PRODUCER_FPS_DEFAULT,
                                  TEST_WIDTH,
                                  TEST_HEIGTH);
     int32_t rc = testSinkPipeline_->CreateDataProcessPipeline(PipelineType::VIDEO, srcParams, destParams, listener);
-    EXPECT_EQ(rc, DCAMERA_OK);
-
-    size_t capacity = 100;
-    std::vector<std::shared_ptr<DataBuffer>> buffers;
-    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
-    buffers.push_back(db);
-    rc = testSinkPipeline_->ProcessData(buffers);
     EXPECT_EQ(rc, DCAMERA_OK);
 }
 
@@ -130,7 +123,7 @@ HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_003, TestSize.Level
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
                                 TEST_HEIGTH);
-    VideoConfigParams destParams(VideoCodecType::CODEC_H265,
+    VideoConfigParams destParams(VideoCodecType::CODEC_H264,
                                  Videoformat::NV21,
                                  DCAMERA_PRODUCER_FPS_DEFAULT,
                                  TEST_WIDTH,
@@ -156,7 +149,7 @@ HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_004, TestSize.Level
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
                                 TEST_HEIGTH);
-    VideoConfigParams destParams(VideoCodecType::CODEC_H265,
+    VideoConfigParams destParams(VideoCodecType::CODEC_H264,
                                  Videoformat::NV21,
                                  DCAMERA_PRODUCER_FPS_DEFAULT,
                                  TEST_WIDTH,
