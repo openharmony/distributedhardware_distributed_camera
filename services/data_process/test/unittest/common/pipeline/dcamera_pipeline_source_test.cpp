@@ -95,24 +95,17 @@ HWTEST_F(DCameraPipelineSourceTest, dcamera_pipeline_source_test_002, TestSize.L
     EXPECT_EQ(false, testSourcePipeline_ == nullptr);
 
     std::shared_ptr<DataProcessListener> listener = std::make_shared<MockDCameraDataProcessListener>();
-    VideoConfigParams srcParams(VideoCodecType::CODEC_H265,
+    VideoConfigParams srcParams(VideoCodecType::CODEC_H264,
                                 Videoformat::NV21,
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
                                 TEST_HEIGTH);
-    VideoConfigParams destParams(VideoCodecType::CODEC_H265,
+    VideoConfigParams destParams(VideoCodecType::CODEC_H264,
                                  Videoformat::NV21,
                                  DCAMERA_PRODUCER_FPS_DEFAULT,
                                  TEST_WIDTH,
                                  TEST_HEIGTH);
     int32_t rc = testSourcePipeline_->CreateDataProcessPipeline(PipelineType::VIDEO, srcParams, destParams, listener);
-    EXPECT_EQ(rc, DCAMERA_OK);
-
-    size_t capacity = 100;
-    std::vector<std::shared_ptr<DataBuffer>> buffers;
-    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
-    buffers.push_back(db);
-    rc = testSourcePipeline_->ProcessData(buffers);
     EXPECT_EQ(rc, DCAMERA_OK);
 }
 
@@ -132,7 +125,7 @@ HWTEST_F(DCameraPipelineSourceTest, dcamera_pipeline_source_test_003, TestSize.L
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
                                 TEST_HEIGTH);
-    VideoConfigParams destParams(VideoCodecType::CODEC_H265,
+    VideoConfigParams destParams(VideoCodecType::CODEC_H264,
                                  Videoformat::NV21,
                                  DCAMERA_PRODUCER_FPS_DEFAULT,
                                  TEST_WIDTH,
