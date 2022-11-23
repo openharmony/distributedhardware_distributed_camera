@@ -63,6 +63,7 @@ private:
     std::shared_ptr<DCameraSourceStateMachine> stateMachine_;
     std::shared_ptr<EventBus> eventBus_;
     int32_t channelState_;
+    sptr<IDCameraProvider> camHdiProvider_;
 
     bool isInit;
     const std::string SESSION_FLAG = "control";

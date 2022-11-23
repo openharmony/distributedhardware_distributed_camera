@@ -28,7 +28,8 @@ namespace OHOS {
 namespace DistributedHardware {
 DCameraStreamDataProcessProducer::DCameraStreamDataProcessProducer(std::string devId, std::string dhId,
     int32_t streamId, DCStreamType streamType)
-    : devId_(devId), dhId_(dhId), streamId_(streamId), streamType_(streamType), eventHandler_(nullptr)
+    : devId_(devId), dhId_(dhId), streamId_(streamId), streamType_(streamType), eventHandler_(nullptr),
+    camHdiProvider_(nullptr)
 {
     DHLOGI("DCameraStreamDataProcessProducer Constructor devId %s dhId %s streamType: %d streamId: %d",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_);
@@ -49,6 +50,10 @@ void DCameraStreamDataProcessProducer::Start()
 {
     DHLOGI("DCameraStreamDataProcessProducer Start producer devId: %s dhId: %s streamType: %d streamId: %d",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_);
+    camHdiProvider_ = IDCameraProvider::Get(HDF_DCAMERA_EXT_SERVICE);
+    if (camHdiProvider_ == nullptr) {
+        DHLOGE("camHdiProvider_ is null.");
+    }
     state_ = DCAMERA_PRODUCER_STATE_START;
     if (streamType_ == CONTINUOUS_FRAME) {
         eventThread_ = std::thread(&DCameraStreamDataProcessProducer::StartEvent, this);
@@ -77,6 +82,7 @@ void DCameraStreamDataProcessProducer::Stop()
         eventThread_.join();
         eventHandler_ = nullptr;
     }
+    camHdiProvider_ = nullptr;
     DHLOGI("DCameraStreamDataProcessProducer Stop end devId: %s dhId: %s streamType: %d streamId: %d state: %d",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_, state_);
 }
@@ -201,13 +207,12 @@ int32_t DCameraStreamDataProcessProducer::FeedStreamToDriver(const DHBase& dhBas
 {
     DHLOGD("LooperFeed devId %s dhId %s streamSize: %d streamType: %d, streamId: %d", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str(), buffer->Size(), streamType_, streamId_);
-    sptr<IDCameraProvider> camHdiProvider = IDCameraProvider::Get(HDF_DCAMERA_EXT_SERVICE);
-    if (camHdiProvider == nullptr) {
+    if (camHdiProvider_ == nullptr) {
         DHLOGI("camHdiProvider is nullptr");
         return DCAMERA_BAD_VALUE;
     }
     DCameraBuffer sharedMemory;
-    int32_t ret = camHdiProvider->AcquireBuffer(dhBase, streamId_, sharedMemory);
+    int32_t ret = camHdiProvider_->AcquireBuffer(dhBase, streamId_, sharedMemory);
     if (ret != SUCCESS) {
         DHLOGE("AcquireBuffer devId: %s dhId: %s streamId: %d ret: %d",
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamId_, ret);
@@ -238,7 +243,7 @@ int32_t DCameraStreamDataProcessProducer::FeedStreamToDriver(const DHBase& dhBas
         sharedMemory.size_ = buffer->Size();
     } while (0);
 
-    ret = camHdiProvider->ShutterBuffer(dhBase, streamId_, sharedMemory);
+    ret = camHdiProvider_->ShutterBuffer(dhBase, streamId_, sharedMemory);
     DCameraMemoryUnmap(sharedMemory.bufferHandle_->GetBufferHandle());
     if (ret != SUCCESS) {
         DHLOGE("ShutterBuffer devId: %s dhId: %s streamId: %d ret: %d",
