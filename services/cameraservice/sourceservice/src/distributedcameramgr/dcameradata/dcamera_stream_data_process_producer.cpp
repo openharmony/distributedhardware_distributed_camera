@@ -29,7 +29,7 @@ namespace DistributedHardware {
 DCameraStreamDataProcessProducer::DCameraStreamDataProcessProducer(std::string devId, std::string dhId,
     int32_t streamId, DCStreamType streamType)
     : devId_(devId), dhId_(dhId), streamId_(streamId), streamType_(streamType), eventHandler_(nullptr),
-        camHdiProvider_(nullptr)
+    camHdiProvider_(nullptr)
 {
     DHLOGI("DCameraStreamDataProcessProducer Constructor devId %s dhId %s streamType: %d streamId: %d",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_);
