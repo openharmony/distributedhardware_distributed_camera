@@ -87,7 +87,7 @@ private:
     constexpr static int32_t MIN_VIDEO_HEIGHT = 240;
     constexpr static int32_t MAX_VIDEO_WIDTH = 1920;
     constexpr static int32_t MAX_VIDEO_HEIGHT = 1080;
-    constexpr static int32_t IDR_FRAME_INTERVAL_MS = 300;
+    constexpr static int32_t IDR_FRAME_INTERVAL_MS = 8000;
     constexpr static int32_t FIRST_FRAME_OUTPUT_NUM = 2;
     const int32_t DATABUFF_MAX_SIZE = 100 * 1024 * 1024;
 
