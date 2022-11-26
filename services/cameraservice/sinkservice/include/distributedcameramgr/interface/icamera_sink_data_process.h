@@ -32,6 +32,7 @@ public:
     virtual int32_t StartCapture(std::shared_ptr<DCameraCaptureInfo>& captureInfo) = 0;
     virtual int32_t StopCapture() = 0;
     virtual int32_t FeedStream(std::shared_ptr<DataBuffer>& dataBuffer) = 0;
+    virtual void Init() = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
