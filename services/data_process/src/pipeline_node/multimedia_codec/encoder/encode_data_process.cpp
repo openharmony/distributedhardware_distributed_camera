@@ -311,6 +311,7 @@ void EncodeDataProcess::ReleaseVideoEncoder()
         DHLOGE("VideoEncoder release failed. Error type: %d.", ret);
     }
     videoEncoder_ = nullptr;
+    DHLOGD("Start release videoEncoder success.");
 }
 
 void EncodeDataProcess::ReleaseProcessNode()
