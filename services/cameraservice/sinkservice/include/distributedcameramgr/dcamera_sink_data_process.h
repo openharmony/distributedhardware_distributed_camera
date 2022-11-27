@@ -16,31 +16,28 @@
 #ifndef OHOS_DCAMERA_SINK_DATA_PROCESS_H
 #define OHOS_DCAMERA_SINK_DATA_PROCESS_H
 
-#include "event_bus.h"
-#include "dcamera_photo_output_event.h"
-#include "dcamera_video_output_event.h"
-#include "icamera_sink_data_process.h"
+#include <condition_variable>
+#include <mutex>
+#include <thread>
 
+#include "event_handler.h"
 #include "icamera_channel.h"
+#include "icamera_sink_data_process.h"
 #include "idata_process_pipeline.h"
 #include "image_common_type.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class DCameraSinkDataProcess : public ICameraSinkDataProcess, public EventSender,
-    public DistributedHardware::EventBusHandler<DCameraPhotoOutputEvent>,
-    public DistributedHardware::EventBusHandler<DCameraVideoOutputEvent>,
+class DCameraSinkDataProcess : public ICameraSinkDataProcess,
     public std::enable_shared_from_this<DCameraSinkDataProcess> {
 public:
     DCameraSinkDataProcess(const std::string& dhId, std::shared_ptr<ICameraChannel>& channel);
-    ~DCameraSinkDataProcess() override = default;
+    ~DCameraSinkDataProcess();
 
     int32_t StartCapture(std::shared_ptr<DCameraCaptureInfo>& captureInfo) override;
     int32_t StopCapture() override;
     int32_t FeedStream(std::shared_ptr<DataBuffer>& dataBuffer) override;
-
-    void OnEvent(DCameraPhotoOutputEvent& event) override;
-    void OnEvent(DCameraVideoOutputEvent& event) override;
+    void Init() override;
 
     void OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult);
     void OnError(DataProcessErrorType errorType);
@@ -51,12 +48,18 @@ private:
     int32_t FeedStreamInner(std::shared_ptr<DataBuffer>& dataBuffer);
     VideoCodecType GetPipelineCodecType(DCEncodeType encodeType);
     Videoformat GetPipelineFormat(int32_t format);
+    void StartEventHandler();
+    void SendDataAsync(const std::shared_ptr<DataBuffer>& buffer);
 
     std::string dhId_;
     std::shared_ptr<DCameraCaptureInfo> captureInfo_;
-    std::shared_ptr<EventBus> eventBus_;
     std::shared_ptr<ICameraChannel> channel_;
     std::shared_ptr<IDataProcessPipeline> pipeline_;
+
+    std::mutex eventMutex_;
+    std::thread eventThread_;
+    std::condition_variable eventCon_;
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

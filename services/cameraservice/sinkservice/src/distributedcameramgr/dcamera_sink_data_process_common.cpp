@@ -26,14 +26,40 @@
 namespace OHOS {
 namespace DistributedHardware {
 DCameraSinkDataProcess::DCameraSinkDataProcess(const std::string& dhId, std::shared_ptr<ICameraChannel>& channel)
-    : dhId_(dhId), channel_(channel)
+    : dhId_(dhId), channel_(channel), eventHandler_(nullptr)
 {
     DHLOGI("DCameraSinkDataProcess Constructor dhId: %s", GetAnonyString(dhId_).c_str());
-    eventBus_ = std::make_shared<EventBus>("SinkDPHandler");
-    DCameraPhotoOutputEvent photoEvent(*this);
-    DCameraVideoOutputEvent videoEvent(*this);
-    eventBus_->AddHandler<DCameraPhotoOutputEvent>(photoEvent.GetType(), *this);
-    eventBus_->AddHandler<DCameraVideoOutputEvent>(videoEvent.GetType(), *this);
+}
+
+DCameraSinkDataProcess::~DCameraSinkDataProcess()
+{
+    DHLOGI("DCameraSinkDataProcess delete dhId: %s", GetAnonyString(dhId_).c_str());
+    if ((eventHandler_ != nullptr) && (eventHandler_->GetEventRunner() != nullptr)) {
+        eventHandler_->GetEventRunner()->Stop();
+    }
+    eventThread_.join();
+    eventHandler_ = nullptr;
+}
+
+void DCameraSinkDataProcess::Init()
+{
+    DHLOGI("DCameraSinkDataProcess Init dhId: %s", GetAnonyString(dhId_).c_str());
+    eventThread_ = std::thread(&DCameraSinkDataProcess::StartEventHandler, this);
+    std::unique_lock<std::mutex> lock(eventMutex_);
+    eventCon_.wait(lock, [this] {
+        return eventHandler_ != nullptr;
+    });
+}
+
+void DCameraSinkDataProcess::StartEventHandler()
+{
+    auto runner = AppExecFwk::EventRunner::Create(false);
+    {
+        std::lock_guard<std::mutex> lock(eventMutex_);
+        eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
+    }
+    eventCon_.notify_one();
+    runner->Run();
 }
 
 int32_t DCameraSinkDataProcess::StartCapture(std::shared_ptr<DCameraCaptureInfo>& captureInfo)
@@ -80,6 +106,10 @@ int32_t DCameraSinkDataProcess::StopCapture()
         pipeline_->DestroyDataProcessPipeline();
         pipeline_ = nullptr;
     }
+    if (eventHandler_ != nullptr) {
+        DHLOGI("DCameraSinkDataProcess::StopCapture dhId: %s, remove all events", GetAnonyString(dhId_).c_str());
+        eventHandler_->RemoveAllEvents();
+    }
     return DCAMERA_OK;
 }
 
@@ -98,41 +128,34 @@ int32_t DCameraSinkDataProcess::FeedStream(std::shared_ptr<DataBuffer>& dataBuff
             break;
         }
         case SNAPSHOT_FRAME: {
-            DCameraPhotoOutputEvent photoEvent(*this, dataBuffer);
-            eventBus_->PostEvent<DCameraPhotoOutputEvent>(photoEvent, POSTMODE::POST_ASYNC);
+            SendDataAsync(dataBuffer);
             break;
         }
         default: {
             DHLOGE("DCameraSinkDataProcess::FeedStream %s unknown stream type: %d",
-                   GetAnonyString(dhId_).c_str(), type);
+                GetAnonyString(dhId_).c_str(), type);
             break;
         }
     }
     return DCAMERA_OK;
 }
 
-void DCameraSinkDataProcess::OnEvent(DCameraPhotoOutputEvent& event)
+void DCameraSinkDataProcess::SendDataAsync(const std::shared_ptr<DataBuffer>& buffer)
 {
-    std::shared_ptr<DataBuffer> buffer = event.GetParam();
-    int32_t ret = channel_->SendData(buffer);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSinkDataProcess::OnEvent %s send photo output data ret: %d", GetAnonyString(dhId_).c_str(), ret);
-    }
-}
-
-void DCameraSinkDataProcess::OnEvent(DCameraVideoOutputEvent& event)
-{
-    std::shared_ptr<DataBuffer> buffer = event.GetParam();
-    int32_t ret = channel_->SendData(buffer);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSinkDataProcess::OnEvent %s send video output data ret: %d", GetAnonyString(dhId_).c_str(), ret);
+    auto sendFunc = [this, buffer]() mutable {
+        std::shared_ptr<DataBuffer> sendBuffer = buffer;
+        int32_t ret = channel_->SendData(sendBuffer);
+        DHLOGD("SendData type: %d output data ret: %d, dhId: %s, bufferSize: %d", captureInfo_->streamType_, ret,
+            GetAnonyString(dhId_).c_str(), buffer->Size());
+    };
+    if (eventHandler_ != nullptr) {
+        eventHandler_->PostTask(sendFunc);
     }
 }
 
 void DCameraSinkDataProcess::OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult)
 {
-    DCameraVideoOutputEvent videoEvent(*this, videoResult);
-    eventBus_->PostEvent<DCameraVideoOutputEvent>(videoEvent, POSTMODE::POST_ASYNC);
+    SendDataAsync(videoResult);
 }
 
 void DCameraSinkDataProcess::OnError(DataProcessErrorType errorType)

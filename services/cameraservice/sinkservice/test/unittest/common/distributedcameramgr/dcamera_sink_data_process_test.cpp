@@ -105,6 +105,7 @@ void DCameraSinkDataProcessTest::SetUp(void)
     DCameraHandler::GetInstance().Initialize();
     std::vector<std::string> cameras = DCameraHandler::GetInstance().GetCameras();
     dataProcess_ = std::make_shared<DCameraSinkDataProcess>(cameras[0], channel_);
+    dataProcess_->Init();
 
     dataProcess_->pipeline_ = std::make_shared<MockDataProcessPipeline>();
     dataProcess_->captureInfo_ = g_testCaptureInfoContinuousNeedEncode;

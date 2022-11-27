@@ -59,6 +59,7 @@ void DCameraSinkOutput::InitInner(DCStreamType type)
 {
     std::shared_ptr<ICameraChannel> channel = std::make_shared<DCameraChannelSinkImpl>();
     std::shared_ptr<ICameraSinkDataProcess> dataProcess = std::make_shared<DCameraSinkDataProcess>(dhId_, channel);
+    dataProcess->Init();
     dataProcesses_.emplace(type, dataProcess);
     channels_.emplace(type, channel);
     sessionState_.emplace(type, DCAMERA_CHANNEL_STATE_DISCONNECTED);

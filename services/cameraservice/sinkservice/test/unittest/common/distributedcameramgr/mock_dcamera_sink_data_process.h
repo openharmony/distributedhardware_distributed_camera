@@ -59,6 +59,9 @@ public:
     {
         return DCAMERA_OK;
     }
+    void Init()
+    {
+    }
     void OnEvent(DCameraPhotoOutputEvent& event)
     {
     }
