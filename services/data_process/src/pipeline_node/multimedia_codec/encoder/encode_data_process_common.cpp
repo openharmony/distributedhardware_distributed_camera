@@ -268,10 +268,10 @@ void EncodeDataProcess::ReleaseVideoEncoder()
 {
     std::lock_guard<std::mutex> lck(mtxEncoderState_);
     DHLOGD("Start release videoEncoder.");
-    encodeProducerSurface_ = nullptr;
-    encodeVideoCallback_ = nullptr;
     if (videoEncoder_ == nullptr) {
         DHLOGE("The video encoder does not exist before ReleaseVideoEncoder.");
+        encodeProducerSurface_ = nullptr;
+        encodeVideoCallback_ = nullptr;
         return;
     }
     int32_t ret = StopVideoEncoder();
@@ -282,7 +282,9 @@ void EncodeDataProcess::ReleaseVideoEncoder()
     if (ret != Media::MediaServiceErrCode::MSERR_OK) {
         DHLOGE("VideoEncoder release failed. Error type: %d.", ret);
     }
+    encodeProducerSurface_ = nullptr;
     videoEncoder_ = nullptr;
+    encodeVideoCallback_ = nullptr;
     DHLOGD("Start release videoEncoder success.");
 }
 
