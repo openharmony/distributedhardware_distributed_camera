@@ -274,7 +274,6 @@ void EncodeDataProcess::ReleaseVideoEncoder()
         encodeVideoCallback_ = nullptr;
         return;
     }
-
     int32_t ret = StopVideoEncoder();
     if (ret != DCAMERA_OK) {
         DHLOGE("StopVideoEncoder failed.");
@@ -286,6 +285,7 @@ void EncodeDataProcess::ReleaseVideoEncoder()
     encodeProducerSurface_ = nullptr;
     videoEncoder_ = nullptr;
     encodeVideoCallback_ = nullptr;
+    DHLOGD("Start release videoEncoder success.");
 }
 
 void EncodeDataProcess::ReleaseProcessNode()
@@ -492,8 +492,10 @@ void EncodeDataProcess::OnError()
 {
     DHLOGD("EncodeDataProcess : OnError.");
     isEncoderProcess_.store(false);
-    videoEncoder_->Flush();
-    videoEncoder_->Stop();
+    if (videoEncoder_ != nullptr) {
+        videoEncoder_->Flush();
+        videoEncoder_->Stop();
+    }
     std::shared_ptr<DCameraPipelineSink> targetPipelineSink = callbackPipelineSink_.lock();
     if (targetPipelineSink == nullptr) {
         DHLOGE("callbackPipelineSink_ is nullptr.");

@@ -75,7 +75,6 @@ void DCameraSessionCallback::OnFocusState(FocusState state)
     dcSetting->value_ = encodeString;
     std::vector<std::shared_ptr<DCameraSettings>> settings;
     settings.push_back(dcSetting);
-    callback_->OnMetadataResult(settings);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

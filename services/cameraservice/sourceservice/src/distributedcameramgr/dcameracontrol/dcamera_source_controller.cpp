@@ -51,6 +51,7 @@ DCameraSourceController::~DCameraSourceController()
     if (isInit) {
         UnInit();
     }
+    camHdiProvider_ = nullptr;
 }
 
 int32_t DCameraSourceController::StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos)
@@ -171,8 +172,7 @@ int32_t DCameraSourceController::DCameraNotify(std::shared_ptr<DCameraEvent>& ev
         DcameraFinishAsyncTrace(DCAMERA_CONTINUE_FIRST_FRAME, DCAMERA_CONTINUE_FIRST_FRAME_TASKID);
         DcameraFinishAsyncTrace(DCAMERA_SNAPSHOT_FIRST_FRAME, DCAMERA_SNAPSHOT_FIRST_FRAME_TASKID);
     }
-    sptr<IDCameraProvider> camHdiProvider = IDCameraProvider::Get(HDF_DCAMERA_EXT_SERVICE);
-    if (camHdiProvider == nullptr) {
+    if (camHdiProvider_ == nullptr) {
         DHLOGI("DCameraNotify camHdiProvider is nullptr devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
             GetAnonyString(dhId_).c_str());
         return DCAMERA_BAD_OPERATE;
@@ -184,7 +184,7 @@ int32_t DCameraSourceController::DCameraNotify(std::shared_ptr<DCameraEvent>& ev
     hdiEvent.type_ = events->eventType_;
     hdiEvent.result_ = events->eventResult_;
     hdiEvent.content_ = events->eventContent_;
-    int32_t retHdi = camHdiProvider->Notify(dhBase, hdiEvent);
+    int32_t retHdi = camHdiProvider_->Notify(dhBase, hdiEvent);
     DHLOGI("Nofify hal, ret: %d, devId: %s dhId: %s, type: %d, result: %d, content: %s", retHdi,
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), events->eventType_, events->eventResult_,
         events->eventContent_.c_str());
@@ -362,6 +362,10 @@ int32_t DCameraSourceController::Init(std::vector<DCameraIndex>& indexs)
         DHLOGE("DCameraSourceController init error");
         return DCAMERA_INIT_ERR;
     }
+    camHdiProvider_ = IDCameraProvider::Get(HDF_DCAMERA_EXT_SERVICE);
+    if (camHdiProvider_ == nullptr) {
+        DHLOGE("camHdiProvider_ is null.");
+    }
     indexs_.assign(indexs.begin(), indexs.end());
     std::string dhId = indexs_.begin()->dhId_;
     std::string devId = indexs_.begin()->devId_;
@@ -455,8 +459,7 @@ void DCameraSourceController::OnDataReceived(std::vector<std::shared_ptr<DataBuf
 
 void DCameraSourceController::HandleMetaDataResult(std::string& jsonStr)
 {
-    sptr<IDCameraProvider> camHdiProvider = IDCameraProvider::Get(HDF_DCAMERA_EXT_SERVICE);
-    if (camHdiProvider == nullptr) {
+    if (camHdiProvider_ == nullptr) {
         DHLOGI("DCameraSourceController HandleMetaDataResult camHdiProvider is null, devId: %s, dhId: %s",
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return;
@@ -475,7 +478,7 @@ void DCameraSourceController::HandleMetaDataResult(std::string& jsonStr)
         DCameraSettings setting;
         setting.type_ = (*iter)->type_;
         setting.value_ = (*iter)->value_;
-        int32_t retHdi = camHdiProvider->OnSettingsResult(dhBase, setting);
+        int32_t retHdi = camHdiProvider_->OnSettingsResult(dhBase, setting);
         DHLOGI("OnSettingsResult hal, ret: %d, devId: %s dhId: %s", retHdi, GetAnonyString(devId_).c_str(),
             GetAnonyString(dhId_).c_str());
     }

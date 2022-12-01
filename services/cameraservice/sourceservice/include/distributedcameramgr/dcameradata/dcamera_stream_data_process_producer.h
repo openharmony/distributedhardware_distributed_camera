@@ -68,6 +68,8 @@ private:
     int32_t streamId_;
     DCStreamType streamType_;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_;
+
+    sptr<IDCameraProvider> camHdiProvider_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
