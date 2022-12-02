@@ -56,7 +56,9 @@ ohos_unittest("DCameraSourceMgrTest") {
   module_out_path = module_out_path
 
   sources = [
+    "dcamera_source_controller_test.cpp",
     "dcamera_source_data_process_test.cpp",
+    "dcamera_source_dev_test.cpp",
     "dcamera_source_input_test.cpp",
     "dcamera_source_state_machine_test.cpp",
   ]
