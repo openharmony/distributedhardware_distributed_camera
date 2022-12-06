@@ -17,9 +17,15 @@
 
 #include "accesstoken_kit.h"
 #include "anonymous_string.h"
+#include "camera_util.h"
 #include "dcamera_client.h"
 #include "dcamera_handler.h"
-#include "dcamera_video_surface_listener.h"
+#include "dcamera_input_callback.h"
+#include "dcamera_manager_callback.h"
+#include "dcamera_photo_callback.h"
+#include "dcamera_preview_callback.h"
+#include "dcamera_session_callback.h"
+#include "dcamera_video_callback.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -175,7 +181,52 @@ void DCameraClientTest::SetTokenID()
 HWTEST_F(DCameraClientTest, dcamera_client_test_001, TestSize.Level1)
 {
     DHLOGI("DCameraClientTest dcamera_client_test_001: test set state callback");
+    auto managerCallback = std::make_shared<DCameraManagerCallback>();
+    CameraStandard::CameraStatusInfo cameraStatus;
+    managerCallback->OnCameraStatusChanged(cameraStatus);
+    managerCallback->OnFlashlightStatusChanged("", CameraStandard::FlashStatus::FLASH_STATUS_OFF);
+
+    auto inputCallback = std::make_shared<DCameraInputCallback>(nullptr);
+    inputCallback->OnError(CameraStandard::CamServiceError::CAMERA_DEVICE_BUSY, 0);
+
+    auto sessionCallback = std::make_shared<DCameraSessionCallback>(nullptr);
+    sessionCallback->OnError(0);
+    sessionCallback->OnFocusState(CameraStandard::FocusCallback::UNFOCUSED);
+
+    auto photoCallback = std::make_shared<DCameraPhotoCallback>(nullptr);
+    photoCallback->OnCaptureStarted(0);
+    photoCallback->OnCaptureEnded(0, 0);
+    photoCallback->OnFrameShutter(0, 0);
+    photoCallback->OnCaptureError(0, 0);
+
+    auto previewCallback = std::make_shared<DCameraPreviewCallback>(nullptr);
+    previewCallback->OnFrameStarted();
+    previewCallback->OnFrameEnded(0);
+    previewCallback->OnError(0);
+
+    auto videoCallback = std::make_shared<DCameraVideoCallback>(nullptr);
+    videoCallback->OnFrameStarted();
+    videoCallback->OnFrameEnded(0);
+    videoCallback->OnError(0);
+
     std::shared_ptr<StateCallback> stateCallback = std::make_shared<DCameraClientTestStateCallback>();
+    inputCallback = std::make_shared<DCameraInputCallback>(stateCallback);
+    inputCallback->OnError(CameraStandard::CamServiceError::CAMERA_DEVICE_BUSY, 0);
+    inputCallback->OnError(CameraStandard::CamServiceError::CAMERA_DEVICE_PREEMPTED, 0);
+
+    sessionCallback = std::make_shared<DCameraSessionCallback>(stateCallback);
+    sessionCallback->OnError(0);
+    sessionCallback->OnFocusState(CameraStandard::FocusCallback::UNFOCUSED);
+
+    photoCallback = std::make_shared<DCameraPhotoCallback>(stateCallback);
+    photoCallback->OnCaptureError(0, 0);
+
+    previewCallback = std::make_shared<DCameraPreviewCallback>(stateCallback);
+    previewCallback->OnError(0);
+
+    videoCallback = std::make_shared<DCameraVideoCallback>(stateCallback);
+    videoCallback->OnError(0);
+
     int32_t ret = client_->SetStateCallback(stateCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
@@ -189,7 +240,19 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_001, TestSize.Level1)
 HWTEST_F(DCameraClientTest, dcamera_client_test_002, TestSize.Level1)
 {
     DHLOGI("DCameraClientTest dcamera_client_test_002: test set result callback");
+    auto photoSurfaceListener = std::make_shared<DCameraPhotoSurfaceListener>(nullptr, nullptr);
+    photoSurfaceListener->OnBufferAvailable();
+
+    auto videoSurfaceListener = std::make_shared<DCameraVideoSurfaceListener>(nullptr, nullptr);
+    videoSurfaceListener->OnBufferAvailable();
+
     std::shared_ptr<ResultCallback> resultCallback = std::make_shared<DCameraClientTestResultCallback>();
+    photoSurfaceListener = std::make_shared<DCameraPhotoSurfaceListener>(nullptr, resultCallback);
+    photoSurfaceListener->OnBufferAvailable();
+
+    videoSurfaceListener = std::make_shared<DCameraVideoSurfaceListener>(nullptr, resultCallback);
+    videoSurfaceListener->OnBufferAvailable();
+
     int32_t ret = client_->SetResultCallback(resultCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
