@@ -15,7 +15,7 @@ import("//build/test.gni")
 import(
     "//foundation/distributedhardware/distributed_camera/distributedcamera.gni")
 
-module_out_path = "distributed_camera/dcamera_source_mgr_test"
+module_out_path = "distributed_camera/dcamera_source_test"
 
 config("module_private_config") {
   visibility = [ ":*" ]
@@ -48,26 +48,26 @@ config("module_private_config") {
     "//utils/system/safwk/native/include",
     "//third_party/jsoncpp/include",
     "//drivers/peripheral/base/",
+    "${graphicstandard_path}/frameworks/surface/include",
   ]
 }
 
-ohos_unittest("DCameraSourceMgrTest") {
+ohos_unittest("DCameraSourceTest") {
   module_out_path = module_out_path
 
   sources = [
-    "dcamera_hdf_operate_test.cpp",
-    "dcamera_provider_callback_impl_test.cpp",
-    "dcamera_source_controller_test.cpp",
-    "dcamera_source_data_process_test.cpp",
-    "dcamera_source_dev_test.cpp",
-    "dcamera_source_input_test.cpp",
-    "dcamera_source_state_machine_test.cpp",
+    "dcamera_service_state_listener_test.cpp",
+    "dcamera_source_callback proxy_test.cpp",
+    "dcamera_source_hidumper_test.cpp",
+    "distributed_camera_source_service_test.cpp",
   ]
 
   configs = [ ":module_private_config" ]
 
   deps = [
     "${common_path}:distributed_camera_utils",
+    "${graphicstandard_path}:libsurface",
+    "${innerkits_path}/native_cpp/camera_source:distributed_camera_source_sdk",
     "${services_path}/cameraservice/sourceservice:distributed_camera_source",
     "${services_path}/channel:distributed_camera_channel",
     "//third_party/googletest:gtest_main",
@@ -81,16 +81,17 @@ ohos_unittest("DCameraSourceMgrTest") {
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "samgr:samgr_proxy",
   ]
 
   defines = [
     "HI_LOG_ENABLE",
-    "DH_LOG_TAG=\"DCameraSourceMgrTest\"",
+    "DH_LOG_TAG=\"DCameraSourceTest\"",
     "LOG_DOMAIN=0xD004100",
   ]
 }
 
-group("dcamera_source_mgr_test") {
+group("dcamera_source_test") {
   testonly = true
-  deps = [ ":DCameraSourceMgrTest" ]
+  deps = [ ":DCameraSourceTest" ]
 }

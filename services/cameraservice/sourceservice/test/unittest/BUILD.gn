@@ -13,5 +13,8 @@
 
 group("source_service_test") {
   testonly = true
-  deps = [ "common/distributedcameramgr:dcamera_mgr_test" ]
+  deps = [
+    "common/distributedcamera:dcamera_source_test",
+    "common/distributedcameramgr:dcamera_source_mgr_test",
+  ]
 }
