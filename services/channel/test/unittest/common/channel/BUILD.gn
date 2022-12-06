@@ -1,0 +1,98 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+import(
+    "//foundation/distributedhardware/distributed_camera/distributedcamera.gni")
+
+module_out_path = "distributed_camera/dcamera_channel_test"
+
+config("module_private_config") {
+  visibility = [ ":*" ]
+  include_dirs = [
+    "include",
+    "${common_path}/include/constants",
+    "${common_path}/include/utils",
+    "${fwk_common_path}/utils/include",
+    "${fwk_utils_path}/include",
+    "${fwk_utils_path}/include/eventbus",
+    "${services_path}/cameraservice/base/include",
+    "${services_path}/channel/include",
+    "${services_path}/cameraservice/base/include",
+    "${services_path}/cameraservice/cameraoperator/client/include",
+    "${services_path}/cameraservice/cameraoperator/client/include/callback",
+    "${services_path}/cameraservice/cameraoperator/client/include/listener",
+    "${services_path}/cameraservice/cameraoperator/handler/include",
+    "${services_path}/cameraservice/sinkservice/include/distributedcameramgr",
+    "${services_path}/cameraservice/sinkservice/include/distributedcameramgr/callback",
+    "${services_path}/cameraservice/sinkservice/include/distributedcameramgr/eventbus",
+    "${services_path}/cameraservice/sinkservice/include/distributedcameramgr/interface",
+    "${services_path}/cameraservice/sinkservice/include/distributedcameramgr/listener",
+    "${services_path}/cameraservice/sinkservice/test/unittest/common/distributedcameramgr",
+    "${services_path}/cameraservice/sourceservice/include/distributedcameramgr",
+    "${services_path}/cameraservice/sourceservice/include/distributedcameramgr/dcameradata",
+    "${services_path}/cameraservice/sourceservice/include/distributedcameramgr/dcamerainterface",
+    "${services_path}/cameraservice/sourceservice/include/distributedcameramgr/dcamerastate",
+    "${services_path}/cameraservice/sourceservice/test/unittest/common/distributedcameramgr",
+    "${services_path}/data_process/include/utils",
+    "${innerkits_path}/native_cpp/camera_source/include",
+    "${innerkits_path}/native_cpp/camera_source/include/callback",
+    "${graphicstandard_path}/frameworks/surface/include",
+    "//commonlibrary/c_utils/base/include",
+    "//utils/system/safwk/native/include",
+    "//third_party/jsoncpp/include",
+  ]
+}
+
+ohos_unittest("DCameraChannelTest") {
+  module_out_path = module_out_path
+
+  sources = [
+    "dcamera_channel_sink_impl_test.cpp",
+    "dcamera_channel_source_impl_test.cpp",
+    "dcamera_softbus_adapter_test.cpp",
+    "dcamera_softbus_session_test.cpp",
+    "session_bus_center.cpp",
+    "session_mock.cpp",
+  ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "${common_path}:distributed_camera_utils",
+    "${graphicstandard_path}:libsurface",
+    "${services_path}/cameraservice/sinkservice:distributed_camera_sink",
+    "${services_path}/cameraservice/sourceservice:distributed_camera_source",
+    "${services_path}/channel:distributed_camera_channel",
+    "${services_path}/data_process:distributed_camera_data_process",
+    "//third_party/jsoncpp:jsoncpp",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
+    "eventhandler:libeventhandler",
+    "graphic_chipsetsdk:buffer_handle",
+  ]
+
+  defines = [
+    "HI_LOG_ENABLE",
+    "DH_LOG_TAG=\"DCameraChannelTest\"",
+    "LOG_DOMAIN=0xD004100",
+  ]
+}
+
+group("dcamera_channel_test") {
+  testonly = true
+  deps = [ ":DCameraChannelTest" ]
+}
