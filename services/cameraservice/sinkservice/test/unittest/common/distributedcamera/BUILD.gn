@@ -42,13 +42,17 @@ config("module_private_config") {
     "${innerkits_path}/native_cpp/camera_sink/include",
     "${services_path}/cameraservice/base/include",
     "${services_path}/cameraservice/cameraoperator/handler/include",
+    "${services_path}/cameraservice/sinkservice/include/distributedcamera",
   ]
 }
 
 ohos_unittest("DistributedCameraSinkServiceTest") {
   module_out_path = module_out_path
 
-  sources = [ "distributed_camera_sink_service_test.cpp" ]
+  sources = [
+    "dcamera_sink_hidumper_test.cpp",
+    "distributed_camera_sink_service_test.cpp",
+  ]
 
   configs = [ ":module_private_config" ]
 
@@ -58,6 +62,7 @@ ohos_unittest("DistributedCameraSinkServiceTest") {
     "${graphicstandard_path}:libsurface",
     "${innerkits_path}/native_cpp/camera_sink:distributed_camera_sink_sdk",
     "${services_path}/cameraservice/cameraoperator/handler:distributed_camera_handler",
+    "${services_path}/cameraservice/sinkservice:distributed_camera_sink",
     "//drivers/peripheral/camera/interfaces/metadata:metadata",
     "//third_party/googletest:gtest_main",
     "//third_party/jsoncpp:jsoncpp",
