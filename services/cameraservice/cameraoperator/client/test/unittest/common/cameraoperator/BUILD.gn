@@ -72,6 +72,7 @@ ohos_unittest("DCameraClientTest") {
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "c_utils:utils",
+    "drivers_interface_camera:libcamera_proxy_1.0",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
