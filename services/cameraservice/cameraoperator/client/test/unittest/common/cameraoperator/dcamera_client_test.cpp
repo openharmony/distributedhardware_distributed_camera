@@ -15,20 +15,26 @@
 
 #include <gtest/gtest.h>
 
+#define private public
+#include "dcamera_client.h"
+#undef private
+
 #include "accesstoken_kit.h"
 #include "anonymous_string.h"
+#include "camera_metadata_operator.h"
 #include "camera_util.h"
-#include "dcamera_client.h"
 #include "dcamera_handler.h"
 #include "dcamera_input_callback.h"
 #include "dcamera_manager_callback.h"
 #include "dcamera_photo_callback.h"
 #include "dcamera_preview_callback.h"
 #include "dcamera_session_callback.h"
+#include "dcamera_utils_tools.h"
 #include "dcamera_video_callback.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
+#include "metadata_utils.h"
 #include "nativetoken_kit.h"
 #include "token_setproc.h"
 
@@ -75,7 +81,12 @@ public:
         const int32_t TEST_FORMAT_PHOTO = OHOS_CAMERA_FORMAT_RGBA_8888;
 #endif
 
-const int32_t TEST_SLEEP_SEC = 2;
+constexpr int32_t TEST_SLEEP_SEC = 2;
+constexpr uint32_t ENTRY_CAPACITY = 30;
+constexpr uint32_t DATA_CAPACITY = 2000;
+constexpr double LATITUDE = 22.306;
+constexpr double LONGITUDE = 52.12;
+constexpr double ALTITUDE = 2.365;
 
 class DCameraClientTest : public testing::Test {
 public:
@@ -226,6 +237,10 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_001, TestSize.Level1)
 
     int32_t ret = client_->SetStateCallback(stateCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
+
+    stateCallback = nullptr;
+    ret = client_->SetStateCallback(stateCallback);
+    EXPECT_EQ(DCAMERA_OK, ret);
 }
 
 /**
@@ -251,6 +266,10 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_002, TestSize.Level1)
     videoSurfaceListener->OnBufferAvailable();
 
     int32_t ret = client_->SetResultCallback(resultCallback);
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    resultCallback = nullptr;
+    ret = client_->SetResultCallback(resultCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
@@ -306,6 +325,17 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_004, TestSize.Level1)
     ret = client_->StartCapture(captureInfos);
     EXPECT_EQ(DCAMERA_OK, ret);
 
+    auto metaData = std::make_shared<Camera::CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
+    std::string abilityString = Camera::MetadataUtils::EncodeToString(metaData);
+    std::vector<std::shared_ptr<DCameraSettings>> settings;
+    auto setting = std::make_shared<DCameraSettings>();
+    setting->type_ = UPDATE_METADATA;
+    setting->value_ = Base64Encode(reinterpret_cast<const unsigned char *>(abilityString.c_str()),
+        abilityString.length());
+    settings.push_back(setting);
+    ret = client_->UpdateSettings(settings);
+    EXPECT_EQ(DCAMERA_OK, ret);
+
     sleep(TEST_SLEEP_SEC);
 
     ret = client_->StopCapture();
@@ -356,6 +386,217 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_005, TestSize.Level1)
     captureInfos.push_back(videoInfo_false_);
     captureInfos.push_back(photoInfo_true_);
     ret = client_->StartCapture(captureInfos);
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    sleep(TEST_SLEEP_SEC);
+    ret = client_->StopCapture();
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    ret = client_->UnInit();
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_client_test_006
+ * @tc.desc: Verify UpdateSettings
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6ML
+ */
+HWTEST_F(DCameraClientTest, dcamera_client_test_006, TestSize.Level1)
+{
+    DHLOGI("DCameraClientTest dcamera_client_test_006: test updateSettings");
+    std::vector<std::shared_ptr<DCameraSettings>> settings;
+    auto setting = std::make_shared<DCameraSettings>();
+    setting->type_ = ENABLE_METADATA;
+    setting->value_ = "";
+    settings.push_back(setting);
+    int32_t ret = client_->UpdateSettings(settings);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_client_test_007
+ * @tc.desc: Verify UpdateSettings
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6ML
+ */
+HWTEST_F(DCameraClientTest, dcamera_client_test_007, TestSize.Level1)
+{
+    DHLOGI("DCameraClientTest dcamera_client_test_007: test updateSettings");
+    auto metaData = std::make_shared<Camera::CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
+    uint8_t afMode = OHOS_CAMERA_FOCUS_MODE_AUTO;
+    uint8_t aeMode = OHOS_CAMERA_EXPOSURE_MODE_CONTINUOUS_AUTO;
+    uint8_t stabilizationMode = OHOS_CAMERA_VIDEO_STABILIZATION_OFF;
+    metaData->addEntry(OHOS_CONTROL_FOCUS_MODE, &afMode, sizeof(afMode));
+    metaData->addEntry(OHOS_CONTROL_EXPOSURE_MODE, &aeMode, sizeof(aeMode));
+    metaData->addEntry(OHOS_CONTROL_VIDEO_STABILIZATION_MODE, &stabilizationMode, sizeof(stabilizationMode));
+    std::string abilityString = Camera::MetadataUtils::EncodeToString(metaData);
+
+    std::vector<std::shared_ptr<DCameraSettings>> settings;
+    auto setting = std::make_shared<DCameraSettings>();
+    setting->type_ = UPDATE_METADATA;
+    setting->value_ = Base64Encode(reinterpret_cast<const unsigned char *>(abilityString.c_str()),
+        abilityString.length());
+    settings.push_back(setting);
+    int32_t ret = client_->UpdateSettings(settings);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_client_test_008
+ * @tc.desc: Verify UpdateSettings
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6ML
+ */
+HWTEST_F(DCameraClientTest, dcamera_client_test_008, TestSize.Level1)
+{
+    DHLOGI("DCameraClientTest dcamera_client_test_008: test updateSettings");
+    auto metaData = std::make_shared<Camera::CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
+    std::string abilityString = Camera::MetadataUtils::EncodeToString(metaData);
+    std::vector<std::shared_ptr<DCameraSettings>> settings;
+    auto setting = std::make_shared<DCameraSettings>();
+    setting->type_ = UPDATE_METADATA;
+    setting->value_ = Base64Encode(reinterpret_cast<const unsigned char *>(abilityString.c_str()),
+        abilityString.length());
+    settings.push_back(setting);
+    int32_t ret = client_->UpdateSettings(settings);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_client_test_009
+ * @tc.desc: Verify CameraServiceErrorType
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6ML
+ */
+HWTEST_F(DCameraClientTest, dcamera_client_test_009, TestSize.Level1)
+{
+    DHLOGI("DCameraClientTest dcamera_client_test_009: test cameraServiceErrorType");
+    int32_t ret = client_->CameraServiceErrorType(CameraStandard::CamServiceError::CAMERA_OK);
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    ret = client_->CameraServiceErrorType(CameraStandard::CamServiceError::CAMERA_ALLOC_ERROR);
+    EXPECT_EQ(DCAMERA_ALLOC_ERROR, ret);
+
+    ret = client_->CameraServiceErrorType(CameraStandard::CamServiceError::CAMERA_DEVICE_BUSY);
+    EXPECT_EQ(DCAMERA_DEVICE_BUSY, ret);
+}
+
+/**
+ * @tc.name: dcamera_client_test_010
+ * @tc.desc: Verify CreateCaptureOutput
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6ML
+ */
+HWTEST_F(DCameraClientTest, dcamera_client_test_010, TestSize.Level1)
+{
+    DHLOGI("DCameraClientTest dcamera_client_test_010: test createCaptureOutput");
+    std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos;
+    int32_t ret = client_->CreateCaptureOutput(captureInfos);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_client_test_011
+ * @tc.desc: Verify ConvertToCameraFormat
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6ML
+ */
+HWTEST_F(DCameraClientTest, dcamera_client_test_011, TestSize.Level1)
+{
+    DHLOGI("DCameraClientTest dcamera_client_test_011: test convertToCameraFormat");
+    CameraStandard::CameraFormat ret = client_->ConvertToCameraFormat(OHOS_CAMERA_FORMAT_INVALID);
+    EXPECT_EQ(CameraStandard::CameraFormat::CAMERA_FORMAT_INVALID, ret);
+
+    ret = client_->ConvertToCameraFormat(OHOS_CAMERA_FORMAT_RGBA_8888);
+    EXPECT_EQ(CameraStandard::CameraFormat::CAMERA_FORMAT_RGBA_8888, ret);
+
+    ret = client_->ConvertToCameraFormat(OHOS_CAMERA_FORMAT_YCBCR_420_888);
+    EXPECT_EQ(CameraStandard::CameraFormat::CAMERA_FORMAT_YCBCR_420_888, ret);
+
+    ret = client_->ConvertToCameraFormat(OHOS_CAMERA_FORMAT_YCRCB_420_SP);
+    EXPECT_EQ(CameraStandard::CameraFormat::CAMERA_FORMAT_YUV_420_SP, ret);
+
+    ret = client_->ConvertToCameraFormat(OHOS_CAMERA_FORMAT_JPEG);
+    EXPECT_EQ(CameraStandard::CameraFormat::CAMERA_FORMAT_JPEG, ret);
+}
+
+/**
+ * @tc.name: dcamera_client_test_012
+ * @tc.desc: Verify StartPhotoOutput and StartVideoOutput
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6ML
+ */
+HWTEST_F(DCameraClientTest, dcamera_client_test_012, TestSize.Level1)
+{
+    DHLOGI("DCameraClientTest dcamera_client_test_012: test startOutput");
+    auto info = std::make_shared<DCameraCaptureInfo>();
+    int32_t ret = client_->StartPhotoOutput(info);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = client_->StartVideoOutput();
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_client_test_013
+ * @tc.desc: Verify StartPhotoOutput
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6ML
+ */
+HWTEST_F(DCameraClientTest, dcamera_client_test_013, TestSize.Level1)
+{
+    DHLOGI("DCameraClientTest dcamera_client_test_013: test startPhotoOutput");
+    std::shared_ptr<StateCallback> stateCallback = std::make_shared<DCameraClientTestStateCallback>();
+    int32_t ret = client_->SetStateCallback(stateCallback);
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    std::shared_ptr<ResultCallback> resultCallback = std::make_shared<DCameraClientTestResultCallback>();
+    ret = client_->SetResultCallback(resultCallback);
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    ret = client_->Init();
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    SetTokenID();
+    DHLOGI("DCameraClientTest dcamera_client_test_013: video width: %d, height: %d, format: %d, isCapture: %d",
+        videoInfo_true_->width_, videoInfo_true_->height_, videoInfo_true_->format_, videoInfo_true_->isCapture_);
+    DHLOGI("DCameraClientTest dcamera_client_test_013: photo width: %d, height: %d, format: %d, isCapture: %d",
+        photoInfo_false_->width_, photoInfo_false_->height_, photoInfo_false_->format_, photoInfo_false_->isCapture_);
+    std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos;
+    captureInfos.push_back(videoInfo_true_);
+    captureInfos.push_back(photoInfo_false_);
+    ret = client_->StartCapture(captureInfos);
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    sleep(TEST_SLEEP_SEC);
+
+    auto metaData = std::make_shared<Camera::CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
+    int32_t orientation = OHOS_CAMERA_JPEG_ROTATION_180;
+    metaData->addEntry(OHOS_JPEG_ORIENTATION, &orientation, sizeof(orientation));
+    uint8_t quality = OHOS_CAMERA_JPEG_LEVEL_HIGH;
+    metaData->addEntry(OHOS_JPEG_QUALITY, &quality, sizeof(quality));
+    std::vector<double> gps;
+    gps.push_back(LATITUDE);
+    gps.push_back(LONGITUDE);
+    gps.push_back(ALTITUDE);
+    metaData->addEntry(OHOS_JPEG_GPS_COORDINATES, gps.data(), gps.size());
+    std::string abilityString = Camera::MetadataUtils::EncodeToString(metaData);
+    std::vector<std::shared_ptr<DCameraSettings>> settings;
+    auto setting = std::make_shared<DCameraSettings>();
+    setting->type_ = UPDATE_METADATA;
+    setting->value_ = Base64Encode(reinterpret_cast<const unsigned char *>(abilityString.c_str()),
+        abilityString.length());
+    settings.push_back(setting);
+
+    auto info = std::make_shared<DCameraCaptureInfo>();
+    info->width_ = TEST_WIDTH;
+    info->height_ = TEST_HEIGHT;
+    info->format_ = TEST_FORMAT_PHOTO;
+    info->isCapture_ = true;
+    info->streamType_ = SNAPSHOT_FRAME;
+    info->captureSettings_ = settings;
+    ret = client_->StartPhotoOutput(info);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     sleep(TEST_SLEEP_SEC);
