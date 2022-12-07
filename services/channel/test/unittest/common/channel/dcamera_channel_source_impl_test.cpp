@@ -57,7 +57,6 @@ const int32_t TEST_TWO_S = 2;
 }
 void DCameraChannelSourceImplTest::SetUpTestCase(void)
 {
-
 }
 
 void DCameraChannelSourceImplTest::TearDownTestCase(void)
@@ -67,7 +66,6 @@ void DCameraChannelSourceImplTest::TearDownTestCase(void)
 void DCameraChannelSourceImplTest::SetUp(void)
 {
     channel_ = std::make_shared<DCameraChannelSourceImpl>();
-
 }
 
 void DCameraChannelSourceImplTest::TearDown(void)
@@ -254,6 +252,26 @@ HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_008, Tes
     int32_t ret = channel_->SendData(dataBuffer);
     sleep(TEST_TWO_S);
     EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
+}
+
+/**
+ * @tc.name: dcamera_channel_source_impl_test_009
+ * @tc.desc: Verify the SendData function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_009, TestSize.Level1)
+{
+    std::vector<DCameraIndex> camIndexs;
+    DCameraIndex index;
+    index.devId_ = TEST_DEVICE_ID;
+    index.dhId_ = TEST_CAMERA_DH_ID_0;
+    camIndexs.push_back(index);
+    std::string sessionFlag = "test004";
+    DCameraSessionMode sessionMode = DCAMERA_SESSION_MODE_JPEG;
+    listener_ = nullptr;
+    int32_t ret = channel_->CreateSession(camIndexs, sessionFlag, sessionMode, listener_);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 }
 }

@@ -51,7 +51,6 @@ const int32_t TEST_TWO_S = 2;
 }
 void DCameraChannelSinkImplTest::SetUpTestCase(void)
 {
-
 }
 
 void DCameraChannelSinkImplTest::TearDownTestCase(void)
@@ -61,7 +60,6 @@ void DCameraChannelSinkImplTest::TearDownTestCase(void)
 void DCameraChannelSinkImplTest::SetUp(void)
 {
     channel_ = std::make_shared<DCameraChannelSinkImpl>();
-
 }
 
 void DCameraChannelSinkImplTest::TearDown(void)
@@ -228,6 +226,53 @@ HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_008, TestSiz
     int32_t ret = channel_->SendData(dataBuffer);
     sleep(TEST_TWO_S);
     EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
+}
+
+/**
+ * @tc.name: dcamera_channel_sink_impl_test_009
+ * @tc.desc: Verify the SendData function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_009, TestSize.Level1)
+{
+    std::vector<DCameraIndex> camIndexs;
+    DCameraIndex index;
+    index.devId_ = TEST_DEVICE_ID;
+    index.dhId_ = TEST_CAMERA_DH_ID_0;
+    camIndexs.push_back(index);
+    std::string sessionFlag = "test009";
+    DCameraSessionMode sessionMode = DCAMERA_SESSION_MODE_JPEG;
+
+    listener_ = nullptr;
+    int32_t ret = channel_->CreateSession(camIndexs, sessionFlag, sessionMode, listener_);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_channel_sink_impl_test_0010
+ * @tc.desc: Verify the OnSessionState function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_010, TestSize.Level1)
+{
+    operator_ = std::make_shared<MockCameraOperator>();
+    output_ = std::make_shared<DCameraSinkOutput>(TEST_CAMERA_DH_ID_0, operator_);
+    listener_ = std::make_shared<DCameraSinkOutputChannelListener>(CONTINUOUS_FRAME, output_);
+    int32_t state = 1;
+    int32_t eventType = 1;
+    int32_t eventReason = 1;
+    std::string detail = "test010";
+    listener_->OnSessionState(state);
+    listener_->OnSessionError(eventType, eventReason, detail);
+    size_t capacity = 1;
+    std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);
+    std::vector<std::shared_ptr<DataBuffer>> buffers;
+    buffers.push_back(dataBuffer);
+    listener_->OnDataReceived(buffers);
+    int32_t ret = channel_->ReleaseSession();
+    EXPECT_EQ(DCAMERA_OK, ret);
 }
 }
 }
