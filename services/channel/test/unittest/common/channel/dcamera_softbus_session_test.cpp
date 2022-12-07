@@ -56,7 +56,6 @@ const std::string TEST_CAMERA_DH_ID_0 = "camera_0";
 
 void DCameraSoftbusSessionTest::SetUpTestCase(void)
 {
-
 }
 
 void DCameraSoftbusSessionTest::TearDownTestCase(void)
@@ -262,6 +261,105 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_009, TestSize.L
     softbusSession_->U32Get(ptrPacket);
     int32_t ret = softbusSession_->CloseSession();
     EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_softbus_session_test_010
+ * @tc.desc: Verify the SendData function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_010, TestSize.Level1)
+{
+    DCameraSessionMode mode = DCAMERA_SESSION_MODE_VIDEO;
+    size_t capacity = 1;
+    std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(capacity);
+    int32_t ret = softbusSession_->SendData(mode, buffer);
+    EXPECT_EQ(DCAMERA_WRONG_STATE, ret);
+    mode = DCAMERA_SESSION_MODE_JPEG;
+    ret = softbusSession_->SendData(mode, buffer);
+    EXPECT_EQ(DCAMERA_WRONG_STATE, ret);
+    softbusSession_->sendFuncMap_.clear();
+    ret = softbusSession_->SendData(mode, buffer);
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
+}
+
+/**
+ * @tc.name: dcamera_softbus_session_test_011
+ * @tc.desc: Verify the UnPackSendData function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_011, TestSize.Level1)
+{
+    size_t offset = DCameraSoftbusSession::BINARY_DATA_PACKET_MAX_LEN;
+    size_t size = DCameraSoftbusSession::BINARY_DATA_PACKET_MAX_LEN - 1;
+    size_t capacity = size;
+    std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(capacity);
+    buffer->SetRange(offset, size);
+    int32_t ret = softbusSession_->UnPackSendData(buffer, softbusSession_->sendFuncMap_[DCAMERA_SESSION_MODE_VIDEO]);
+    size = DCameraSoftbusSession::BINARY_DATA_PACKET_MAX_LEN + 1;
+    buffer->SetRange(offset, size);
+    ret = softbusSession_->UnPackSendData(buffer, softbusSession_->sendFuncMap_[DCAMERA_SESSION_MODE_VIDEO]);
+    EXPECT_EQ(DCAMERA_WRONG_STATE, ret);
+}
+
+/**
+ * @tc.name: dcamera_softbus_session_test_012
+ * @tc.desc: Verify the UnPackSendData function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_012, TestSize.Level1)
+{
+    DCameraSoftbusSession::SessionDataHeader headerPara;
+    headerPara.dataLen = 1;
+    headerPara.totalLen = 2;
+    headerPara.fragFlag = DCameraSoftbusSession::FRAG_START;
+    uint8_t ptr = 9;
+    uint32_t len = sizeof(uint8_t) * DCameraSoftbusSession::HEADER_UINT8_NUM;
+    uint8_t *header = &ptr;
+    softbusSession_->MakeFragDataHeader(headerPara, header, len);
+    len = sizeof(uint8_t) * DCameraSoftbusSession::HEADER_UINT8_NUM + sizeof(uint16_t) *
+        DCameraSoftbusSession::HEADER_UINT16_NUM + sizeof(uint32_t) * DCameraSoftbusSession::HEADER_UINT32_NUM + 1;
+    softbusSession_->MakeFragDataHeader(headerPara, header, len);
+    int32_t ret = softbusSession_->CloseSession();
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_softbus_session_test_013
+ * @tc.desc: Verify the SendBytes function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_013, TestSize.Level1)
+{
+    size_t capacity = 1;
+    std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(capacity);
+    softbusSession_->state_ = DCAMERA_SOFTBUS_STATE_OPENED;
+    int32_t ret = softbusSession_->SendBytes(buffer);
+    softbusSession_->state_ = DCAMERA_SOFTBUS_STATE_CLOSED;
+    ret = softbusSession_->SendBytes(buffer);
+    EXPECT_EQ(DCAMERA_WRONG_STATE, ret);
+}
+
+/**
+ * @tc.name: dcamera_softbus_session_test_014
+ * @tc.desc: Verify the SendStream function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_014, TestSize.Level1)
+{
+    size_t capacity = 1;
+    std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(capacity);
+    softbusSession_->state_ = DCAMERA_SOFTBUS_STATE_OPENED;
+    int32_t ret = softbusSession_->SendStream(buffer);
+    softbusSession_->state_ = DCAMERA_SOFTBUS_STATE_CLOSED;
+    ret = softbusSession_->SendStream(buffer);
+    sleep(2);
+    EXPECT_EQ(DCAMERA_WRONG_STATE, ret);
 }
 }
 }
