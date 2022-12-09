@@ -14,15 +14,19 @@
  */
 
 #include <gtest/gtest.h>
+
 #define private public
-#include "dcamera_source_state.h"
+#include "dcamera_source_dev.h"
 #undef private
 
-#include "dcamera_source_dev.h"
+#include "accesstoken_kit.h"
+#include "dcamera_source_state.h"
 #include "dcamera_utils_tools.h"
 #include "distributed_camera_errno.h"
 #include "dcamera_source_dev.h"
 #include "mock_dcamera_source_state_listener.h"
+#include "nativetoken_kit.h"
+#include "token_setproc.h"
 
 using namespace testing::ext;
 
@@ -34,6 +38,7 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
+    void SetTokenID();
 
     std::shared_ptr<DCameraSourceDev> camDev_;
     std::shared_ptr<ICameraStateListener> stateListener_;
@@ -54,6 +59,27 @@ std::string TEST_EVENT_CMD_JSON = R"({
     "Command": "STATE_NOTIFY",
     "Value": {"EventType": 1, "EventResult": 1, "EventContent": "TestContent"}
 })";
+}
+
+void DCameraSourceDevTest::SetTokenID()
+{
+    uint64_t tokenId;
+    const char *perms[2];
+    perms[0] = "ohos.permission.DISTRIBUTED_DATASYNC";
+    perms[1] = "ohos.permission.CAMERA";
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = 2,
+        .aclsNum = 0,
+        .dcaps = NULL,
+        .perms = perms,
+        .acls = NULL,
+        .processName = "dcamera_client_demo",
+        .aplStr = "system_basic",
+    };
+    tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
+    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 }
 
 void DCameraSourceDevTest::SetUpTestCase(void)
@@ -320,6 +346,301 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_012, TestSize.Level1)
     camDev_->GetVersion();
     int32_t ret = camDev_->GetStateInfo();
     sleep(TEST_SLEEP_SEC);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_dev_test_013
+ * @tc.desc: Verify source dev Register.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_013, TestSize.Level1)
+{
+    std::vector<DCameraIndex> indexs;
+    DCameraIndex index;
+    index.devId_ = TEST_DEVICE_ID;
+    index.dhId_ = TEST_CAMERA_DH_ID_0;
+    indexs.push_back(index);
+    camDev_->InitDCameraSourceDev();
+    camDev_->controller_->Init(indexs);
+    camDev_->input_->Init();
+    std::string devId = TEST_DEVICE_ID;
+    std::string dhId = TEST_CAMERA_DH_ID_0;
+    std::string reqId = TEST_REQID;
+    std::string params = TEST_VER;
+    std::shared_ptr<DCameraRegistParam> param = std::make_shared<DCameraRegistParam>(devId, dhId, reqId, params);
+    int32_t ret = camDev_->Register(param);
+    sleep(TEST_SLEEP_SEC);
+    EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_dev_test_014
+ * @tc.desc: Verify source dev UnRegister.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_014, TestSize.Level1)
+{
+    camDev_->InitDCameraSourceDev();
+    std::string devId = TEST_DEVICE_ID;
+    std::string dhId = TEST_CAMERA_DH_ID_0;
+    std::string reqId = TEST_REQID;
+    std::string params = TEST_VER;
+    std::shared_ptr<DCameraRegistParam> param = std::make_shared<DCameraRegistParam>(devId, dhId, reqId, params);
+    int32_t ret = camDev_->UnRegister(param);
+    sleep(TEST_SLEEP_SEC);
+    EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_dev_test_015
+ * @tc.desc: Verify source dev OpenCamera.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_015, TestSize.Level1)
+{
+    SetTokenID();
+    std::vector<DCameraIndex> indexs;
+    DCameraIndex index;
+    index.devId_ = TEST_DEVICE_ID;
+    index.dhId_ = TEST_CAMERA_DH_ID_0;
+    indexs.push_back(index);
+    camDev_->InitDCameraSourceDev();
+    camDev_->controller_->Init(indexs);
+    camDev_->input_->Init();
+    int32_t ret = camDev_->OpenCamera();
+    sleep(TEST_SLEEP_SEC);
+    ret = camDev_->CloseCamera();
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_dev_test_016
+ * @tc.desc: Verify source dev ConfigStreams.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_016, TestSize.Level1)
+{
+    camDev_->InitDCameraSourceDev();
+    std::vector<DCameraIndex> indexs;
+    DCameraIndex index;
+    index.devId_ = TEST_DEVICE_ID;
+    index.dhId_ = TEST_CAMERA_DH_ID_0;
+    indexs.push_back(index);
+    camDev_->InitDCameraSourceDev();
+    camDev_->controller_->Init(indexs);
+    camDev_->input_->Init();
+    std::vector<std::shared_ptr<DCStreamInfo>> streamInfos;
+    std::shared_ptr<DCStreamInfo> streamInfo = std::make_shared<DCStreamInfo>();
+    streamInfo->streamId_ = 1;
+    streamInfo->width_ = TEST_WIDTH;
+    streamInfo->height_ = TEST_HEIGTH;
+    streamInfo->stride_ = 1;
+    streamInfo->format_ = 1;
+    streamInfo->dataspace_ = 1;
+    streamInfo->encodeType_ = ENCODE_TYPE_JPEG;
+    streamInfo->type_ = SNAPSHOT_FRAME;
+    streamInfos.push_back(streamInfo);
+    int32_t ret = camDev_->ConfigStreams(streamInfos);
+    sleep(TEST_SLEEP_SEC);
+    EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_dev_test_017
+ * @tc.desc: Verify source dev ReleaseStreams.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_017, TestSize.Level1)
+{
+    camDev_->InitDCameraSourceDev();
+    std::vector<DCameraIndex> indexs;
+    DCameraIndex index;
+    index.devId_ = TEST_DEVICE_ID;
+    index.dhId_ = TEST_CAMERA_DH_ID_0;
+    indexs.push_back(index);
+    camDev_->InitDCameraSourceDev();
+    camDev_->controller_->Init(indexs);
+    camDev_->input_->Init();
+    std::vector<std::shared_ptr<DCStreamInfo>> streamInfos;
+    std::shared_ptr<DCStreamInfo> streamInfo = std::make_shared<DCStreamInfo>();
+    streamInfo->streamId_ = 1;
+    streamInfo->width_ = TEST_WIDTH;
+    streamInfo->height_ = TEST_HEIGTH;
+    streamInfo->stride_ = 1;
+    streamInfo->format_ = 1;
+    streamInfo->dataspace_ = 1;
+    streamInfo->encodeType_ = ENCODE_TYPE_JPEG;
+    streamInfo->type_ = SNAPSHOT_FRAME;
+    streamInfos.push_back(streamInfo);
+    int32_t ret = camDev_->ConfigStreams(streamInfos);
+    sleep(TEST_SLEEP_SEC);
+    std::vector<int> streamIds;
+    int32_t streamId = 1;
+    streamIds.push_back(streamId);
+    bool isAllRelease = true;
+    ret = camDev_->ReleaseStreams(streamIds, isAllRelease);
+    isAllRelease = false;
+    ret = camDev_->ReleaseStreams(streamIds, isAllRelease);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_dev_test_018
+ * @tc.desc: Verify source dev ReleaseAllStreams.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_018, TestSize.Level1)
+{
+    camDev_->InitDCameraSourceDev();
+    std::vector<DCameraIndex> indexs;
+    DCameraIndex index;
+    index.devId_ = TEST_DEVICE_ID;
+    index.dhId_ = TEST_CAMERA_DH_ID_0;
+    indexs.push_back(index);
+    camDev_->InitDCameraSourceDev();
+    camDev_->controller_->Init(indexs);
+    camDev_->input_->Init();
+    int32_t ret = camDev_->ReleaseAllStreams();
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_dev_test_019
+ * @tc.desc: Verify source dev StartCapture.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_019, TestSize.Level1)
+{
+    std::vector<std::shared_ptr<DCCaptureInfo>> captureInfos;
+    std::shared_ptr<DCCaptureInfo> captureInfo = std::make_shared<DCCaptureInfo>();
+    captureInfo->streamIds_.push_back(1);
+    captureInfo->width_ = TEST_WIDTH;
+    captureInfo->height_ = TEST_HEIGTH;
+    captureInfo->stride_ = 1;
+    captureInfo->format_ = 1;
+    captureInfo->dataspace_ = 1;
+    captureInfo->encodeType_ = ENCODE_TYPE_H265;
+    captureInfo->type_ = CONTINUOUS_FRAME;
+    captureInfos.push_back(captureInfo);
+    camDev_->InitDCameraSourceDev();
+    std::vector<DCameraIndex> indexs;
+    DCameraIndex index;
+    index.devId_ = TEST_DEVICE_ID;
+    index.dhId_ = TEST_CAMERA_DH_ID_0;
+    indexs.push_back(index);
+    camDev_->InitDCameraSourceDev();
+    camDev_->controller_->Init(indexs);
+    camDev_->input_->Init();
+    int32_t ret = camDev_->StartCapture(captureInfos);
+    EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
+    camDev_->HitraceAndHisyseventImpl(captureInfos);
+    sleep(TEST_SLEEP_SEC);
+    EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_dev_test_020
+ * @tc.desc: Verify source dev StopAllCapture.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_020, TestSize.Level1)
+{
+    std::vector<std::shared_ptr<DCCaptureInfo>> captureInfos;
+    std::shared_ptr<DCCaptureInfo> captureInfo = std::make_shared<DCCaptureInfo>();
+    captureInfo->streamIds_.push_back(1);
+    captureInfo->width_ = TEST_WIDTH;
+    captureInfo->height_ = TEST_HEIGTH;
+    captureInfo->stride_ = 1;
+    captureInfo->format_ = 1;
+    captureInfo->dataspace_ = 1;
+    captureInfo->encodeType_ = ENCODE_TYPE_H265;
+    captureInfo->type_ = CONTINUOUS_FRAME;
+    captureInfos.push_back(captureInfo);
+    camDev_->InitDCameraSourceDev();
+    std::vector<DCameraIndex> indexs;
+    DCameraIndex index;
+    index.devId_ = TEST_DEVICE_ID;
+    index.dhId_ = TEST_CAMERA_DH_ID_0;
+    indexs.push_back(index);
+    camDev_->InitDCameraSourceDev();
+    camDev_->controller_->Init(indexs);
+    camDev_->input_->Init();
+    int32_t ret = camDev_->StartCapture(captureInfos);
+    std::vector<int> streamIds;
+    int32_t streamId = 1;
+    streamIds.push_back(streamId);
+    bool isAllStop = true;
+    sleep(TEST_SLEEP_SEC);
+    ret = camDev_->StopCapture(streamIds, isAllStop);
+    EXPECT_EQ(DCAMERA_OK, ret);
+    ret = camDev_->StopAllCapture();
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_dev_test_021
+ * @tc.desc: Verify source dev UpdateSettings.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_021, TestSize.Level1)
+{
+    std::vector<std::shared_ptr<DCCaptureInfo>> captureInfos;
+    std::shared_ptr<DCCaptureInfo> captureInfo = std::make_shared<DCCaptureInfo>();
+    int streamId = 1;
+    captureInfo->streamIds_.push_back(streamId);
+    captureInfo->width_ = TEST_WIDTH;
+    captureInfo->height_ = TEST_HEIGTH;
+    captureInfo->stride_ = 1;
+    captureInfo->format_ = 1;
+    captureInfo->dataspace_ = 1;
+    captureInfo->encodeType_ = ENCODE_TYPE_H265;
+    captureInfo->type_ = CONTINUOUS_FRAME;
+    captureInfos.push_back(captureInfo);
+    camDev_->InitDCameraSourceDev();
+    std::vector<DCameraIndex> indexs;
+    DCameraIndex index;
+    index.devId_ = TEST_DEVICE_ID;
+    index.dhId_ = TEST_CAMERA_DH_ID_0;
+    indexs.push_back(index);
+    camDev_->InitDCameraSourceDev();
+    camDev_->controller_->Init(indexs);
+    camDev_->input_->Init();
+    std::vector<std::shared_ptr<DCameraSettings>> settings;
+    std::shared_ptr<DCameraSettings> setting = std::make_shared<DCameraSettings>();
+    setting->type_ = DCSettingsType::DISABLE_METADATA;
+    setting->value_ = "UpdateSettingsTest";
+    settings.push_back(setting);
+    int32_t ret = camDev_->UpdateSettings(settings);
+    sleep(TEST_SLEEP_SEC);
+    EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_dev_test_022
+ * @tc.desc: Verify source dev NotifyResult.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_022, TestSize.Level1)
+{
+    int32_t ret = camDev_->InitDCameraSourceDev();
+    int32_t result = 0;
+    DCAMERA_EVENT eventType = DCAMERA_EVENT::DCAMERA_EVENT_OPEN;
+    std::shared_ptr<DCameraEvent> camEvent = std::make_shared<DCameraEvent>();
+    DCameraSourceEvent event(*camDev_, DCAMERA_EVENT_NOFIFY, camEvent);
+    camDev_->NotifyResult(eventType, event, result);
+    camDev_->memberFuncMap_.clear();
+    camDev_->NotifyResult(eventType, event, result);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 }
