@@ -31,6 +31,7 @@
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
 #include "idistributed_camera_sink.h"
+#include "dcamera_low_latency.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -325,7 +326,7 @@ int32_t DCameraSourceController::CloseChannel()
         DHLOGE("DCameraSourceController CloseChannel not support operate %d camera", indexs_.size());
         return DCAMERA_BAD_OPERATE;
     }
-
+    DCameraLowLatency::GetInstance().DisableLowLatency();
     std::string dhId = indexs_.begin()->dhId_;
     std::string devId = indexs_.begin()->devId_;
     DHLOGI("DCameraSourceController CloseChannel devId: %s, dhId: %s", GetAnonyString(devId).c_str(),
@@ -491,6 +492,7 @@ int32_t DCameraSourceController::WaitforSessionResult()
         PostChannelDisconnectedEvent();
         return DCAMERA_BAD_VALUE;
     }
+    DCameraLowLatency::GetInstance().EnableLowLatency();
     return DCAMERA_OK;
 }
 

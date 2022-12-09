@@ -36,6 +36,7 @@
 #include "distributed_hardware_log.h"
 #include "idistributed_camera_source.h"
 #include "json/json.h"
+#include "dcamera_low_latency.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -186,6 +187,7 @@ int32_t DCameraSinkController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& ope
                GetAnonyString(dhId_).c_str(), sessionState_);
         return DCAMERA_WRONG_STATE;
     }
+    DCameraLowLatency::GetInstance().EnableLowLatency();
     srcDevId_ = openInfo->sourceDevId_;
     std::vector<DCameraIndex> indexs;
     indexs.push_back(DCameraIndex(srcDevId_, dhId_));
@@ -206,6 +208,7 @@ int32_t DCameraSinkController::CloseChannel()
 {
     DHLOGI("DCameraSinkController::CloseChannel dhId: %s", GetAnonyString(dhId_).c_str());
     std::lock_guard<std::mutex> autoLock(channelLock_);
+    DCameraLowLatency::GetInstance().DisableLowLatency();
     DCameraSinkServiceIpc::GetInstance().DeleteSourceRemoteCamSrv(srcDevId_);
     srcDevId_.clear();
     int32_t ret = channel_->ReleaseSession();
