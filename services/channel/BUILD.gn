@@ -27,16 +27,22 @@ ohos_shared_library("distributed_camera_channel") {
     "include",
     "${common_path}/include/constants",
     "${common_path}/include/utils",
+    "${fwk_innerkits_path}/include",
+    "//third_party/json/include",
   ]
 
   sources = [
     "src/dcamera_channel_sink_impl.cpp",
     "src/dcamera_channel_source_impl.cpp",
+    "src/dcamera_low_latency.cpp",
     "src/dcamera_softbus_adapter.cpp",
     "src/dcamera_softbus_session.cpp",
   ]
 
-  deps = [ "${common_path}:distributed_camera_utils" ]
+  deps = [
+    "${common_path}:distributed_camera_utils",
+    "${fwk_innerkits_path}:libdhfwk_sdk",
+  ]
 
   defines = [
     "HI_LOG_ENABLE",
