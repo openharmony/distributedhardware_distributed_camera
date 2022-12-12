@@ -314,8 +314,7 @@ HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_009, TestSize.Level1)
     EXPECT_EQ(rc, DCAMERA_OK);
 
     rc = testInput_->OpenChannel(g_camIndexs);
-    EXPECT_EQ(rc, DCAMERA_MEMORY_OPT_ERROR);
-
+    EXPECT_NE(rc, DCAMERA_OK);
     rc = testInput_->UnInit();
     EXPECT_EQ(rc, DCAMERA_OK);
 }
@@ -334,8 +333,7 @@ HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_010, TestSize.Level1)
     EXPECT_EQ(rc, DCAMERA_OK);
 
     rc = testInput_->OpenChannel(g_camIndexs);
-    EXPECT_EQ(rc, DCAMERA_MEMORY_OPT_ERROR);
-
+    EXPECT_NE(rc, DCAMERA_OK);
     rc = testInput_->CloseChannel();
     EXPECT_EQ(rc, DCAMERA_OK);
 

@@ -78,5 +78,32 @@ HWTEST_F(DcameraBufferHandleTest, DCameraMemoryUnmap_001, TestSize.Level1)
     DCameraMemoryUnmap(handle);
     EXPECT_EQ(nullptr, handle->virAddr);
 }
+/**
+ * @tc.name: DCameraMemoryMap_002
+ * @tc.desc: Verify the DCameraMemoryMap function failed.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+
+HWTEST_F(DcameraBufferHandleTest, DCameraMemoryMap_002, TestSize.Level1)
+{
+    BufferHandle *handle = nullptr;
+    void* viraddr = DCameraMemoryMap(handle);
+    EXPECT_EQ(nullptr, viraddr);
+}
+
+/**
+ * @tc.name: DCameraMemoryUnmap_002
+ * @tc.desc: Verify the DCameraMemoryUnmap function failed.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DcameraBufferHandleTest, DCameraMemoryUnmap_002, TestSize.Level1)
+{
+    int32_t value = 0;
+    BufferHandle *handle = nullptr;
+    DCameraMemoryUnmap(handle);
+    EXPECT_EQ(DCAMERA_OK, value);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

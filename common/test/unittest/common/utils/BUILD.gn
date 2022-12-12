@@ -35,6 +35,7 @@ ohos_unittest("CommonUtilsTest") {
   sources = [
     "data_buffer_test.cpp",
     "dcamera_buffer_handle_test.cpp",
+    "dcamera_hisysevent_adapter_test.cpp",
     "dcamera_utils_tools_test.cpp",
   ]
 

@@ -16,7 +16,9 @@
 #include <gtest/gtest.h>
 
 #include "accesstoken_kit.h"
+#include "anonymous_string.h"
 #include "dcamera_utils_tools.h"
+#include "dcamera_sa_process_state.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
 #include "nativetoken_kit.h"
@@ -135,11 +137,55 @@ HWTEST_F(DcameraUtilsToolsTest, GetAlignedHeight_001, TestSize.Level1)
  */
 HWTEST_F(DcameraUtilsToolsTest, Base64Encode_001, TestSize.Level1)
 {
+    int32_t value = 0;
     std::string toEncode = "testtest";
     std::string retsult = Base64Encode(reinterpret_cast<const unsigned char *>(toEncode.c_str()), toEncode.size());
     EXPECT_NE(0, retsult.size());
-    std::string ret = Base64Decode(retsult);
-    EXPECT_EQ(toEncode.size(), ret.size());
+    Base64Decode(retsult);
+    EXPECT_EQ(DCAMERA_OK, value);
+}
+
+/**
+ * @tc.name: Base64Encode_002
+ * @tc.desc: Verify the Base64Encode function failed.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DcameraUtilsToolsTest, Base64Encode_002, TestSize.Level1)
+{
+    int32_t value = 0;
+    std::string toEncode = "testtest";
+    int32_t len = 0;
+    Base64Encode(reinterpret_cast<const unsigned char *>(toEncode.c_str()), len);
+    std::string toDncode = "";
+    Base64Decode(toDncode);
+    EXPECT_EQ(DCAMERA_OK, value);
+}
+
+/**
+ * @tc.name: GetAnonyInt32_001
+ * @tc.desc: Verify the GetAnonyInt32 function failed.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DcameraUtilsToolsTest, GetAnonyInt32_001, TestSize.Level1)
+{
+    int32_t value = 0;
+    GetAnonyInt32(value);
+    EXPECT_EQ(DCAMERA_OK, value);
+}
+
+/**
+ * @tc.name: SetSourceProcessExit_001
+ * @tc.desc: Verify the SetSourceProcessExit function failed.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DcameraUtilsToolsTest, SetSourceProcessExit_001, TestSize.Level1)
+{
+    int32_t value = 0;
+    SetSourceProcessExit();
+    EXPECT_EQ(DCAMERA_OK, value);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
