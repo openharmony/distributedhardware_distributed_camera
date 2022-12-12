@@ -229,6 +229,10 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_001, TestSize.Level1)
     sessionCallback->OnError(0);
     sessionCallback->OnFocusState(CameraStandard::FocusCallback::UNFOCUSED);
 
+    int32_t invalidParam = 3;
+    auto state = static_cast<CameraStandard::FocusCallback::FocusState>(invalidParam);
+    sessionCallback->OnFocusState(state);
+
     photoCallback = std::make_shared<DCameraPhotoCallback>(stateCallback);
     photoCallback->OnCaptureError(0, 0);
 
@@ -501,6 +505,13 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_010, TestSize.Level1)
     std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos;
     int32_t ret = client_->CreateCaptureOutput(captureInfos);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    int32_t invalidParam = 2;
+    auto info = std::make_shared<DCameraCaptureInfo>();
+    info->streamType_ = static_cast<DCStreamType>(invalidParam);
+    captureInfos.push_back(info);
+    client_->CreateCaptureOutput(captureInfos);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
 /**
@@ -614,6 +625,37 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_013, TestSize.Level1)
 
     ret = client_->UnInit();
     EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_client_test_014
+ * @tc.desc: Verify StartCapture
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6ML
+ */
+HWTEST_F(DCameraClientTest, dcamera_client_test_014, TestSize.Level1)
+{
+    DHLOGI("DCameraClientTest dcamera_client_test_014: test startCapture");
+    std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos;
+    sptr<Surface> surface = nullptr;
+    int32_t ret = client_->StartCapture(captureInfos, surface);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_client_test_015
+ * @tc.desc: Verify StartCaptureInner
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6ML
+ */
+HWTEST_F(DCameraClientTest, dcamera_client_test_015, TestSize.Level1)
+{
+    DHLOGI("DCameraClientTest dcamera_client_test_015: test startCaptureInner");
+    int32_t invalidParam = 2;
+    auto info = std::make_shared<DCameraCaptureInfo>();
+    info->streamType_ = static_cast<DCStreamType>(invalidParam);
+    int32_t ret = client_->StartCaptureInner(info);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

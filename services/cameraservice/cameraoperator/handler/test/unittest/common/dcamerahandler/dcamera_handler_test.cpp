@@ -15,8 +15,13 @@
 
 #include <gtest/gtest.h>
 
-#include "accesstoken_kit.h"
+#define private public
 #include "dcamera_handler.h"
+#undef private
+
+#include "accesstoken_kit.h"
+#include "anonymous_string.h"
+#include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
 #include "nativetoken_kit.h"
@@ -26,6 +31,24 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace DistributedHardware {
+class DCameraHandlerTestPluginListener : public PluginListener {
+public:
+    DCameraHandlerTestPluginListener() = default;
+    virtual ~DCameraHandlerTestPluginListener() = default;
+
+    void PluginHardware(const std::string &dhId, const std::string &attrs) override
+    {
+        DHLOGI("DCameraHandlerTestPluginListener::PluginHardware dhId: %s, attrs: %s",
+            GetAnonyString(dhId).c_str(), attrs.c_str());
+    }
+
+    void UnPluginHardware(const std::string &dhId) override
+    {
+        DHLOGI("DCameraHandlerTestPluginListener::UnPluginHardware dhId: %s",
+            GetAnonyString(dhId).c_str());
+    }
+};
+
 class DCameraHandlerTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -111,6 +134,114 @@ HWTEST_F(DCameraHandlerTest, dcamera_handler_test_003, TestSize.Level1)
     SetTokenID();
     int32_t ret = DCameraHandler::GetInstance().Query().size();
     EXPECT_GT(ret, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: dcamera_handler_test_004
+ * @tc.desc: Verify QueryExtraInfo
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MF
+ */
+HWTEST_F(DCameraHandlerTest, dcamera_handler_test_004, TestSize.Level1)
+{
+    int32_t ret = DCameraHandler::GetInstance().QueryExtraInfo().size();
+    EXPECT_EQ(ret, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: dcamera_handler_test_005
+ * @tc.desc: Verify IsSupportPlugin, RegisterPluginListener and UnRegisterPluginListener
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MF
+ */
+HWTEST_F(DCameraHandlerTest, dcamera_handler_test_005, TestSize.Level1)
+{
+    auto listener = std::make_shared<DCameraHandlerTestPluginListener>();
+    DCameraHandler::GetInstance().RegisterPluginListener(listener);
+
+    listener = nullptr;
+    DCameraHandler::GetInstance().RegisterPluginListener(listener);
+
+    DCameraHandler::GetInstance().UnRegisterPluginListener();
+
+    int32_t ret = DCameraHandler::GetInstance().IsSupportPlugin();
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: dcamera_handler_test_006
+ * @tc.desc: Verify GetCameraPosition
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MF
+ */
+HWTEST_F(DCameraHandlerTest, dcamera_handler_test_006, TestSize.Level1)
+{
+    std::string ret = DCameraHandler::GetInstance().GetCameraPosition(
+        CameraStandard::CameraPosition::CAMERA_POSITION_UNSPECIFIED);
+    EXPECT_EQ(ret, CAMERA_POSITION_UNSPECIFIED);
+
+    ret = DCameraHandler::GetInstance().GetCameraPosition(
+        CameraStandard::CameraPosition::CAMERA_POSITION_BACK);
+    EXPECT_EQ(ret, CAMERA_POSITION_BACK);
+
+    ret = DCameraHandler::GetInstance().GetCameraPosition(
+        CameraStandard::CameraPosition::CAMERA_POSITION_FRONT);
+    EXPECT_EQ(ret, CAMERA_POSITION_FRONT);
+
+    int32_t invalidParam = 3;
+    auto position = static_cast<CameraStandard::CameraPosition>(invalidParam);
+    ret = DCameraHandler::GetInstance().GetCameraPosition(position);
+    EXPECT_EQ(ret, "");
+}
+
+/**
+ * @tc.name: dcamera_handler_test_007
+ * @tc.desc: Verify CovertToDcameraFormat
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MF
+ */
+HWTEST_F(DCameraHandlerTest, dcamera_handler_test_007, TestSize.Level1)
+{
+    int32_t ret = DCameraHandler::GetInstance().CovertToDcameraFormat(
+        CameraStandard::CameraFormat::CAMERA_FORMAT_INVALID);
+    EXPECT_EQ(ret, -1);
+
+    ret = DCameraHandler::GetInstance().CovertToDcameraFormat(
+        CameraStandard::CameraFormat::CAMERA_FORMAT_RGBA_8888);
+    EXPECT_EQ(ret, OHOS_CAMERA_FORMAT_RGBA_8888);
+
+    ret = DCameraHandler::GetInstance().CovertToDcameraFormat(
+        CameraStandard::CameraFormat::CAMERA_FORMAT_YCBCR_420_888);
+    EXPECT_EQ(ret, OHOS_CAMERA_FORMAT_YCBCR_420_888);
+
+    ret = DCameraHandler::GetInstance().CovertToDcameraFormat(
+        CameraStandard::CameraFormat::CAMERA_FORMAT_YUV_420_SP);
+    EXPECT_EQ(ret, OHOS_CAMERA_FORMAT_YCRCB_420_SP);
+
+    ret = DCameraHandler::GetInstance().CovertToDcameraFormat(
+        CameraStandard::CameraFormat::CAMERA_FORMAT_JPEG);
+    EXPECT_EQ(ret, OHOS_CAMERA_FORMAT_JPEG);
+}
+
+/**
+ * @tc.name: dcamera_handler_test_008
+ * @tc.desc: Verify IsValid
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MF
+ */
+HWTEST_F(DCameraHandlerTest, dcamera_handler_test_008, TestSize.Level1)
+{
+    CameraStandard::Size size{ 640, 480 };
+    bool ret = DCameraHandler::GetInstance().IsValid(CONTINUOUS_FRAME, size);
+    EXPECT_EQ(ret, true);
+
+    ret = DCameraHandler::GetInstance().IsValid(SNAPSHOT_FRAME, size);
+    EXPECT_EQ(ret, true);
+
+    int32_t invalidParam = 2;
+    auto type = static_cast<DCStreamType>(invalidParam);
+    ret = DCameraHandler::GetInstance().IsValid(type, size);
+    EXPECT_EQ(ret, false);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
