@@ -39,6 +39,7 @@ const int32_t TEST_WIDTH = 1920;
 const int32_t TEST_HEIGTH = 1080;
 const int32_t TEST_WIDTH2 = 640;
 const int32_t TEST_HEIGTH2 = 480;
+const int32_t SLEEP_TIME = 200000;
 }
 
 void DCameraPipelineSourceTest::SetUpTestCase(void)
@@ -107,6 +108,14 @@ HWTEST_F(DCameraPipelineSourceTest, dcamera_pipeline_source_test_002, TestSize.L
                                  TEST_HEIGTH);
     int32_t rc = testSourcePipeline_->CreateDataProcessPipeline(PipelineType::VIDEO, srcParams, destParams, listener);
     EXPECT_EQ(rc, DCAMERA_OK);
+
+    size_t capacity = 100;
+    std::vector<std::shared_ptr<DataBuffer>> buffers;
+    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
+    buffers.push_back(db);
+    rc = testSourcePipeline_->ProcessData(buffers);
+    EXPECT_EQ(rc, DCAMERA_OK);
+    usleep(SLEEP_TIME);
 }
 
 /**

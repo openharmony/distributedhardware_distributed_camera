@@ -37,6 +37,7 @@ public:
 namespace {
 const int32_t TEST_WIDTH = 1920;
 const int32_t TEST_HEIGTH = 1080;
+const int32_t SLEEP_TIME = 200000;
 }
 
 void DCameraPipelineSinkTest::SetUpTestCase(void)
@@ -105,6 +106,15 @@ HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_002, TestSize.Level
                                  TEST_HEIGTH);
     int32_t rc = testSinkPipeline_->CreateDataProcessPipeline(PipelineType::VIDEO, srcParams, destParams, listener);
     EXPECT_EQ(rc, DCAMERA_OK);
+
+    size_t capacity = 100;
+    std::vector<std::shared_ptr<DataBuffer>> buffers;
+    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
+    buffers.push_back(db);
+    rc = testSinkPipeline_->ProcessData(buffers);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    usleep(SLEEP_TIME);
 }
 
 /**
