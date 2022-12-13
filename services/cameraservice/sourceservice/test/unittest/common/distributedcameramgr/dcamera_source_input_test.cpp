@@ -30,7 +30,7 @@ public:
     void TearDown();
 
     std::shared_ptr<DCameraSourceInput> testInput_;
-
+    std::shared_ptr<EventBus> eventBus_;
 private:
     static void SetStreamInfos();
     static void SetCaptureInfos();
@@ -42,6 +42,7 @@ const std::string TEST_CAMERA_DH_ID_0 = "camera_0";
 const int32_t TEST_WIDTH = 1920;
 const int32_t TEST_HEIGTH = 1080;
 const int32_t TEST_STREAMID = 2;
+const int32_t TEST_SLEEP_SEC = 200000;
 std::vector<std::shared_ptr<DCStreamInfo>> g_streamInfos;
 std::vector<std::shared_ptr<DCCaptureInfo>> g_captureInfos;
 std::vector<std::shared_ptr<DCameraSettings>> g_cameraSettings;
@@ -126,12 +127,14 @@ void DCameraSourceInputTest::TearDownTestCase(void)
 
 void DCameraSourceInputTest::SetUp(void)
 {
-    std::shared_ptr<EventBus> eventBus = std::make_shared<EventBus>("TestInputHandler");
-    testInput_ = std::make_shared<DCameraSourceInput>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, eventBus);
+    eventBus_ = std::make_shared<EventBus>("TestInputHandler");
+    testInput_ = std::make_shared<DCameraSourceInput>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, eventBus_);
 }
 
 void DCameraSourceInputTest::TearDown(void)
 {
+    usleep(TEST_SLEEP_SEC);
+    eventBus_ = nullptr;
     testInput_ = nullptr;
 }
 

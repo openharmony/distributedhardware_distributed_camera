@@ -15,10 +15,10 @@
 
 #include <gtest/gtest.h>
 #define private public
-#include "dcamera_source_state.h"
+#include "dcamera_source_controller.h"
 #undef private
 
-#include "dcamera_source_controller.h"
+#include "dcamera_source_state.h"
 #include "dcamera_utils_tools.h"
 #include "icamera_state_listener.h"
 #include "dcamera_source_controller_channel_listener.h"
@@ -41,7 +41,7 @@ public:
     std::shared_ptr<DCameraSourceDev> camDev_;
     std::shared_ptr<ICameraStateListener> stateListener_;
     std::shared_ptr<DCameraSourceStateMachine> stateMachine_;
-    std::shared_ptr<ICameraController> controller_;
+    std::shared_ptr<DCameraSourceController> controller_;
     std::vector<DCameraIndex> indexs_;
 };
 
@@ -251,16 +251,212 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_009, TestSi
 }
 
 /**
- * @tc.name: dcamera_source_controller_test_0010
+ * @tc.name: dcamera_source_controller_test_010
  * @tc.desc: Verify source controller OnDataReceived.
  * @tc.type: FUNC
  * @tc.require: Issue Number
  */
-HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_0010, TestSize.Level1)
+HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_010, TestSize.Level1)
 {
     int32_t ret = controller_->Init(indexs_);
     std::shared_ptr<DCameraSourceController> controller = std::make_shared<DCameraSourceController>(TEST_DEVICE_ID,
         TEST_CAMERA_DH_ID_0, stateMachine_, eventBus_);
+    std::shared_ptr<ICameraChannelListener> listener_ =
+        std::make_shared<DCameraSourceControllerChannelListener>(controller);
+    int32_t state = 0;
+    listener_->OnSessionState(state);
+    int32_t eventType = 1;
+    int32_t eventReason = 1;
+    std::string detail = "OnSessionErrorTest";
+    listener_->OnSessionError(eventType, eventReason, detail);
+    std::vector<std::shared_ptr<DataBuffer>> buffers;
+    listener_->OnDataReceived(buffers);
+    ret = controller_->UnInit();
+    EXPECT_EQ(ret, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: dcamera_source_controller_test_011
+ * @tc.desc: Verify source controller ChannelNeg.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_011, TestSize.Level1)
+{
+    std::shared_ptr<DCameraChannelInfo> chanInfo = std::make_shared<DCameraChannelInfo>();
+    int32_t ret = GetLocalDeviceNetworkId(chanInfo->sourceDevId_);
+    DCameraChannelDetail continueChInfo(CONTINUE_SESSION_FLAG, CONTINUOUS_FRAME);
+    DCameraChannelDetail snapShotChInfo(SNAP_SHOT_SESSION_FLAG, SNAPSHOT_FRAME);
+    chanInfo->detail_.push_back(continueChInfo);
+    chanInfo->detail_.push_back(snapShotChInfo);
+    DCameraIndex index1;
+    index1.devId_ = TEST_DEVICE_ID;
+    index1.dhId_ = TEST_CAMERA_DH_ID_0;
+    DCameraIndex index2;
+    index2.devId_ = TEST_DEVICE_ID;
+    index2.dhId_ = TEST_CAMERA_DH_ID_0;
+    controller_->Init(indexs_);
+
+    controller_->indexs_.push_back(index1);
+    controller_->indexs_.push_back(index2);
+    ret = controller_->ChannelNeg(chanInfo);
+    controller_->UnInit();
+    EXPECT_EQ(ret, DCAMERA_BAD_OPERATE);
+}
+
+/**
+ * @tc.name: dcamera_source_controller_test_012
+ * @tc.desc: Verify source controller DCameraNotify.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_012, TestSize.Level1)
+{
+    std::shared_ptr<DCameraEvent> events = std::make_shared<DCameraEvent>();
+    events->eventType_ = 1;
+    events->eventResult_ = DCAMERA_EVENT_CAMERA_ERROR;
+    events->eventContent_ = "controllerTest012";
+    int32_t ret = controller_->DCameraNotify(events);
+    controller_->UnInit();
+    EXPECT_EQ(ret, DCAMERA_BAD_OPERATE);
+}
+
+/**
+ * @tc.name: dcamera_source_controller_test_013
+ * @tc.desc: Verify source controller UpdateSettings.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_013, TestSize.Level1)
+{
+    std::shared_ptr<DCameraChannelInfo> chanInfo = std::make_shared<DCameraChannelInfo>();
+    std::vector<std::shared_ptr<DCameraSettings>> settings;
+    std::shared_ptr<DCameraSettings> setting = std::make_shared<DCameraSettings>();
+    setting->type_ = DCSettingsType::DISABLE_METADATA;
+    setting->value_ = "UpdateSettingsTest";
+    settings.push_back(setting);
+    DCameraIndex index1;
+    index1.devId_ = TEST_DEVICE_ID;
+    index1.dhId_ = TEST_CAMERA_DH_ID_0;
+    DCameraIndex index2;
+    index2.devId_ = TEST_DEVICE_ID;
+    index2.dhId_ = TEST_CAMERA_DH_ID_0;
+    controller_->indexs_.push_back(index1);
+    controller_->indexs_.push_back(index2);
+    int32_t ret = controller_->UpdateSettings(settings);
+    controller_->UnInit();
+    EXPECT_EQ(ret, DCAMERA_BAD_OPERATE);
+}
+
+/**
+ * @tc.name: dcamera_source_controller_test_014
+ * @tc.desc: Verify source controller GetCameraInfo.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_014, TestSize.Level1)
+{
+    DCameraIndex index1;
+    index1.devId_ = TEST_DEVICE_ID;
+    index1.dhId_ = TEST_CAMERA_DH_ID_0;
+    DCameraIndex index2;
+    index2.devId_ = TEST_DEVICE_ID;
+    index2.dhId_ = TEST_CAMERA_DH_ID_0;
+    controller_->indexs_.push_back(index1);
+    controller_->indexs_.push_back(index2);
+    indexs_.push_back(index1);
+
+    std::shared_ptr<DCameraInfo> camInfo = std::make_shared<DCameraInfo>();
+    camInfo->state_ = 1;
+    int32_t ret = controller_->GetCameraInfo(camInfo);
+    controller_->UnInit();
+    EXPECT_EQ(ret, DCAMERA_BAD_OPERATE);
+}
+
+/**
+ * @tc.name: dcamera_source_controller_test_015
+ * @tc.desc: Verify source controller OpenChannel.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_015, TestSize.Level1)
+{
+    DCameraIndex index1;
+    index1.devId_ = TEST_DEVICE_ID;
+    index1.dhId_ = TEST_CAMERA_DH_ID_0;
+    DCameraIndex index2;
+    index2.devId_ = TEST_DEVICE_ID;
+    index2.dhId_ = TEST_CAMERA_DH_ID_0;
+    controller_->indexs_.push_back(index1);
+    controller_->indexs_.push_back(index2);
+    indexs_.push_back(index1);
+
+    std::shared_ptr<DCameraOpenInfo> openInfo = std::make_shared<DCameraOpenInfo>();
+    int32_t ret = GetLocalDeviceNetworkId(openInfo->sourceDevId_);
+    ret = controller_->OpenChannel(openInfo);
+    controller_->UnInit();
+    EXPECT_EQ(ret, DCAMERA_BAD_OPERATE);
+}
+
+/**
+ * @tc.name: dcamera_source_controller_test_016
+ * @tc.desc: Verify source controller OpenChannel and CloseChannel.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_016, TestSize.Level1)
+{
+    DCameraIndex index1;
+    index1.devId_ = TEST_DEVICE_ID;
+    index1.dhId_ = TEST_CAMERA_DH_ID_0;
+    DCameraIndex index2;
+    index2.devId_ = TEST_DEVICE_ID;
+    index2.dhId_ = TEST_CAMERA_DH_ID_0;
+    controller_->indexs_.push_back(index1);
+    controller_->indexs_.push_back(index2);
+    controller_->CloseChannel();
+    int32_t ret = controller_->UnInit();
+    EXPECT_EQ(ret, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: dcamera_source_controller_test_017
+ * @tc.desc: Verify source controller OpenChannel and HandleMetaDataResult.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_017, TestSize.Level1)
+{
+    int32_t ret = controller_->Init(indexs_);
+    std::string jsonStr = "controllerTest17";
+    controller_->HandleMetaDataResult(jsonStr);
+    ret = controller_->UnInit();
+    EXPECT_EQ(ret, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: dcamera_source_controller_test_018
+ * @tc.desc: Verify source controller OpenChannel and WaitforSessionResult.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_018, TestSize.Level1)
+{
+    controller_->WaitforSessionResult();
+    int32_t ret = controller_->UnInit();
+    EXPECT_EQ(ret, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: dcamera_source_controller_test_019
+ * @tc.desc: Verify source controller OnSessionError.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_019, TestSize.Level1)
+{
+    int32_t ret = controller_->Init(indexs_);
+    std::shared_ptr<DCameraSourceController> controller = nullptr;
     std::shared_ptr<ICameraChannelListener> listener_ =
         std::make_shared<DCameraSourceControllerChannelListener>(controller);
     int32_t state = 0;
