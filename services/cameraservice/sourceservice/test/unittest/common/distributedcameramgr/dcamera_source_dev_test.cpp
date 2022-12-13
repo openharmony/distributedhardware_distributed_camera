@@ -52,7 +52,7 @@ const std::string TEST_VER = "1.0";
 const std::string TEST_ATTRS = "";
 const int32_t TEST_WIDTH = 1920;
 const int32_t TEST_HEIGTH = 1080;
-const int32_t TEST_SLEEP_SEC = 2;
+const int32_t TEST_SLEEP_SEC = 200000;
 std::string TEST_EVENT_CMD_JSON = R"({
     "Type": "MESSAGE",
     "dhId": "camrea_0",
@@ -74,7 +74,7 @@ void DCameraSourceDevTest::SetTokenID()
         .dcaps = NULL,
         .perms = perms,
         .acls = NULL,
-        .processName = "dcamera_client_demo",
+        .processName = "dcamera_source_dev_test",
         .aplStr = "system_basic",
     };
     tokenId = GetAccessTokenId(&infoInstance);
@@ -98,6 +98,7 @@ void DCameraSourceDevTest::SetUp(void)
 
 void DCameraSourceDevTest::TearDown(void)
 {
+    usleep(TEST_SLEEP_SEC);
     camDev_ = nullptr;
     stateListener_ = nullptr;
 }
@@ -167,7 +168,6 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_005, TestSize.Level1)
     index.dhId_ = TEST_CAMERA_DH_ID_0;
     camDev_->InitDCameraSourceDev();
     int32_t ret = camDev_->OpenSession(index);
-    sleep(TEST_SLEEP_SEC);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
@@ -184,7 +184,6 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_006, TestSize.Level1)
     index.dhId_ = TEST_CAMERA_DH_ID_0;
     camDev_->InitDCameraSourceDev();
     int32_t ret = camDev_->CloseSession(index);
-    sleep(TEST_SLEEP_SEC);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
@@ -209,7 +208,6 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_007, TestSize.Level1)
     streamInfos.push_back(streamInfo);
     camDev_->InitDCameraSourceDev();
     int32_t ret = camDev_->ConfigCameraStreams(streamInfos);
-    sleep(TEST_SLEEP_SEC);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
@@ -238,7 +236,6 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_008, TestSize.Level1)
     camDev_->InitDCameraSourceDev();
     int32_t ret = camDev_->ConfigCameraStreams(streamInfos);
     ret = camDev_->ReleaseCameraStreams(streamIds);
-    sleep(TEST_SLEEP_SEC);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
@@ -263,7 +260,6 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_009, TestSize.Level1)
     captureInfos.push_back(captureInfo);
     camDev_->InitDCameraSourceDev();
     int32_t ret = camDev_->StartCameraCapture(captureInfos);
-    sleep(TEST_SLEEP_SEC);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
@@ -292,7 +288,6 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_010, TestSize.Level1)
     std::vector<int> streamIds;
     streamIds.push_back(streamId);
     ret = camDev_->StopCameraCapture(streamIds);
-    sleep(TEST_SLEEP_SEC);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
@@ -327,7 +322,6 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_011, TestSize.Level1)
     std::vector<int> streamIds;
     streamIds.push_back(streamId);
     camDev_->StopCameraCapture(streamIds);
-    sleep(TEST_SLEEP_SEC);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
@@ -345,7 +339,6 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_012, TestSize.Level1)
     camDev_->OnEvent(event);
     camDev_->GetVersion();
     int32_t ret = camDev_->GetStateInfo();
-    sleep(TEST_SLEEP_SEC);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
@@ -371,7 +364,6 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_013, TestSize.Level1)
     std::string params = TEST_VER;
     std::shared_ptr<DCameraRegistParam> param = std::make_shared<DCameraRegistParam>(devId, dhId, reqId, params);
     int32_t ret = camDev_->Register(param);
-    sleep(TEST_SLEEP_SEC);
     EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
 }
 
@@ -390,7 +382,6 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_014, TestSize.Level1)
     std::string params = TEST_VER;
     std::shared_ptr<DCameraRegistParam> param = std::make_shared<DCameraRegistParam>(devId, dhId, reqId, params);
     int32_t ret = camDev_->UnRegister(param);
-    sleep(TEST_SLEEP_SEC);
     EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
 }
 
@@ -412,7 +403,6 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_015, TestSize.Level1)
     camDev_->controller_->Init(indexs);
     camDev_->input_->Init();
     int32_t ret = camDev_->OpenCamera();
-    sleep(TEST_SLEEP_SEC);
     ret = camDev_->CloseCamera();
     EXPECT_EQ(DCAMERA_OK, ret);
 }
@@ -446,7 +436,6 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_016, TestSize.Level1)
     streamInfo->type_ = SNAPSHOT_FRAME;
     streamInfos.push_back(streamInfo);
     int32_t ret = camDev_->ConfigStreams(streamInfos);
-    sleep(TEST_SLEEP_SEC);
     EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
 }
 
@@ -479,7 +468,6 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_017, TestSize.Level1)
     streamInfo->type_ = SNAPSHOT_FRAME;
     streamInfos.push_back(streamInfo);
     int32_t ret = camDev_->ConfigStreams(streamInfos);
-    sleep(TEST_SLEEP_SEC);
     std::vector<int> streamIds;
     int32_t streamId = 1;
     streamIds.push_back(streamId);
@@ -542,7 +530,6 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_019, TestSize.Level1)
     int32_t ret = camDev_->StartCapture(captureInfos);
     EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
     camDev_->HitraceAndHisyseventImpl(captureInfos);
-    sleep(TEST_SLEEP_SEC);
     EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
 }
 
@@ -579,7 +566,6 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_020, TestSize.Level1)
     int32_t streamId = 1;
     streamIds.push_back(streamId);
     bool isAllStop = true;
-    sleep(TEST_SLEEP_SEC);
     ret = camDev_->StopCapture(streamIds, isAllStop);
     EXPECT_EQ(DCAMERA_OK, ret);
     ret = camDev_->StopAllCapture();
@@ -621,7 +607,6 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_021, TestSize.Level1)
     setting->value_ = "UpdateSettingsTest";
     settings.push_back(setting);
     int32_t ret = camDev_->UpdateSettings(settings);
-    sleep(TEST_SLEEP_SEC);
     EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
 }
 

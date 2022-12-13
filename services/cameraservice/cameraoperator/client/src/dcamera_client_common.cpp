@@ -109,7 +109,7 @@ int32_t DCameraClient::UpdateSettings(std::vector<std::shared_ptr<DCameraSetting
                     DHLOGE("DCameraClientCommon::UpdateSettings %s cameraInput is null",
                         GetAnonyString(cameraId_).c_str());
                     UpdateSettingCache(metadataStr);
-                    return DCAMERA_BAD_VALUE;
+                    return DCAMERA_OK;
                 }
 
                 int32_t ret = ((sptr<CameraStandard::CameraInput> &)cameraInput_)->SetCameraSettings(metadataStr);
