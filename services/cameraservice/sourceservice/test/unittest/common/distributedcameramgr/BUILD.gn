@@ -62,6 +62,7 @@ ohos_unittest("DCameraSourceMgrTest") {
     "dcamera_source_data_process_test.cpp",
     "dcamera_source_dev_test.cpp",
     "dcamera_source_input_test.cpp",
+    "dcamera_source_service_ipc_test.cpp",
     "dcamera_source_state_machine_test.cpp",
   ]
 
@@ -86,6 +87,7 @@ ohos_unittest("DCameraSourceMgrTest") {
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "samgr:samgr_proxy",
   ]
 
   defines = [

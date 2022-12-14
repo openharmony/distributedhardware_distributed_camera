@@ -45,7 +45,7 @@ public:
     std::shared_ptr<DCameraSourceInput> input_;
     std::shared_ptr<DCameraSourceDev> camDev_;
     std::shared_ptr<EventBus> eventBus_;
-    std::shared_ptr<ICameraChannel> channel_;
+    std::shared_ptr<DCameraChannelSourceImpl> channel_;
     std::shared_ptr<ICameraChannelListener> listener_;
     std::shared_ptr<ICameraStateListener> stateListener_;
 };
@@ -53,7 +53,7 @@ public:
 namespace {
 const std::string TEST_DEVICE_ID = "bb536a637105409e904d4da83790a4a7";
 const std::string TEST_CAMERA_DH_ID_0 = "camera_0";
-const int32_t TEST_TWO_S = 2;
+const int32_t TEST_SLEEP_SEC = 200000;
 }
 void DCameraChannelSourceImplTest::SetUpTestCase(void)
 {
@@ -70,6 +70,7 @@ void DCameraChannelSourceImplTest::SetUp(void)
 
 void DCameraChannelSourceImplTest::TearDown(void)
 {
+    usleep(TEST_SLEEP_SEC);
     input_ = nullptr;
     camDev_ = nullptr;
     eventBus_ = nullptr;
@@ -197,7 +198,7 @@ HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_004, Tes
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);
     ret = channel_->SendData(dataBuffer);
-    sleep(TEST_TWO_S);
+    usleep(TEST_SLEEP_SEC);
     channel_->CloseSession();
     ret = channel_->ReleaseSession();
     EXPECT_EQ(DCAMERA_OK, ret);
@@ -250,7 +251,7 @@ HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_008, Tes
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);
     int32_t ret = channel_->SendData(dataBuffer);
-    sleep(TEST_TWO_S);
+    usleep(TEST_SLEEP_SEC);
     EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
 }
 
