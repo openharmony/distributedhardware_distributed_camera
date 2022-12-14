@@ -13,5 +13,5 @@
 
 group("services_base_test") {
   testonly = true
-  deps = [ "common/dcameraprotocol:dcamera_protocol_test" ]
+  deps = [ "common/base:dcamera_services_base_test" ]
 }
