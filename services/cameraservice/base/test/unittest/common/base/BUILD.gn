@@ -15,7 +15,7 @@ import("//build/test.gni")
 import(
     "//foundation/distributedhardware/distributed_camera/distributedcamera.gni")
 
-module_out_path = "distributed_camera/dcamera_protocol_test"
+module_out_path = "distributed_camera/dcamera_services_base_test"
 
 config("module_private_config") {
   visibility = [ ":*" ]
@@ -39,10 +39,18 @@ config("module_private_config") {
   ]
 }
 
-ohos_unittest("DCameraProtocolTest") {
+ohos_unittest("DCameraServicesBaseTest") {
   module_out_path = module_out_path
 
-  sources = [ "dcamera_protocol_test.cpp" ]
+  sources = [
+    "dcamera_protocol_test.cpp",
+    "dcamera_capture_info_cmd_test.cpp",
+    "dcamera_channel_info_cmd_test.cpp",
+    "dcamera_event_cmd_test.cpp",
+    "dcamera_info_cmd_test.cpp",
+    "dcamera_metadata_setting_cmd_test.cpp",
+    "dcamera_open_info_cmd_test.cpp",
+  ]
 
   configs = [ ":module_private_config" ]
 
@@ -64,12 +72,12 @@ ohos_unittest("DCameraProtocolTest") {
 
   defines = [
     "HI_LOG_ENABLE",
-    "DH_LOG_TAG=\"DCameraProtocolTest\"",
+    "DH_LOG_TAG=\"DCameraServicesBaseTest\"",
     "LOG_DOMAIN=0xD004100",
   ]
 }
 
-group("dcamera_protocol_test") {
+group("dcamera_services_base_test") {
   testonly = true
-  deps = [ ":DCameraProtocolTest" ]
+  deps = [ ":DCameraServicesBaseTest" ]
 }
