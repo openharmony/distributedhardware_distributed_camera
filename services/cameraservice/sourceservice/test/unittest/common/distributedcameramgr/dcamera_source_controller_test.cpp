@@ -53,6 +53,7 @@ const int32_t TEST_HEIGTH = 1080;
 const int32_t TEST_FORMAT = 4;
 const int32_t TEST_DATASPACE = 8;
 const int32_t TEST_ISCAPTURE = 0;
+const int32_t TEST_SLEEP_SEC = 200000;
 }
 
 void DCameraSourceControllerTest::SetUpTestCase(void)
@@ -79,6 +80,7 @@ void DCameraSourceControllerTest::SetUp(void)
 
 void DCameraSourceControllerTest::TearDown(void)
 {
+    usleep(TEST_SLEEP_SEC);
     eventBus_ = nullptr;
     stateMachine_ = nullptr;
     camDev_ = nullptr;
