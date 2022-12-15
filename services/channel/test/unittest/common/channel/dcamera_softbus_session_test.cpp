@@ -52,6 +52,7 @@ namespace {
 const std::string TEST_MYDEVICE_ID = "bb536a637105409e904d4da83790a4a7";
 const std::string TEST_PEERDEVICE_ID = "bb536a637105409e904d4da83790a4a9";
 const std::string TEST_CAMERA_DH_ID_0 = "camera_0";
+const int32_t TEST_SLEEP_SEC = 200000;
 }
 
 void DCameraSoftbusSessionTest::SetUpTestCase(void)
@@ -143,7 +144,7 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_004, TestSize.L
     std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(capacity);
     softbusSession_->mode_ = DCAMERA_SESSION_MODE_VIDEO;
     softbusSession_->DealRecvData(buffer);
-    softbusSession_->mode_ = DCAMERA_SESSION_MODE_VIDEO;
+    softbusSession_->mode_ = DCAMERA_SESSION_MODE_JPEG;
     softbusSession_->DealRecvData(buffer);
     int32_t ret = softbusSession_->CloseSession();
     EXPECT_EQ(DCAMERA_OK, ret);
@@ -234,7 +235,7 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_008, TestSize.L
     headerPara.seqNum = 1;
     headerPara.subSeq = 1;
     ret = softbusSession_->CheckUnPackBuffer(headerPara);
-    softbusSession_->offset_ = 3;
+    softbusSession_->offset_ = 5;
     softbusSession_->totalLen_ = 2;
     ret = softbusSession_->CheckUnPackBuffer(headerPara);
     softbusSession_->offset_ = 0;
@@ -292,8 +293,8 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_010, TestSize.L
  */
 HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_011, TestSize.Level1)
 {
-    size_t offset = DCameraSoftbusSession::BINARY_DATA_PACKET_MAX_LEN;
-    size_t size = DCameraSoftbusSession::BINARY_DATA_PACKET_MAX_LEN - 1;
+    size_t offset = 1;
+    size_t size = DCameraSoftbusSession::BINARY_DATA_PACKET_MAX_LEN - 10;
     size_t capacity = size;
     std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(capacity);
     buffer->SetRange(offset, size);
@@ -358,7 +359,7 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_014, TestSize.L
     int32_t ret = softbusSession_->SendStream(buffer);
     softbusSession_->state_ = DCAMERA_SOFTBUS_STATE_CLOSED;
     ret = softbusSession_->SendStream(buffer);
-    sleep(2);
+    usleep(TEST_SLEEP_SEC);
     EXPECT_EQ(DCAMERA_WRONG_STATE, ret);
 }
 }

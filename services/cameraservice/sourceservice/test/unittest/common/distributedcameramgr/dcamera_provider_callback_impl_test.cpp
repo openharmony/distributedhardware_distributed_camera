@@ -50,7 +50,7 @@ const std::string TEST_PARAM = "0xFFFF";
 const int32_t TEST_WIDTH = 1920;
 const int32_t TEST_HEIGTH = 1080;
 const int32_t TEST_STREAMID = 2;
-const int32_t SLEEP_TIME = 2;
+const int32_t SLEEP_TIME = 200000;
 std::vector<DCStreamInfo> g_streamInfosSnap;
 std::vector<DCCaptureInfo> g_captureInfoSnap;
 std::vector<DCameraSettings> g_cameraSettingSnap;
@@ -140,6 +140,7 @@ void DCameraProviderCallbackImplTest::SetUp(void)
 
 void DCameraProviderCallbackImplTest::TearDown(void)
 {
+    usleep(SLEEP_TIME);
     testProviderCallback_ = nullptr;
     camDev_ = nullptr;
     stateListener_ = nullptr;
@@ -178,7 +179,6 @@ HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_00
 
     ret = testProviderCallback_->CloseSession(dhBase);
     EXPECT_EQ(SUCCESS, ret);
-    sleep(SLEEP_TIME);
 }
 
 /**
@@ -217,7 +217,6 @@ HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_00
 
     ret = testProviderCallback_->ReleaseStreams(dhBase, g_streamIdSnap);
     EXPECT_EQ(SUCCESS, ret);
-    sleep(SLEEP_TIME);
 }
 
 /**
@@ -256,7 +255,6 @@ HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_00
 
     ret = testProviderCallback_->StopCapture(dhBase, g_streamIdSnap);
     EXPECT_EQ(SUCCESS, ret);
-    sleep(SLEEP_TIME);
 }
 
 /**
@@ -293,7 +291,6 @@ HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_00
 
     ret = testProviderCallback_->CloseSession(dhBase);
     EXPECT_EQ(SUCCESS, ret);
-    sleep(SLEEP_TIME);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

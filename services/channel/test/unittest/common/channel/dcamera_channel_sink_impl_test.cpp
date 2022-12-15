@@ -47,7 +47,7 @@ public:
 namespace {
 const std::string TEST_DEVICE_ID = "bb536a637105409e904d4da83790a4a7";
 const std::string TEST_CAMERA_DH_ID_0 = "camera_0";
-const int32_t TEST_TWO_S = 2;
+const int32_t TEST_SLEEP_SEC = 200000;
 }
 void DCameraChannelSinkImplTest::SetUpTestCase(void)
 {
@@ -171,7 +171,7 @@ HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_004, TestSiz
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);
     ret = channel_->SendData(dataBuffer);
-    sleep(TEST_TWO_S);
+    usleep(TEST_SLEEP_SEC);
     channel_->CloseSession();
     ret = channel_->ReleaseSession();
     EXPECT_EQ(DCAMERA_OK, ret);
@@ -224,7 +224,7 @@ HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_008, TestSiz
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);
     int32_t ret = channel_->SendData(dataBuffer);
-    sleep(TEST_TWO_S);
+    usleep(TEST_SLEEP_SEC);
     EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
 }
 
