@@ -14,8 +14,9 @@
  */
 
 #include <gtest/gtest.h>
-
+#define private public
 #include "dcamera_source_input.h"
+#undef private
 #include "distributed_camera_errno.h"
 
 using namespace testing::ext;
@@ -362,6 +363,48 @@ HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_011, TestSize.Level1)
 
     rc = testInput_->UnInit();
     EXPECT_EQ(rc, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: dcamera_source_input_test_012
+ * @tc.desc: Verify source inptut OnDataReceived.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_012, TestSize.Level1)
+{
+    int32_t rc = testInput_->Init();
+    std::vector<std::shared_ptr<DataBuffer>> buffers;
+    size_t capacity = 1;
+    std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(capacity);
+    buffers.push_back(buffer);
+    testInput_->OnDataReceived(DCStreamType::SNAPSHOT_FRAME, buffers);
+    EXPECT_EQ(rc, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: dcamera_source_input_test_013
+ * @tc.desc: Verify source inptut WaitforSessionResult.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_013, TestSize.Level1)
+{
+    int32_t rc = testInput_->WaitforSessionResult();
+    EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
+}
+
+/**
+ * @tc.name: dcamera_source_input_test_014
+ * @tc.desc: Verify source inptut WaitforSessionResult.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_014, TestSize.Level1)
+{
+    int32_t rc = testInput_->Init();
+    rc = testInput_->EstablishContinuousFrameSession(g_camIndexs);
+    EXPECT_EQ(rc, DCAMERA_BAD_OPERATE);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

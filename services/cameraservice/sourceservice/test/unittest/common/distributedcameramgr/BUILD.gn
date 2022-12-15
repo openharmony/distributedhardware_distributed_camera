@@ -64,6 +64,7 @@ ohos_unittest("DCameraSourceMgrTest") {
     "dcamera_source_input_test.cpp",
     "dcamera_source_service_ipc_test.cpp",
     "dcamera_source_state_machine_test.cpp",
+    "dcamera_stream_data_process_test.cpp",
   ]
 
   configs = [ ":module_private_config" ]
@@ -73,6 +74,7 @@ ohos_unittest("DCameraSourceMgrTest") {
     "${graphicstandard_path}:libsurface",
     "${services_path}/cameraservice/sourceservice:distributed_camera_source",
     "${services_path}/channel:distributed_camera_channel",
+    "${services_path}/data_process:distributed_camera_data_process",
     "//third_party/googletest:gtest_main",
     "//third_party/jsoncpp:jsoncpp",
   ]

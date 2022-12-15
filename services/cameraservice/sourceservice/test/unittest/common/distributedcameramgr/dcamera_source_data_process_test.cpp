@@ -138,6 +138,9 @@ HWTEST_F(DCameraSourceDataProcessTest, dcamera_source_data_process_test_003, Tes
     captureInfo->type_ = CONTINUOUS_FRAME;
     int32_t rc = testSrcDataProcess_->StartCapture(captureInfo);
     EXPECT_EQ(rc, DCAMERA_OK);
+    captureInfo->isCapture_ = true;
+    rc = testSrcDataProcess_->StartCapture(captureInfo);
+    EXPECT_EQ(rc, DCAMERA_OK);
 }
 
 /**
