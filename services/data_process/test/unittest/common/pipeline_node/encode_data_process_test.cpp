@@ -15,7 +15,9 @@
 
 #include <gtest/gtest.h>
 
+#define private public
 #include "encode_data_process.h"
+#undef private
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 
@@ -71,7 +73,7 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_001, TestSize.Level1)
 
     int32_t frameRate = 50;
     VideoConfigParams srcParams(VideoCodecType::CODEC_H264,
-                                Videoformat::NV12,
+                                Videoformat::YUVI420,
                                 frameRate,
                                 TEST_WIDTH,
                                 TEST_HEIGTH);
@@ -137,7 +139,7 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_003, TestSize.Level1)
 
 /**
  * @tc.name: encode_data_process_test_004
- * @tc.desc: Verify encode data process InitNode normal.
+ * @tc.desc: Verify encode data process InitEncoder abnormal.
  * @tc.type: FUNC
  * @tc.require: Issue Number
  */
@@ -150,14 +152,25 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_004, TestSize.Level1)
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
                                 TEST_HEIGTH);
-    VideoConfigParams destParams(VideoCodecType::CODEC_H264,
+    VideoConfigParams destParams(VideoCodecType::CODEC_MPEG4,
                                  Videoformat::NV21,
                                  DCAMERA_PRODUCER_FPS_DEFAULT,
                                  TEST_WIDTH2,
                                  TEST_HEIGTH2);
     VideoConfigParams procConfig;
+#ifdef DCAMERA_COMMON
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
     EXPECT_EQ(rc, DCAMERA_OK);
+
+    rc = testEncodeDataProcess_->InitEncoderMetadataFormat();
+    EXPECT_EQ(rc, DCAMERA_OK);
+#else
+    int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
+    EXPECT_EQ(rc, DCAMERA_NOT_FOUND);
+
+    rc = testEncodeDataProcess_->InitEncoderMetadataFormat();
+    EXPECT_EQ(rc, DCAMERA_NOT_FOUND);
+#endif
 }
 
 /**
@@ -173,6 +186,20 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_005, TestSize.Level1)
     std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
     int32_t rc = testEncodeDataProcess_->ProcessData(inputBuffers);
     EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
+
+    rc = testEncodeDataProcess_->StartVideoEncoder();
+    EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
+
+    rc = testEncodeDataProcess_->StopVideoEncoder();
+    EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
+
+    size_t capacity = 100;
+    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
+    inputBuffers.push_back(db);
+    testEncodeDataProcess_->sourceConfig_.videoCodec_ = VideoCodecType::NO_CODEC;
+    testEncodeDataProcess_->processedConfig_.videoCodec_ = VideoCodecType::CODEC_H264;
+    rc = testEncodeDataProcess_->ProcessData(inputBuffers);
+    EXPECT_EQ(rc, DCAMERA_INIT_ERR);
 }
 
 /**
@@ -236,6 +263,286 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_007, TestSize.Level1)
     std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
     inputBuffers.push_back(db);
     rc = testEncodeDataProcess_->ProcessData(inputBuffers);
+    EXPECT_EQ(rc, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: encode_data_process_test_008
+ * @tc.desc: Verify encode data process InitEncoder abnormal.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(EncodeDataProcessTest, encode_data_process_test_008, TestSize.Level1)
+{
+    EXPECT_EQ(false, testEncodeDataProcess_ == nullptr);
+
+    VideoConfigParams srcParams(VideoCodecType::NO_CODEC,
+                                Videoformat::RGBA_8888,
+                                DCAMERA_PRODUCER_FPS_DEFAULT,
+                                TEST_WIDTH,
+                                TEST_HEIGTH);
+    VideoConfigParams destParams(VideoCodecType::CODEC_H264,
+                                 Videoformat::NV21,
+                                 DCAMERA_PRODUCER_FPS_DEFAULT,
+                                 TEST_WIDTH2,
+                                 TEST_HEIGTH2);
+    VideoConfigParams procConfig;
+#ifdef DCAMERA_COMMON
+    int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    rc = testEncodeDataProcess_->InitEncoderMetadataFormat();
+    EXPECT_EQ(rc, DCAMERA_OK);
+#else
+    int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
+    EXPECT_EQ(rc, DCAMERA_NOT_FOUND);
+
+    rc = testEncodeDataProcess_->InitEncoderMetadataFormat();
+    EXPECT_EQ(rc, DCAMERA_NOT_FOUND);
+#endif
+}
+
+/**
+ * @tc.name: encode_data_process_test_009
+ * @tc.desc: Verify encode data process ProcessData.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(EncodeDataProcessTest, encode_data_process_test_009, TestSize.Level1)
+{
+    EXPECT_EQ(false, testEncodeDataProcess_ == nullptr);
+
+    VideoConfigParams srcParams(VideoCodecType::NO_CODEC,
+                                Videoformat::NV12,
+                                DCAMERA_PRODUCER_FPS_DEFAULT,
+                                TEST_WIDTH,
+                                TEST_HEIGTH);
+    VideoConfigParams destParams(VideoCodecType::CODEC_H264,
+                                 Videoformat::NV21,
+                                 DCAMERA_PRODUCER_FPS_DEFAULT,
+                                 TEST_WIDTH,
+                                 TEST_HEIGTH);
+    VideoConfigParams procConfig;
+    int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+#ifdef DCAMERA_COMMON
+    constexpr int32_t NORM_RGB32_BUFFER_SIZE = 1920 * 1080 * 4;
+    size_t capacity = NORM_RGB32_BUFFER_SIZE + 5;
+    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
+    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
+    size_t offset = 1;
+    size_t size = NORM_RGB32_BUFFER_SIZE + 1;
+    db->SetRange(offset, size);
+    inputBuffers.push_back(db);
+    rc = testEncodeDataProcess_->ProcessData(inputBuffers);
+    EXPECT_EQ(rc, DCAMERA_MEMORY_OPT_ERROR);
+#else
+    constexpr int64_t NORM_YUV420_BUFFER_SIZE = 1920 * 1080 * 3 / 2;
+    size_t capacity = NORM_YUV420_BUFFER_SIZE + 5;
+    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
+    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
+    size_t offset = 1;
+    size_t size = NORM_YUV420_BUFFER_SIZE + 1;
+    db->SetRange(offset, size);
+    inputBuffers.push_back(db);
+    rc = testEncodeDataProcess_->ProcessData(inputBuffers);
+    EXPECT_EQ(rc, DCAMERA_MEMORY_OPT_ERROR);
+#endif
+}
+
+/**
+ * @tc.name: encode_data_process_test_010
+ * @tc.desc: Verify encode data process ProcessData.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(EncodeDataProcessTest, encode_data_process_test_010, TestSize.Level1)
+{
+    EXPECT_EQ(false, testEncodeDataProcess_ == nullptr);
+
+    VideoConfigParams srcParams(VideoCodecType::NO_CODEC,
+                                Videoformat::RGBA_8888,
+                                DCAMERA_PRODUCER_FPS_DEFAULT,
+                                TEST_WIDTH,
+                                TEST_HEIGTH);
+    VideoConfigParams destParams(VideoCodecType::CODEC_H264,
+                                 Videoformat::NV21,
+                                 DCAMERA_PRODUCER_FPS_DEFAULT,
+                                 TEST_WIDTH,
+                                 TEST_HEIGTH);
+    VideoConfigParams procConfig;
+#ifdef DCAMERA_COMMON
+    int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    size_t capacity = 100;
+    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
+    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
+    inputBuffers.push_back(db);
+    rc = testEncodeDataProcess_->ProcessData(inputBuffers);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    rc = testEncodeDataProcess_->FeedEncoderInputBuffer(db);
+    EXPECT_EQ(rc, DCAMERA_OK);
+#else
+    int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
+    EXPECT_EQ(rc, DCAMERA_NOT_FOUND);
+
+    size_t capacity = 100;
+    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
+    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
+    inputBuffers.push_back(db);
+    rc = testEncodeDataProcess_->ProcessData(inputBuffers);
+    EXPECT_EQ(rc, DCAMERA_INIT_ERR);
+
+    rc = testEncodeDataProcess_->FeedEncoderInputBuffer(db);
+    EXPECT_EQ(rc, DCAMERA_INIT_ERR);
+#endif
+}
+
+/**
+ * @tc.name: encode_data_process_test_011
+ * @tc.desc: Verify encode data process ProcessData.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(EncodeDataProcessTest, encode_data_process_test_011, TestSize.Level1)
+{
+    EXPECT_EQ(false, testEncodeDataProcess_ == nullptr);
+
+    VideoConfigParams srcParams(VideoCodecType::NO_CODEC,
+                                Videoformat::YUVI420,
+                                DCAMERA_PRODUCER_FPS_DEFAULT,
+                                TEST_WIDTH,
+                                TEST_HEIGTH);
+    VideoConfigParams destParams(VideoCodecType::CODEC_H264,
+                                 Videoformat::NV21,
+                                 DCAMERA_PRODUCER_FPS_DEFAULT,
+                                 TEST_WIDTH,
+                                 TEST_HEIGTH);
+    VideoConfigParams procConfig;
+    int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    size_t capacity = 100;
+    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
+    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
+    inputBuffers.push_back(db);
+    rc = testEncodeDataProcess_->ProcessData(inputBuffers);
+    EXPECT_EQ(rc, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: encode_data_process_test_012
+ * @tc.desc: Verify encode data process ProcessData.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(EncodeDataProcessTest, encode_data_process_test_012, TestSize.Level1)
+{
+    EXPECT_EQ(false, testEncodeDataProcess_ == nullptr);
+
+    VideoConfigParams srcParams(VideoCodecType::NO_CODEC,
+                                Videoformat::NV21,
+                                DCAMERA_PRODUCER_FPS_DEFAULT,
+                                TEST_WIDTH,
+                                TEST_HEIGTH);
+    VideoConfigParams destParams(VideoCodecType::CODEC_H264,
+                                 Videoformat::NV21,
+                                 DCAMERA_PRODUCER_FPS_DEFAULT,
+                                 TEST_WIDTH,
+                                 TEST_HEIGTH);
+    VideoConfigParams procConfig;
+    int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    size_t capacity = 100;
+    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
+    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
+    inputBuffers.push_back(db);
+    rc = testEncodeDataProcess_->ProcessData(inputBuffers);
+    EXPECT_EQ(rc, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: encode_data_process_test_013
+ * @tc.desc: Verify encode data process GetEncoderOutputBuffer.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(EncodeDataProcessTest, encode_data_process_test_013, TestSize.Level1)
+{
+    EXPECT_EQ(false, testEncodeDataProcess_ == nullptr);
+
+    testEncodeDataProcess_->ReduceWaitEncodeCnt();
+    testEncodeDataProcess_->inputTimeStampUs_ = 1;
+    int64_t time = testEncodeDataProcess_->GetEncoderTimeStamp();
+    testEncodeDataProcess_->IncreaseWaitEncodeCnt();
+    testEncodeDataProcess_->ReduceWaitEncodeCnt();
+    uint32_t index = time;
+    Media::AVCodecBufferInfo info;
+    int32_t rc = testEncodeDataProcess_->GetEncoderOutputBuffer(index, info);
+    EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
+}
+
+/**
+ * @tc.name: encode_data_process_test_014
+ * @tc.desc: Verify encode data process EncodeDone.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(EncodeDataProcessTest, encode_data_process_test_014, TestSize.Level1)
+{
+    EXPECT_EQ(false, testEncodeDataProcess_ == nullptr);
+
+    std::vector<std::shared_ptr<DataBuffer>> outputBuffers;
+    int32_t rc = testEncodeDataProcess_->EncodeDone(outputBuffers);
+    EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
+}
+
+/**
+ * @tc.name: encode_data_process_test_015
+ * @tc.desc: Verify encode data process ProcessData codetype equality.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(EncodeDataProcessTest, encode_data_process_test_015, TestSize.Level1)
+{
+    EXPECT_EQ(false, testEncodeDataProcess_ == nullptr);
+
+    VideoConfigParams srcParams(VideoCodecType::CODEC_H264,
+                                Videoformat::NV12,
+                                DCAMERA_PRODUCER_FPS_DEFAULT,
+                                TEST_WIDTH,
+                                TEST_HEIGTH);
+    VideoConfigParams destParams(VideoCodecType::CODEC_H264,
+                                 Videoformat::NV21,
+                                 DCAMERA_PRODUCER_FPS_DEFAULT,
+                                 TEST_WIDTH,
+                                 TEST_HEIGTH);
+    VideoConfigParams procConfig;
+    int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    size_t capacity = 100;
+    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
+    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
+    inputBuffers.push_back(db);
+    std::shared_ptr<DCameraPipelineSink> callbackPipelineSink = std::make_shared<DCameraPipelineSink>();
+    testEncodeDataProcess_->callbackPipelineSink_ = callbackPipelineSink;
+    rc = testEncodeDataProcess_->ProcessData(inputBuffers);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    uint32_t index = 0;
+    Media::AVCodecBufferInfo info;
+    Media::AVCodecBufferFlag flag = Media::AVCODEC_BUFFER_FLAG_CODEC_DATA;
+    testEncodeDataProcess_->OnOutputBufferAvailable(index, info, flag);
+    testEncodeDataProcess_->OnError();
+    testEncodeDataProcess_->OnInputBufferAvailable(index);
+    Media::Format format;
+    testEncodeDataProcess_->OnOutputFormatChanged(format);
+    testEncodeDataProcess_->OnOutputBufferAvailable(index, info, flag);
     EXPECT_EQ(rc, DCAMERA_OK);
 }
 } // namespace DistributedHardware

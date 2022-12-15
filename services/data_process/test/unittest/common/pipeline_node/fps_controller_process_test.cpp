@@ -226,5 +226,81 @@ HWTEST_F(FpsControllerProcessTest, fps_controller_process_test_006, TestSize.Lev
     rc = testFpsControllerProcess_->ProcessData(inputBuffers);
     EXPECT_EQ(rc, DCAMERA_OK);
 }
+
+/**
+ * @tc.name: fps_controller_process_test_007
+ * @tc.desc: Verify fps controller process ProcessData.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(FpsControllerProcessTest, fps_controller_process_test_007, TestSize.Level1)
+{
+    EXPECT_EQ(false, testFpsControllerProcess_ == nullptr);
+
+    VideoConfigParams srcParams(VideoCodecType::CODEC_H264,
+                                Videoformat::NV12,
+                                DCAMERA_PRODUCER_FPS_DEFAULT,
+                                TEST_WIDTH,
+                                TEST_HEIGTH);
+    VideoConfigParams destParams(VideoCodecType::CODEC_H264,
+                                 Videoformat::NV21,
+                                 0,
+                                 TEST_WIDTH,
+                                 TEST_HEIGTH);
+    VideoConfigParams procConfig;
+    int32_t rc = testFpsControllerProcess_->InitNode(srcParams, destParams, procConfig);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    size_t capacity = 100;
+    int64_t timeStamp = 10;
+    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
+    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
+    db->SetInt64("timeUs", timeStamp);
+    inputBuffers.push_back(db);
+    std::shared_ptr<DCameraPipelineSource> sourcePipeline = std::make_shared<DCameraPipelineSource>();
+    testFpsControllerProcess_->callbackPipelineSource_ = sourcePipeline;
+    rc = testFpsControllerProcess_->ProcessData(inputBuffers);
+    int64_t nowMs = 100;
+    testFpsControllerProcess_->UpdateFrameRateCorrectionFactor(nowMs);
+    testFpsControllerProcess_->UpdateIncomingFrameTimes(nowMs);
+    float ret = testFpsControllerProcess_->CalculateFrameRate(nowMs);
+    bool brc = testFpsControllerProcess_->IsDropFrame(ret);
+    EXPECT_EQ(brc, true);
+
+    std::vector<std::shared_ptr<DataBuffer>> outputBuffers;
+    rc = testFpsControllerProcess_->FpsControllerDone(outputBuffers);
+    EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
+}
+
+/**
+ * @tc.name: fps_controller_process_test_008
+ * @tc.desc: Verify fps controller process UpdateFrameRateCorrectionFactor.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(FpsControllerProcessTest, fps_controller_process_test_008, TestSize.Level1)
+{
+    EXPECT_EQ(false, testFpsControllerProcess_ == nullptr);
+
+    VideoConfigParams srcParams(VideoCodecType::CODEC_H264,
+                                Videoformat::NV12,
+                                DCAMERA_PRODUCER_FPS_DEFAULT,
+                                TEST_WIDTH,
+                                TEST_HEIGTH);
+    VideoConfigParams destParams(VideoCodecType::CODEC_H264,
+                                 Videoformat::NV21,
+                                 DCAMERA_PRODUCER_FPS_DEFAULT,
+                                 TEST_WIDTH,
+                                 TEST_HEIGTH);
+    VideoConfigParams procConfig;
+    int32_t rc = testFpsControllerProcess_->InitNode(srcParams, destParams, procConfig);
+    int64_t nowMs = 100;
+    testFpsControllerProcess_->UpdateFrameRateCorrectionFactor(nowMs);
+    testFpsControllerProcess_->UpdateIncomingFrameTimes(nowMs);
+    float ret = testFpsControllerProcess_->CalculateFrameRate(nowMs);
+    bool brc = testFpsControllerProcess_->IsDropFrame(ret);
+    brc = true;
+    EXPECT_EQ(rc, DCAMERA_OK);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
