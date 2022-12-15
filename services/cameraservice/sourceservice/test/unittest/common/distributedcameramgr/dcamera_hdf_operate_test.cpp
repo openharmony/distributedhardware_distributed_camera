@@ -15,7 +15,10 @@
 
 #include <gtest/gtest.h>
 
+#define private public
 #include "dcamera_hdf_operate.h"
+#undef private
+
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
 
@@ -75,6 +78,49 @@ HWTEST_F(DCameraHdfOperateTest, dcamera_hdf_operate_test_002, TestSize.Level1)
     DHLOGI("DCameraHdfOperateTest::dcamera_hdf_operate_test_002");
     int32_t ret = DCameraHdfOperate::GetInstance().UnLoadDcameraHDFImpl();
     EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_hdf_operate_test_003
+ * @tc.desc: Verify LoadDcameraHDFImpl func.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraHdfOperateTest, dcamera_hdf_operate_test_003, TestSize.Level1)
+{
+    DHLOGI("DCameraHdfOperateTest::dcamera_hdf_operate_test_003");
+    DCameraHdfOperate::GetInstance().cameraServStatus_ = OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START;
+    DCameraHdfOperate::GetInstance().providerServStatus_ = OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START;
+    int32_t ret = DCameraHdfOperate::GetInstance().LoadDcameraHDFImpl();
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_hdf_operate_test_004
+ * @tc.desc: Verify UnLoadDcameraHDFImpl func.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraHdfOperateTest, dcamera_hdf_operate_test_004, TestSize.Level1)
+{
+    DHLOGI("DCameraHdfOperateTest::dcamera_hdf_operate_test_004");
+    DCameraHdfOperate::GetInstance().cameraServStatus_ = OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_STOP;
+    int32_t ret = DCameraHdfOperate::GetInstance().WaitLoadCameraService();
+    EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
+}
+
+/**
+ * @tc.name: dcamera_hdf_operate_test_005
+ * @tc.desc: Verify WaitLoadProviderService func.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraHdfOperateTest, dcamera_hdf_operate_test_005, TestSize.Level1)
+{
+    DHLOGI("DCameraHdfOperateTest::dcamera_hdf_operate_test_005");
+    DCameraHdfOperate::GetInstance().providerServStatus_ = OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_STOP;
+    int32_t ret = DCameraHdfOperate::GetInstance().WaitLoadProviderService();
+    EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

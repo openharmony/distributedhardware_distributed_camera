@@ -15,7 +15,10 @@
 
 #include <gtest/gtest.h>
 
+#define private public
 #include "dcamera_channel_sink_impl.h"
+#undef private
+
 #include "dcamera_softbus_adapter.h"
 #include "dcamera_sink_output.h"
 #include "dcamera_sink_output_channel_listener.h"
@@ -39,7 +42,7 @@ public:
     void TearDown();
 
     std::shared_ptr<DCameraSinkOutput> output_;
-    std::shared_ptr<ICameraChannel> channel_;
+    std::shared_ptr<DCameraChannelSinkImpl> channel_;
     std::shared_ptr<ICameraChannelListener> listener_;
     std::shared_ptr<ICameraOperator> operator_;
 };
@@ -47,7 +50,7 @@ public:
 namespace {
 const std::string TEST_DEVICE_ID = "bb536a637105409e904d4da83790a4a7";
 const std::string TEST_CAMERA_DH_ID_0 = "camera_0";
-const int32_t TEST_TWO_S = 2;
+const int32_t TEST_SLEEP_SEC = 200000;
 }
 void DCameraChannelSinkImplTest::SetUpTestCase(void)
 {
@@ -171,7 +174,7 @@ HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_004, TestSiz
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);
     ret = channel_->SendData(dataBuffer);
-    sleep(TEST_TWO_S);
+    usleep(TEST_SLEEP_SEC);
     channel_->CloseSession();
     ret = channel_->ReleaseSession();
     EXPECT_EQ(DCAMERA_OK, ret);
@@ -224,7 +227,7 @@ HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_008, TestSiz
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);
     int32_t ret = channel_->SendData(dataBuffer);
-    sleep(TEST_TWO_S);
+    usleep(TEST_SLEEP_SEC);
     EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
 }
 
@@ -272,6 +275,30 @@ HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_010, TestSiz
     buffers.push_back(dataBuffer);
     listener_->OnDataReceived(buffers);
     int32_t ret = channel_->ReleaseSession();
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_channel_sink_impl_test_011
+ * @tc.desc: Verify the SendData function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_011, TestSize.Level1)
+{
+    std::vector<DCameraIndex> camIndexs;
+    DCameraIndex index;
+    index.devId_ = TEST_DEVICE_ID;
+    index.dhId_ = TEST_CAMERA_DH_ID_0;
+    camIndexs.push_back(index);
+    std::string sessionFlag = "test001";
+    DCameraSessionMode sessionMode = DCAMERA_SESSION_MODE_JPEG;
+    operator_ = std::make_shared<MockCameraOperator>();
+    output_ = std::make_shared<DCameraSinkOutput>(TEST_CAMERA_DH_ID_0, operator_);
+
+    listener_ = std::make_shared<DCameraSinkOutputChannelListener>(CONTINUOUS_FRAME, output_);
+    channel_->softbusSession_ = nullptr;
+    int32_t ret = channel_->CreateSession(camIndexs, sessionFlag, sessionMode, listener_);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 }

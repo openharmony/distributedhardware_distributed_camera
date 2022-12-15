@@ -14,8 +14,10 @@
  */
 
 #include <gtest/gtest.h>
-
+#define private public
 #include "dcamera_provider_callback_impl.h"
+#undef private
+
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -50,7 +52,7 @@ const std::string TEST_PARAM = "0xFFFF";
 const int32_t TEST_WIDTH = 1920;
 const int32_t TEST_HEIGTH = 1080;
 const int32_t TEST_STREAMID = 2;
-const int32_t SLEEP_TIME = 2;
+const int32_t SLEEP_TIME = 200000;
 std::vector<DCStreamInfo> g_streamInfosSnap;
 std::vector<DCCaptureInfo> g_captureInfoSnap;
 std::vector<DCameraSettings> g_cameraSettingSnap;
@@ -140,6 +142,7 @@ void DCameraProviderCallbackImplTest::SetUp(void)
 
 void DCameraProviderCallbackImplTest::TearDown(void)
 {
+    usleep(SLEEP_TIME);
     testProviderCallback_ = nullptr;
     camDev_ = nullptr;
     stateListener_ = nullptr;
@@ -178,7 +181,6 @@ HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_00
 
     ret = testProviderCallback_->CloseSession(dhBase);
     EXPECT_EQ(SUCCESS, ret);
-    sleep(SLEEP_TIME);
 }
 
 /**
@@ -217,7 +219,6 @@ HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_00
 
     ret = testProviderCallback_->ReleaseStreams(dhBase, g_streamIdSnap);
     EXPECT_EQ(SUCCESS, ret);
-    sleep(SLEEP_TIME);
 }
 
 /**
@@ -256,7 +257,6 @@ HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_00
 
     ret = testProviderCallback_->StopCapture(dhBase, g_streamIdSnap);
     EXPECT_EQ(SUCCESS, ret);
-    sleep(SLEEP_TIME);
 }
 
 /**
@@ -293,7 +293,157 @@ HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_00
 
     ret = testProviderCallback_->CloseSession(dhBase);
     EXPECT_EQ(SUCCESS, ret);
-    sleep(SLEEP_TIME);
+}
+
+/**
+ * @tc.name: dcamera_provider_callback_impl_test_009
+ * @tc.desc: Verify OpenSession CloseSession func.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_009, TestSize.Level1)
+{
+    DHBase dhBase{TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0};
+    std::shared_ptr<DCameraSourceDev> camDev = nullptr;
+    std::shared_ptr<DCameraProviderCallbackImpl> testProviderCallback =
+        std::make_shared<DCameraProviderCallbackImpl>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, camDev);
+    int32_t ret = testProviderCallback->OpenSession(dhBase);
+    EXPECT_EQ(FAILED, ret);
+
+    ret = testProviderCallback->CloseSession(dhBase);
+    EXPECT_EQ(FAILED, ret);
+}
+
+/**
+ * @tc.name: dcamera_provider_callback_impl_test_010
+ * @tc.desc: Verify UpdateSettings func.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_010, TestSize.Level1)
+{
+    DHBase dhBase{TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0};
+    std::shared_ptr<DCameraSourceDev> camDev = nullptr;
+    std::shared_ptr<DCameraProviderCallbackImpl> testProviderCallback =
+        std::make_shared<DCameraProviderCallbackImpl>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, camDev);
+    int32_t ret = testProviderCallback->UpdateSettings(dhBase, g_cameraSettingSnap);
+
+    EXPECT_EQ(FAILED, ret);
+}
+
+/**
+ * @tc.name: dcamera_provider_callback_impl_test_011
+ * @tc.desc: Verify ConfigureStreams ReleaseStreams func.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_011, TestSize.Level1)
+{
+    EXPECT_EQ(false, testProviderCallback_ == nullptr);
+
+    DHBase dhBase{TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0};
+    std::shared_ptr<DCameraSourceDev> camDev = nullptr;
+    std::shared_ptr<DCameraProviderCallbackImpl> testProviderCallback =
+        std::make_shared<DCameraProviderCallbackImpl>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, camDev);
+    std::vector<DCStreamInfo> streamInfos;
+    DCStreamInfo streamInfo11;
+    streamInfo11.streamId_ = 1;
+    streamInfo11.width_ = TEST_WIDTH;
+    streamInfo11.height_ = TEST_HEIGTH;
+    streamInfo11.stride_ = 1;
+    streamInfo11.format_ = 1;
+    streamInfo11.dataspace_ = 1;
+    streamInfo11.encodeType_ = ENCODE_TYPE_JPEG;
+    streamInfo11.type_ = SNAPSHOT_FRAME;
+    streamInfos.push_back(streamInfo11);
+    int32_t ret = testProviderCallback->ConfigureStreams(dhBase, streamInfos);
+    EXPECT_EQ(FAILED, ret);
+
+    std::vector<int> streamIds;
+    ret = testProviderCallback->ReleaseStreams(dhBase, streamIds);
+    EXPECT_EQ(FAILED, ret);
+}
+
+/**
+ * @tc.name: dcamera_provider_callback_impl_test_012
+ * @tc.desc: Verify CheckStreamInfo func.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_012, TestSize.Level1)
+{
+    std::shared_ptr<DCameraProviderCallbackImpl> testProviderCallback =
+        std::make_shared<DCameraProviderCallbackImpl>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, camDev_);
+    DCStreamInfo stream;
+    stream.streamId_ = 1;
+    stream.width_ = TEST_WIDTH;
+    stream.height_ = TEST_HEIGTH;
+    stream.stride_ = 1;
+    stream.format_ = 1;
+    stream.dataspace_ = 1;
+    stream.encodeType_ = ENCODE_TYPE_JPEG;
+    stream.type_ = SNAPSHOT_FRAME;
+    int32_t ret = testProviderCallback->CheckStreamInfo(stream);
+    EXPECT_EQ(true, ret);
+    stream.streamId_ = -1;
+    ret = testProviderCallback->CheckStreamInfo(stream);
+    EXPECT_EQ(false, ret);
+    stream.streamId_ = 1;
+    stream.height_ = -1;
+    ret = testProviderCallback->CheckStreamInfo(stream);
+    EXPECT_EQ(false, ret);
+    stream.streamId_ = 1;
+    stream.height_ = TEST_HEIGTH;
+    stream.width_ = -1;
+    ret = testProviderCallback->CheckStreamInfo(stream);
+    EXPECT_EQ(false, ret);
+    stream.height_ = testProviderCallback->RESOLUTION_MAX_WIDTH;
+    stream.width_ = testProviderCallback->RESOLUTION_MAX_WIDTH + 1;
+    ret = testProviderCallback->CheckStreamInfo(stream);
+    EXPECT_EQ(false, ret);
+    stream.width_ = TEST_WIDTH;
+    stream.height_ = TEST_HEIGTH;
+    stream.stride_ = -1;
+    ret = testProviderCallback->CheckStreamInfo(stream);
+    EXPECT_EQ(false, ret);
+    stream.stride_ = 1;
+    stream.dataspace_ = -1;
+    ret = testProviderCallback->CheckStreamInfo(stream);
+    EXPECT_EQ(false, ret);
+    stream.format_ = -1;
+    stream.dataspace_ = 1;
+    ret = testProviderCallback->CheckStreamInfo(stream);
+    EXPECT_EQ(false, ret);
+}
+
+/**
+ * @tc.name: dcamera_provider_callback_impl_test_013
+ * @tc.desc: Verify StartCapture StopCapture func.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_013, TestSize.Level1)
+{
+    DHBase dhBase{TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0};
+    std::vector<DCCaptureInfo> captureInfos;
+    DCCaptureInfo captureInfo13;
+    captureInfo13.streamIds_.push_back(1);
+    captureInfo13.width_ = TEST_WIDTH;
+    captureInfo13.height_ = TEST_HEIGTH;
+    captureInfo13.stride_ = 1;
+    captureInfo13.format_ = 1;
+    captureInfo13.dataspace_ = 1;
+    captureInfo13.encodeType_ = ENCODE_TYPE_H265;
+    captureInfo13.type_ = CONTINUOUS_FRAME;
+    std::shared_ptr<DCameraSourceDev> camDev = nullptr;
+    std::shared_ptr<DCameraProviderCallbackImpl> testProviderCallback =
+        std::make_shared<DCameraProviderCallbackImpl>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, camDev);
+    int32_t ret = testProviderCallback->StartCapture(dhBase, captureInfos);
+    EXPECT_EQ(FAILED, ret);
+
+    std::vector<int> streamIds;
+    ret = testProviderCallback->StopCapture(dhBase, streamIds);
+    EXPECT_EQ(FAILED, ret);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
