@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef OHOS_MOCK_DISTRIBUTED_CAMERA_SINK_STUB_H
+#define OHOS_MOCK_DISTRIBUTED_CAMERA_SINK_STUB_H
+
 #include "distributed_camera_errno.h"
 #include "distributed_camera_sink_stub.h"
 
@@ -83,3 +86,4 @@ public:
 
 } // namespace DistributedHardware
 } // namespace OHOS
+#endif // OHOS_MOCK_DISTRIBUTED_CAMERA_SINK_STUB_H
