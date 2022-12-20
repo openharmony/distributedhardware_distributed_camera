@@ -64,6 +64,7 @@ ohos_unittest("DCameraSourceMgrTest") {
     "dcamera_source_input_test.cpp",
     "dcamera_source_service_ipc_test.cpp",
     "dcamera_source_state_machine_test.cpp",
+    "dcamera_stream_data_process_producer_test.cpp",
     "dcamera_stream_data_process_test.cpp",
   ]
 

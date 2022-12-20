@@ -472,5 +472,41 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_019, TestSi
     ret = controller_->UnInit();
     EXPECT_EQ(ret, DCAMERA_OK);
 }
+
+/**
+ * @tc.name: dcamera_source_controller_test_020
+ * @tc.desc: Verify source controller OpenChannel and CloseChannel.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_020, TestSize.Level1)
+{
+    std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos;
+    std::shared_ptr<DCameraCaptureInfo> capture = std::make_shared<DCameraCaptureInfo>();
+    capture->width_ = TEST_WIDTH;
+    capture->height_ = TEST_HEIGTH;
+    capture->format_ = TEST_FORMAT;
+    capture->dataspace_ = TEST_DATASPACE;
+    capture->isCapture_ = TEST_ISCAPTURE;
+    capture->encodeType_ = DCEncodeType::ENCODE_TYPE_H264;
+    capture->streamType_ = DCStreamType::SNAPSHOT_FRAME;
+    captureInfos.push_back(capture);
+    DCameraIndex index1;
+    index1.devId_ = TEST_DEVICE_ID;
+    index1.dhId_ = TEST_CAMERA_DH_ID_0;
+    DCameraIndex index2;
+    index2.devId_ = TEST_DEVICE_ID;
+    index2.dhId_ = TEST_CAMERA_DH_ID_0;
+    controller_->indexs_.push_back(index1);
+    controller_->indexs_.push_back(index2);
+    indexs_.push_back(index1);
+
+    int32_t ret = controller_->Init(indexs_);
+    EXPECT_EQ(ret, DCAMERA_INIT_ERR);
+    ret = controller_->StartCapture(captureInfos);
+    EXPECT_EQ(ret, DCAMERA_BAD_OPERATE);
+    ret = controller_->StopCapture();
+    EXPECT_EQ(ret, DCAMERA_BAD_OPERATE);
+}
 }
 }
