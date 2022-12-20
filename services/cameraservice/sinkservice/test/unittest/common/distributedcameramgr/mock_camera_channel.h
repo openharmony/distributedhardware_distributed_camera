@@ -21,6 +21,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+extern std::string g_channelStr;
 class MockCameraChannel : public ICameraChannel {
 public:
     explicit MockCameraChannel()
@@ -44,11 +45,17 @@ public:
     int32_t CreateSession(std::vector<DCameraIndex>& camIndexs, std::string sessionFlag,
         DCameraSessionMode sessionMode, std::shared_ptr<ICameraChannelListener>& listener)
     {
+        if (g_channelStr == "test016") {
+            return DCAMERA_BAD_VALUE;
+        }
         return DCAMERA_OK;
     }
 
     int32_t ReleaseSession()
     {
+        if (g_channelStr == "test017") {
+            return DCAMERA_BAD_VALUE;
+        }
         return DCAMERA_OK;
     }
 

@@ -151,5 +151,22 @@ HWTEST_F(DcameraSinkHidumperTest, dcamera_sink_hidumper_test_006, TestSize.Level
     bool ret = DcameraSinkHidumper::GetInstance().Dump(args, result);
     EXPECT_EQ(true, ret);
 }
+
+/**
+ * @tc.name: dcamera_sink_hidumper_test_007
+ * @tc.desc: Verify the Dump function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSinkHidumperTest, dcamera_sink_hidumper_test_007, TestSize.Level1)
+{
+    DHLOGI("DcameraSinkHidumperTest::dcamera_sink_hidumper_test_007");
+    std::vector<std::string> args;
+    std::string str1 = "-help";
+    args.push_back(str1);
+    std::string result;
+    bool ret = DcameraSinkHidumper::GetInstance().Dump(args, result);
+    EXPECT_EQ(true, ret);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
