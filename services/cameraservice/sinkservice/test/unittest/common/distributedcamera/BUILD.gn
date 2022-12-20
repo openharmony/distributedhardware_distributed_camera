@@ -43,6 +43,8 @@ config("module_private_config") {
     "${services_path}/cameraservice/base/include",
     "${services_path}/cameraservice/cameraoperator/handler/include",
     "${services_path}/cameraservice/sinkservice/include/distributedcamera",
+    "${services_path}/cameraservice/sinkservice/include/distributedcameramgr",
+    "${services_path}/cameraservice/sinkservice/include/distributedcameramgr/interface",
   ]
 }
 
