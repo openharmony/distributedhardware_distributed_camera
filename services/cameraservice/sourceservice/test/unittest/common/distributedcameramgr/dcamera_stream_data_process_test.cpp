@@ -206,5 +206,34 @@ HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_006, Tes
     streamProcess->GetPipelineCodecType(DCEncodeType::ENCODE_TYPE_NULL);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
+
+/**
+ * @tc.name: dcamera_stream_data_process_test_007
+ * @tc.desc: Verify DestroyPipeline func.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_007, TestSize.Level1)
+{
+    DHLOGI("DCameraStreamDataProcessTest::dcamera_stream_data_process_test_007");
+    int32_t ret = 0;
+    std::shared_ptr<DCameraStreamDataProcess> streamProcess1 =
+        std::make_shared<DCameraStreamDataProcess>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, DCStreamType::CONTINUOUS_FRAME);
+    std::shared_ptr<DCameraStreamDataProcessPipelineListener> listener1 =
+        std::make_shared<DCameraStreamDataProcessPipelineListener>(streamProcess1);
+
+
+    size_t capacity = 1;
+    std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(capacity);
+    listener1->OnProcessedVideoBuffer(buffer);
+    listener1->OnError(DataProcessErrorType::ERROR_PIPELINE_ENCODER);
+
+    std::shared_ptr<DCameraStreamDataProcess> streamProcess2 = nullptr;
+    std::shared_ptr<DCameraStreamDataProcessPipelineListener> listener2 =
+        std::make_shared<DCameraStreamDataProcessPipelineListener>(streamProcess2);
+    listener2->OnProcessedVideoBuffer(buffer);
+    listener2->OnError(DataProcessErrorType::ERROR_PIPELINE_ENCODER);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
 }
 }
