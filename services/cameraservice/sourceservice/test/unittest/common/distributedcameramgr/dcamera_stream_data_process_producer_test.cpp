@@ -43,7 +43,7 @@ public:
 namespace {
 const std::string TEST_DEVICE_ID = "bb536a637105409e904d4da83790a4a7";
 const std::string TEST_CAMERA_DH_ID_0 = "camera_0";
-#define DCAMERA_PRODUCER_MAX_BUFFER_SIZE 1;
+#define DCAMERA_PRODUCER_MAX_BUFFER_SIZE 1
 }
 void DCameraStreamDataProcessProducerTest::SetUpTestCase(void)
 {
