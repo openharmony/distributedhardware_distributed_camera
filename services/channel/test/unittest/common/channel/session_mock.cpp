@@ -24,9 +24,9 @@ constexpr int32_t DH_SUCCESS = 0;
 constexpr int32_t DH_ERROR = -1;
 constexpr int32_t MOCK_SESSION_ID = 1;
 static ISessionListener listener_;
-static char peerDeviceId_[CHAR_ARRAY_SIZE];
-static char peerSessionName_[CHAR_ARRAY_SIZE];
-static char mySessionName_[CHAR_ARRAY_SIZE];
+static char g_peerDeviceId_[CHAR_ARRAY_SIZE + 1];
+static char g_peerSessionName_[CHAR_ARRAY_SIZE + 1];
+static char g_mySessionName_[CHAR_ARRAY_SIZE + 1];
 int CreateSessionServer(const char *pkgName, const char *sessionName, const ISessionListener *listener)
 {
     (void)pkgName;
@@ -44,7 +44,7 @@ int CreateSessionServer(const char *pkgName, const char *sessionName, const ISes
         std::cout << "CreateSessionServer listener is null." << std::endl;
         return DH_ERROR;
     }
-    strcpy_s(mySessionName_, tmpstr.size() + 1, tmpstr.c_str());
+    strcpy_s(g_mySessionName_, tmpstr.size() + 1, tmpstr.c_str());
     listener_.OnBytesReceived = listener->OnBytesReceived;
     listener_.OnMessageReceived = listener->OnMessageReceived;
     listener_.OnSessionClosed = listener->OnSessionClosed;
@@ -72,8 +72,8 @@ int OpenSession(const char *mySessionName, const char *peerSessionName, const ch
     if (strlen(peerDeviceId) <= 0) {
         return DH_ERROR;
     }
-    strncpy_s(peerSessionName_, CHAR_ARRAY_SIZE, peerSessionName, CHAR_ARRAY_SIZE);
-    strncpy_s(peerDeviceId_, DEVICE_ID_SIZE_MAX, peerDeviceId, DEVICE_ID_SIZE_MAX);
+    strncpy_s(g_peerSessionName_, CHAR_ARRAY_SIZE + 1, peerSessionName, CHAR_ARRAY_SIZE);
+    strncpy_s(g_peerDeviceId_, DEVICE_ID_SIZE_MAX + 1, peerDeviceId, DEVICE_ID_SIZE_MAX);
     std::thread thd(OpenSessionResult);
     thd.detach();
     return MOCK_SESSION_ID;
@@ -118,7 +118,7 @@ int GetMySessionName(int sessionId, char *sessionName, unsigned int len)
 {
     (void)sessionId;
     (void)len;
-    strncpy_s(sessionName, CHAR_ARRAY_SIZE, mySessionName_, CHAR_ARRAY_SIZE);
+    strncpy_s(sessionName, CHAR_ARRAY_SIZE + 1, g_mySessionName_, CHAR_ARRAY_SIZE);
     return DH_SUCCESS;
 }
 
@@ -131,7 +131,7 @@ int GetPeerSessionName(int sessionId, char *sessionName, unsigned int len)
     if (tmpstr == peerSessName) {
         return DH_ERROR;
     }
-    strncpy_s(sessionName, CHAR_ARRAY_SIZE, peerSessionName_, CHAR_ARRAY_SIZE);
+    strncpy_s(sessionName, CHAR_ARRAY_SIZE + 1, g_peerSessionName_, CHAR_ARRAY_SIZE);
     return DH_SUCCESS;
 }
 
@@ -142,7 +142,7 @@ int GetPeerDeviceId(int sessionId, char *devId, unsigned int len)
     if (sessionId == mySessionId) {
         return DH_ERROR;
     }
-    strncpy_s(devId, DEVICE_ID_SIZE_MAX, peerDeviceId_, DEVICE_ID_SIZE_MAX);
+    strncpy_s(devId, DEVICE_ID_SIZE_MAX + 1, g_peerDeviceId_, DEVICE_ID_SIZE_MAX);
     return DH_SUCCESS;
 }
 
