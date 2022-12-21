@@ -38,6 +38,9 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace DistributedHardware {
+std::string g_channelStr = "";
+std::string g_outputStr = "";
+std::string g_operatorStr = "";
 class DCameraSinkControllerTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -212,6 +215,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_005, TestSize.L
     DCameraMetadataSettingCmd cmdMetadata;
     cmdMetadata.Unmarshal(TEST_METADATA_SETTING_CMD_JSON);
     ret = controller_->UpdateSettings(cmdMetadata.value_);
+    controller_->OnMetadataResult(cmdMetadata.value_);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
@@ -360,6 +364,139 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_014, TestSize.L
 {
     int32_t ret = controller_->CloseChannel();
     EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_controller_test_015
+ * @tc.desc: Verify the UpdateSettings function.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6N1
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_015, TestSize.Level1)
+{
+    DCameraCaptureInfoCmd cmd;
+    cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON);
+    int32_t ret = controller_->StartCapture(cmd.value_);
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    DCameraMetadataSettingCmd cmdMetadata;
+    cmdMetadata.Unmarshal(TEST_METADATA_SETTING_CMD_JSON);
+    g_operatorStr = "test015";
+    ret = controller_->UpdateSettings(cmdMetadata.value_);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_controller_test_016
+ * @tc.desc: Verify the OpenChannel function.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6N1
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_016, TestSize.Level1)
+{
+    DCameraOpenInfoCmd cmd;
+    cmd.Unmarshal(TEST_OPEN_INFO_CMD_JSON);
+    g_channelStr = "test016";
+    int32_t ret = controller_->OpenChannel(cmd.value_);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_controller_test_017
+ * @tc.desc: Verify the CloseChannel function.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6N1
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_017, TestSize.Level1)
+{
+    g_channelStr = "test017";
+    int32_t ret = controller_->CloseChannel();
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_controller_test_018
+ * @tc.desc: Verify the CloseChannel function.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6N1
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_018, TestSize.Level1)
+{
+    g_outputStr = "test018";
+    int32_t ret = controller_->CloseChannel();
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_controller_test_019
+ * @tc.desc: Verify the Init and UnInit function.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MV
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_019, TestSize.Level1)
+{
+    g_outputStr = "test019";
+    int32_t ret = controller_->UnInit();
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_controller_test_020
+ * @tc.desc: Verify the Init and UnInit function.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MV
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_020, TestSize.Level1)
+{
+    g_operatorStr = "test020";
+    int32_t ret = controller_->UnInit();
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_controller_test_021
+ * @tc.desc: Verify the StartCapture function.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MU
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_021, TestSize.Level1)
+{
+    DCameraCaptureInfoCmd cmd;
+    cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON);
+    g_outputStr = "test021";
+    int32_t ret = controller_->StartCapture(cmd.value_);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_controller_test_022
+ * @tc.desc: Verify the StartCapture function.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MU
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_022, TestSize.Level1)
+{
+    DCameraCaptureInfoCmd cmd;
+    cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON);
+    g_outputStr = "";
+    g_operatorStr = "test022";
+    int32_t ret = controller_->StartCapture(cmd.value_);
+    EXPECT_EQ(DCAMERA_ALLOC_ERROR, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_controller_test_023
+ * @tc.desc: Verify the StartCapture function.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MU
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_023, TestSize.Level1)
+{
+    DCameraCaptureInfoCmd cmd;
+    cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON);
+    g_operatorStr = "test023";
+    int32_t ret = controller_->StartCapture(cmd.value_);
+    EXPECT_EQ(DCAMERA_DEVICE_BUSY, ret);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

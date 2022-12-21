@@ -21,6 +21,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+extern std::string g_operatorStr;
 class MockCameraOperator : public ICameraOperator {
 public:
     explicit MockCameraOperator()
@@ -38,11 +39,17 @@ public:
 
     int32_t UnInit()
     {
+        if (g_operatorStr == "test020") {
+            return DCAMERA_BAD_VALUE;
+        }
         return DCAMERA_OK;
     }
 
     int32_t UpdateSettings(std::vector<std::shared_ptr<DCameraSettings>>& settings)
     {
+        if (g_operatorStr == "test015") {
+            return DCAMERA_BAD_VALUE;
+        }
         return DCAMERA_OK;
     }
 
@@ -59,6 +66,11 @@ public:
     int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos,
         sptr<Surface>& surface)
     {
+        if (g_operatorStr == "test022") {
+            return DCAMERA_ALLOC_ERROR;
+        } else if (g_operatorStr == "test023") {
+            return DCAMERA_DEVICE_BUSY;
+        }
         return DCAMERA_OK;
     }
 

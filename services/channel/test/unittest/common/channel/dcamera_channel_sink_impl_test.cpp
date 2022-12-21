@@ -34,6 +34,7 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace DistributedHardware {
+std::string g_operatorStr = "";
 class DCameraChannelSinkImplTest : public testing::Test {
 public:
     static void SetUpTestCase(void);

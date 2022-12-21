@@ -22,6 +22,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+extern std::string g_outputStr;
 class MockDCameraSinkOutput : public ICameraSinkOutput {
 public:
     explicit MockDCameraSinkOutput(const std::string& dhId, const std::shared_ptr<ICameraOperator>& cameraOperator)
@@ -38,10 +39,16 @@ public:
     }
     int32_t UnInit()
     {
+        if (g_outputStr == "test019") {
+            return DCAMERA_BAD_VALUE;
+        }
         return DCAMERA_OK;
     }
     int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos)
     {
+        if (g_outputStr == "test021") {
+            return DCAMERA_BAD_VALUE;
+        }
         return DCAMERA_OK;
     }
     int32_t StopCapture()
@@ -54,6 +61,9 @@ public:
     }
     int32_t CloseChannel()
     {
+        if (g_outputStr == "test018") {
+            return DCAMERA_BAD_VALUE;
+        }
         return DCAMERA_OK;
     }
     int32_t GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier)
