@@ -15,9 +15,17 @@
 
 #include <gtest/gtest.h>
 
+#define private public
+#define protected public
 #include "distributed_camera_source_service.h"
+#undef protected
+#undef private
+
+#include "dcamera_source_callback_proxy.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
+#include "if_system_ability_manager.h"
+#include "iservice_registry.h"
 
 using namespace testing::ext;
 
@@ -112,6 +120,108 @@ HWTEST_F(DistributedCameraSourceServiceTest, dcamera_source_service_test_003, Te
     std::u16string str(u"");
     args.push_back(str);
     int ret = testSrcService_->Dump(fd, args);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_service_test_004
+ * @tc.desc: Verify the OnStart function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DistributedCameraSourceServiceTest, dcamera_source_service_test_004, TestSize.Level1)
+{
+    DHLOGI("DistributedCameraSourceServiceTest::dcamera_source_service_test_004");
+    EXPECT_EQ(false, testSrcService_ == nullptr);
+
+    int32_t ret = 0;
+    testSrcService_->state_ = DCameraServiceState::DCAMERA_SRV_STATE_RUNNING;
+    testSrcService_->OnStart();
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_service_test_005
+ * @tc.desc: Verify the Init function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DistributedCameraSourceServiceTest, dcamera_source_service_test_005, TestSize.Level1)
+{
+    DHLOGI("DistributedCameraSourceServiceTest::dcamera_source_service_test_005");
+    EXPECT_EQ(false, testSrcService_ == nullptr);
+
+    int32_t ret = 0;
+    testSrcService_->registerToService_ = true;
+    testSrcService_->Init();
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_service_test_006
+ * @tc.desc: Verify the InitSource function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DistributedCameraSourceServiceTest, dcamera_source_service_test_006, TestSize.Level1)
+{
+    DHLOGI("DistributedCameraSourceServiceTest::dcamera_source_service_test_006");
+    EXPECT_EQ(false, testSrcService_ == nullptr);
+
+    std::string params = "test006";
+    sptr<ISystemAbilityManager> samgr =
+        SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID);
+    sptr<DCameraSourceCallbackProxy> callbackProxy(new DCameraSourceCallbackProxy(remoteObject));
+    testSrcService_->listener_ = std::make_shared<DCameraServiceStateListener>();
+    int32_t ret = testSrcService_->InitSource(params, callbackProxy);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_service_test_007
+ * @tc.desc: Verify the ReleaseSource function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DistributedCameraSourceServiceTest, dcamera_source_service_test_007, TestSize.Level1)
+{
+    DHLOGI("DistributedCameraSourceServiceTest::dcamera_source_service_test_007");
+    EXPECT_EQ(false, testSrcService_ == nullptr);
+
+    int32_t ret = testSrcService_->ReleaseSource();
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_service_test_008
+ * @tc.desc: Verify the LoadDCameraHDF function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DistributedCameraSourceServiceTest, dcamera_source_service_test_008, TestSize.Level1)
+{
+    DHLOGI("DistributedCameraSourceServiceTest::dcamera_source_service_test_008");
+    EXPECT_EQ(false, testSrcService_ == nullptr);
+
+    int32_t ret = testSrcService_->LoadDCameraHDF();
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_service_test_009
+ * @tc.desc: Verify the UnLoadCameraHDF function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DistributedCameraSourceServiceTest, dcamera_source_service_test_009, TestSize.Level1)
+{
+    DHLOGI("DistributedCameraSourceServiceTest::dcamera_source_service_test_009");
+    EXPECT_EQ(false, testSrcService_ == nullptr);
+
+    int32_t ret = testSrcService_->LoadDCameraHDF();
+    EXPECT_EQ(DCAMERA_OK, ret);
+    ret = testSrcService_->UnLoadCameraHDF();
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 } // namespace DistributedHardware
