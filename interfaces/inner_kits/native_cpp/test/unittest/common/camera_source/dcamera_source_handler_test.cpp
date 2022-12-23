@@ -1,0 +1,181 @@
+/*
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include <gtest/gtest.h>
+
+#define private public
+#include "dcamera_source_handler.h"
+#undef private
+#include "anonymous_string.h"
+#include "dcamera_hisysevent_adapter.h"
+#include "dcamera_source_callback.h"
+#include "dcamera_source_handler_ipc.h"
+#include "dcamera_source_load_callback.h"
+#include "distributed_camera_constants.h"
+#include "distributed_camera_errno.h"
+#include "distributed_hardware_log.h"
+#include "mock_component_disable.h"
+#include "mock_component_enable.h"
+#include "if_system_ability_manager.h"
+#include "iservice_registry.h"
+
+using namespace testing::ext;
+
+namespace OHOS {
+namespace DistributedHardware {
+class DCameraSourceHandlerTest : public testing::Test {
+public:
+    static void SetUpTestCase(void);
+    static void TearDownTestCase(void);
+    void SetUp();
+    void TearDown();
+};
+
+namespace {
+const std::string TEST_DEVICE_ID = "bb536a637105409e904d4da83790a4a7";
+const std::string TEST_CAMERA_DH_ID_0 = "camera_0";
+const std::string TEST_VER = "1.0";
+const std::string TEST_ATTRS = "";
+}
+void DCameraSourceHandlerTest::SetUpTestCase(void)
+{
+    DHLOGI("DCameraSourceHandlerTest::SetUpTestCase");
+}
+
+void DCameraSourceHandlerTest::TearDownTestCase(void)
+{
+    DHLOGI("DCameraSourceHandlerTest::TearDownTestCase");
+}
+
+void DCameraSourceHandlerTest::SetUp(void)
+{
+    DHLOGI("DCameraSourceHandlerTest::SetUp");
+}
+
+void DCameraSourceHandlerTest::TearDown(void)
+{
+    DHLOGI("DCameraSourceHandlerTest::TearDown");
+}
+
+/**
+ * @tc.name: dcamera_source_handler_test_001
+ * @tc.desc: Verify the InitSource function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_001, TestSize.Level1)
+{
+    std::string params = "test001";
+    int32_t ret = DCameraSourceHandler::GetInstance().InitSource(params);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_handler_test_002
+ * @tc.desc: Verify the ReleaseSource function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_002, TestSize.Level1)
+{
+    std::string params = "test002";
+    int32_t ret = DCameraSourceHandler::GetInstance().InitSource(params);
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    int32_t systemAbilityId = 4803;
+    DCameraSourceHandler::GetInstance().FinishStartSA(params);
+    DCameraSourceHandler::GetInstance().FinishStartSAFailed(systemAbilityId);
+    ret = DCameraSourceHandler::GetInstance().ReleaseSource();
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_handler_test_003
+ * @tc.desc: Verify the RegisterDistributedHardware function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_003, TestSize.Level1)
+{
+    std::string devId = TEST_DEVICE_ID;
+    std::string dhId = TEST_CAMERA_DH_ID_0;
+    EnableParam param;
+    param.version = TEST_VER;
+    param.attrs = TEST_ATTRS;
+    std::shared_ptr<RegisterCallback> callback = std::make_shared<MockComponentEnable>();
+    int32_t ret = DCameraSourceHandler::GetInstance().RegisterDistributedHardware(devId, dhId, param, callback);
+    EXPECT_NE(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_handler_test_004
+ * @tc.desc: Verify the RegisterDistributedHardware function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_004, TestSize.Level1)
+{
+    std::string devId = TEST_DEVICE_ID;
+    std::string dhId = TEST_CAMERA_DH_ID_0;
+    std::shared_ptr<UnregisterCallback> uncallback = std::make_shared<MockComponentDisable>();
+
+    int32_t ret = DCameraSourceHandler::GetInstance().UnregisterDistributedHardware(devId, dhId, uncallback);
+    EXPECT_NE(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_handler_test_005
+ * @tc.desc: Verify the OnLoadSystemAbilitySuccess function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_005, TestSize.Level1)
+{
+    std::string params = "test005";
+    int32_t systemAbilityId = 4803;
+    sptr<ISystemAbilityManager> samgr =
+            SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(systemAbilityId);
+    sptr<DCameraSourceLoadCallback> loadCallback = new DCameraSourceLoadCallback(params);
+    loadCallback->OnLoadSystemAbilitySuccess(systemAbilityId, remoteObject);
+
+    remoteObject = nullptr;
+    loadCallback->OnLoadSystemAbilitySuccess(systemAbilityId, remoteObject);
+    systemAbilityId = 1;
+    loadCallback->OnLoadSystemAbilitySuccess(systemAbilityId, remoteObject);
+    int32_t ret = DCameraSourceHandler::GetInstance().InitSource(params);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_handler_test_006
+ * @tc.desc: Verify the OnLoadSystemAbilityFail function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_006, TestSize.Level1)
+{
+    std::string params = "test006";
+    int32_t systemAbilityId = 4803;
+    sptr<DCameraSourceLoadCallback> loadCallback = new DCameraSourceLoadCallback(params);
+    loadCallback->OnLoadSystemAbilityFail(systemAbilityId);
+
+    systemAbilityId = 1;
+    loadCallback->OnLoadSystemAbilityFail(systemAbilityId);
+    int32_t ret = DCameraSourceHandler::GetInstance().InitSource(params);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+}
+}
