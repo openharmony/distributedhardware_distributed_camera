@@ -98,7 +98,8 @@
                 "//foundation/distributedhardware/distributed_camera/services/cameraservice/base/test/unittest:services_base_test",
                 "//foundation/distributedhardware/distributed_camera/services/channel/test/unittest:camera_channel_test",
                 "//foundation/distributedhardware/distributed_camera/services/data_process/test/unittest:data_process_test",
-                "//foundation/distributedhardware/distributed_camera/interfaces/inner_kits/native_cpp/test/fuzztest:fuzztest"
+                "//foundation/distributedhardware/distributed_camera/interfaces/inner_kits/native_cpp/test/fuzztest:fuzztest",
+                "//foundation/distributedhardware/distributed_camera/interfaces/inner_kits/native_cpp/test/unittest:dcamera_handler_test"
             ]
         }
     }
