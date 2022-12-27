@@ -272,8 +272,9 @@ int32_t DecodeDataProcess::StopVideoDecoder()
 
 void DecodeDataProcess::ReleaseVideoDecoder()
 {
-    std::lock_guard<std::mutex> lck(mtxDecoderState_);
     DHLOGD("Start release videoDecoder.");
+    std::lock_guard<std::mutex> inputLock(mtxDecoderLock_);
+    std::lock_guard<std::mutex> outputLock(mtxDecoderState_);
     if (videoDecoder_ == nullptr) {
         DHLOGE("The video decoder does not exist before ReleaseVideoDecoder.");
         decodeVideoCallback_ = nullptr;
@@ -405,7 +406,7 @@ int32_t DecodeDataProcess::FeedDecoderInputBuffer()
         }
 
         {
-            std::lock_guard<std::mutex> lck(mtxDecoderState_);
+            std::lock_guard<std::mutex> inputLock(mtxDecoderLock_);
             if (videoDecoder_ == nullptr) {
                 DHLOGE("The video decoder does not exist before GetInputBuffer.");
                 return DCAMERA_OK;
@@ -769,7 +770,7 @@ void DecodeDataProcess::OnOutputBufferAvailable(uint32_t index, const Media::AVC
         info.presentationTimeUs, info.size, info.offset, flag);
     outputInfo_ = info;
     {
-        std::lock_guard<std::mutex> lck(mtxDecoderState_);
+        std::lock_guard<std::mutex> outputLock(mtxDecoderState_);
         if (videoDecoder_ == nullptr) {
             DHLOGE("The video decoder does not exist before decoding data.");
             return;
