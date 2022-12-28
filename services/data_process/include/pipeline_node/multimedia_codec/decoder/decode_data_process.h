@@ -118,6 +118,7 @@ private:
 
     std::shared_ptr<EventBus> eventBusPipeline_;
     std::weak_ptr<DCameraPipelineSource> callbackPipelineSource_;
+    std::mutex mtxDecoderLock_;
     std::mutex mtxDecoderState_;
     std::mutex mtxHoldCount_;
     VideoConfigParams sourceConfig_;
