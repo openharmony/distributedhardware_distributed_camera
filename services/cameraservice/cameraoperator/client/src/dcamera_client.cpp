@@ -214,19 +214,31 @@ int32_t DCameraClient::StopCapture()
                    GetAnonyString(cameraId_).c_str(), ret);
         }
         DHLOGI("DCameraClient::StopCapture %s release videoOutput", GetAnonyString(cameraId_).c_str());
-        videoOutput_->Release();
+        ret = videoOutput_->Release();
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCameraClient::StopCapture videoOutput Release failed, cameraId: %s, ret: %d",
+                   GetAnonyString(cameraId_).c_str(), ret);
+        }
         videoOutput_ = nullptr;
     }
 
     if (photoOutput_ != nullptr) {
         DHLOGI("DCameraClient::StopCapture %s release photoOutput", GetAnonyString(cameraId_).c_str());
-        photoOutput_->Release();
+        int32_t ret = photoOutput_->Release();
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCameraClient::StopCapture photoOutput Release failed, cameraId: %s, ret: %d",
+                   GetAnonyString(cameraId_).c_str(), ret);
+        }
         photoOutput_ = nullptr;
     }
     ReleaseCaptureSession();
     if (cameraInput_ != nullptr) {
         DHLOGI("DCameraClient::StopCapture %s release cameraInput", GetAnonyString(cameraId_).c_str());
-        cameraInput_->Release();
+        int32_t ret = cameraInput_->Release();
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCameraClient::StopCapture cameraInput Release failed, cameraId: %s, ret: %d",
+                   GetAnonyString(cameraId_).c_str(), ret);
+        }
         cameraInput_ = nullptr;
     }
 
@@ -269,9 +281,17 @@ void DCameraClient::ReleaseCaptureSession()
         DHLOGE("DCameraClient::StopCapture captureSession stop failed, cameraId: %s, ret: %d",
                GetAnonyString(cameraId_).c_str(), ret);
     }
-    cameraInput_->Close();
+    ret = cameraInput_->Close();
+    if (ret != DCAMERA_OK) {
+        DHLOGE("DCameraClient::StopCapture cameraInput Close failed, cameraId: %s, ret: %d",
+               GetAnonyString(cameraId_).c_str(), ret);
+    }
     DHLOGI("DCameraClient::StopCapture %s release captureSession", GetAnonyString(cameraId_).c_str());
-    captureSession_->Release();
+    ret = captureSession_->Release();
+    if (ret != DCAMERA_OK) {
+        DHLOGE("DCameraClient::StopCapture captureSession Release failed, cameraId: %s, ret: %d",
+               GetAnonyString(cameraId_).c_str(), ret);
+    }
     captureSession_ = nullptr;
 }
 
@@ -298,12 +318,17 @@ int32_t DCameraClient::SetResultCallback(std::shared_ptr<ResultCallback>& callba
 int32_t DCameraClient::ConfigCaptureSession(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos)
 {
     DHLOGI("DCameraClient::ConfigCaptureSession cameraId: %s", GetAnonyString(cameraId_).c_str());
-    cameraInput_ = cameraManager_->CreateCameraInput(cameraInfo_);
-    if (cameraInput_ == nullptr) {
+    int rv = cameraManager_->CreateCameraInput(cameraInfo_, &((sptr<CameraStandard::CameraInput> &)cameraInput_));
+    if (rv != DCAMERA_OK) {
         DHLOGE("DCameraClient::ConfigCaptureSession %s create cameraInput failed", GetAnonyString(cameraId_).c_str());
         return DCAMERA_BAD_VALUE;
     }
-    ((sptr<CameraStandard::CameraInput> &)cameraInput_)->Open();
+    int32_t rc = ((sptr<CameraStandard::CameraInput> &)cameraInput_)->Open();
+    if (rc != DCAMERA_OK) {
+        DHLOGE("DCameraClient::ConfigCaptureSession cameraInput_ Open failed, cameraId: %s, ret: %d",
+               GetAnonyString(cameraId_).c_str(), rc);
+        return DCAMERA_BAD_VALUE;
+    }
     std::shared_ptr<DCameraInputCallback> inputCallback = std::make_shared<DCameraInputCallback>(stateCallback_);
     ((sptr<CameraStandard::CameraInput> &)cameraInput_)->SetErrorCallback(inputCallback);
 
@@ -319,8 +344,8 @@ int32_t DCameraClient::ConfigCaptureSession(std::vector<std::shared_ptr<DCameraC
         cameraMetadatas_.pop();
     }
 
-    captureSession_ = cameraManager_->CreateCaptureSession();
-    if (captureSession_ == nullptr) {
+    rv = cameraManager_->CreateCaptureSession(&captureSession_);
+    if (rv != DCAMERA_OK) {
         DHLOGE("DCameraClient::ConfigCaptureSession %s create captureSession failed",
                GetAnonyString(cameraId_).c_str());
         return DCAMERA_BAD_VALUE;
@@ -434,8 +459,9 @@ int32_t DCameraClient::CreatePhotoOutput(std::shared_ptr<DCameraCaptureInfo>& in
     CameraStandard::CameraFormat photoFormat = ConvertToCameraFormat(info->format_);
     CameraStandard::Size photoSize = {info->width_, info->height_};
     CameraStandard::Profile photoProfile(photoFormat, photoSize);
-    photoOutput_ = cameraManager_->CreatePhotoOutput(photoProfile, photoSurface_);
-    if (photoOutput_ == nullptr) {
+    int rv = cameraManager_->CreatePhotoOutput(
+        photoProfile, photoSurface_, &((sptr<CameraStandard::PhotoOutput> &)photoOutput_));
+    if (rv != DCAMERA_OK) {
         DHLOGE("DCameraClient::CreatePhotoOutput %s create photo output failed", GetAnonyString(cameraId_).c_str());
         return DCAMERA_BAD_VALUE;
     }
@@ -458,9 +484,10 @@ int32_t DCameraClient::CreateVideoOutput(std::shared_ptr<DCameraCaptureInfo>& in
     CameraStandard::CameraFormat videoFormat = ConvertToCameraFormat(info->format_);
     CameraStandard::Size videoSize = {info->width_, info->height_};
     std::vector<int32_t> framerates = {};
-    CameraStandard::VideoProfile videoProfile(videoFormat, videoSize, framerates);
-    videoOutput_ = cameraManager_->CreateVideoOutput(videoProfile, videoSurface_);
-    if (videoOutput_ == nullptr) {
+    CameraStandard::VideoProfile videoSettings(videoFormat, videoSize, framerates);
+    int rv = cameraManager_->CreateVideoOutput(
+        videoSettings, videoSurface_, &((sptr<CameraStandard::VideoOutput> &)videoOutput_));
+    if (rv != DCAMERA_OK) {
         DHLOGE("DCameraClient::CreateVideoOutput %s create video output failed", GetAnonyString(cameraId_).c_str());
         return DCAMERA_BAD_VALUE;
     }
