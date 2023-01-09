@@ -46,6 +46,7 @@ const int32_t TEST_WIDTH = 1920;
 const int32_t TEST_HEIGTH = 1080;
 const int32_t TEST_FORMAT = 1;
 const int32_t TEST_DATASPACE = 1;
+const int32_t SLEEP_TIME = 200000;
 }
 void DCameraStreamDataProcessTest::SetUpTestCase(void)
 {
@@ -157,6 +158,7 @@ HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_004, Tes
     streamProcess->FeedStreamToContinue(buffer);
     streamProcess->srcConfig_ = srcConfig;
     streamProcess->CreatePipeline();
+    usleep(SLEEP_TIME);
     streamProcess->FeedStreamToContinue(buffer);
     EXPECT_EQ(DCAMERA_OK, ret);
 }

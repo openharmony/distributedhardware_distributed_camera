@@ -38,6 +38,7 @@ ohos_unittest("DCameraSourceHandlerTest") {
   module_out_path = module_out_path
 
   sources = [
+    "callback/dcamera_source_callback_test.cpp",
     "dcamera_source_handler_ipc_test.cpp",
     "dcamera_source_handler_test.cpp",
   ]
