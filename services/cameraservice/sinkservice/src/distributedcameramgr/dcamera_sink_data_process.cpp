@@ -73,7 +73,7 @@ int32_t DCameraSinkDataProcess::StartCapture(std::shared_ptr<DCameraCaptureInfo>
         return DCAMERA_OK;
     }
 
-    if ((captureInfo->streamType_ == CONTINUOUS_FRAME) && (captureInfo->format_ != captureInfo->encodeType_)) {
+    if (captureInfo->streamType_ == CONTINUOUS_FRAME) {
         DHLOGI("DCameraSinkDataProcess::StartCapture %s create data process pipeline", GetAnonyString(dhId_).c_str());
         pipeline_ = std::make_shared<DCameraPipelineSink>();
         auto dataProcess = std::shared_ptr<DCameraSinkDataProcess>(shared_from_this());
@@ -166,12 +166,6 @@ void DCameraSinkDataProcess::OnError(DataProcessErrorType errorType)
 
 int32_t DCameraSinkDataProcess::FeedStreamInner(std::shared_ptr<DataBuffer>& dataBuffer)
 {
-    if (captureInfo_->format_ == captureInfo_->encodeType_) {
-        DHLOGI("DCameraSinkDataProcess::FeedStreamInner %s send video buffer", GetAnonyString(dhId_).c_str());
-        SendDataAsync(dataBuffer);
-        return DCAMERA_OK;
-    }
-
     std::vector<std::shared_ptr<DataBuffer>> buffers;
     buffers.push_back(dataBuffer);
     int32_t ret = pipeline_->ProcessData(buffers);
@@ -193,6 +187,9 @@ VideoCodecType DCameraSinkDataProcess::GetPipelineCodecType(DCEncodeType encodeT
         case ENCODE_TYPE_H265:
             codecType = VideoCodecType::CODEC_H265;
             break;
+        case ENCODE_TYPE_MPEG4_ES:
+            codecType = VideoCodecType::CODEC_MPEG4_ES;
+            break;
         default:
             codecType = VideoCodecType::NO_CODEC;
             break;
@@ -202,8 +199,16 @@ VideoCodecType DCameraSinkDataProcess::GetPipelineCodecType(DCEncodeType encodeT
 
 Videoformat DCameraSinkDataProcess::GetPipelineFormat(int32_t format)
 {
-    (void)format;
-    return Videoformat::NV21;
+    Videoformat videoFormat;
+    switch (format) {
+        case OHOS_CAMERA_FORMAT_RGBA_8888:
+            videoFormat = Videoformat::RGBA_8888;
+            break;
+        default:
+            videoFormat = Videoformat::NV21;
+            break;
+    }
+    return videoFormat;
 }
 
 int32_t DCameraSinkDataProcess::GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier)

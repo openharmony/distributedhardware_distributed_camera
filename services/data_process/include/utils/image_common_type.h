@@ -30,7 +30,7 @@ enum class VideoCodecType : int32_t {
     NO_CODEC = 0,
     CODEC_H264 = 1,
     CODEC_H265 = 2,
-    CODEC_MPEG4 = 3,
+    CODEC_MPEG4_ES = 3,
 };
 
 enum class Videoformat : int32_t {

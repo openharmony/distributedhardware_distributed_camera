@@ -51,6 +51,7 @@ ohos_shared_library("distributed_camera_data_process") {
     "src/pipeline_node/fpscontroller/fps_controller_process.cpp",
     "src/pipeline_node/multimedia_codec/decoder/decode_surface_listener.cpp",
     "src/pipeline_node/multimedia_codec/decoder/decode_video_callback.cpp",
+    "src/pipeline_node/multimedia_codec/encoder/encode_data_process.cpp",
     "src/pipeline_node/multimedia_codec/encoder/encode_video_callback.cpp",
     "src/pipeline_node/scale_conversion/scale_convert_process.cpp",
     "src/utils/image_common_type.cpp",
@@ -58,15 +59,10 @@ ohos_shared_library("distributed_camera_data_process") {
   ]
 
   if (!distributed_camera_common) {
-    sources += [
-      "src/pipeline_node/multimedia_codec/decoder/decode_data_process.cpp",
-      "src/pipeline_node/multimedia_codec/encoder/encode_data_process.cpp",
-    ]
+    sources +=
+        [ "src/pipeline_node/multimedia_codec/decoder/decode_data_process.cpp" ]
   } else {
-    sources += [
-      "src/pipeline_node/multimedia_codec/decoder/decode_data_process_common.cpp",
-      "src/pipeline_node/multimedia_codec/encoder/encode_data_process_common.cpp",
-    ]
+    sources += [ "src/pipeline_node/multimedia_codec/decoder/decode_data_process_common.cpp" ]
   }
 
   deps = [

@@ -30,8 +30,8 @@ using namespace OHOS::DistributedHardware;
 constexpr double LATITUDE = 22.306;
 constexpr double LONGITUDE = 52.12;
 constexpr double ALTITUDE = 2.365;
-constexpr int32_t PHOTO_WIDTH = 640;
-constexpr int32_t PHOTO_HEIGTH = 480;
+constexpr int32_t PHOTO_WIDTH = 1280;
+constexpr int32_t PHOTO_HEIGTH = 960;
 constexpr int32_t PREVIEW_WIDTH = 640;
 constexpr int32_t PREVIEW_HEIGTH = 480;
 constexpr int32_t VIDEO_WIDTH = 640;
@@ -55,7 +55,7 @@ static std::shared_ptr<DCameraCaptureInfo> g_videoInfo = nullptr;
     constexpr int32_t PREVIEW_FORMAT = camera_format_t::OHOS_CAMERA_FORMAT_YCRCB_420_SP;
     constexpr int32_t VIDEO_FORMAT = camera_format_t::OHOS_CAMERA_FORMAT_YCRCB_420_SP;
 #else
-    constexpr int32_t PHOTO_FORMAT = camera_format_t::OHOS_CAMERA_FORMAT_RGBA_8888;
+    constexpr int32_t PHOTO_FORMAT = camera_format_t::OHOS_CAMERA_FORMAT_JPEG;
     constexpr int32_t PREVIEW_FORMAT = camera_format_t::OHOS_CAMERA_FORMAT_RGBA_8888;
     constexpr int32_t VIDEO_FORMAT = camera_format_t::OHOS_CAMERA_FORMAT_RGBA_8888;
 #endif

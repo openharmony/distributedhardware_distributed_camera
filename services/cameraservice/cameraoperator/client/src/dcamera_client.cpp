@@ -21,6 +21,7 @@
 #include "dcamera_input_callback.h"
 #include "dcamera_manager_callback.h"
 #include "dcamera_photo_callback.h"
+#include "dcamera_preview_callback.h"
 #include "dcamera_session_callback.h"
 #include "dcamera_utils_tools.h"
 #include "dcamera_video_callback.h"
@@ -247,12 +248,12 @@ int32_t DCameraClient::StopCapture()
         int32_t ret = cameraInput_->Close();
         if (ret != DCAMERA_OK) {
             DHLOGE("DCameraClient::StopCapture cameraInput Close failed, cameraId: %s, ret: %d",
-                   GetAnonyString(cameraId_).c_str(), ret);
+                GetAnonyString(cameraId_).c_str(), ret);
         }
         ret = cameraInput_->Release();
         if (ret != DCAMERA_OK) {
             DHLOGE("DCameraClient::StopCapture cameraInput Release failed, cameraId: %s, ret: %d",
-                   GetAnonyString(cameraId_).c_str(), ret);
+                GetAnonyString(cameraId_).c_str(), ret);
         }
         cameraInput_ = nullptr;
     }
@@ -266,7 +267,6 @@ int32_t DCameraClient::StopCapture()
             DHLOGE("DCameraClient::StopCapture %s video surface unregister consumer listener failed, ret: %d",
                 GetAnonyString(cameraId_).c_str(), ret);
         }
-        videoListener_ = nullptr;
         videoSurface_ = nullptr;
     }
 
@@ -337,7 +337,7 @@ int32_t DCameraClient::ConfigCaptureSession(std::vector<std::shared_ptr<DCameraC
     int32_t rc = ((sptr<CameraStandard::CameraInput> &)cameraInput_)->Open();
     if (rc != DCAMERA_OK) {
         DHLOGE("DCameraClient::ConfigCaptureSession cameraInput_ Open failed, cameraId: %s, ret: %d",
-               GetAnonyString(cameraId_).c_str(), rc);
+            GetAnonyString(cameraId_).c_str(), rc);
         return DCAMERA_BAD_VALUE;
     }
     std::shared_ptr<DCameraInputCallback> inputCallback = std::make_shared<DCameraInputCallback>(stateCallback_);
@@ -459,9 +459,9 @@ int32_t DCameraClient::CreateCaptureOutput(std::vector<std::shared_ptr<DCameraCa
 
 int32_t DCameraClient::CreatePhotoOutput(std::shared_ptr<DCameraCaptureInfo>& info)
 {
-    DHLOGI("DCameraClient::CreatePhotoOutput camId: %s, width: %d, height: %d, format: %d, stream: %d, isCapture: %d",
-           GetAnonyString(cameraId_).c_str(), info->width_, info->height_, info->format_,
-           info->streamType_, info->isCapture_);
+    DHLOGI("DCameraClient::CreatePhotoOutput dhId: %s, width: %d, height: %d, format: %d, stream: %d, isCapture: %d",
+        GetAnonyString(cameraId_).c_str(), info->width_, info->height_, info->format_, info->streamType_,
+        info->isCapture_);
     photoSurface_ = Surface::CreateSurfaceAsConsumer();
     photoListener_ = new DCameraPhotoSurfaceListener(photoSurface_, resultCallback_);
     photoSurface_->RegisterConsumerListener((sptr<IBufferConsumerListener> &)photoListener_);
@@ -482,9 +482,9 @@ int32_t DCameraClient::CreatePhotoOutput(std::shared_ptr<DCameraCaptureInfo>& in
 
 int32_t DCameraClient::CreateVideoOutput(std::shared_ptr<DCameraCaptureInfo>& info)
 {
-    DHLOGI("DCameraClient::CreateVideoOutput camId: %s, width: %d, height: %d, format: %d, stream: %d, isCapture: %d",
-           GetAnonyString(cameraId_).c_str(), info->width_, info->height_, info->format_,
-           info->streamType_, info->isCapture_);
+    DHLOGI("DCameraClient::CreateVideoOutput dhId: %s, width: %d, height: %d, format: %d, stream: %d, isCapture: %d",
+        GetAnonyString(cameraId_).c_str(), info->width_, info->height_, info->format_, info->streamType_,
+        info->isCapture_);
     CameraStandard::CameraFormat videoFormat = ConvertToCameraFormat(info->format_);
     CameraStandard::Size videoSize = {info->width_, info->height_};
     std::vector<int32_t> framerates = {};
@@ -506,16 +506,16 @@ CameraStandard::CameraFormat DCameraClient::ConvertToCameraFormat(int32_t format
     CameraStandard::CameraFormat ret = CameraStandard::CameraFormat::CAMERA_FORMAT_INVALID;
     DCameraFormat df = static_cast<DCameraFormat>(format);
     switch (df) {
-        case OHOS_CAMERA_FORMAT_RGBA_8888:
+        case DCameraFormat::OHOS_CAMERA_FORMAT_RGBA_8888:
             ret = CameraStandard::CameraFormat::CAMERA_FORMAT_RGBA_8888;
             break;
-        case OHOS_CAMERA_FORMAT_YCBCR_420_888:
+        case DCameraFormat::OHOS_CAMERA_FORMAT_YCBCR_420_888:
             ret = CameraStandard::CameraFormat::CAMERA_FORMAT_YCBCR_420_888;
             break;
-        case OHOS_CAMERA_FORMAT_YCRCB_420_SP:
+        case DCameraFormat::OHOS_CAMERA_FORMAT_YCRCB_420_SP:
             ret = CameraStandard::CameraFormat::CAMERA_FORMAT_YUV_420_SP;
             break;
-        case OHOS_CAMERA_FORMAT_JPEG:
+        case DCameraFormat::OHOS_CAMERA_FORMAT_JPEG:
             ret = CameraStandard::CameraFormat::CAMERA_FORMAT_JPEG;
             break;
         default:
@@ -562,7 +562,7 @@ int32_t DCameraClient::StartPhotoOutput(std::shared_ptr<DCameraCaptureInfo>& inf
         int32_t ret = ((sptr<CameraStandard::PhotoOutput> &)photoOutput_)->Capture();
         if (ret != DCAMERA_OK) {
             DHLOGE("DCameraClient::StartPhotoOutput %s photoOutput capture failed, ret: %d",
-                   GetAnonyString(cameraId_).c_str(), ret);
+                GetAnonyString(cameraId_).c_str(), ret);
             return ret;
         }
         return DCAMERA_OK;
@@ -578,7 +578,7 @@ int32_t DCameraClient::StartPhotoOutput(std::shared_ptr<DCameraCaptureInfo>& inf
     int32_t ret = ((sptr<CameraStandard::PhotoOutput> &)photoOutput_)->Capture(photoCaptureSetting);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraClient::StartPhotoOutput %s photoOutput capture failed, ret: %d",
-               GetAnonyString(cameraId_).c_str(), ret);
+            GetAnonyString(cameraId_).c_str(), ret);
         return ret;
     }
     return DCAMERA_OK;
@@ -629,8 +629,9 @@ void DCameraClient::SetPhotoCaptureLocation(const std::shared_ptr<Camera::Camera
         location->longitude = item.data.d[longitudeIndex];
         location->altitude = item.data.d[altitudeIndex];
         photoCaptureSetting->SetLocation(location);
-        DHLOGI("DCameraClient::SetPhotoCaptureLocation %s photo capture settings set %d location success",
-            GetAnonyString(cameraId_).c_str(), item.count);
+        DHLOGI("DCameraClient::SetPhotoCaptureLocation %s photo capture settings set %d location: " +
+            "latitude=%f, longitude=%f, altitude=%f", GetAnonyString(cameraId_).c_str(), item.count,
+            item.data.d[latitudeIndex], item.data.d[longitudeIndex], item.data.d[altitudeIndex]);
     }
 }
 
@@ -644,7 +645,7 @@ int32_t DCameraClient::StartVideoOutput()
     int32_t ret = ((sptr<CameraStandard::VideoOutput> &)videoOutput_)->Start();
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraClient::StartVideoOutput %s videoOutput start failed, ret: %d",
-               GetAnonyString(cameraId_).c_str(), ret);
+            GetAnonyString(cameraId_).c_str(), ret);
         return ret;
     }
     return DCAMERA_OK;

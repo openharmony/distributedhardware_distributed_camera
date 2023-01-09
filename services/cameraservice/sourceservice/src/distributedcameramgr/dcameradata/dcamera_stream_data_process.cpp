@@ -269,6 +269,9 @@ VideoCodecType DCameraStreamDataProcess::GetPipelineCodecType(DCEncodeType encod
         case ENCODE_TYPE_H265:
             codecType = VideoCodecType::CODEC_H265;
             break;
+        case ENCODE_TYPE_MPEG4_ES:
+            codecType = VideoCodecType::CODEC_MPEG4_ES;
+            break;
         default:
             codecType = VideoCodecType::NO_CODEC;
             break;
@@ -278,8 +281,16 @@ VideoCodecType DCameraStreamDataProcess::GetPipelineCodecType(DCEncodeType encod
 
 Videoformat DCameraStreamDataProcess::GetPipelineFormat(int32_t format)
 {
-    (void)format;
-    return Videoformat::NV21;
+    Videoformat videoFormat;
+    switch (format) {
+        case OHOS_CAMERA_FORMAT_RGBA_8888:
+            videoFormat = Videoformat::RGBA_8888;
+            break;
+        default:
+            videoFormat = Videoformat::NV21;
+            break;
+    }
+    return videoFormat;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

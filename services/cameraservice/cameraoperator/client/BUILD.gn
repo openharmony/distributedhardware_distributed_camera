@@ -49,20 +49,13 @@ ohos_shared_library("distributed_camera_client") {
     "src/callback/dcamera_preview_callback.cpp",
     "src/callback/dcamera_session_callback.cpp",
     "src/callback/dcamera_video_callback.cpp",
+    "src/listener/dcamera_photo_surface_listener.cpp",
   ]
 
   if (!distributed_camera_common) {
-    sources += [
-      "src/dcamera_client.cpp",
-      "src/listener/dcamera_photo_surface_listener.cpp",
-      "src/listener/dcamera_video_surface_listener.cpp",
-    ]
+    sources += [ "src/dcamera_client.cpp" ]
   } else {
-    sources += [
-      "src/dcamera_client_common.cpp",
-      "src/listener/dcamera_photo_surface_listener_common.cpp",
-      "src/listener/dcamera_video_surface_listener_common.cpp",
-    ]
+    sources += [ "src/dcamera_client_common.cpp" ]
   }
 
   deps = [

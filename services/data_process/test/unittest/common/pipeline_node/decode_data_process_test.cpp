@@ -271,7 +271,7 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_008, TestSize.Level1)
     DHLOGI("DecodeDataProcessTest::decode_data_process_test_008.");
     EXPECT_EQ(false, testDecodeDataProcess_ == nullptr);
 
-    VideoConfigParams srcParams(VideoCodecType::CODEC_MPEG4,
+    VideoConfigParams srcParams(VideoCodecType::CODEC_MPEG4_ES,
                                 Videoformat::NV12,
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
@@ -282,19 +282,11 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_008, TestSize.Level1)
                                  TEST_WIDTH,
                                  TEST_HEIGTH);
     VideoConfigParams procConfig;
-#ifdef DCAMERA_COMMON
     int32_t rc = testDecodeDataProcess_->InitNode(srcParams, destParams, procConfig);
     EXPECT_EQ(rc, DCAMERA_OK);
 
     rc = testDecodeDataProcess_->InitDecoderMetadataFormat();
     EXPECT_EQ(rc, DCAMERA_OK);
-#else
-    int32_t rc = testDecodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_NOT_FOUND);
-
-    rc = testDecodeDataProcess_->InitDecoderMetadataFormat();
-    EXPECT_EQ(rc, DCAMERA_NOT_FOUND);
-#endif
 }
 
 /**

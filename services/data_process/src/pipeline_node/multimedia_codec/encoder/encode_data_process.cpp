@@ -167,46 +167,49 @@ int32_t EncodeDataProcess::ConfigureVideoEncoder()
 
 int32_t EncodeDataProcess::InitEncoderMetadataFormat()
 {
-    DHLOGD("Init video encoder metadata format.");
-
     processedConfig_ = sourceConfig_;
-
     switch (targetConfig_.GetVideoCodecType()) {
         case VideoCodecType::CODEC_H264:
             processType_ = "video/avc";
-            metadataFormat_.PutStringValue("codec_mime", processType_);
             metadataFormat_.PutIntValue("codec_profile", Media::AVCProfile::AVC_PROFILE_BASELINE);
-
             processedConfig_.SetVideoCodecType(VideoCodecType::CODEC_H264);
             break;
         case VideoCodecType::CODEC_H265:
             processType_ = "video/hevc";
-            metadataFormat_.PutStringValue("codec_mime", processType_);
             metadataFormat_.PutIntValue("codec_profile", Media::HEVCProfile::HEVC_PROFILE_MAIN);
-
             processedConfig_.SetVideoCodecType(VideoCodecType::CODEC_H265);
+            break;
+        case VideoCodecType::CODEC_MPEG4_ES:
+            processType_ = "video/mp4v-es";
+            metadataFormat_.PutIntValue("codec_profile", Media::MPEG4Profile::MPEG4_PROFILE_ADVANCED_CODING);
+            processedConfig_.SetVideoCodecType(VideoCodecType::CODEC_MPEG4_ES);
             break;
         default:
             DHLOGE("The current codec type does not support encoding.");
             return DCAMERA_NOT_FOUND;
     }
-
     switch (sourceConfig_.GetVideoformat()) {
         case Videoformat::YUVI420:
             metadataFormat_.PutIntValue("pixel_format", Media::VideoPixelFormat::YUVI420);
+            metadataFormat_.PutLongValue("max_input_size", NORM_YUV420_BUFFER_SIZE);
             break;
         case Videoformat::NV12:
             metadataFormat_.PutIntValue("pixel_format", Media::VideoPixelFormat::NV12);
+            metadataFormat_.PutLongValue("max_input_size", NORM_YUV420_BUFFER_SIZE);
             break;
         case Videoformat::NV21:
             metadataFormat_.PutIntValue("pixel_format", Media::VideoPixelFormat::NV21);
+            metadataFormat_.PutLongValue("max_input_size", NORM_YUV420_BUFFER_SIZE);
+            break;
+        case Videoformat::RGBA_8888:
+            metadataFormat_.PutIntValue("pixel_format",  Media::VideoPixelFormat::RGBA);
+            metadataFormat_.PutLongValue("max_input_size", NORM_RGB32_BUFFER_SIZE);
             break;
         default:
             DHLOGE("The current pixel format does not support encoding.");
             return DCAMERA_NOT_FOUND;
     }
-
-    metadataFormat_.PutLongValue("max_input_size", NORM_YUV420_BUFFER_SIZE);
+    metadataFormat_.PutStringValue("codec_mime", processType_);
     metadataFormat_.PutIntValue("width", static_cast<int32_t>(sourceConfig_.GetWidth()));
     metadataFormat_.PutIntValue("height", static_cast<int32_t>(sourceConfig_.GetHeight()));
     metadataFormat_.PutIntValue("frame_rate", MAX_FRAME_RATE);
@@ -346,7 +349,6 @@ int32_t EncodeDataProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>&
             sourceConfig_.GetVideoCodecType(), processedConfig_.GetVideoCodecType());
         return EncodeDone(inputBuffers);
     }
-
     if (videoEncoder_ == nullptr) {
         DHLOGE("The video encoder does not exist before encoding data.");
         return DCAMERA_INIT_ERR;
@@ -424,6 +426,9 @@ sptr<SurfaceBuffer> EncodeDataProcess::GetEncoderInputSurfaceBuffer()
             break;
         case Videoformat::NV21:
             requestConfig.format = PixelFormat::PIXEL_FMT_YCRCB_420_SP;
+            break;
+        case Videoformat::RGBA_8888:
+            requestConfig.format = PixelFormat::PIXEL_FMT_RGBA_8888;
             break;
         default:
             DHLOGE("The current pixel format does not support encoding.");

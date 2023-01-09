@@ -45,13 +45,13 @@ namespace OHOS {
 namespace DistributedHardware {
 class DCameraClientTestStateCallback : public StateCallback {
 public:
-    void OnStateChanged(std::shared_ptr<DCameraEvent>& event)
+    void OnStateChanged(std::shared_ptr<DCameraEvent>& event) override
     {
         DHLOGI("DCameraClientTestStateCallback::OnStateChanged type: %d, result: %d",
-               event->eventType_, event->eventResult_);
+            event->eventType_, event->eventResult_);
     }
 
-    void OnMetadataResult(std::vector<std::shared_ptr<DCameraSettings>>& settings)
+    void OnMetadataResult(std::vector<std::shared_ptr<DCameraSettings>>& settings) override
     {
         DHLOGI("DCameraClientTestStateCallback::OnMetadataResult");
     }
@@ -59,14 +59,22 @@ public:
 
 class DCameraClientTestResultCallback : public ResultCallback {
 public:
-    void OnPhotoResult(std::shared_ptr<DataBuffer>& buffer)
+    void OnPhotoResult(std::shared_ptr<DataBuffer>& buffer) override
     {
         DHLOGI("DCameraClientTestResultCallback::OnPhotoResult");
     }
 
-    void OnVideoResult(std::shared_ptr<DataBuffer>& buffer)
+    void OnVideoResult(std::shared_ptr<DataBuffer>& buffer) override
     {
         DHLOGI("DCameraClientTestResultCallback::OnVideoResult");
+    }
+};
+
+class DCameraClientTestVideoSurfaceListener : public IBufferConsumerListener {
+public:
+    void OnBufferAvailable() override
+    {
+        DHLOGD("DCameraClientTestVideoSurfaceListener::OnBufferAvailable");
     }
 };
 
@@ -96,14 +104,12 @@ public:
     void SetUp();
     void TearDown();
     void SetTokenID();
-    
-    sptr<Surface> surface_;
+
     std::shared_ptr<DCameraClient> client_;
     std::shared_ptr<DCameraCaptureInfo> photoInfo_false_;
     std::shared_ptr<DCameraCaptureInfo> videoInfo_false_;
     std::shared_ptr<DCameraCaptureInfo> photoInfo_true_;
     std::shared_ptr<DCameraCaptureInfo> videoInfo_true_;
-    sptr<DCameraVideoSurfaceListener> videoListener_;
 };
 
 void DCameraClientTest::SetUpTestCase(void)
@@ -262,15 +268,9 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_002, TestSize.Level1)
     auto photoSurfaceListener = std::make_shared<DCameraPhotoSurfaceListener>(nullptr, nullptr);
     photoSurfaceListener->OnBufferAvailable();
 
-    auto videoSurfaceListener = std::make_shared<DCameraVideoSurfaceListener>(nullptr, nullptr);
-    videoSurfaceListener->OnBufferAvailable();
-
     std::shared_ptr<ResultCallback> resultCallback = std::make_shared<DCameraClientTestResultCallback>();
     photoSurfaceListener = std::make_shared<DCameraPhotoSurfaceListener>(nullptr, resultCallback);
     photoSurfaceListener->OnBufferAvailable();
-
-    videoSurfaceListener = std::make_shared<DCameraVideoSurfaceListener>(nullptr, resultCallback);
-    videoSurfaceListener->OnBufferAvailable();
 
     int32_t ret = client_->SetResultCallback(resultCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
@@ -320,9 +320,10 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_004, TestSize.Level1)
     std::shared_ptr<ResultCallback> resultCallback = std::make_shared<DCameraClientTestResultCallback>();
     ret = client_->SetResultCallback(resultCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
-    surface_ = Surface::CreateSurfaceAsConsumer();
-    videoListener_ = new DCameraVideoSurfaceListener(surface_, resultCallback);
-    surface_->RegisterConsumerListener((sptr<IBufferConsumerListener> &)videoListener_);
+
+    sptr<Surface> videoSurface = Surface::CreateSurfaceAsConsumer();
+    sptr<IBufferConsumerListener> videoListener = new DCameraClientTestVideoSurfaceListener();
+    videoSurface->RegisterConsumerListener(videoListener);
     ret = client_->Init();
     EXPECT_EQ(DCAMERA_OK, ret);
 
@@ -331,7 +332,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_004, TestSize.Level1)
         videoInfo_true_->width_, videoInfo_true_->height_, videoInfo_true_->format_, videoInfo_true_->isCapture_);
     std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos;
     captureInfos.push_back(videoInfo_true_);
-    ret = client_->StartCapture(captureInfos, surface_);
+    ret = client_->StartCapture(captureInfos, videoSurface);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     auto metaData = std::make_shared<Camera::CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
@@ -370,9 +371,10 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_005, TestSize.Level1)
     std::shared_ptr<ResultCallback> resultCallback = std::make_shared<DCameraClientTestResultCallback>();
     ret = client_->SetResultCallback(resultCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
-    surface_ = Surface::CreateSurfaceAsConsumer();
-    videoListener_ = new DCameraVideoSurfaceListener(surface_, resultCallback);
-    surface_->RegisterConsumerListener((sptr<IBufferConsumerListener> &)videoListener_);
+
+    sptr<Surface> videoSurface = Surface::CreateSurfaceAsConsumer();
+    sptr<IBufferConsumerListener> videoListener = new DCameraClientTestVideoSurfaceListener();
+    videoSurface->RegisterConsumerListener(videoListener);
     ret = client_->Init();
     EXPECT_EQ(DCAMERA_OK, ret);
 
@@ -384,7 +386,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_005, TestSize.Level1)
     std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos;
     captureInfos.push_back(videoInfo_true_);
     captureInfos.push_back(photoInfo_false_);
-    ret = client_->StartCapture(captureInfos, surface_);
+    ret = client_->StartCapture(captureInfos, videoSurface);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     sleep(TEST_SLEEP_SEC);
@@ -396,7 +398,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_005, TestSize.Level1)
     captureInfos.clear();
     captureInfos.push_back(videoInfo_false_);
     captureInfos.push_back(photoInfo_true_);
-    ret = client_->StartCapture(captureInfos, surface_);
+    ret = client_->StartCapture(captureInfos, videoSurface);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     sleep(TEST_SLEEP_SEC);
@@ -572,9 +574,10 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_013, TestSize.Level1)
     std::shared_ptr<ResultCallback> resultCallback = std::make_shared<DCameraClientTestResultCallback>();
     ret = client_->SetResultCallback(resultCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
-    surface_ = Surface::CreateSurfaceAsConsumer();
-    videoListener_ = new DCameraVideoSurfaceListener(surface_, resultCallback);
-    surface_->RegisterConsumerListener((sptr<IBufferConsumerListener> &)videoListener_);
+
+    sptr<Surface> videoSurface = Surface::CreateSurfaceAsConsumer();
+    sptr<IBufferConsumerListener> videoListener = new DCameraClientTestVideoSurfaceListener();
+    videoSurface->RegisterConsumerListener(videoListener);
     ret = client_->Init();
     EXPECT_EQ(DCAMERA_OK, ret);
 
@@ -586,7 +589,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_013, TestSize.Level1)
     std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos;
     captureInfos.push_back(videoInfo_true_);
     captureInfos.push_back(photoInfo_false_);
-    ret = client_->StartCapture(captureInfos, surface_);
+    ret = client_->StartCapture(captureInfos, videoSurface);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     sleep(TEST_SLEEP_SEC);

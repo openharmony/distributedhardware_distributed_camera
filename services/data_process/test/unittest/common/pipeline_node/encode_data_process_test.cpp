@@ -152,25 +152,17 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_004, TestSize.Level1)
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
                                 TEST_HEIGTH);
-    VideoConfigParams destParams(VideoCodecType::CODEC_MPEG4,
+    VideoConfigParams destParams(VideoCodecType::CODEC_MPEG4_ES,
                                  Videoformat::NV21,
                                  DCAMERA_PRODUCER_FPS_DEFAULT,
                                  TEST_WIDTH2,
                                  TEST_HEIGTH2);
     VideoConfigParams procConfig;
-#ifdef DCAMERA_COMMON
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
     EXPECT_EQ(rc, DCAMERA_OK);
 
     rc = testEncodeDataProcess_->InitEncoderMetadataFormat();
     EXPECT_EQ(rc, DCAMERA_OK);
-#else
-    int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_NOT_FOUND);
-
-    rc = testEncodeDataProcess_->InitEncoderMetadataFormat();
-    EXPECT_EQ(rc, DCAMERA_NOT_FOUND);
-#endif
 }
 
 /**
@@ -287,19 +279,11 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_008, TestSize.Level1)
                                  TEST_WIDTH2,
                                  TEST_HEIGTH2);
     VideoConfigParams procConfig;
-#ifdef DCAMERA_COMMON
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
     EXPECT_EQ(rc, DCAMERA_OK);
 
     rc = testEncodeDataProcess_->InitEncoderMetadataFormat();
     EXPECT_EQ(rc, DCAMERA_OK);
-#else
-    int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_NOT_FOUND);
-
-    rc = testEncodeDataProcess_->InitEncoderMetadataFormat();
-    EXPECT_EQ(rc, DCAMERA_NOT_FOUND);
-#endif
 }
 
 /**
@@ -326,18 +310,6 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_009, TestSize.Level1)
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
     EXPECT_EQ(rc, DCAMERA_OK);
 
-#ifdef DCAMERA_COMMON
-    constexpr int32_t NORM_RGB32_BUFFER_SIZE = 1920 * 1080 * 4;
-    size_t capacity = NORM_RGB32_BUFFER_SIZE + 5;
-    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
-    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
-    size_t offset = 1;
-    size_t size = NORM_RGB32_BUFFER_SIZE + 1;
-    db->SetRange(offset, size);
-    inputBuffers.push_back(db);
-    rc = testEncodeDataProcess_->ProcessData(inputBuffers);
-    EXPECT_EQ(rc, DCAMERA_MEMORY_OPT_ERROR);
-#else
     constexpr int64_t NORM_YUV420_BUFFER_SIZE = 1920 * 1080 * 3 / 2;
     size_t capacity = NORM_YUV420_BUFFER_SIZE + 5;
     std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
@@ -348,7 +320,6 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_009, TestSize.Level1)
     inputBuffers.push_back(db);
     rc = testEncodeDataProcess_->ProcessData(inputBuffers);
     EXPECT_EQ(rc, DCAMERA_MEMORY_OPT_ERROR);
-#endif
 }
 
 /**
@@ -372,7 +343,6 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_010, TestSize.Level1)
                                  TEST_WIDTH,
                                  TEST_HEIGTH);
     VideoConfigParams procConfig;
-#ifdef DCAMERA_COMMON
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
     EXPECT_EQ(rc, DCAMERA_OK);
 
@@ -385,20 +355,6 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_010, TestSize.Level1)
 
     rc = testEncodeDataProcess_->FeedEncoderInputBuffer(db);
     EXPECT_EQ(rc, DCAMERA_OK);
-#else
-    int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_NOT_FOUND);
-
-    size_t capacity = 100;
-    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
-    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
-    inputBuffers.push_back(db);
-    rc = testEncodeDataProcess_->ProcessData(inputBuffers);
-    EXPECT_EQ(rc, DCAMERA_INIT_ERR);
-
-    rc = testEncodeDataProcess_->FeedEncoderInputBuffer(db);
-    EXPECT_EQ(rc, DCAMERA_INIT_ERR);
-#endif
 }
 
 /**
