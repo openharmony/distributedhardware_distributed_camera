@@ -64,7 +64,11 @@ static int32_t InitCameraStandard()
     g_cameraManager = CameraManager::GetInstance();
     g_cameraManager->SetCallback(std::make_shared<DemoDCameraManagerCallback>());
 
-    g_captureSession = g_cameraManager->CreateCaptureSession();
+    int rv = g_cameraManager->CreateCaptureSession(&g_captureSession);
+    if (rv != DCAMERA_OK) {
+        DHLOGE("InitCameraStandard create captureSession failed, rv: %d", rv);
+        return rv;
+    }
     g_captureSession->SetCallback(std::make_shared<DemoDCameraSessionCallback>());
 
     std::vector<sptr<CameraDevice>> cameraObjList = g_cameraManager->GetSupportedCameras();
@@ -84,8 +88,16 @@ static int32_t InitCameraStandard()
         return DCAMERA_BAD_VALUE;
     }
 
-    g_cameraInput = g_cameraManager->CreateCameraInput(g_cameraInfo);
-    ((sptr<CameraInput> &)g_cameraInput)->Open();
+    rv = g_cameraManager->CreateCameraInput(g_cameraInfo, &((sptr<CameraInput> &)g_cameraInput));
+    if (rv != DCAMERA_OK) {
+        DHLOGE("InitCameraStandard create cameraInput failed, rv: %d", rv);
+        return rv;
+    }
+    int32_t ret = ((sptr<CameraInput> &)g_cameraInput)->Open();
+    if (ret != DCAMERA_OK) {
+        DHLOGE("InitCameraStandard g_cameraInput Open failed, ret: %d", ret);
+        return ret;
+    }
     std::shared_ptr<DemoDCameraInputCallback> inputCallback = std::make_shared<DemoDCameraInputCallback>();
     ((sptr<CameraInput> &)g_cameraInput)->SetErrorCallback(inputCallback);
     g_captureSession->SetFocusCallback(std::make_shared<DemoDCameraSessionCallback>());
@@ -145,7 +157,11 @@ static void InitPhotoOutput()
     CameraFormat photoFormat = ConvertToCameraFormat(g_photoInfo->format_);
     Size photoSize = {g_photoInfo->width_, g_photoInfo->height_};
     Profile photoProfile(photoFormat, photoSize);
-    g_photoOutput = g_cameraManager->CreatePhotoOutput(photoProfile, photoSurface);
+    int rv = g_cameraManager->CreatePhotoOutput(photoProfile, photoSurface, &((sptr<PhotoOutput> &)g_photoOutput));
+    if (rv != DCAMERA_OK) {
+        DHLOGE("InitPhotoOutput create photoOutput failed, rv: %d", rv);
+        return;
+    }
     ((sptr<PhotoOutput> &)g_photoOutput)->SetCallback(std::make_shared<DemoDCameraPhotoCallback>());
 }
 
@@ -161,7 +177,12 @@ static void InitPreviewOutput()
     CameraFormat previewFormat = ConvertToCameraFormat(g_previewInfo->format_);
     Size previewSize = {g_previewInfo->width_, g_previewInfo->height_};
     Profile previewProfile(previewFormat, previewSize);
-    g_previewOutput = g_cameraManager->CreatePreviewOutput(previewProfile, previewSurface);
+    int rv = g_cameraManager->CreatePreviewOutput(
+        previewProfile, previewSurface, &((sptr<PreviewOutput> &)g_previewOutput));
+    if (rv != DCAMERA_OK) {
+        DHLOGE("InitPhotoOutput create previewOutput failed, rv: %d", rv);
+        return;
+    }
     ((sptr<PreviewOutput> &)g_previewOutput)->SetCallback(std::make_shared<DemoDCameraPreviewCallback>());
 }
 
@@ -177,8 +198,12 @@ static void InitVideoOutput()
     CameraFormat videoFormat = ConvertToCameraFormat(g_videoInfo->format_);
     Size videoSize = {g_videoInfo->width_, g_videoInfo->height_};
     std::vector<int32_t> framerates = {};
-    VideoProfile videoProfile(videoFormat, videoSize, framerates);
-    g_videoOutput = g_cameraManager->CreateVideoOutput(videoProfile, videoSurface);
+    VideoProfile videoSettings(videoFormat, videoSize, framerates);
+    int rv = g_cameraManager->CreateVideoOutput(videoSettings, videoSurface, &((sptr<VideoOutput> &)g_videoOutput));
+    if (rv != DCAMERA_OK) {
+        DHLOGE("InitPhotoOutput create videoOutput failed, rv: %d", rv);
+        return;
+    }
     ((sptr<VideoOutput> &)g_videoOutput)->SetCallback(std::make_shared<DemoDCameraVideoCallback>());
 }
 
@@ -191,7 +216,12 @@ static void ConfigCaptureSession()
     g_captureSession->AddOutput(g_photoOutput);
     g_captureSession->CommitConfig();
 
-    std::vector<VideoStabilizationMode> stabilizationModes = g_captureSession->GetSupportedStabilizationMode();
+    std::vector<VideoStabilizationMode> stabilizationModes;
+    int32_t rv = g_captureSession->GetSupportedStabilizationMode(stabilizationModes);
+    if (rv != DCAMERA_OK) {
+        DHLOGE("ConfigCaptureSession get supported stabilization mode failed, rv: %d", rv);
+        return;
+    }
     for (auto mode : stabilizationModes) {
         DHLOGI("Distributed Camera Demo: video stabilization mode %d", mode);
     }
@@ -204,7 +234,12 @@ static void ConfigFocusAndExposure()
     FocusMode focusMode = FOCUS_MODE_CONTINUOUS_AUTO;
     ExposureMode exposureMode = EXPOSURE_MODE_AUTO;
     int32_t exposureValue = 0;
-    std::vector<int32_t> biasRange = g_captureSession->GetExposureBiasRange();
+    std::vector<int32_t> biasRange;
+    int32_t rv = g_captureSession->GetExposureBiasRange(biasRange);
+    if (rv != DCAMERA_OK) {
+        DHLOGE("ConfigFocusAndExposure get exposure bias range failed, rv: %d", rv);
+        return;
+    }
     if (!biasRange.empty()) {
         DHLOGI("Distributed Camera Demo: get %d exposure compensation range", biasRange.size());
         exposureValue = biasRange[0];
@@ -330,7 +365,9 @@ int main()
     g_captureSession->Start();
     sleep(SLEEP_FIVE_SECOND);
 
-    ((sptr<VideoOutput> &)g_videoOutput)->Start();
+    if (((sptr<VideoOutput> &)g_videoOutput)->Start() != DCAMERA_OK) {
+        DHLOGE("main g_videoOutput Start failed");
+    }
     sleep(SLEEP_FIVE_SECOND);
 
     ConfigFocusAndExposure();
@@ -339,13 +376,19 @@ int main()
     ((sptr<PhotoOutput> &)g_photoOutput)->Capture(ConfigPhotoCaptureSetting());
     sleep(SLEEP_TWENTY_SECOND);
 
-    ((sptr<VideoOutput> &)g_videoOutput)->Stop();
+    if (((sptr<VideoOutput> &)g_videoOutput)->Stop() != DCAMERA_OK) {
+        DHLOGE("main g_videoOutput Stop failed");
+    }
     sleep(SLEEP_FIVE_SECOND);
 
     g_captureSession->Stop();
-    g_cameraInput->Close();
+    if (g_cameraInput->Close() != DCAMERA_OK) {
+        DHLOGE("main g_cameraInput Close failed");
+    }
     g_captureSession->Release();
-    g_cameraInput->Release();
+    if (g_cameraInput->Release() != DCAMERA_OK) {
+        DHLOGE("main g_cameraInput Close failed");
+    }
     DHLOGI("========== Distributed Camera Demo End ==========");
     return 0;
 }

@@ -142,8 +142,9 @@ int32_t DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraDevice>& info, D
     root[CAMERA_POSITION_KEY] = Json::Value(GetCameraPosition(info->GetPosition()));
     root[CAMERA_CODEC_TYPE_KEY].append("OMX_hisi_video_encoder_avc");
 
-    sptr<CameraStandard::CameraInput> cameraInput = cameraManager_->CreateCameraInput(info);
-    if (cameraInput == nullptr) {
+    sptr<CameraStandard::CameraInput> cameraInput = nullptr;
+    int rv = cameraManager_->CreateCameraInput(info, &cameraInput);
+    if (rv != DCAMERA_OK) {
         DHLOGE("DCameraHandlerCommon::CreateDHItem create cameraInput failed");
         return DCAMERA_BAD_VALUE;
     }
@@ -171,7 +172,9 @@ int32_t DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraDevice>& info, D
     root[CAMERA_METADATA_KEY] = Json::Value(encodeString);
 
     item.attrs = root.toStyledString();
-    cameraInput->Release();
+    if (cameraInput->Release() != DCAMERA_OK) {
+        DHLOGE("DCameraHandlerCommon::CreateDHItem cameraInput Release failed");
+    }
     return DCAMERA_OK;
 }
 

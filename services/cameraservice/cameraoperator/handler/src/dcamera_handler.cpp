@@ -161,8 +161,9 @@ int32_t DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraDevice>& info, D
     std::vector<CameraStandard::Profile> previewProfiles = capability->GetPreviewProfiles();
     ConfigFormatAndResolution(CONTINUOUS_FRAME, root, previewProfiles);
 
-    sptr<CameraStandard::CameraInput> cameraInput = cameraManager_->CreateCameraInput(info);
-    if (cameraInput == nullptr) {
+    sptr<CameraStandard::CameraInput> cameraInput = nullptr;
+    int rv = cameraManager_->CreateCameraInput(info, &cameraInput);
+    if (rv != DCAMERA_OK) {
         DHLOGE("DCameraHandler::CreateDHItem create cameraInput failed");
         return DCAMERA_BAD_VALUE;
     }
@@ -179,7 +180,9 @@ int32_t DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraDevice>& info, D
     root[CAMERA_METADATA_KEY] = Json::Value(encodeString);
 
     item.attrs = root.toStyledString();
-    cameraInput->Release();
+    if (cameraInput->Release() != DCAMERA_OK) {
+        DHLOGE("DCameraHandler::CreateDHItem cameraInput Release failed");
+    }
     return DCAMERA_OK;
 }
 
