@@ -244,7 +244,9 @@ int32_t DCameraStreamDataProcessProducer::FeedStreamToDriver(const DHBase& dhBas
     } while (0);
 
     ret = camHdiProvider_->ShutterBuffer(dhBase, streamId_, sharedMemory);
-    DCameraMemoryUnmap(sharedMemory.bufferHandle_->GetBufferHandle());
+    if (sharedMemory.bufferHandle_ != nullptr) {
+        DCameraMemoryUnmap(sharedMemory.bufferHandle_->GetBufferHandle());
+    }
     if (ret != SUCCESS) {
         DHLOGE("ShutterBuffer devId: %s dhId: %s streamId: %d ret: %d",
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamId_, ret);
