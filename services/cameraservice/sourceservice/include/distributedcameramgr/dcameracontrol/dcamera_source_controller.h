@@ -52,7 +52,7 @@ public:
 private:
     void HandleMetaDataResult(std::string& jsonStr);
     void PostChannelDisconnectedEvent();
-    int32_t WaitforSessionResult();
+    int32_t WaitforSessionResult(const std::string& devId);
 
 private:
     std::string devId_;

@@ -444,7 +444,7 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_017, TestSi
  */
 HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_018, TestSize.Level1)
 {
-    controller_->WaitforSessionResult();
+    controller_->WaitforSessionResult(TEST_DEVICE_ID);
     int32_t ret = controller_->UnInit();
     EXPECT_EQ(ret, DCAMERA_OK);
 }

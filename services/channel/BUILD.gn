@@ -36,6 +36,7 @@ ohos_shared_library("distributed_camera_channel") {
     "src/dcamera_channel_source_impl.cpp",
     "src/dcamera_low_latency.cpp",
     "src/dcamera_softbus_adapter.cpp",
+    "src/dcamera_softbus_latency.cpp",
     "src/dcamera_softbus_session.cpp",
   ]
 
