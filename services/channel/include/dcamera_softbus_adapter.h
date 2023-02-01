@@ -58,6 +58,7 @@ public:
     void OnSinkMessageReceived(int32_t sessionId, const void *data, uint32_t dataLen);
     void OnSinkStreamReceived(int32_t sessionId, const StreamData *data, const StreamData *ext,
         const StreamFrameInfo *param);
+    int32_t ConstructSessionAttribute(int32_t sessionMode, SessionAttribute& attr);
 
 public:
     std::map<std::string, std::shared_ptr<DCameraSoftbusSession>> sourceSessions_;

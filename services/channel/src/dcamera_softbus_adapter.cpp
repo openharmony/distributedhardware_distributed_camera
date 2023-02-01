@@ -13,18 +13,17 @@
  * limitations under the License.
  */
 
-#include "dcamera_softbus_adapter.h"
-
-#include <securec.h>
-
-#include "softbus_bus_center.h"
-#include "softbus_common.h"
-
 #include "anonymous_string.h"
 #include "dcamera_hisysevent_adapter.h"
+#include "dcamera_frame_info.h"
+#include "dcamera_softbus_adapter.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
+#include <securec.h>
+#include "softbus_bus_center.h"
+#include "softbus_common.h"
+#include "softbus_errcode.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -158,45 +157,12 @@ int32_t DCameraSoftbusAdapter::DestroySoftbusSessionServer(std::string sessionNa
 int32_t DCameraSoftbusAdapter::OpenSoftbusSession(std::string mySessName, std::string peerSessName,
     int32_t sessionMode, std::string peerDevId)
 {
-    uint32_t dataType = TYPE_STREAM;
-    uint32_t streamType = -1;
-    switch (sessionMode) {
-        case DCAMERA_SESSION_MODE_CTRL: {
-            dataType = TYPE_BYTES;
-            streamType = -1;
-            break;
-        }
-        case DCAMERA_SESSION_MODE_VIDEO:
-        case DCAMERA_SESSION_MODE_JPEG: {
-            dataType = TYPE_STREAM;
-            streamType = RAW_STREAM;
-            break;
-        }
-        default:
-            DHLOGE("DCameraSoftbusAdapter OpenSoftbusSession bad sessionMode %d", sessionMode);
-            return DCAMERA_BAD_VALUE;
-    }
     SessionAttribute attr = { 0 };
-    attr.dataType = static_cast<int32_t>(dataType);
-    attr.linkTypeNum = DCAMERA_LINK_TYPE_MAX;
-    LinkType linkTypeList[DCAMERA_LINK_TYPE_MAX] = {
-        LINK_TYPE_WIFI_P2P,
-        LINK_TYPE_WIFI_WLAN_5G,
-        LINK_TYPE_WIFI_WLAN_2G,
-        LINK_TYPE_BR,
-    };
-
-    if (dataType == TYPE_BYTES) {
-        linkTypeList[0] = LINK_TYPE_WIFI_WLAN_2G;
-        linkTypeList[DCAMERA_LINK_TYPE_INDEX_2] = LINK_TYPE_WIFI_P2P;
-    }
-    int32_t ret = memcpy_s(attr.linkType, DCAMERA_LINK_TYPE_MAX * sizeof(LinkType), linkTypeList,
-        DCAMERA_LINK_TYPE_MAX * sizeof(LinkType));
-    if (ret != EOK) {
-        DHLOGE("DCameraSoftbusAdapter OpenSoftbusSession memcpy_s failed %d", ret);
+    int32_t ret = ConstructSessionAttribute(sessionMode, attr);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("ConstructSessionAttribute failed, ret is: %d", ret);
         return DCAMERA_BAD_VALUE;
     }
-    attr.attr.streamAttr.streamType = static_cast<StreamType>(streamType);
     int32_t sessionId = OpenSession(mySessName.c_str(), peerSessName.c_str(), peerDevId.c_str(), "0", &attr);
     if (sessionId < 0) {
         DHLOGE("DCameraSoftbusAdapter OpenSoftbusSession failed %d", sessionId);
@@ -228,9 +194,22 @@ int32_t DCameraSoftbusAdapter::SendSofbusBytes(int32_t sessionId, std::shared_pt
 int32_t DCameraSoftbusAdapter::SendSofbusStream(int32_t sessionId, std::shared_ptr<DataBuffer>& buffer)
 {
     StreamData streamData = { reinterpret_cast<char *>(buffer->Data()), buffer->Size() };
-    StreamData ext = { 0 };
+    int64_t timeStamp;
+    if (!buffer->FindInt64(TIME_STAMP_US, timeStamp)) {
+        DHLOGD("SendSofbusStream find %s failed.", TIME_STAMP_US.c_str());
+    }
+    std::string jsonStr = "";
+    DCameraFrameInfo frameInfo;
+    frameInfo.pts_ = timeStamp;
+    frameInfo.Marshal(jsonStr);
+    StreamData ext = { const_cast<char *>(jsonStr.c_str()), jsonStr.length() };
     StreamFrameInfo param = { 0 };
-    return SendStream(sessionId, &streamData, &ext, &param);
+    int32_t ret = SendStream(sessionId, &streamData, &ext, &param);
+    if (ret != SOFTBUS_OK) {
+        DHLOGD("SendSofbusStream failed, ret is %d", ret);
+        return DCAMERA_BAD_VALUE;
+    }
+    return DCAMERA_OK;
 }
 
 int32_t DCameraSoftbusAdapter::DCameraSoftbusGetSessionById(int32_t sessionId,
@@ -370,8 +349,24 @@ void DCameraSoftbusAdapter::OnSourceStreamReceived(int32_t sessionId, const Stre
         DHLOGE("DCameraSoftbusAdapter OnSourceStreamReceived memcpy_s failed ret: %d", ret);
         return;
     }
+
+    if (ext == nullptr) {
+        DHLOGE("OnSourceStreamReceived ext is null, sessionId: %d.", sessionId);
+    }
+    int32_t extLen = ext->bufLen;
+    if (extLen <= 0 || extLen > DCAMERA_MAX_RECV_EXT_LEN) {
+        DHLOGE("OnSourceStreamReceived extLen is invalid, extLen: %d, sessionId: %d", dataLen, sessionId);
+    }
+
+    std::string jsonStr(reinterpret_cast<const char*>(ext->buf), ext->bufLen);
+    DCameraFrameInfo frameInfo;
+    ret = frameInfo.Unmarshal(jsonStr);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("Unmarshal frameInfo failed.");
+    }
+    int64_t timeStamp = frameInfo.pts_;
+    buffer->SetInt64(TIME_STAMP_US, timeStamp);
     session->OnDataReceived(buffer);
-    return;
 }
 
 int32_t DCameraSoftbusAdapter::DCameraSoftbusSinkGetSession(int32_t sessionId,
@@ -499,6 +494,47 @@ int32_t DCameraSoftbusAdapter::GetLocalNetworkId(std::string& myDevId)
     }
 
     myDevId = std::string(basicInfo.networkId);
+    return DCAMERA_OK;
+}
+
+int32_t DCameraSoftbusAdapter::ConstructSessionAttribute(int32_t sessionMode, SessionAttribute& attr)
+{
+    int dataType = TYPE_STREAM;
+    int streamType = INVALID;
+    switch (sessionMode) {
+        case DCAMERA_SESSION_MODE_CTRL:
+            dataType = TYPE_BYTES;
+            break;
+        case DCAMERA_SESSION_MODE_VIDEO:
+            streamType = COMMON_VIDEO_STREAM;
+            break;
+        case DCAMERA_SESSION_MODE_JPEG:
+            streamType = RAW_STREAM;
+            break;
+        default:
+            DHLOGE("Bad sessionMode %d", sessionMode);
+            return DCAMERA_BAD_VALUE;
+    }
+    attr.dataType = dataType;
+    attr.linkTypeNum = DCAMERA_LINK_TYPE_MAX;
+    LinkType linkTypeList[DCAMERA_LINK_TYPE_MAX] = {
+        LINK_TYPE_WIFI_P2P,
+        LINK_TYPE_WIFI_WLAN_5G,
+        LINK_TYPE_WIFI_WLAN_2G,
+        LINK_TYPE_BR,
+    };
+
+    if (dataType == TYPE_BYTES) {
+        linkTypeList[0] = LINK_TYPE_WIFI_WLAN_2G;
+        linkTypeList[DCAMERA_LINK_TYPE_INDEX_2] = LINK_TYPE_WIFI_P2P;
+    }
+    int32_t ret = memcpy_s(attr.linkType, DCAMERA_LINK_TYPE_MAX * sizeof(LinkType), linkTypeList,
+        DCAMERA_LINK_TYPE_MAX * sizeof(LinkType));
+    if (ret != EOK) {
+        DHLOGE("LinkType memcpy_s failed %d", ret);
+        return DCAMERA_BAD_VALUE;
+    }
+    attr.attr.streamAttr.streamType = streamType;
     return DCAMERA_OK;
 }
 } // namespace DistributedHardware

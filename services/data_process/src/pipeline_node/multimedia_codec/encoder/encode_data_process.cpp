@@ -13,16 +13,14 @@
  * limitations under the License.
  */
 
-#include "encode_data_process.h"
-
 #include <cmath>
-
-#include "distributed_hardware_log.h"
-#include "graphic_common_c.h"
-
 #include "dcamera_hisysevent_adapter.h"
 #include "dcamera_utils_tools.h"
+#include "distributed_camera_constants.h"
+#include "distributed_hardware_log.h"
+#include "encode_data_process.h"
 #include "encode_video_callback.h"
+#include "graphic_common_c.h"
 
 #ifndef DH_LOG_TAG
 #define DH_LOG_TAG "DCDP_NODE_ENCODEC"
@@ -496,7 +494,7 @@ int32_t EncodeDataProcess::GetEncoderOutputBuffer(uint32_t index, Media::AVCodec
         DHLOGE("memcpy_s buffer failed.");
         return DCAMERA_MEMORY_OPT_ERROR;
     }
-    bufferOutput->SetInt64("timeUs", info.presentationTimeUs);
+    bufferOutput->SetInt64(TIME_STAMP_US, info.presentationTimeUs);
 
     std::vector<std::shared_ptr<DataBuffer>> nextInputBuffers;
     nextInputBuffers.push_back(bufferOutput);

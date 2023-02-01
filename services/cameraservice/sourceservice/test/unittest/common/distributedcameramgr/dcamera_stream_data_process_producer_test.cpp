@@ -133,8 +133,8 @@ HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_produ
     std::shared_ptr<DCameraStreamDataProcessProducer> streamProcess1 =
         std::make_shared<DCameraStreamDataProcessProducer>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, streamId,
         DCStreamType::SNAPSHOT_FRAME);
-    streamProcess1->buffers_.push(buffer);
-    streamProcess1->buffers_.push(buffer);
+    streamProcess1->buffers_.push_back(buffer);
+    streamProcess1->buffers_.push_back(buffer);
     streamProcess1->FeedStream(buffer);
 
     std::shared_ptr<DCameraStreamDataProcessProducer> streamProcess2 =
