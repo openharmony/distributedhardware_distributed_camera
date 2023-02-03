@@ -23,6 +23,7 @@
 #include "dcamera_hitrace_adapter.h"
 #include "dcamera_metadata_setting_cmd.h"
 #include "dcamera_protocol.h"
+#include "dcamera_softbus_latency.h"
 #include "dcamera_source_controller_channel_listener.h"
 #include "dcamera_source_service_ipc.h"
 #include "dcamera_utils_tools.h"
@@ -317,7 +318,7 @@ int32_t DCameraSourceController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& o
         PostChannelDisconnectedEvent();
         return ret;
     }
-    return WaitforSessionResult();
+    return WaitforSessionResult(devId);
 }
 
 int32_t DCameraSourceController::CloseChannel()
@@ -327,6 +328,7 @@ int32_t DCameraSourceController::CloseChannel()
         return DCAMERA_BAD_OPERATE;
     }
     DCameraLowLatency::GetInstance().DisableLowLatency();
+    DCameraSoftbusLatency::GetInstance().StopSoftbusTimeSync();
     std::string dhId = indexs_.begin()->dhId_;
     std::string devId = indexs_.begin()->devId_;
     DHLOGI("DCameraSourceController CloseChannel devId: %s, dhId: %s", GetAnonyString(devId).c_str(),
@@ -479,7 +481,7 @@ void DCameraSourceController::HandleMetaDataResult(std::string& jsonStr)
     }
 }
 
-int32_t DCameraSourceController::WaitforSessionResult()
+int32_t DCameraSourceController::WaitforSessionResult(const std::string& devId)
 {
     isChannelConnected_.store(false);
     std::unique_lock<std::mutex> lck(channelMtx_);
@@ -493,6 +495,7 @@ int32_t DCameraSourceController::WaitforSessionResult()
         return DCAMERA_BAD_VALUE;
     }
     DCameraLowLatency::GetInstance().EnableLowLatency();
+    DCameraSoftbusLatency::GetInstance().StartSoftbusTimeSync(devId);
     return DCAMERA_OK;
 }
 
