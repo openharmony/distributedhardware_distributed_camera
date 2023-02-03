@@ -19,6 +19,7 @@
 
 #include "anonymous_string.h"
 #include "dcamera_softbus_adapter.h"
+#include "dcamera_utils_tools.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -162,14 +163,15 @@ void DCameraSoftbusSession::PackRecvData(std::shared_ptr<DataBuffer>& buffer)
             buffer->Size(), headerPara.dataLen, headerPara.totalLen, mySessionName_.c_str(), peerSessionName_.c_str());
         return;
     }
-
-    DHLOGD("DCameraSoftbusSession PackRecvData Assemble, size: %d, dataLen: %d, totalLen: %d sess: %s peerSess: %s",
-        buffer->Size(), headerPara.dataLen, headerPara.totalLen, mySessionName_.c_str(), peerSessionName_.c_str());
+    DHLOGD("DCameraSoftbusSession PackRecvData Assemble, size: %d, dataLen: %d, totalLen: %d, nowTime: %lld start",
+        buffer->Size(), headerPara.dataLen, headerPara.totalLen, GetNowTimeStampUs());
     if (headerPara.fragFlag == FRAG_START_END) {
         AssembleNoFrag(buffer, headerPara);
     } else {
         AssembleFrag(buffer, headerPara);
     }
+    DHLOGD("DCameraSoftbusSession PackRecvData Assemble, size: %d, dataLen: %d, totalLen: %d, nowTime: %lld end",
+        buffer->Size(), headerPara.dataLen, headerPara.totalLen, GetNowTimeStampUs());
 }
 
 void DCameraSoftbusSession::AssembleNoFrag(std::shared_ptr<DataBuffer>& buffer, SessionDataHeader& headerPara)
@@ -346,7 +348,8 @@ int32_t DCameraSoftbusSession::UnPackSendData(std::shared_ptr<DataBuffer>& buffe
             headPara.fragFlag = FRAG_END;
             headPara.dataLen = totalLen - offset;
         }
-
+        DHLOGD("DCameraSoftbusSession UnPackSendData, size: %d, dataLen: %d, totalLen: %d, nowTime: %lld start:",
+            buffer->Size(), headPara.dataLen, headPara.totalLen, GetNowTimeStampUs());
         std::shared_ptr<DataBuffer> unpackData =
             std::make_shared<DataBuffer>(headPara.dataLen + BINARY_HEADER_FRAG_LEN);
         MakeFragDataHeader(headPara, unpackData->Data(), BINARY_HEADER_FRAG_LEN);
@@ -363,6 +366,8 @@ int32_t DCameraSoftbusSession::UnPackSendData(std::shared_ptr<DataBuffer>& buffe
                 ret, mySessionName_.c_str(), peerSessionName_.c_str());
             return ret;
         }
+        DHLOGD("DCameraSoftbusSession UnPackSendData, size: %d, dataLen: %d, totalLen: %d, nowTime: %lld end:",
+            buffer->Size(), headPara.dataLen, headPara.totalLen, GetNowTimeStampUs());
         headPara.subSeq++;
         headPara.fragFlag = FRAG_MID;
         offset += headPara.dataLen;
