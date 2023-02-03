@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (c) 2021 - 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -20,7 +20,6 @@ module_out_path = "distributed_camera/dcamera_handler_test"
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
-    "//drivers/peripheral/camera/interfaces/metadata/include",
     "//commonlibrary/c_utils/base/include",
     "//utils/system/safwk/native/include",
     "${graphicstandard_path}/frameworks/surface/include",
@@ -57,7 +56,6 @@ ohos_unittest("DCameraHandlerTest") {
     "${common_path}:distributed_camera_utils",
     "${graphicstandard_path}:libsurface",
     "${services_path}/cameraservice/cameraoperator/handler:distributed_camera_handler",
-    "//drivers/peripheral/camera/interfaces/metadata:metadata",
     "//third_party/googletest:gtest_main",
     "//third_party/jsoncpp:jsoncpp",
   ]
@@ -67,6 +65,7 @@ ohos_unittest("DCameraHandlerTest") {
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "c_utils:utils",
+    "drivers_interface_camera:metadata",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
