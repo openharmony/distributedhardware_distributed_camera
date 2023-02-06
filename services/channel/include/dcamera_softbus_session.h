@@ -71,6 +71,7 @@ private:
     uint16_t U16Get(const uint8_t *ptr);
     uint32_t U32Get(const uint8_t *ptr);
     void ResetAssembleFrag();
+    void SetHeadParaDataLen(SessionDataHeader& headPara, const uint32_t totalLen, const uint32_t offset);
 
     enum {
         FRAG_NULL = 0,
