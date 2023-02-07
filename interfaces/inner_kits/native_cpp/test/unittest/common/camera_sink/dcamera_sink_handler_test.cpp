@@ -167,7 +167,7 @@ HWTEST_F(DCameraSinkHandlerTest, dcamera_sink_handler_test_006, TestSize.Level1)
 
     systemAbilityId = 1;
     loadCallback->OnLoadSystemAbilityFail(systemAbilityId);
-    int32_t ret = DCameraSinkHandler::GetInstance().InitSink(params);
+    int32_t ret = DCameraSinkHandler::GetInstance().ReleaseSink();
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 }
