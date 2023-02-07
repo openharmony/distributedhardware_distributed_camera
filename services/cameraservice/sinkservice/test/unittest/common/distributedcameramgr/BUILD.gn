@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (c) 2021 - 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -50,7 +50,6 @@ config("module_private_config") {
     "${fwk_common_path}/utils/include",
     "${fwk_utils_path}/include/eventbus",
     "//drivers/peripheral/base",
-    "//drivers/peripheral/camera/interfaces/metadata/include",
   ]
 }
 
@@ -75,12 +74,12 @@ ohos_unittest("DCameraSinkMgrTest") {
     "${services_path}/cameraservice/cameraoperator/handler:distributed_camera_handler",
     "${services_path}/cameraservice/sinkservice:distributed_camera_sink",
     "${services_path}/channel:distributed_camera_channel",
-    "//drivers/peripheral/camera/interfaces/metadata:metadata",
     "//third_party/jsoncpp:jsoncpp",
   ]
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_camera:metadata",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "eventhandler:libeventhandler",
     "ipc:ipc_core",
