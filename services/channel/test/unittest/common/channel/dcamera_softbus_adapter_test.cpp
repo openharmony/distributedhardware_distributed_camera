@@ -737,7 +737,7 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_028, TestSize.L
     dataLen = 8;
     data = nullptr;
     DCameraSoftbusAdapter::GetInstance().OnSourceBytesReceived(sessionId, data, dataLen);
-    int32_t ret = DCameraSoftbusAdapter::GetInstance().DestroySoftbusSessionServer(sessionName);
+    int32_t ret = DCameraSoftbusAdapter::GetInstance().CloseSoftbusSession(sessionId);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 

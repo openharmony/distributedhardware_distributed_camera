@@ -129,6 +129,7 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_003, TestSize.L
     auto runner = AppExecFwk::EventRunner::Create(mySessionName);
     softbusSession_->eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
     int32_t ret = softbusSession_->OnDataReceived(buffer);
+    usleep(TEST_SLEEP_SEC);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
@@ -146,6 +147,7 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_004, TestSize.L
     softbusSession_->DealRecvData(buffer);
     softbusSession_->mode_ = DCAMERA_SESSION_MODE_JPEG;
     softbusSession_->DealRecvData(buffer);
+    usleep(TEST_SLEEP_SEC);
     int32_t ret = softbusSession_->CloseSession();
     EXPECT_EQ(DCAMERA_OK, ret);
 }
@@ -166,6 +168,7 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_005, TestSize.L
     softbusSession_->PackRecvData(buffer);
     size = 2;
     softbusSession_->PackRecvData(buffer);
+    usleep(TEST_SLEEP_SEC);
     int32_t ret = softbusSession_->CloseSession();
     EXPECT_EQ(DCAMERA_OK, ret);
 }
