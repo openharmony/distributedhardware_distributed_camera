@@ -342,12 +342,7 @@ int32_t DCameraSoftbusSession::UnPackSendData(std::shared_ptr<DataBuffer>& buffe
 
     uint32_t offset = 0;
     while (totalLen > offset) {
-        if (totalLen - offset > BINARY_DATA_PACKET_MAX_LEN) {
-            headPara.dataLen = BINARY_DATA_PACKET_MAX_LEN;
-        } else {
-            headPara.fragFlag = FRAG_END;
-            headPara.dataLen = totalLen - offset;
-        }
+        SetHeadParaDataLen(headPara, totalLen, offset);
         DHLOGD("DCameraSoftbusSession UnPackSendData, size: %d, dataLen: %d, totalLen: %d, nowTime: %lld start:",
             buffer->Size(), headPara.dataLen, headPara.totalLen, GetNowTimeStampUs());
         std::shared_ptr<DataBuffer> unpackData =
@@ -373,6 +368,17 @@ int32_t DCameraSoftbusSession::UnPackSendData(std::shared_ptr<DataBuffer>& buffe
         offset += headPara.dataLen;
     }
     return DCAMERA_OK;
+}
+
+void DCameraSoftbusSession::SetHeadParaDataLen(SessionDataHeader& headPara, const uint32_t totalLen,
+    const uint32_t offset)
+{
+    if (totalLen - offset > BINARY_DATA_PACKET_MAX_LEN) {
+        headPara.dataLen = BINARY_DATA_PACKET_MAX_LEN;
+    } else {
+        headPara.fragFlag = FRAG_END;
+        headPara.dataLen = totalLen - offset;
+    }
 }
 
 void DCameraSoftbusSession::MakeFragDataHeader(const SessionDataHeader& headPara, uint8_t *header, uint32_t len)
