@@ -33,59 +33,78 @@ static void OnTimeSyncResult(const TimeSyncResultInfo *info, int32_t retCode)
     int32_t microsecond = info->result.millisecond * MICROSECONDS + info->result.microsecond;
     DHLOGD("DCameraSoftbusLatency OnTimeSyncResult retcode %d, millisecond: %d, microsecond %d microsecond_ %d",
         retCode, info->result.millisecond, info->result.microsecond, microsecond);
-    DCameraSoftbusLatency::GetInstance().SetTimeSyncInfo(microsecond);
+    DCameraSoftbusLatency::GetInstance().SetTimeSyncInfo(microsecond, info->target.targetNetworkId);
 }
 
 int32_t DCameraSoftbusLatency::StartSoftbusTimeSync(const std::string& devId)
 {
     DHLOGI("StartSoftbusTimeSync latency start.");
-    if (refCount_ > REF_INITIAL) {
-        refCount_++;
-        DHLOGD("No need to start time offset, refCount just plus one and now is: %d.", refCount_.load());
-        return DCAMERA_OK;
+    {
+        std::lock_guard<std::mutex> lock(micLock_);
+        if (refCount_[devId] > REF_INITIAL) {
+            refCount_[devId]++;
+            DHLOGD("No need to start time offset, refCount just plus one and now is: %d.", refCount_[devId]);
+            return DCAMERA_OK;
+        }
     }
     ITimeSyncCb timeSyncCb;
     timeSyncCb.onTimeSyncResult = OnTimeSyncResult;
-    networkId_ = devId;
-    int32_t ret = StartTimeSync(DCAMERA_PKG_NAME.c_str(), networkId_.c_str(), LOW_ACCURACY, NORMAL_PERIOD,
+    int32_t ret = StartTimeSync(DCAMERA_PKG_NAME.c_str(), devId.c_str(), LOW_ACCURACY, NORMAL_PERIOD,
         &timeSyncCb);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSoftbusLatency:: StartSoftbusTimeSync failed networkId %s", networkId_.c_str());
+        DHLOGE("DCameraSoftbusLatency:: StartSoftbusTimeSync failed networkId %s", devId.c_str());
+    }
+    {
+        std::lock_guard<std::mutex> lock(micLock_);
+        refCount_[devId]++;
+        offsets_.emplace(devId, 0);
     }
     DHLOGI("DCameraSoftbusLatency:: StartSoftbusTimeSync success ");
     return DCAMERA_OK;
 }
 
-int32_t DCameraSoftbusLatency::StopSoftbusTimeSync()
+int32_t DCameraSoftbusLatency::StopSoftbusTimeSync(const std::string& devId)
 {
     DHLOGI("DCameraSoftbusLatency::StopSoftbusTimeSync start.");
-    if (refCount_ == REF_INITIAL) {
-        DHLOGD("No need to stop time offset, refCount is zero.");
-        return DCAMERA_OK;
+    {
+        std::lock_guard<std::mutex> lock(micLock_);
+        if (refCount_[devId] == REF_INITIAL) {
+            DHLOGD("No need to stop time offset, refCount is zero.");
+            return DCAMERA_OK;
+        }
+        if (refCount_[devId] > REF_NORMAL) {
+            refCount_[devId]--;
+            DHLOGD("No need to stop time offset, refCount just minus one and now is: %d.", refCount_[devId]);
+            return DCAMERA_OK;
+        }
     }
-    if (refCount_ > REF_NORMAL) {
-        refCount_--;
-        DHLOGD("No need to stop time offset, refCount just minus one and now is: %d.", refCount_.load());
-        return DCAMERA_OK;
-    }
-    int32_t ret = StopTimeSync(DCAMERA_PKG_NAME.c_str(), networkId_.c_str());
+    int32_t ret = StopTimeSync(DCAMERA_PKG_NAME.c_str(), devId.c_str());
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSoftbusLatency:: StopSoftbusTimeSync failed ret:%d", ret);
     }
-    refCount_--;
+    {
+        std::lock_guard<std::mutex> lock(micLock_);
+        refCount_[devId]--;
+        offsets_.erase(devId);
+        refCount_.erase(devId);
+    }
     return DCAMERA_OK;
 }
 
-void DCameraSoftbusLatency::SetTimeSyncInfo(const int32_t microsecond)
+void DCameraSoftbusLatency::SetTimeSyncInfo(const int32_t microsecond, const std::string& devId)
 {
-    std::lock_guard<std::mutex> lock(micLock_);
-    microsecond_ = microsecond;
+    std::lock_guard<std::mutex> lock(offsetLock_);
+    offsets_[devId] = microsecond;
 }
 
-int32_t DCameraSoftbusLatency::GetTimeSyncInfo()
+int32_t DCameraSoftbusLatency::GetTimeSyncInfo(const std::string& devId)
 {
-    std::lock_guard<std::mutex> lock(micLock_);
-    return microsecond_;
+    std::lock_guard<std::mutex> lock(offsetLock_);
+    auto dev = offsets_.find(devId);
+    if (dev == offsets_.end()) {
+        return DCAMERA_OK;
+    }
+    return offsets_[devId];
 }
 } // namespace DistributedHardware
 }
