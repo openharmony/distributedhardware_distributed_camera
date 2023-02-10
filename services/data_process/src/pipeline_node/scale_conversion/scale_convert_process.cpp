@@ -13,10 +13,11 @@
  * limitations under the License.
  */
 
-#include "scale_convert_process.h"
-
-#include "distributed_hardware_log.h"
+#include "dcamera_utils_tools.h"
+#include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
+#include "distributed_hardware_log.h"
+#include "scale_convert_process.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -121,8 +122,8 @@ int ScaleConvertProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& i
     }
 
     int64_t timeStamp = 0;
-    if (!(inputBuffers[0]->FindInt64("timeUs", timeStamp))) {
-        DHLOGE("ScaleConvertProcess : Find inputBuffer timeStamp failed.");
+    if (!(inputBuffers[0]->FindInt64(TIME_STAMP_US, timeStamp))) {
+        DHLOGE("ScaleConvertProcess : Find inputBuffer %s failed.", TIME_STAMP_US.c_str());
         return DCAMERA_BAD_VALUE;
     }
 
@@ -141,7 +142,7 @@ int ScaleConvertProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& i
         return DCAMERA_BAD_OPERATE;
     }
 
-    dstBuf->SetInt64("timeUs", timeStamp);
+    dstBuf->SetInt64(TIME_STAMP_US, timeStamp);
     dstBuf->SetInt32("Videoformat", static_cast<int32_t>(processedConfig_.GetVideoformat()));
     dstBuf->SetInt32("alignedWidth", processedConfig_.GetWidth());
     dstBuf->SetInt32("alignedHeight", processedConfig_.GetHeight());

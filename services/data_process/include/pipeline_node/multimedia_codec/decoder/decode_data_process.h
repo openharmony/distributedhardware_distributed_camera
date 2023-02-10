@@ -90,7 +90,7 @@ private:
     int64_t GetDecoderTimeStamp();
     void IncreaseWaitDecodeCnt();
     void ReduceWaitDecodeCnt();
-    void CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int64_t timeStampUs, int32_t alignedWidth,
+    void CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int64_t timeStamp, int32_t alignedWidth,
         int32_t alignedHeight);
     int32_t CopyYUVPlaneByRow(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo);
     int32_t CheckCopyImageInfo(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo);

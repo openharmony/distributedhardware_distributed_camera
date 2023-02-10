@@ -21,17 +21,20 @@ ohos_shared_library("distributed_camera_channel") {
     "//commonlibrary/c_utils/base/include",
     "//utils/system/safwk/native/include",
     "${fwk_common_path}/utils/include",
+    "${services_path}/cameraservice/base/include",
   ]
 
   include_dirs += [
     "include",
     "${common_path}/include/constants",
     "${common_path}/include/utils",
+    "//foundation//communication//dsoftbus//core//common//include",
     "${fwk_innerkits_path}/include",
     "//third_party/json/include",
   ]
 
   sources = [
+    "${services_path}/cameraservice/base/src/dcamera_frame_info.cpp",
     "src/dcamera_channel_sink_impl.cpp",
     "src/dcamera_channel_source_impl.cpp",
     "src/dcamera_low_latency.cpp",
