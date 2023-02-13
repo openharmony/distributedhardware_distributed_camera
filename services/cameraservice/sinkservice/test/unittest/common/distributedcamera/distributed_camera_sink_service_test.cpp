@@ -56,17 +56,17 @@ std::string g_testOpenInfoService = R"({
 
 void DistributedCameraSinkServiceTest::SetUpTestCase(void)
 {
-    DHLOGI("DistributedCameraSinkServiceTest::SetUpTestCase");
+    DHLOGI("enter");
 }
 
 void DistributedCameraSinkServiceTest::TearDownTestCase(void)
 {
-    DHLOGI("DistributedCameraSinkServiceTest::TearDownTestCase");
+    DHLOGI("enter");
 }
 
 void DistributedCameraSinkServiceTest::SetUp(void)
 {
-    DHLOGI("DistributedCameraSinkServiceTest::SetUp");
+    DHLOGI("enter");
     sinkService_ = std::make_shared<DistributedCameraSinkService>(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, true);
     DCameraHandler::GetInstance().Initialize();
     g_dhId = DCameraHandler::GetInstance().GetCameras().front();
@@ -74,7 +74,7 @@ void DistributedCameraSinkServiceTest::SetUp(void)
 
 void DistributedCameraSinkServiceTest::TearDown(void)
 {
-    DHLOGI("DistributedCameraSinkServiceTest::TearDown");
+    DHLOGI("enter");
     sinkService_ = nullptr;
 }
 
@@ -86,7 +86,7 @@ void DistributedCameraSinkServiceTest::TearDown(void)
  */
 HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_001, TestSize.Level1)
 {
-    DHLOGI("DistributedCameraSinkServiceTest::dcamera_sink_service_test_001");
+    DHLOGI("dcamera_sink_service_test_001");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
     int32_t ret = sinkService_->InitSink(g_testParams);
@@ -107,7 +107,7 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_001, TestSi
  */
 HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_002, TestSize.Level1)
 {
-    DHLOGI("DistributedCameraSinkServiceTest::dcamera_sink_service_test_002");
+    DHLOGI("dcamera_sink_service_test_002");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
     int32_t ret = sinkService_->InitSink(g_testParams);
@@ -128,7 +128,7 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_002, TestSi
  */
 HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_003, TestSize.Level1)
 {
-    DHLOGI("DistributedCameraSinkServiceTest::dcamera_sink_service_test_003");
+    DHLOGI("dcamera_sink_service_test_003");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
     int32_t ret = sinkService_->InitSink(g_testParams);
@@ -149,7 +149,7 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_003, TestSi
  */
 HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_004, TestSize.Level1)
 {
-    DHLOGI("DistributedCameraSinkServiceTest::dcamera_sink_service_test_004");
+    DHLOGI("dcamera_sink_service_test_004");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
     int32_t ret = sinkService_->InitSink(g_testParams);
@@ -170,7 +170,7 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_004, TestSi
  */
 HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_005, TestSize.Level1)
 {
-    DHLOGI("DistributedCameraSinkServiceTest::dcamera_sink_service_test_005");
+    DHLOGI("dcamera_sink_service_test_005");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
     int32_t ret = sinkService_->InitSink(g_testParams);
@@ -191,7 +191,7 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_005, TestSi
  */
 HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_006, TestSize.Level1)
 {
-    DHLOGI("DistributedCameraSinkServiceTest::dcamera_sink_service_test_006");
+    DHLOGI("dcamera_sink_service_test_006");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
     int32_t ret = sinkService_->InitSink(g_testParams);
@@ -218,7 +218,7 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_006, TestSi
  */
 HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_007, TestSize.Level1)
 {
-    DHLOGI("DistributedCameraSinkServiceTest::dcamera_sink_service_test_007");
+    DHLOGI("dcamera_sink_service_test_007");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
     int32_t fd = 0;

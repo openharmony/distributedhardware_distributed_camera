@@ -40,22 +40,22 @@ public:
 
 void DCameraSourceHandlerIpcTest::SetUpTestCase(void)
 {
-    DHLOGI("DCameraSourceHandlerIpcTest::SetUpTestCase");
+    DHLOGI("enter");
 }
 
 void DCameraSourceHandlerIpcTest::TearDownTestCase(void)
 {
-    DHLOGI("DCameraSourceHandlerIpcTest::TearDownTestCase");
+    DHLOGI("enter");
 }
 
 void DCameraSourceHandlerIpcTest::SetUp(void)
 {
-    DHLOGI("DCameraSourceHandlerIpcTest::SetUp");
+    DHLOGI("enter");
 }
 
 void DCameraSourceHandlerIpcTest::TearDown(void)
 {
-    DHLOGI("DCameraSourceHandlerIpcTest::TearDown");
+    DHLOGI("enter");
 }
 
 /**

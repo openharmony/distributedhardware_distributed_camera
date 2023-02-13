@@ -27,9 +27,9 @@ namespace DistributedHardware {
 int32_t DistributedCameraSourceProxy::InitSource(const std::string& params,
     const sptr<IDCameraSourceCallback>& callback)
 {
-    DHLOGI("DistributedCameraSourceProxy InitSource");
+    DHLOGI("start");
     if (params.empty() || params.size() > PARAM_MAX_SIZE) {
-        DHLOGE("DistributedCameraSourceProxy InitSource params is invalid");
+        DHLOGE("params is invalid");
         return DCAMERA_BAD_VALUE;
     }
     sptr<IRemoteObject> remote = Remote();
@@ -41,17 +41,17 @@ int32_t DistributedCameraSourceProxy::InitSource(const std::string& params,
     MessageParcel reply;
     MessageOption option;
     if (!data.WriteInterfaceToken(DistributedCameraSourceProxy::GetDescriptor())) {
-        DHLOGE("DistributedCameraSourceProxy InitSource write token failed");
+        DHLOGE("write token failed");
         return DCAMERA_BAD_VALUE;
     }
 
     if (!data.WriteString(params)) {
-        DHLOGE("DistributedCameraSourceProxy InitSource write params failed");
+        DHLOGE("write params failed");
         return DCAMERA_BAD_VALUE;
     }
 
     if (!data.WriteRemoteObject(callback->AsObject())) {
-        DHLOGE("DistributedCameraSourceProxy InitSource write callback failed");
+        DHLOGE("write callback failed");
         return DCAMERA_BAD_VALUE;
     }
 
@@ -62,7 +62,7 @@ int32_t DistributedCameraSourceProxy::InitSource(const std::string& params,
 
 int32_t DistributedCameraSourceProxy::ReleaseSource()
 {
-    DHLOGI("DistributedCameraSourceProxy ReleaseSource");
+    DHLOGI("start");
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
         DHLOGE("DistributedCameraSourceProxy remote service null");
@@ -72,7 +72,7 @@ int32_t DistributedCameraSourceProxy::ReleaseSource()
     MessageParcel reply;
     MessageOption option;
     if (!data.WriteInterfaceToken(DistributedCameraSourceProxy::GetDescriptor())) {
-        DHLOGE("DistributedCameraSourceProxy InitSource write token failed");
+        DHLOGE("write token failed");
         return DCAMERA_BAD_VALUE;
     }
     remote->SendRequest(RELEASE_SOURCE, data, reply, option);
@@ -83,10 +83,9 @@ int32_t DistributedCameraSourceProxy::ReleaseSource()
 int32_t DistributedCameraSourceProxy::RegisterDistributedHardware(const std::string& devId, const std::string& dhId,
     const std::string& reqId, const EnableParam& param)
 {
-    DHLOGI("DistributedCameraSourceProxy RegisterDistributedHardware devId: %s dhId: %s",
-        GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
+    DHLOGI("devId: %s dhId: %s", GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
     if (!CheckRegParams(devId, dhId, reqId, param)) {
-        DHLOGE("DistributedCameraSourceProxy RegisterDistributedHardware input is invalid");
+        DHLOGE("input is invalid");
         return DCAMERA_BAD_VALUE;
     }
     sptr<IRemoteObject> remote = Remote();
@@ -98,13 +97,13 @@ int32_t DistributedCameraSourceProxy::RegisterDistributedHardware(const std::str
     MessageParcel reply;
     MessageOption option;
     if (!data.WriteInterfaceToken(DistributedCameraSourceProxy::GetDescriptor())) {
-        DHLOGE("DistributedCameraSourceProxy RegisterDistributedHardware write token failed");
+        DHLOGE("write token failed");
         return DCAMERA_BAD_VALUE;
     }
 
     if (!data.WriteString(devId) || !data.WriteString(dhId) || !data.WriteString(reqId) ||
         !data.WriteString(param.version) || !data.WriteString(param.attrs)) {
-        DHLOGE("DistributedCameraSourceProxy RegisterDistributedHardware write params failed");
+        DHLOGE("write params failed");
         return DCAMERA_BAD_VALUE;
     }
     remote->SendRequest(REGISTER_DISTRIBUTED_HARDWARE, data, reply, option);
@@ -116,18 +115,18 @@ bool DistributedCameraSourceProxy::CheckRegParams(const std::string& devId, cons
     const std::string& reqId, const EnableParam& param)
 {
     if (devId.empty() || devId.size() > DID_MAX_SIZE || dhId.empty() || dhId.size() > DID_MAX_SIZE) {
-        DHLOGE("DistributedCameraSourceProxy CheckRegParams devId or dhId is invalid");
+        DHLOGE("devId or dhId is invalid");
         return false;
     }
 
     if (reqId.empty() || reqId.size() > DID_MAX_SIZE) {
-        DHLOGE("DistributedCameraSourceProxy CheckRegParams reqId is invalid");
+        DHLOGE("reqId is invalid");
         return false;
     }
 
     if (param.version.empty() || param.version.size() > PARAM_MAX_SIZE ||
         param.attrs.empty() || param.attrs.size() > PARAM_MAX_SIZE) {
-        DHLOGE("DistributedCameraSourceProxy CheckRegParams param is invalid");
+        DHLOGE("param is invalid");
         return false;
     }
     return true;
@@ -136,10 +135,9 @@ bool DistributedCameraSourceProxy::CheckRegParams(const std::string& devId, cons
 int32_t DistributedCameraSourceProxy::UnregisterDistributedHardware(const std::string& devId, const std::string& dhId,
     const std::string& reqId)
 {
-    DHLOGI("DistributedCameraSourceProxy UnregisterDistributedHardware devId: %s dhId: %s",
-        GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
+    DHLOGI("devId: %s dhId: %s", GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
     if (!CheckUnregParams(devId, dhId, reqId)) {
-        DHLOGE("DistributedCameraSourceProxy UnregisterDistributedHardware input is invalid");
+        DHLOGE("input is invalid");
         return DCAMERA_BAD_VALUE;
     }
     sptr<IRemoteObject> remote = Remote();
@@ -151,12 +149,12 @@ int32_t DistributedCameraSourceProxy::UnregisterDistributedHardware(const std::s
     MessageParcel reply;
     MessageOption option;
     if (!data.WriteInterfaceToken(DistributedCameraSourceProxy::GetDescriptor())) {
-        DHLOGE("DistributedCameraSourceProxy UnregisterDistributedHardware write token failed");
+        DHLOGE("write token failed");
         return DCAMERA_BAD_VALUE;
     }
 
     if (!data.WriteString(devId) || !data.WriteString(dhId) || !data.WriteString(reqId)) {
-        DHLOGE("DistributedCameraSourceProxy UnregisterDistributedHardware write params failed");
+        DHLOGE("write params failed");
         return DCAMERA_BAD_VALUE;
     }
     remote->SendRequest(UNREGISTER_DISTRIBUTED_HARDWARE, data, reply, option);
@@ -168,12 +166,12 @@ bool DistributedCameraSourceProxy::CheckUnregParams(const std::string& devId, co
     const std::string& reqId)
 {
     if (devId.empty() || devId.size() > DID_MAX_SIZE || dhId.empty() || dhId.size() > DID_MAX_SIZE) {
-        DHLOGE("DistributedCameraSourceProxy CheckUnregParams devId or dhId is invalid");
+        DHLOGE("devId or dhId is invalid");
         return false;
     }
 
     if (reqId.empty() || reqId.size() > DID_MAX_SIZE) {
-        DHLOGE("DistributedCameraSourceProxy CheckUnregParams reqId is invalid");
+        DHLOGE("reqId is invalid");
         return false;
     }
     return true;
@@ -185,7 +183,7 @@ int32_t DistributedCameraSourceProxy::DCameraNotify(const std::string& devId, co
     DHLOGI("DCameraNotify devId: %s dhId: %s events: %s",
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), events.c_str());
     if (!CheckNotifyParams(devId, dhId, events)) {
-        DHLOGE("DistributedCameraSourceProxy DCameraNotify input is invalid");
+        DHLOGE("input is invalid");
         return DCAMERA_BAD_VALUE;
     }
     sptr<IRemoteObject> remote = Remote();
@@ -197,12 +195,12 @@ int32_t DistributedCameraSourceProxy::DCameraNotify(const std::string& devId, co
     MessageParcel reply;
     MessageOption option;
     if (!data.WriteInterfaceToken(DistributedCameraSourceProxy::GetDescriptor())) {
-        DHLOGE("DistributedCameraSourceProxy DCameraNotify write token failed");
+        DHLOGE("write token failed");
         return DCAMERA_BAD_VALUE;
     }
 
     if (!data.WriteString(devId) || !data.WriteString(dhId) || !data.WriteString(events)) {
-        DHLOGE("DistributedCameraSourceProxy DCameraNotify write params failed");
+        DHLOGE("write params failed");
         return DCAMERA_BAD_VALUE;
     }
     remote->SendRequest(CAMERA_NOTIFY, data, reply, option);
@@ -214,12 +212,12 @@ bool DistributedCameraSourceProxy::CheckNotifyParams(const std::string& devId, c
     std::string& events)
 {
     if (devId.empty() || devId.size() > DID_MAX_SIZE || dhId.empty() || dhId.size() > DID_MAX_SIZE) {
-        DHLOGE("DistributedCameraSourceProxy CheckNotifyParams devId or dhId is invalid");
+        DHLOGE("devId or dhId is invalid");
         return false;
     }
 
     if (events.empty() || events.size() > PARAM_MAX_SIZE) {
-        DHLOGE("DistributedCameraSourceProxy CheckNotifyParams events is invalid");
+        DHLOGE("events is invalid");
         return false;
     }
     return true;

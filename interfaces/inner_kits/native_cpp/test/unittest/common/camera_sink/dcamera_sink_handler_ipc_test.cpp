@@ -40,22 +40,22 @@ public:
 
 void DCameraSinkHandlerIpcTest::SetUpTestCase(void)
 {
-    DHLOGI("DCameraSinkHandlerIpcTest::SetUpTestCase");
+    DHLOGI("enter");
 }
 
 void DCameraSinkHandlerIpcTest::TearDownTestCase(void)
 {
-    DHLOGI("DCameraSinkHandlerIpcTest::TearDownTestCase");
+    DHLOGI("enter");
 }
 
 void DCameraSinkHandlerIpcTest::SetUp(void)
 {
-    DHLOGI("DCameraSinkHandlerIpcTest::SetUp");
+    DHLOGI("enter");
 }
 
 void DCameraSinkHandlerIpcTest::TearDown(void)
 {
-    DHLOGI("DCameraSinkHandlerIpcTest::TearDown");
+    DHLOGI("enter");
 }
 
 /**

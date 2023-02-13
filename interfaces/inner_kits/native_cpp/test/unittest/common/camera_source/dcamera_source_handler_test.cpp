@@ -51,22 +51,22 @@ const std::string TEST_ATTRS = "";
 }
 void DCameraSourceHandlerTest::SetUpTestCase(void)
 {
-    DHLOGI("DCameraSourceHandlerTest::SetUpTestCase");
+    DHLOGI("enter");
 }
 
 void DCameraSourceHandlerTest::TearDownTestCase(void)
 {
-    DHLOGI("DCameraSourceHandlerTest::TearDownTestCase");
+    DHLOGI("enter");
 }
 
 void DCameraSourceHandlerTest::SetUp(void)
 {
-    DHLOGI("DCameraSourceHandlerTest::SetUp");
+    DHLOGI("enter");
 }
 
 void DCameraSourceHandlerTest::TearDown(void)
 {
-    DHLOGI("DCameraSourceHandlerTest::TearDown");
+    DHLOGI("enter");
 }
 
 /**

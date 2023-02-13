@@ -41,7 +41,7 @@ DCameraSinkDev::~DCameraSinkDev()
 
 int32_t DCameraSinkDev::Init()
 {
-    DHLOGI("DCameraSinkDev::Init dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("Init dhId: %s", GetAnonyString(dhId_).c_str());
     accessControl_ = std::make_shared<DCameraSinkAccessControl>();
     controller_ = std::make_shared<DCameraSinkController>(accessControl_);
     DCameraIndex index("", dhId_);
@@ -49,12 +49,12 @@ int32_t DCameraSinkDev::Init()
     indexs.push_back(index);
     int32_t ret = controller_->Init(indexs);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSinkDev::Init init controller failed, dhId: %s, ret: %d", GetAnonyString(dhId_).c_str(), ret);
+        DHLOGE("init controller failed, dhId: %s, ret: %d", GetAnonyString(dhId_).c_str(), ret);
         return ret;
     }
 
     isInit_ = true;
-    DHLOGI("DCameraSinkDev::Init %s success", GetAnonyString(dhId_).c_str());
+    DHLOGI("DCameraSinkDev Init %s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
 }
 
@@ -63,7 +63,7 @@ int32_t DCameraSinkDev::UnInit()
     if (controller_ != nullptr) {
         int32_t ret = controller_->UnInit();
         if (ret != DCAMERA_OK) {
-            DHLOGE("DCameraSinkDev::UnInit release controller failed, dhId: %s, ret: %d",
+            DHLOGE("release controller failed, dhId: %s, ret: %d",
                    GetAnonyString(dhId_).c_str(), ret);
         }
     }
@@ -73,35 +73,35 @@ int32_t DCameraSinkDev::UnInit()
 
 int32_t DCameraSinkDev::SubscribeLocalHardware(const std::string& parameters)
 {
-    DHLOGI("DCameraSinkDev::SubscribeLocalHardware");
+    DHLOGI("enter");
     (void)parameters;
     return DCAMERA_OK;
 }
 
 int32_t DCameraSinkDev::UnsubscribeLocalHardware()
 {
-    DHLOGI("DCameraSinkDev::UnsubscribeLocalHardware");
+    DHLOGI("enter");
     return DCAMERA_OK;
 }
 
 int32_t DCameraSinkDev::StopCapture()
 {
-    DHLOGI("DCameraSinkDev::StopCapture dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("StopCapture dhId: %s", GetAnonyString(dhId_).c_str());
     return controller_->StopCapture();
 }
 
 int32_t DCameraSinkDev::ChannelNeg(std::string& channelInfo)
 {
-    DHLOGI("DCameraSinkDev::ChannelNeg dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("ChannelNeg dhId: %s", GetAnonyString(dhId_).c_str());
     if (channelInfo.empty()) {
-        DHLOGE("DCameraSinkDev::ChannelNeg channelInfo is empty");
+        DHLOGE("channelInfo is empty");
         return DCAMERA_BAD_VALUE;
     }
 
     DCameraChannelInfoCmd channelInfoCmd;
     int32_t ret = channelInfoCmd.Unmarshal(channelInfo);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSinkDev::ChannelNeg channelInfo unmarshal failed, dhId: %s, ret: %d",
+        DHLOGE("channelInfo unmarshal failed, dhId: %s, ret: %d",
                GetAnonyString(dhId_).c_str(), ret);
         return ret;
     }
@@ -110,12 +110,11 @@ int32_t DCameraSinkDev::ChannelNeg(std::string& channelInfo)
 
 int32_t DCameraSinkDev::GetCameraInfo(std::string& cameraInfo)
 {
-    DHLOGI("DCameraSinkDev::GetCameraInfo dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("GetCameraInfo dhId: %s", GetAnonyString(dhId_).c_str());
     std::shared_ptr<DCameraInfo> info = std::make_shared<DCameraInfo>();
     int32_t ret = controller_->GetCameraInfo(info);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSinkDev::GetCameraInfo get state failed, dhId: %s, ret: %d",
-               GetAnonyString(dhId_).c_str(), ret);
+        DHLOGE("get state failed, dhId: %s, ret: %d", GetAnonyString(dhId_).c_str(), ret);
         return ret;
     }
 
@@ -126,27 +125,25 @@ int32_t DCameraSinkDev::GetCameraInfo(std::string& cameraInfo)
     cameraInfoCmd.value_ = info;
     ret = cameraInfoCmd.Marshal(cameraInfo);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSinkDev::GetCameraInfo cameraInfoCmd marshal failed, dhId: %s, ret: %d",
-               GetAnonyString(dhId_).c_str(), ret);
+        DHLOGE("cameraInfoCmd marshal failed, dhId: %s, ret: %d", GetAnonyString(dhId_).c_str(), ret);
         return ret;
     }
-    DHLOGI("DCameraSinkDev::GetCameraInfo %s success", GetAnonyString(dhId_).c_str());
+    DHLOGI("GetCameraInfo %s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
 }
 
 int32_t DCameraSinkDev::OpenChannel(std::string& openInfo)
 {
-    DHLOGI("DCameraSinkDev::OpenChannel dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("OpenChannel dhId: %s", GetAnonyString(dhId_).c_str());
     if (openInfo.empty()) {
-        DHLOGE("DCameraSinkDev::OpenChannel openInfo is empty");
+        DHLOGE("openInfo is empty");
         return DCAMERA_BAD_VALUE;
     }
 
     DCameraOpenInfoCmd cmd;
     int32_t ret = cmd.Unmarshal(openInfo);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSinkDev::OpenChannel openInfo unmarshal failed, dhId: %s, ret: %d",
-               GetAnonyString(dhId_).c_str(), ret);
+        DHLOGE("openInfo unmarshal failed, dhId: %s, ret: %d", GetAnonyString(dhId_).c_str(), ret);
         return ret;
     }
     return controller_->OpenChannel(cmd.value_);
@@ -154,7 +151,7 @@ int32_t DCameraSinkDev::OpenChannel(std::string& openInfo)
 
 int32_t DCameraSinkDev::CloseChannel()
 {
-    DHLOGI("DCameraSinkDev::CloseChannel dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("CloseChannel dhId: %s", GetAnonyString(dhId_).c_str());
     return controller_->CloseChannel();
 }
 

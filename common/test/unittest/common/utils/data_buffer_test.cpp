@@ -36,24 +36,24 @@ public:
 
 void DataBufferTest::SetUpTestCase(void)
 {
-    DHLOGI("DataBufferTest::SetUpTestCase");
+    DHLOGI("enter");
 }
 
 void DataBufferTest::TearDownTestCase(void)
 {
-    DHLOGI("DataBufferTest::TearDownTestCase");
+    DHLOGI("enter");
 }
 
 void DataBufferTest::SetUp(void)
 {
-    DHLOGI("DataBufferTest::SetUp");
+    DHLOGI("enter");
     size_t capacity = 1;
     dataBuffer_ = std::make_shared<DataBuffer>(capacity);
 }
 
 void DataBufferTest::TearDown(void)
 {
-    DHLOGI("DataBufferTest::TearDown");
+    DHLOGI("enter");
     dataBuffer_ = nullptr;
 }
 

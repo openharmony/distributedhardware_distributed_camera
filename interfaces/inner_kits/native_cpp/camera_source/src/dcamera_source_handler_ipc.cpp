@@ -42,20 +42,20 @@ IMPLEMENT_SINGLE_INSTANCE(DCameraSourceHandlerIpc);
 void DCameraSourceHandlerIpc::Init()
 {
     std::lock_guard<std::mutex> autoLock(initCamSrvLock_);
-    DHLOGI("DCameraSourceHandlerIpc Init Start");
+    DHLOGI("Start");
     if (isInit_) {
         DHLOGI("DCameraSourceHandlerIpc has already init");
         return;
     }
     sourceLocalRecipient_ = new SourceLocalRecipient();
     isInit_ = true;
-    DHLOGI("DCameraSourceHandlerIpc Init End");
+    DHLOGI("End");
 }
 
 void DCameraSourceHandlerIpc::UnInit()
 {
     std::lock_guard<std::mutex> autoLock(initCamSrvLock_);
-    DHLOGI("DCameraSourceHandlerIpc UnInit Start");
+    DHLOGI("Start");
     if (!isInit_) {
         DHLOGI("DCameraSourceHandlerIpc has already UnInit");
         return;
@@ -64,7 +64,7 @@ void DCameraSourceHandlerIpc::UnInit()
     DHLOGI("DCameraSourceHandlerIpc Start free recipient");
     sourceLocalRecipient_ = nullptr;
     isInit_ = false;
-    DHLOGI("DCameraSourceHandlerIpc UnInit End");
+    DHLOGI("End");
 }
 
 sptr<IDistributedCameraSource> DCameraSourceHandlerIpc::GetSourceLocalCamSrv()
@@ -76,16 +76,16 @@ sptr<IDistributedCameraSource> DCameraSourceHandlerIpc::GetSourceLocalCamSrv()
             return localSource_;
         }
     }
-    DHLOGI("GetSourceLocalCamSrv Start");
+    DHLOGI("Start");
     sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sm == nullptr) {
-        DHLOGE("GetSourceLocalCamSrv GetSystemAbilityManager failed");
+        DHLOGE("GetSystemAbilityManager failed");
         return nullptr;
     }
 
     sptr<IRemoteObject> object = sm->GetSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID);
     if (object == nullptr) {
-        DHLOGE("GetSourceLocalCamSrv GetSystemAbility failed");
+        DHLOGE("GetSystemAbility failed");
         return nullptr;
     }
     int32_t ret = object->AddDeathRecipient(sourceLocalRecipient_);
@@ -101,19 +101,19 @@ sptr<IDistributedCameraSource> DCameraSourceHandlerIpc::GetSourceLocalCamSrv()
         }
         localSource_ = localSource;
     }
-    DHLOGI("GetSourceLocalCamSrv success, AddDeathRecipient ret: %d", ret);
+    DHLOGI("success, AddDeathRecipient ret: %d", ret);
     return localSource;
 }
 
 void DCameraSourceHandlerIpc::DeleteSourceLocalCamSrv()
 {
-    DHLOGI("DeleteSourceLocalCamSrv start");
+    DHLOGI("start");
     std::lock_guard<std::mutex> autoLock(sourceLocalCamSrvLock_);
     if (localSource_ != nullptr) {
         localSource_->AsObject()->RemoveDeathRecipient(sourceLocalRecipient_);
     }
     localSource_ = nullptr;
-    DHLOGI("DeleteSourceLocalCamSrv end");
+    DHLOGI("end");
 }
 
 void DCameraSourceHandlerIpc::SourceLocalRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
@@ -127,7 +127,7 @@ void DCameraSourceHandlerIpc::OnSourceLocalCamSrvDied(const wptr<IRemoteObject>&
     DHLOGI("OnSourceLocalCamSrvDied delete diedRemoted");
     std::lock_guard<std::mutex> autoLock(sourceLocalCamSrvLock_);
     if (localSource_ == nullptr) {
-        DHLOGE("DCameraSourceHandlerIpc::OnSourceLocalCamSrvDied, localSource is null.");
+        DHLOGE("localSource is null.");
         return;
     }
     sptr<IRemoteObject> diedRemoted = remote.promote();

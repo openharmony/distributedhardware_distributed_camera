@@ -26,24 +26,24 @@ DCameraPhotoCallback::DCameraPhotoCallback(const std::shared_ptr<StateCallback>&
 
 void DCameraPhotoCallback::OnCaptureStarted(const int32_t captureID) const
 {
-    DHLOGI("DCameraPhotoCallback::OnCaptureStarted, captureID: %d", captureID);
+    DHLOGI("enter, captureID: %d", captureID);
 }
 
 void DCameraPhotoCallback::OnCaptureEnded(const int32_t captureID, const int32_t frameCount) const
 {
-    DHLOGI("DCameraPhotoCallback::OnCaptureEnded, captureID: %d, frameCount: %d", captureID, frameCount);
+    DHLOGI("enter, captureID: %d, frameCount: %d", captureID, frameCount);
 }
 
 void DCameraPhotoCallback::OnFrameShutter(const int32_t captureId, const uint64_t timestamp) const
 {
-    DHLOGI("DCameraPhotoCallback::OnFrameShutter, captureId: %d, timestamp: %llu", captureId, timestamp);
+    DHLOGI("enter, captureId: %d, timestamp: %llu", captureId, timestamp);
 }
 
 void DCameraPhotoCallback::OnCaptureError(const int32_t captureId, const int32_t errorCode) const
 {
-    DHLOGE("DCameraPhotoCallback::OnCaptureError, captureId: %d, errorCode: %d", captureId, errorCode);
+    DHLOGE("enter, captureId: %d, errorCode: %d", captureId, errorCode);
     if (callback_ == nullptr) {
-        DHLOGE("DCameraPhotoCallback::OnCaptureError StateCallback is null");
+        DHLOGE("StateCallback is null");
         return;
     }
 

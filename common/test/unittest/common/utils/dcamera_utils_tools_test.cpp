@@ -40,22 +40,22 @@ public:
 
 void DcameraUtilsToolsTest::SetUpTestCase(void)
 {
-    DHLOGI("DcameraUtilsToolsTest::SetUpTestCase");
+    DHLOGI("enter");
 }
 
 void DcameraUtilsToolsTest::TearDownTestCase(void)
 {
-    DHLOGI("DcameraUtilsToolsTest::TearDownTestCase");
+    DHLOGI("enter");
 }
 
 void DcameraUtilsToolsTest::SetUp(void)
 {
-    DHLOGI("DcameraUtilsToolsTest::SetUp");
+    DHLOGI("enter");
 }
 
 void DcameraUtilsToolsTest::TearDown(void)
 {
-    DHLOGI("DcameraUtilsToolsTest::TearDown");
+    DHLOGI("enter");
 }
 
 void DcameraUtilsToolsTest::SetTokenID()

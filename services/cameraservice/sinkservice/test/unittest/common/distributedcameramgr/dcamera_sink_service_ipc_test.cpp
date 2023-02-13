@@ -34,22 +34,22 @@ public:
 
 void DCameraSinkServiceIpcTest::SetUpTestCase(void)
 {
-    DHLOGI("DCameraSinkServiceIpcTest::SetUpTestCase");
+    DHLOGI("enter");
 }
 
 void DCameraSinkServiceIpcTest::TearDownTestCase(void)
 {
-    DHLOGI("DCameraSinkServiceIpcTest::TearDownTestCase");
+    DHLOGI("enter");
 }
 
 void DCameraSinkServiceIpcTest::SetUp(void)
 {
-    DHLOGI("DCameraSinkServiceIpcTest::SetUp");
+    DHLOGI("enter");
 }
 
 void DCameraSinkServiceIpcTest::TearDown(void)
 {
-    DHLOGI("DCameraSinkServiceIpcTest::TearDown");
+    DHLOGI("enter");
 }
 
 /**
@@ -60,7 +60,7 @@ void DCameraSinkServiceIpcTest::TearDown(void)
  */
 HWTEST_F(DCameraSinkServiceIpcTest, dcamera_sink_service_ipc_test_001, TestSize.Level1)
 {
-    DHLOGI("DCameraSinkServiceIpcTest::dcamera_sink_service_ipc_test_001");
+    DHLOGI("dcamera_sink_service_ipc_test_001");
     DCameraSinkServiceIpc::GetInstance().UnInit();
     DCameraSinkServiceIpc::GetInstance().Init();
     DCameraSinkServiceIpc::GetInstance().UnInit();
@@ -78,7 +78,7 @@ HWTEST_F(DCameraSinkServiceIpcTest, dcamera_sink_service_ipc_test_001, TestSize.
  */
 HWTEST_F(DCameraSinkServiceIpcTest, dcamera_sink_service_ipc_test_002, TestSize.Level1)
 {
-    DHLOGI("DCameraSinkServiceIpcTest::dcamera_sink_service_ipc_test_002");
+    DHLOGI("dcamera_sink_service_ipc_test_002");
     std::string devId = "";
     sptr<IDistributedCameraSource> sourceSA = DCameraSinkServiceIpc::GetInstance().GetSourceRemoteCamSrv(devId);
     EXPECT_EQ(nullptr, sourceSA);

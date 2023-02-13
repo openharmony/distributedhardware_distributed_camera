@@ -63,23 +63,23 @@ public:
 
 void DCameraSourceCallbackTest::SetUpTestCase(void)
 {
-    DHLOGI("DCameraSourceCallbackTest::SetUpTestCase");
+    DHLOGI("enter");
 }
 
 void DCameraSourceCallbackTest::TearDownTestCase(void)
 {
-    DHLOGI("DCameraSourceCallbackTest::TearDownTestCase");
+    DHLOGI("enter");
 }
 
 void DCameraSourceCallbackTest::SetUp(void)
 {
-    DHLOGI("DCameraSourceCallbackTest::SetUp");
+    DHLOGI("enter");
     sourceCallback_ = std::make_shared<DCameraSourceCallback>();
 }
 
 void DCameraSourceCallbackTest::TearDown(void)
 {
-    DHLOGI("DCameraSourceCallbackTest::TearDown");
+    DHLOGI("enter");
     sourceCallback_ = nullptr;
 }
 

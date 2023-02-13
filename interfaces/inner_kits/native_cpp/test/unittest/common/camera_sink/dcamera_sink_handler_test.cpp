@@ -49,22 +49,22 @@ const std::string TEST_CAMERA_DH_ID_0 = "camera_0";
 }
 void DCameraSinkHandlerTest::SetUpTestCase(void)
 {
-    DHLOGI("DCameraSinkHandlerTest::SetUpTestCase");
+    DHLOGI("enter");
 }
 
 void DCameraSinkHandlerTest::TearDownTestCase(void)
 {
-    DHLOGI("DCameraSinkHandlerTest::TearDownTestCase");
+    DHLOGI("enter");
 }
 
 void DCameraSinkHandlerTest::SetUp(void)
 {
-    DHLOGI("DCameraSinkHandlerTest::SetUp");
+    DHLOGI("enter");
 }
 
 void DCameraSinkHandlerTest::TearDown(void)
 {
-    DHLOGI("DCameraSinkHandlerTest::TearDown");
+    DHLOGI("enter");
 }
 
 /**

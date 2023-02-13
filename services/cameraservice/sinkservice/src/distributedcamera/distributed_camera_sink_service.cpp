@@ -44,7 +44,7 @@ DistributedCameraSinkService::DistributedCameraSinkService(int32_t saId, bool ru
 
 void DistributedCameraSinkService::OnStart()
 {
-    DHLOGI("DistributedCameraSinkService::OnStart");
+    DHLOGI("DistributedCameraSinkService OnStart");
     if (state_ == DCameraServiceState::DCAMERA_SRV_STATE_RUNNING) {
         DHLOGI("DistributedCameraSinkService has already started.");
         return;
@@ -84,18 +84,18 @@ void DistributedCameraSinkService::OnStop()
 
 int32_t DistributedCameraSinkService::InitSink(const std::string& params)
 {
-    DHLOGI("DistributedCameraSinkService::InitSink");
+    DHLOGI("start");
     sinkVer_ = params;
     g_camDump.version = sinkVer_;
     int32_t ret = DCameraHandler::GetInstance().Initialize();
     if (ret != DCAMERA_OK) {
-        DHLOGE("DistributedCameraSinkService::InitSink handler initialize failed, ret: %d", ret);
+        DHLOGE("handler initialize failed, ret: %d", ret);
         return ret;
     }
 
     std::vector<std::string> cameras = DCameraHandler::GetInstance().GetCameras();
     if (cameras.empty()) {
-        DHLOGE("DistributedCameraSinkService::InitSink no camera device");
+        DHLOGE("no camera device");
         return DCAMERA_BAD_VALUE;
     }
     g_camDump.camNumber = static_cast<int32_t>(cameras.size());
@@ -103,23 +103,23 @@ int32_t DistributedCameraSinkService::InitSink(const std::string& params)
         std::shared_ptr<DCameraSinkDev> sinkDevice = std::make_shared<DCameraSinkDev>(dhId);
         ret = sinkDevice->Init();
         if (ret != DCAMERA_OK) {
-            DHLOGE("DistributedCameraSinkService::InitSink sink device init failed, ret: %d", ret);
+            DHLOGE("sink device init failed, ret: %d", ret);
             return ret;
         }
         camerasMap_.emplace(dhId, sinkDevice);
     }
-    DHLOGI("DistributedCameraSinkService::InitSink success");
+    DHLOGI("success");
     return DCAMERA_OK;
 }
 
 int32_t DistributedCameraSinkService::ReleaseSink()
 {
-    DHLOGI("DistributedCameraSinkService::ReleaseSink");
+    DHLOGI("enter");
     for (auto iter = camerasMap_.begin(); iter != camerasMap_.end(); iter++) {
         std::shared_ptr<DCameraSinkDev> sinkDevice = iter->second;
         int32_t ret = sinkDevice->UnInit();
         if (ret != DCAMERA_OK) {
-            DHLOGE("DistributedCameraSinkService::ReleaseSink release sink device failed, ret: %d", ret);
+            DHLOGE("release sink device failed, ret: %d", ret);
         }
     }
     camerasMap_.clear();
@@ -130,136 +130,136 @@ int32_t DistributedCameraSinkService::ReleaseSink()
 
 int32_t DistributedCameraSinkService::SubscribeLocalHardware(const std::string& dhId, const std::string& parameters)
 {
-    DHLOGI("DistributedCameraSinkService::SubscribeLocalHardware dhId: %s", GetAnonyString(dhId).c_str());
+    DHLOGI("dhId: %s", GetAnonyString(dhId).c_str());
     auto iter = camerasMap_.find(dhId);
     if (iter == camerasMap_.end()) {
-        DHLOGE("DistributedCameraSinkService::SubscribeLocalHardware device not found");
+        DHLOGE("device not found");
         return DCAMERA_NOT_FOUND;
     }
 
     std::shared_ptr<DCameraSinkDev> sinkDevice = iter->second;
     int32_t ret = sinkDevice->SubscribeLocalHardware(parameters);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DistributedCameraSinkService::SubscribeLocalHardware failed, ret: %d", ret);
+        DHLOGE("SubscribeLocalHardware failed, ret: %d", ret);
         return ret;
     }
-    DHLOGI("DistributedCameraSinkService::SubscribeLocalHardware success");
+    DHLOGI("SubscribeLocalHardware success");
     return DCAMERA_OK;
 }
 
 int32_t DistributedCameraSinkService::UnsubscribeLocalHardware(const std::string& dhId)
 {
-    DHLOGI("DistributedCameraSinkService::UnsubscribeLocalHardware dhId: %s", GetAnonyString(dhId).c_str());
+    DHLOGI("dhId: %s", GetAnonyString(dhId).c_str());
     auto iter = camerasMap_.find(dhId);
     if (iter == camerasMap_.end()) {
-        DHLOGE("DistributedCameraSinkService::UnsubscribeLocalHardware device not found");
+        DHLOGE("device not found");
         return DCAMERA_NOT_FOUND;
     }
 
     std::shared_ptr<DCameraSinkDev> sinkDevice = iter->second;
     int32_t ret = sinkDevice->UnsubscribeLocalHardware();
     if (ret != DCAMERA_OK) {
-        DHLOGE("DistributedCameraSinkService::UnsubscribeLocalHardware failed, ret: %d", ret);
+        DHLOGE("UnsubscribeLocalHardware failed, ret: %d", ret);
         return ret;
     }
-    DHLOGI("DistributedCameraSinkService::UnsubscribeLocalHardware success");
+    DHLOGI("UnsubscribeLocalHardware success");
     return DCAMERA_OK;
 }
 
 int32_t DistributedCameraSinkService::StopCapture(const std::string& dhId)
 {
-    DHLOGI("DistributedCameraSinkService::StopCapture dhId: %s", GetAnonyString(dhId).c_str());
+    DHLOGI("dhId: %s", GetAnonyString(dhId).c_str());
     auto iter = camerasMap_.find(dhId);
     if (iter == camerasMap_.end()) {
-        DHLOGE("DistributedCameraSinkService::StopCapture device not found");
+        DHLOGE("device not found");
         return DCAMERA_NOT_FOUND;
     }
 
     std::shared_ptr<DCameraSinkDev> sinkDevice = iter->second;
     int32_t ret = sinkDevice->StopCapture();
     if (ret != DCAMERA_OK) {
-        DHLOGE("DistributedCameraSinkService::StopCapture failed, ret: %d", ret);
+        DHLOGE("StopCapture failed, ret: %d", ret);
         return ret;
     }
-    DHLOGI("DistributedCameraSinkService::StopCapture success");
+    DHLOGI("StopCapture success");
     return DCAMERA_OK;
 }
 
 int32_t DistributedCameraSinkService::ChannelNeg(const std::string& dhId, std::string& channelInfo)
 {
-    DHLOGI("DistributedCameraSinkService::ChannelNeg dhId: %s", GetAnonyString(dhId).c_str());
+    DHLOGI("dhId: %s", GetAnonyString(dhId).c_str());
     auto iter = camerasMap_.find(dhId);
     if (iter == camerasMap_.end()) {
-        DHLOGE("DistributedCameraSinkService::ChannelNeg device not found");
+        DHLOGE("device not found");
         return DCAMERA_NOT_FOUND;
     }
 
     std::shared_ptr<DCameraSinkDev> sinkDevice = iter->second;
     int32_t ret = sinkDevice->ChannelNeg(channelInfo);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DistributedCameraSinkService::ChannelNeg failed, ret: %d", ret);
+        DHLOGE("ChannelNeg failed, ret: %d", ret);
         return ret;
     }
-    DHLOGI("DistributedCameraSinkService::ChannelNeg success");
+    DHLOGI("ChannelNeg success");
     return DCAMERA_OK;
 }
 
 int32_t DistributedCameraSinkService::GetCameraInfo(const std::string& dhId, std::string& cameraInfo)
 {
-    DHLOGI("DistributedCameraSinkService::GetCameraInfo dhId: %s", GetAnonyString(dhId).c_str());
+    DHLOGI("dhId: %s", GetAnonyString(dhId).c_str());
     auto iter = camerasMap_.find(dhId);
     if (iter == camerasMap_.end()) {
-        DHLOGE("DistributedCameraSinkService::GetCameraInfo device not found");
+        DHLOGE("device not found");
         return DCAMERA_NOT_FOUND;
     }
 
     std::shared_ptr<DCameraSinkDev> sinkDevice = iter->second;
     int32_t ret = sinkDevice->GetCameraInfo(cameraInfo);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DistributedCameraSinkService::GetCameraInfo failed, ret: %d", ret);
+        DHLOGE("GetCameraInfo failed, ret: %d", ret);
         return ret;
     }
-    DHLOGI("DistributedCameraSinkService::GetCameraInfo success");
+    DHLOGI("GetCameraInfo success");
     return DCAMERA_OK;
 }
 
 int32_t DistributedCameraSinkService::OpenChannel(const std::string& dhId, std::string& openInfo)
 {
-    DHLOGI("DistributedCameraSinkService::OpenChannel dhId: %s", GetAnonyString(dhId).c_str());
+    DHLOGI("dhId: %s", GetAnonyString(dhId).c_str());
     auto iter = camerasMap_.find(dhId);
     if (iter == camerasMap_.end()) {
-        DHLOGE("DistributedCameraSinkService::OpenChannel device not found");
+        DHLOGE("device not found");
         return DCAMERA_NOT_FOUND;
     }
 
     std::shared_ptr<DCameraSinkDev> sinkDevice = iter->second;
     int32_t ret = sinkDevice->OpenChannel(openInfo);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DistributedCameraSinkService::OpenChannel failed, ret: %d", ret);
+        DHLOGE("OpenChannel failed, ret: %d", ret);
         ReportDcamerOptFail(DCAMERA_OPT_FAIL, DCAMERA_SINK_OPEN_CAM_ERROR,
             CreateMsg("sink service open channel failed, dhId: %s", GetAnonyString(dhId).c_str()));
         return ret;
     }
-    DHLOGI("DistributedCameraSinkService::OpenChannel success");
+    DHLOGI("OpenChannel success");
     return DCAMERA_OK;
 }
 
 int32_t DistributedCameraSinkService::CloseChannel(const std::string& dhId)
 {
-    DHLOGI("DistributedCameraSinkService::CloseChannel dhId: %s", GetAnonyString(dhId).c_str());
+    DHLOGI("dhId: %s", GetAnonyString(dhId).c_str());
     auto iter = camerasMap_.find(dhId);
     if (iter == camerasMap_.end()) {
-        DHLOGE("DistributedCameraSinkService::CloseChannel device not found");
+        DHLOGE("device not found");
         return DCAMERA_NOT_FOUND;
     }
 
     std::shared_ptr<DCameraSinkDev> sinkDevice = iter->second;
     int32_t ret = sinkDevice->CloseChannel();
     if (ret != DCAMERA_OK) {
-        DHLOGE("DistributedCameraSinkService::CloseChannel failed, ret: %d", ret);
+        DHLOGE("CloseChannel failed, ret: %d", ret);
         return ret;
     }
-    DHLOGI("DistributedCameraSinkService::CloseChannel success");
+    DHLOGI("CloseChannel success");
     return DCAMERA_OK;
 }
 

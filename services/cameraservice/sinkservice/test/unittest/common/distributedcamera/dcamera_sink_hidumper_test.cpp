@@ -32,22 +32,22 @@ public:
 
 void DcameraSinkHidumperTest::SetUpTestCase(void)
 {
-    DHLOGI("DcameraSinkHidumperTest::SetUpTestCase");
+    DHLOGI("enter");
 }
 
 void DcameraSinkHidumperTest::TearDownTestCase(void)
 {
-    DHLOGI("DcameraSinkHidumperTest::TearDownTestCase");
+    DHLOGI("enter");
 }
 
 void DcameraSinkHidumperTest::SetUp(void)
 {
-    DHLOGI("DcameraSinkHidumperTest::SetUp");
+    DHLOGI("enter");
 }
 
 void DcameraSinkHidumperTest::TearDown(void)
 {
-    DHLOGI("DcameraSinkHidumperTest::TearDown");
+    DHLOGI("enter");
 }
 
 /**
@@ -58,7 +58,7 @@ void DcameraSinkHidumperTest::TearDown(void)
  */
 HWTEST_F(DcameraSinkHidumperTest, dcamera_sink_hidumper_test_001, TestSize.Level1)
 {
-    DHLOGI("DcameraSinkHidumperTest::dcamera_sink_hidumper_test_001");
+    DHLOGI("dcamera_sink_hidumper_test_001");
     std::vector<std::string> args;
     std::string result;
     bool ret = DcameraSinkHidumper::GetInstance().Dump(args, result);
@@ -73,7 +73,7 @@ HWTEST_F(DcameraSinkHidumperTest, dcamera_sink_hidumper_test_001, TestSize.Level
  */
 HWTEST_F(DcameraSinkHidumperTest, dcamera_sink_hidumper_test_002, TestSize.Level1)
 {
-    DHLOGI("DcameraSinkHidumperTest::dcamera_sink_hidumper_test_002");
+    DHLOGI("dcamera_sink_hidumper_test_002");
     std::vector<std::string> args;
     std::string str1 = "--version";
     std::string str2 = "--camNum";
@@ -92,7 +92,7 @@ HWTEST_F(DcameraSinkHidumperTest, dcamera_sink_hidumper_test_002, TestSize.Level
  */
 HWTEST_F(DcameraSinkHidumperTest, dcamera_sink_hidumper_test_003, TestSize.Level1)
 {
-    DHLOGI("DcameraSinkHidumperTest::dcamera_sink_hidumper_test_003");
+    DHLOGI("dcamera_sink_hidumper_test_003");
     std::vector<std::string> args;
     std::string str1 = "--version";
     args.push_back(str1);
@@ -109,7 +109,7 @@ HWTEST_F(DcameraSinkHidumperTest, dcamera_sink_hidumper_test_003, TestSize.Level
  */
 HWTEST_F(DcameraSinkHidumperTest, dcamera_sink_hidumper_test_004, TestSize.Level1)
 {
-    DHLOGI("DcameraSinkHidumperTest::dcamera_sink_hidumper_test_004");
+    DHLOGI("dcamera_sink_hidumper_test_004");
     std::vector<std::string> args;
     std::string str1 = "--camNum";
     args.push_back(str1);
@@ -126,7 +126,7 @@ HWTEST_F(DcameraSinkHidumperTest, dcamera_sink_hidumper_test_004, TestSize.Level
  */
 HWTEST_F(DcameraSinkHidumperTest, dcamera_sink_hidumper_test_005, TestSize.Level1)
 {
-    DHLOGI("DcameraSinkHidumperTest::dcamera_sink_hidumper_test_005");
+    DHLOGI("dcamera_sink_hidumper_test_005");
     std::vector<std::string> args;
     std::string str1 = "--opened";
     args.push_back(str1);
@@ -143,7 +143,7 @@ HWTEST_F(DcameraSinkHidumperTest, dcamera_sink_hidumper_test_005, TestSize.Level
  */
 HWTEST_F(DcameraSinkHidumperTest, dcamera_sink_hidumper_test_006, TestSize.Level1)
 {
-    DHLOGI("DcameraSinkHidumperTest::dcamera_sink_hidumper_test_006");
+    DHLOGI("dcamera_sink_hidumper_test_006");
     std::vector<std::string> args;
     std::string str1 = "-h";
     args.push_back(str1);
@@ -160,7 +160,7 @@ HWTEST_F(DcameraSinkHidumperTest, dcamera_sink_hidumper_test_006, TestSize.Level
  */
 HWTEST_F(DcameraSinkHidumperTest, dcamera_sink_hidumper_test_007, TestSize.Level1)
 {
-    DHLOGI("DcameraSinkHidumperTest::dcamera_sink_hidumper_test_007");
+    DHLOGI("dcamera_sink_hidumper_test_007");
     std::vector<std::string> args;
     std::string str1 = "-help";
     args.push_back(str1);

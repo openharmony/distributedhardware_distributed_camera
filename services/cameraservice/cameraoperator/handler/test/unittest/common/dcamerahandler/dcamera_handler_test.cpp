@@ -38,14 +38,12 @@ public:
 
     void PluginHardware(const std::string &dhId, const std::string &attrs) override
     {
-        DHLOGI("DCameraHandlerTestPluginListener::PluginHardware dhId: %s, attrs: %s",
-            GetAnonyString(dhId).c_str(), attrs.c_str());
+        DHLOGI("dhId: %s, attrs: %s", GetAnonyString(dhId).c_str(), attrs.c_str());
     }
 
     void UnPluginHardware(const std::string &dhId) override
     {
-        DHLOGI("DCameraHandlerTestPluginListener::UnPluginHardware dhId: %s",
-            GetAnonyString(dhId).c_str());
+        DHLOGI("dhId: %s", GetAnonyString(dhId).c_str());
     }
 };
 
@@ -60,22 +58,22 @@ public:
 
 void DCameraHandlerTest::SetUpTestCase(void)
 {
-    DHLOGI("DCameraHandlerTest::SetUpTestCase");
+    DHLOGI("enter");
 }
 
 void DCameraHandlerTest::TearDownTestCase(void)
 {
-    DHLOGI("DCameraHandlerTest::TearDownTestCase");
+    DHLOGI("enter");
 }
 
 void DCameraHandlerTest::SetUp(void)
 {
-    DHLOGI("DCameraHandlerTest::SetUp");
+    DHLOGI("enter");
 }
 
 void DCameraHandlerTest::TearDown(void)
 {
-    DHLOGI("DCameraHandlerTest::TearDown");
+    DHLOGI("enter");
 }
 
 void DCameraHandlerTest::SetTokenID()

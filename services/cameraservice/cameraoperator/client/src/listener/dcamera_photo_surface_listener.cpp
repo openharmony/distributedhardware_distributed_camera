@@ -30,7 +30,7 @@ DCameraPhotoSurfaceListener::DCameraPhotoSurfaceListener(const sptr<Surface>& su
 
 void DCameraPhotoSurfaceListener::OnBufferAvailable()
 {
-    DHLOGI("DCameraPhotoSurfaceListener::OnBufferAvailable");
+    DHLOGI("enter");
     if (callback_ == nullptr || surface_ == nullptr) {
         DHLOGE("DCameraPhotoSurfaceListener ResultCallback or Surface is null");
         return;

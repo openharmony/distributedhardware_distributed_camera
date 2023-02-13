@@ -35,22 +35,22 @@ public:
 
 void DcameraBufferHandleTest::SetUpTestCase(void)
 {
-    DHLOGI("DcameraBufferHandleTest::SetUpTestCase");
+    DHLOGI("enter");
 }
 
 void DcameraBufferHandleTest::TearDownTestCase(void)
 {
-    DHLOGI("DcameraBufferHandleTest::TearDownTestCase");
+    DHLOGI("enter");
 }
 
 void DcameraBufferHandleTest::SetUp(void)
 {
-    DHLOGI("DcameraBufferHandleTest::SetUp");
+    DHLOGI("enter");
 }
 
 void DcameraBufferHandleTest::TearDown(void)
 {
-    DHLOGI("DcameraBufferHandleTest::TearDown");
+    DHLOGI("enter");
 }
 
 /**

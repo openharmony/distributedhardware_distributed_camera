@@ -41,29 +41,29 @@ IMPLEMENT_SINGLE_INSTANCE(DCameraSourceServiceIpc);
 void DCameraSourceServiceIpc::Init()
 {
     std::lock_guard<std::mutex> autoLock(initCamSrvLock_);
-    DHLOGI("DCameraSourceServiceIpc Init Start");
+    DHLOGI("Start");
     if (isInit_) {
         DHLOGI("DCameraSourceServiceIpc has already init");
         return;
     }
     sinkRemoteRecipient_ = new SinkRemoteRecipient();
     isInit_ = true;
-    DHLOGI("DCameraSourceServiceIpc Init End");
+    DHLOGI("End");
 }
 
 void DCameraSourceServiceIpc::UnInit()
 {
     std::lock_guard<std::mutex> autoLock(initCamSrvLock_);
-    DHLOGI("DCameraSourceServiceIpc UnInit Start");
+    DHLOGI("Start");
     if (!isInit_) {
         DHLOGI("DCameraSourceServiceIpc has already UnInit");
         return;
     }
     ClearSinkRemoteCamSrv();
-    DHLOGI("DCameraSourceServiceIpc UnInit Start free recipient");
+    DHLOGI("Start free recipient");
     sinkRemoteRecipient_ = nullptr;
     isInit_ = false;
-    DHLOGI("DCameraSourceServiceIpc UnInit End");
+    DHLOGI("End");
 }
 
 sptr<IDistributedCameraSink> DCameraSourceServiceIpc::GetSinkRemoteCamSrv(const std::string& deviceId)
