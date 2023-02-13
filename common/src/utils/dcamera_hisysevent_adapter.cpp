@@ -26,7 +26,6 @@ namespace DistributedHardware {
 namespace {
 constexpr int32_t MSG_MAX_LEN = 2048;
 using HiSysEventNameSpace = OHOS::HiviewDFX::HiSysEvent;
-const std::string DOMAIN_STR = std::string(HiSysEventNameSpace::Domain::DISTRIBUTED_CAMERA);
 const std::string ENUM_STREAMTYPE_STRINGS[] = {
     "CONTINUOUS_FRAME", "SNAPSHOT_FRAME"
 };
@@ -37,7 +36,7 @@ const std::string ENUM_ENCODETYPE_STRINGS[] = {
 
 void ReportDcamerInitFail(const std::string& eventName, int32_t errCode, const std::string& errMsg)
 {
-    int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
+    int32_t ret = HiSysEventWrite(HiSysEventNameSpace::Domain::DISTRIBUTED_CAMERA,
         eventName,
         HiSysEventNameSpace::EventType::FAULT,
         "ERRCODE", errCode,
@@ -50,7 +49,7 @@ void ReportDcamerInitFail(const std::string& eventName, int32_t errCode, const s
 void ReportRegisterCameraFail(const std::string& eventName, const std::string& devId, const std::string& dhId,
     std::string version, const std::string& errMsg)
 {
-    int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
+    int32_t ret = HiSysEventWrite(HiSysEventNameSpace::Domain::DISTRIBUTED_CAMERA,
         eventName,
         HiSysEventNameSpace::EventType::FAULT,
         "DEVID", devId,
@@ -65,7 +64,7 @@ void ReportRegisterCameraFail(const std::string& eventName, const std::string& d
 
 void ReportDcamerOptFail(const std::string& eventName, int32_t errCode, const std::string& errMsg)
 {
-    int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
+    int32_t ret = HiSysEventWrite(HiSysEventNameSpace::Domain::DISTRIBUTED_CAMERA,
         eventName,
         HiSysEventNameSpace::EventType::FAULT,
         "ERRCODE", errCode,
@@ -77,7 +76,7 @@ void ReportDcamerOptFail(const std::string& eventName, int32_t errCode, const st
 
 void ReportSaEvent(const std::string& eventName, int32_t saId, const std::string& errMsg)
 {
-    int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
+    int32_t ret = HiSysEventWrite(HiSysEventNameSpace::Domain::DISTRIBUTED_CAMERA,
         eventName,
         HiSysEventNameSpace::EventType::BEHAVIOR,
         "SAID", saId,
@@ -90,7 +89,7 @@ void ReportSaEvent(const std::string& eventName, int32_t saId, const std::string
 void ReportRegisterCameraEvent(const std::string& eventName, const std::string& devId, const std::string& dhId,
     std::string version, const std::string& errMsg)
 {
-    int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
+    int32_t ret = HiSysEventWrite(HiSysEventNameSpace::Domain::DISTRIBUTED_CAMERA,
         eventName,
         HiSysEventNameSpace::EventType::BEHAVIOR,
         "DEVID", devId,
@@ -105,7 +104,7 @@ void ReportRegisterCameraEvent(const std::string& eventName, const std::string& 
 void ReportCameraOperaterEvent(const std::string& eventName, const std::string& devId, const std::string& dhId,
     const std::string& errMsg)
 {
-    int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
+    int32_t ret = HiSysEventWrite(HiSysEventNameSpace::Domain::DISTRIBUTED_CAMERA,
         eventName,
         HiSysEventNameSpace::EventType::BEHAVIOR,
         "DEVID", devId,
@@ -118,7 +117,7 @@ void ReportCameraOperaterEvent(const std::string& eventName, const std::string& 
 
 void ReportStartCaptureEvent(const std::string& eventName, EventCaptureInfo& capture, const std::string& errMsg)
 {
-    int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
+    int32_t ret = HiSysEventWrite(HiSysEventNameSpace::Domain::DISTRIBUTED_CAMERA,
         eventName,
         HiSysEventNameSpace::EventType::BEHAVIOR,
         "WIDTH", capture.width_,
