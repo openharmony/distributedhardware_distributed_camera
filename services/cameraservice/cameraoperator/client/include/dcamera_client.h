@@ -32,7 +32,6 @@
 #include "video_output.h"
 
 #include "dcamera_photo_surface_listener.h"
-#include "dcamera_video_surface_listener.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -87,7 +86,6 @@ private:
     sptr<CameraStandard::CaptureOutput> previewOutput_;
     sptr<CameraStandard::CaptureOutput> videoOutput_;
     sptr<DCameraPhotoSurfaceListener> photoListener_;
-    sptr<DCameraVideoSurfaceListener> videoListener_;
     std::shared_ptr<StateCallback> stateCallback_;
     std::shared_ptr<ResultCallback> resultCallback_;
 };

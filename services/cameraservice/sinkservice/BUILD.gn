@@ -76,6 +76,7 @@ ohos_shared_library("distributed_camera_sink") {
     "src/distributedcameramgr/callback/dcamera_sink_output_result_callback.cpp",
     "src/distributedcameramgr/dcamera_sink_access_control.cpp",
     "src/distributedcameramgr/dcamera_sink_controller.cpp",
+    "src/distributedcameramgr/dcamera_sink_data_process.cpp",
     "src/distributedcameramgr/dcamera_sink_dev.cpp",
     "src/distributedcameramgr/dcamera_sink_output.cpp",
     "src/distributedcameramgr/dcamera_sink_service_ipc.cpp",
@@ -87,13 +88,6 @@ ohos_shared_library("distributed_camera_sink") {
     "src/distributedcameramgr/listener/dcamera_sink_data_process_listener.cpp",
     "src/distributedcameramgr/listener/dcamera_sink_output_channel_listener.cpp",
   ]
-
-  if (!distributed_camera_common) {
-    sources += [ "src/distributedcameramgr/dcamera_sink_data_process.cpp" ]
-  } else {
-    sources +=
-        [ "src/distributedcameramgr/dcamera_sink_data_process_common.cpp" ]
-  }
 
   deps = [
     "${camerastandard_path}/frameworks/native/camera:camera_framework",

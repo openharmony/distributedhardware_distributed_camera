@@ -146,8 +146,9 @@ int32_t DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraDevice>& info, D
     for (auto& videoCaps : videoCapsList) {
         std::shared_ptr<Media::AVCodecInfo> codecInfo = videoCaps->GetCodecInfo();
         std::string name = codecInfo->GetName();
-        root[CAMERA_CODEC_TYPE_KEY].append(name);
-        DHLOGI("DCameraHandler::CreateDHItem codec type: %s", name.c_str());
+        std::string mimeType = codecInfo->GetMimeType();
+        root[CAMERA_CODEC_TYPE_KEY].append(mimeType);
+        DHLOGI("DCameraHandler::CreateDHItem codec name: %s, mimeType: %s", name.c_str(), mimeType.c_str());
     }
 
     sptr<CameraStandard::CameraOutputCapability> capability = cameraManager_->GetSupportedOutputCapability(info);
@@ -215,13 +216,15 @@ std::string DCameraHandler::GetCameraPosition(CameraStandard::CameraPosition pos
 void DCameraHandler::ConfigFormatAndResolution(const DCStreamType type, Json::Value& root,
     std::vector<CameraStandard::Profile>& profileList)
 {
-    DHLOGI("DCameraHandler::ConfigFormatAndResolution camera Profile size: %d", profileList.size());
+    DHLOGI("DCameraHandler::ConfigFormatAndResolution type: %d, size: %d", type, profileList.size());
     std::set<int32_t> formatSet;
     for (auto& profile : profileList) {
         CameraStandard::CameraFormat format = profile.GetCameraFormat();
         CameraStandard::Size picSize = profile.GetSize();
         int32_t dformat = CovertToDcameraFormat(format);
         formatSet.insert(dformat);
+        DHLOGI("DCameraHandler::ConfigFormatAndResolution, width: %d, height: %d, format: %d",
+            picSize.width, picSize.height, dformat);
         std::string formatName = std::to_string(dformat);
         if (IsValid(type, picSize)) {
             std::string resolutionValue = std::to_string(picSize.width) + "*" + std::to_string(picSize.height);
