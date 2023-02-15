@@ -441,9 +441,9 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_012, TestSize.Level1)
     testDecodeDataProcess_->lastFeedDecoderInputBufferTimeUs_ = 1;
     time = testDecodeDataProcess_->GetDecoderTimeStamp();
     testDecodeDataProcess_->ReduceWaitDecodeCnt();
-    sptr<Surface> surface;
+    sptr<IConsumerSurface> surface;
     testDecodeDataProcess_->GetDecoderOutputBuffer(surface);
-    sptr<Surface> surface2 = Surface::CreateSurfaceAsConsumer();
+    sptr<IConsumerSurface> surface2 = IConsumerSurface::Create();
     testDecodeDataProcess_->GetDecoderOutputBuffer(surface2);
     EXPECT_EQ(rc, DCAMERA_OK);
 }

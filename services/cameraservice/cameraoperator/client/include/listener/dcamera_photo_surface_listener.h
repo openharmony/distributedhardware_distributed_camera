@@ -18,17 +18,18 @@
 
 #include "surface.h"
 #include "icamera_operator.h"
+#include "iconsumer_surface.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 class DCameraPhotoSurfaceListener : public IBufferConsumerListener {
 public:
-    DCameraPhotoSurfaceListener(const sptr<Surface>& surface,
+    DCameraPhotoSurfaceListener(const sptr<IConsumerSurface>& surface,
                                 const std::shared_ptr<ResultCallback>& callback);
     void OnBufferAvailable() override;
 
 private:
-    sptr<Surface> surface_;
+    sptr<IConsumerSurface> surface_;
     std::shared_ptr<ResultCallback> callback_;
     const int32_t SURFACE_BUFFER_MAX_SIZE = 50 * 1024 * 1024;
 };

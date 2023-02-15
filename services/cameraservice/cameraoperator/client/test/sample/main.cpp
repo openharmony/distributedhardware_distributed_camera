@@ -151,13 +151,14 @@ static void InitPhotoOutput()
 {
     DHLOGI("Distributed Camera Demo: Create PhotoOutput, width = %d, height = %d, format = %d",
         g_photoInfo->width_, g_photoInfo->height_, g_photoInfo->format_);
-    sptr<Surface> photoSurface = Surface::CreateSurfaceAsConsumer();
+    sptr<IConsumerSurface> photoSurface = IConsumerSurface::Create();
     sptr<IBufferConsumerListener> photoListener = new DemoDCameraPhotoSurfaceListener(photoSurface);
     photoSurface->RegisterConsumerListener(photoListener);
     CameraFormat photoFormat = ConvertToCameraFormat(g_photoInfo->format_);
     Size photoSize = {g_photoInfo->width_, g_photoInfo->height_};
     Profile photoProfile(photoFormat, photoSize);
-    int rv = g_cameraManager->CreatePhotoOutput(photoProfile, photoSurface, &((sptr<PhotoOutput> &)g_photoOutput));
+    sptr<IBufferProducer> photoProducer = photoSurface->GetProducer();
+    int rv = g_cameraManager->CreatePhotoOutput(photoProfile, photoProducer, &((sptr<PhotoOutput> &)g_photoOutput));
     if (rv != DCAMERA_OK) {
         DHLOGE("InitPhotoOutput create photoOutput failed, rv: %d", rv);
         return;
@@ -169,14 +170,16 @@ static void InitPreviewOutput()
 {
     DHLOGI("Distributed Camera Demo: Create PreviewOutput, width = %d, height = %d, format = %d",
         g_previewInfo->width_, g_previewInfo->height_, g_previewInfo->format_);
-    sptr<Surface> previewSurface = Surface::CreateSurfaceAsConsumer();
+    sptr<IConsumerSurface> previewSurface = IConsumerSurface::Create();
     sptr<IBufferConsumerListener> previewListener = new DemoDCameraPreviewSurfaceListener(previewSurface);
     previewSurface->RegisterConsumerListener(previewListener);
     CameraFormat previewFormat = ConvertToCameraFormat(g_previewInfo->format_);
     Size previewSize = {g_previewInfo->width_, g_previewInfo->height_};
     Profile previewProfile(previewFormat, previewSize);
+    sptr<IBufferProducer> previewProducer = previewSurface->GetProducer();
+    sptr<Surface> previewProducerSurface = Surface::CreateSurfaceAsProducer(previewProducer);
     int rv = g_cameraManager->CreatePreviewOutput(
-        previewProfile, previewSurface, &((sptr<PreviewOutput> &)g_previewOutput));
+        previewProfile, previewProducerSurface, &((sptr<PreviewOutput> &)g_previewOutput));
     if (rv != DCAMERA_OK) {
         DHLOGE("InitPhotoOutput create previewOutput failed, rv: %d", rv);
         return;
@@ -188,14 +191,16 @@ static void InitVideoOutput()
 {
     DHLOGI("Distributed Camera Demo: Create VideoOutput, width = %d, height = %d, format = %d",
         g_videoInfo->width_, g_videoInfo->height_, g_videoInfo->format_);
-    sptr<Surface> videoSurface = Surface::CreateSurfaceAsConsumer();
+    sptr<IConsumerSurface> videoSurface = IConsumerSurface::Create();
     sptr<IBufferConsumerListener> videoListener = new DemoDCameraVideoSurfaceListener(videoSurface);
     videoSurface->RegisterConsumerListener(videoListener);
     CameraFormat videoFormat = ConvertToCameraFormat(g_videoInfo->format_);
     Size videoSize = {g_videoInfo->width_, g_videoInfo->height_};
     std::vector<int32_t> framerates = {};
     VideoProfile videoSettings(videoFormat, videoSize, framerates);
-    int rv = g_cameraManager->CreateVideoOutput(videoSettings, videoSurface, &((sptr<VideoOutput> &)g_videoOutput));
+    sptr<IBufferProducer> videoProducer = videoSurface->GetProducer();
+    sptr<Surface> pSurface = Surface::CreateSurfaceAsProducer(videoProducer);
+    int rv = g_cameraManager->CreateVideoOutput(videoSettings, pSurface, &((sptr<VideoOutput> &)g_videoOutput));
     if (rv != DCAMERA_OK) {
         DHLOGE("InitPhotoOutput create videoOutput failed, rv: %d", rv);
         return;

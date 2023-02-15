@@ -32,6 +32,7 @@
 #include "eventbus_handler.h"
 #include "format.h"
 #include "ibuffer_consumer_listener.h"
+#include "iconsumer_surface.h"
 #include "media_errors.h"
 #include "securec.h"
 #include "surface.h"
@@ -67,7 +68,7 @@ public:
     void OnOutputFormatChanged(const Media::Format &format);
     void OnOutputBufferAvailable(uint32_t index, const Media::AVCodecBufferInfo& info,
         const Media::AVCodecBufferFlag& flag);
-    void GetDecoderOutputBuffer(const sptr<Surface>& surface);
+    void GetDecoderOutputBuffer(const sptr<IConsumerSurface>& surface);
     VideoConfigParams GetSourceConfig() const;
     VideoConfigParams GetTargetConfig() const;
 
@@ -129,7 +130,7 @@ private:
     std::shared_ptr<EventRegistration> eventBusRegHandlePipeline2Decode_ = nullptr;
     std::shared_ptr<Media::AVCodecVideoDecoder> videoDecoder_ = nullptr;
     std::shared_ptr<Media::AVCodecCallback> decodeVideoCallback_ = nullptr;
-    sptr<Surface> decodeConsumerSurface_ = nullptr;
+    sptr<IConsumerSurface> decodeConsumerSurface_ = nullptr;
     sptr<Surface> decodeProducerSurface_ = nullptr;
     sptr<IBufferConsumerListener> decodeSurfaceListener_ = nullptr;
 

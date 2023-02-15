@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-DCameraPhotoSurfaceListener::DCameraPhotoSurfaceListener(const sptr<Surface>& surface,
+DCameraPhotoSurfaceListener::DCameraPhotoSurfaceListener(const sptr<IConsumerSurface>& surface,
     const std::shared_ptr<ResultCallback>& callback) : surface_(surface), callback_(callback)
 {
 }

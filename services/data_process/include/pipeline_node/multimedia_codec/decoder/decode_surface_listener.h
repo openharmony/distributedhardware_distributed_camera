@@ -27,18 +27,18 @@ class DecodeDataProcess;
 
 class DecodeSurfaceListener : public IBufferConsumerListener {
 public:
-    DecodeSurfaceListener(sptr<Surface> surface, std::weak_ptr<DecodeDataProcess> decodeVideoNode)
+    DecodeSurfaceListener(sptr<IConsumerSurface> surface, std::weak_ptr<DecodeDataProcess> decodeVideoNode)
         : surface_(surface), decodeVideoNode_(decodeVideoNode) {}
     ~DecodeSurfaceListener() override;
 
     void OnBufferAvailable() override;
-    void SetSurface(const sptr<Surface>& surface);
+    void SetSurface(const sptr<IConsumerSurface>& surface);
     void SetDecodeVideoNode(const std::weak_ptr<DecodeDataProcess>& decodeVideoNode);
-    sptr<Surface> GetSurface() const;
+    sptr<IConsumerSurface> GetSurface() const;
     std::shared_ptr<DecodeDataProcess> GetDecodeVideoNode() const;
 
 private:
-    sptr<Surface> surface_;
+    sptr<IConsumerSurface> surface_;
     std::weak_ptr<DecodeDataProcess> decodeVideoNode_;
 };
 } // namespace DistributedHardware

@@ -36,7 +36,7 @@ void DecodeSurfaceListener::OnBufferAvailable()
     targetDecoderNode->GetDecoderOutputBuffer(surface_);
 }
 
-void DecodeSurfaceListener::SetSurface(const sptr<Surface>& surface)
+void DecodeSurfaceListener::SetSurface(const sptr<IConsumerSurface>& surface)
 {
     surface_ = surface;
 }
@@ -46,7 +46,7 @@ void DecodeSurfaceListener::SetDecodeVideoNode(const std::weak_ptr<DecodeDataPro
     decodeVideoNode_ = decodeVideoNode;
 }
 
-sptr<Surface> DecodeSurfaceListener::GetSurface() const
+sptr<IConsumerSurface> DecodeSurfaceListener::GetSurface() const
 {
     return surface_;
 }

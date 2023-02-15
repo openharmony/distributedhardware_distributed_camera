@@ -76,7 +76,7 @@ private:
     bool isInit_;
     std::string cameraId_;
     std::queue<std::string> cameraMetadatas_;
-    sptr<Surface> photoSurface_;
+    sptr<IConsumerSurface> photoSurface_;
     sptr<Surface> videoSurface_;
     sptr<CameraStandard::CameraDevice> cameraInfo_;
     sptr<CameraStandard::CameraManager> cameraManager_;

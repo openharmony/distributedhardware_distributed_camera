@@ -237,11 +237,6 @@ int32_t DCameraClient::StopCapture()
     if (videoSurface_ != nullptr) {
         DHLOGI("DCameraClient::StopCapture %s video surface unregister consumer listener",
             GetAnonyString(cameraId_).c_str());
-        int32_t ret = videoSurface_->UnregisterConsumerListener();
-        if (ret != DCAMERA_OK) {
-            DHLOGE("DCameraClient::StopCapture %s video surface unregister consumer listener failed, ret: %d",
-                GetAnonyString(cameraId_).c_str(), ret);
-        }
         videoSurface_ = nullptr;
     }
 
@@ -439,14 +434,15 @@ int32_t DCameraClient::CreatePhotoOutput(std::shared_ptr<DCameraCaptureInfo>& in
     DHLOGI("DCameraClient::CreatePhotoOutput dhId: %s, width: %d, height: %d, format: %d, stream: %d, isCapture: %d",
         GetAnonyString(cameraId_).c_str(), info->width_, info->height_, info->format_, info->streamType_,
         info->isCapture_);
-    photoSurface_ = Surface::CreateSurfaceAsConsumer();
+    photoSurface_ = IConsumerSurface::Create();
     photoListener_ = new DCameraPhotoSurfaceListener(photoSurface_, resultCallback_);
     photoSurface_->RegisterConsumerListener((sptr<IBufferConsumerListener> &)photoListener_);
     CameraStandard::CameraFormat photoFormat = ConvertToCameraFormat(info->format_);
     CameraStandard::Size photoSize = {info->width_, info->height_};
     CameraStandard::Profile photoProfile(photoFormat, photoSize);
+    sptr<IBufferProducer> bp = photoSurface_->GetProducer();
     int rv = cameraManager_->CreatePhotoOutput(
-        photoProfile, photoSurface_, &((sptr<CameraStandard::PhotoOutput> &)photoOutput_));
+        photoProfile, bp, &((sptr<CameraStandard::PhotoOutput> &)photoOutput_));
     if (rv != DCAMERA_OK) {
         DHLOGE("DCameraClient::CreatePhotoOutput %s create photo output failed", GetAnonyString(cameraId_).c_str());
         return DCAMERA_BAD_VALUE;
