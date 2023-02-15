@@ -28,7 +28,7 @@ config("module_private_config") {
     "${fwk_utils_path}/include/eventbus",
     "${services_path}/cameraservice/base/include",
     "${services_path}/channel/include",
-    "${services_path}/cameraservice/base/include",
+    "${services_path}/channel/test/unittest/common/channel",
     "${services_path}/cameraservice/cameraoperator/client/include",
     "${services_path}/cameraservice/cameraoperator/client/include/callback",
     "${services_path}/cameraservice/cameraoperator/client/include/listener",
@@ -58,6 +58,11 @@ ohos_unittest("DCameraChannelTest") {
   module_out_path = module_out_path
 
   sources = [
+    "${services_path}/cameraservice/base/src/dcamera_frame_info.cpp",
+    "${services_path}/channel/src/dcamera_channel_sink_impl.cpp",
+    "${services_path}/channel/src/dcamera_channel_source_impl.cpp",
+    "${services_path}/channel/src/dcamera_softbus_adapter.cpp",
+    "${services_path}/channel/src/dcamera_softbus_session.cpp",
     "dcamera_channel_sink_impl_test.cpp",
     "dcamera_channel_source_impl_test.cpp",
     "dcamera_softbus_adapter_test.cpp",
@@ -73,7 +78,6 @@ ohos_unittest("DCameraChannelTest") {
     "${graphicstandard_path}:libsurface",
     "${services_path}/cameraservice/sinkservice:distributed_camera_sink",
     "${services_path}/cameraservice/sourceservice:distributed_camera_source",
-    "${services_path}/channel:distributed_camera_channel",
     "${services_path}/data_process:distributed_camera_data_process",
     "//third_party/jsoncpp:jsoncpp",
   ]

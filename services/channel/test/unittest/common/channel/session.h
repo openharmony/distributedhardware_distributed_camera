@@ -180,7 +180,7 @@ int SendBytes(int sessionId, const void *data, unsigned int len);
 
 int SendMessage(int sessionId, const void *data, unsigned int len);
 
-int SendStream(int sessionId, const StreamData *data, const StreamData *ext, const FrameInfo *param);
+int SendStream(int sessionId, const StreamData *data, const StreamData *ext, const StreamFrameInfo *param);
 
 int GetMySessionName(int sessionId, char *sessionName, unsigned int len);
 
