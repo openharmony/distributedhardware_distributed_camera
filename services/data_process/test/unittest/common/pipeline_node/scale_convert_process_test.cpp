@@ -256,7 +256,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_007, TestSize.Level
     inputBuffers.push_back(db);
     std::shared_ptr<DCameraPipelineSource> sourcePipeline = std::make_shared<DCameraPipelineSource>();
     testScaleConvertProcess_->callbackPipelineSource_ = sourcePipeline;
-    rc = testScaleConvertProcess_->ProcessData(inputBuffers);
+    testScaleConvertProcess_->ProcessData(inputBuffers);
     EXPECT_EQ(rc, DCAMERA_OK);
 }
 

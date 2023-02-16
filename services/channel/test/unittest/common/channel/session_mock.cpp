@@ -105,7 +105,7 @@ int SendMessage(int sessionId, const void *data, unsigned int len)
     return DH_SUCCESS;
 }
 
-int SendStream(int sessionId, const StreamData *data, const StreamData *ext, const FrameInfo *param)
+int SendStream(int sessionId, const StreamData *data, const StreamData *ext, const StreamFrameInfo *param)
 {
     (void)sessionId;
     (void)data;

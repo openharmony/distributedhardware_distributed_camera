@@ -172,6 +172,7 @@ HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_004, TestSiz
     channel_->CreateSession(camIndexs, sessionFlag, sessionMode, listener_);
 
     int32_t ret = channel_->OpenSession();
+    usleep(TEST_SLEEP_SEC);
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);
     ret = channel_->SendData(dataBuffer);

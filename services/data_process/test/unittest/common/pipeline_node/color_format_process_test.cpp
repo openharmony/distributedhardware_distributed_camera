@@ -241,7 +241,7 @@ HWTEST_F(ColorFormatProcessTest, color_format_process_test_006, TestSize.Level1)
     inputBuffers.push_back(db);
     std::shared_ptr<DCameraPipelineSource> sourcePipeline = std::make_shared<DCameraPipelineSource>();
     testColorFmtProcess_->callbackPipelineSource_ = sourcePipeline;
-    rc = testColorFmtProcess_->ProcessData(inputBuffers);
+    testColorFmtProcess_->ProcessData(inputBuffers);
     EXPECT_EQ(rc, DCAMERA_OK);
 }
 
