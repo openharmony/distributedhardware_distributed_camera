@@ -17,6 +17,7 @@
 #define DCAMERA_SOFTBUS_LATENCY_H
 
 #include <string>
+#include <map>
 #include <mutex>
 
 #include "single_instance.h"
@@ -27,20 +28,20 @@ class DCameraSoftbusLatency {
 DECLARE_SINGLE_INSTANCE_BASE(DCameraSoftbusLatency);
 public:
     int32_t StartSoftbusTimeSync(const std::string& devId);
-    int32_t StopSoftbusTimeSync();
-    void SetTimeSyncInfo(const int32_t microsecond);
-    int32_t GetTimeSyncInfo();
+    int32_t StopSoftbusTimeSync(const std::string& devId);
+    void SetTimeSyncInfo(const int32_t microsecond, const std::string& devId);
+    int32_t GetTimeSyncInfo(const std::string& devId);
 private:
     DCameraSoftbusLatency() = default;
     ~DCameraSoftbusLatency() = default;
 
 private:
-    std::string networkId_;
-    int32_t microsecond_ = 0;
     constexpr static int32_t REF_INITIAL = 0;
     constexpr static int32_t REF_NORMAL = 1;
-    std::atomic<int> refCount_ = 0;
+    std::mutex offsetLock_;
     std::mutex micLock_;
+    std::map<std::string, int32_t> offsets_;
+    std::map<std::string, int32_t> refCount_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -328,7 +328,7 @@ int32_t DCameraSourceController::CloseChannel()
         return DCAMERA_BAD_OPERATE;
     }
     DCameraLowLatency::GetInstance().DisableLowLatency();
-    DCameraSoftbusLatency::GetInstance().StopSoftbusTimeSync();
+    DCameraSoftbusLatency::GetInstance().StopSoftbusTimeSync(devId_);
     std::string dhId = indexs_.begin()->dhId_;
     std::string devId = indexs_.begin()->devId_;
     DHLOGI("DCameraSourceController CloseChannel devId: %s, dhId: %s", GetAnonyString(devId).c_str(),
