@@ -216,7 +216,7 @@ int32_t DecodeDataProcess::SetDecoderOutputSurface()
         return DCAMERA_BAD_VALUE;
     }
 
-    decodeConsumerSurface_ = Surface::CreateSurfaceAsConsumer();
+    decodeConsumerSurface_ = IConsumerSurface::Create();
     if (decodeConsumerSurface_ == nullptr) {
         DHLOGE("Create the decode consumer surface failed.");
         return DCAMERA_INIT_ERR;
@@ -501,7 +501,7 @@ void DecodeDataProcess::ReduceWaitDecodeCnt()
     DHLOGD("Wait decoder output frames number is %d.", waitDecoderOutputCount_);
 }
 
-void DecodeDataProcess::GetDecoderOutputBuffer(const sptr<Surface>& surface)
+void DecodeDataProcess::GetDecoderOutputBuffer(const sptr<IConsumerSurface>& surface)
 {
     DHLOGD("Get decoder output buffer.");
     if (surface == nullptr) {

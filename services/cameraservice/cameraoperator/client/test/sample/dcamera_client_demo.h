@@ -42,7 +42,7 @@ namespace OHOS {
 namespace DistributedHardware {
 class DemoDCameraBufferConsumerListener : public IBufferConsumerListener {
 public:
-    explicit DemoDCameraBufferConsumerListener(const sptr<Surface>& surface) : surface_(surface)
+    explicit DemoDCameraBufferConsumerListener(const sptr<IConsumerSurface>& surface) : surface_(surface)
     {
     }
 
@@ -94,12 +94,12 @@ protected:
     int32_t height_ = 0;
     int32_t width_ = 0;
     int32_t size_ = 0;
-    sptr<Surface> surface_;
+    sptr<IConsumerSurface> surface_;
 };
 
 class DemoDCameraPhotoSurfaceListener : public DemoDCameraBufferConsumerListener {
 public:
-    explicit DemoDCameraPhotoSurfaceListener(const sptr<Surface>& surface)
+    explicit DemoDCameraPhotoSurfaceListener(const sptr<IConsumerSurface>& surface)
         : DemoDCameraBufferConsumerListener(surface)
     {
     }
@@ -130,7 +130,7 @@ protected:
 
 class DemoDCameraPreviewSurfaceListener : public DemoDCameraBufferConsumerListener {
 public:
-    explicit DemoDCameraPreviewSurfaceListener(const sptr<Surface>& surface)
+    explicit DemoDCameraPreviewSurfaceListener(const sptr<IConsumerSurface>& surface)
         : DemoDCameraBufferConsumerListener(surface)
     {
     }
@@ -162,7 +162,7 @@ protected:
 
 class DemoDCameraVideoSurfaceListener : public DemoDCameraBufferConsumerListener {
 public:
-    explicit DemoDCameraVideoSurfaceListener(const sptr<Surface>& surface)
+    explicit DemoDCameraVideoSurfaceListener(const sptr<IConsumerSurface>& surface)
         : DemoDCameraBufferConsumerListener(surface)
     {
     }

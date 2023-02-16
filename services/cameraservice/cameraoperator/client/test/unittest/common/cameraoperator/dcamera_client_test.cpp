@@ -321,7 +321,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_004, TestSize.Level1)
     ret = client_->SetResultCallback(resultCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
 
-    sptr<Surface> videoSurface = Surface::CreateSurfaceAsConsumer();
+    sptr<IConsumerSurface> videoSurface = IConsumerSurface::Create();
     sptr<IBufferConsumerListener> videoListener = new DCameraClientTestVideoSurfaceListener();
     videoSurface->RegisterConsumerListener(videoListener);
     ret = client_->Init();
@@ -332,7 +332,9 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_004, TestSize.Level1)
         videoInfo_true_->width_, videoInfo_true_->height_, videoInfo_true_->format_, videoInfo_true_->isCapture_);
     std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos;
     captureInfos.push_back(videoInfo_true_);
-    ret = client_->StartCapture(captureInfos, videoSurface);
+    sptr<IBufferProducer> bp = videoSurface->GetProducer();
+    sptr<Surface> pSurface = Surface::CreateSurfaceAsProducer(bp);
+    ret = client_->StartCapture(captureInfos, pSurface);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     auto metaData = std::make_shared<Camera::CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
@@ -372,7 +374,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_005, TestSize.Level1)
     ret = client_->SetResultCallback(resultCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
 
-    sptr<Surface> videoSurface = Surface::CreateSurfaceAsConsumer();
+    sptr<IConsumerSurface> videoSurface = IConsumerSurface::Create();
     sptr<IBufferConsumerListener> videoListener = new DCameraClientTestVideoSurfaceListener();
     videoSurface->RegisterConsumerListener(videoListener);
     ret = client_->Init();
@@ -386,7 +388,9 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_005, TestSize.Level1)
     std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos;
     captureInfos.push_back(videoInfo_true_);
     captureInfos.push_back(photoInfo_false_);
-    ret = client_->StartCapture(captureInfos, videoSurface);
+    sptr<IBufferProducer> bp = videoSurface->GetProducer();
+    sptr<Surface> pSurface = Surface::CreateSurfaceAsProducer(bp);
+    ret = client_->StartCapture(captureInfos, pSurface);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     sleep(TEST_SLEEP_SEC);
@@ -398,7 +402,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_005, TestSize.Level1)
     captureInfos.clear();
     captureInfos.push_back(videoInfo_false_);
     captureInfos.push_back(photoInfo_true_);
-    ret = client_->StartCapture(captureInfos, videoSurface);
+    ret = client_->StartCapture(captureInfos, pSurface);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     sleep(TEST_SLEEP_SEC);
@@ -575,7 +579,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_013, TestSize.Level1)
     ret = client_->SetResultCallback(resultCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
 
-    sptr<Surface> videoSurface = Surface::CreateSurfaceAsConsumer();
+    sptr<IConsumerSurface> videoSurface = IConsumerSurface::Create();
     sptr<IBufferConsumerListener> videoListener = new DCameraClientTestVideoSurfaceListener();
     videoSurface->RegisterConsumerListener(videoListener);
     ret = client_->Init();
@@ -589,7 +593,9 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_013, TestSize.Level1)
     std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos;
     captureInfos.push_back(videoInfo_true_);
     captureInfos.push_back(photoInfo_false_);
-    ret = client_->StartCapture(captureInfos, videoSurface);
+    sptr<IBufferProducer> bp = videoSurface->GetProducer();
+    sptr<Surface> pSurface = Surface::CreateSurfaceAsProducer(bp);
+    ret = client_->StartCapture(captureInfos, pSurface);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     sleep(TEST_SLEEP_SEC);
