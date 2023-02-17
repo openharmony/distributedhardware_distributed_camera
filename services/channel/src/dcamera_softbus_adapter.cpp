@@ -349,24 +349,35 @@ void DCameraSoftbusAdapter::OnSourceStreamReceived(int32_t sessionId, const Stre
         DHLOGE("DCameraSoftbusAdapter OnSourceStreamReceived memcpy_s failed ret: %d", ret);
         return;
     }
+    ret = HandleSourceStreamExt(buffer, ext);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("Handle source stream ext failed, ret is: %d", ret);
+    }
+    session->OnDataReceived(buffer);
+}
 
+int32_t DCameraSoftbusAdapter::HandleSourceStreamExt(std::shared_ptr<DataBuffer>& buffer, const StreamData *ext)
+{
     if (ext == nullptr) {
-        DHLOGE("OnSourceStreamReceived ext is null, sessionId: %d.", sessionId);
+        DHLOGE("Source stream ext is null.");
+        return DCAMERA_BAD_VALUE;
     }
     int32_t extLen = ext->bufLen;
     if (extLen <= 0 || extLen > DCAMERA_MAX_RECV_EXT_LEN) {
-        DHLOGE("OnSourceStreamReceived extLen is invalid, extLen: %d, sessionId: %d", dataLen, sessionId);
+        DHLOGE("Source stream extLen is invalid, extLen: %d.", extLen);
+        return DCAMERA_BAD_VALUE;
     }
 
     std::string jsonStr(reinterpret_cast<const char*>(ext->buf), ext->bufLen);
     DCameraFrameInfo frameInfo;
-    ret = frameInfo.Unmarshal(jsonStr);
+    int32_t ret = frameInfo.Unmarshal(jsonStr);
     if (ret != DCAMERA_OK) {
         DHLOGE("Unmarshal frameInfo failed.");
+        return DCAMERA_BAD_VALUE;
     }
     int64_t timeStamp = frameInfo.pts_;
     buffer->SetInt64(TIME_STAMP_US, timeStamp);
-    session->OnDataReceived(buffer);
+    return DCAMERA_OK;
 }
 
 int32_t DCameraSoftbusAdapter::DCameraSoftbusSinkGetSession(int32_t sessionId,
