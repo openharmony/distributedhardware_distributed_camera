@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -543,23 +543,6 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_011, TestSize.Level1)
 
     ret = client_->ConvertToCameraFormat(OHOS_CAMERA_FORMAT_JPEG);
     EXPECT_EQ(CameraStandard::CameraFormat::CAMERA_FORMAT_JPEG, ret);
-}
-
-/**
- * @tc.name: dcamera_client_test_012
- * @tc.desc: Verify StartPhotoOutput and StartVideoOutput
- * @tc.type: FUNC
- * @tc.require: AR000GK6ML
- */
-HWTEST_F(DCameraClientTest, dcamera_client_test_012, TestSize.Level1)
-{
-    DHLOGI("DCameraClientTest dcamera_client_test_012: test startOutput");
-    auto info = std::make_shared<DCameraCaptureInfo>();
-    int32_t ret = client_->StartPhotoOutput(info);
-    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
-
-    ret = client_->StartVideoOutput();
-    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
 /**

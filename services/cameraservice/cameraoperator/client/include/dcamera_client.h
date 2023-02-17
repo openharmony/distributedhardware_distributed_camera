@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,7 +29,6 @@
 #include "capture_session.h"
 #include "photo_output.h"
 #include "preview_output.h"
-#include "video_output.h"
 
 #include "dcamera_photo_surface_listener.h"
 
@@ -54,10 +53,9 @@ private:
     int32_t ConfigCaptureSessionInner();
     int32_t CreateCaptureOutput(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos);
     int32_t CreatePhotoOutput(std::shared_ptr<DCameraCaptureInfo>& info);
-    int32_t CreateVideoOutput(std::shared_ptr<DCameraCaptureInfo>& info);
+    int32_t CreatePreviewOutput(std::shared_ptr<DCameraCaptureInfo>& info);
     int32_t StartCaptureInner(std::shared_ptr<DCameraCaptureInfo>& info);
     int32_t StartPhotoOutput(std::shared_ptr<DCameraCaptureInfo>& info);
-    int32_t StartVideoOutput();
     void FindCameraMetadata(const std::string& metadataStr);
     void SetPhotoCaptureRotation(const std::shared_ptr<Camera::CameraMetadata>& cameraMetadata,
         std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSetting);
@@ -77,14 +75,13 @@ private:
     std::string cameraId_;
     std::queue<std::string> cameraMetadatas_;
     sptr<IConsumerSurface> photoSurface_;
-    sptr<Surface> videoSurface_;
+    sptr<Surface> previewSurface_;
     sptr<CameraStandard::CameraDevice> cameraInfo_;
     sptr<CameraStandard::CameraManager> cameraManager_;
     sptr<CameraStandard::CaptureSession> captureSession_;
     sptr<CameraStandard::CaptureInput> cameraInput_;
     sptr<CameraStandard::CaptureOutput> photoOutput_;
     sptr<CameraStandard::CaptureOutput> previewOutput_;
-    sptr<CameraStandard::CaptureOutput> videoOutput_;
     sptr<DCameraPhotoSurfaceListener> photoListener_;
     std::shared_ptr<StateCallback> stateCallback_;
     std::shared_ptr<ResultCallback> resultCallback_;
