@@ -70,8 +70,10 @@ private:
     std::thread producerThread_;
     std::condition_variable eventCon_;
     std::condition_variable producerCon_;
+    std::condition_variable sleepCon_;
     std::mutex bufferMutex_;
     std::mutex eventMutex_;
+    std::mutex sleepMutex_;
     std::deque<std::shared_ptr<DataBuffer>> buffers_;
     DCameraProducerState state_;
     uint32_t interval_;
@@ -82,7 +84,7 @@ private:
     sptr<IDCameraProvider> camHdiProvider_;
 
     constexpr static float ADJUST_SLEEP_FACTOR = 0.1;
-    constexpr static float WAIT_CLOCK_FACTOR = 0.5;
+    constexpr static float WAIT_CLOCK_FACTOR = 0.1;
     constexpr static float TRACK_CLOCK_FACTOR = 0.2;
     constexpr static float OFFSET_FACTOR = 2.0;
     constexpr static float NORMAL_SLEEP_FACTOR = 0.8;
