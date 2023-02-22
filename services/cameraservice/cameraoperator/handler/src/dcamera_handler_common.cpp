@@ -208,17 +208,33 @@ void DCameraHandler::ConfigFormatAndResolution(const DCStreamType type, Json::Va
     std::vector<CameraStandard::Profile>& profileList)
 {
     DHLOGI("DCameraHandler::ConfigFormatAndResolution camera Profile size: %d", profileList.size());
-    CameraStandard::CameraFormat format = CameraStandard::CameraFormat::CAMERA_FORMAT_RGBA_8888;
-    int32_t dformat = CovertToDcameraFormat(format);
-    std::string formatName = std::to_string(dformat);
-    if (type == SNAPSHOT_FRAME) {
-        root[CAMERA_FORMAT_PHOTO][CAMERA_RESOLUTION_KEY][formatName].append("640*480");
-        root[CAMERA_FORMAT_PHOTO][CAMERA_FORMAT_KEY].append(format);
-    } else if (type == CONTINUOUS_FRAME) {
-        root[CAMERA_FORMAT_PREVIEW][CAMERA_RESOLUTION_KEY][formatName].append("640*480");
-        root[CAMERA_FORMAT_VIDEO][CAMERA_RESOLUTION_KEY][formatName].append("640*480");
-        root[CAMERA_FORMAT_PREVIEW][CAMERA_FORMAT_KEY].append(format);
-        root[CAMERA_FORMAT_VIDEO][CAMERA_FORMAT_KEY].append(format);
+    std::set<int32_t> formatSet;
+    for (auto& profile : profileList) {
+        CameraStandard::CameraFormat format = profile.GetCameraFormat();
+        CameraStandard::Size picSize = profile.GetSize();
+        int32_t dformat = CovertToDcameraFormat(format);
+        formatSet.insert(dformat);
+        DHLOGI("DCameraHandler::ConfigFormatAndResolution, width: %d, height: %d, format: %d",
+            picSize.width, picSize.height, dformat);
+        std::string formatName = std::to_string(dformat);
+        if (IsValid(type, picSize)) {
+            std::string resolutionValue = std::to_string(picSize.width) + "*" + std::to_string(picSize.height);
+            if (type == SNAPSHOT_FRAME) {
+                root[CAMERA_FORMAT_PHOTO][CAMERA_RESOLUTION_KEY][formatName].append(resolutionValue);
+            } else if (type == CONTINUOUS_FRAME) {
+                root[CAMERA_FORMAT_PREVIEW][CAMERA_RESOLUTION_KEY][formatName].append(resolutionValue);
+                root[CAMERA_FORMAT_VIDEO][CAMERA_RESOLUTION_KEY][formatName].append(resolutionValue);
+            }
+        }
+    }
+
+    for (auto format : formatSet) {
+        if (type == SNAPSHOT_FRAME) {
+            root[CAMERA_FORMAT_PHOTO][CAMERA_FORMAT_KEY].append(format);
+        } else if (type == CONTINUOUS_FRAME) {
+            root[CAMERA_FORMAT_PREVIEW][CAMERA_FORMAT_KEY].append(format);
+            root[CAMERA_FORMAT_VIDEO][CAMERA_FORMAT_KEY].append(format);
+        }
     }
 }
 
