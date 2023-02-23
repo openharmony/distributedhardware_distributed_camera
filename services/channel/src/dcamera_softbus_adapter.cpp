@@ -364,7 +364,7 @@ int32_t DCameraSoftbusAdapter::HandleSourceStreamExt(std::shared_ptr<DataBuffer>
     }
     int32_t extLen = ext->bufLen;
     if (extLen <= 0 || extLen > DCAMERA_MAX_RECV_EXT_LEN) {
-        DHLOGE("Source stream extLen is invalid, extLen: %d.", extLen);
+        DHLOGD("ExtLen is: %d.", extLen);
         return DCAMERA_BAD_VALUE;
     }
 

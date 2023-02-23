@@ -78,12 +78,13 @@ void DCameraStreamDataProcessProducer::Stop()
         state_ = DCAMERA_PRODUCER_STATE_STOP;
     }
     producerCon_.notify_one();
-    producerThread_.join();
     if (streamType_ == CONTINUOUS_FRAME) {
+        sleepCon_.notify_one();
         eventHandler_->GetEventRunner()->Stop();
         eventThread_.join();
         eventHandler_ = nullptr;
     }
+    producerThread_.join();
     camHdiProvider_ = nullptr;
     DHLOGI("DCameraStreamDataProcessProducer Stop end devId: %s dhId: %s streamType: %d streamId: %d state: %d",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_, state_);
@@ -331,7 +332,16 @@ void DCameraStreamDataProcessProducer::ControlDisplay(const int64_t timeStamp, c
 {
     AdjustSleep(duration);
     int64_t offset = SyncClock(timeStamp, duration, clock);
-    std::this_thread::sleep_for(std::chrono::microseconds(sleep_));
+    {
+        std::unique_lock<std::mutex> lock(sleepMutex_);
+        sleepCon_.wait_for(lock, std::chrono::microseconds(sleep_), [this] {
+            return (this->state_ == DCAMERA_PRODUCER_STATE_STOP);
+        });
+        if (state_ == DCAMERA_PRODUCER_STATE_STOP) {
+            DHLOGD("Notify to interrupt sleep.");
+            return;
+        }
+    }
     LocateBaseline(timeStamp, duration, offset);
 }
 
@@ -415,7 +425,7 @@ void DCameraStreamDataProcessProducer::LocateBaseline(const int64_t timeStamp, c
         }
 
         if (plusCount_ >= PLUS_THRE) {
-            int64_t time = duration * normalSleepThre_ - sleep_;
+            int64_t time = normalSleepThre_ - sleep_;
             sysTimeBaseline_ += time;
             plusCount_ = 0;
             DHLOGD("PlusCount more than plus thre, plus %ld us.", time);
