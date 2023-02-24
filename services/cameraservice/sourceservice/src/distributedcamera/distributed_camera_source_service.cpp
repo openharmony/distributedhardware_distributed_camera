@@ -30,7 +30,6 @@
 #include "dcamera_source_service_ipc.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
-#include "dcamera_sa_process_state.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -108,8 +107,18 @@ int32_t DistributedCameraSourceService::ReleaseSource()
         DHLOGE("DistributedCameraSourceService ReleaseSource UnLoadHDF failed, ret: %d", ret);
         return ret;
     }
-    DHLOGI("check source sa state.");
-    SetSourceProcessExit();
+
+    auto systemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (systemAbilityMgr == nullptr) {
+        DHLOGE("source systemAbilityMgr is null");
+        return DCAMERA_BAD_VALUE;
+    }
+    ret = systemAbilityMgr->UnloadSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("source systemAbilityMgr UnLoadSystemAbility failed, ret: %d", ret);
+        return DCAMERA_BAD_VALUE;
+    }
+    DHLOGI("source systemAbilityMgr UnLoadSystemAbility success");
     return DCAMERA_OK;
 }
 

@@ -57,7 +57,7 @@ ohos_unittest("DCameraSourceTest") {
 
   sources = [
     "dcamera_service_state_listener_test.cpp",
-    "dcamera_source_callback proxy_test.cpp",
+    "dcamera_source_callback_proxy_test.cpp",
     "dcamera_source_hidumper_test.cpp",
     "distributed_camera_source_service_test.cpp",
     "distributed_camera_source_stub_test.cpp",
