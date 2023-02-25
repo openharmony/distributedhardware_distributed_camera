@@ -89,6 +89,7 @@ ohos_unittest("DCameraSourceMgrTest") {
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
+    "hdf_core:libhdi",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
