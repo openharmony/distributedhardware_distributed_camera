@@ -27,9 +27,9 @@ DCameraInputCallback::DCameraInputCallback(const std::shared_ptr<StateCallback>&
 
 void DCameraInputCallback::OnError(const int32_t errorType, const int32_t errorMsg) const
 {
-    DHLOGE("DCameraInputCallback::OnError, errorType: %d, errorMsg: %d", errorType, errorMsg);
+    DHLOGE("enter, errorType: %d, errorMsg: %d", errorType, errorMsg);
     if (callback_ == nullptr) {
-        DHLOGE("DCameraInputCallback::OnError StateCallback is null");
+        DHLOGE("StateCallback is null");
         return;
     }
 

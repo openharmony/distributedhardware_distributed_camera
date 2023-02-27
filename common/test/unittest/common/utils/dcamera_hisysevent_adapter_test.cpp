@@ -37,22 +37,22 @@ public:
 
 void DcameraHisyseventAdapterTest::SetUpTestCase(void)
 {
-    DHLOGI("DcameraHisyseventAdapterTest::SetUpTestCase");
+    DHLOGI("enter");
 }
 
 void DcameraHisyseventAdapterTest::TearDownTestCase(void)
 {
-    DHLOGI("DcameraHisyseventAdapterTest::TearDownTestCase");
+    DHLOGI("enter");
 }
 
 void DcameraHisyseventAdapterTest::SetUp(void)
 {
-    DHLOGI("DcameraHisyseventAdapterTest::SetUp");
+    DHLOGI("enter");
 }
 
 void DcameraHisyseventAdapterTest::TearDown(void)
 {
-    DHLOGI("DcameraHisyseventAdapterTest::TearDown");
+    DHLOGI("enter");
 }
 
 /**

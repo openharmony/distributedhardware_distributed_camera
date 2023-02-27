@@ -44,7 +44,7 @@ int32_t GetLocalDeviceNetworkId(std::string& networkId)
     NodeBasicInfo basicInfo = { { 0 } };
     int32_t ret = GetLocalNodeDeviceInfo(DCAMERA_PKG_NAME.c_str(), &basicInfo);
     if (ret != DCAMERA_OK) {
-        DHLOGE("GetLocalDeviceNetworkId GetLocalNodeDeviceInfo failed ret: %d", ret);
+        DHLOGE("GetLocalNodeDeviceInfo failed ret: %d", ret);
         return ret;
     }
 

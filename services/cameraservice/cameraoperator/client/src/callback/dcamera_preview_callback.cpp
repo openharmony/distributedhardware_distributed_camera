@@ -27,19 +27,19 @@ DCameraPreviewCallback::DCameraPreviewCallback(const std::shared_ptr<StateCallba
 
 void DCameraPreviewCallback::OnFrameStarted() const
 {
-    DHLOGI("DCameraPreviewCallback::OnFrameStarted");
+    DHLOGI("enter");
 }
 
 void DCameraPreviewCallback::OnFrameEnded(const int32_t frameCount) const
 {
-    DHLOGI("DCameraPreviewCallback::OnFrameEnded, frameCount: %d", frameCount);
+    DHLOGI("enter, frameCount: %d", frameCount);
 }
 
 void DCameraPreviewCallback::OnError(const int32_t errorCode) const
 {
-    DHLOGE("DCameraPreviewCallback::OnError, errorCode: %d", errorCode);
+    DHLOGE("enter, errorCode: %d", errorCode);
     if (callback_ == nullptr) {
-        DHLOGE("DCameraPreviewCallback::OnError StateCallback is null");
+        DHLOGE("StateCallback is null");
         return;
     }
 

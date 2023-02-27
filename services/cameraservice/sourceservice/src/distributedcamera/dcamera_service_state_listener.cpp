@@ -38,7 +38,7 @@ DCameraServiceStateListener::~DCameraServiceStateListener()
 
 void DCameraServiceStateListener::SetCallback(sptr<IDCameraSourceCallback> callback)
 {
-    DHLOGI("DCameraServiceStateListener SetCallback");
+    DHLOGI("enter");
     std::lock_guard<std::mutex> autoLock(proxyMutex_);
     callbackProxy_ = callback;
 }
@@ -46,33 +46,32 @@ void DCameraServiceStateListener::SetCallback(sptr<IDCameraSourceCallback> callb
 int32_t DCameraServiceStateListener::OnRegisterNotify(const std::string& devId, const std::string& dhId,
     const std::string& reqId, int32_t status, std::string& data)
 {
-    DHLOGI("DCameraServiceStateListener OnRegisterNotify devId: %s, dhId: %s, status: %d",
+    DHLOGI("OnRegisterNotify devId: %s, dhId: %s, status: %d",
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), status);
     std::lock_guard<std::mutex> autoLock(proxyMutex_);
 
     if (status != DCAMERA_OK) {
         std::thread([=]() mutable {
-            DHLOGI("DCameraServiceStateListener OnRegisterNotify thread delete devId: %s dhId: %s",
-                GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
+            DHLOGI("thread delete devId: %s dhId: %s", GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
             DCameraIndex camIndex(devId, dhId);
             DistributedCameraSourceService::CamDevErase(camIndex);
             if (callbackProxy_ == nullptr) {
-                DHLOGE("DCameraServiceStateListener OnRegisterNotify callbackProxy_ is nullptr");
+                DHLOGE("callbackProxy_ is nullptr");
                 return;
             }
             int32_t ret = callbackProxy_->OnNotifyRegResult(devId, dhId, reqId, status, data);
             if (ret != DCAMERA_OK) {
-                DHLOGE("DCameraServiceStateListener OnRegisterNotify OnNotifyRegResult failed: %d", ret);
+                DHLOGE("OnNotifyRegResult failed: %d", ret);
             }
         }).detach();
     } else {
         if (callbackProxy_ == nullptr) {
-            DHLOGE("DCameraServiceStateListener OnRegisterNotify callbackProxy_ is nullptr");
+            DHLOGE("callbackProxy_ is nullptr");
             return DCAMERA_BAD_VALUE;
         }
         int32_t ret = callbackProxy_->OnNotifyRegResult(devId, dhId, reqId, status, data);
         if (ret != DCAMERA_OK) {
-            DHLOGE("DCameraServiceStateListener OnRegisterNotify OnNotifyRegResult failed: %d", ret);
+            DHLOGE("OnNotifyRegResult failed: %d", ret);
         }
     }
     return DCAMERA_OK;
@@ -81,30 +80,29 @@ int32_t DCameraServiceStateListener::OnRegisterNotify(const std::string& devId, 
 int32_t DCameraServiceStateListener::OnUnregisterNotify(const std::string& devId, const std::string& dhId,
     const std::string& reqId, int32_t status, std::string& data)
 {
-    DHLOGI("DCameraServiceStateListener OnUnregisterNotify devId: %s, dhId: %s, status: %d",
+    DHLOGI("OnUnregisterNotify devId: %s, dhId: %s, status: %d",
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), status);
     std::lock_guard<std::mutex> autoLock(proxyMutex_);
     if (callbackProxy_ == nullptr) {
-        DHLOGE("DCameraServiceStateListener OnUnregisterNotify callbackProxy_ is nullptr");
+        DHLOGE("callbackProxy_ is nullptr");
         return DCAMERA_BAD_VALUE;
     }
 
     if (status == DCAMERA_OK) {
         std::thread([=]() mutable {
-            DHLOGI("DCameraServiceStateListener OnUnregisterNotify thread delete devId: %s dhId: %s",
-                GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
+            DHLOGI("thread delete devId: %s dhId: %s", GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
             DCameraIndex camIndex(devId, dhId);
             DistributedCameraSourceService::CamDevErase(camIndex);
 
             int32_t ret = callbackProxy_->OnNotifyUnregResult(devId, dhId, reqId, status, data);
             if (ret != DCAMERA_OK) {
-                DHLOGE("DCameraServiceStateListener OnUnregisterNotify failed, ret: %d", ret);
+                DHLOGE("OnNotifyUnregResult failed, ret: %d", ret);
             }
         }).detach();
     } else {
         int32_t ret = callbackProxy_->OnNotifyUnregResult(devId, dhId, reqId, status, data);
         if (ret != DCAMERA_OK) {
-            DHLOGE("DCameraServiceStateListener OnUnregisterNotify failed, ret: %d", ret);
+            DHLOGE("OnNotifyUnregResult failed, ret: %d", ret);
         }
     }
 

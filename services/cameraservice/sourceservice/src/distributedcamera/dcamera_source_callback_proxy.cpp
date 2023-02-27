@@ -27,7 +27,7 @@ int32_t DCameraSourceCallbackProxy::OnNotifyRegResult(const std::string& devId, 
     const std::string& reqId, int32_t status, std::string& data)
 {
     if (!CheckParams(devId, dhId, reqId, data)) {
-        DHLOGE("DCameraSourceCallbackProxy OnNotifyRegResult input is invalid");
+        DHLOGE("input is invalid");
         return DCAMERA_BAD_VALUE;
     }
     sptr<IRemoteObject> remote = Remote();
@@ -39,7 +39,7 @@ int32_t DCameraSourceCallbackProxy::OnNotifyRegResult(const std::string& devId, 
     MessageParcel reply;
     MessageOption option;
     if (!req.WriteInterfaceToken(DCameraSourceCallbackProxy::GetDescriptor())) {
-        DHLOGE("DCameraSourceCallbackProxy OnNotifyRegResult write token failed");
+        DHLOGE("write token failed");
         return DCAMERA_BAD_VALUE;
     }
 
@@ -57,7 +57,7 @@ int32_t DCameraSourceCallbackProxy::OnNotifyUnregResult(const std::string& devId
     const std::string& reqId, int32_t status, std::string& data)
 {
     if (!CheckParams(devId, dhId, reqId, data)) {
-        DHLOGE("DCameraSourceCallbackProxy OnNotifyUnregResult input is invalid");
+        DHLOGE("input is invalid");
         return DCAMERA_BAD_VALUE;
     }
     sptr<IRemoteObject> remote = Remote();
@@ -69,7 +69,7 @@ int32_t DCameraSourceCallbackProxy::OnNotifyUnregResult(const std::string& devId
     MessageParcel reply;
     MessageOption option;
     if (!req.WriteInterfaceToken(DCameraSourceCallbackProxy::GetDescriptor())) {
-        DHLOGE("DCameraSourceCallbackProxy OnNotifyRegResult write token failed");
+        DHLOGE("write token failed");
         return DCAMERA_BAD_VALUE;
     }
 
@@ -87,12 +87,12 @@ bool DCameraSourceCallbackProxy::CheckParams(const std::string& devId, const std
     const std::string& reqId, std::string& data)
 {
     if (devId.empty() || devId.size() > DID_MAX_SIZE || dhId.empty() || dhId.size() > DID_MAX_SIZE) {
-        DHLOGE("DCameraSourceCallbackProxy CheckParams devId or dhId is invalid");
+        DHLOGE("devId or dhId is invalid");
         return false;
     }
 
     if (reqId.empty() || reqId.size() > DID_MAX_SIZE || data.size() > PARAM_MAX_SIZE) {
-        DHLOGE("DCameraSourceCallbackProxy CheckParams reqId or data is invalid");
+        DHLOGE("reqId or data is invalid");
         return false;
     }
     return true;

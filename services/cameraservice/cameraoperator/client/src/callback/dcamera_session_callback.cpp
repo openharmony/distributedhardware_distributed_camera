@@ -29,9 +29,9 @@ DCameraSessionCallback::DCameraSessionCallback(const std::shared_ptr<StateCallba
 
 void DCameraSessionCallback::OnError(int32_t errorCode)
 {
-    DHLOGE("DCameraSessionCallback::OnError, errorCode: %d", errorCode);
+    DHLOGE("enter, errorCode: %d", errorCode);
     if (callback_ == nullptr) {
-        DHLOGE("DCameraSessionCallback::OnError StateCallback is null");
+        DHLOGE("StateCallback is null");
         return;
     }
 
@@ -43,15 +43,15 @@ void DCameraSessionCallback::OnError(int32_t errorCode)
 
 void DCameraSessionCallback::OnFocusState(FocusState state)
 {
-    DHLOGI("DCameraSessionCallback::OnFocusState, state: %d", state);
+    DHLOGI("enter, state: %d", state);
     if (callback_ == nullptr) {
-        DHLOGE("DCameraSessionCallback::OnFocusState StateCallback is null");
+        DHLOGE("StateCallback is null");
         return;
     }
 
     auto iter = focusStateMap_.find(state);
     if (iter == focusStateMap_.end()) {
-        DHLOGE("DCameraSessionCallback::OnFocusState focusStateMap find %d state failed", state);
+        DHLOGE("focusStateMap find %d state failed", state);
         return;
     }
 
@@ -62,7 +62,7 @@ void DCameraSessionCallback::OnFocusState(FocusState state)
     std::shared_ptr<Camera::CameraMetadata> cameraMetadata =
         std::make_shared<Camera::CameraMetadata>(itemCapacity, dataCapacity);
     if (!cameraMetadata->addEntry(OHOS_CONTROL_FOCUS_STATE, &focusState, dataCount)) {
-        DHLOGE("DCameraSessionCallback::OnFocusState cameraMetadata add entry failed");
+        DHLOGE("cameraMetadata add entry failed");
         return;
     }
 

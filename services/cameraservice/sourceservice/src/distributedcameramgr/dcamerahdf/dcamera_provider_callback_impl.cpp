@@ -39,22 +39,22 @@ DCameraProviderCallbackImpl::~DCameraProviderCallbackImpl()
 
 int32_t DCameraProviderCallbackImpl::OpenSession(const DHBase& dhBase)
 {
-    DHLOGI("DCameraProviderCallbackImpl OpenSession devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
+    DHLOGI("OpenSession devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     if (!CheckDHBase(dhBase)) {
-        DHLOGE("DCameraProviderCallbackImpl OpenSession input is invalid");
+        DHLOGE("input is invalid");
         return FAILED;
     }
     std::shared_ptr<DCameraSourceDev> sourceDev = sourceDev_.lock();
     if (sourceDev == nullptr) {
-        DHLOGE("DCameraProviderCallbackImpl OpenSession failed, can not get device, devId: %s, dhId: %s",
+        DHLOGE("OpenSession failed, can not get device, devId: %s, dhId: %s",
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return FAILED;
     }
     DCameraIndex camIndex(devId_, dhId_);
     int32_t ret = sourceDev->OpenSession(camIndex);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraProviderCallbackImpl OpenSession failed, ret: %d, devId: %s, dhId: %s", ret,
+        DHLOGE("OpenSession failed, ret: %d, devId: %s, dhId: %s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return FAILED;
     }
@@ -63,22 +63,22 @@ int32_t DCameraProviderCallbackImpl::OpenSession(const DHBase& dhBase)
 
 int32_t DCameraProviderCallbackImpl::CloseSession(const DHBase& dhBase)
 {
-    DHLOGI("DCameraProviderCallbackImpl CloseSession devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
+    DHLOGI("CloseSession devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     if (!CheckDHBase(dhBase)) {
-        DHLOGE("DCameraProviderCallbackImpl CloseSession input is invalid");
+        DHLOGE("input is invalid");
         return FAILED;
     }
     std::shared_ptr<DCameraSourceDev> sourceDev = sourceDev_.lock();
     if (sourceDev == nullptr) {
-        DHLOGE("DCameraProviderCallbackImpl CloseSession failed, can not get device, devId: %s, dhId: %s",
+        DHLOGE("CloseSession failed, can not get device, devId: %s, dhId: %s",
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return FAILED;
     }
     DCameraIndex camIndex(devId_, dhId_);
     int32_t ret = sourceDev->CloseSession(camIndex);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraProviderCallbackImpl CloseSession failed, ret: %d, devId: %s, dhId: %s", ret,
+        DHLOGE("CloseSession failed, ret: %d, devId: %s, dhId: %s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return FAILED;
     }
@@ -89,7 +89,7 @@ bool DCameraProviderCallbackImpl::CheckDHBase(const DHBase& dhBase)
 {
     if (dhBase.deviceId_.empty() || dhBase.deviceId_.size() > DID_MAX_SIZE ||
         dhBase.dhId_.empty() || dhBase.dhId_.size() > DID_MAX_SIZE) {
-        DHLOGE("DCameraProviderCallbackImpl CheckDHBase dhBase is invalid");
+        DHLOGE("dhBase is invalid");
         return false;
     }
     return true;
@@ -98,22 +98,22 @@ bool DCameraProviderCallbackImpl::CheckDHBase(const DHBase& dhBase)
 int32_t DCameraProviderCallbackImpl::ConfigureStreams(const DHBase& dhBase,
     const std::vector<DCStreamInfo>& streamInfos)
 {
-    DHLOGI("DCameraProviderCallbackImpl ConfigStreams devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
+    DHLOGI("ConfigStreams devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     if (!CheckDHBase(dhBase) || streamInfos.empty() || streamInfos.size() > PARAM_MAX_SIZE) {
-        DHLOGE("DCameraProviderCallbackImpl ConfigStreams input is invalid");
+        DHLOGE("input is invalid");
         return FAILED;
     }
     std::shared_ptr<DCameraSourceDev> sourceDev = sourceDev_.lock();
     if (sourceDev == nullptr) {
-        DHLOGE("DCameraProviderCallbackImpl ConfigStreams failed, can not get device, devId: %s, dhId: %s",
+        DHLOGE("ConfigStreams failed, can not get device, devId: %s, dhId: %s",
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return FAILED;
     }
     std::vector<std::shared_ptr<DCStreamInfo>> streams;
     for (auto iter = streamInfos.begin(); iter != streamInfos.end(); iter++) {
         if (!CheckStreamInfo(*iter)) {
-            DHLOGE("DCameraProviderCallbackImpl ConfigStreams streamInfo is invalid");
+            DHLOGE("streamInfo is invalid");
             return FAILED;
         }
         std::shared_ptr<DCStreamInfo> stream = std::make_shared<DCStreamInfo>();
@@ -129,7 +129,7 @@ int32_t DCameraProviderCallbackImpl::ConfigureStreams(const DHBase& dhBase,
     }
     int32_t ret = sourceDev->ConfigCameraStreams(streams);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraProviderCallbackImpl CloseSession failed, ret: %d, devId: %s, dhId: %s", ret,
+        DHLOGE("CloseSession failed, ret: %d, devId: %s, dhId: %s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return FAILED;
     }
@@ -140,12 +140,12 @@ bool DCameraProviderCallbackImpl::CheckStreamInfo(const DCStreamInfo& stream)
 {
     if (stream.streamId_ < 0 || stream.width_ < 0 || stream.height_ < 0 ||
         (stream.width_ * stream.height_ > RESOLUTION_MAX_WIDTH * RESOLUTION_MAX_HEIGHT)) {
-        DHLOGE("DCameraProviderCallbackImpl CheckStreamInfo stream is invalid");
+        DHLOGE("stream is invalid");
         return false;
     }
 
     if (stream.stride_ < 0 || stream.format_ < 0 || stream.dataspace_ < 0) {
-        DHLOGE("DCameraProviderCallbackImpl CheckStreamInfo stream is invalid");
+        DHLOGE("stream is invalid");
         return false;
     }
     return true;
@@ -153,21 +153,21 @@ bool DCameraProviderCallbackImpl::CheckStreamInfo(const DCStreamInfo& stream)
 
 int32_t DCameraProviderCallbackImpl::ReleaseStreams(const DHBase& dhBase, const std::vector<int>& streamIds)
 {
-    DHLOGI("DCameraProviderCallbackImpl ReleaseStreams devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
+    DHLOGI("ReleaseStreams devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     if (!CheckDHBase(dhBase) || streamIds.size() > PARAM_MAX_SIZE) {
-        DHLOGE("DCameraProviderCallbackImpl ReleaseStreams input is invalid");
+        DHLOGE("input is invalid");
         return FAILED;
     }
     std::shared_ptr<DCameraSourceDev> sourceDev = sourceDev_.lock();
     if (sourceDev == nullptr) {
-        DHLOGE("DCameraProviderCallbackImpl ReleaseStreams failed, can not get device, devId: %s, dhId: %s",
+        DHLOGE("ReleaseStreams failed, can not get device, devId: %s, dhId: %s",
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return FAILED;
     }
     int32_t ret = sourceDev->ReleaseCameraStreams(streamIds);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraProviderCallbackImpl ReleaseStreams failed, ret: %d, devId: %s, dhId: %s", ret,
+        DHLOGE("ReleaseStreams failed, ret: %d, devId: %s, dhId: %s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return FAILED;
     }
@@ -176,15 +176,15 @@ int32_t DCameraProviderCallbackImpl::ReleaseStreams(const DHBase& dhBase, const 
 
 int32_t DCameraProviderCallbackImpl::StartCapture(const DHBase& dhBase, const std::vector<DCCaptureInfo>& captureInfos)
 {
-    DHLOGI("DCameraProviderCallbackImpl StartCapture devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
+    DHLOGI("StartCapture devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     if (!CheckDHBase(dhBase) || captureInfos.empty() || captureInfos.size() > PARAM_MAX_SIZE) {
-        DHLOGE("DCameraProviderCallbackImpl StartCapture input is invalid");
+        DHLOGE("input is invalid");
         return FAILED;
     }
     std::shared_ptr<DCameraSourceDev> sourceDev = sourceDev_.lock();
     if (sourceDev == nullptr) {
-        DHLOGE("DCameraProviderCallbackImpl StartCapture failed, can not get device, devId: %s, dhId: %s",
+        DHLOGE("StartCapture failed, can not get device, devId: %s, dhId: %s",
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return FAILED;
     }
@@ -192,12 +192,12 @@ int32_t DCameraProviderCallbackImpl::StartCapture(const DHBase& dhBase, const st
     std::vector<std::shared_ptr<DCCaptureInfo>> captures;
     for (auto iter = captureInfos.begin(); iter != captureInfos.end(); iter++) {
         if (!CheckCaptureInfo(*iter)) {
-            DHLOGE("DCameraProviderCallbackImpl StartCapture captureInfo is invalid");
+            DHLOGE("captureInfo is invalid");
             return FAILED;
         }
         for (auto item : iter->captureSettings_) {
             if (item.value_.size() > PARAM_MAX_SIZE) {
-                DHLOGE("DCameraProviderCallbackImpl StartCapture captureSettings value is too long");
+                DHLOGE("captureSettings value is too long");
                 return FAILED;
             }
         }
@@ -216,7 +216,7 @@ int32_t DCameraProviderCallbackImpl::StartCapture(const DHBase& dhBase, const st
     }
     int32_t ret = sourceDev->StartCameraCapture(captures);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraProviderCallbackImpl StartCapture failed, ret: %d, devId: %s, dhId: %s", ret,
+        DHLOGE("StartCapture failed, ret: %d, devId: %s, dhId: %s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return FAILED;
     }
@@ -227,13 +227,13 @@ bool DCameraProviderCallbackImpl::CheckCaptureInfo(const DCCaptureInfo& captureI
 {
     if (sizeof(captureInfo.streamIds_) > PARAM_MAX_SIZE || captureInfo.width_ < 0 || captureInfo.height_ < 0 ||
         (captureInfo.width_ * captureInfo.height_ > RESOLUTION_MAX_WIDTH * RESOLUTION_MAX_HEIGHT)) {
-        DHLOGE("DCameraProviderCallbackImpl CheckCaptureInfo captureInfo is invalid");
+        DHLOGE("captureInfo is invalid");
         return false;
     }
 
     if (captureInfo.stride_ < 0 || captureInfo.format_ < 0 || captureInfo.dataspace_ < 0 ||
         sizeof(captureInfo.captureSettings_) > PARAM_MAX_SIZE) {
-        DHLOGE("DCameraProviderCallbackImpl CheckCaptureInfo captureInfo is invalid");
+        DHLOGE("captureInfo is invalid");
         return false;
     }
     return true;
@@ -241,21 +241,21 @@ bool DCameraProviderCallbackImpl::CheckCaptureInfo(const DCCaptureInfo& captureI
 
 int32_t DCameraProviderCallbackImpl::StopCapture(const DHBase& dhBase, const std::vector<int>& streamIds)
 {
-    DHLOGI("DCameraProviderCallbackImpl StopCapture devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
+    DHLOGI("StopCapture devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     if (!CheckDHBase(dhBase) || streamIds.size() > PARAM_MAX_SIZE) {
-        DHLOGE("DCameraProviderCallbackImpl StopCapture input is invalid");
+        DHLOGE("input is invalid");
         return FAILED;
     }
     std::shared_ptr<DCameraSourceDev> sourceDev = sourceDev_.lock();
     if (sourceDev == nullptr) {
-        DHLOGE("DCameraProviderCallbackImpl StopCapture failed, can not get device, devId: %s, dhId: %s",
+        DHLOGE("StopCapture failed, can not get device, devId: %s, dhId: %s",
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return FAILED;
     }
     int32_t ret = sourceDev->StopCameraCapture(streamIds);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraProviderCallbackImpl StopCapture failed, ret: %d, devId: %s, dhId: %s", ret,
+        DHLOGE("StopCapture failed, ret: %d, devId: %s, dhId: %s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return FAILED;
     }
@@ -264,15 +264,15 @@ int32_t DCameraProviderCallbackImpl::StopCapture(const DHBase& dhBase, const std
 
 int32_t DCameraProviderCallbackImpl::UpdateSettings(const DHBase& dhBase, const std::vector<DCameraSettings>& settings)
 {
-    DHLOGI("DCameraProviderCallbackImpl UpdateSettings devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
+    DHLOGI("UpdateSettings devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     if (!CheckDHBase(dhBase) || settings.size() > PARAM_MAX_SIZE) {
-        DHLOGE("DCameraProviderCallbackImpl UpdateSettings input is invalid");
+        DHLOGE("input is invalid");
         return FAILED;
     }
     std::shared_ptr<DCameraSourceDev> sourceDev = sourceDev_.lock();
     if (sourceDev == nullptr) {
-        DHLOGE("DCameraProviderCallbackImpl UpdateSettings failed, can not get device, devId: %s, dhId: %s",
+        DHLOGE("UpdateSettings failed, can not get device, devId: %s, dhId: %s",
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return FAILED;
     }
@@ -280,7 +280,7 @@ int32_t DCameraProviderCallbackImpl::UpdateSettings(const DHBase& dhBase, const 
     std::vector<std::shared_ptr<DCameraSettings>> settingInfos;
     for (auto iter = settings.begin(); iter != settings.end(); iter++) {
         if (iter->value_.size() > PARAM_MAX_SIZE) {
-            DHLOGE("DCameraProviderCallbackImpl UpdateSettings value is too long");
+            DHLOGE("value is too long");
             return FAILED;
         }
         std::shared_ptr<DCameraSettings> settingInfo = std::make_shared<DCameraSettings>();
@@ -290,7 +290,7 @@ int32_t DCameraProviderCallbackImpl::UpdateSettings(const DHBase& dhBase, const 
     }
     int32_t ret = sourceDev->UpdateCameraSettings(settingInfos);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraProviderCallbackImpl UpdateSettings failed, ret: %d, devId: %s, dhId: %s", ret,
+        DHLOGE("UpdateSettings failed, ret: %d, devId: %s, dhId: %s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return FAILED;
     }

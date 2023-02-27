@@ -26,17 +26,17 @@ DCameraVideoCallback::DCameraVideoCallback(const std::shared_ptr<StateCallback>&
 
 void DCameraVideoCallback::OnFrameStarted() const
 {
-    DHLOGI("DCameraVideoCallback::OnFrameStarted");
+    DHLOGI("enter");
 }
 
 void DCameraVideoCallback::OnFrameEnded(const int32_t frameCount) const
 {
-    DHLOGI("DCameraVideoCallback::OnFrameEnded, frameCount: %d", frameCount);
+    DHLOGI("enter, frameCount: %d", frameCount);
 }
 
 void DCameraVideoCallback::OnError(const int32_t errorCode) const
 {
-    DHLOGE("DCameraVideoCallback::OnError, errorCode: %d", errorCode);
+    DHLOGE("enter, errorCode: %d", errorCode);
     if (callback_ == nullptr) {
         DHLOGE("DCameraVideoCallback StateCallback is null");
         return;
