@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,13 +35,6 @@ public:
     std::shared_ptr<ScaleConvertProcess> testScaleConvertProcess_;
 };
 
-namespace {
-const int32_t TEST_WIDTH = 1920;
-const int32_t TEST_HEIGTH = 1080;
-const int32_t TEST_WIDTH2 = 640;
-const int32_t TEST_HEIGTH2 = 480;
-}
-
 void ScaleConvertProcessTest::SetUpTestCase(void)
 {
 }
@@ -61,6 +54,13 @@ void ScaleConvertProcessTest::TearDown(void)
     testScaleConvertProcess_ = nullptr;
 }
 
+#ifdef DCAMERA_SUPPORT_FFMPEG
+namespace {
+const int32_t TEST_WIDTH = 1920;
+const int32_t TEST_HEIGTH = 1080;
+const int32_t TEST_WIDTH2 = 640;
+const int32_t TEST_HEIGTH2 = 480;
+}
 /**
  * @tc.name: scale_convert_process_test_001
  * @tc.desc: Verify scale convert process InitNode IsConvertible true.
@@ -384,9 +384,9 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_012, TestSize.Level
     bool rc = testScaleConvertProcess_->CheckScaleConvertInfo(srcImgInfo, dstImgInfo);
     EXPECT_EQ(rc, false);
 
-    uint8_t *imgData = new uint8_t(10);
-    srcImgInfo.imgData = imgData;
-    dstImgInfo.imgData = imgData;
+    std::shared_ptr<DataBuffer> dtBuf = std::make_shared<DataBuffer>(10);
+    srcImgInfo.imgData = dtBuf;
+    dstImgInfo.imgData = dtBuf;
     rc = testScaleConvertProcess_->CheckScaleConvertInfo(srcImgInfo, dstImgInfo);
     EXPECT_EQ(rc, false);
 }
@@ -401,7 +401,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_013, TestSize.Level
 {
     EXPECT_EQ(false, testScaleConvertProcess_ == nullptr);
 
-    uint8_t *imgData = new uint8_t(10);
+    std::shared_ptr<DataBuffer> imgData = std::make_shared<DataBuffer>(10);
     ImageUnitInfo srcImgInfo {Videoformat::NV12, TEST_WIDTH, TEST_HEIGTH, 0, 0, 0, 0, imgData};
     ImageUnitInfo dstImgInfo {Videoformat::NV12, TEST_WIDTH, TEST_HEIGTH, 0, 0, 0, 0, imgData};
 
@@ -437,10 +437,10 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_015, TestSize.Level
     EXPECT_EQ(false, testScaleConvertProcess_ == nullptr);
 
     ImageUnitInfo srcImgInfo {};
-    uint8_t imgData[4] = { 0 };
+    std::shared_ptr<DataBuffer> dtBuf = std::make_shared<DataBuffer>(10);
     srcImgInfo.alignedWidth = TEST_WIDTH2;
     srcImgInfo.alignedHeight = TEST_HEIGTH2;
-    srcImgInfo.imgData = imgData;
+    srcImgInfo.imgData = dtBuf;
 
     int32_t rc = testScaleConvertProcess_->CopyYUV420SrcData(srcImgInfo);
     EXPECT_EQ(rc, DCAMERA_MEMORY_OPT_ERROR);
@@ -467,5 +467,6 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_016, TestSize.Level
     int32_t rc = testScaleConvertProcess_->ConvertDone(outputBuffers);
     EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
 }
+#endif
 } // namespace DistributedHardware
 } // namespace OHOS

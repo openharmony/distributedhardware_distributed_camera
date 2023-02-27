@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,6 +18,7 @@
 
 #include "abstract_data_process.h"
 
+#ifdef DCAMERA_SUPPORT_FFMPEG
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -27,6 +28,7 @@ extern "C" {
 #include <libswscale/swscale.h>
 #ifdef __cplusplus
 };
+#endif
 #endif
 
 #include <mutex>
@@ -56,12 +58,22 @@ private:
     bool CheckScaleProcessInputInfo(const ImageUnitInfo& srcImgInfo);
     bool CheckScaleConvertInfo(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo);
     int32_t GetImageUnitInfo(ImageUnitInfo& imgInfo, const std::shared_ptr<DataBuffer>& imgBuf);
-    int32_t ScaleConvert(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo);
+    int32_t ScaleConvert(ImageUnitInfo& srcImgInfo, ImageUnitInfo& dstImgInfo);
+#ifdef DCAMERA_SUPPORT_FFMPEG
     int32_t CopyYUV420SrcData(const ImageUnitInfo& srcImgInfo);
     int32_t CopyNV12SrcData(const ImageUnitInfo& srcImgInfo);
     int32_t CopyNV21SrcData(const ImageUnitInfo& srcImgInfo);
-    int32_t ConvertDone(std::vector<std::shared_ptr<DataBuffer>>& outputBuffers);
     AVPixelFormat GetAVPixelFormat(Videoformat colorFormat);
+#else
+    int32_t ConvertResolution(ImageUnitInfo& srcImgInfo, ImageUnitInfo& dstImgInfo,
+        std::shared_ptr<DataBuffer>& dstBuf);
+    int32_t ConvertFormatToNV21(ImageUnitInfo& srcImgInfo, ImageUnitInfo& dstImgInfo,
+        std::shared_ptr<DataBuffer>& dstBuf);
+    int32_t ConvertFormatToRGBA(ImageUnitInfo& srcImgInfo, ImageUnitInfo& dstImgInfo,
+        std::shared_ptr<DataBuffer>& dstBuf);
+    void CalculateBuffSize(size_t& dstBuffSize);
+#endif
+    int32_t ConvertDone(std::vector<std::shared_ptr<DataBuffer>>& outputBuffers);
 
 private:
     constexpr static int32_t DATA_LEN = 4;
@@ -71,19 +83,22 @@ private:
     constexpr static int32_t TARGET_ALIGN = 1;
     constexpr static int32_t YUV_BYTES_PER_PIXEL = 3;
     constexpr static int32_t Y2UV_RATIO = 2;
+    constexpr static int32_t RGB32_MEMORY_COEFFICIENT = 4;
 
+#ifdef DCAMERA_SUPPORT_FFMPEG
     uint8_t *srcData_[DATA_LEN] = { nullptr };
     uint8_t *dstData_[DATA_LEN] = { nullptr };
     int32_t srcLineSize_[DATA_LEN] = { 0 };
     int32_t dstLineSize_[DATA_LEN] = { 0 };
     int32_t dstBuffSize_ = 0;
     SwsContext *swsContext_ = nullptr;
+    std::mutex scaleMutex_;
+#endif
     VideoConfigParams sourceConfig_;
     VideoConfigParams targetConfig_;
     VideoConfigParams processedConfig_;
     std::weak_ptr<DCameraPipelineSource> callbackPipelineSource_;
     std::atomic<bool> isScaleConvert_ = false;
-    std::mutex scaleMutex_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

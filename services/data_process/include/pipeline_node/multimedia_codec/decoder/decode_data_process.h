@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -93,9 +93,6 @@ private:
     void ReduceWaitDecodeCnt();
     void CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int64_t timeStamp, int32_t alignedWidth,
         int32_t alignedHeight);
-    int32_t CopyYUVPlaneByRow(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo);
-    int32_t CheckCopyImageInfo(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo);
-    bool IsCorrectImageUnitInfo(const ImageUnitInfo& imgInfo);
     bool IsCorrectSurfaceBuffer(const sptr<SurfaceBuffer>& surBuf, int32_t alignedWidth, int32_t alignedHeight);
     void PostOutputDataBuffers(std::shared_ptr<DataBuffer>& outputBuffer);
     int32_t DecodeDone(std::vector<std::shared_ptr<DataBuffer>>& outputBuffers);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,6 @@
 #include "dcamera_hitrace_adapter.h"
 #include "distributed_hardware_log.h"
 
-#include "color_format_process.h"
 #include "decode_data_process.h"
 #include "fps_controller_process.h"
 #include "scale_convert_process.h"
@@ -104,7 +103,6 @@ int32_t DCameraPipelineSource::InitDCameraPipNodes(const VideoConfigParams& sour
 
     pipNodeRanks_.push_back(std::make_shared<DecodeDataProcess>(eventBusSource_, shared_from_this()));
     pipNodeRanks_.push_back(std::make_shared<ScaleConvertProcess>(shared_from_this()));
-    pipNodeRanks_.push_back(std::make_shared<ColorFormatProcess>(shared_from_this()));
     if (pipNodeRanks_.size() == 0) {
         DHLOGD("Creating an empty source pipeline.");
         pipelineHead_ = nullptr;
