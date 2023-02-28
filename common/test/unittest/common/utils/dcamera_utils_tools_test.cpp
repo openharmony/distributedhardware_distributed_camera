@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -142,7 +142,8 @@ HWTEST_F(DcameraUtilsToolsTest, Base64Encode_001, TestSize.Level1)
     std::string retsult = Base64Encode(reinterpret_cast<const unsigned char *>(toEncode.c_str()), toEncode.size());
     EXPECT_NE(0, retsult.size());
     Base64Decode(retsult);
-    EXPECT_EQ(DCAMERA_OK, value);
+    int32_t ret = GetAlignedHeight(value);
+    EXPECT_EQ(DCAMERA_OK, ret);
 }
 
 /**
@@ -159,7 +160,8 @@ HWTEST_F(DcameraUtilsToolsTest, Base64Encode_002, TestSize.Level1)
     Base64Encode(reinterpret_cast<const unsigned char *>(toEncode.c_str()), len);
     std::string toDncode = "";
     Base64Decode(toDncode);
-    EXPECT_EQ(DCAMERA_OK, value);
+    int32_t ret = GetAlignedHeight(value);
+    EXPECT_EQ(DCAMERA_OK, ret);
 }
 
 /**
@@ -172,7 +174,8 @@ HWTEST_F(DcameraUtilsToolsTest, GetAnonyInt32_001, TestSize.Level1)
 {
     int32_t value = 0;
     GetAnonyInt32(value);
-    EXPECT_EQ(DCAMERA_OK, value);
+    int32_t ret = GetAlignedHeight(value);
+    EXPECT_EQ(DCAMERA_OK, ret);
 }
 
 /**
