@@ -231,10 +231,10 @@ HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_produ
     sharedMemory.size_ = 1;
     sharedMemory.bufferHandle_ = nullptr;
     int32_t ret = streamProcess->CheckSharedMemory(sharedMemory, buffer);
-    sharedMemory.bufferHandle_ = new BufferHandleSequenceable();
+    sharedMemory.bufferHandle_ = new NativeBuffer();
     ret = streamProcess->CheckSharedMemory(sharedMemory, buffer);
     BufferHandle *bufferHandle = new BufferHandle();
-    sharedMemory.bufferHandle_ = new BufferHandleSequenceable(bufferHandle);
+    sharedMemory.bufferHandle_ = new NativeBuffer(bufferHandle);
     ret = streamProcess->CheckSharedMemory(sharedMemory, buffer);
     EXPECT_EQ(DCAMERA_OK, ret);
 }

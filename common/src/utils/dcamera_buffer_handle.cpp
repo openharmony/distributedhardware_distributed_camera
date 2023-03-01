@@ -74,7 +74,6 @@ void DCameraMemoryUnmap(BufferHandle *buffer)
         }
     }
     buffer->virAddr = nullptr;
-    FreeBufferHandle(buffer);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
