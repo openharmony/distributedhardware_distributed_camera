@@ -38,7 +38,6 @@ ohos_shared_library("distributed_camera_utils") {
     "src/utils/dcamera_buffer_handle.cpp",
     "src/utils/dcamera_hisysevent_adapter.cpp",
     "src/utils/dcamera_hitrace_adapter.cpp",
-    "src/utils/dcamera_sa_process_state.cpp",
     "src/utils/dcamera_utils_tools.cpp",
     "src/utils/dh_log.cpp",
   ]

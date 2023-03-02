@@ -28,7 +28,7 @@
 #include "dcamera_sink_service_ipc.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
-#include "dcamera_sa_process_state.h"
+
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -123,8 +123,18 @@ int32_t DistributedCameraSinkService::ReleaseSink()
         }
     }
     camerasMap_.clear();
-    DHLOGI("check sink sa state.");
-    SetSinkProcessExit();
+
+    auto systemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (systemAbilityMgr == nullptr) {
+        DHLOGE("sink systemAbilityMgr is null");
+        return DCAMERA_BAD_VALUE;
+    }
+    int32_t ret = systemAbilityMgr->UnloadSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("sink systemAbilityMgr UnLoadSystemAbility failed, ret: %d", ret);
+        return DCAMERA_BAD_VALUE;
+    }
+    DHLOGI("sink systemAbilityMgr UnLoadSystemAbility success");
     return DCAMERA_OK;
 }
 

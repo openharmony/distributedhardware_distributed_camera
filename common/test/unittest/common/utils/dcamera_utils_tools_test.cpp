@@ -18,7 +18,6 @@
 #include "accesstoken_kit.h"
 #include "anonymous_string.h"
 #include "dcamera_utils_tools.h"
-#include "dcamera_sa_process_state.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
 #include "nativetoken_kit.h"
@@ -175,17 +174,5 @@ HWTEST_F(DcameraUtilsToolsTest, GetAnonyInt32_001, TestSize.Level1)
     EXPECT_EQ(DCAMERA_OK, value);
 }
 
-/**
- * @tc.name: SetSourceProcessExit_001
- * @tc.desc: Verify the SetSourceProcessExit function failed.
- * @tc.type: FUNC
- * @tc.require: Issue Number
- */
-HWTEST_F(DcameraUtilsToolsTest, SetSourceProcessExit_001, TestSize.Level1)
-{
-    int32_t value = 0;
-    SetSourceProcessExit();
-    EXPECT_EQ(DCAMERA_OK, value);
-}
 } // namespace DistributedHardware
 } // namespace OHOS
