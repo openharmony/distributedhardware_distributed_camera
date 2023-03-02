@@ -398,7 +398,7 @@ int32_t EncodeDataProcess::FeedEncoderInputBuffer(std::shared_ptr<DataBuffer>& i
     DHLOGD("Encoder input buffer size %d, timeStamp %lld.", inputBuffer->Size(), (long long)inputTimeStampUs_);
     surfacebuffer->GetExtraData()->ExtraSet("timeStamp", inputTimeStampUs_);
 
-    BufferFlushConfig flushConfig = { {0, 0, sourceConfig_.GetWidth(), sourceConfig_.GetHeight()}, {}, 0};
+    BufferFlushConfig flushConfig = { {0, 0, sourceConfig_.GetWidth(), sourceConfig_.GetHeight()}, 0};
     SurfaceError ret = encodeProducerSurface_->FlushBuffer(surfacebuffer, -1, flushConfig);
     if (ret != SURFACE_ERROR_OK) {
         DHLOGE("Flush encoder input producer surface buffer failed.");
