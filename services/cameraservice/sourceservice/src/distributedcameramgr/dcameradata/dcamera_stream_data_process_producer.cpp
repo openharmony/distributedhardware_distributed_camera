@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,7 +24,7 @@
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
-
+#include <sys/prctl.h>
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -109,6 +109,7 @@ void DCameraStreamDataProcessProducer::FeedStream(const std::shared_ptr<DataBuff
 
 void DCameraStreamDataProcessProducer::StartEvent()
 {
+    prctl(PR_SET_NAME, SOURCE_START_EVENT.c_str());
     auto runner = AppExecFwk::EventRunner::Create(false);
     {
         std::lock_guard<std::mutex> lock(eventMutex_);
@@ -122,6 +123,8 @@ void DCameraStreamDataProcessProducer::LooperContinue()
 {
     DHLOGI("LooperContinue producer devId: %s dhId: %s streamType: %d streamId: %d state: %d",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_, state_);
+    std::string name = PRODUCER + std::to_string(streamType_);
+    prctl(PR_SET_NAME, name.c_str());
     DHBase dhBase;
     dhBase.deviceId_ = devId_;
     dhBase.dhId_ = dhId_;
@@ -162,6 +165,8 @@ void DCameraStreamDataProcessProducer::LooperSnapShot()
 {
     DHLOGI("LooperSnapShot producer devId: %s dhId: %s streamType: %d streamId: %d state: %d",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_, state_);
+    std::string name = PRODUCER + std::to_string(streamType_);
+    prctl(PR_SET_NAME, name.c_str());
     DHBase dhBase;
     dhBase.deviceId_ = devId_;
     dhBase.dhId_ = dhId_;

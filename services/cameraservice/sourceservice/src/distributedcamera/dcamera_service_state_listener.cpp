@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,6 +22,7 @@
 #include "distributed_camera_errno.h"
 #include "distributed_camera_source_service.h"
 #include "distributed_hardware_log.h"
+#include <sys/prctl.h>
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -53,6 +54,7 @@ int32_t DCameraServiceStateListener::OnRegisterNotify(const std::string& devId, 
     if (status != DCAMERA_OK) {
         std::thread([=]() mutable {
             DHLOGI("thread delete devId: %s dhId: %s", GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
+            prctl(PR_SET_NAME, REGISTER_SERVICE_NOTIFY.c_str());
             DCameraIndex camIndex(devId, dhId);
             DistributedCameraSourceService::CamDevErase(camIndex);
             if (callbackProxy_ == nullptr) {
@@ -91,6 +93,7 @@ int32_t DCameraServiceStateListener::OnUnregisterNotify(const std::string& devId
     if (status == DCAMERA_OK) {
         std::thread([=]() mutable {
             DHLOGI("thread delete devId: %s dhId: %s", GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
+            prctl(PR_SET_NAME, UNREGISTER_SERVICE_NOTIFY.c_str());
             DCameraIndex camIndex(devId, dhId);
             DistributedCameraSourceService::CamDevErase(camIndex);
 

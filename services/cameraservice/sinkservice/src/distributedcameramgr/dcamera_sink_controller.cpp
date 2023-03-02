@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,6 +37,7 @@
 #include "idistributed_camera_source.h"
 #include "json/json.h"
 #include "dcamera_low_latency.h"
+#include <sys/prctl.h>
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -352,19 +353,18 @@ void DCameraSinkController::OnSessionState(int32_t state)
     DHLOGI("DCameraSinkController::OnSessionState dhId: %s, state: %d", GetAnonyString(dhId_).c_str(), state);
     sessionState_ = state;
     switch (state) {
-        case DCAMERA_CHANNEL_STATE_CONNECTING: {
+        case DCAMERA_CHANNEL_STATE_CONNECTING:
             DHLOGI("channel is connecting");
             break;
-        }
-        case DCAMERA_CHANNEL_STATE_CONNECTED: {
+        case DCAMERA_CHANNEL_STATE_CONNECTED:
             DHLOGI("channel is connected");
             break;
-        }
-        case DCAMERA_CHANNEL_STATE_DISCONNECTED: {
+        case DCAMERA_CHANNEL_STATE_DISCONNECTED:
             DHLOGI("channel is disconnected");
             std::thread([this]() {
                 DHLOGI("DCameraSinkController::OnSessionState %s new thread session state: %d",
                     GetAnonyString(dhId_).c_str(), sessionState_);
+                prctl(PR_SET_NAME, CHANNEL_DISCONNECTED.c_str());
                 std::lock_guard<std::mutex> autoLock(autoLock_);
                 int32_t ret = CloseChannel();
                 if (ret != DCAMERA_OK) {
@@ -378,11 +378,9 @@ void DCameraSinkController::OnSessionState(int32_t state)
                 }
             }).detach();
             break;
-        }
-        default: {
+        default:
             DHLOGE("unknown session state");
             break;
-        }
     }
 }
 
