@@ -66,28 +66,6 @@
                 "//foundation/distributedhardware/distributed_camera/sa_profile:dcamera.cfg",
                 "//foundation/distributedhardware/distributed_camera/services/channel:distributed_camera_channel"
             ],
-            "inner_kits":[
-                {
-                    "type":"so",
-                    "name":"//foundation/distributedhardware/distributed_camera/interfaces/inner_kits/native_cpp/camera_sink:distributed_camera_sink_sdk",
-                    "header":{
-                        "header_base":"//foundation/distributedhardware/distributed_camera/interfaces/inner_kits/native_cpp/camera_sink/include",
-                        "header_files":[
-                            "idistributed_camera_sink.h"
-                        ]
-                    }
-                },
-                {
-                    "type":"so",
-                    "name":"//foundation/distributedhardware/distributed_camera/interfaces/inner_kits/native_cpp/camera_source:distributed_camera_source_sdk",
-                    "header":{
-                        "header_base":"//foundation/distributedhardware/distributed_camera/interfaces/inner_kits/native_cpp/camera_source/include",
-                        "header_files":[
-                            "idistributed_camera_source.h"
-                        ]
-                    }
-                }
-            ],
             "test":[
                 "//foundation/distributedhardware/distributed_camera/common/test/unittest:common_utils_test",
                 "//foundation/distributedhardware/distributed_camera/services/cameraservice/cameraoperator/client/test/sample:dcamera_client_demo",

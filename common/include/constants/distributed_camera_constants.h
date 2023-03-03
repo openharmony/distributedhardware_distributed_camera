@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -119,6 +119,13 @@ const uint32_t UINT32_SHIFT_MASK_16 = 0x00ff0000;
 const uint32_t UINT32_SHIFT_MASK_8 = 0x0000ff00;
 const uint32_t UINT32_SHIFT_MASK_0 = 0x000000ff;
 const uint16_t UINT16_SHIFT_MASK_0 = 0x00ff;
+
+const std::string CHANNEL_DISCONNECTED = "disconnected";
+const std::string PRODUCER = "producer";
+const std::string REGISTER_SERVICE_NOTIFY = "regSvcNotify";
+const std::string SINK_START_EVENT = "sinkStartEvent";
+const std::string SOURCE_START_EVENT = "srcStartEvent";
+const std::string UNREGISTER_SERVICE_NOTIFY = "unregSvcNotify";
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DISTRIBUTED_CAMERA_CONSTANTS_H
