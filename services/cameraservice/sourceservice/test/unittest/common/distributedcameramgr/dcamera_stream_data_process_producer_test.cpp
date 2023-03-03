@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -43,6 +43,9 @@ public:
 namespace {
 const std::string TEST_DEVICE_ID = "bb536a637105409e904d4da83790a4a7";
 const std::string TEST_CAMERA_DH_ID_0 = "camera_0";
+const int64_t TEST_TIMESTAMP = 1;
+const int64_t TEST_DURATION = 1;
+const int64_t TEST_CLOCK = 1;
 #define DCAMERA_PRODUCER_MAX_BUFFER_SIZE 1
 }
 void DCameraStreamDataProcessProducerTest::SetUpTestCase(void)
@@ -74,7 +77,6 @@ void DCameraStreamDataProcessProducerTest::TearDown(void)
 HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_producer_test_001, TestSize.Level1)
 {
     DHLOGI("DCameraStreamDataProcessProducerTest::dcamera_stream_data_process_producer_test_001");
-    int32_t ret = 0;
     int32_t streamId = 1;
     std::shared_ptr<DCameraStreamDataProcessProducer> streamProcess1 =
         std::make_shared<DCameraStreamDataProcessProducer>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, streamId,
@@ -89,6 +91,7 @@ HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_produ
     streamProcess2->Start();
     sleep(1);
     streamProcess2->Stop();
+    int32_t ret = streamProcess2->SyncClock(TEST_TIMESTAMP, TEST_DURATION, TEST_CLOCK);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
@@ -101,7 +104,6 @@ HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_produ
 HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_producer_test_002, TestSize.Level1)
 {
     DHLOGI("DCameraStreamDataProcessProducerTest::dcamera_stream_data_process_producer_test_002");
-    int32_t ret = 0;
     int32_t streamId = 1;
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(capacity);
@@ -114,6 +116,7 @@ HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_produ
         std::make_shared<DCameraStreamDataProcessProducer>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, streamId,
         DCStreamType::CONTINUOUS_FRAME);
     streamProcess2->FeedStream(buffer);
+    int32_t ret = streamProcess2->SyncClock(TEST_TIMESTAMP, TEST_DURATION, TEST_CLOCK);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
@@ -126,7 +129,6 @@ HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_produ
 HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_producer_test_003, TestSize.Level1)
 {
     DHLOGI("DCameraStreamDataProcessProducerTest::dcamera_stream_data_process_producer_test_003");
-    int32_t ret = 0;
     int32_t streamId = 1;
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(capacity);
@@ -141,6 +143,7 @@ HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_produ
         std::make_shared<DCameraStreamDataProcessProducer>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, streamId,
         DCStreamType::CONTINUOUS_FRAME);
     streamProcess2->FeedStream(buffer);
+    int32_t ret = streamProcess2->SyncClock(TEST_TIMESTAMP, TEST_DURATION, TEST_CLOCK);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
@@ -153,7 +156,6 @@ HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_produ
 HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_producer_test_004, TestSize.Level1)
 {
     DHLOGI("DCameraStreamDataProcessProducerTest::dcamera_stream_data_process_producer_test_004");
-    int32_t ret = 0;
     int32_t streamId = 1;
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(capacity);
@@ -162,6 +164,7 @@ HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_produ
         DCStreamType::SNAPSHOT_FRAME);
     streamProcess->state_ = DCameraStreamDataProcessProducer::DCAMERA_PRODUCER_STATE_STOP;
     streamProcess->LooperContinue();
+    int32_t ret = streamProcess->SyncClock(TEST_TIMESTAMP, TEST_DURATION, TEST_CLOCK);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
@@ -174,7 +177,6 @@ HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_produ
 HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_producer_test_005, TestSize.Level1)
 {
     DHLOGI("DCameraStreamDataProcessProducerTest::dcamera_stream_data_process_producer_test_005");
-    int32_t ret = 0;
     int32_t streamId = 1;
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(capacity);
@@ -183,6 +185,7 @@ HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_produ
         DCStreamType::SNAPSHOT_FRAME);
     streamProcess->state_ = DCameraStreamDataProcessProducer::DCAMERA_PRODUCER_STATE_STOP;
     streamProcess->LooperSnapShot();
+    int32_t ret = streamProcess->SyncClock(TEST_TIMESTAMP, TEST_DURATION, TEST_CLOCK);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 

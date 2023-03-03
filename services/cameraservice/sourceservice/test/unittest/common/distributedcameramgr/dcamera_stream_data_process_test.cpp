@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -77,12 +77,12 @@ void DCameraStreamDataProcessTest::TearDown(void)
 HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_001, TestSize.Level1)
 {
     DHLOGI("DCameraStreamDataProcessTest::dcamera_stream_data_process_test_001");
-    int32_t ret = 0;
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(capacity);
     std::shared_ptr<DCameraStreamDataProcess> streamProcess1 =
         std::make_shared<DCameraStreamDataProcess>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, DCStreamType::SNAPSHOT_FRAME);
 
+    int32_t ret = streamProcess1->GetProducerSize();
     streamProcess1->FeedStream(buffer);
     EXPECT_EQ(DCAMERA_OK, ret);
     std::shared_ptr<DCameraStreamDataProcess> streamProcess2 =
@@ -101,7 +101,6 @@ HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_001, Tes
 HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_002, TestSize.Level1)
 {
     DHLOGI("DCameraStreamDataProcessTest::dcamera_stream_data_process_test_002");
-    int32_t ret = 0;
     std::shared_ptr<DCameraStreamDataProcess> streamProcess =
         std::make_shared<DCameraStreamDataProcess>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, DCStreamType::CONTINUOUS_FRAME);
     std::shared_ptr<DCameraStreamConfig> srcConfig =
@@ -112,7 +111,8 @@ HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_002, Tes
     streamIds.insert(1);
     streamProcess->ConfigStreams(srcConfig, streamIds);
     streamProcess->StartCapture(srcConfig, streamIds);
-    EXPECT_EQ(DCAMERA_OK, ret);
+    int32_t ret = streamProcess->GetProducerSize();
+    EXPECT_NE(DCAMERA_OK, ret);
 }
 
 /**
@@ -124,13 +124,13 @@ HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_002, Tes
 HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_003, TestSize.Level1)
 {
     DHLOGI("DCameraStreamDataProcessTest::dcamera_stream_data_process_test_003");
-    int32_t ret = 0;
     std::shared_ptr<DCameraStreamDataProcess> streamProcess =
         std::make_shared<DCameraStreamDataProcess>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, DCStreamType::CONTINUOUS_FRAME);
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(capacity);
 
     streamProcess->FeedStreamToSnapShot(buffer);
+    int32_t ret = streamProcess->GetProducerSize();
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
@@ -143,7 +143,6 @@ HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_003, Tes
 HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_004, TestSize.Level1)
 {
     DHLOGI("DCameraStreamDataProcessTest::dcamera_stream_data_process_test_004");
-    int32_t ret = 0;
     std::shared_ptr<DCameraStreamDataProcess> streamProcess =
         std::make_shared<DCameraStreamDataProcess>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, DCStreamType::CONTINUOUS_FRAME);
     size_t capacity = 1;
@@ -155,12 +154,13 @@ HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_004, Tes
     std::set<int32_t> streamIds;
     streamIds.insert(1);
     streamProcess->ConfigStreams(srcConfig, streamIds);
+    streamProcess->StartCapture(srcConfig, streamIds);
     streamProcess->FeedStreamToContinue(buffer);
-    streamProcess->srcConfig_ = srcConfig;
     streamProcess->CreatePipeline();
     usleep(SLEEP_TIME);
     streamProcess->FeedStreamToContinue(buffer);
-    EXPECT_EQ(DCAMERA_OK, ret);
+    int32_t ret = streamProcess->GetProducerSize();
+    EXPECT_NE(DCAMERA_OK, ret);
 }
 
 /**
@@ -172,7 +172,6 @@ HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_004, Tes
 HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_005, TestSize.Level1)
 {
     DHLOGI("DCameraStreamDataProcessTest::dcamera_stream_data_process_test_005");
-    int32_t ret = 0;
     std::shared_ptr<DCameraStreamDataProcess> streamProcess =
         std::make_shared<DCameraStreamDataProcess>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, DCStreamType::CONTINUOUS_FRAME);
     streamProcess->pipeline_ = std::make_shared<DCameraPipelineSource>();
@@ -187,6 +186,7 @@ HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_005, Tes
     streamProcess->DestroyPipeline();
     streamProcess->pipeline_ = nullptr;
     streamProcess->DestroyPipeline();
+    int32_t ret = streamProcess->GetProducerSize();
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
@@ -199,13 +199,13 @@ HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_005, Tes
 HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_006, TestSize.Level1)
 {
     DHLOGI("DCameraStreamDataProcessTest::dcamera_stream_data_process_test_006");
-    int32_t ret = 0;
     std::shared_ptr<DCameraStreamDataProcess> streamProcess =
         std::make_shared<DCameraStreamDataProcess>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, DCStreamType::CONTINUOUS_FRAME);
 
     streamProcess->GetPipelineCodecType(DCEncodeType::ENCODE_TYPE_H264);
     streamProcess->GetPipelineCodecType(DCEncodeType::ENCODE_TYPE_H265);
     streamProcess->GetPipelineCodecType(DCEncodeType::ENCODE_TYPE_NULL);
+    int32_t ret = streamProcess->GetProducerSize();
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
@@ -218,7 +218,6 @@ HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_006, Tes
 HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_007, TestSize.Level1)
 {
     DHLOGI("DCameraStreamDataProcessTest::dcamera_stream_data_process_test_007");
-    int32_t ret = 0;
     std::shared_ptr<DCameraStreamDataProcess> streamProcess1 =
         std::make_shared<DCameraStreamDataProcess>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, DCStreamType::CONTINUOUS_FRAME);
     std::shared_ptr<DCameraStreamDataProcessPipelineListener> listener1 =
@@ -235,6 +234,7 @@ HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_007, Tes
         std::make_shared<DCameraStreamDataProcessPipelineListener>(streamProcess2);
     listener2->OnProcessedVideoBuffer(buffer);
     listener2->OnError(DataProcessErrorType::ERROR_PIPELINE_ENCODER);
+    int32_t ret = streamProcess1->GetProducerSize();
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 }

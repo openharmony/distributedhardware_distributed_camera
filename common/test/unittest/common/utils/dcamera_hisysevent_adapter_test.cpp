@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -63,12 +63,12 @@ void DcameraHisyseventAdapterTest::TearDown(void)
  */
 HWTEST_F(DcameraHisyseventAdapterTest, dcamera_hisysevent_adapter_test_001, TestSize.Level1)
 {
-    int32_t value = 0;
     std::string eventName = "test001";
     int32_t errCode = 2;
     std::string errMsg = "dcamera_hisysevent_adapter_test_001";
     ReportDcamerInitFail(eventName, errCode, errMsg);
-    EXPECT_EQ(DCAMERA_OK, value);
+    std::string ret = CreateMsg(eventName.c_str());
+    EXPECT_NE(DCAMERA_OK, ret.size());
 }
 
 /**
@@ -79,14 +79,14 @@ HWTEST_F(DcameraHisyseventAdapterTest, dcamera_hisysevent_adapter_test_001, Test
  */
 HWTEST_F(DcameraHisyseventAdapterTest, dcamera_hisysevent_adapter_test_002, TestSize.Level1)
 {
-    int32_t value = 0;
     std::string eventName = "test002";
     std::string devId = "bb536a637105409e904d4da83790a4a7";
     std::string dhId = "camera01";
     std::string version = "1.0";
     std::string errMsg = "error";
     ReportRegisterCameraFail(eventName, devId, dhId, version, errMsg);
-    EXPECT_EQ(DCAMERA_OK, value);
+    std::string ret = CreateMsg(eventName.c_str());
+    EXPECT_NE(DCAMERA_OK, ret.size());
 }
 
 /**
@@ -97,14 +97,14 @@ HWTEST_F(DcameraHisyseventAdapterTest, dcamera_hisysevent_adapter_test_002, Test
  */
 HWTEST_F(DcameraHisyseventAdapterTest, dcamera_hisysevent_adapter_test_003, TestSize.Level1)
 {
-    int32_t value = 0;
     std::string eventName = "test003";
     std::string devId = "bb536a637105409e904d4da83790a4a7";
     std::string dhId = "camera01";
     std::string version = "1.0";
     std::string errMsg = "error";
     ReportRegisterCameraEvent(eventName, devId, dhId, version, errMsg);
-    EXPECT_EQ(DCAMERA_OK, value);
+    std::string ret = CreateMsg(eventName.c_str());
+    EXPECT_NE(DCAMERA_OK, ret.size());
 }
 
 /**
@@ -115,13 +115,13 @@ HWTEST_F(DcameraHisyseventAdapterTest, dcamera_hisysevent_adapter_test_003, Test
  */
 HWTEST_F(DcameraHisyseventAdapterTest, dcamera_hisysevent_adapter_test_004, TestSize.Level1)
 {
-    int32_t value = 0;
     std::string eventName = "test004";
     std::string devId = "bb536a637105409e904d4da83790a4a7";
     std::string dhId = "camera01";
     std::string errMsg = "error";
     ReportCameraOperaterEvent(eventName, devId, dhId, errMsg);
-    EXPECT_EQ(DCAMERA_OK, value);
+    std::string ret = CreateMsg(eventName.c_str());
+    EXPECT_NE(DCAMERA_OK, ret.size());
 }
 
 /**
@@ -132,7 +132,6 @@ HWTEST_F(DcameraHisyseventAdapterTest, dcamera_hisysevent_adapter_test_004, Test
  */
 HWTEST_F(DcameraHisyseventAdapterTest, dcamera_hisysevent_adapter_test_005, TestSize.Level1)
 {
-    int32_t value = 0;
     std::string eventName = "test005";
     EventCaptureInfo capture;
     capture.width_ = 640;
@@ -142,7 +141,8 @@ HWTEST_F(DcameraHisyseventAdapterTest, dcamera_hisysevent_adapter_test_005, Test
     capture.type_ = 0;
     std::string errMsg = "error";
     ReportStartCaptureEvent(eventName, capture, errMsg);
-    EXPECT_EQ(DCAMERA_OK, value);
+    std::string ret = CreateMsg(eventName.c_str());
+    EXPECT_NE(DCAMERA_OK, ret.size());
 }
 } // namespace DistributedHardware
 } // namespace OHOS
