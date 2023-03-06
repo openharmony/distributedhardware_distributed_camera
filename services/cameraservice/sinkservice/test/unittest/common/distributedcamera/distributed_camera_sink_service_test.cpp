@@ -96,7 +96,7 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_001, TestSi
     EXPECT_EQ(DCAMERA_OK, ret);
 
     ret = sinkService_->ReleaseSink();
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
 /**
@@ -117,7 +117,7 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_002, TestSi
     EXPECT_EQ(DCAMERA_OK, ret);
 
     ret = sinkService_->ReleaseSink();
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
 /**
@@ -138,7 +138,7 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_003, TestSi
     EXPECT_EQ(DCAMERA_OK, ret);
 
     ret = sinkService_->ReleaseSink();
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
 /**
@@ -159,7 +159,7 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_004, TestSi
     EXPECT_NE(DCAMERA_OK, ret);
 
     ret = sinkService_->ReleaseSink();
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
 /**
@@ -180,7 +180,7 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_005, TestSi
     EXPECT_EQ(DCAMERA_OK, ret);
 
     ret = sinkService_->ReleaseSink();
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
 /**
@@ -207,7 +207,7 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_006, TestSi
     EXPECT_EQ(DCAMERA_OK, ret);
 
     ret = sinkService_->ReleaseSink();
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
 /**
