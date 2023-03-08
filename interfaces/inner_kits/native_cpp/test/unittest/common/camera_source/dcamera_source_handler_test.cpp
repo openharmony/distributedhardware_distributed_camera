@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -133,7 +133,7 @@ HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_004, TestSize.Lev
 
     int32_t ret = DCameraSourceHandler::GetInstance().UnregisterDistributedHardware(devId, dhId, uncallback);
     ret = DCameraSourceHandler::GetInstance().ReleaseSource();
-    EXPECT_NE(DCAMERA_OK, ret);
+    EXPECT_EQ(DCAMERA_OK, ret);
 }
 
 /**

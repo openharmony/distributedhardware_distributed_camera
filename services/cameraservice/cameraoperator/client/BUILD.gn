@@ -51,11 +51,7 @@ ohos_shared_library("distributed_camera_client") {
     "src/listener/dcamera_photo_surface_listener.cpp",
   ]
 
-  if (!distributed_camera_common) {
-    sources += [ "src/dcamera_client.cpp" ]
-  } else {
-    sources += [ "src/dcamera_client_common.cpp" ]
-  }
+  sources += [ "src/dcamera_client.cpp" ]
 
   deps = [
     "${camerastandard_path}/frameworks/native/camera:camera_framework",
