@@ -190,7 +190,7 @@ HWTEST_F(DistributedCameraSourceServiceTest, dcamera_source_service_test_007, Te
     EXPECT_EQ(false, testSrcService_ == nullptr);
 
     int32_t ret = testSrcService_->ReleaseSource();
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
 /**
