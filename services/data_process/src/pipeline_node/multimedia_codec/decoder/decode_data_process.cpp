@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,11 +13,13 @@
  * limitations under the License.
  */
 
+#include "decode_data_process.h"
+
+#include "libyuv.h"
 #include "distributed_camera_constants.h"
 #include "distributed_hardware_log.h"
 #include "dcamera_hisysevent_adapter.h"
 #include "dcamera_utils_tools.h"
-#include "decode_data_process.h"
 #include "decode_surface_listener.h"
 #include "decode_video_callback.h"
 #include "graphic_common_c.h"
@@ -54,7 +56,7 @@ int32_t DecodeDataProcess::InitNode(const VideoConfigParams& sourceConfig, const
     targetConfig_ = targetConfig;
     if (sourceConfig_.GetVideoCodecType() == targetConfig_.GetVideoCodecType()) {
         DHLOGD("Disable DecodeNode. The target video codec type %d is the same as the source video codec type %d.",
-            sourceConfig_.GetVideoCodecType(), targetConfig_.GetVideoCodecType());
+            targetConfig_.GetVideoCodecType(), sourceConfig_.GetVideoCodecType());
         processedConfig_ = sourceConfig;
         processedConfig = processedConfig_;
         isDecoderProcess_.store(true);
@@ -176,29 +178,7 @@ int32_t DecodeDataProcess::InitDecoderMetadataFormat()
             return DCAMERA_NOT_FOUND;
     }
 
-    DHLOGI("Init video decoder metadata format. videoformat: %d", processedConfig_.GetVideoformat());
-    switch (processedConfig_.GetVideoformat()) {
-        case Videoformat::YUVI420:
-            metadataFormat_.PutIntValue("pixel_format", Media::VideoPixelFormat::YUVI420);
-            metadataFormat_.PutIntValue("max_input_size", MAX_YUV420_BUFFER_SIZE);
-            break;
-        case Videoformat::NV12:
-            metadataFormat_.PutIntValue("pixel_format", Media::VideoPixelFormat::NV12);
-            metadataFormat_.PutIntValue("max_input_size", MAX_YUV420_BUFFER_SIZE);
-            break;
-        case Videoformat::NV21:
-            metadataFormat_.PutIntValue("pixel_format", Media::VideoPixelFormat::NV21);
-            metadataFormat_.PutIntValue("max_input_size", MAX_YUV420_BUFFER_SIZE);
-            break;
-        case Videoformat::RGBA_8888:
-            metadataFormat_.PutIntValue("pixel_format", Media::VideoPixelFormat::RGBA);
-            metadataFormat_.PutIntValue("max_input_size", MAX_RGB32_BUFFER_SIZE);
-            break;
-        default:
-            DHLOGE("The current pixel format does not support encoding.");
-            return DCAMERA_NOT_FOUND;
-    }
-
+    metadataFormat_.PutIntValue("pixel_format", Media::VideoPixelFormat::NV12);
     metadataFormat_.PutStringValue("codec_mime", processType_);
     metadataFormat_.PutIntValue("width", sourceConfig_.GetWidth());
     metadataFormat_.PutIntValue("height", sourceConfig_.GetHeight());
@@ -541,124 +521,40 @@ void DecodeDataProcess::CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int6
         return;
     }
 
-    size_t yuvImageSize = static_cast<size_t>(sourceConfig_.GetWidth() * sourceConfig_.GetHeight() *
-                                                       YUV_BYTES_PER_PIXEL / Y2UV_RATIO);
-    std::shared_ptr<DataBuffer> bufferOutput = std::make_shared<DataBuffer>(yuvImageSize);
-    uint8_t *addr = static_cast<uint8_t *>(surBuf->GetVirAddr());
-    if (alignedWidth == sourceConfig_.GetWidth() &&
-        alignedHeight == sourceConfig_.GetHeight()) {
-        errno_t err = memcpy_s(bufferOutput->Data(), bufferOutput->Size(), addr, yuvImageSize);
-        if (err != EOK) {
-            DHLOGE("memcpy_s surface buffer failed.");
-            return;
-        }
-    } else {
-        ImageUnitInfo srcImgInfo = { processedConfig_.GetVideoformat(), sourceConfig_.GetWidth(),
-            sourceConfig_.GetHeight(), alignedWidth, alignedHeight, static_cast<size_t>(alignedWidth * alignedHeight),
-            surBuf->GetSize(), addr };
-        ImageUnitInfo dstImgInfo = { processedConfig_.GetVideoformat(), processedConfig_.GetWidth(),
-            processedConfig_.GetHeight(), processedConfig_.GetWidth(), processedConfig_.GetHeight(),
-            processedConfig_.GetWidth() * processedConfig_.GetHeight(), bufferOutput->Size(), bufferOutput->Data() };
-        int32_t retRow = CopyYUVPlaneByRow(srcImgInfo, dstImgInfo);
-        if (retRow != DCAMERA_OK) {
-            DHLOGE("memcpy_s surface buffer failed.");
-            return;
-        }
+    DHLOGD("Convert NV12 to I420, format=%d, width=[%d, %d], height=[%d, %d]", sourceConfig_.GetVideoformat(),
+        sourceConfig_.GetWidth(), alignedWidth, sourceConfig_.GetHeight(), alignedHeight);
+    int srcSizeY = alignedWidth * alignedHeight;
+    uint8_t *srcDataY = static_cast<uint8_t *>(surBuf->GetVirAddr());
+    uint8_t *srcDataUV = static_cast<uint8_t *>(surBuf->GetVirAddr()) + srcSizeY;
+
+    int dstSizeY = sourceConfig_.GetWidth() * sourceConfig_.GetHeight();
+    int dstSizeUV = (sourceConfig_.GetWidth() >> 1) * (sourceConfig_.GetHeight() >> 1);
+    std::shared_ptr<DataBuffer> bufferOutput =
+        std::make_shared<DataBuffer>(dstSizeY * YUV_BYTES_PER_PIXEL / Y2UV_RATIO);
+    uint8_t *dstDataY = bufferOutput->Data();
+    uint8_t *dstDataU = bufferOutput->Data() + dstSizeY;
+    uint8_t *dstDataV = bufferOutput->Data() + dstSizeY + dstSizeUV;
+
+    int32_t ret = libyuv::NV12ToI420(
+        srcDataY, sourceConfig_.GetWidth(),
+        srcDataUV, sourceConfig_.GetWidth(),
+        dstDataY, sourceConfig_.GetWidth(),
+        dstDataU, sourceConfig_.GetWidth() >> 1,
+        dstDataV, sourceConfig_.GetWidth() >> 1,
+        processedConfig_.GetWidth(), processedConfig_.GetHeight());
+    if (ret != DCAMERA_OK) {
+        DHLOGE("Convert NV12 to I420 failed.");
+        return;
     }
 
     bufferOutput->SetInt64(TIME_STAMP_US, timeStamp);
-    bufferOutput->SetInt32("Videoformat", static_cast<int32_t>(processedConfig_.GetVideoformat()));
+    bufferOutput->SetInt32("Videoformat", static_cast<int32_t>(Videoformat::YUVI420));
     bufferOutput->SetInt32("alignedWidth", processedConfig_.GetWidth());
     bufferOutput->SetInt32("alignedHeight", processedConfig_.GetHeight());
     bufferOutput->SetInt32("width", processedConfig_.GetWidth());
     bufferOutput->SetInt32("height", processedConfig_.GetHeight());
 
     PostOutputDataBuffers(bufferOutput);
-}
-
-int32_t DecodeDataProcess::CopyYUVPlaneByRow(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo)
-{
-    int32_t ret = CheckCopyImageInfo(srcImgInfo, dstImgInfo);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("Check CopyImageUnitInfo failed.");
-        return ret;
-    }
-
-    /* Copy YPlane by Row */
-    int32_t srcDataOffset = 0;
-    int32_t dstDataOffset = 0;
-    for (int32_t yh = 0; yh < dstImgInfo.height; yh++) {
-        errno_t err = EOK;
-        err = memcpy_s(dstImgInfo.imgData + dstDataOffset, dstImgInfo.chromaOffset - dstDataOffset,
-            srcImgInfo.imgData + srcDataOffset, dstImgInfo.width);
-        if (err != EOK) {
-            DHLOGE("memcpy_s YPlane in line[%d] failed.", yh);
-            return DCAMERA_MEMORY_OPT_ERROR;
-        }
-        dstDataOffset += dstImgInfo.alignedWidth;
-        srcDataOffset += srcImgInfo.alignedWidth;
-    }
-    DHLOGD("Copy Yplane end, dstDataOffset %d, srcDataOffset %d, validYPlaneSize %d.",
-        dstDataOffset, srcDataOffset, dstImgInfo.chromaOffset);
-
-    /* Copy UVPlane by Row */
-    dstDataOffset = dstImgInfo.chromaOffset;
-    srcDataOffset = srcImgInfo.chromaOffset;
-    for (int32_t uvh = 0; uvh < dstImgInfo.height / Y2UV_RATIO; uvh++) {
-        errno_t err = EOK;
-        err = memcpy_s(dstImgInfo.imgData + dstDataOffset, dstImgInfo.imgSize - dstDataOffset,
-            srcImgInfo.imgData + srcDataOffset, dstImgInfo.width);
-        if (err != EOK) {
-            DHLOGE("memcpy_s UVPlane in line[%d] failed.", uvh);
-            return DCAMERA_MEMORY_OPT_ERROR;
-        }
-        dstDataOffset += dstImgInfo.alignedWidth;
-        srcDataOffset += srcImgInfo.alignedWidth;
-    }
-    DHLOGD("Copy UVplane end, dstDataOffset %d, srcDataOffset %d.", dstDataOffset, srcDataOffset);
-    return DCAMERA_OK;
-}
-
-int32_t DecodeDataProcess::CheckCopyImageInfo(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo)
-{
-    if (srcImgInfo.imgData == nullptr || dstImgInfo.imgData == nullptr) {
-        DHLOGE("The imgData of srcImgInfo or the imgData of dstImgInfo are null!");
-        return DCAMERA_BAD_VALUE;
-    }
-    if (srcImgInfo.colorFormat != dstImgInfo.colorFormat) {
-        DHLOGE("CopyInfo error : srcImgInfo colorFormat %d, dstImgInfo colorFormat %d.",
-            srcImgInfo.colorFormat, dstImgInfo.colorFormat);
-        return DCAMERA_BAD_VALUE;
-    }
-
-    if (!IsCorrectImageUnitInfo(srcImgInfo)) {
-        DHLOGE("srcImginfo fail: width %d, height %d, alignedWidth %d, alignedHeight %d, chromaOffset %lld, " +
-            "imgSize %lld.", srcImgInfo.width, srcImgInfo.height, srcImgInfo.alignedWidth, srcImgInfo.alignedHeight,
-            srcImgInfo.chromaOffset, srcImgInfo.imgSize);
-        return DCAMERA_BAD_VALUE;
-    }
-    if (!IsCorrectImageUnitInfo(dstImgInfo)) {
-        DHLOGE("dstImginfo fail: width %d, height %d, alignedWidth %d, alignedHeight %d, chromaOffset %lld, " +
-            "imgSize %lld.", dstImgInfo.width, dstImgInfo.height, dstImgInfo.alignedWidth, dstImgInfo.alignedHeight,
-            dstImgInfo.chromaOffset, dstImgInfo.imgSize);
-        return DCAMERA_BAD_VALUE;
-    }
-
-    if (dstImgInfo.width > srcImgInfo.alignedWidth || dstImgInfo.height > srcImgInfo.alignedHeight) {
-        DHLOGE("Comparison ImgInfo fail: dstwidth %d, dstheight %d, srcAlignedWidth %d, srcAlignedHeight %d.",
-            dstImgInfo.width, dstImgInfo.height, srcImgInfo.alignedWidth, srcImgInfo.alignedHeight);
-        return DCAMERA_BAD_VALUE;
-    }
-    return DCAMERA_OK;
-}
-
-bool DecodeDataProcess::IsCorrectImageUnitInfo(const ImageUnitInfo& imgInfo)
-{
-    size_t expectedImgSize = static_cast<size_t>(imgInfo.alignedWidth * imgInfo.alignedHeight *
-        YUV_BYTES_PER_PIXEL / Y2UV_RATIO);
-    size_t expectedChromaOffset = static_cast<size_t>(imgInfo.alignedWidth * imgInfo.alignedHeight);
-    return (imgInfo.width <= imgInfo.alignedWidth && imgInfo.height <= imgInfo.alignedHeight &&
-        imgInfo.imgSize >= expectedImgSize && imgInfo.chromaOffset == expectedChromaOffset);
 }
 
 bool DecodeDataProcess::IsCorrectSurfaceBuffer(const sptr<SurfaceBuffer>& surBuf, int32_t alignedWidth,

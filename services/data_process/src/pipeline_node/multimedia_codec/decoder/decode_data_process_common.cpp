@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  */
 
 #include "decode_data_process.h"
-
+#include "distributed_camera_constants.h"
 #include "distributed_hardware_log.h"
 #include "graphic_common_c.h"
 
@@ -55,7 +55,7 @@ int32_t DecodeDataProcess::InitNode(const VideoConfigParams& sourceConfig, const
     targetConfig_ = targetConfig;
     if (sourceConfig_.GetVideoCodecType() == targetConfig_.GetVideoCodecType()) {
         DHLOGD("Disable DecodeNode. The target video codec type %d is the same as the source video codec type %d.",
-            sourceConfig_.GetVideoCodecType(), targetConfig_.GetVideoCodecType());
+            targetConfig_.GetVideoCodecType(), sourceConfig_.GetVideoCodecType());
         processedConfig_ = sourceConfig;
         processedConfig = processedConfig_;
         isDecoderProcess_.store(true);
@@ -548,7 +548,7 @@ void DecodeDataProcess::CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int6
         return;
     }
 
-    bufferOutput->SetInt64("timeUs", timeStampUs);
+    bufferOutput->SetInt64(TIME_STAMP_US, timeStampUs);
     bufferOutput->SetInt32("Videoformat", static_cast<int32_t>(processedConfig_.GetVideoformat()));
     bufferOutput->SetInt32("alignedWidth", processedConfig_.GetWidth());
     bufferOutput->SetInt32("alignedHeight", processedConfig_.GetHeight());

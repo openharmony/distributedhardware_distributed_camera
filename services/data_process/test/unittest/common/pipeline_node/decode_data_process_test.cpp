@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -344,7 +344,7 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_010, TestSize.Level1)
     int32_t rc = testDecodeDataProcess_->InitNode(srcParams, destParams, procConfig);
     EXPECT_EQ(rc, DCAMERA_OK);
 
-#ifdef DCAMERA_COMMON
+#ifdef DCAMERA_SUPPORT_FFMPEG
     constexpr int32_t MAX_RGB32_BUFFER_SIZE = 1920 * 1080 * 4 * 2;
     size_t capacity = MAX_RGB32_BUFFER_SIZE + 5;
     std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
