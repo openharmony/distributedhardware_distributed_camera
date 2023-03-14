@@ -26,3 +26,21 @@ int32_t GetLocalNodeDeviceInfo(const char *pkgName, NodeBasicInfo *info)
     *info = nodeBasicInfo_;
     return DH_SUCCESS;
 }
+
+int32_t StartTimeSync(const char *pkgName, const char *targetNetworkId, TimeSyncAccuracy accuracy,
+    TimeSyncPeriod period, ITimeSyncCb *cb)
+{
+    (void)pkgName;
+    (void)targetNetworkId;
+    (void)accuracy;
+    (void)period;
+    (void)cb;
+    return DH_SUCCESS;
+}
+
+int32_t StopTimeSync(const char *pkgName, const char *targetNetworkId)
+{
+    (void)pkgName;
+    (void)targetNetworkId;
+    return DH_SUCCESS;
+}

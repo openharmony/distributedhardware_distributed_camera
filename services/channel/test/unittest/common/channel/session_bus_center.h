@@ -35,6 +35,44 @@ typedef struct {
     uint16_t deviceTypeId;
 } NodeBasicInfo;
 
+typedef enum {
+    LOW_ACCURACY = 0,
+    NORMAL_ACCURACY,
+    HIGH_ACCURACY,
+    SUPER_HIGH_ACCURACY,
+    UNAVAIL_ACCURACY = 0xFFFF,
+} TimeSyncAccuracy;
+
+typedef enum {
+    SHORT_PERIOD = 0,
+    NORMAL_PERIOD,
+    LONG_PERIOD,
+} TimeSyncPeriod;
+
+typedef struct {
+    int32_t millisecond;
+    int32_t microsecond;
+    TimeSyncAccuracy accuracy;
+} TimeSyncResult;
+
+typedef enum {
+    NODE_SPECIFIC = 0,
+    ALL_LNN,
+    WRITE_RTC,
+} TimeSyncFlag;
+typedef struct {
+    TimeSyncResult result;
+    TimeSyncFlag flag;
+    union {
+        char targetNetworkId[MOCK_NETWORK_ID_BUF_LEN];
+        char masterNetworkId[MOCK_NETWORK_ID_BUF_LEN];
+    } target;
+} TimeSyncResultInfo;
+
+typedef struct {
+    void (*onTimeSyncResult)(const TimeSyncResultInfo *info, int32_t retCode);
+} ITimeSyncCb;
+
 int32_t GetLocalNodeDeviceInfo(const char *pkgName, NodeBasicInfo *info);
 #ifdef __cplusplus
 }

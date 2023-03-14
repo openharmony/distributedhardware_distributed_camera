@@ -43,13 +43,14 @@ ohos_unittest("DCameraServicesBaseTest") {
   module_out_path = module_out_path
 
   sources = [
-    "dcamera_protocol_test.cpp",
     "dcamera_capture_info_cmd_test.cpp",
     "dcamera_channel_info_cmd_test.cpp",
     "dcamera_event_cmd_test.cpp",
+    "dcamera_frame_info_test.cpp",
     "dcamera_info_cmd_test.cpp",
     "dcamera_metadata_setting_cmd_test.cpp",
     "dcamera_open_info_cmd_test.cpp",
+    "dcamera_protocol_test.cpp",
   ]
 
   configs = [ ":module_private_config" ]
@@ -58,6 +59,7 @@ ohos_unittest("DCameraServicesBaseTest") {
     "${common_path}:distributed_camera_utils",
     "${fwk_utils_path}:distributedhardwareutils",
     "${services_path}/cameraservice/sourceservice:distributed_camera_source",
+    "${services_path}/channel:distributed_camera_channel",
     "//third_party/googletest:gtest_main",
     "//third_party/jsoncpp:jsoncpp",
   ]
