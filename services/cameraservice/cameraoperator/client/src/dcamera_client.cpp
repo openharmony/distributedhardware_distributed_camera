@@ -21,6 +21,7 @@
 #include "dcamera_input_callback.h"
 #include "dcamera_manager_callback.h"
 #include "dcamera_photo_callback.h"
+#include "dcamera_preview_callback.h"
 #include "dcamera_session_callback.h"
 #include "dcamera_utils_tools.h"
 #include "dcamera_video_callback.h"
@@ -168,7 +169,7 @@ void DCameraClient::FindCameraMetadata(const std::string& metadataStr)
 int32_t DCameraClient::StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos)
 {
     DHLOGI("DCameraClient::StartCapture cameraId: %s", GetAnonyString(cameraId_).c_str());
-    if ((photoOutput_ == nullptr) && (videoOutput_ == nullptr)) {
+    if ((photoOutput_ == nullptr) && (previewOutput_ == nullptr)) {
         DHLOGI("DCameraClient::StartCapture %s config capture session", GetAnonyString(cameraId_).c_str());
         int32_t ret = ConfigCaptureSession(captureInfos);
         if (ret != DCAMERA_OK) {
@@ -179,7 +180,7 @@ int32_t DCameraClient::StartCapture(std::vector<std::shared_ptr<DCameraCaptureIn
     }
 
     for (auto& info : captureInfos) {
-        if (!(info->isCapture_)) {
+        if ((info->streamType_ == CONTINUOUS_FRAME) || (!info->isCapture_)) {
             continue;
         }
         int32_t ret = StartCaptureInner(info);
@@ -206,21 +207,6 @@ int32_t DCameraClient::CameraServiceErrorType(const int32_t errorType)
 int32_t DCameraClient::StopCapture()
 {
     DHLOGI("DCameraClient::StopCapture cameraId: %s", GetAnonyString(cameraId_).c_str());
-    if (videoOutput_ != nullptr) {
-        DHLOGI("DCameraClient::StopCapture %s stop videoOutput", GetAnonyString(cameraId_).c_str());
-        int32_t ret = ((sptr<CameraStandard::VideoOutput> &)videoOutput_)->Stop();
-        if (ret != DCAMERA_OK) {
-            DHLOGE("DCameraClient::StopCapture videoOutput stop failed, cameraId: %s, ret: %d",
-                   GetAnonyString(cameraId_).c_str(), ret);
-        }
-        DHLOGI("DCameraClient::StopCapture %s release videoOutput", GetAnonyString(cameraId_).c_str());
-        ret = videoOutput_->Release();
-        if (ret != DCAMERA_OK) {
-            DHLOGE("DCameraClient::StopCapture videoOutput Release failed, cameraId: %s, ret: %d",
-                   GetAnonyString(cameraId_).c_str(), ret);
-        }
-        videoOutput_ = nullptr;
-    }
 
     if (photoOutput_ != nullptr) {
         DHLOGI("DCameraClient::StopCapture %s release photoOutput", GetAnonyString(cameraId_).c_str());
@@ -266,6 +252,7 @@ int32_t DCameraClient::StopCapture()
         photoSurface_ = nullptr;
     }
 
+    previewOutput_ = nullptr;
     DHLOGI("DCameraClient::StopCapture %s success", GetAnonyString(cameraId_).c_str());
     return DCAMERA_OK;
 }
@@ -390,8 +377,8 @@ int32_t DCameraClient::ConfigCaptureSessionInner()
         }
     }
 
-    if (videoOutput_ != nullptr) {
-        ret = captureSession_->AddOutput(videoOutput_);
+    if (previewOutput_ != nullptr) {
+        ret = captureSession_->AddOutput(previewOutput_);
         if (ret != DCAMERA_OK) {
             DHLOGE("DCameraClient::ConfigCaptureSession %s add videoOutput to captureSession failed, ret: %d",
                    GetAnonyString(cameraId_).c_str(), ret);
@@ -481,19 +468,18 @@ int32_t DCameraClient::CreateVideoOutput(std::shared_ptr<DCameraCaptureInfo>& in
     videoSurface_->SetUserData(CAMERA_SURFACE_FORMAT, std::to_string(info->format_));
     videoListener_ = new DCameraVideoSurfaceListener(videoSurface_, resultCallback_);
     videoSurface_->RegisterConsumerListener((sptr<IBufferConsumerListener> &)videoListener_);
-    CameraStandard::CameraFormat videoFormat = ConvertToCameraFormat(info->format_);
-    CameraStandard::Size videoSize = {info->width_, info->height_};
-    std::vector<int32_t> framerates = {};
-    CameraStandard::VideoProfile videoSettings(videoFormat, videoSize, framerates);
-    int rv = cameraManager_->CreateVideoOutput(
-        videoSettings, videoSurface_, &((sptr<CameraStandard::VideoOutput> &)videoOutput_));
+    CameraStandard::CameraFormat previewFormat = ConvertToCameraFormat(info->format_);
+    CameraStandard::Size previewSize = {info->width_, info->height_};
+    CameraStandard::Profile previewProfile(previewFormat, previewSize);
+    int rv = cameraManager_->CreatePreviewOutput(
+        previewProfile, videoSurface_, &((sptr<CameraStandard::PreviewOutput> &)previewOutput_));
     if (rv != DCAMERA_OK) {
-        DHLOGE("DCameraClient::CreateVideoOutput %s create video output failed", GetAnonyString(cameraId_).c_str());
+        DHLOGE("DCameraClient::CreatePreviewOutput %s create video output failed", GetAnonyString(cameraId_).c_str());
         return DCAMERA_BAD_VALUE;
     }
-    std::shared_ptr<DCameraVideoCallback> videoCallback = std::make_shared<DCameraVideoCallback>(stateCallback_);
-    ((sptr<CameraStandard::VideoOutput> &)videoOutput_)->SetCallback(videoCallback);
-    DHLOGI("DCameraClient::CreateVideoOutput %s success", GetAnonyString(cameraId_).c_str());
+    std::shared_ptr<DCameraPreviewCallback> previewCallback = std::make_shared<DCameraPreviewCallback>(stateCallback_);
+    ((sptr<CameraStandard::PreviewOutput> &)previewOutput_)->SetCallback(previewCallback);
+    DHLOGI("DCameraClient::CreateVideoOutput preview output %s success", GetAnonyString(cameraId_).c_str());
     return DCAMERA_OK;
 }
 
