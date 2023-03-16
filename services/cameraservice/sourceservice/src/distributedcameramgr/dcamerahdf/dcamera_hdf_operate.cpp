@@ -15,7 +15,7 @@
 
 #include "dcamera_hdf_operate.h"
 
-#include <hdf_io_service_if.h>
+#include <hdf_device_class.h>
 
 #include "anonymous_string.h"
 #include "distributed_camera_errno.h"
