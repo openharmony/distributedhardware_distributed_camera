@@ -357,13 +357,13 @@ void DCameraStreamDataProcessProducer::ControlDisplay(const int64_t timeStamp, c
  */
 void DCameraStreamDataProcessProducer::AdjustSleep(const int64_t duration)
 {
-    const int64_t adjustThre_ = duration * ADJUST_SLEEP_FACTOR;
-    if (delta_ > adjustThre_ && sleep_ > 0) {
-        int64_t sleep = sleep_ - adjustThre_;
-        delta_ -= (sleep < 0) ? sleep_ : adjustThre_;
+    const int64_t adjustThre = duration * ADJUST_SLEEP_FACTOR;
+    if (delta_ > adjustThre && sleep_ > 0) {
+        int64_t sleep = sleep_ - adjustThre;
+        delta_ -= (sleep < 0) ? sleep_ : adjustThre;
         sleep_ = sleep;
         DHLOGD("Delta more than thre, adjust sleep to %ld us.", sleep_);
-    } else if (delta_ < -adjustThre_) {
+    } else if (delta_ < -adjustThre) {
         sleep_ += delta_;
         delta_ = 0;
         DHLOGD("Delta less than negative thre, adjust sleep to %ld us.", sleep_);
@@ -377,10 +377,10 @@ void DCameraStreamDataProcessProducer::AdjustSleep(const int64_t duration)
 int64_t DCameraStreamDataProcessProducer::SyncClock(const int64_t timeStamp, const int64_t duration,
     const int64_t clock)
 {
-    const int64_t waitThre_ = duration * WAIT_CLOCK_FACTOR;
-    const int64_t trackThre_ = duration * TRACK_CLOCK_FACTOR;
+    const int64_t waitThre = duration * WAIT_CLOCK_FACTOR;
+    const int64_t trackThre = duration * TRACK_CLOCK_FACTOR;
     int64_t offset = timeStamp - sleep_ - clock;
-    if (offset > waitThre_ || offset < -trackThre_) {
+    if (offset > waitThre || offset < -trackThre) {
         sleep_ += offset;
         DHLOGD("Offset is not in the threshold range, adjust sleep to %ld us.", sleep_);
     }
@@ -398,15 +398,15 @@ int64_t DCameraStreamDataProcessProducer::SyncClock(const int64_t timeStamp, con
 void DCameraStreamDataProcessProducer::LocateBaseline(const int64_t timeStamp, const int64_t duration,
     const int64_t offset)
 {
-    const uint8_t normalSize_ = displayBufferSize_ + 1;
-    const int64_t offsetThre_ = duration * OFFSET_FACTOR;
-    const int64_t normalSleepThre_ = duration * NORMAL_SLEEP_FACTOR;
-    const int64_t abnormalSleepThre_ = duration * ABNORMAL_SLEEP_FACTOR;
+    const uint8_t normalSize = displayBufferSize_ + 1;
+    const int64_t offsetThre = duration * OFFSET_FACTOR;
+    const int64_t normalSleepThre = duration * NORMAL_SLEEP_FACTOR;
+    const int64_t abnormalSleepThre = duration * ABNORMAL_SLEEP_FACTOR;
     {
         std::lock_guard<std::mutex> lock(bufferMutex_);
         uint8_t size = buffers_.size();
         DHLOGD("Buffers curSize is %d.", size);
-        if (size > normalSize_ && offset > -offsetThre_ && sleep_ > normalSleepThre_) {
+        if (size > normalSize && offset > -offsetThre && sleep_ > normalSleepThre) {
             minusCount_++;
         } else {
             minusCount_ = 0;
@@ -416,21 +416,21 @@ void DCameraStreamDataProcessProducer::LocateBaseline(const int64_t timeStamp, c
             finetuneTime_ = GetNowTimeStampUs();
             needFinetune_.store(true);
             int64_t time = 0;
-            buffers_.at(size - normalSize_)->FindInt64(TIME_STAMP_US, time);
+            buffers_.at(size - normalSize)->FindInt64(TIME_STAMP_US, time);
             time -= timeStamp;
             sysTimeBaseline_ -= time;
             minusCount_ = 0;
             DHLOGD("MinusCount more than minus thre, minus %ld us.", time);
         }
 
-        if (size == normalSize_ && offset > -offsetThre_ && sleep_ < abnormalSleepThre_) {
+        if (size == normalSize && offset > -offsetThre && sleep_ < abnormalSleepThre) {
             plusCount_++;
         } else {
             plusCount_ = 0;
         }
 
         if (plusCount_ >= PLUS_THRE) {
-            int64_t time = normalSleepThre_ - sleep_;
+            int64_t time = normalSleepThre - sleep_;
             sysTimeBaseline_ += time;
             plusCount_ = 0;
             DHLOGD("PlusCount more than plus thre, plus %ld us.", time);

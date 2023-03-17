@@ -241,5 +241,299 @@ HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_produ
     ret = streamProcess->CheckSharedMemory(sharedMemory, buffer);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
+
+/**
+ * @tc.name: dcamera_stream_data_process_producer_test_008
+ * @tc.desc: Verify ControlFrameRate func.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_producer_test_008, TestSize.Level1)
+{
+    DHLOGI("DCameraStreamDataProcessProducerTest::dcamera_stream_data_process_producer_test_008");
+    int32_t streamId = 1;
+    size_t capacity = 1;
+    int64_t timeStamp = 421476047;
+    std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(capacity);
+    std::shared_ptr<DCameraStreamDataProcessProducer> streamProcess =
+        std::make_shared<DCameraStreamDataProcessProducer>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, streamId,
+        DCStreamType::CONTINUOUS_FRAME);
+    DCameraBuffer sharedMemory;
+    sharedMemory.index_ = 1;
+    sharedMemory.size_ = 1;
+    BufferHandle *bufferHandle = new BufferHandle();
+    sharedMemory.bufferHandle_ = new NativeBuffer(bufferHandle);
+    int32_t ret = streamProcess->CheckSharedMemory(sharedMemory, buffer);
+
+    streamProcess->ControlFrameRate(timeStamp);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_stream_data_process_producer_test_009
+ * @tc.desc: Verify InitTime func.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_producer_test_009, TestSize.Level1)
+{
+    DHLOGI("DCameraStreamDataProcessProducerTest::dcamera_stream_data_process_producer_test_009");
+    int32_t streamId = 1;
+    size_t capacity = 1;
+    int64_t timeStamp = 421476047;
+    std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(capacity);
+    std::shared_ptr<DCameraStreamDataProcessProducer> streamProcess =
+        std::make_shared<DCameraStreamDataProcessProducer>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, streamId,
+        DCStreamType::CONTINUOUS_FRAME);
+    DCameraBuffer sharedMemory;
+    sharedMemory.index_ = 1;
+    sharedMemory.size_ = 1;
+    BufferHandle *bufferHandle = new BufferHandle();
+    sharedMemory.bufferHandle_ = new NativeBuffer(bufferHandle);
+    int32_t ret = streamProcess->CheckSharedMemory(sharedMemory, buffer);
+    streamProcess->lastTimeStamp_ = timeStamp;
+    streamProcess->InitTime(timeStamp);
+
+    streamProcess->lastTimeStamp_ = 0;
+    streamProcess->InitTime(timeStamp);
+
+    streamProcess->lastTimeStamp_ = timeStamp + 1;
+    streamProcess->InitTime(timeStamp);
+
+    streamProcess->sysTimeBaseline_ = 0;
+    streamProcess->InitTime(timeStamp);
+
+    streamProcess->sysTimeBaseline_ = timeStamp;
+    streamProcess->InitTime(timeStamp);
+
+    streamProcess->leaveTime_ = 0;
+    streamProcess->InitTime(timeStamp);
+
+    streamProcess->leaveTime_ = timeStamp;
+    streamProcess->InitTime(timeStamp);
+
+    streamProcess->lastEnterTime_ = 0;
+    streamProcess->InitTime(timeStamp);
+
+    streamProcess->lastEnterTime_ = timeStamp;
+    streamProcess->InitTime(timeStamp);
+
+    streamProcess->timeStampBaseline_ = 0;
+    streamProcess->InitTime(timeStamp);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_stream_data_process_producer_test_010
+ * @tc.desc: Verify ControlDisplay func.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_producer_test_010, TestSize.Level1)
+{
+    DHLOGI("DCameraStreamDataProcessProducerTest::dcamera_stream_data_process_producer_test_010");
+    int32_t streamId = 1;
+    size_t capacity = 1;
+    int64_t timeStamp = 421476047;
+    std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(capacity);
+    std::shared_ptr<DCameraStreamDataProcessProducer> streamProcess =
+        std::make_shared<DCameraStreamDataProcessProducer>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, streamId,
+        DCStreamType::CONTINUOUS_FRAME);
+    DCameraBuffer sharedMemory;
+    sharedMemory.index_ = 1;
+    sharedMemory.size_ = 1;
+    BufferHandle *bufferHandle = new BufferHandle();
+    sharedMemory.bufferHandle_ = new NativeBuffer(bufferHandle);
+    int32_t ret = streamProcess->CheckSharedMemory(sharedMemory, buffer);
+    int64_t duration = 100;
+    int64_t clock = 1;
+    streamProcess->ControlDisplay(timeStamp, duration, clock);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_stream_data_process_producer_test_011
+ * @tc.desc: Verify AdjustSleep func.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_producer_test_011, TestSize.Level1)
+{
+    DHLOGI("DCameraStreamDataProcessProducerTest::dcamera_stream_data_process_producer_test_011");
+    int32_t streamId = 1;
+    size_t capacity = 1;
+    std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(capacity);
+    std::shared_ptr<DCameraStreamDataProcessProducer> streamProcess =
+        std::make_shared<DCameraStreamDataProcessProducer>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, streamId,
+        DCStreamType::CONTINUOUS_FRAME);
+    DCameraBuffer sharedMemory;
+    sharedMemory.index_ = 1;
+    sharedMemory.size_ = 1;
+    BufferHandle *bufferHandle = new BufferHandle();
+    sharedMemory.bufferHandle_ = new NativeBuffer(bufferHandle);
+    int32_t ret = streamProcess->CheckSharedMemory(sharedMemory, buffer);
+    int64_t duration = 100;
+
+    streamProcess->AdjustSleep(duration);
+
+    streamProcess->delta_ = duration;
+    streamProcess->sleep_ = 0;
+    streamProcess->AdjustSleep(duration);
+
+    streamProcess->delta_ = duration - 1;
+    streamProcess->sleep_ = 1;
+    streamProcess->AdjustSleep(duration);
+
+    streamProcess->delta_ = -100;
+    streamProcess->sleep_ = 1;
+    streamProcess->AdjustSleep(duration);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_stream_data_process_producer_test_012
+ * @tc.desc: Verify SyncClock func.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_producer_test_012, TestSize.Level1)
+{
+    DHLOGI("DCameraStreamDataProcessProducerTest::dcamera_stream_data_process_producer_test_012");
+    int32_t streamId = 1;
+    size_t capacity = 1;
+    int64_t timeStamp = 421476047;
+    std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(capacity);
+    std::shared_ptr<DCameraStreamDataProcessProducer> streamProcess =
+        std::make_shared<DCameraStreamDataProcessProducer>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, streamId,
+        DCStreamType::CONTINUOUS_FRAME);
+    DCameraBuffer sharedMemory;
+    sharedMemory.index_ = 1;
+    sharedMemory.size_ = 1;
+    BufferHandle *bufferHandle = new BufferHandle();
+    sharedMemory.bufferHandle_ = new NativeBuffer(bufferHandle);
+    int32_t ret = streamProcess->CheckSharedMemory(sharedMemory, buffer);
+    int64_t duration = 100;
+    int64_t clock = 1;
+
+    streamProcess->sleep_ = duration;
+    streamProcess->SyncClock(timeStamp, duration, clock);
+
+    streamProcess->sleep_ = -1;
+    duration = -100;
+    timeStamp = 1;
+    streamProcess->SyncClock(timeStamp, duration, clock);
+
+    timeStamp = -10;
+    clock = 1;
+    streamProcess->SyncClock(timeStamp, duration, clock);
+
+    duration = -10;
+    streamProcess->SyncClock(timeStamp, duration, clock);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_stream_data_process_producer_test_013
+ * @tc.desc: Verify LocateBaseline func.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_producer_test_013, TestSize.Level1)
+{
+    DHLOGI("DCameraStreamDataProcessProducerTest::dcamera_stream_data_process_producer_test_013");
+    int32_t streamId = 1;
+    size_t capacity = 1;
+    int64_t timeStamp = 421476047;
+    std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(capacity);
+    std::shared_ptr<DCameraStreamDataProcessProducer> streamProcess =
+        std::make_shared<DCameraStreamDataProcessProducer>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, streamId,
+        DCStreamType::CONTINUOUS_FRAME);
+    DCameraBuffer sharedMemory;
+    sharedMemory.index_ = 1;
+    sharedMemory.size_ = 1;
+    BufferHandle *bufferHandle = new BufferHandle();
+    sharedMemory.bufferHandle_ = new NativeBuffer(bufferHandle);
+    int32_t ret = streamProcess->CheckSharedMemory(sharedMemory, buffer);
+    int64_t duration = 100;
+    int64_t offset = 1;
+
+    streamProcess->buffers_.push_back(buffer);
+    streamProcess->displayBufferSize_ = 2;
+    streamProcess->sleep_ = duration;
+    streamProcess->LocateBaseline(timeStamp, duration, offset);
+
+    streamProcess->sleep_ = duration;
+    streamProcess->LocateBaseline(timeStamp, duration, offset);
+
+    streamProcess->buffers_.push_back(buffer);
+    streamProcess->displayBufferSize_ = 0;
+    streamProcess->sleep_ = 1;
+    offset = -duration;
+    streamProcess->LocateBaseline(timeStamp, duration, offset);
+
+    offset = duration;
+    streamProcess->sleep_ = 1;
+    streamProcess->LocateBaseline(timeStamp, duration, offset);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_stream_data_process_producer_test_014
+ * @tc.desc: Verify FinetuneBaseline func.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_producer_test_014, TestSize.Level1)
+{
+    DHLOGI("DCameraStreamDataProcessProducerTest::dcamera_stream_data_process_producer_test_014");
+    int32_t streamId = 1;
+    size_t capacity = 1;
+    int64_t timeStamp = 421476047;
+    std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(capacity);
+    std::shared_ptr<DCameraStreamDataProcessProducer> streamProcess =
+        std::make_shared<DCameraStreamDataProcessProducer>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, streamId,
+        DCStreamType::CONTINUOUS_FRAME);
+    DCameraBuffer sharedMemory;
+    sharedMemory.index_ = 1;
+    sharedMemory.size_ = 1;
+    BufferHandle *bufferHandle = new BufferHandle();
+    sharedMemory.bufferHandle_ = new NativeBuffer(bufferHandle);
+    int32_t ret = streamProcess->CheckSharedMemory(sharedMemory, buffer);
+
+    streamProcess->needFinetune_.store(true);
+    streamProcess->FinetuneBaseline(timeStamp);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_stream_data_process_producer_test_015
+ * @tc.desc: Verify CalculateAverFeedInterval func.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_producer_test_015, TestSize.Level1)
+{
+    DHLOGI("DCameraStreamDataProcessProducerTest::dcamera_stream_data_process_producer_test_015");
+    int32_t streamId = 1;
+    size_t capacity = 1;
+    int64_t timeStamp = 421476047;
+    std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(capacity);
+    std::shared_ptr<DCameraStreamDataProcessProducer> streamProcess =
+        std::make_shared<DCameraStreamDataProcessProducer>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, streamId,
+        DCStreamType::CONTINUOUS_FRAME);
+    DCameraBuffer sharedMemory;
+    sharedMemory.index_ = 1;
+    sharedMemory.size_ = 1;
+    BufferHandle *bufferHandle = new BufferHandle();
+    sharedMemory.bufferHandle_ = new NativeBuffer(bufferHandle);
+    int32_t ret = streamProcess->CheckSharedMemory(sharedMemory, buffer);
+
+    streamProcess->feedTime_ = 0;
+    streamProcess->CalculateAverFeedInterval(timeStamp);
+
+    streamProcess->feedTime_ = 1;
+    streamProcess->CalculateAverFeedInterval(timeStamp);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
 }
 }
