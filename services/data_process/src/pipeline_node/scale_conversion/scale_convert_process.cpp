@@ -271,25 +271,25 @@ int32_t ScaleConvertProcess::ConvertResolution(ImageUnitInfo& srcImgInfo, ImageU
     DHLOGD("Convert I420 Scale: format=%d, width=[%d, %d], height=[%d, %d]", srcImgInfo.colorFormat,
         srcImgInfo.width, srcImgInfo.alignedWidth, srcImgInfo.height, srcImgInfo.alignedHeight);
     int srcSizeY = srcImgInfo.width * srcImgInfo.height;
-    int srcSizeUV = (srcImgInfo.width >> 1) * (srcImgInfo.height >> 1);
+    int srcSizeUV = (static_cast<uint32_t>(srcImgInfo.width) >> 1) * (static_cast<uint32_t>(srcImgInfo.height >> 1));
     uint8_t *srcDataY = srcImgInfo.imgData->Data();
     uint8_t *srcDataU = srcImgInfo.imgData->Data() + srcSizeY;
     uint8_t *srcDataV = srcImgInfo.imgData->Data() + srcSizeY + srcSizeUV;
 
     int dstSizeY = dstImgInfo.width * dstImgInfo.height;
-    int dstSizeUV = (dstImgInfo.width >> 1) * (dstImgInfo.height >> 1);
+    int dstSizeUV = (static_cast<uint32_t>(srcImgInfo.width) >> 1) * (static_cast<uint32_t>(srcImgInfo.height) >> 1);
     uint8_t *dstDataY = dstBuf->Data();
     uint8_t *dstDataU = dstBuf->Data() + dstSizeY;
     uint8_t *dstDataV = dstBuf->Data() + dstSizeY + dstSizeUV;
 
     int32_t ret = libyuv::I420Scale(
         srcDataY, srcImgInfo.width,
-        srcDataU, srcImgInfo.width >> 1,
-        srcDataV, srcImgInfo.width >> 1,
+        srcDataU, static_cast<uint32_t>(srcImgInfo.width) >> 1,
+        srcDataV, static_cast<uint32_t>(srcImgInfo.width) >> 1,
         srcImgInfo.width, srcImgInfo.height,
         dstDataY, dstImgInfo.width,
-        dstDataU, dstImgInfo.width >> 1,
-        dstDataV, dstImgInfo.width >> 1,
+        dstDataU, static_cast<uint32_t>(srcImgInfo.width) >> 1,
+        dstDataV, static_cast<uint32_t>(srcImgInfo.width) >> 1,
         dstImgInfo.width, dstImgInfo.height,
         libyuv::FilterMode::kFilterNone);
     if (ret != DCAMERA_OK) {
@@ -301,7 +301,7 @@ int32_t ScaleConvertProcess::ConvertResolution(ImageUnitInfo& srcImgInfo, ImageU
     srcImgInfo.height = dstImgInfo.height;
     srcImgInfo.alignedWidth = dstImgInfo.alignedWidth;
     srcImgInfo.alignedHeight = dstImgInfo.alignedHeight;
-    srcImgInfo.chromaOffset = srcImgInfo.alignedWidth * srcImgInfo.alignedHeight;
+    srcImgInfo.chromaOffset = static_cast<size_t>(srcImgInfo.alignedWidth * srcImgInfo.alignedHeight);
     srcImgInfo.imgSize = dstBuf->Size();
 
     DHLOGD("Convert I420 scale success.");
@@ -319,7 +319,7 @@ int32_t ScaleConvertProcess::ConvertFormatToNV21(ImageUnitInfo& srcImgInfo, Imag
     DHLOGD("Convert I420 to NV21: format=%d, width=[%d, %d], height=[%d, %d]", srcImgInfo.colorFormat,
         srcImgInfo.width, srcImgInfo.alignedWidth, srcImgInfo.height, srcImgInfo.alignedHeight);
     int srcSizeY = srcImgInfo.width * srcImgInfo.height;
-    int srcSizeUV = (srcImgInfo.width >> 1) * (srcImgInfo.height >> 1);
+    int srcSizeUV = (static_cast<uint32_t>(srcImgInfo.width) >> 1) * (static_cast<uint32_t>(srcImgInfo.height >> 1));
     uint8_t *srcDataY = dstBuf->Data();
     uint8_t *srcDataU = dstBuf->Data() + srcSizeY;
     uint8_t *srcDataV = dstBuf->Data() + srcSizeY + srcSizeUV;
@@ -330,8 +330,8 @@ int32_t ScaleConvertProcess::ConvertFormatToNV21(ImageUnitInfo& srcImgInfo, Imag
 
     int32_t ret = libyuv::I420ToNV21(
         srcDataY, srcImgInfo.width,
-        srcDataU, srcImgInfo.width >> 1,
-        srcDataV, srcImgInfo.width >> 1,
+        srcDataU, static_cast<uint32_t>(srcImgInfo.width) >> 1,
+        srcDataV, static_cast<uint32_t>(srcImgInfo.width) >> 1,
         dstDataY, dstImgInfo.width,
         dstDataUV, dstImgInfo.width,
         dstImgInfo.width, dstImgInfo.height);
@@ -355,7 +355,7 @@ int32_t ScaleConvertProcess::ConvertFormatToRGBA(ImageUnitInfo& srcImgInfo, Imag
     DHLOGI("Convert I420 to RGBA: format=%d, width=[%d, %d], height=[%d, %d]", srcImgInfo.colorFormat,
         srcImgInfo.width, srcImgInfo.alignedWidth, srcImgInfo.height, srcImgInfo.alignedHeight);
     int srcSizeY = srcImgInfo.width * srcImgInfo.height;
-    int srcSizeUV = (srcImgInfo.width >> 1) * (srcImgInfo.height >> 1);
+    int srcSizeUV = (static_cast<uint32_t>(srcImgInfo.width) >> 1) * (static_cast<uint32_t>(srcImgInfo.height >> 1));
     uint8_t *srcDataY = dstBuf->Data();
     uint8_t *srcDataU = dstBuf->Data() + srcSizeY;
     uint8_t *srcDataV = dstBuf->Data() + srcSizeY + srcSizeUV;
@@ -363,8 +363,8 @@ int32_t ScaleConvertProcess::ConvertFormatToRGBA(ImageUnitInfo& srcImgInfo, Imag
     uint8_t *dstDataRGBA = dstImgInfo.imgData->Data();
     int32_t ret = libyuv::I420ToRGBA(
         srcDataY, srcImgInfo.width,
-        srcDataU, srcImgInfo.width >> 1,
-        srcDataV, srcImgInfo.width >> 1,
+        srcDataU, static_cast<uint32_t>(srcImgInfo.width) >> 1,
+        srcDataV, static_cast<uint32_t>(srcImgInfo.width) >> 1,
         dstDataRGBA, dstImgInfo.width * RGB32_MEMORY_COEFFICIENT,
         dstImgInfo.width, dstImgInfo.height);
     if (ret != DCAMERA_OK) {
