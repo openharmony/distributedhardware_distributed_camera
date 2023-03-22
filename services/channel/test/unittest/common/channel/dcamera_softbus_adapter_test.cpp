@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -176,6 +176,8 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_006, TestSize.L
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);
     int32_t sessionId = 2;
+    ret = DCameraSoftbusAdapter::GetInstance().SendSofbusStream(sessionId, dataBuffer);
+    dataBuffer->SetInt64(TIME_STAMP_US, 1);
     ret = DCameraSoftbusAdapter::GetInstance().SendSofbusStream(sessionId, dataBuffer);
     DCameraSoftbusAdapter::GetInstance().DestroySoftbusSessionServer(sessionName);
     EXPECT_EQ(DCAMERA_OK, ret);
@@ -805,6 +807,40 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_031, TestSize.L
     DCameraSoftbusAdapter::GetInstance().sessionTotal_[sessionName] = 1;
     int32_t ret = DCameraSoftbusAdapter::GetInstance().CreateSoftbusSessionServer(sessionName, role);
     EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_032
+ * @tc.desc: Verify the CreateSoftbusSessionServer function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_032, TestSize.Level1)
+{
+    size_t capacity = 1;
+    std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);
+    std::string buff01 = R"({
+        "type": 0,
+        "index": 1,
+        "pts": 1,
+        "encodeT": 1,
+        "sendT": 1,
+        "ver": "test",
+    })";
+    StreamData test01;
+    test01.buf = const_cast<char *>(buff01.c_str());
+    test01.bufLen = buff01.size();
+    StreamData *data = &test01;
+    int32_t ret = DCameraSoftbusAdapter::GetInstance().HandleSourceStreamExt(dataBuffer, data);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    test01.bufLen = 0;
+    ret = DCameraSoftbusAdapter::GetInstance().HandleSourceStreamExt(dataBuffer, data);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    test01.bufLen = DCAMERA_MAX_RECV_EXT_LEN + 1;
+    ret = DCameraSoftbusAdapter::GetInstance().HandleSourceStreamExt(dataBuffer, data);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 }
 }
