@@ -536,8 +536,8 @@ void DecodeDataProcess::CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int6
     uint8_t *dstDataV = bufferOutput->Data() + dstSizeY + dstSizeUV;
 
     int32_t ret = libyuv::NV12ToI420(
-        srcDataY, sourceConfig_.GetWidth(),
-        srcDataUV, sourceConfig_.GetWidth(),
+        srcDataY, alignedWidth,
+        srcDataUV, alignedWidth,
         dstDataY, sourceConfig_.GetWidth(),
         dstDataU, sourceConfig_.GetWidth() >> 1,
         dstDataV, sourceConfig_.GetWidth() >> 1,

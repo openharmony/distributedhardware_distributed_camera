@@ -277,7 +277,7 @@ int32_t ScaleConvertProcess::ConvertResolution(ImageUnitInfo& srcImgInfo, ImageU
     uint8_t *srcDataV = srcImgInfo.imgData->Data() + srcSizeY + srcSizeUV;
 
     int dstSizeY = dstImgInfo.width * dstImgInfo.height;
-    int dstSizeUV = (static_cast<uint32_t>(srcImgInfo.width) >> 1) * (static_cast<uint32_t>(srcImgInfo.height) >> 1);
+    int dstSizeUV = (static_cast<uint32_t>(dstImgInfo.width) >> 1) * (static_cast<uint32_t>(dstImgInfo.height) >> 1);
     uint8_t *dstDataY = dstBuf->Data();
     uint8_t *dstDataU = dstBuf->Data() + dstSizeY;
     uint8_t *dstDataV = dstBuf->Data() + dstSizeY + dstSizeUV;
@@ -288,8 +288,8 @@ int32_t ScaleConvertProcess::ConvertResolution(ImageUnitInfo& srcImgInfo, ImageU
         srcDataV, static_cast<uint32_t>(srcImgInfo.width) >> 1,
         srcImgInfo.width, srcImgInfo.height,
         dstDataY, dstImgInfo.width,
-        dstDataU, static_cast<uint32_t>(srcImgInfo.width) >> 1,
-        dstDataV, static_cast<uint32_t>(srcImgInfo.width) >> 1,
+        dstDataU, static_cast<uint32_t>(dstImgInfo.width) >> 1,
+        dstDataV, static_cast<uint32_t>(dstImgInfo.width) >> 1,
         dstImgInfo.width, dstImgInfo.height,
         libyuv::FilterMode::kFilterNone);
     if (ret != DCAMERA_OK) {
