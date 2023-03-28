@@ -221,7 +221,7 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_007, TestSi
     DHLOGI("dcamera_sink_service_test_007");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
-    int32_t fd = 0;
+    int32_t fd = 1;
     std::vector<std::u16string> args;
     std::u16string str(u"");
     args.push_back(str);

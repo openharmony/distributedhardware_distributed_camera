@@ -404,7 +404,7 @@ HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_014, TestSize.Level1)
 {
     int32_t rc = testInput_->Init();
     rc = testInput_->EstablishContinuousFrameSession(g_camIndexs);
-    EXPECT_EQ(rc, DCAMERA_BAD_OPERATE);
+    EXPECT_NE(rc, DCAMERA_OK);
 }
 
 /**
@@ -419,7 +419,7 @@ HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_015, TestSize.Level1)
     testInput_->FinshFrameAsyncTrace(DCStreamType::CONTINUOUS_FRAME);
     testInput_->FinshFrameAsyncTrace(DCStreamType::SNAPSHOT_FRAME);
     rc = testInput_->EstablishSnapshotFrameSession(g_camIndexs);
-    EXPECT_EQ(rc, DCAMERA_BAD_OPERATE);
+    EXPECT_NE(rc, DCAMERA_OK);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

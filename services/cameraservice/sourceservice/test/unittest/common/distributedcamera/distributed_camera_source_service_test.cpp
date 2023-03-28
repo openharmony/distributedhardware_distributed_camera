@@ -115,7 +115,7 @@ HWTEST_F(DistributedCameraSourceServiceTest, dcamera_source_service_test_003, Te
     DHLOGI("DistributedCameraSourceServiceTest::dcamera_source_service_test_003");
     EXPECT_EQ(false, testSrcService_ == nullptr);
 
-    int32_t fd = 0;
+    int32_t fd = 1;
     std::vector<std::u16string> args;
     std::u16string str(u"");
     args.push_back(str);
