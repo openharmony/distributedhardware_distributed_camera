@@ -81,6 +81,7 @@ HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_001, TestSize.Level
                                  TEST_HEIGTH);
     int32_t rc = testSinkPipeline_->CreateDataProcessPipeline(PipelineType::VIDEO, srcParams, destParams, listener);
     EXPECT_EQ(rc, DCAMERA_OK);
+    usleep(SLEEP_TIME);
 }
 
 /**
@@ -141,6 +142,7 @@ HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_003, TestSize.Level
     int32_t rc = testSinkPipeline_->CreateDataProcessPipeline(
         PipelineType::PHOTO_JPEG, srcParams, destParams, listener);
     EXPECT_EQ(rc, DCAMERA_NOT_FOUND);
+    usleep(SLEEP_TIME);
 }
 
 /**
@@ -170,6 +172,7 @@ HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_004, TestSize.Level
     std::vector<std::shared_ptr<DataBuffer>> buffers;
     rc = testSinkPipeline_->ProcessData(buffers);
     EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
+    usleep(SLEEP_TIME);
 }
 
 /**
@@ -188,6 +191,7 @@ HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_005, TestSize.Level
     buffers.push_back(db);
     int32_t rc = testSinkPipeline_->ProcessData(buffers);
     EXPECT_EQ(rc, DCAMERA_INIT_ERR);
+    usleep(SLEEP_TIME);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
