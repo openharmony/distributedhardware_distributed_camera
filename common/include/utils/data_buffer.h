@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,10 +20,12 @@
 #include <string>
 #include <cstddef>
 #include <cstdint>
+#include "ifeedable_data.h"
+#include "dcamera_frame_info.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class DataBuffer {
+class DataBuffer : public IFeedableData {
 public:
     explicit DataBuffer(size_t capacity);
 
@@ -39,8 +41,9 @@ public:
     bool FindInt32(const std::string& name, int32_t& value);
     bool FindInt64(const std::string& name, int64_t& value);
     bool FindString(const std::string& name, std::string& value);
-
+    int64_t GetTimeStamp() override;
     virtual ~DataBuffer();
+    DCameraFrameInfo frameInfo_;
 
 private:
     size_t capacity_ = 0;

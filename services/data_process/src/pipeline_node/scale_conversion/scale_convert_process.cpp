@@ -20,6 +20,7 @@
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
+#include "dcamera_frame_info.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -74,6 +75,7 @@ void ScaleConvertProcess::ReleaseProcessNode()
 
 int ScaleConvertProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& inputBuffers)
 {
+    inputBuffers[0]->frameInfo_.timePonit.startScale = GetNowTimeStampUs();
     DHLOGD("Process data in ScaleConvertProcess.");
     if (!isScaleConvert_.load()) {
         DHLOGE("Scale Convert node occurred error or start release.");
@@ -90,12 +92,6 @@ int ScaleConvertProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& i
             processedConfig_.GetWidth(), processedConfig_.GetHeight(), processedConfig_.GetVideoformat(),
             sourceConfig_.GetWidth(), sourceConfig_.GetHeight(), sourceConfig_.GetVideoformat());
         return ConvertDone(inputBuffers);
-    }
-
-    int64_t timeStamp = 0;
-    if (!(inputBuffers[0]->FindInt64(TIME_STAMP_US, timeStamp))) {
-        DHLOGE("ScaleConvertProcess : Find inputBuffer %s failed.", TIME_STAMP_US.c_str());
-        return DCAMERA_BAD_VALUE;
     }
 
     ImageUnitInfo srcImgInfo {Videoformat::YUVI420, 0, 0, 0, 0, 0, 0, nullptr};
@@ -115,7 +111,7 @@ int ScaleConvertProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& i
         return DCAMERA_BAD_OPERATE;
     }
 
-    dstBuf->SetInt64(TIME_STAMP_US, timeStamp);
+    dstBuf->frameInfo_ = inputBuffers[0]->frameInfo_;
     dstBuf->SetInt32("Videoformat", static_cast<int32_t>(processedConfig_.GetVideoformat()));
     dstBuf->SetInt32("alignedWidth", processedConfig_.GetWidth());
     dstBuf->SetInt32("alignedHeight", processedConfig_.GetHeight());
@@ -378,6 +374,7 @@ int32_t ScaleConvertProcess::ConvertFormatToRGBA(ImageUnitInfo& srcImgInfo, Imag
 
 int32_t ScaleConvertProcess::ConvertDone(std::vector<std::shared_ptr<DataBuffer>>& outputBuffers)
 {
+    outputBuffers[0]->frameInfo_.timePonit.finishScale = GetNowTimeStampUs();
     DHLOGD("ScaleConvertProcess : Convert Done.");
     if (outputBuffers.empty()) {
         DHLOGE("The received data buffer is empty.");

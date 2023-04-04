@@ -19,6 +19,7 @@
 #include <chrono>
 #include <cstdint>
 #include <queue>
+#include <deque>
 #include <thread>
 #include <vector>
 
@@ -71,6 +72,8 @@ public:
     void GetDecoderOutputBuffer(const sptr<IConsumerSurface>& surface);
     VideoConfigParams GetSourceConfig() const;
     VideoConfigParams GetTargetConfig() const;
+    void OnSurfaceOutputBufferAvailable(const sptr<IConsumerSurface>& surface);
+    void AlignFirstFrameTime();
 
     int32_t GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier) override;
 
@@ -91,8 +94,7 @@ private:
     int64_t GetDecoderTimeStamp();
     void IncreaseWaitDecodeCnt();
     void ReduceWaitDecodeCnt();
-    void CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int64_t timeStamp, int32_t alignedWidth,
-        int32_t alignedHeight);
+    void CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int32_t alignedWidth, int32_t alignedHeight);
     bool IsCorrectSurfaceBuffer(const sptr<SurfaceBuffer>& surBuf, int32_t alignedWidth, int32_t alignedHeight);
     void PostOutputDataBuffers(std::shared_ptr<DataBuffer>& outputBuffer);
     int32_t DecodeDone(std::vector<std::shared_ptr<DataBuffer>>& outputBuffers);
@@ -119,6 +121,7 @@ private:
     std::mutex mtxDecoderLock_;
     std::mutex mtxDecoderState_;
     std::mutex mtxHoldCount_;
+    std::mutex mtxDequeLock_;
     VideoConfigParams sourceConfig_;
     VideoConfigParams targetConfig_;
     VideoConfigParams processedConfig_;
@@ -142,6 +145,7 @@ private:
     Media::AVCodecBufferInfo outputInfo_;
     std::queue<std::shared_ptr<DataBuffer>> inputBuffersQueue_;
     std::queue<uint32_t> availableInputIndexsQueue_;
+    std::deque<DCameraFrameInfo> frameInfoDeque_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

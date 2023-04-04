@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -49,6 +49,10 @@ config("module_private_config") {
     "//third_party/jsoncpp/include",
     "//drivers/peripheral/base/",
     "${graphicstandard_path}/frameworks/surface/include",
+    "${feeding_smoother_path}",
+    "${feeding_smoother_path}/base",
+    "${feeding_smoother_path}/derived",
+    "${feeding_smoother_path}/utils",
   ]
 }
 
@@ -65,7 +69,6 @@ ohos_unittest("DCameraSourceMgrTest") {
     "dcamera_source_input_test.cpp",
     "dcamera_source_service_ipc_test.cpp",
     "dcamera_source_state_machine_test.cpp",
-    "dcamera_stream_data_process_producer_test.cpp",
     "dcamera_stream_data_process_test.cpp",
   ]
 

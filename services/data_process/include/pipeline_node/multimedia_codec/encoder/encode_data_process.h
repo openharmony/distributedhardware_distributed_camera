@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,6 +33,7 @@
 #include "dcamera_pipeline_sink.h"
 #include "distributed_camera_errno.h"
 #include "image_common_type.h"
+#include "distributed_camera_constants.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -112,6 +113,8 @@ private:
     constexpr static int32_t BITRATE_5000000 = 5000000;
     constexpr static int32_t BITRATE_6000000 = 6000000;
     const static std::map<std::int64_t, int32_t> ENCODER_BITRATE_TABLE;
+    constexpr static uint64_t S2NS = 1000000000;
+    constexpr static uint32_t US2NS = 1000;
 
     std::weak_ptr<DCameraPipelineSink> callbackPipelineSink_;
     std::mutex mtxEncoderState_;
@@ -131,6 +134,7 @@ private:
     Media::Format metadataFormat_;
     Media::Format encodeOutputFormat_;
     std::string surfaceStr_ = "surface";
+    int32_t index_ = FRAME_HEAD;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

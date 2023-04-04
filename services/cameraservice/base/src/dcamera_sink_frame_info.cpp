@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "dcamera_frame_info.h"
+#include "dcamera_sink_frame_info.h"
 #include "nlohmann/json.hpp"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -21,19 +21,20 @@ using json = nlohmann::json;
 
 namespace OHOS {
 namespace DistributedHardware {
-void DCameraFrameInfo::Marshal(std::string& jsonStr)
+void DCameraSinkFrameInfo::Marshal(std::string& jsonStr)
 {
     json frameInfo;
     frameInfo[FRAME_INFO_TYPE] = type_;
     frameInfo[FRAME_INFO_INDEX] = index_;
     frameInfo[FRAME_INFO_PTS] = pts_;
-    frameInfo[FRAME_INFO_ENCODET] = encodeT_;
+    frameInfo[FRAME_INFO_START_ENCODE] = startEncodeT_;
+    frameInfo[FRAME_INFO_FINISH_ENCODE] = finishEncodeT_;
     frameInfo[FRAME_INFO_SENDT] = sendT_;
     frameInfo[FRAME_INFO_VERSION] = ver_;
     jsonStr = frameInfo.dump();
 }
 
-int32_t DCameraFrameInfo::Unmarshal(const std::string& jsonStr)
+int32_t DCameraSinkFrameInfo::Unmarshal(const std::string& jsonStr)
 {
     json frameInfo = json::parse(jsonStr, nullptr, false);
     if (frameInfo.is_discarded()) {
@@ -56,10 +57,15 @@ int32_t DCameraFrameInfo::Unmarshal(const std::string& jsonStr)
     }
     pts_ = frameInfo[FRAME_INFO_PTS].get<std::int64_t>();
 
-    if (!frameInfo.contains(FRAME_INFO_ENCODET) || !frameInfo[FRAME_INFO_ENCODET].is_number_integer()) {
+    if (!frameInfo.contains(FRAME_INFO_START_ENCODE) || !frameInfo[FRAME_INFO_START_ENCODE].is_number_integer()) {
         return DCAMERA_BAD_VALUE;
     }
-    encodeT_ = frameInfo[FRAME_INFO_ENCODET].get<std::int64_t>();
+    startEncodeT_ = frameInfo[FRAME_INFO_START_ENCODE].get<std::int64_t>();
+
+    if (!frameInfo.contains(FRAME_INFO_FINISH_ENCODE) || !frameInfo[FRAME_INFO_FINISH_ENCODE].is_number_integer()) {
+        return DCAMERA_BAD_VALUE;
+    }
+    finishEncodeT_ = frameInfo[FRAME_INFO_FINISH_ENCODE].get<std::int64_t>();
 
     if (!frameInfo.contains(FRAME_INFO_SENDT) || !frameInfo[FRAME_INFO_SENDT].is_number_integer()) {
         return DCAMERA_BAD_VALUE;

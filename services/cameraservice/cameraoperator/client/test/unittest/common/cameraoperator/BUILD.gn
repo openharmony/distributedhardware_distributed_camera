@@ -1,4 +1,4 @@
-# Copyright (c) 2021 - 2023 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -39,6 +39,9 @@ config("module_private_config") {
   include_dirs += [
     "${common_path}/include/constants",
     "${common_path}/include/utils",
+    "${feeding_smoother_path}/base",
+    "${feeding_smoother_path}/derived",
+    "${feeding_smoother_path}/utils",
     "${services_path}/cameraservice/base/include",
     "${services_path}/cameraservice/cameraoperator/client/include",
     "${services_path}/cameraservice/cameraoperator/client/include/callback",

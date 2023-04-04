@@ -13,33 +13,26 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DCAMERA_FRAME_INFO_H
-#define OHOS_DCAMERA_FRAME_INFO_H
-#include <string>
-#include <dcamera_sink_frame_info.h>
+#ifndef OHOS_SMOTTHER_CONSTANTS_H
+#define OHOS_SMOTTHER_CONSTANTS_H
 
 namespace OHOS {
 namespace DistributedHardware {
-struct DCameraFrameProcessTimePoint {
-    int64_t startEncode;
-    int64_t finishEncode;
-    int64_t send;
-    int64_t recv;
-    int64_t startDecode;
-    int64_t finishDecode;
-    int64_t startScale;
-    int64_t finishScale;
-    int64_t startSmooth;
-    int64_t finishSmooth;
-};
-struct DCameraFrameInfo {
-    int8_t type;
-    std::string ver;
-    int32_t index;
-    int32_t offset;
-    int64_t pts;
-    DCameraFrameProcessTimePoint timePonit;
-};
+typedef enum {
+    SMOOTH_START = 0,
+    SMOOTH_STOP = 1,
+} SmoothState;
+
+typedef enum {
+    SMOOTH_SUCCESS = 0,
+    SMOOTH_IS_STARTED = 1,
+    SMOOTH_IS_STOPED = 2,
+} SmoothErrorCode;
+
+typedef enum {
+    NOTIFY_SUCCESS = 0,
+    NOTIFY_FAILED = 1,
+} SmootherListnerState;
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DCAMERA_FRAME_INFO_H
+#endif // OHOS_SMOTTHER_CONSTANTS_H

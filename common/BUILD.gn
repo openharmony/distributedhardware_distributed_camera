@@ -21,6 +21,9 @@ ohos_shared_library("distributed_camera_utils") {
     "//utils/system/safwk/native/include",
     "include/constants",
     "include/utils",
+    "${feeding_smoother_path}/base",
+    "${feeding_smoother_path}/derived",
+    "${services_path}/cameraservice/base/include",
   ]
 
   cflags = [

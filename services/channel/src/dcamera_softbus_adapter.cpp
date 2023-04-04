@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,7 +15,7 @@
 
 #include "anonymous_string.h"
 #include "dcamera_hisysevent_adapter.h"
-#include "dcamera_frame_info.h"
+#include "dcamera_sink_frame_info.h"
 #include "dcamera_softbus_adapter.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
@@ -24,6 +24,8 @@
 #include "softbus_bus_center.h"
 #include "softbus_common.h"
 #include "softbus_errcode.h"
+#include "dcamera_utils_tools.h"
+#include "dcamera_frame_info.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -198,10 +200,26 @@ int32_t DCameraSoftbusAdapter::SendSofbusStream(int32_t sessionId, std::shared_p
     if (!buffer->FindInt64(TIME_STAMP_US, timeStamp)) {
         DHLOGD("SendSofbusStream find %s failed.", TIME_STAMP_US.c_str());
     }
+    int32_t index;
+    if (!buffer->FindInt32(INDEX, index)) {
+        DHLOGD("SendSofbusStream find %s failed.", INDEX.c_str());
+    }
+    int64_t startEncodeT;
+    if (!buffer->FindInt64(START_ENCODE_TIME_US, startEncodeT)) {
+        DHLOGD("SendSofbusStream find %s failed.", START_ENCODE_TIME_US.c_str());
+    }
+    int64_t finishEncodeT;
+    if (!buffer->FindInt64(FINISH_ENCODE_TIME_US, finishEncodeT)) {
+        DHLOGD("SendSofbusStream find %s failed.", FINISH_ENCODE_TIME_US.c_str());
+    }
     std::string jsonStr = "";
-    DCameraFrameInfo frameInfo;
-    frameInfo.pts_ = timeStamp;
-    frameInfo.Marshal(jsonStr);
+    DCameraSinkFrameInfo sinkFrameInfo;
+    sinkFrameInfo.pts_ = timeStamp;
+    sinkFrameInfo.index_ = index;
+    sinkFrameInfo.startEncodeT_ = startEncodeT;
+    sinkFrameInfo.finishEncodeT_ = finishEncodeT;
+    sinkFrameInfo.sendT_ = GetNowTimeStampUs();
+    sinkFrameInfo.Marshal(jsonStr);
     StreamData ext = { const_cast<char *>(jsonStr.c_str()), jsonStr.length() };
     StreamFrameInfo param = { 0 };
     int32_t ret = SendStream(sessionId, &streamData, &ext, &param);
@@ -327,6 +345,7 @@ void DCameraSoftbusAdapter::OnSourceMessageReceived(int32_t sessionId, const voi
 void DCameraSoftbusAdapter::OnSourceStreamReceived(int32_t sessionId, const StreamData *data, const StreamData *ext,
     const StreamFrameInfo *param)
 {
+    int64_t recvT = GetNowTimeStampUs();
     if (data == nullptr) {
         DHLOGE("DCameraSoftbusAdapter::OnSourceStreamReceived, data is null, sessionId: %d.", sessionId);
         return;
@@ -344,6 +363,7 @@ void DCameraSoftbusAdapter::OnSourceStreamReceived(int32_t sessionId, const Stre
     }
 
     std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(data->bufLen);
+    buffer->SetInt64(RECV_TIME_US, recvT);
     ret = memcpy_s(buffer->Data(), buffer->Capacity(), reinterpret_cast<uint8_t *>(data->buf), data->bufLen);
     if (ret != EOK) {
         DHLOGE("DCameraSoftbusAdapter OnSourceStreamReceived memcpy_s failed ret: %d", ret);
@@ -369,14 +389,26 @@ int32_t DCameraSoftbusAdapter::HandleSourceStreamExt(std::shared_ptr<DataBuffer>
     }
 
     std::string jsonStr(reinterpret_cast<const char*>(ext->buf), ext->bufLen);
-    DCameraFrameInfo frameInfo;
-    int32_t ret = frameInfo.Unmarshal(jsonStr);
+    DCameraSinkFrameInfo sinkFrameInfo;
+    int32_t ret = sinkFrameInfo.Unmarshal(jsonStr);
     if (ret != DCAMERA_OK) {
-        DHLOGE("Unmarshal frameInfo failed.");
+        DHLOGE("Unmarshal sinkFrameInfo failed.");
         return DCAMERA_BAD_VALUE;
     }
-    int64_t timeStamp = frameInfo.pts_;
-    buffer->SetInt64(TIME_STAMP_US, timeStamp);
+    int64_t recvT;
+    if (!buffer->FindInt64(RECV_TIME_US, recvT)) {
+        DHLOGD("HandleSourceStreamExt find %s failed.", RECV_TIME_US.c_str());
+    }
+    DCameraFrameInfo frameInfo;
+    frameInfo.type = sinkFrameInfo.type_;
+    frameInfo.pts = sinkFrameInfo.pts_;
+    frameInfo.index = sinkFrameInfo.index_;
+    frameInfo.ver = sinkFrameInfo.ver_;
+    frameInfo.timePonit.startEncode = sinkFrameInfo.startEncodeT_;
+    frameInfo.timePonit.finishEncode = sinkFrameInfo.finishEncodeT_;
+    frameInfo.timePonit.send = sinkFrameInfo.sendT_;
+    frameInfo.timePonit.recv = recvT;
+    buffer->frameInfo_ = frameInfo;
     return DCAMERA_OK;
 }
 

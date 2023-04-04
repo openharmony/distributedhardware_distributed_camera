@@ -25,6 +25,7 @@
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
 #include <sys/prctl.h>
+#include "dcamera_frame_info.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -63,7 +64,10 @@ void DCameraStreamDataProcessProducer::Start()
         eventCon_.wait(lock, [this] {
             return eventHandler_ != nullptr;
         });
-        producerThread_ = std::thread(&DCameraStreamDataProcessProducer::LooperContinue, this);
+        smoother_ = std::make_unique<DCameraFeedingSmoother>();
+        smootherListener_ = std::make_shared<FeedingSmootherListener>(shared_from_this());
+        smoother_->RegisterListener(smootherListener_);
+        smoother_->StartSmooth();
     } else {
         producerThread_ = std::thread(&DCameraStreamDataProcessProducer::LooperSnapShot, this);
     }
@@ -79,12 +83,15 @@ void DCameraStreamDataProcessProducer::Stop()
     }
     producerCon_.notify_one();
     if (streamType_ == CONTINUOUS_FRAME) {
-        sleepCon_.notify_one();
+        smoother_->StopSmooth();
+        smoother_ = nullptr;
+        smootherListener_ = nullptr;
         eventHandler_->GetEventRunner()->Stop();
         eventThread_.join();
         eventHandler_ = nullptr;
+    } else {
+        producerThread_.join();
     }
-    producerThread_.join();
     camHdiProvider_ = nullptr;
     DHLOGI("DCameraStreamDataProcessProducer Stop end devId: %s dhId: %s streamType: %d streamId: %d state: %d",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_, state_);
@@ -92,19 +99,26 @@ void DCameraStreamDataProcessProducer::Stop()
 
 void DCameraStreamDataProcessProducer::FeedStream(const std::shared_ptr<DataBuffer>& buffer)
 {
-    DHLOGD("DCameraStreamDataProcessProducer FeedStream devId %s dhId %s streamId: %d streamType: %d streamSize: %d",
-        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamId_, streamType_, buffer->Size());
-    std::lock_guard<std::mutex> lock(bufferMutex_);
-    if (buffers_.size() >= DCAMERA_PRODUCER_MAX_BUFFER_SIZE) {
-        DHLOGD("DCameraStreamDataProcessProducer FeedStream OverSize devId %s dhId %s streamType: %d streamSize: %d",
-            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, buffer->Size());
-        buffers_.pop_front();
+    buffer->frameInfo_.timePonit.startSmooth = GetNowTimeStampUs();
+    {
+        std::lock_guard<std::mutex> lock(bufferMutex_);
+        DHLOGD("DCameraStreamDataProcessProducer FeedStream devId %s dhId %s streamId: %d streamType: %d" +
+            " streamSize: %d", GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(),
+            streamId_, streamType_, buffer->Size());
+        if (buffers_.size() >= DCAMERA_PRODUCER_MAX_BUFFER_SIZE) {
+            DHLOGD("DCameraStreamDataProcessProducer FeedStream OverSize devId %s dhId %s streamType: %d" +
+                " streamSize: %d", GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(),
+                streamType_, buffer->Size());
+            buffers_.pop_front();
+        }
+        if (streamType_ == SNAPSHOT_FRAME) {
+            buffers_.push_back(buffer);
+            producerCon_.notify_one();
+        }
     }
-    buffers_.push_back(buffer);
-    int64_t time = GetNowTimeStampUs();
-    FinetuneBaseline(time);
-    CalculateAverFeedInterval(time);
-    producerCon_.notify_one();
+    if (streamType_ == CONTINUOUS_FRAME) {
+        smoother_->PushData(buffer);
+    }
 }
 
 void DCameraStreamDataProcessProducer::StartEvent()
@@ -117,48 +131,6 @@ void DCameraStreamDataProcessProducer::StartEvent()
     }
     eventCon_.notify_one();
     runner->Run();
-}
-
-void DCameraStreamDataProcessProducer::LooperContinue()
-{
-    DHLOGI("LooperContinue producer devId: %s dhId: %s streamType: %d streamId: %d state: %d",
-        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_, state_);
-    std::string name = PRODUCER + std::to_string(streamType_);
-    prctl(PR_SET_NAME, name.c_str());
-    DHBase dhBase;
-    dhBase.deviceId_ = devId_;
-    dhBase.dhId_ = dhId_;
-
-    while (state_ == DCAMERA_PRODUCER_STATE_START) {
-        std::shared_ptr<DataBuffer> buffer = nullptr;
-        {
-            std::unique_lock<std::mutex> lock(bufferMutex_);
-            producerCon_.wait(lock, [this] {
-                return (!buffers_.empty() || this->state_ == DCAMERA_PRODUCER_STATE_STOP);
-            });
-            if (state_ == DCAMERA_PRODUCER_STATE_STOP) {
-                continue;
-            }
-            buffer = buffers_.front();
-        }
-        int64_t timeStamp = 0;
-        if (!buffer->FindInt64(TIME_STAMP_US, timeStamp)) {
-            DHLOGD("LooperContinue find %s failed.", TIME_STAMP_US.c_str());
-        }
-        ControlFrameRate(timeStamp);
-        {
-            std::lock_guard<std::mutex> lock(bufferMutex_);
-            buffers_.pop_front();
-        }
-        auto feedFunc = [this, dhBase, buffer]() {
-            FeedStreamToDriver(dhBase, buffer);
-        };
-        if (eventHandler_ != nullptr) {
-            eventHandler_->PostTask(feedFunc);
-        }
-    }
-    DHLOGI("LooperContinue producer end devId: %s dhId: %s streamType: %d streamId: %d state: %d",
-        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_, state_);
 }
 
 void DCameraStreamDataProcessProducer::LooperSnapShot()
@@ -282,189 +254,18 @@ int32_t DCameraStreamDataProcessProducer::CheckSharedMemory(const DCameraBuffer&
     return DCAMERA_OK;
 }
 
-void DCameraStreamDataProcessProducer::ControlFrameRate(const int64_t timeStamp)
+void DCameraStreamDataProcessProducer::OnSmoothFinished(const std::shared_ptr<IFeedableData>& data)
 {
-    if (timeStamp == 0) {
-        DHLOGD("TimeStamp is zero, just directlly display.");
-        return;
+    std::shared_ptr<DataBuffer> buffer = std::reinterpret_pointer_cast<DataBuffer>(data);
+    DHBase dhBase;
+    dhBase.deviceId_ = devId_;
+    dhBase.dhId_ = dhId_;
+    auto feedFunc = [this, dhBase, buffer]() {
+        FeedStreamToDriver(dhBase, buffer);
+    };
+    if (eventHandler_ != nullptr) {
+        eventHandler_->PostTask(feedFunc);
     }
-    int64_t enterTime = GetNowTimeStampUs();
-    InitTime(timeStamp);
-    int64_t duration = timeStamp - lastTimeStamp_;
-    int64_t render = enterTime - leaveTime_;
-    int64_t elapse = enterTime - lastEnterTime_;
-    int64_t delta = elapse - sleep_ - render;
-    delta_ += delta;
-    int64_t clock = timeStampBaseline_ + enterTime - sysTimeBaseline_;
-    sleep_ = duration - render;
-    DHLOGD("Duration is %ld us, render is %ld us, elapse is %ld us, delta is %ld us, delta_ is %ld us, " +
-        "clock is %ld us, sleep is %ld us.", duration, render, elapse, delta, delta_, clock, sleep_);
-
-    ControlDisplay(timeStamp, duration, clock);
-    lastTimeStamp_ = timeStamp;
-    lastEnterTime_ = enterTime;
-    leaveTime_ = GetNowTimeStampUs();
-}
-
-void DCameraStreamDataProcessProducer::InitTime(const int64_t timeStamp)
-{
-    if (lastTimeStamp_ == timeStamp) {
-        sysTimeBaseline_ = 0;
-        timeStampBaseline_ = 0;
-    }
-    if (lastTimeStamp_ == 0) {
-        lastTimeStamp_ = timeStamp;
-    }
-    if (sysTimeBaseline_ == 0) {
-        sysTimeBaseline_ = GetNowTimeStampUs();
-    }
-    if (leaveTime_ == 0) {
-        leaveTime_ = sysTimeBaseline_;
-    }
-    if (lastEnterTime_ == 0) {
-        lastEnterTime_ = sysTimeBaseline_;
-    }
-    if (timeStampBaseline_ == 0) {
-        timeStampBaseline_ = timeStamp;
-        DHLOGD("TimeStamp is %ld us, after initTime sysTimeBaseline is %ld us, timeStampBaseline is %ld us, " +
-            "lastTimeStamp is %ld us, leaveTime is %ld us, lastEnterTime is %ld us.", timeStamp, sysTimeBaseline_,
-            timeStampBaseline_, lastTimeStamp_, leaveTime_, lastEnterTime_);
-    }
-}
-
-void DCameraStreamDataProcessProducer::ControlDisplay(const int64_t timeStamp, const int64_t duration,
-    const int64_t clock)
-{
-    AdjustSleep(duration);
-    int64_t offset = SyncClock(timeStamp, duration, clock);
-    {
-        std::unique_lock<std::mutex> lock(sleepMutex_);
-        sleepCon_.wait_for(lock, std::chrono::microseconds(sleep_), [this] {
-            return (this->state_ == DCAMERA_PRODUCER_STATE_STOP);
-        });
-        if (state_ == DCAMERA_PRODUCER_STATE_STOP) {
-            DHLOGD("Notify to interrupt sleep.");
-            return;
-        }
-    }
-    LocateBaseline(timeStamp, duration, offset);
-}
-
-/*
- * Adjust sleep time to make it reasonable.
- * Count delta in internal process time consumption, sleep accuracy, etc.
- * The sleep time is adjusted to reduce the offset error when Synchronizing the clock.
- */
-void DCameraStreamDataProcessProducer::AdjustSleep(const int64_t duration)
-{
-    const int64_t adjustThre = duration * ADJUST_SLEEP_FACTOR;
-    if (delta_ > adjustThre && sleep_ > 0) {
-        int64_t sleep = sleep_ - adjustThre;
-        delta_ -= (sleep < 0) ? sleep_ : adjustThre;
-        sleep_ = sleep;
-        DHLOGD("Delta more than thre, adjust sleep to %ld us.", sleep_);
-    } else if (delta_ < -adjustThre) {
-        sleep_ += delta_;
-        delta_ = 0;
-        DHLOGD("Delta less than negative thre, adjust sleep to %ld us.", sleep_);
-    }
-}
-
-/*
- * Synchronize the timestamp with the clock.
- * Ahead of the threshold, waiting, behind the threshold, and catching up.
- */
-int64_t DCameraStreamDataProcessProducer::SyncClock(const int64_t timeStamp, const int64_t duration,
-    const int64_t clock)
-{
-    const int64_t waitThre = duration * WAIT_CLOCK_FACTOR;
-    const int64_t trackThre = duration * TRACK_CLOCK_FACTOR;
-    int64_t offset = timeStamp - sleep_ - clock;
-    if (offset > waitThre || offset < -trackThre) {
-        sleep_ += offset;
-        DHLOGD("Offset is not in the threshold range, adjust sleep to %ld us.", sleep_);
-    }
-    if (sleep_ < 0) {
-        sleep_ = 0;
-        DHLOGD("Sleep less than zero, adjust sleep to zero.");
-    }
-    DHLOGD("Offset is %ld us, sleep is %ld us after syncing clock.", offset, sleep_);
-    return offset;
-}
-
-/*
- * Locate the time baseline near the time corresponding to the set display buffer size.
- */
-void DCameraStreamDataProcessProducer::LocateBaseline(const int64_t timeStamp, const int64_t duration,
-    const int64_t offset)
-{
-    const uint8_t normalSize = displayBufferSize_ + 1;
-    const int64_t offsetThre = duration * OFFSET_FACTOR;
-    const int64_t normalSleepThre = duration * NORMAL_SLEEP_FACTOR;
-    const int64_t abnormalSleepThre = duration * ABNORMAL_SLEEP_FACTOR;
-    {
-        std::lock_guard<std::mutex> lock(bufferMutex_);
-        uint8_t size = buffers_.size();
-        DHLOGD("Buffers curSize is %d.", size);
-        if (size > normalSize && offset > -offsetThre && sleep_ > normalSleepThre) {
-            minusCount_++;
-        } else {
-            minusCount_ = 0;
-        }
-
-        if (minusCount_ >= MINUS_THRE) {
-            finetuneTime_ = GetNowTimeStampUs();
-            needFinetune_.store(true);
-            int64_t time = 0;
-            buffers_.at(size - normalSize)->FindInt64(TIME_STAMP_US, time);
-            time -= timeStamp;
-            sysTimeBaseline_ -= time;
-            minusCount_ = 0;
-            DHLOGD("MinusCount more than minus thre, minus %ld us.", time);
-        }
-
-        if (size == normalSize && offset > -offsetThre && sleep_ < abnormalSleepThre) {
-            plusCount_++;
-        } else {
-            plusCount_ = 0;
-        }
-
-        if (plusCount_ >= PLUS_THRE) {
-            int64_t time = normalSleepThre - sleep_;
-            sysTimeBaseline_ += time;
-            plusCount_ = 0;
-            DHLOGD("PlusCount more than plus thre, plus %ld us.", time);
-        }
-    }
-}
-
-void DCameraStreamDataProcessProducer::SetDisplayBufferSize(const uint8_t size)
-{
-    displayBufferSize_ = size;
-}
-
-void DCameraStreamDataProcessProducer::FinetuneBaseline(const int64_t time)
-{
-    if (!needFinetune_.load()) {
-        return;
-    }
-    int64_t finetuneTime = time - finetuneTime_;
-    finetuneTime_ = (finetuneTime > averFeedInterval_) ? (averFeedInterval_ * FINETUNE_TIME_FACTOR) : finetuneTime;
-    sysTimeBaseline_ += finetuneTime_;
-    needFinetune_.store(false);
-    DHLOGD("Finetune baseline %ld us.", finetuneTime_);
-}
-
-void DCameraStreamDataProcessProducer::CalculateAverFeedInterval(const int64_t time)
-{
-    int64_t interval = time - feedTime_;
-    if (feedTime_ != 0) {
-        intervalCount_ += interval;
-        averFeedInterval_ = intervalCount_ / index_;
-    }
-    feedTime_ = time;
-    index_++;
-    DHLOGD("AverFeedInterval is %ld us, interval is %ld us.", averFeedInterval_, interval);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -12,34 +12,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#ifndef OHOS_DCAMERA_FRAME_INFO_H
-#define OHOS_DCAMERA_FRAME_INFO_H
-#include <string>
-#include <dcamera_sink_frame_info.h>
+#include "feeding_smoother_listener.h"
+#include "distributed_hardware_log.h"
+#include "smoother_constants.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-struct DCameraFrameProcessTimePoint {
-    int64_t startEncode;
-    int64_t finishEncode;
-    int64_t send;
-    int64_t recv;
-    int64_t startDecode;
-    int64_t finishDecode;
-    int64_t startScale;
-    int64_t finishScale;
-    int64_t startSmooth;
-    int64_t finishSmooth;
-};
-struct DCameraFrameInfo {
-    int8_t type;
-    std::string ver;
-    int32_t index;
-    int32_t offset;
-    int64_t pts;
-    DCameraFrameProcessTimePoint timePonit;
-};
+int32_t FeedingSmootherListener::OnSmoothFinished(const std::shared_ptr<IFeedableData>& data)
+{
+    std::shared_ptr<IFeedableDataProducer> producer = producer_.lock();
+    if (producer == nullptr) {
+        DHLOGE("Producer is nullptr, notify failed.");
+        return NOTIFY_FAILED;
+    }
+    producer->OnSmoothFinished(data);
+    return NOTIFY_SUCCESS;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DCAMERA_FRAME_INFO_H
