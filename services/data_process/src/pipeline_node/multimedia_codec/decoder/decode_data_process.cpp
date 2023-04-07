@@ -337,6 +337,7 @@ void DecodeDataProcess::ReleaseProcessNode()
     processType_ = "";
     std::queue<std::shared_ptr<DataBuffer>>().swap(inputBuffersQueue_);
     std::queue<uint32_t>().swap(availableInputIndexsQueue_);
+    std::deque<DCameraFrameInfo>().swap(frameInfoDeque_);
     waitDecoderOutputCount_ = 0;
     lastFeedDecoderInputBufferTimeUs_ = 0;
     outputTimeStampUs_ = 0;
@@ -407,10 +408,12 @@ int32_t DecodeDataProcess::FeedDecoderInputBuffer()
                 inputBuffersQueue_.size(), availableInputIndexsQueue_.size());
             return DCAMERA_BAD_VALUE;
         }
-        int64_t timeStamp = 0;
-        if (!buffer->FindInt64(TIME_STAMP_US, timeStamp)) {
-            DHLOGD("FeedDecoderInputBuffer find %s failed.", TIME_STAMP_US.c_str());
+        buffer->frameInfo_.timePonit.startDecode = GetNowTimeStampUs();
+        {
+            std::lock_guard<std::mutex> lock(mtxDequeLock_);
+            frameInfoDeque_.push_back(buffer->frameInfo_);
         }
+        int64_t timeStamp = buffer->frameInfo_.pts;
         {
             std::lock_guard<std::mutex> inputLock(mtxDecoderLock_);
             if (videoDecoder_ == nullptr) {
@@ -482,6 +485,13 @@ void DecodeDataProcess::ReduceWaitDecodeCnt()
     DHLOGD("Wait decoder output frames number is %d.", waitDecoderOutputCount_);
 }
 
+void DecodeDataProcess::OnSurfaceOutputBufferAvailable(const sptr<IConsumerSurface>& surface)
+{
+    std::shared_ptr<CodecPacket> bufferPkt = std::make_shared<CodecPacket>(surface);
+    DCameraCodecEvent dCamCodecEv(*this, bufferPkt, VideoCodecAction::ACTION_GET_DECODER_OUTPUT_BUFFER);
+    eventBusDecode_->PostEvent<DCameraCodecEvent>(dCamCodecEv, POSTMODE::POST_ASYNC);
+}
+
 void DecodeDataProcess::GetDecoderOutputBuffer(const sptr<IConsumerSurface>& surface)
 {
     DHLOGD("Get decoder output buffer.");
@@ -506,14 +516,13 @@ void DecodeDataProcess::GetDecoderOutputBuffer(const sptr<IConsumerSurface>& sur
     int32_t alignedHeight = alignedHeight_;
     DHLOGD("OutputBuffer alignedWidth %d, alignedHeight %d, timeStamp %ld ns.",
         alignedWidth, alignedHeight, timeStamp);
-    int64_t timeStampUs = timeStamp / 1000;
-    CopyDecodedImage(surfaceBuffer, timeStampUs, alignedWidth, alignedHeight);
+    CopyDecodedImage(surfaceBuffer, alignedWidth, alignedHeight);
     surface->ReleaseBuffer(surfaceBuffer, -1);
     outputTimeStampUs_ = timeStamp;
     ReduceWaitDecodeCnt();
 }
 
-void DecodeDataProcess::CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int64_t timeStamp, int32_t alignedWidth,
+void DecodeDataProcess::CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int32_t alignedWidth,
     int32_t alignedHeight)
 {
     if (!IsCorrectSurfaceBuffer(surBuf, alignedWidth, alignedHeight)) {
@@ -546,8 +555,11 @@ void DecodeDataProcess::CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int6
         DHLOGE("Convert NV12 to I420 failed.");
         return;
     }
-
-    bufferOutput->SetInt64(TIME_STAMP_US, timeStamp);
+    {
+        std::lock_guard<std::mutex> lock(mtxDequeLock_);
+        bufferOutput->frameInfo_ = frameInfoDeque_.front();
+        frameInfoDeque_.pop_front();
+    }
     bufferOutput->SetInt32("Videoformat", static_cast<int32_t>(Videoformat::YUVI420));
     bufferOutput->SetInt32("alignedWidth", processedConfig_.GetWidth());
     bufferOutput->SetInt32("alignedHeight", processedConfig_.GetHeight());
@@ -631,7 +643,6 @@ void DecodeDataProcess::OnEvent(DCameraCodecEvent& ev)
                 OnError();
                 return;
             }
-
             std::vector<std::shared_ptr<DataBuffer>> dataBuffers = receivedCodecPacket->GetDataBuffers();
             DecodeDone(dataBuffers);
             break;
@@ -640,6 +651,14 @@ void DecodeDataProcess::OnEvent(DCameraCodecEvent& ev)
             DHLOGD("Try FeedDecoderInputBuffer again.");
             FeedDecoderInputBuffer();
             return;
+        case VideoCodecAction::ACTION_GET_DECODER_OUTPUT_BUFFER:
+            if (receivedCodecPacket == nullptr) {
+                DHLOGE("the received codecPacket of action [%d] is null.", action);
+                OnError();
+                return;
+            }
+            GetDecoderOutputBuffer(receivedCodecPacket->GetSurface());
+            break;
         default:
             DHLOGD("The action : %d is not supported.", action);
             return;
@@ -685,6 +704,7 @@ void DecodeDataProcess::OnOutputFormatChanged(const Media::Format &format)
 void DecodeDataProcess::OnOutputBufferAvailable(uint32_t index, const Media::AVCodecBufferInfo& info,
     const Media::AVCodecBufferFlag& flag)
 {
+    int64_t finishDecodeT = GetNowTimeStampUs();
     if (!isDecoderProcess_.load()) {
         DHLOGE("Decoder node occurred error or start release.");
         return;
@@ -692,6 +712,19 @@ void DecodeDataProcess::OnOutputBufferAvailable(uint32_t index, const Media::AVC
     DHLOGD("Video decode buffer info: presentation TimeUs %lld, size %d, offset %d, flag %d",
         info.presentationTimeUs, info.size, info.offset, flag);
     outputInfo_ = info;
+    {
+        std::lock_guard<std::mutex> lock(mtxDequeLock_);
+        AlignFirstFrameTime();
+        for (auto it = frameInfoDeque_.begin(); it != frameInfoDeque_.end(); it++) {
+            DCameraFrameInfo frameInfo = *it;
+            if (frameInfo.timePonit.finishDecode != 0) {
+                continue;
+            }
+            frameInfo.timePonit.finishDecode = finishDecodeT;
+            frameInfoDeque_.emplace(frameInfoDeque_.erase(it), frameInfo);
+            break;
+        }
+    }
     {
         std::lock_guard<std::mutex> outputLock(mtxDecoderState_);
         if (videoDecoder_ == nullptr) {
@@ -718,6 +751,23 @@ VideoConfigParams DecodeDataProcess::GetTargetConfig() const
 int32_t DecodeDataProcess::GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier)
 {
     return DCAMERA_OK;
+}
+
+void DecodeDataProcess::AlignFirstFrameTime()
+{
+    if (frameInfoDeque_.front().index != FRAME_HEAD) {
+        return;
+    }
+    DCameraFrameInfo frameInfo = frameInfoDeque_.front();
+    frameInfoDeque_.pop_front();
+    DCameraFrameInfo front = frameInfoDeque_.front();
+    frameInfo.index = front.index;
+    frameInfo.pts = front.pts;
+    frameInfo.offset = front.offset;
+    frameInfo.type = front.type;
+    frameInfo.ver = front.ver;
+    frameInfo.timePonit.finishEncode = front.timePonit.finishEncode;
+    frameInfoDeque_.emplace(frameInfoDeque_.erase(frameInfoDeque_.begin()), frameInfo);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

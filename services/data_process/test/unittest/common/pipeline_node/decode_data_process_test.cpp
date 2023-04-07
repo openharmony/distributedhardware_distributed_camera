@@ -474,10 +474,9 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_013, TestSize.Level1)
     EXPECT_EQ(rc, DCAMERA_OK);
 
     sptr<SurfaceBuffer> surBuf = nullptr;
-    int64_t timeStampUs = 1;
     int32_t alignedWidth = TEST_WIDTH;
     int32_t alignedHeight = TEST_HEIGTH;
-    testDecodeDataProcess_->CopyDecodedImage(surBuf, timeStampUs, alignedWidth, alignedHeight);
+    testDecodeDataProcess_->CopyDecodedImage(surBuf, alignedWidth, alignedHeight);
     EXPECT_EQ(rc, DCAMERA_OK);
 }
 

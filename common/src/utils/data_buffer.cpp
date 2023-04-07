@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,7 @@
 
 #include "data_buffer.h"
 #include "distributed_camera_errno.h"
+#include "distributed_camera_constants.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -106,6 +107,11 @@ bool DataBuffer::FindString(const std::string& name, std::string& value)
         value = "";
         return false;
     }
+}
+
+int64_t DataBuffer::GetTimeStamp()
+{
+    return frameInfo_.pts;
 }
 
 DataBuffer::~DataBuffer()

@@ -16,14 +16,14 @@
 #include <gtest/gtest.h>
 #include <memory>
 
-#include "dcamera_frame_info.h"
+#include "dcamera_sink_frame_info.h"
 #include "distributed_camera_errno.h"
 
 using namespace testing::ext;
 
 namespace OHOS {
 namespace DistributedHardware {
-class DCameraFrameInfoTest : public testing::Test {
+class DCameraSinkFrameInfoTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
@@ -31,82 +31,99 @@ public:
     void TearDown();
 };
 
-static const std::string TEST_FRAME_INFO_JSON_TYPE = R"({
+static const std::string TEST_SINK_FRAME_INFO_JSON_TYPE = R"({
     "type": "test",
     "index": 1,
     "pts": 1,
-    "encodeT": 1,
+    "startEncodeT": 1,
+    "finishEncodeT": 1,
     "sendT": 1,
     "ver": "v1"
 })";
 
-static const std::string TEST_FRAME_INFO_JSON_INDEX = R"({
+static const std::string TEST_SINK_FRAME_INFO_JSON_INDEX = R"({
     "type": 0,
     "index": "test",
     "pts": 1,
-    "encodeT": 1,
+    "startEncodeT": 1,
+    "finishEncodeT": 1,
     "sendT": 1,
     "ver": "v1"
 })";
 
-static const std::string TEST_FRAME_INFO_JSON_PTS = R"({
+static const std::string TEST_SINK_FRAME_INFO_JSON_PTS = R"({
     "type": 0,
     "index": 1,
     "pts": "test",
-    "encodeT": 1,
+    "startEncodeT": 1,
+    "finishEncodeT": 1,
     "sendT": 1,
     "ver": "v1"
 })";
 
-static const std::string TEST_FRAME_INFO_JSON_ENCODET = R"({
+static const std::string TEST_SINK_FRAME_INFO_JSON_STARTENCODET = R"({
     "type": 0,
     "index": 1,
     "pts": 1,
-    "encodeT": "test",
+    "startEncodeT": "test",
+    "finishEncodeT": 1,
     "sendT": 1,
     "ver": "v1"
 })";
 
-static const std::string TEST_FRAME_INFO_JSON_SENDT = R"({
+static const std::string TEST_SINK_FRAME_INFO_JSON_FINISHENCODET = R"({
     "type": 0,
     "index": 1,
     "pts": 1,
-    "encodeT": 1,
+    "startEncodeT": 1,
+    "finishEncodeT": "test",
+    "sendT": 1,
+    "ver": "v1"
+})";
+
+static const std::string TEST_SINK_FRAME_INFO_JSON_SENDT = R"({
+    "type": 0,
+    "index": 1,
+    "pts": 1,
+    "startEncodeT": 1,
+    "finishEncodeT": 1,
     "sendT": "test",
     "ver": "v1"
 })";
 
-static const std::string TEST_FRAME_INFO_JSON_VER = R"({
+static const std::string TEST_SINK_FRAME_INFO_JSON_VER = R"({
     "type": 0,
     "index": 1,
     "pts": 1,
-    "encodeT": 1,
+    "startEncodeT": 1,
+    "finishEncodeT": 1,
     "sendT": "test",
     "ver": 1,
 })";
 
-static const std::string TEST_FRAME_INFO_JSON = R"({
+static const std::string TEST_SINK_FRAME_INFO_JSON = R"({
     "type": 0,
     "index": 1,
     "pts": 1,
-    "encodeT": 1,
+    "startEncodeT": 1,
+    "finishEncodeT": 1,
     "sendT": 1,
     "ver": "test",
 })";
 
-void DCameraFrameInfoTest::SetUpTestCase(void)
+void DCameraSinkFrameInfoTest::SetUpTestCase(void)
 {
 }
 
-void DCameraFrameInfoTest::TearDownTestCase(void)
+void DCameraSinkFrameInfoTest::TearDownTestCase(void)
 {
 }
 
-void DCameraFrameInfoTest::SetUp()
+void DCameraSinkFrameInfoTest::SetUp()
 {
 }
 
-void DCameraFrameInfoTest::TearDown()
+void DCameraSinkFrameInfoTest::TearDown()
 {
 }
 
@@ -116,32 +133,35 @@ void DCameraFrameInfoTest::TearDown()
  * @tc.type: FUNC
  * @tc.require: Issue Number
  */
-HWTEST_F(DCameraFrameInfoTest, dcamera_frame_info_test_001, TestSize.Level1)
+HWTEST_F(DCameraSinkFrameInfoTest, dcamera_sink_frame_info_test_001, TestSize.Level1)
 {
-    DCameraFrameInfo frame;
+    DCameraSinkFrameInfo frame;
     std::string str = "0";
     int32_t ret = frame.Unmarshal(str);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 
-    ret = frame.Unmarshal(TEST_FRAME_INFO_JSON_TYPE);
+    ret = frame.Unmarshal(TEST_SINK_FRAME_INFO_JSON_TYPE);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 
-    ret = frame.Unmarshal(TEST_FRAME_INFO_JSON_INDEX);
+    ret = frame.Unmarshal(TEST_SINK_FRAME_INFO_JSON_INDEX);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 
-    ret = frame.Unmarshal(TEST_FRAME_INFO_JSON_PTS);
+    ret = frame.Unmarshal(TEST_SINK_FRAME_INFO_JSON_PTS);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 
-    ret = frame.Unmarshal(TEST_FRAME_INFO_JSON_ENCODET);
+    ret = frame.Unmarshal(TEST_SINK_FRAME_INFO_JSON_STARTENCODET);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 
-    ret = frame.Unmarshal(TEST_FRAME_INFO_JSON_SENDT);
+    ret = frame.Unmarshal(TEST_SINK_FRAME_INFO_JSON_FINISHENCODET);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 
-    ret = frame.Unmarshal(TEST_FRAME_INFO_JSON_VER);
+    ret = frame.Unmarshal(TEST_SINK_FRAME_INFO_JSON_SENDT);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 
-    ret = frame.Unmarshal(TEST_FRAME_INFO_JSON);
+    ret = frame.Unmarshal(TEST_SINK_FRAME_INFO_JSON_VER);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = frame.Unmarshal(TEST_SINK_FRAME_INFO_JSON);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 } // namespace DistributedHardware

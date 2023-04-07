@@ -13,33 +13,16 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DCAMERA_FRAME_INFO_H
-#define OHOS_DCAMERA_FRAME_INFO_H
-#include <string>
-#include <dcamera_sink_frame_info.h>
-
+#ifndef OHOS_IFEEDABLE_DATA_H
+#define OHOS_IFEEDABLE_DATA_H
+#include <stdint.h>
 namespace OHOS {
 namespace DistributedHardware {
-struct DCameraFrameProcessTimePoint {
-    int64_t startEncode;
-    int64_t finishEncode;
-    int64_t send;
-    int64_t recv;
-    int64_t startDecode;
-    int64_t finishDecode;
-    int64_t startScale;
-    int64_t finishScale;
-    int64_t startSmooth;
-    int64_t finishSmooth;
-};
-struct DCameraFrameInfo {
-    int8_t type;
-    std::string ver;
-    int32_t index;
-    int32_t offset;
-    int64_t pts;
-    DCameraFrameProcessTimePoint timePonit;
+class IFeedableData {
+public:
+    virtual ~IFeedableData() = default;
+    virtual int64_t GetTimeStamp() = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DCAMERA_FRAME_INFO_H
+#endif // OHOS_IFEEDABLE_DATA_H

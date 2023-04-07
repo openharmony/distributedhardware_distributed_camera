@@ -83,6 +83,11 @@ const std::string DCAMERA_PKG_NAME = "ohos.dhardware.dcamera";
 const std::string SNAP_SHOT_SESSION_FLAG = "dataSnapshot";
 const std::string CONTINUE_SESSION_FLAG = "dataContinue";
 const std::string TIME_STAMP_US = "timeStampUs";
+const std::string INDEX = "index";
+const std::string START_ENCODE_TIME_US = "startEncodeT";
+const std::string FINISH_ENCODE_TIME_US = "finishEncodeT";
+const std::string SEND_TIME_US = "sendT";
+const std::string RECV_TIME_US = "recvT";
 
 const std::string DISTRIBUTED_HARDWARE_ID_KEY = "dhID";
 const std::string CAMERA_ID_PREFIX = "Camera_";
@@ -101,6 +106,7 @@ const std::string CAMERA_FORMAT_PHOTO = "Photo";
 const std::string CAMERA_RESOLUTION_KEY = "Resolution";
 const std::string CAMERA_SURFACE_FORMAT = "CAMERA_SURFACE_FORMAT";
 const std::string HDF_DCAMERA_EXT_SERVICE = "distributed_camera_provider_service";
+constexpr static int8_t FRAME_HEAD = 0;
 
 const int32_t RESOLUTION_MAX_WIDTH_SNAPSHOT = 4096;
 const int32_t RESOLUTION_MAX_HEIGHT_SNAPSHOT = 3072;
@@ -126,6 +132,7 @@ const std::string REGISTER_SERVICE_NOTIFY = "regSvcNotify";
 const std::string SINK_START_EVENT = "sinkStartEvent";
 const std::string SOURCE_START_EVENT = "srcStartEvent";
 const std::string UNREGISTER_SERVICE_NOTIFY = "unregSvcNotify";
+const std::string LOOPER_SMOOTH = "looperSmooth";
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DISTRIBUTED_CAMERA_CONSTANTS_H

@@ -36,6 +36,8 @@ config("module_private_config") {
     "${fwk_common_path}/utils/include",
     "${fwk_utils_path}/include/eventbus",
     "//third_party/ffmpeg/",
+    "${feeding_smoother_path}/base",
+    "${services_path}/cameraservice/base/include",
   ]
 }
 

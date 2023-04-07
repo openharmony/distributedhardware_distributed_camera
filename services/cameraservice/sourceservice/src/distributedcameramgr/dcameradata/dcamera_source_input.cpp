@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,18 +13,18 @@
  * limitations under the License.
  */
 
-#include "dcamera_source_input.h"
-
 #include "anonymous_string.h"
+#include "dcamera_channel_source_impl.h"
 #include "dcamera_hitrace_adapter.h"
+#include "dcamera_frame_info.h"
+#include "dcamera_source_data_process.h"
+#include "dcamera_source_event.h"
+#include "dcamera_source_input.h"
+#include "dcamera_source_input_channel_listener.h"
+#include "dcamera_softbus_latency.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
-
-#include "dcamera_channel_source_impl.h"
-#include "dcamera_source_data_process.h"
-#include "dcamera_source_event.h"
-#include "dcamera_source_input_channel_listener.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -336,6 +336,7 @@ void DCameraSourceInput::OnSessionError(DCStreamType streamType, int32_t eventTy
 
 void DCameraSourceInput::OnDataReceived(DCStreamType streamType, std::vector<std::shared_ptr<DataBuffer>>& buffers)
 {
+    buffers[0]->frameInfo_.offset = DCameraSoftbusLatency::GetInstance().GetTimeSyncInfo(devId_);
     int32_t ret = dataProcess_[streamType]->FeedStream(buffers);
     if (ret != DCAMERA_OK) {
         DHLOGE("OnDataReceived FeedStream %d stream failed ret: %d, devId: %s, dhId: %s", streamType,

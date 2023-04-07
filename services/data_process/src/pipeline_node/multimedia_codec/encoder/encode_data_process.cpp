@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,11 +16,11 @@
 #include <cmath>
 #include "dcamera_hisysevent_adapter.h"
 #include "dcamera_utils_tools.h"
-#include "distributed_camera_constants.h"
 #include "distributed_hardware_log.h"
 #include "encode_data_process.h"
 #include "encode_video_callback.h"
 #include "graphic_common_c.h"
+#include <ctime>
 
 #ifndef DH_LOG_TAG
 #define DH_LOG_TAG "DCDP_NODE_ENCODEC"
@@ -499,8 +499,18 @@ int32_t EncodeDataProcess::GetEncoderOutputBuffer(uint32_t index, Media::AVCodec
         DHLOGE("memcpy_s buffer failed.");
         return DCAMERA_MEMORY_OPT_ERROR;
     }
-    bufferOutput->SetInt64(TIME_STAMP_US, info.presentationTimeUs);
-
+    int64_t timeStamp = info.presentationTimeUs;
+    struct timespec time = {0, 0};
+    clock_gettime(CLOCK_MONOTONIC, &time);
+    int64_t timeNs = static_cast<uint64_t>(time.tv_sec) * S2NS + static_cast<uint64_t>(time.tv_nsec);
+    int64_t encodeT = timeNs / US2NS - timeStamp;
+    int64_t finishEncodeT = GetNowTimeStampUs();
+    int64_t startEncodeT = finishEncodeT - encodeT;
+    bufferOutput->SetInt64(START_ENCODE_TIME_US, startEncodeT);
+    bufferOutput->SetInt64(FINISH_ENCODE_TIME_US, finishEncodeT);
+    bufferOutput->SetInt64(TIME_STAMP_US, timeStamp);
+    bufferOutput->SetInt32(INDEX, index_);
+    index_++;
     std::vector<std::shared_ptr<DataBuffer>> nextInputBuffers;
     nextInputBuffers.push_back(bufferOutput);
     return EncodeDone(nextInputBuffers);

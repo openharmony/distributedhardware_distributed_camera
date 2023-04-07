@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,12 +21,14 @@
 #include "event.h"
 #include "data_buffer.h"
 #include "image_common_type.h"
+#include "surface.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 enum class VideoCodecAction : int32_t {
     NO_ACTION = 0,
     ACTION_ONCE_AGAIN = 1,
+    ACTION_GET_DECODER_OUTPUT_BUFFER = 2,
 };
 
 class CodecPacket {
@@ -34,6 +36,8 @@ public:
     CodecPacket() : videoCodec_(VideoCodecType::NO_CODEC) {}
     CodecPacket(VideoCodecType videoCodec, const std::vector<std::shared_ptr<DataBuffer>>& multiDataBuffers)
         : videoCodec_(videoCodec), multiDataBuffers_(multiDataBuffers) {}
+    CodecPacket(const sptr<IConsumerSurface>& surface)
+        : videoCodec_(VideoCodecType::NO_CODEC), surface_(surface) {}
     ~CodecPacket() = default;
 
     void SetVideoCodecType(VideoCodecType videoCodec)
@@ -56,9 +60,20 @@ public:
         return multiDataBuffers_;
     }
 
+    void SetSurface(sptr<IConsumerSurface> surface)
+    {
+        surface_ = surface;
+    }
+
+    sptr<IConsumerSurface> GetSurface() const
+    {
+        return surface_;
+    }
+
 private:
     VideoCodecType videoCodec_;
     std::vector<std::shared_ptr<DataBuffer>> multiDataBuffers_;
+    sptr<IConsumerSurface> surface_;
 };
 
 class DCameraCodecEvent : public Event {

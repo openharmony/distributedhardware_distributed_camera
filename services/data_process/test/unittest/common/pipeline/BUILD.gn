@@ -35,6 +35,8 @@ config("module_private_config") {
     "//commonlibrary/c_utils/base/include",
     "${fwk_common_path}/utils/include",
     "${fwk_utils_path}/include/eventbus",
+    "${feeding_smoother_path}/base",
+    "${services_path}/cameraservice/base/include",
   ]
 }
 
