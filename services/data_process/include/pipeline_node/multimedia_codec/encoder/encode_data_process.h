@@ -75,7 +75,7 @@ private:
     int64_t GetEncoderTimeStamp();
     void IncreaseWaitEncodeCnt();
     void ReduceWaitEncodeCnt();
-    int32_t GetEncoderOutputBuffer(uint32_t index, Media::AVCodecBufferInfo info);
+    int32_t GetEncoderOutputBuffer(uint32_t index, Media::AVCodecBufferInfo info, Media::AVCodecBufferFlag flag);
     int32_t EncodeDone(std::vector<std::shared_ptr<DataBuffer>>& outputBuffers);
 
 private:

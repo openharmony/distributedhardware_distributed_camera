@@ -438,7 +438,8 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_013, TestSize.Level1)
     testEncodeDataProcess_->ReduceWaitEncodeCnt();
     uint32_t index = time;
     Media::AVCodecBufferInfo info;
-    int32_t rc = testEncodeDataProcess_->GetEncoderOutputBuffer(index, info);
+    Media::AVCodecBufferFlag flag = Media::AVCODEC_BUFFER_FLAG_CODEC_DATA;
+    int32_t rc = testEncodeDataProcess_->GetEncoderOutputBuffer(index, info, flag);
     EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
 }
 

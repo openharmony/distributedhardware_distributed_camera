@@ -716,6 +716,7 @@ void DecodeDataProcess::OnOutputBufferAvailable(uint32_t index, const Media::AVC
     outputInfo_ = info;
     {
         std::lock_guard<std::mutex> lock(mtxDequeLock_);
+        AlignFirstFrameTime();
         for (auto it = frameInfoDeque_.begin(); it != frameInfoDeque_.end(); it++) {
             DCameraFrameInfo frameInfo = *it;
             if (frameInfo.timePonit.finishDecode != 0) {
@@ -756,10 +757,13 @@ int32_t DecodeDataProcess::GetProperty(const std::string& propertyName, Property
 
 void DecodeDataProcess::AlignFirstFrameTime()
 {
-    if (frameInfoDeque_.front().index != FRAME_HEAD) {
+    if (frameInfoDeque_.empty()) {
         return;
     }
     DCameraFrameInfo frameInfo = frameInfoDeque_.front();
+    if (frameInfo.index != FRAME_HEAD || frameInfo.type != Media::AVCODEC_BUFFER_FLAG_CODEC_DATA) {
+        return;
+    }
     frameInfoDeque_.pop_front();
     DCameraFrameInfo front = frameInfoDeque_.front();
     frameInfo.index = front.index;

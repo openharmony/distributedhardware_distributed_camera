@@ -755,10 +755,13 @@ int32_t DecodeDataProcess::GetProperty(const std::string& propertyName, Property
 
 void DecodeDataProcess::AlignFirstFrameTime()
 {
-    if (frameInfoDeque_.front().index != FRAME_HEAD) {
+    if (frameInfoDeque_.empty()) {
         return;
     }
     DCameraFrameInfo frameInfo = frameInfoDeque_.front();
+    if (frameInfo.index != FRAME_HEAD || frameInfo.type != Media::AVCODEC_BUFFER_FLAG_CODEC_DATA) {
+        return;
+    }
     frameInfoDeque_.pop_front();
     DCameraFrameInfo front = frameInfoDeque_.front();
     frameInfo.index = front.index;
