@@ -472,7 +472,8 @@ void EncodeDataProcess::ReduceWaitEncodeCnt()
     DHLOGD("Wait encoder output frames number is %d.", waitEncoderOutputCount_);
 }
 
-int32_t EncodeDataProcess::GetEncoderOutputBuffer(uint32_t index, Media::AVCodecBufferInfo info)
+int32_t EncodeDataProcess::GetEncoderOutputBuffer(uint32_t index, Media::AVCodecBufferInfo info,
+    Media::AVCodecBufferFlag flag)
 {
     DHLOGD("Get encoder output buffer.");
     if (videoEncoder_ == nullptr) {
@@ -509,6 +510,7 @@ int32_t EncodeDataProcess::GetEncoderOutputBuffer(uint32_t index, Media::AVCodec
     bufferOutput->SetInt64(START_ENCODE_TIME_US, startEncodeT);
     bufferOutput->SetInt64(FINISH_ENCODE_TIME_US, finishEncodeT);
     bufferOutput->SetInt64(TIME_STAMP_US, timeStamp);
+    bufferOutput->SetInt32(FRAME_TYPE, flag);
     bufferOutput->SetInt32(INDEX, index_);
     index_++;
     std::vector<std::shared_ptr<DataBuffer>> nextInputBuffers;
@@ -581,7 +583,7 @@ void EncodeDataProcess::OnOutputBufferAvailable(uint32_t index, Media::AVCodecBu
     }
     DHLOGD("Video encode buffer info: presentation TimeUs %lld, size %d, offset %d, flag %d",
         info.presentationTimeUs, info.size, info.offset, flag);
-    int32_t err = GetEncoderOutputBuffer(index, info);
+    int32_t err = GetEncoderOutputBuffer(index, info, flag);
     if (err != DCAMERA_OK) {
         DHLOGE("Get encode output Buffer failed.");
         return;

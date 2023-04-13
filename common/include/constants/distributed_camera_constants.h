@@ -83,6 +83,7 @@ const std::string DCAMERA_PKG_NAME = "ohos.dhardware.dcamera";
 const std::string SNAP_SHOT_SESSION_FLAG = "dataSnapshot";
 const std::string CONTINUE_SESSION_FLAG = "dataContinue";
 const std::string TIME_STAMP_US = "timeStampUs";
+const std::string FRAME_TYPE = "frameType";
 const std::string INDEX = "index";
 const std::string START_ENCODE_TIME_US = "startEncodeT";
 const std::string FINISH_ENCODE_TIME_US = "finishEncodeT";

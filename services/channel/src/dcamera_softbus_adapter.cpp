@@ -200,6 +200,10 @@ int32_t DCameraSoftbusAdapter::SendSofbusStream(int32_t sessionId, std::shared_p
     if (!buffer->FindInt64(TIME_STAMP_US, timeStamp)) {
         DHLOGD("SendSofbusStream find %s failed.", TIME_STAMP_US.c_str());
     }
+    int32_t frameType;
+    if (!buffer->FindInt32(FRAME_TYPE, frameType)) {
+        DHLOGD("SendSofbusStream find %s failed.", FRAME_TYPE.c_str());
+    }
     int32_t index;
     if (!buffer->FindInt32(INDEX, index)) {
         DHLOGD("SendSofbusStream find %s failed.", INDEX.c_str());
@@ -215,6 +219,7 @@ int32_t DCameraSoftbusAdapter::SendSofbusStream(int32_t sessionId, std::shared_p
     std::string jsonStr = "";
     DCameraSinkFrameInfo sinkFrameInfo;
     sinkFrameInfo.pts_ = timeStamp;
+    sinkFrameInfo.type_ = frameType;
     sinkFrameInfo.index_ = index;
     sinkFrameInfo.startEncodeT_ = startEncodeT;
     sinkFrameInfo.finishEncodeT_ = finishEncodeT;
