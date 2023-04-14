@@ -39,10 +39,13 @@ void IFeedingSmoother::PushData(const std::shared_ptr<IFeedableData>& data)
             return;
         }
     }
+    {
+        std::lock_guard<std::mutex> lock(queueMutex_);
+        dataQueue_.push(data);
+    }
     if (statistician_ != nullptr) {
         statistician_->CalProcessTime(data);
     }
-    dataQueue_.push(data);
     smoothCon_.notify_one();
 }
 
@@ -226,11 +229,14 @@ void IFeedingSmoother::RecordTime(const int64_t enterTime, const int64_t timeSta
 
 int32_t IFeedingSmoother::StopSmooth()
 {
-    if (state_ == SMOOTH_STOP) {
-        DHLOGD("Smooth is stoped.");
-        return SMOOTH_IS_STOPED;
+    {
+        std::lock_guard<std::mutex> lock(stateMutex_);
+        if (state_ == SMOOTH_STOP) {
+            DHLOGD("Smooth is stoped.");
+            return SMOOTH_IS_STOPED;
+        }
+        state_ = SMOOTH_STOP;
     }
-    state_ = SMOOTH_STOP;
     statistician_ = nullptr;
     UnregisterListener();
     smoothCon_.notify_one();
