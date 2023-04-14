@@ -81,7 +81,6 @@ void DCameraStreamDataProcessProducer::Stop()
         std::lock_guard<std::mutex> lock(bufferMutex_);
         state_ = DCAMERA_PRODUCER_STATE_STOP;
     }
-    producerCon_.notify_one();
     if (streamType_ == CONTINUOUS_FRAME) {
         smoother_->StopSmooth();
         smoother_ = nullptr;
@@ -90,6 +89,7 @@ void DCameraStreamDataProcessProducer::Stop()
         eventThread_.join();
         eventHandler_ = nullptr;
     } else {
+        producerCon_.notify_one();
         producerThread_.join();
     }
     camHdiProvider_ = nullptr;
