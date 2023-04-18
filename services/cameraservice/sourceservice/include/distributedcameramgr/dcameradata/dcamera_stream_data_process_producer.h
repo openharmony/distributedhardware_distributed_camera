@@ -43,12 +43,10 @@ public:
     void Start();
     void Stop();
     void FeedStream(const std::shared_ptr<DataBuffer>& buffer);
-    void UpdateInterval(uint32_t fps);
     virtual void OnSmoothFinished(const std::shared_ptr<IFeedableData>& data) override;
 
 private:
     void StartEvent();
-    void LooperContinue();
     void LooperSnapShot();
     int32_t FeedStreamToDriver(const DHBase& dhBase, const std::shared_ptr<DataBuffer>& buffer);
     int32_t CheckSharedMemory(const DCameraBuffer& sharedMemory, const std::shared_ptr<DataBuffer>& buffer);

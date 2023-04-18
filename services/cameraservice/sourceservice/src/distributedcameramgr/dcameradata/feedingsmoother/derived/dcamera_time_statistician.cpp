@@ -14,6 +14,7 @@
  */
 #include "dcamera_time_statistician.h"
 #include "distributed_hardware_log.h"
+#include "distributed_camera_constants.h"
 #include <memory>
 
 namespace OHOS {
@@ -65,6 +66,9 @@ void DCameraTimeStatistician::SetFrameIndex(const int32_t index)
 
 int64_t DCameraTimeStatistician::CalAverValue(int64_t& value, int64_t& valueSum)
 {
+    if (frameIndex_ == FRAME_HEAD) {
+        return 0;
+    }
     valueSum += value;
     return valueSum / frameIndex_;
 }
