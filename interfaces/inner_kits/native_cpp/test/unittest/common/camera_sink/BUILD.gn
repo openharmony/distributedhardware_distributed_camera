@@ -12,8 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import(
-    "//foundation/distributedhardware/distributed_camera/distributedcamera.gni")
+import("./../../../../../../../distributedcamera.gni")
 
 module_out_path = "distributed_camera/dcamera_sink_handler_test"
 
@@ -26,8 +25,6 @@ config("module_private_config") {
     "${common_path}/include/utils",
     "${innerkits_path}/native_cpp/camera_sink/include",
     "${innerkits_path}/native_cpp/camera_sink/include/callback",
-    "//commonlibrary/c_utils/base/include",
-    "//utils/system/safwk/native/include",
     "${fwk_common_path}/utils/include",
   ]
 }

@@ -14,8 +14,7 @@
 #####################hydra-fuzz###################
 import("//build/config/features.gni")
 import("//build/test.gni")
-import(
-    "//foundation/distributedhardware/distributed_camera/distributedcamera.gni")
+import("./../../../../../../distributedcamera.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SourceHandlerConfigDistributedHardwareFuzzTest") {
@@ -23,9 +22,7 @@ ohos_fuzztest("SourceHandlerConfigDistributedHardwareFuzzTest") {
 
   fuzz_config_file = "${innerkits_path}/native_cpp/test/fuzztest/sourcehandlerconfigdistributedhardware_fuzzer"
 
-  include_dirs = [ "//utils/system/safwk/native/include" ]
-
-  include_dirs += [
+  include_dirs = [
     "include",
     "${common_path}/include",
     "${common_path}/include/constants",

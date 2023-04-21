@@ -13,14 +13,11 @@
 
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
-import(
-    "//foundation/distributedhardware/distributed_camera/distributedcamera.gni")
+import("./../../../../../../distributedcamera.gni")
 
 config("module_private_config") {
   include_dirs = [
     "//third_party/jsoncpp/include",
-    "//commonlibrary/c_utils/base/include",
-    "//utils/system/safwk/native/include",
     "${graphicstandard_path}/frameworks/surface/include",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include/input",
@@ -69,8 +66,6 @@ ohos_executable("dcamera_client_demo") {
     "${graphicstandard_path}:libsurface",
     "${services_path}/cameraservice/cameraoperator/client:distributed_camera_client",
     "${services_path}/cameraservice/sinkservice:distributed_camera_sink",
-    "//base/security/access_token/interfaces/innerkits/nativetoken:libnativetoken",
-    "//base/security/access_token/interfaces/innerkits/token_setproc:libtoken_setproc",
     "//third_party/jsoncpp:jsoncpp",
   ]
 
@@ -84,6 +79,8 @@ ohos_executable("dcamera_client_demo") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "multimedia_player_framework:media_client",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
   ]
 
   defines = [

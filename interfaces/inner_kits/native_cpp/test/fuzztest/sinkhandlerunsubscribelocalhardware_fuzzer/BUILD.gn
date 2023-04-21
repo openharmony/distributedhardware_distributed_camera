@@ -14,8 +14,7 @@
 #####################hydra-fuzz###################
 import("//build/config/features.gni")
 import("//build/test.gni")
-import(
-    "//foundation/distributedhardware/distributed_camera/distributedcamera.gni")
+import("./../../../../../../distributedcamera.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SinkHandlerUnsubscribeLocalHardwareFuzzTest") {
@@ -24,7 +23,6 @@ ohos_fuzztest("SinkHandlerUnsubscribeLocalHardwareFuzzTest") {
   fuzz_config_file = "${innerkits_path}/native_cpp/test/fuzztest/sinkhandlerunsubscribelocalhardware_fuzzer"
 
   include_dirs = [
-    "//utils/system/safwk/native/include",
     "${innerkits_path}/native_cpp",
     "${fwk_common_path}/utils/include",
   ]

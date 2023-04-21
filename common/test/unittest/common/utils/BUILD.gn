@@ -12,8 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import(
-    "//foundation/distributedhardware/distributed_camera/distributedcamera.gni")
+import("./../../../../../distributedcamera.gni")
 
 module_out_path = "distributed_camera/utils_test"
 
@@ -23,8 +22,6 @@ config("module_private_config") {
   include_dirs = [
     "${common_path}/include/constants",
     "${common_path}/include/utils",
-    "//foundation/graphic/graphic_2d/interfaces/innerkits/surface",
-    "//foundation/graphic/graphic_2d/frameworks/surface/include",
     "${feeding_smoother_path}/base",
     "${services_path}/cameraservice/base/include",
   ]

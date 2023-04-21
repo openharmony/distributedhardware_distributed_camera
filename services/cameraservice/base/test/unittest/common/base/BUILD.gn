@@ -12,16 +12,13 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import(
-    "//foundation/distributedhardware/distributed_camera/distributedcamera.gni")
+import("./../../../../../../../distributedcamera.gni")
 
 module_out_path = "distributed_camera/dcamera_services_base_test"
 
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
-    "//commonlibrary/c_utils/base/include",
-    "//utils/system/safwk/native/include",
     "//drivers/peripheral/base",
     "${fwk_common_path}/log/include",
     "${fwk_common_path}/utils/include",

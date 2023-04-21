@@ -13,13 +13,10 @@
 
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
-import(
-    "//foundation/distributedhardware/distributed_camera/distributedcamera.gni")
+import("./../../distributedcamera.gni")
 
 ohos_shared_library("distributed_camera_channel") {
   include_dirs = [
-    "//commonlibrary/c_utils/base/include",
-    "//utils/system/safwk/native/include",
     "${fwk_common_path}/utils/include",
     "${services_path}/cameraservice/base/include",
   ]

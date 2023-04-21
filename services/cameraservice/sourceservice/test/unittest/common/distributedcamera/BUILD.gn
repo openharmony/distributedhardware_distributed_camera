@@ -12,8 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import(
-    "//foundation/distributedhardware/distributed_camera/distributedcamera.gni")
+import("./../../../../../../../distributedcamera.gni")
 
 module_out_path = "distributed_camera/dcamera_source_test"
 
@@ -44,8 +43,6 @@ config("module_private_config") {
     "${fwk_utils_path}/include",
     "${fwk_utils_path}/include/eventbus",
     "${fwk_common_path}/utils/include",
-    "//commonlibrary/c_utils/base/include",
-    "//utils/system/safwk/native/include",
     "//third_party/jsoncpp/include",
     "//drivers/peripheral/base/",
     "${graphicstandard_path}/frameworks/surface/include",
