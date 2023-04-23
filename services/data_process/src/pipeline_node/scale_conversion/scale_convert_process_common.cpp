@@ -106,7 +106,7 @@ void ScaleConvertProcess::ReleaseProcessNode()
 
 int ScaleConvertProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& inputBuffers)
 {
-    inputBuffers[0]->frameInfo_.timePonit.startScale = GetNowTimeStampUs();
+    int64_t startScaleTime = GetNowTimeStampUs();
     DHLOGD("Process data in ScaleConvertProcess.");
     if (!isScaleConvert_.load()) {
         DHLOGE("Scale Convert node occurred error or start release.");
@@ -117,6 +117,7 @@ int ScaleConvertProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& i
         DHLOGE("The input data buffers is empty.");
         return DCAMERA_BAD_VALUE;
     }
+    inputBuffers[0]->frameInfo_.timePonit.startScale = startScaleTime;
 
     if (!IsConvertible(sourceConfig_, processedConfig_)) {
         DHLOGD("The target resolution: %dx%d format: %d is the same as the source resolution: %dx%d format: %d",
@@ -362,12 +363,13 @@ int32_t ScaleConvertProcess::CopyNV21SrcData(const ImageUnitInfo& srcImgInfo)
 
 int32_t ScaleConvertProcess::ConvertDone(std::vector<std::shared_ptr<DataBuffer>>& outputBuffers)
 {
-    outputBuffers[0]->frameInfo_.timePonit.finishScale = GetNowTimeStampUs();
+    int64_t startConvertDone = GetNowTimeStampUs();
     DHLOGD("ScaleConvertProcess : Convert Done.");
     if (outputBuffers.empty()) {
         DHLOGE("The received data buffer is empty.");
         return DCAMERA_BAD_VALUE;
     }
+    outputBuffers[0]->frameInfo_.timePonit.finishScale = startConvertDone;
 
     if (nextDataProcess_ != nullptr) {
         DHLOGD("Send to the next node of the scale convert for processing.");
