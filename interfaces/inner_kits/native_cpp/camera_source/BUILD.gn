@@ -15,9 +15,7 @@ import("//build/ohos.gni")
 import("./../../../../distributedcamera.gni")
 
 ohos_shared_library("distributed_camera_source_sdk") {
-  include_dirs = [
-    "${fwk_common_path}/utils/include",
-  ]
+  include_dirs = [ "${fwk_common_path}/utils/include" ]
 
   include_dirs += [
     "include",

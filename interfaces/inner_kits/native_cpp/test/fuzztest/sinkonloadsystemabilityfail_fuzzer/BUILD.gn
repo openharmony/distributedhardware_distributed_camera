@@ -22,9 +22,7 @@ ohos_fuzztest("SinkOnLoadSystemAbilityFailFuzzTest") {
 
   fuzz_config_file = "${innerkits_path}/native_cpp/test/fuzztest/sinkonloadsystemabilityfail_fuzzer"
 
-  include_dirs = [
-    "${fwk_common_path}/utils/include",
-  ]
+  include_dirs = [ "${fwk_common_path}/utils/include" ]
 
   include_dirs += [
     "include",

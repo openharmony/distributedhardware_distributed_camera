@@ -23,9 +23,7 @@ ohos_fuzztest("SinkProxyGetCameraInfoFuzzTest") {
   fuzz_config_file =
       "${innerkits_path}/native_cpp/test/fuzztest/sinkproxygetcamerainfo_fuzzer"
 
-  include_dirs = [
-    "${fwk_common_path}/utils/include",
-  ]
+  include_dirs = [ "${fwk_common_path}/utils/include" ]
 
   include_dirs += [
     "include",
