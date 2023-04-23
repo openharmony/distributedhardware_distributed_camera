@@ -69,8 +69,8 @@ ohos_unittest("DCameraDataProcessPipelineNodeTest") {
   external_deps = [
     "c_utils:utils",
     "eventhandler:libeventhandler",
-    "hitrace_native:hitrace_meter",
     "graphic_standard:surface",
+    "hitrace_native:hitrace_meter",
     "multimedia_player_framework:media_client",
   ]
 
