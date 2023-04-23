@@ -20,8 +20,7 @@ import("./../../../../../../distributedcamera.gni")
 ohos_fuzztest("SinkProxyInitSinkFuzzTest") {
   module_out_path = "distributed_camera/sinkproxyinitsink"
 
-  fuzz_config_file =
-      "${innerkits_path}/native_cpp/test/fuzztest/sinkproxyinitsink_fuzzer"
+  fuzz_config_file = "${innerkits_path}/native_cpp/test/fuzztest/sinkproxyinitsink_fuzzer"
 
   include_dirs = [ "${fwk_common_path}/utils/include" ]
 

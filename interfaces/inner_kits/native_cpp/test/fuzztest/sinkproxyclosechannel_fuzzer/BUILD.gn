@@ -20,8 +20,7 @@ import("./../../../../../../distributedcamera.gni")
 ohos_fuzztest("SinkProxyCloseChannelFuzzTest") {
   module_out_path = "distributed_camera/sinkproxyclosechannel"
 
-  fuzz_config_file =
-      "${innerkits_path}/native_cpp/test/fuzztest/sinkproxyclosechannel_fuzzer"
+  fuzz_config_file = "${innerkits_path}/native_cpp/test/fuzztest/sinkproxyclosechannel_fuzzer"
 
   include_dirs = [ "${fwk_common_path}/utils/include" ]
 
