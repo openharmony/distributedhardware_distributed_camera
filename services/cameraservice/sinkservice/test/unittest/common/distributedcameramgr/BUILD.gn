@@ -12,7 +12,8 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("./../../../../../../../distributedcamera.gni")
+import(
+    "//foundation/distributedhardware/distributed_camera/distributedcamera.gni")
 
 module_out_path = "distributed_camera/dcamera_sink_mgr_test"
 

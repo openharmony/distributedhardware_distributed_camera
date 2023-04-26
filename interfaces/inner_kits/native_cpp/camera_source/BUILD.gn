@@ -12,7 +12,8 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("./../../../../distributedcamera.gni")
+import(
+    "//foundation/distributedhardware/distributed_camera/distributedcamera.gni")
 
 ohos_shared_library("distributed_camera_source_sdk") {
   include_dirs = [ "${fwk_common_path}/utils/include" ]

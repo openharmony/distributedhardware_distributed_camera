@@ -13,7 +13,8 @@
 
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
-import("./../../../../../../distributedcamera.gni")
+import(
+    "//foundation/distributedhardware/distributed_camera/distributedcamera.gni")
 
 config("module_private_config") {
   include_dirs = [
