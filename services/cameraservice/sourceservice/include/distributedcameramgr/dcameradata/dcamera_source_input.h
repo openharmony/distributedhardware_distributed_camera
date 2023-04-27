@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,7 @@
 #include "icamera_input.h"
 #include "icamera_source_data_process.h"
 
+#include "dcamera_source_dev.h"
 #include "event_bus.h"
 #include "event_sender.h"
 
@@ -29,7 +30,7 @@ namespace DistributedHardware {
 class DCameraSourceInput : public ICameraInput, public EventSender,
     public std::enable_shared_from_this<DCameraSourceInput> {
 public:
-    DCameraSourceInput(std::string devId, std::string dhId, std::shared_ptr<EventBus>& eventBus);
+    DCameraSourceInput(std::string devId, std::string dhId, std::shared_ptr<DCameraSourceDev>& camDev);
     ~DCameraSourceInput() override;
 
     int32_t ConfigStreams(std::vector<std::shared_ptr<DCStreamInfo>>& streamInfos) override;
@@ -62,7 +63,7 @@ private:
     std::map<DCStreamType, DCameraChannelState> channelState_;
     std::string devId_;
     std::string dhId_;
-    std::shared_ptr<EventBus> eventBus_;
+    std::weak_ptr<DCameraSourceDev> camDev_;
 
     bool isInit = false;
 

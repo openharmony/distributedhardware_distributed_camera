@@ -363,13 +363,13 @@ int32_t ScaleConvertProcess::CopyNV21SrcData(const ImageUnitInfo& srcImgInfo)
 
 int32_t ScaleConvertProcess::ConvertDone(std::vector<std::shared_ptr<DataBuffer>>& outputBuffers)
 {
-    int64_t startConvertDone = GetNowTimeStampUs();
+    int64_t finishScaleTime = GetNowTimeStampUs();
     DHLOGD("ScaleConvertProcess : Convert Done.");
     if (outputBuffers.empty()) {
         DHLOGE("The received data buffer is empty.");
         return DCAMERA_BAD_VALUE;
     }
-    outputBuffers[0]->frameInfo_.timePonit.finishScale = startConvertDone;
+    outputBuffers[0]->frameInfo_.timePonit.finishScale = finishScaleTime;
 
     if (nextDataProcess_ != nullptr) {
         DHLOGD("Send to the next node of the scale convert for processing.");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -52,6 +52,8 @@ public:
     void OnEvent(DCameraSourceEvent& event) override;
     int32_t GetStateInfo();
     std::string GetVersion();
+    int32_t OnChannelConnectedEvent();
+    int32_t OnChannelDisconnectedEvent();
 
 public:
     virtual int32_t Register(std::shared_ptr<DCameraRegistParam>& param);

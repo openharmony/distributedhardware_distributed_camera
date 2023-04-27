@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -82,8 +82,8 @@ int32_t DCameraSourceDev::InitDCameraSourceDev()
     auto cameraSourceDev = std::shared_ptr<DCameraSourceDev>(shared_from_this());
     stateMachine_ = std::make_shared<DCameraSourceStateMachine>(cameraSourceDev);
     stateMachine_->UpdateState(DCAMERA_STATE_INIT);
-    controller_ = std::make_shared<DCameraSourceController>(devId_, dhId_, stateMachine_, eventBus_);
-    input_ = std::make_shared<DCameraSourceInput>(devId_, dhId_, eventBus_);
+    controller_ = std::make_shared<DCameraSourceController>(devId_, dhId_, stateMachine_, cameraSourceDev);
+    input_ = std::make_shared<DCameraSourceInput>(devId_, dhId_, cameraSourceDev);
     hdiCallback_ = new (std::nothrow) DCameraProviderCallbackImpl(devId_, dhId_, cameraSourceDev);
     if (hdiCallback_ == nullptr) {
         DHLOGE("DCameraSourceDev InitDCameraSourceDev failed, hdiCallback is null.");
@@ -604,6 +604,29 @@ int32_t DCameraSourceDev::GetStateInfo()
 std::string DCameraSourceDev::GetVersion()
 {
     return version_;
+}
+
+int32_t DCameraSourceDev::OnChannelConnectedEvent()
+{
+    std::shared_ptr<DCameraEvent> camEvent = std::make_shared<DCameraEvent>();
+    camEvent->eventType_ = DCAMERA_MESSAGE;
+    camEvent->eventResult_ = DCAMERA_EVENT_CHANNEL_CONNECTED;
+    DCameraSourceEvent event(*this, DCAMERA_EVENT_NOFIFY, camEvent);
+    eventBus_->PostEvent<DCameraSourceEvent>(event);
+    return DCAMERA_OK;
+}
+
+int32_t DCameraSourceDev::OnChannelDisconnectedEvent()
+{
+    DCameraIndex camIndex(devId_, dhId_);
+    DCameraSourceEvent event(*this, DCAMERA_EVENT_CLOSE, camIndex);
+    eventBus_->PostEvent<DCameraSourceEvent>(event);
+    std::shared_ptr<DCameraEvent> camEvent = std::make_shared<DCameraEvent>();
+    camEvent->eventType_ = DCAMERA_MESSAGE;
+    camEvent->eventResult_ = DCAMERA_EVENT_CHANNEL_DISCONNECTED;
+    DCameraSourceEvent eventNotify(*this, DCAMERA_EVENT_NOFIFY, camEvent);
+    eventBus_->PostEvent<DCameraSourceEvent>(eventNotify);
+    return DCAMERA_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

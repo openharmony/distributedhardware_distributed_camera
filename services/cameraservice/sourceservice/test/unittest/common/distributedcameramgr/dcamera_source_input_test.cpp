@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,6 +18,7 @@
 #include "dcamera_source_input.h"
 #undef private
 #include "distributed_camera_errno.h"
+#include "mock_dcamera_source_state_listener.h"
 
 using namespace testing::ext;
 
@@ -31,7 +32,8 @@ public:
     void TearDown();
 
     std::shared_ptr<DCameraSourceInput> testInput_;
-    std::shared_ptr<EventBus> eventBus_;
+    std::shared_ptr<DCameraSourceDev> camDev_;
+    std::shared_ptr<ICameraStateListener> stateListener_;
 private:
     static void SetStreamInfos();
     static void SetCaptureInfos();
@@ -128,14 +130,16 @@ void DCameraSourceInputTest::TearDownTestCase(void)
 
 void DCameraSourceInputTest::SetUp(void)
 {
-    eventBus_ = std::make_shared<EventBus>("TestInputHandler");
-    testInput_ = std::make_shared<DCameraSourceInput>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, eventBus_);
+    stateListener_ = std::make_shared<MockDCameraSourceStateListener>();
+    camDev_ = std::make_shared<DCameraSourceDev>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, stateListener_);
+    testInput_ = std::make_shared<DCameraSourceInput>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, camDev_);
 }
 
 void DCameraSourceInputTest::TearDown(void)
 {
     usleep(TEST_SLEEP_SEC);
-    eventBus_ = nullptr;
+    camDev_ = nullptr;
+    stateListener_ = nullptr;
     testInput_ = nullptr;
 }
 
@@ -317,6 +321,9 @@ HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_009, TestSize.Level1)
     int32_t rc = testInput_->Init();
     EXPECT_EQ(rc, DCAMERA_OK);
 
+    rc = camDev_->InitDCameraSourceDev();
+    EXPECT_EQ(rc, DCAMERA_OK);
+
     rc = testInput_->OpenChannel(g_camIndexs);
     EXPECT_NE(rc, DCAMERA_OK);
     rc = testInput_->UnInit();
@@ -334,6 +341,9 @@ HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_010, TestSize.Level1)
     EXPECT_EQ(false, testInput_ == nullptr);
 
     int32_t rc = testInput_->Init();
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    rc = camDev_->InitDCameraSourceDev();
     EXPECT_EQ(rc, DCAMERA_OK);
 
     rc = testInput_->OpenChannel(g_camIndexs);
@@ -390,7 +400,10 @@ HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_012, TestSize.Level1)
  */
 HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_013, TestSize.Level1)
 {
-    int32_t rc = testInput_->WaitforSessionResult();
+    int32_t rc = camDev_->InitDCameraSourceDev();
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    rc = testInput_->WaitforSessionResult();
     EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
 }
 
@@ -403,6 +416,9 @@ HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_013, TestSize.Level1)
 HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_014, TestSize.Level1)
 {
     int32_t rc = testInput_->Init();
+    rc = camDev_->InitDCameraSourceDev();
+    EXPECT_EQ(rc, DCAMERA_OK);
+
     rc = testInput_->EstablishContinuousFrameSession(g_camIndexs);
     EXPECT_NE(rc, DCAMERA_OK);
 }
@@ -416,6 +432,9 @@ HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_014, TestSize.Level1)
 HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_015, TestSize.Level1)
 {
     int32_t rc = testInput_->Init();
+    rc = camDev_->InitDCameraSourceDev();
+    EXPECT_EQ(rc, DCAMERA_OK);
+
     testInput_->FinshFrameAsyncTrace(DCStreamType::CONTINUOUS_FRAME);
     testInput_->FinshFrameAsyncTrace(DCStreamType::SNAPSHOT_FRAME);
     rc = testInput_->EstablishSnapshotFrameSession(g_camIndexs);

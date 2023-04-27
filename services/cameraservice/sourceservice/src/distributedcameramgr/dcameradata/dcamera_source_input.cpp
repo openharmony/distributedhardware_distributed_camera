@@ -28,8 +28,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-DCameraSourceInput::DCameraSourceInput(std::string devId, std::string dhId, std::shared_ptr<EventBus>& eventBus)
-    : devId_(devId), dhId_(dhId), eventBus_(eventBus), isInit(false)
+DCameraSourceInput::DCameraSourceInput(std::string devId, std::string dhId, std::shared_ptr<DCameraSourceDev>& camDev)
+    : devId_(devId), dhId_(dhId), camDev_(camDev), isInit(false)
 {
     DHLOGI("DCameraSourceInput Constructor devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
@@ -394,14 +394,12 @@ int32_t DCameraSourceInput::StopAllCapture()
 
 void DCameraSourceInput::PostChannelDisconnectedEvent()
 {
-    DCameraIndex camIndex(devId_, dhId_);
-    DCameraSourceEvent event(*this, DCAMERA_EVENT_CLOSE, camIndex);
-    eventBus_->PostEvent<DCameraSourceEvent>(event);
-    std::shared_ptr<DCameraEvent> camEvent = std::make_shared<DCameraEvent>();
-    camEvent->eventType_ = DCAMERA_MESSAGE;
-    camEvent->eventResult_ = DCAMERA_EVENT_CHANNEL_DISCONNECTED;
-    DCameraSourceEvent eventNotify(*this, DCAMERA_EVENT_NOFIFY, camEvent);
-    eventBus_->PostEvent<DCameraSourceEvent>(eventNotify);
+    std::shared_ptr<DCameraSourceDev> camDev = camDev_.lock();
+    if (camDev == nullptr) {
+        DHLOGE("DCameraSourceInput PostChannelDisconnectedEvent camDev is nullptr");
+        return;
+    }
+    camDev->OnChannelDisconnectedEvent();
 }
 
 int32_t DCameraSourceInput::WaitforSessionResult()
