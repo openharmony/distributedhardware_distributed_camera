@@ -18,10 +18,6 @@ import(
 
 ohos_shared_library("distributed_camera_data_process") {
   include_dirs = [
-    "//commonlibrary/c_utils/base/include",
-    "//utils/system/safwk/native/include",
-    "//foundation/graphic/graphic_2d/interfaces/innerkits/common",
-    "//foundation/multimedia/player_framework/interfaces/innerkits/native/media/include",
     "${fwk_common_path}/utils/include",
     "${fwk_utils_path}/include/eventbus",
     "${graphicstandard_path}/frameworks/surface/include",

@@ -32,7 +32,6 @@ config("module_private_config") {
     "${common_path}/include/constants",
     "${common_path}/include/utils",
     "${innerkits_path}/native_cpp/camera_source/include",
-    "//commonlibrary/c_utils/base/include",
     "${fwk_common_path}/utils/include",
     "${fwk_utils_path}/include/eventbus",
     "//third_party/ffmpeg/",
@@ -65,13 +64,13 @@ ohos_unittest("DCameraDataProcessPipelineNodeTest") {
   deps = [
     "${common_path}:distributed_camera_utils",
     "${services_path}/data_process:distributed_camera_data_process",
-    "//foundation/graphic/graphic_2d/frameworks/surface:surface",
     "//third_party/ffmpeg:libohosffmpeg",
   ]
 
   external_deps = [
     "c_utils:utils",
     "eventhandler:libeventhandler",
+    "graphic_standard:surface",
     "hitrace_native:hitrace_meter",
     "multimedia_player_framework:media_client",
   ]
