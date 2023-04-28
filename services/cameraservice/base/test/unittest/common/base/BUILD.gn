@@ -20,7 +20,6 @@ module_out_path = "distributed_camera/dcamera_services_base_test"
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
-    "//drivers/peripheral/base",
     "${fwk_common_path}/log/include",
     "${fwk_common_path}/utils/include",
     "${fwk_utils_path}/include/log",
