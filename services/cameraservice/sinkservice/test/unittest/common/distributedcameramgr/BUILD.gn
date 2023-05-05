@@ -49,7 +49,6 @@ config("module_private_config") {
 
     "${fwk_common_path}/utils/include",
     "${fwk_utils_path}/include/eventbus",
-    "//drivers/peripheral/base",
     "${feeding_smoother_path}/base",
     "${feeding_smoother_path}/derived",
     "${feeding_smoother_path}/utils",

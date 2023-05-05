@@ -21,8 +21,8 @@
         "adapted_system_type":[
             "standard"
         ],
-        "rom":"2000k",
-        "ram":"6M",
+        "rom":"2000KB",
+        "ram":"6MB",
         "hisysevent_config": [
             "//foundation/distributedhardware/distributed_camera/hisysevent.yaml"
         ],
