@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -100,7 +100,7 @@ HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_001, Tes
     DCameraSourceEvent event(*camDev_);
     eventBus_->AddHandler<DCameraSourceEvent>(event.GetType(), *camDev_);
 
-    input_ = std::make_shared<DCameraSourceInput>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, eventBus_);
+    input_ = std::make_shared<DCameraSourceInput>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, camDev_);
 
     listener_ = std::make_shared<DCameraSourceInputChannelListener>(input_, CONTINUOUS_FRAME);
     channel_->CreateSession(camIndexs, sessionFlag, sessionMode, listener_);
@@ -130,7 +130,7 @@ HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_002, Tes
     DCameraSourceEvent event(*camDev_);
     eventBus_->AddHandler<DCameraSourceEvent>(event.GetType(), *camDev_);
 
-    input_ = std::make_shared<DCameraSourceInput>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, eventBus_);
+    input_ = std::make_shared<DCameraSourceInput>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, camDev_);
 
     listener_ = std::make_shared<DCameraSourceInputChannelListener>(input_, CONTINUOUS_FRAME);
     channel_->CreateSession(camIndexs, sessionFlag, sessionMode, listener_);
@@ -161,7 +161,7 @@ HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_003, Tes
     DCameraSourceEvent event(*camDev_);
     eventBus_->AddHandler<DCameraSourceEvent>(event.GetType(), *camDev_);
 
-    input_ = std::make_shared<DCameraSourceInput>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, eventBus_);
+    input_ = std::make_shared<DCameraSourceInput>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, camDev_);
 
     listener_ = std::make_shared<DCameraSourceInputChannelListener>(input_, CONTINUOUS_FRAME);
     channel_->CreateSession(camIndexs, sessionFlag, sessionMode, listener_);
@@ -190,7 +190,7 @@ HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_004, Tes
     DCameraSourceEvent event(*camDev_);
     eventBus_->AddHandler<DCameraSourceEvent>(event.GetType(), *camDev_);
 
-    input_ = std::make_shared<DCameraSourceInput>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, eventBus_);
+    input_ = std::make_shared<DCameraSourceInput>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, camDev_);
 
     listener_ = std::make_shared<DCameraSourceInputChannelListener>(input_, CONTINUOUS_FRAME);
     channel_->CreateSession(camIndexs, sessionFlag, sessionMode, listener_);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,8 +37,8 @@
 namespace OHOS {
 namespace DistributedHardware {
 DCameraSourceController::DCameraSourceController(std::string devId, std::string dhId,
-    std::shared_ptr<DCameraSourceStateMachine>& stateMachine, std::shared_ptr<EventBus>& eventBus)
-    : devId_(devId), dhId_(dhId), stateMachine_(stateMachine), eventBus_(eventBus),
+    std::shared_ptr<DCameraSourceStateMachine>& stateMachine, std::shared_ptr<DCameraSourceDev>& camDev)
+    : devId_(devId), dhId_(dhId), stateMachine_(stateMachine), camDev_(camDev),
     channelState_(DCAMERA_CHANNEL_STATE_DISCONNECTED)
 {
     DHLOGI("DCameraSourceController create devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
@@ -395,11 +395,12 @@ void DCameraSourceController::OnSessionState(int32_t state)
             isChannelConnected_.store(true);
             channelCond_.notify_all();
             stateMachine_->UpdateState(DCAMERA_STATE_OPENED);
-            std::shared_ptr<DCameraEvent> camEvent = std::make_shared<DCameraEvent>();
-            camEvent->eventType_ = DCAMERA_MESSAGE;
-            camEvent->eventResult_ = DCAMERA_EVENT_CHANNEL_CONNECTED;
-            DCameraSourceEvent event(*this, DCAMERA_EVENT_NOFIFY, camEvent);
-            eventBus_->PostEvent<DCameraSourceEvent>(event);
+            std::shared_ptr<DCameraSourceDev> camDev = camDev_.lock();
+            if (camDev == nullptr) {
+                DHLOGE("DCameraSourceController OnSessionState camDev is nullptr");
+                break;
+            }
+            camDev->OnChannelConnectedEvent();
             break;
         }
         case DCAMERA_CHANNEL_STATE_DISCONNECTED: {
@@ -499,14 +500,12 @@ int32_t DCameraSourceController::WaitforSessionResult(const std::string& devId)
 
 void DCameraSourceController::PostChannelDisconnectedEvent()
 {
-    DCameraIndex camIndex(devId_, dhId_);
-    DCameraSourceEvent event(*this, DCAMERA_EVENT_CLOSE, camIndex);
-    eventBus_->PostEvent<DCameraSourceEvent>(event);
-    std::shared_ptr<DCameraEvent> camEvent = std::make_shared<DCameraEvent>();
-    camEvent->eventType_ = DCAMERA_MESSAGE;
-    camEvent->eventResult_ = DCAMERA_EVENT_CHANNEL_DISCONNECTED;
-    DCameraSourceEvent eventNotify(*this, DCAMERA_EVENT_NOFIFY, camEvent);
-    eventBus_->PostEvent<DCameraSourceEvent>(eventNotify);
+    std::shared_ptr<DCameraSourceDev> camDev = camDev_.lock();
+    if (camDev == nullptr) {
+        DHLOGE("DCameraSourceController PostChannelDisconnectedEvent camDev is nullptr");
+        return;
+    }
+    camDev->OnChannelDisconnectedEvent();
 }
 } // namespace DistributedHardware
 } // namespace OHOS

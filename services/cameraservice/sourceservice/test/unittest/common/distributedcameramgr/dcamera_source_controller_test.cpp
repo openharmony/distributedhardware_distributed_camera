@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,7 +37,6 @@ public:
     void SetUp();
     void TearDown();
 
-    std::shared_ptr<EventBus> eventBus_;
     std::shared_ptr<DCameraSourceDev> camDev_;
     std::shared_ptr<ICameraStateListener> stateListener_;
     std::shared_ptr<DCameraSourceStateMachine> stateMachine_;
@@ -66,12 +65,11 @@ void DCameraSourceControllerTest::TearDownTestCase(void)
 
 void DCameraSourceControllerTest::SetUp(void)
 {
-    eventBus_ = std::make_shared<EventBus>("SrcController");
     stateListener_ = std::make_shared<MockDCameraSourceStateListener>();
     camDev_ = std::make_shared<MockDCameraSourceDev>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, stateListener_);
     stateMachine_ = std::make_shared<DCameraSourceStateMachine>(camDev_);
     controller_ = std::make_shared<DCameraSourceController>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, stateMachine_,
-        eventBus_);
+        camDev_);
     DCameraIndex index;
     index.devId_ = TEST_DEVICE_ID;
     index.dhId_ = TEST_CAMERA_DH_ID_0;
@@ -81,7 +79,6 @@ void DCameraSourceControllerTest::SetUp(void)
 void DCameraSourceControllerTest::TearDown(void)
 {
     usleep(TEST_SLEEP_SEC);
-    eventBus_ = nullptr;
     stateMachine_ = nullptr;
     camDev_ = nullptr;
     stateListener_ = nullptr;
@@ -261,18 +258,17 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_009, TestSi
 HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_010, TestSize.Level1)
 {
     int32_t ret = controller_->Init(indexs_);
-    std::shared_ptr<DCameraSourceController> controller = std::make_shared<DCameraSourceController>(TEST_DEVICE_ID,
-        TEST_CAMERA_DH_ID_0, stateMachine_, eventBus_);
-    std::shared_ptr<ICameraChannelListener> listener_ =
-        std::make_shared<DCameraSourceControllerChannelListener>(controller);
+    ret = camDev_->InitDCameraSourceDev();
+    std::shared_ptr<ICameraChannelListener> listener =
+        std::make_shared<DCameraSourceControllerChannelListener>(controller_);
     int32_t state = 0;
-    listener_->OnSessionState(state);
+    listener->OnSessionState(state);
     int32_t eventType = 1;
     int32_t eventReason = 1;
     std::string detail = "OnSessionErrorTest";
-    listener_->OnSessionError(eventType, eventReason, detail);
+    listener->OnSessionError(eventType, eventReason, detail);
     std::vector<std::shared_ptr<DataBuffer>> buffers;
-    listener_->OnDataReceived(buffers);
+    listener->OnDataReceived(buffers);
     ret = controller_->UnInit();
     EXPECT_EQ(ret, DCAMERA_OK);
 }
@@ -444,8 +440,9 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_017, TestSi
  */
 HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_018, TestSize.Level1)
 {
+    int32_t ret = camDev_->InitDCameraSourceDev();
     controller_->WaitforSessionResult(TEST_DEVICE_ID);
-    int32_t ret = controller_->UnInit();
+    ret = controller_->UnInit();
     EXPECT_EQ(ret, DCAMERA_OK);
 }
 

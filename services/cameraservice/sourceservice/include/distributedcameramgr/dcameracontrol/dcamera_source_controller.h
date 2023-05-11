@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,7 @@
 
 #include "dcamera_index.h"
 #include "icamera_channel_listener.h"
+#include "dcamera_source_dev.h"
 #include "dcamera_source_state_machine.h"
 #include "event_bus.h"
 #include "icamera_channel.h"
@@ -32,7 +33,7 @@ class DCameraSourceController : public ICameraController, public EventSender,
     public std::enable_shared_from_this<DCameraSourceController> {
 public:
     DCameraSourceController(std::string devId, std::string dhId,
-        std::shared_ptr<DCameraSourceStateMachine>& stateMachine, std::shared_ptr<EventBus>& eventBus);
+        std::shared_ptr<DCameraSourceStateMachine>& stateMachine, std::shared_ptr<DCameraSourceDev>& camDev);
     ~DCameraSourceController() override;
     int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos) override;
     int32_t StopCapture() override;
@@ -61,7 +62,7 @@ private:
     std::shared_ptr<ICameraChannelListener> listener_;
     std::vector<DCameraIndex> indexs_;
     std::shared_ptr<DCameraSourceStateMachine> stateMachine_;
-    std::shared_ptr<EventBus> eventBus_;
+    std::weak_ptr<DCameraSourceDev> camDev_;
     int32_t channelState_;
     sptr<IDCameraProvider> camHdiProvider_;
 
