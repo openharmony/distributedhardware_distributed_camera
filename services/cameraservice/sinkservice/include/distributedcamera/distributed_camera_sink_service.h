@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,7 @@
 #ifndef OHOS_DISTRIBUTED_CAMERA_SINK_SERVICE_H
 #define OHOS_DISTRIBUTED_CAMERA_SINK_SERVICE_H
 
+#include <mutex>
 #include "system_ability.h"
 #include "ipc_object_stub.h"
 
@@ -57,6 +58,7 @@ private:
     DCameraServiceState state_ = DCameraServiceState::DCAMERA_SRV_STATE_NOT_START;
 
     std::string sinkVer_;
+    std::mutex mapMutex_;
     std::map<std::string, std::shared_ptr<DCameraSinkDev>> camerasMap_;
     static DistributedCameraSinkService* dcSinkService;
     const size_t DUMP_MAX_SIZE = 10 * 1024;
