@@ -3,7 +3,7 @@
     "description":"distributed hardware camera",
     "version":"3.1",
     "author":{},
-    "repository":"https://gitee.com/openharmony/distributed_camera",
+    "repository":"https://gitee.com/openharmony/distributedhardware_distributed_camera",
     "license":"Apache License 2.0",
     "publishAs":"code-segment",
     "segment":{
@@ -21,8 +21,8 @@
         "adapted_system_type":[
             "standard"
         ],
-        "rom":"2000KB",
-        "ram":"6MB",
+        "rom":"5120KB",
+        "ram":"66560KB",
         "hisysevent_config": [
             "//foundation/distributedhardware/distributed_camera/hisysevent.yaml"
         ],
