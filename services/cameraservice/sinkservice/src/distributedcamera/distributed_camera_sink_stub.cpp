@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "dcamera_ipc_interface_code.h"
 #include "distributed_camera_sink_stub.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -21,15 +22,17 @@ namespace OHOS {
 namespace DistributedHardware {
 DistributedCameraSinkStub::DistributedCameraSinkStub()
 {
-    memberFuncMap_[INIT_SINK] = &DistributedCameraSinkStub::InitSinkInner;
-    memberFuncMap_[RELEASE_SINK] = &DistributedCameraSinkStub::ReleaseSinkInner;
-    memberFuncMap_[SUBSCRIBE_LOCAL_HARDWARE] = &DistributedCameraSinkStub::SubscribeLocalHardwareInner;
-    memberFuncMap_[UNSUBSCRIBE_LOCAL_HARDWARE] = &DistributedCameraSinkStub::UnsubscribeLocalHardwareInner;
-    memberFuncMap_[STOP_CAPTURE] = &DistributedCameraSinkStub::StopCaptureInner;
-    memberFuncMap_[CHANNEL_NEG] = &DistributedCameraSinkStub::ChannelNegInner;
-    memberFuncMap_[GET_CAMERA_INFO] = &DistributedCameraSinkStub::GetCameraInfoInner;
-    memberFuncMap_[OPEN_CHANNEL] = &DistributedCameraSinkStub::OpenChannelInner;
-    memberFuncMap_[CLOSE_CHANNEL] = &DistributedCameraSinkStub::CloseChannelInner;
+    memberFuncMap_[IDCameraSinkInterfaceCode::INIT_SINK] = &DistributedCameraSinkStub::InitSinkInner;
+    memberFuncMap_[IDCameraSinkInterfaceCode::RELEASE_SINK] = &DistributedCameraSinkStub::ReleaseSinkInner;
+    memberFuncMap_[IDCameraSinkInterfaceCode::SUBSCRIBE_LOCAL_HARDWARE] =
+        &DistributedCameraSinkStub::SubscribeLocalHardwareInner;
+    memberFuncMap_[IDCameraSinkInterfaceCode::UNSUBSCRIBE_LOCAL_HARDWARE] =
+        &DistributedCameraSinkStub::UnsubscribeLocalHardwareInner;
+    memberFuncMap_[IDCameraSinkInterfaceCode::STOP_CAPTURE] = &DistributedCameraSinkStub::StopCaptureInner;
+    memberFuncMap_[IDCameraSinkInterfaceCode::CHANNEL_NEG] = &DistributedCameraSinkStub::ChannelNegInner;
+    memberFuncMap_[IDCameraSinkInterfaceCode::GET_CAMERA_INFO] = &DistributedCameraSinkStub::GetCameraInfoInner;
+    memberFuncMap_[IDCameraSinkInterfaceCode::OPEN_CHANNEL] = &DistributedCameraSinkStub::OpenChannelInner;
+    memberFuncMap_[IDCameraSinkInterfaceCode::CLOSE_CHANNEL] = &DistributedCameraSinkStub::CloseChannelInner;
 }
 
 DistributedCameraSinkStub::~DistributedCameraSinkStub()

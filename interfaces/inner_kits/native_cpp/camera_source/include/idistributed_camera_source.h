@@ -26,13 +26,6 @@ namespace DistributedHardware {
 class IDistributedCameraSource : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.distributedhardware.distributedcamerasource");
-    enum {
-        INIT_SOURCE = 0,
-        RELEASE_SOURCE = 1,
-        REGISTER_DISTRIBUTED_HARDWARE = 2,
-        UNREGISTER_DISTRIBUTED_HARDWARE = 3,
-        CAMERA_NOTIFY = 4,
-    };
 
     ~IDistributedCameraSource() override {}
     virtual int32_t InitSource(const std::string& params, const sptr<IDCameraSourceCallback>& callback) = 0;

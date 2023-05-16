@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "dcamera_ipc_interface_code.h"
 #include "dcamera_source_callback_stub.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -25,8 +26,10 @@ namespace OHOS {
 namespace DistributedHardware {
 DCameraSourceCallbackStub::DCameraSourceCallbackStub()
 {
-    memberFuncMap_[NOTIFY_REG_RESULT] = &DCameraSourceCallbackStub::NotifyRegResultInner;
-    memberFuncMap_[NOTIFY_UNREG_RESULT] = &DCameraSourceCallbackStub::NotifyUnregResultInner;
+    memberFuncMap_[IDCameraSourceCBInterfaceCode::NOTIFY_REG_RESULT] =
+        &DCameraSourceCallbackStub::NotifyRegResultInner;
+    memberFuncMap_[IDCameraSourceCBInterfaceCode::NOTIFY_UNREG_RESULT] =
+        &DCameraSourceCallbackStub::NotifyUnregResultInner;
 }
 
 DCameraSourceCallbackStub::~DCameraSourceCallbackStub()

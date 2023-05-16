@@ -23,17 +23,6 @@ namespace DistributedHardware {
 class IDistributedCameraSink : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.distributedhardware.distributedcamerasink");
-    enum {
-        INIT_SINK = 0,
-        RELEASE_SINK = 1,
-        SUBSCRIBE_LOCAL_HARDWARE = 2,
-        UNSUBSCRIBE_LOCAL_HARDWARE = 3,
-        STOP_CAPTURE = 4,
-        CHANNEL_NEG = 5,
-        GET_CAMERA_INFO = 6,
-        OPEN_CHANNEL = 7,
-        CLOSE_CHANNEL = 8,
-    };
 
     IDistributedCameraSink() = default;
     virtual ~IDistributedCameraSink() = default;

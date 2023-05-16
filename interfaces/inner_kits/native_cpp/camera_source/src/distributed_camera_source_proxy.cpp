@@ -16,6 +16,7 @@
 #include "distributed_camera_source_proxy.h"
 
 #include "anonymous_string.h"
+#include "dcamera_ipc_interface_code.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
 #include "iremote_object.h"
@@ -55,7 +56,7 @@ int32_t DistributedCameraSourceProxy::InitSource(const std::string& params,
         return DCAMERA_BAD_VALUE;
     }
 
-    remote->SendRequest(INIT_SOURCE, data, reply, option);
+    remote->SendRequest(static_cast<uint32_t>(IDCameraSourceInterfaceCode::INIT_SOURCE), data, reply, option);
     int32_t result = reply.ReadInt32();
     return result;
 }
@@ -75,7 +76,7 @@ int32_t DistributedCameraSourceProxy::ReleaseSource()
         DHLOGE("write token failed");
         return DCAMERA_BAD_VALUE;
     }
-    remote->SendRequest(RELEASE_SOURCE, data, reply, option);
+    remote->SendRequest(static_cast<uint32_t>(IDCameraSourceInterfaceCode::RELEASE_SOURCE), data, reply, option);
     int32_t result = reply.ReadInt32();
     return result;
 }
@@ -106,7 +107,8 @@ int32_t DistributedCameraSourceProxy::RegisterDistributedHardware(const std::str
         DHLOGE("write params failed");
         return DCAMERA_BAD_VALUE;
     }
-    remote->SendRequest(REGISTER_DISTRIBUTED_HARDWARE, data, reply, option);
+    remote->SendRequest(static_cast<uint32_t>(IDCameraSourceInterfaceCode::REGISTER_DISTRIBUTED_HARDWARE),
+        data, reply, option);
     int32_t result = reply.ReadInt32();
     return result;
 }
@@ -157,7 +159,8 @@ int32_t DistributedCameraSourceProxy::UnregisterDistributedHardware(const std::s
         DHLOGE("write params failed");
         return DCAMERA_BAD_VALUE;
     }
-    remote->SendRequest(UNREGISTER_DISTRIBUTED_HARDWARE, data, reply, option);
+    remote->SendRequest(static_cast<uint32_t>(IDCameraSourceInterfaceCode::UNREGISTER_DISTRIBUTED_HARDWARE),
+        data, reply, option);
     int32_t result = reply.ReadInt32();
     return result;
 }
@@ -203,7 +206,8 @@ int32_t DistributedCameraSourceProxy::DCameraNotify(const std::string& devId, co
         DHLOGE("write params failed");
         return DCAMERA_BAD_VALUE;
     }
-    remote->SendRequest(CAMERA_NOTIFY, data, reply, option);
+    remote->SendRequest(static_cast<uint32_t>(IDCameraSourceInterfaceCode::CAMERA_NOTIFY),
+        data, reply, option);
     int32_t result = reply.ReadInt32();
     return result;
 }
