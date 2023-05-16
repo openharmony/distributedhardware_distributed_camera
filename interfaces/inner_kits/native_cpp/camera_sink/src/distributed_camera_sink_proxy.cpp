@@ -48,7 +48,7 @@ int32_t DistributedCameraSinkProxy::InitSink(const std::string& params)
         DHLOGE("write params failed");
         return DCAMERA_BAD_VALUE;
     }
-    remote->SendRequest(IDCameraSinkInterfaceCode::INIT_SINK, data, reply, option);
+    remote->SendRequest(static_cast<uint32_t>(IDCameraSinkInterfaceCode::INIT_SINK), data, reply, option);
     int32_t result = reply.ReadInt32();
     return result;
 }
@@ -69,7 +69,7 @@ int32_t DistributedCameraSinkProxy::ReleaseSink()
         DHLOGE("write token failed");
         return DCAMERA_BAD_VALUE;
     }
-    remote->SendRequest(IDCameraSinkInterfaceCode::RELEASE_SINK, data, reply, option);
+    remote->SendRequest(static_cast<uint32_t>(IDCameraSinkInterfaceCode::RELEASE_SINK), data, reply, option);
     int32_t result = reply.ReadInt32();
     return result;
 }
@@ -99,7 +99,8 @@ int32_t DistributedCameraSinkProxy::SubscribeLocalHardware(const std::string& dh
         DHLOGE("write params failed");
         return DCAMERA_BAD_VALUE;
     }
-    remote->SendRequest(IDCameraSinkInterfaceCode::SUBSCRIBE_LOCAL_HARDWARE, data, reply, option);
+    remote->SendRequest(static_cast<uint32_t>(IDCameraSinkInterfaceCode::SUBSCRIBE_LOCAL_HARDWARE), data, reply,
+        option);
     int32_t result = reply.ReadInt32();
     return result;
 }
@@ -128,7 +129,8 @@ int32_t DistributedCameraSinkProxy::UnsubscribeLocalHardware(const std::string& 
         DHLOGE("write params failed");
         return DCAMERA_BAD_VALUE;
     }
-    remote->SendRequest(IDCameraSinkInterfaceCode::UNSUBSCRIBE_LOCAL_HARDWARE, data, reply, option);
+    remote->SendRequest(static_cast<uint32_t>(IDCameraSinkInterfaceCode::UNSUBSCRIBE_LOCAL_HARDWARE), data, reply,
+        option);
     int32_t result = reply.ReadInt32();
     return result;
 }
@@ -157,7 +159,7 @@ int32_t DistributedCameraSinkProxy::StopCapture(const std::string& dhId)
         DHLOGE("write params failed");
         return DCAMERA_BAD_VALUE;
     }
-    remote->SendRequest(IDCameraSinkInterfaceCode::STOP_CAPTURE, data, reply, option);
+    remote->SendRequest(static_cast<uint32_t>(IDCameraSinkInterfaceCode::STOP_CAPTURE), data, reply, option);
     int32_t result = reply.ReadInt32();
     DHLOGI("async dhId: %s", GetAnonyString(dhId).c_str());
     return result;
@@ -188,7 +190,7 @@ int32_t DistributedCameraSinkProxy::ChannelNeg(const std::string& dhId, std::str
         DHLOGE("write params failed");
         return DCAMERA_BAD_VALUE;
     }
-    remote->SendRequest(IDCameraSinkInterfaceCode::CHANNEL_NEG, data, reply, option);
+    remote->SendRequest(static_cast<uint32_t>(IDCameraSinkInterfaceCode::CHANNEL_NEG), data, reply, option);
     int32_t result = reply.ReadInt32();
     return result;
 }
@@ -217,7 +219,7 @@ int32_t DistributedCameraSinkProxy::GetCameraInfo(const std::string& dhId, std::
         DHLOGE("write params failed");
         return DCAMERA_BAD_VALUE;
     }
-    remote->SendRequest(IDCameraSinkInterfaceCode::GET_CAMERA_INFO, data, reply, option);
+    remote->SendRequest(static_cast<uint32_t>(IDCameraSinkInterfaceCode::GET_CAMERA_INFO), data, reply, option);
     int32_t result = reply.ReadInt32();
     return result;
 }
@@ -247,7 +249,7 @@ int32_t DistributedCameraSinkProxy::OpenChannel(const std::string& dhId, std::st
         DHLOGE("write params failed");
         return DCAMERA_BAD_VALUE;
     }
-    remote->SendRequest(IDCameraSinkInterfaceCode::OPEN_CHANNEL, data, reply, option);
+    remote->SendRequest(static_cast<uint32_t>(IDCameraSinkInterfaceCode::OPEN_CHANNEL), data, reply, option);
     int32_t result = reply.ReadInt32();
     return result;
 }
@@ -276,7 +278,7 @@ int32_t DistributedCameraSinkProxy::CloseChannel(const std::string& dhId)
         DHLOGE("write params failed");
         return DCAMERA_BAD_VALUE;
     }
-    remote->SendRequest(IDCameraSinkInterfaceCode::CLOSE_CHANNEL, data, reply, option);
+    remote->SendRequest(static_cast<uint32_t>(IDCameraSinkInterfaceCode::CLOSE_CHANNEL), data, reply, option);
     int32_t result = reply.ReadInt32();
     return result;
 }
