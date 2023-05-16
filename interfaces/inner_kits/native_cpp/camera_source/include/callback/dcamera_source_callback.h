@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 #define OHOS_DCAMERA_SOURCE_CALLBACK_H
 
 #include <map>
+#include <mutex>
 
 #include "dcamera_source_callback_stub.h"
 #include "idistributed_hardware_source.h"
@@ -40,6 +41,7 @@ public:
 private:
     std::map<std::string, std::shared_ptr<RegisterCallback>> regCallbacks_;
     std::map<std::string, std::shared_ptr<UnregisterCallback>> unregCallbacks_;
+    std::mutex mapMutex_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
