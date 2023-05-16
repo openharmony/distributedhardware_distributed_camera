@@ -49,7 +49,7 @@ int32_t DCameraSourceCallbackProxy::OnNotifyRegResult(const std::string& devId, 
         DHLOGE("DistributedCameraSourceProxy InitSource write params failed");
         return DCAMERA_BAD_VALUE;
     }
-    remote->SendRequest(IDCameraSourceCBInterfaceCode::NOTIFY_REG_RESULT, req, reply, option);
+    remote->SendRequest(static_cast<uint32_t>(IDCameraSourceCBInterfaceCode::NOTIFY_REG_RESULT), req, reply, option);
     int32_t result = reply.ReadInt32();
     return result;
 }
@@ -79,7 +79,7 @@ int32_t DCameraSourceCallbackProxy::OnNotifyUnregResult(const std::string& devId
         DHLOGE("DistributedCameraSourceProxy InitSource write params failed");
         return DCAMERA_BAD_VALUE;
     }
-    remote->SendRequest(IDCameraSourceCBInterfaceCode::NOTIFY_UNREG_RESULT, req, reply, option);
+    remote->SendRequest(static_cast<uint32_t>(IDCameraSourceCBInterfaceCode::NOTIFY_UNREG_RESULT), req, reply, option);
     int32_t result = reply.ReadInt32();
     return result;
 }
