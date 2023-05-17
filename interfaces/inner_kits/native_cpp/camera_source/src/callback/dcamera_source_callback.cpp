@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,6 +32,7 @@ int32_t DCameraSourceCallback::OnNotifyRegResult(const std::string& devId, const
 {
     DHLOGI("DCameraSourceCallback OnNotifyRegResult devId: %s dhId: %s",
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
+    std::lock_guard<std::mutex> lock(mapMutex_);
     auto iter = regCallbacks_.find(reqId);
     if (iter == regCallbacks_.end()) {
         DHLOGE("DCameraSourceCallback OnNotifyRegResult not found devId: %s dhId: %s",
@@ -52,6 +53,7 @@ int32_t DCameraSourceCallback::OnNotifyUnregResult(const std::string& devId, con
 {
     DHLOGI("DCameraSourceCallback OnNotifyUnregResult devId: %s dhId: %s",
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
+    std::lock_guard<std::mutex> lock(mapMutex_);
     auto iter = unregCallbacks_.find(reqId);
     if (iter == unregCallbacks_.end()) {
         DHLOGE("DCameraSourceCallback OnNotifyUnregResult not found devId: %s dhId: %s",
@@ -69,21 +71,25 @@ int32_t DCameraSourceCallback::OnNotifyUnregResult(const std::string& devId, con
 
 void DCameraSourceCallback::PushRegCallback(std::string& reqId, std::shared_ptr<RegisterCallback>& callback)
 {
+    std::lock_guard<std::mutex> lock(mapMutex_);
     regCallbacks_.emplace(reqId, callback);
 }
 
 void DCameraSourceCallback::PopRegCallback(std::string& reqId)
 {
+    std::lock_guard<std::mutex> lock(mapMutex_);
     regCallbacks_.erase(reqId);
 }
 
 void DCameraSourceCallback::PushUnregCallback(std::string& reqId, std::shared_ptr<UnregisterCallback>& callback)
 {
+    std::lock_guard<std::mutex> lock(mapMutex_);
     unregCallbacks_.emplace(reqId, callback);
 }
 
 void DCameraSourceCallback::PopUnregCallback(std::string& reqId)
 {
+    std::lock_guard<std::mutex> lock(mapMutex_);
     unregCallbacks_.erase(reqId);
 }
 } // namespace DistributedHardware
