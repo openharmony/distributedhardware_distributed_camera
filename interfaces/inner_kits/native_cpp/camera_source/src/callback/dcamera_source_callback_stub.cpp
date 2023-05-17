@@ -26,10 +26,8 @@ namespace OHOS {
 namespace DistributedHardware {
 DCameraSourceCallbackStub::DCameraSourceCallbackStub()
 {
-    memberFuncMap_[static_cast<uint32_t>(IDCameraSourceCBInterfaceCode::NOTIFY_REG_RESULT)] =
-        &DCameraSourceCallbackStub::NotifyRegResultInner;
-    memberFuncMap_[static_cast<uint32_t>(IDCameraSourceCBInterfaceCode::NOTIFY_UNREG_RESULT)] =
-        &DCameraSourceCallbackStub::NotifyUnregResultInner;
+    memberFuncMap_[NOTIFY_REG_RESULT] = &DCameraSourceCallbackStub::NotifyRegResultInner;
+    memberFuncMap_[NOTIFY_UNREG_RESULT] = &DCameraSourceCallbackStub::NotifyUnregResultInner;
 }
 
 DCameraSourceCallbackStub::~DCameraSourceCallbackStub()

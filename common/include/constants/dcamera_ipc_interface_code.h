@@ -41,12 +41,6 @@ enum class IDCameraSinkInterfaceCode : uint32_t {
     OPEN_CHANNEL = 7,
     CLOSE_CHANNEL = 8,
 };
-
-/* SAID: 4803 */
-enum class IDCameraSourceCBInterfaceCode : uint32_t {
-    NOTIFY_REG_RESULT = 0,
-    NOTIFY_UNREG_RESULT = 1,
-};
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif

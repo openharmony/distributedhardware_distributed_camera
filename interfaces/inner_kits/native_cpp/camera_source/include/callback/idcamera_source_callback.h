@@ -23,6 +23,10 @@ namespace DistributedHardware {
 class IDCameraSourceCallback : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.distributedhardware.dcamerasourcecallback");
+    enum {
+        NOTIFY_REG_RESULT = 0,
+        NOTIFY_UNREG_RESULT = 1,
+    };
 
     virtual ~IDCameraSourceCallback() {}
     virtual int32_t OnNotifyRegResult(const std::string& devId, const std::string& dhId, const std::string& reqId,
