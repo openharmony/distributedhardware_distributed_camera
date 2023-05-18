@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,7 @@
 
 #include "distributed_camera_source_stub.h"
 
+#include "dcamera_ipc_interface_code.h"
 #include "dcamera_source_callback_proxy.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -23,11 +24,16 @@ namespace OHOS {
 namespace DistributedHardware {
 DistributedCameraSourceStub::DistributedCameraSourceStub()
 {
-    memberFuncMap_[INIT_SOURCE] = &DistributedCameraSourceStub::InitSourceInner;
-    memberFuncMap_[RELEASE_SOURCE] = &DistributedCameraSourceStub::ReleaseSourceInner;
-    memberFuncMap_[REGISTER_DISTRIBUTED_HARDWARE] = &DistributedCameraSourceStub::RegisterDistributedHardwareInner;
-    memberFuncMap_[UNREGISTER_DISTRIBUTED_HARDWARE] = &DistributedCameraSourceStub::UnregisterDistributedHardwareInner;
-    memberFuncMap_[CAMERA_NOTIFY] = &DistributedCameraSourceStub::DCameraNotifyInner;
+    memberFuncMap_[static_cast<uint32_t>(IDCameraSourceInterfaceCode::INIT_SOURCE)] =
+        &DistributedCameraSourceStub::InitSourceInner;
+    memberFuncMap_[static_cast<uint32_t>(IDCameraSourceInterfaceCode::RELEASE_SOURCE)] =
+        &DistributedCameraSourceStub::ReleaseSourceInner;
+    memberFuncMap_[static_cast<uint32_t>(IDCameraSourceInterfaceCode::REGISTER_DISTRIBUTED_HARDWARE)] =
+        &DistributedCameraSourceStub::RegisterDistributedHardwareInner;
+    memberFuncMap_[static_cast<uint32_t>(IDCameraSourceInterfaceCode::UNREGISTER_DISTRIBUTED_HARDWARE)] =
+        &DistributedCameraSourceStub::UnregisterDistributedHardwareInner;
+    memberFuncMap_[static_cast<uint32_t>(IDCameraSourceInterfaceCode::CAMERA_NOTIFY)] =
+        &DistributedCameraSourceStub::DCameraNotifyInner;
 }
 
 DistributedCameraSourceStub::~DistributedCameraSourceStub()

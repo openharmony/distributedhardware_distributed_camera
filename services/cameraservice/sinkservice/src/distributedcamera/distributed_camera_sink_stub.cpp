@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "dcamera_ipc_interface_code.h"
 #include "distributed_camera_sink_stub.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -21,15 +22,24 @@ namespace OHOS {
 namespace DistributedHardware {
 DistributedCameraSinkStub::DistributedCameraSinkStub()
 {
-    memberFuncMap_[INIT_SINK] = &DistributedCameraSinkStub::InitSinkInner;
-    memberFuncMap_[RELEASE_SINK] = &DistributedCameraSinkStub::ReleaseSinkInner;
-    memberFuncMap_[SUBSCRIBE_LOCAL_HARDWARE] = &DistributedCameraSinkStub::SubscribeLocalHardwareInner;
-    memberFuncMap_[UNSUBSCRIBE_LOCAL_HARDWARE] = &DistributedCameraSinkStub::UnsubscribeLocalHardwareInner;
-    memberFuncMap_[STOP_CAPTURE] = &DistributedCameraSinkStub::StopCaptureInner;
-    memberFuncMap_[CHANNEL_NEG] = &DistributedCameraSinkStub::ChannelNegInner;
-    memberFuncMap_[GET_CAMERA_INFO] = &DistributedCameraSinkStub::GetCameraInfoInner;
-    memberFuncMap_[OPEN_CHANNEL] = &DistributedCameraSinkStub::OpenChannelInner;
-    memberFuncMap_[CLOSE_CHANNEL] = &DistributedCameraSinkStub::CloseChannelInner;
+    memberFuncMap_[static_cast<uint32_t>(IDCameraSinkInterfaceCode::INIT_SINK)] =
+        &DistributedCameraSinkStub::InitSinkInner;
+    memberFuncMap_[static_cast<uint32_t>(IDCameraSinkInterfaceCode::RELEASE_SINK)] =
+        &DistributedCameraSinkStub::ReleaseSinkInner;
+    memberFuncMap_[static_cast<uint32_t>(IDCameraSinkInterfaceCode::SUBSCRIBE_LOCAL_HARDWARE)] =
+        &DistributedCameraSinkStub::SubscribeLocalHardwareInner;
+    memberFuncMap_[static_cast<uint32_t>(IDCameraSinkInterfaceCode::UNSUBSCRIBE_LOCAL_HARDWARE)] =
+        &DistributedCameraSinkStub::UnsubscribeLocalHardwareInner;
+    memberFuncMap_[static_cast<uint32_t>(IDCameraSinkInterfaceCode::STOP_CAPTURE)] =
+        &DistributedCameraSinkStub::StopCaptureInner;
+    memberFuncMap_[static_cast<uint32_t>(IDCameraSinkInterfaceCode::CHANNEL_NEG)] =
+        &DistributedCameraSinkStub::ChannelNegInner;
+    memberFuncMap_[static_cast<uint32_t>(IDCameraSinkInterfaceCode::GET_CAMERA_INFO)] =
+        &DistributedCameraSinkStub::GetCameraInfoInner;
+    memberFuncMap_[static_cast<uint32_t>(IDCameraSinkInterfaceCode::OPEN_CHANNEL)] =
+        &DistributedCameraSinkStub::OpenChannelInner;
+    memberFuncMap_[static_cast<uint32_t>(IDCameraSinkInterfaceCode::CLOSE_CHANNEL)] =
+        &DistributedCameraSinkStub::CloseChannelInner;
 }
 
 DistributedCameraSinkStub::~DistributedCameraSinkStub()
