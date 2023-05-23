@@ -16,8 +16,8 @@ import("//build/ohos/sa_profile/sa_profile.gni")
 
 ohos_sa_profile("dcamera_sa_profile") {
   sources = [
-    "4803.xml",
-    "4804.xml",
+    "4803.json",
+    "4804.json",
   ]
 
   part_name = "distributed_camera"
