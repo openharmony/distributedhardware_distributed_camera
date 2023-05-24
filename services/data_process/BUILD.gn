@@ -94,7 +94,7 @@ ohos_shared_library("distributed_camera_data_process") {
     "eventhandler:libeventhandler",
     "graphic_standard:surface",
     "hitrace_native:hitrace_meter",
-    "multimedia_player_framework:media_client",
+    "player_framework:media_client",
   ]
 
   subsystem_name = "distributedhardware"
