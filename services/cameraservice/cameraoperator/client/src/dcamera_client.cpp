@@ -579,11 +579,29 @@ void DCameraClient::SetPhotoCaptureRotation(const std::shared_ptr<Camera::Camera
     camera_metadata_item_t item;
     int32_t ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_JPEG_ORIENTATION, &item);
     if ((ret == CAM_META_SUCCESS) && (rotationCount == item.count)) {
+        int32_t oriSetRotate = item.data.i32[0];
+        int32_t setRotate = oriSetRotate;
+        int32_t sensorRotate = 0;
+        std::string abilityString = ((sptr<CameraStandard::CameraInput> &)cameraInput_)->GetCameraSettings();
+        std::shared_ptr<Camera::CameraMetadata> cameraAbility = Camera::MetadataUtils::DecodeFromString(abilityString);
+        if (cameraAbility != nullptr) {
+            camera_metadata_item_t itemSensor;
+            ret = Camera::FindCameraMetadataItem(cameraAbility->get(), OHOS_SENSOR_ORIENTATION, &itemSensor);
+            if ((ret == CAM_META_SUCCESS) && (rotationCount == itemSensor.count)) {
+                sensorRotate = itemSensor.data.i32[0];
+                setRotate = setRotate - sensorRotate;
+            }
+        }
+
+        if (setRotate < 0) {
+            setRotate += DCAMERA_CAPTURE_ROTATE_360;
+        }
+
         CameraStandard::PhotoCaptureSetting::RotationConfig rotation =
-            static_cast<CameraStandard::PhotoCaptureSetting::RotationConfig>(item.data.i32[0]);
+            static_cast<CameraStandard::PhotoCaptureSetting::RotationConfig>(setRotate);
         photoCaptureSetting->SetRotation(rotation);
-        DHLOGI("SetPhotoCaptureRotation %s photo capture settings set %d rotation: %d",
-            GetAnonyString(cameraId_).c_str(), item.count, rotation);
+        DHLOGI("SetPhotoCaptureRotation %s photo set %d rotation: %d setRotate: %d sensorRotate: %d oriSetRotate: %d",
+            GetAnonyString(cameraId_).c_str(), item.count, rotation, setRotate, sensorRotate, oriSetRotate);
     }
 }
 
