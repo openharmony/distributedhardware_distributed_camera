@@ -263,6 +263,7 @@ int32_t DistributedCameraSinkService::OpenChannel(const std::string& dhId, std::
     DHLOGI("dhId: %s", GetAnonyString(dhId).c_str());
     std::shared_ptr<DCameraSinkDev> sinkDevice = nullptr;
     {
+        std::lock_guard<std::mutex> lock(mapMutex_);
         auto iter = camerasMap_.find(dhId);
         if (iter == camerasMap_.end()) {
             DHLOGE("device not found");

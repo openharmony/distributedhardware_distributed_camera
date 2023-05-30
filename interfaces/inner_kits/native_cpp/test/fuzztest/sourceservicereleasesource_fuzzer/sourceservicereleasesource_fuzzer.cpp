@@ -28,7 +28,6 @@ void SourceServiceReleaseSourceFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size == 0)) {
         return;
     }
-    std::string params(reinterpret_cast<const char*>(data), size);
 
     std::shared_ptr<DistributedCameraSourceService> sourceService =
         std::make_shared<DistributedCameraSourceService>(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, true);
