@@ -236,8 +236,8 @@ static void ConfigFocusAndExposure()
     g_captureSession->LockForControl();
     FocusMode focusMode = FOCUS_MODE_CONTINUOUS_AUTO;
     ExposureMode exposureMode = EXPOSURE_MODE_AUTO;
-    int32_t exposureValue = 0;
-    std::vector<int32_t> biasRange;
+    float exposureValue = 0;
+    std::vector<float> biasRange;
     int32_t rv = g_captureSession->GetExposureBiasRange(biasRange);
     if (rv != DCAMERA_OK) {
         DHLOGE("ConfigFocusAndExposure get exposure bias range failed, rv: %d", rv);
