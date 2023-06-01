@@ -95,7 +95,9 @@ int32_t DistributedCameraSourceService::InitSource(const std::string& params,
         return ret;
     }
     sourceVer_ = params;
-    listener_->SetCallback(callback);
+    if (listener_ != nullptr) {
+        listener_->SetCallback(callback);
+    }
     return DCAMERA_OK;
 }
 
