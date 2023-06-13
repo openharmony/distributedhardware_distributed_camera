@@ -44,12 +44,13 @@
                 "samgr",
                 "hitrace_native",
                 "safwk",
-                "driver_interface_camera",
+                "drivers_interface_camera",
                 "access_token"
             ],
             "third_party":[
                 "ffmpeg",
-                "jsoncpp"
+                "jsoncpp",
+                "libyuv"
             ]
         },
         "build":{

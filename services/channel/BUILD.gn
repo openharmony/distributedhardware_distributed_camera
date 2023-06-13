@@ -44,10 +44,7 @@ ohos_shared_library("distributed_camera_channel") {
     "src/dcamera_softbus_session.cpp",
   ]
 
-  deps = [
-    "${common_path}:distributed_camera_utils",
-    "${fwk_innerkits_path}:libdhfwk_sdk",
-  ]
+  deps = [ "${common_path}:distributed_camera_utils" ]
 
   defines = [
     "HI_LOG_ENABLE",
@@ -57,6 +54,7 @@ ohos_shared_library("distributed_camera_channel") {
 
   external_deps = [
     "c_utils:utils",
+    "distributed_hardware_fwk:libdhfwk_sdk",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
   ]
