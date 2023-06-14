@@ -54,11 +54,7 @@ ohos_shared_library("distributed_camera_client") {
 
   sources += [ "src/dcamera_client.cpp" ]
 
-  deps = [
-    "${camerastandard_path}/frameworks/native/camera:camera_framework",
-    "${common_path}:distributed_camera_utils",
-    "${graphicstandard_path}:libsurface",
-  ]
+  deps = [ "${common_path}:distributed_camera_utils" ]
 
   defines = [
     "HI_LOG_ENABLE",
@@ -68,9 +64,11 @@ ohos_shared_library("distributed_camera_client") {
 
   external_deps = [
     "c_utils:utils",
+    "camera_framework:camera_framework",
     "drivers_interface_camera:libcamera_proxy_1.0",
     "drivers_interface_camera:metadata",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
+    "graphic_standard:surface",
     "ipc:ipc_core",
   ]
 
