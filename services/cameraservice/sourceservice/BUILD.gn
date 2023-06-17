@@ -18,6 +18,7 @@ import(
 
 ohos_shared_library("distributed_camera_source") {
   include_dirs = [
+    "${av_transport_path}/common/include",
     "${fwk_common_path}/utils/include",
     "${fwk_utils_path}/include/eventbus",
     "//third_party/jsoncpp/include",
