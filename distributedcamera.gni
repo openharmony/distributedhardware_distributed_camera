@@ -36,6 +36,8 @@ fwk_common_path = "${distributedhardwarefwk_path}/common"
 
 fwk_innerkits_path = "${distributedhardwarefwk_path}/interfaces/inner_kits"
 
+av_transport_path = "${distributedhardwarefwk_path}/av_transport"
+
 feeding_smoother_path = "${services_path}/cameraservice/sourceservice/include/distributedcameramgr/dcameradata/feedingsmoother"
 
 build_flags = [ "-Werror" ]
