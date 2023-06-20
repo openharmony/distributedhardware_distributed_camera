@@ -18,6 +18,7 @@ import(
 
 ohos_shared_library("distributed_camera_channel") {
   include_dirs = [
+    "${av_transport_path}/common/include",
     "${fwk_common_path}/utils/include",
     "${services_path}/cameraservice/base/include",
   ]
