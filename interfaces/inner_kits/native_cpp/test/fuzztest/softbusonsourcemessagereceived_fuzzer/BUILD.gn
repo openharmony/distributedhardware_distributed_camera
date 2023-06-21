@@ -19,8 +19,7 @@ import(
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SoftbusOnSourceMessageReceivedFuzzTest") {
-  module_out_path =
-      "distributed_camera/softbusonsourcemessagereceived"
+  module_out_path = "distributed_camera/softbusonsourcemessagereceived"
 
   fuzz_config_file = "${innerkits_path}/native_cpp/test/fuzztest/softbusonsourcemessagereceived_fuzzer"
 
@@ -30,7 +29,7 @@ ohos_fuzztest("SoftbusOnSourceMessageReceivedFuzzTest") {
   ]
 
   include_dirs += [
-    "include",
+    "${services_path}/channel/include",
     "${common_path}/include/constants",
     "${common_path}/include/utils",
     "//foundation//communication//dsoftbus//core//common//include",
@@ -50,7 +49,10 @@ ohos_fuzztest("SoftbusOnSourceMessageReceivedFuzzTest") {
 
   sources = [ "softbusonsourcemessagereceived_fuzzer.cpp" ]
 
-  deps = [ "${common_path}:distributed_camera_utils" ]
+  deps = [
+    "${common_path}:distributed_camera_utils",
+    "${services_path}/channel:distributed_camera_channel",
+  ]
 
   defines = [
     "HI_LOG_ENABLE",

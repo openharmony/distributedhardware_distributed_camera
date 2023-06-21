@@ -15,9 +15,7 @@
 
 #include "softbusonsourcesessionclosed_fuzzer.h"
 
-#include "session.h"
-#include "single_instance.h"
-#include "dcamera_softbus_session.h"
+#include "dcamera_softbus_adapter.h"
 
 namespace OHOS {
 namespace DistributedHardware {

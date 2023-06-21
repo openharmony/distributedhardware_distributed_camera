@@ -15,9 +15,7 @@
 
 #include "softbusonsourcebytesreceived_fuzzer.h"
 
-#include "session.h"
-#include "single_instance.h"
-#include "dcamera_softbus_session.h"
+#include "dcamera_softbus_adapter.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -28,10 +26,10 @@ void SoftbusOnSourceBytesReceivedFuzzTest(const uint8_t* data, size_t size)
     }
 
     int32_t sessionId = *(reinterpret_cast<const int32_t*>(data));
-    const void *data = static_cast<void*>(data);
+    const void *receivedData = reinterpret_cast<const void*>(data);
     uint32_t dataLen = *(reinterpret_cast<const uint32_t*>(data));
 
-    DCameraSoftbusAdapter::GetInstance().OnSourceBytesReceived(sessionId, data, dataLen);
+    DCameraSoftbusAdapter::GetInstance().OnSourceBytesReceived(sessionId, receivedData, dataLen);
 }
 }
 }

@@ -46,6 +46,7 @@ group("fuzztest") {
     "softbusonsourcemessagereceived_fuzzer:fuzztest",
     "softbusonsourcesessionclosed_fuzzer:fuzztest",
     "softbusonsourcesessionopened_fuzzer:fuzztest",
+    "softbusonsourcestreamreceived_fuzzer:fuzztest",
     "sourcehandlerconfigdistributedhardware_fuzzer:fuzztest",
     "sourcehandlerinitsource_fuzzer:fuzztest",
     "sourcehandlerregisterdistributedhardware_fuzzer:fuzztest",
