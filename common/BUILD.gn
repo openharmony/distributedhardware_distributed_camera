@@ -53,9 +53,9 @@ ohos_shared_library("distributed_camera_utils") {
     "c_utils:utils",
     "dsoftbus:softbus_client",
     "graphic_chipsetsdk:buffer_handle",
+    "hilog:libhilog",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
-    "hiviewdfx_hilog_native:libhilog",
   ]
 
   cflags_cc = cflags

@@ -1,33 +1,33 @@
 {
-    "name":"@ohos/distributed_camera",
-    "description":"distributed hardware camera",
-    "version":"3.1",
-    "author":{},
-    "repository":"https://gitee.com/openharmony/distributedhardware_distributed_camera",
-    "license":"Apache License 2.0",
-    "publishAs":"code-segment",
-    "segment":{
-        "destPath":"foundation/distributedhardware/distributed_camera"
+    "name": "@ohos/distributed_camera",
+    "description": "distributed hardware camera",
+    "version": "3.1",
+    "author": {},
+    "repository": "https://gitee.com/openharmony/distributedhardware_distributed_camera",
+    "license": "Apache License 2.0",
+    "publishAs": "code-segment",
+    "segment": {
+        "destPath": "foundation/distributedhardware/distributed_camera"
     },
-    "dirs":{},
-    "scripts":{},
-    "component":{
-        "name":"distributed_camera",
-        "subsystem":"distributedhardware",
-        "syscap":[
+    "dirs": {},
+    "scripts": {},
+    "component": {
+        "name": "distributed_camera",
+        "subsystem": "distributedhardware",
+        "syscap": [
             "SystemCapability.DistributedHardware.DistributedCamera"
         ],
-        "features":[],
-        "adapted_system_type":[
+        "features": [],
+        "adapted_system_type": [
             "standard"
         ],
-        "rom":"5120KB",
-        "ram":"66560KB",
+        "rom": "5120KB",
+        "ram": "66560KB",
         "hisysevent_config": [
             "//foundation/distributedhardware/distributed_camera/hisysevent.yaml"
         ],
-        "deps":{
-            "components":[
+        "deps": {
+            "components": [
                 "ipc",
                 "graphic_chipsetsdk",
                 "eventhandler",
@@ -40,21 +40,21 @@
                 "c_utils",
                 "dsoftbus",
                 "hisysevent_native",
-                "hiviewdfx_hilog_native",
+                "hilog",
                 "samgr",
                 "hitrace_native",
                 "safwk",
                 "drivers_interface_camera",
                 "access_token"
             ],
-            "third_party":[
+            "third_party": [
                 "ffmpeg",
                 "jsoncpp",
                 "libyuv"
             ]
         },
-        "build":{
-            "sub_component":[
+        "build": {
+            "sub_component": [
                 "//foundation/distributedhardware/distributed_camera/common:distributed_camera_utils",
                 "//foundation/distributedhardware/distributed_camera/interfaces/inner_kits/native_cpp/camera_sink:distributed_camera_sink_sdk",
                 "//foundation/distributedhardware/distributed_camera/interfaces/inner_kits/native_cpp/camera_source:distributed_camera_source_sdk",
@@ -67,7 +67,7 @@
                 "//foundation/distributedhardware/distributed_camera/sa_profile:dcamera.cfg",
                 "//foundation/distributedhardware/distributed_camera/services/channel:distributed_camera_channel"
             ],
-            "test":[
+            "test": [
                 "//foundation/distributedhardware/distributed_camera/common/test/unittest:common_utils_test",
                 "//foundation/distributedhardware/distributed_camera/services/cameraservice/cameraoperator/client/test/sample:dcamera_client_demo",
                 "//foundation/distributedhardware/distributed_camera/services/cameraservice/cameraoperator/client/test/unittest:camera_client_test",

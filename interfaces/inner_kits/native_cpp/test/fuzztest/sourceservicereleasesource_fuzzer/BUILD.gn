@@ -72,7 +72,7 @@ ohos_fuzztest("SourceServiceReleaseSourceFuzzTest") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",

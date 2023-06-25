@@ -65,7 +65,7 @@ ohos_unittest("DCameraServicesBaseTest") {
     "c_utils:utils",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "dsoftbus:softbus_client",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_core",
   ]
 
