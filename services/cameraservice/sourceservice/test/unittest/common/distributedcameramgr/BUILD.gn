@@ -93,7 +93,7 @@ ohos_unittest("DCameraSourceMgrTest") {
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
     "hdf_core:libhdi",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]
