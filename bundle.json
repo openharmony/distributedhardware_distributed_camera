@@ -36,6 +36,7 @@
                 "graphic_standard",
                 "distributed_hardware_fwk",
                 "hdf_core",
+                "drivers_interface_display",
                 "drivers_interface_distributed_camera",
                 "c_utils",
                 "dsoftbus",

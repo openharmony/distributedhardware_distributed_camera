@@ -91,6 +91,7 @@ ohos_shared_library("distributed_camera_data_process") {
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "eventhandler:libeventhandler",
     "graphic_standard:surface",
     "hitrace_native:hitrace_meter",

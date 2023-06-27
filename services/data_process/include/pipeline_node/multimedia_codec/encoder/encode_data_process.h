@@ -35,8 +35,11 @@
 #include "image_common_type.h"
 #include "distributed_camera_constants.h"
 
+#include "v1_0/display_composer_type.h"
+
 namespace OHOS {
 namespace DistributedHardware {
+using namespace OHOS::HDI::Display::Composer::V1_0;
 class DCameraPipelineSink;
 class EncodeVideoCallback;
 
