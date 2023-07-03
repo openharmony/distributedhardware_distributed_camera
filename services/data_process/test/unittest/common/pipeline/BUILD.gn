@@ -59,7 +59,7 @@ ohos_unittest("DCameraDataProcessPipelineTest") {
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "graphic_standard:surface",
-    "hitrace_native:hitrace_meter",
+    "hitrace:hitrace_meter",
     "player_framework:media_client",
   ]
 
