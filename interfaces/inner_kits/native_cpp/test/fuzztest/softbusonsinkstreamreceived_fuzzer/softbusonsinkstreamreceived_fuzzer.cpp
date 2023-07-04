@@ -21,16 +21,25 @@ namespace OHOS {
 namespace DistributedHardware {
 void SoftbusOnSinkStreamReceivedFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
+    if ((data == nullptr) || (size < sizeof(int64_t))) {
         return;
     }
 
     int32_t sessionId = *(reinterpret_cast<const int32_t*>(data));
-    const StreamData *receivedData = reinterpret_cast<const StreamData*>(data);
-    const StreamData *ext = reinterpret_cast<const StreamData*>(data);
-    const StreamFrameInfo *param = reinterpret_cast<const StreamFrameInfo*>(data);
+    const StreamData receivedData = {
+        const_cast<char*>(reinterpret_cast<const char*>(data)), static_cast<int>(size)
+    };
+    const StreamData ext = {
+        const_cast<char*>(reinterpret_cast<const char*>(data)), static_cast<int>(size)
+    };
+    const StreamFrameInfo param = {
+        *(reinterpret_cast<const int*>(data)), *(reinterpret_cast<const int64_t*>(data)),
+        *(reinterpret_cast<const int*>(data)), *(reinterpret_cast<const int*>(data)),
+        *(reinterpret_cast<const int*>(data)), *(reinterpret_cast<const int*>(data)),
+        *(reinterpret_cast<const int*>(data)), nullptr
+    };
 
-    DCameraSoftbusAdapter::GetInstance().OnSinkStreamReceived(sessionId, receivedData, ext, param);
+    DCameraSoftbusAdapter::GetInstance().OnSinkStreamReceived(sessionId, &receivedData, &ext, &param);
 }
 }
 }
