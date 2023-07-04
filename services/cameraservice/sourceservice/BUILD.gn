@@ -113,7 +113,7 @@ ohos_shared_library("distributed_camera_source") {
     "graphic_standard:surface",
     "hdf_core:libhdi",
     "hdf_core:libpub_utils",
-    "hitrace_native:hitrace_meter",
+    "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",

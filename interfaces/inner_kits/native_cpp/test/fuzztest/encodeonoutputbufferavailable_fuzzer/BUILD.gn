@@ -73,7 +73,7 @@ ohos_fuzztest("EncodeOnOutputBufferAvailableFuzzTest") {
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "eventhandler:libeventhandler",
     "graphic_standard:surface",
-    "hitrace_native:hitrace_meter",
+    "hitrace:hitrace_meter",
     "player_framework:media_client",
   ]
 }

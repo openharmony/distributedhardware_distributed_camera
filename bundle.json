@@ -40,10 +40,10 @@
                 "drivers_interface_distributed_camera",
                 "c_utils",
                 "dsoftbus",
-                "hisysevent_native",
+                "hisysevent",
                 "hilog",
                 "samgr",
-                "hitrace_native",
+                "hitrace",
                 "safwk",
                 "drivers_interface_camera",
                 "access_token"
