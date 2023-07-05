@@ -52,7 +52,7 @@ ohos_shared_library("distributed_camera_utils") {
   external_deps = [
     "c_utils:utils",
     "dsoftbus:softbus_client",
-    "graphic_chipsetsdk:buffer_handle",
+    "hdf_core:libhdi",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
