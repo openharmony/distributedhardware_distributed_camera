@@ -110,7 +110,7 @@ ohos_shared_library("distributed_camera_source") {
     "c_utils:utils",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "eventhandler:libeventhandler",
-    "graphic_standard:surface",
+    "graphic_2d:surface",
     "hdf_core:libhdi",
     "hdf_core:libpub_utils",
     "hitrace:hitrace_meter",

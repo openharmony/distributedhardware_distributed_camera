@@ -33,7 +33,7 @@
                 "eventhandler",
                 "camera_framework",
                 "player_framework",
-                "graphic_standard",
+                "graphic_2d",
                 "distributed_hardware_fwk",
                 "hdf_core",
                 "drivers_interface_display",
