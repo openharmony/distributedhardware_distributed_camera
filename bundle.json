@@ -29,7 +29,6 @@
         "deps": {
             "components": [
                 "ipc",
-                "graphic_chipsetsdk",
                 "eventhandler",
                 "camera_framework",
                 "player_framework",

@@ -87,7 +87,7 @@ ohos_unittest("DCameraChannelTest") {
     "c_utils:utils",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "eventhandler:libeventhandler",
-    "graphic_chipsetsdk:buffer_handle",
+    "hdf_core:libhdi",
   ]
 
   defines = [
