@@ -111,7 +111,7 @@ ohos_shared_library("distributed_camera_sink") {
     "camera_framework:camera_framework",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "eventhandler:libeventhandler",
-    "graphic_standard:surface",
+    "graphic_2d:surface",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
