@@ -84,6 +84,7 @@ private:
     constexpr static int32_t YUV_BYTES_PER_PIXEL = 3;
     constexpr static int32_t Y2UV_RATIO = 2;
     constexpr static int32_t RGB32_MEMORY_COEFFICIENT = 4;
+    constexpr static uint32_t MEMORY_RATIO_UV = 1;
 
 #ifdef DCAMERA_SUPPORT_FFMPEG
     uint8_t *srcData_[DATA_LEN] = { nullptr };

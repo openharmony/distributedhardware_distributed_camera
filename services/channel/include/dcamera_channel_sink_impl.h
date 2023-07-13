@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,7 +38,7 @@ private:
     std::vector<DCameraIndex> camIndexs_;
     std::shared_ptr<DCameraSoftbusSession> softbusSession_;
     std::string mySessionName_;
-    DCameraSessionMode mode_;
+    DCameraSessionMode mode_ = DCAMERA_SESSION_MODE_CTRL;
     const std::string SESSION_HEAD = "ohos.dhardware.dcamera_";
 };
 } // namespace DistributedHardware

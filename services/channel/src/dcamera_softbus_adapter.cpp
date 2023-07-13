@@ -572,7 +572,7 @@ int32_t DCameraSoftbusAdapter::ConstructSessionAttribute(int32_t sessionMode, Se
         LINK_TYPE_BR,
     };
 
-    if (dataType == TYPE_BYTES) {
+    if (dataType == TYPE_BYTES && (DCAMERA_LINK_TYPE_INDEX_2 < DCAMERA_LINK_TYPE_MAX)) {
         linkTypeList[0] = LINK_TYPE_WIFI_WLAN_2G;
         linkTypeList[DCAMERA_LINK_TYPE_INDEX_2] = LINK_TYPE_WIFI_P2P;
     }
