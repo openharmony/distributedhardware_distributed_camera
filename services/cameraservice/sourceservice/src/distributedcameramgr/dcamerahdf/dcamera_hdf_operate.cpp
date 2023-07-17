@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,9 +40,9 @@ int32_t DCameraHdfOperate::LoadDcameraHDFImpl()
         DHLOGI("service has already start");
         return DCAMERA_OK;
     }
-    servMgr_ = IServiceManager::Get();
-    devmgr_ = IDeviceManager::Get();
-    if (servMgr_ == nullptr || devmgr_ == nullptr) {
+    OHOS::sptr<IServiceManager> servMgr = IServiceManager::Get();
+    OHOS::sptr<IDeviceManager> devmgr = IDeviceManager::Get();
+    if (servMgr == nullptr || devmgr == nullptr) {
         DHLOGE("get hdi service manager or device manager failed!");
         return DCAMERA_BAD_VALUE;
     }
@@ -60,13 +60,13 @@ int32_t DCameraHdfOperate::LoadDcameraHDFImpl()
                 hdfOperateCon_.notify_one();
             }
         }));
-    if (servMgr_->RegisterServiceStatusListener(listener, DEVICE_CLASS_CAMERA) != 0) {
+    if (servMgr->RegisterServiceStatusListener(listener, DEVICE_CLASS_CAMERA) != 0) {
         DHLOGE("RegisterServiceStatusListener failed!");
         return DCAMERA_BAD_VALUE;
     }
 
     DHLOGI("Load camera service.");
-    if (devmgr_->LoadDevice(CAMERA_SERVICE_NAME) != 0) {
+    if (devmgr->LoadDevice(CAMERA_SERVICE_NAME) != 0) {
         DHLOGE("Load camera service failed!");
         return DCAMERA_BAD_OPERATE;
     }
@@ -75,7 +75,7 @@ int32_t DCameraHdfOperate::LoadDcameraHDFImpl()
     }
 
     DHLOGI("Load provider service.");
-    if (devmgr_->LoadDevice(PROVIDER_SERVICE_NAME) != 0) {
+    if (devmgr->LoadDevice(PROVIDER_SERVICE_NAME) != 0) {
         DHLOGE("Load provider service failed!");
         return DCAMERA_BAD_OPERATE;
     }
@@ -83,7 +83,7 @@ int32_t DCameraHdfOperate::LoadDcameraHDFImpl()
         return DCAMERA_BAD_OPERATE;
     }
 
-    if (servMgr_->UnregisterServiceStatusListener(listener) != 0) {
+    if (servMgr->UnregisterServiceStatusListener(listener) != 0) {
         DHLOGE("UnregisterServiceStatusListener failed!");
     }
     return DCAMERA_OK;
@@ -124,17 +124,17 @@ int32_t DCameraHdfOperate::WaitLoadProviderService()
 int32_t DCameraHdfOperate::UnLoadDcameraHDFImpl()
 {
     DHLOGI("UnLoadCameraHDFImpl begin!");
-    devmgr_ = IDeviceManager::Get();
-    if (devmgr_ == nullptr) {
+    OHOS::sptr<IDeviceManager> devmgr = IDeviceManager::Get();
+    if (devmgr == nullptr) {
         DHLOGE("get hdi device manager failed!");
         return DCAMERA_BAD_VALUE;
     }
 
-    int32_t ret = devmgr_->UnloadDevice(CAMERA_SERVICE_NAME);
+    int32_t ret = devmgr->UnloadDevice(CAMERA_SERVICE_NAME);
     if (ret != 0) {
         DHLOGE("Unload camera service failed, ret: %d", ret);
     }
-    ret = devmgr_->UnloadDevice(PROVIDER_SERVICE_NAME);
+    ret = devmgr->UnloadDevice(PROVIDER_SERVICE_NAME);
     if (ret != 0) {
         DHLOGE("Unload provider service failed, ret: %d", ret);
     }
