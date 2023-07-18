@@ -36,7 +36,7 @@ void TimeStatistician::CalAverFeedInterval(const int64_t feedTime)
     }
     feedIndex_++;
     feedIntervalSum_ += feedInterval_;
-    averFeedInterval_ = feedIntervalSum_ / feedIndex_;
+    averFeedInterval_ = feedIntervalSum_ / static_cast<int64_t>(feedIndex_);
     lastFeedTime_ = feedTime_;
 }
 
@@ -50,7 +50,7 @@ void TimeStatistician::CalAverTimeStampInterval(const int64_t timeStamp)
     }
     timeStampIndex_++;
     timeStampIntervalSum_ += timeStampInterval_;
-    averTimeStampInterval_ = timeStampIntervalSum_ / timeStampIndex_;
+    averTimeStampInterval_ = timeStampIntervalSum_ / static_cast<int64_t>(timeStampIndex_);
     lastTimeStamp_ = timeStamp_;
 }
 

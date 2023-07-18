@@ -115,6 +115,7 @@ private:
     constexpr static int32_t Y2UV_RATIO = 2;
     constexpr static int32_t BUFFER_MAX_SIZE = 50 * 1024 * 1024;
     constexpr static int32_t ALIGNED_WIDTH_MAX_SIZE = 10000;
+    constexpr static uint32_t MEMORY_RATIO_UV = 1;
 
     std::shared_ptr<EventBus> eventBusPipeline_;
     std::weak_ptr<DCameraPipelineSource> callbackPipelineSource_;

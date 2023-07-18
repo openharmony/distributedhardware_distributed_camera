@@ -21,24 +21,24 @@
 namespace OHOS {
 namespace DistributedHardware {
 struct DCameraFrameProcessTimePoint {
-    int64_t startEncode;
-    int64_t finishEncode;
-    int64_t send;
-    int64_t recv;
-    int64_t startDecode;
-    int64_t finishDecode;
-    int64_t startScale;
-    int64_t finishScale;
-    int64_t startSmooth;
-    int64_t finishSmooth;
+    int64_t startEncode = 0;
+    int64_t finishEncode = 0;
+    int64_t send = 0;
+    int64_t recv = 0;
+    int64_t startDecode = 0;
+    int64_t finishDecode = 0;
+    int64_t startScale = 0;
+    int64_t finishScale = 0;
+    int64_t startSmooth = 0;
+    int64_t finishSmooth = 0;
 };
 struct DCameraFrameInfo {
-    int8_t type;
-    std::string ver;
-    int32_t index;
-    int32_t offset;
-    int64_t pts;
-    DCameraFrameProcessTimePoint timePonit;
+    int8_t type = 0;
+    std::string ver = "";
+    int32_t index = 0;
+    int32_t offset = 0;
+    int64_t pts = 0;
+    DCameraFrameProcessTimePoint timePonit {0};
 };
 } // namespace DistributedHardware
 } // namespace OHOS

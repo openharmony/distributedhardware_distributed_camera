@@ -537,7 +537,8 @@ void DecodeDataProcess::CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int3
     uint8_t *srcDataUV = static_cast<uint8_t *>(surBuf->GetVirAddr()) + srcSizeY;
 
     int dstSizeY = sourceConfig_.GetWidth() * sourceConfig_.GetHeight();
-    int dstSizeUV = (sourceConfig_.GetWidth() >> 1) * (sourceConfig_.GetHeight() >> 1);
+    int dstSizeUV = (static_cast<uint32_t>(sourceConfig_.GetWidth()) >> MEMORY_RATIO_UV) *
+                    (static_cast<uint32_t>(sourceConfig_.GetHeight()) >> MEMORY_RATIO_UV);
     std::shared_ptr<DataBuffer> bufferOutput =
         std::make_shared<DataBuffer>(dstSizeY * YUV_BYTES_PER_PIXEL / Y2UV_RATIO);
     uint8_t *dstDataY = bufferOutput->Data();
@@ -548,8 +549,8 @@ void DecodeDataProcess::CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int3
         srcDataY, alignedWidth,
         srcDataUV, alignedWidth,
         dstDataY, sourceConfig_.GetWidth(),
-        dstDataU, sourceConfig_.GetWidth() >> 1,
-        dstDataV, sourceConfig_.GetWidth() >> 1,
+        dstDataU, static_cast<uint32_t>(sourceConfig_.GetWidth()) >> MEMORY_RATIO_UV,
+        dstDataV, static_cast<uint32_t>(sourceConfig_.GetWidth()) >> MEMORY_RATIO_UV,
         processedConfig_.GetWidth(), processedConfig_.GetHeight());
     if (ret != DCAMERA_OK) {
         DHLOGE("Convert NV12 to I420 failed.");

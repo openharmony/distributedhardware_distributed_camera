@@ -55,7 +55,7 @@ public:
     void SetAdjustSleepFactor(const float factor);
     void SetWaitClockFactor(const float factor);
     void SetTrackClockFactor(const float factor);
-    uint32_t GetBufferTime();
+    int64_t GetBufferTime();
     int64_t GetClockTime();
 
 private:
@@ -93,7 +93,7 @@ private:
     uint8_t dynamicBalanceCount_ = 0;
     uint32_t averIntervalDiffThre_ = 0;
     uint32_t feedOnceDiffThre_ = 0;
-    uint32_t bufferTime_ = 0;
+    int64_t bufferTime_ = 0;
     int64_t lastEnterTime_ = 0;
     int64_t lastTimeStamp_ = 0;
     int64_t leaveTime_ = 0;

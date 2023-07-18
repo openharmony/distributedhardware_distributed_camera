@@ -300,7 +300,7 @@ void IFeedingSmoother::SetClockBaseline(const int64_t clockBaseline)
     clockBaseline_ = clockBaseline;
 }
 
-uint32_t IFeedingSmoother::GetBufferTime()
+int64_t IFeedingSmoother::GetBufferTime()
 {
     return bufferTime_;
 }
