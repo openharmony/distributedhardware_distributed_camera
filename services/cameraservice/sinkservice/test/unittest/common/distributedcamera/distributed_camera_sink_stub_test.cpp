@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -61,7 +61,7 @@ void DcameraSinkStubTest::TearDown(void)
 HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_001, TestSize.Level1)
 {
     DHLOGI("dcamera_sink_stub_test_001");
-    sptr<IRemoteObject> sinkStubPtr = new MockDistributedCameraSinkStub();
+    sptr<IRemoteObject> sinkStubPtr(new MockDistributedCameraSinkStub());
     DistributedCameraSinkProxy sinkProxy(sinkStubPtr);
     std::string params = "params000";
     int32_t ret = sinkProxy.InitSink(params);
@@ -77,7 +77,7 @@ HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_001, TestSize.Level1)
 HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_002, TestSize.Level1)
 {
     DHLOGI("dcamera_sink_stub_test_002");
-    sptr<IRemoteObject> sinkStubPtr = new MockDistributedCameraSinkStub();
+    sptr<IRemoteObject> sinkStubPtr(new MockDistributedCameraSinkStub());
     DistributedCameraSinkProxy sinkProxy(sinkStubPtr);
     int32_t ret = sinkProxy.ReleaseSink();
     EXPECT_EQ(DCAMERA_OK, ret);
@@ -92,7 +92,7 @@ HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_002, TestSize.Level1)
 HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_003, TestSize.Level1)
 {
     DHLOGI("dcamera_sink_stub_test_003");
-    sptr<IRemoteObject> sinkStubPtr = new MockDistributedCameraSinkStub();
+    sptr<IRemoteObject> sinkStubPtr(new MockDistributedCameraSinkStub());
     DistributedCameraSinkProxy sinkProxy(sinkStubPtr);
     std::string dhId = "dhId000";
     std::string params = "params000";
@@ -109,7 +109,7 @@ HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_003, TestSize.Level1)
 HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_004, TestSize.Level1)
 {
     DHLOGI("dcamera_sink_stub_test_004");
-    sptr<IRemoteObject> sinkStubPtr = new MockDistributedCameraSinkStub();
+    sptr<IRemoteObject> sinkStubPtr(new MockDistributedCameraSinkStub());
     DistributedCameraSinkProxy sinkProxy(sinkStubPtr);
     std::string dhId = "dhId000";
     int32_t ret = sinkProxy.UnsubscribeLocalHardware(dhId);
@@ -125,7 +125,7 @@ HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_004, TestSize.Level1)
 HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_005, TestSize.Level1)
 {
     DHLOGI("dcamera_sink_stub_test_005");
-    sptr<IRemoteObject> sinkStubPtr = new MockDistributedCameraSinkStub();
+    sptr<IRemoteObject> sinkStubPtr(new MockDistributedCameraSinkStub());
     DistributedCameraSinkProxy sinkProxy(sinkStubPtr);
     std::string dhId = "dhId000";
     int32_t ret = sinkProxy.StopCapture(dhId);
@@ -141,7 +141,7 @@ HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_005, TestSize.Level1)
 HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_006, TestSize.Level1)
 {
     DHLOGI("dcamera_sink_stub_test_006");
-    sptr<IRemoteObject> sinkStubPtr = new MockDistributedCameraSinkStub();
+    sptr<IRemoteObject> sinkStubPtr(new MockDistributedCameraSinkStub());
     DistributedCameraSinkProxy sinkProxy(sinkStubPtr);
     std::string dhId = "dhId000";
     std::string channelInfo = "channelInfo000";
@@ -158,7 +158,7 @@ HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_006, TestSize.Level1)
 HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_007, TestSize.Level1)
 {
     DHLOGI("dcamera_sink_stub_test_007");
-    sptr<IRemoteObject> sinkStubPtr = new MockDistributedCameraSinkStub();
+    sptr<IRemoteObject> sinkStubPtr(new MockDistributedCameraSinkStub());
     DistributedCameraSinkProxy sinkProxy(sinkStubPtr);
     std::string dhId = "dhId000";
     std::string cameraInfo = "cameraInfo000";
@@ -175,7 +175,7 @@ HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_007, TestSize.Level1)
 HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_008, TestSize.Level1)
 {
     DHLOGI("dcamera_sink_stub_test_008");
-    sptr<IRemoteObject> sinkStubPtr = new MockDistributedCameraSinkStub();
+    sptr<IRemoteObject> sinkStubPtr(new MockDistributedCameraSinkStub());
     DistributedCameraSinkProxy sinkProxy(sinkStubPtr);
     std::string dhId = "dhId000";
     std::string openInfo = "openInfo000";
@@ -192,7 +192,7 @@ HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_008, TestSize.Level1)
 HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_009, TestSize.Level1)
 {
     DHLOGI("dcamera_sink_stub_test_009");
-    sptr<IRemoteObject> sinkStubPtr = new MockDistributedCameraSinkStub();
+    sptr<IRemoteObject> sinkStubPtr(new MockDistributedCameraSinkStub());
     DistributedCameraSinkProxy sinkProxy(sinkStubPtr);
     std::string dhId = "dhId000";
     int32_t ret = sinkProxy.CloseChannel(dhId);

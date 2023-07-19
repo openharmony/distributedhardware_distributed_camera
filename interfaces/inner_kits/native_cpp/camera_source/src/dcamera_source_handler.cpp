@@ -56,7 +56,7 @@ int32_t DCameraSourceHandler::InitSource(const std::string& params)
         return DCAMERA_INIT_ERR;
     }
     ReportSaEvent(INIT_SA_EVENT, DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, "init source sa event.");
-    sptr<DCameraSourceLoadCallback> loadCallback = new DCameraSourceLoadCallback(params);
+    sptr<DCameraSourceLoadCallback> loadCallback(new DCameraSourceLoadCallback(params));
     int32_t ret = sm->LoadSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, loadCallback);
     if (ret != ERR_OK) {
         DHLOGE("systemAbilityId: %d load failed, result code: %d.", DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, ret);

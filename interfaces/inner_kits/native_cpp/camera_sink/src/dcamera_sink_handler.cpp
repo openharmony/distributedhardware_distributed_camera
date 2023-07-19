@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -57,7 +57,7 @@ int32_t DCameraSinkHandler::InitSink(const std::string& params)
         return DCAMERA_INIT_ERR;
     }
     ReportSaEvent(INIT_SA_EVENT, DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, "init sink sa event.");
-    sptr<DCameraSinkLoadCallback> loadCallback = new DCameraSinkLoadCallback(params);
+    sptr<DCameraSinkLoadCallback> loadCallback(new DCameraSinkLoadCallback(params));
     int32_t ret = sm->LoadSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, loadCallback);
     if (ret != DCAMERA_OK) {
         DHLOGE("systemAbilityId: %d load filed, result code: %d.", DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, ret);

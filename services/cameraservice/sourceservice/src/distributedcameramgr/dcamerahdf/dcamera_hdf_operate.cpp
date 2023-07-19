@@ -47,7 +47,7 @@ int32_t DCameraHdfOperate::LoadDcameraHDFImpl()
         return DCAMERA_BAD_VALUE;
     }
 
-    ::OHOS::sptr<IServStatListener> listener =
+    ::OHOS::sptr<IServStatListener> listener(
         new DCameraHdfServStatListener(DCameraHdfServStatListener::StatusCallback([&](const ServiceStatus& status) {
             DHLOGI("LoadCameraService service status callback, serviceName: %s, status: %d",
                 status.serviceName.c_str(), status.status);
@@ -59,7 +59,7 @@ int32_t DCameraHdfOperate::LoadDcameraHDFImpl()
                 providerServStatus_ = status.status;
                 hdfOperateCon_.notify_one();
             }
-        }));
+        })));
     if (servMgr->RegisterServiceStatusListener(listener, DEVICE_CLASS_CAMERA) != 0) {
         DHLOGE("RegisterServiceStatusListener failed!");
         return DCAMERA_BAD_VALUE;
