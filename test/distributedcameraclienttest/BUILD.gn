@@ -1,0 +1,83 @@
+# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+base_root = "../../../../../"
+import("//test/xts/tools/build/suite.gni")
+import(
+    "$base_root/foundation/distributedhardware/distributed_camera/distributedcamera.gni")
+
+module_output_path = "distributed_camera/dcts"
+
+ohos_moduletest_suite("SubDctsdisCameraClientTest") {
+  module_out_path = module_output_path
+  install_enable = true
+
+  include_dirs = [
+    "./include",
+    "$base_root/foundation/distributedhardware/distributed_camera/common/include/constants",
+    "$base_root/foundation/distributedhardware/distributed_camera/common/include/utils",
+    "$base_root/foundation/distributedhardware/distributed_camera/services/cameraservice/base/include",
+    "$base_root/foundation/distributedhardware/distributed_camera/services/cameraservice/cameraoperator/client/include",
+    "$base_root/foundation/distributedhardware/distributed_camera/services/cameraservice/cameraoperator/client/include/callback",
+    "$base_root/foundation/distributedhardware/distributed_camera/services/cameraservice/cameraoperator/client/include/listener",
+    "$base_root/third_party/jsoncpp/include",
+  ]
+
+  sources = [
+    "dcamera_client_automatic_test.cpp",
+    "dcamera_client_demo.cpp",
+  ]
+
+  cflags = [
+    "-fPIC",
+    "-Wall",
+  ]
+
+  if (distributed_camera_common) {
+    cflags += [ "-DDCAMERA_COMMON" ]
+  }
+
+  deps = [
+    "$base_root/foundation/distributedhardware/distributed_camera/common:distributed_camera_utils",
+    "$base_root/foundation/distributedhardware/distributed_camera/services/cameraservice/cameraoperator/client:distributed_camera_client",
+    "$base_root/foundation/distributedhardware/distributed_camera/services/cameraservice/sinkservice:distributed_camera_sink",
+    "$base_root/third_party/jsoncpp:jsoncpp",
+  ]
+
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
+    "access_token:libtoken_setproc",
+    "c_utils:utils",
+    "camera_framework:camera_framework",
+    "distributed_hardware_fwk:libdhfwk_sdk",
+    "drivers_interface_camera:metadata",
+    "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
+    "graphic_2d:surface",
+    "hilog:libhilog",
+    "ipc:ipc_core",
+    "player_framework:media_client",
+  ]
+
+  defines = [
+    "HI_LOG_ENABLE",
+    "DH_LOG_TAG=\"SubDctsdisCameraClientTest\"",
+    "LOG_DOMAIN=0xD004100",
+  ]
+
+  cflags_cc = cflags
+  subsystem_name = "distributedhardware"
+  part_name = "distributed_camera"
+}
