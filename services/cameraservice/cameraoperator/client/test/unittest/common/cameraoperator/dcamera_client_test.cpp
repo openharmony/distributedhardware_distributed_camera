@@ -322,7 +322,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_004, TestSize.Level1)
     EXPECT_EQ(DCAMERA_OK, ret);
 
     sptr<IConsumerSurface> videoSurface = IConsumerSurface::Create();
-    sptr<IBufferConsumerListener> videoListener = new DCameraClientTestVideoSurfaceListener();
+    sptr<IBufferConsumerListener> videoListener(new DCameraClientTestVideoSurfaceListener());
     videoSurface->RegisterConsumerListener(videoListener);
     ret = client_->Init();
     EXPECT_EQ(DCAMERA_OK, ret);
@@ -375,7 +375,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_005, TestSize.Level1)
     EXPECT_EQ(DCAMERA_OK, ret);
 
     sptr<IConsumerSurface> videoSurface = IConsumerSurface::Create();
-    sptr<IBufferConsumerListener> videoListener = new DCameraClientTestVideoSurfaceListener();
+    sptr<IBufferConsumerListener> videoListener(new DCameraClientTestVideoSurfaceListener());
     videoSurface->RegisterConsumerListener(videoListener);
     ret = client_->Init();
     EXPECT_EQ(DCAMERA_OK, ret);
@@ -563,7 +563,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_013, TestSize.Level1)
     EXPECT_EQ(DCAMERA_OK, ret);
 
     sptr<IConsumerSurface> videoSurface = IConsumerSurface::Create();
-    sptr<IBufferConsumerListener> videoListener = new DCameraClientTestVideoSurfaceListener();
+    sptr<IBufferConsumerListener> videoListener(new DCameraClientTestVideoSurfaceListener());
     videoSurface->RegisterConsumerListener(videoListener);
     ret = client_->Init();
     EXPECT_EQ(DCAMERA_OK, ret);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,7 +35,7 @@ void SourceProxyInitSourceFuzzTest(const uint8_t* data, size_t size)
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID);
     std::shared_ptr<DistributedCameraSourceProxy> dCSourceProxy =
         std::make_shared<DistributedCameraSourceProxy>(remoteObject);
-    sptr<IDCameraSourceCallback> callback = new DCameraSourceCallback();
+    sptr<IDCameraSourceCallback> callback(new DCameraSourceCallback());
 
     dCSourceProxy->InitSource(params, callback);
 }

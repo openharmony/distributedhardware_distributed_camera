@@ -32,7 +32,7 @@ void SourceServiceInitSourceFuzzTest(const uint8_t* data, size_t size)
 
     std::shared_ptr<DistributedCameraSourceService> sourceService =
         std::make_shared<DistributedCameraSourceService>(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, true);
-    sptr<IDCameraSourceCallback> callback = new DCameraSourceCallback();
+    sptr<IDCameraSourceCallback> callback(new DCameraSourceCallback());
 
     sourceService->InitSource(params, callback);
 }
