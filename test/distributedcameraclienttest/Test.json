@@ -1,0 +1,22 @@
+{
+    "description": "Config for disCamera test cases",
+    "driver": {
+        "module-name": "SubDctsdisCameraClientTest",
+        "native-test-timeout": "120000",
+        "native-test-device-path": "/data/local/tmp",
+        "runtime-hint": "1s",
+        "type": "CppTest"
+    },
+    "kits": [
+     {
+        "post-push" : [
+        "chmod -R 777 /data/local/tmp/*"
+     ],
+        "push": [
+          "SubDctsdisCameraClientTest->/data/local/tmp/SubDctsdisCameraClientTest"
+	],
+      "type": "PushKit"
+       }
+    ]
+}
+
