@@ -20,6 +20,8 @@ using namespace OHOS::Camera;
 using namespace OHOS::CameraStandard;
 using namespace OHOS::DistributedHardware;
 
+namespace OHOS {
+namespace DistributedHardware {
 constexpr double LOCATION_LATITUDE = 22.306;
 constexpr double LOCATION_LONGITUDE = 52.12;
 constexpr double LOCATION_ALTITUDE = 2.365;
@@ -148,7 +150,7 @@ CameraFormat ConvertToCameraFormat(int32_t format)
     return ret;
 }
 
-void InitPhotoOutput()
+void InitPhotoOutput(void)
 {
     DHLOGI("Distributed Camera Demo: Create PhotoOutput, width = %d, height = %d, format = %d",
         g_photoInfo->width_, g_photoInfo->height_, g_photoInfo->format_);
@@ -167,7 +169,7 @@ void InitPhotoOutput()
     ((sptr<PhotoOutput> &)g_photoOutput)->SetCallback(std::make_shared<DemoDCameraPhotoCallback>());
 }
 
-void InitPreviewOutput()
+void InitPreviewOutput(void)
 {
     DHLOGI("Distributed Camera Demo: Create PreviewOutput, width = %d, height = %d, format = %d",
         g_previewInfo->width_, g_previewInfo->height_, g_previewInfo->format_);
@@ -188,7 +190,7 @@ void InitPreviewOutput()
     ((sptr<PreviewOutput> &)g_previewOutput)->SetCallback(std::make_shared<DemoDCameraPreviewCallback>());
 }
 
-void InitVideoOutput()
+void InitVideoOutput(void)
 {
     DHLOGI("Distributed Camera Demo: Create VideoOutput, width = %d, height = %d, format = %d",
         g_videoInfo->width_, g_videoInfo->height_, g_videoInfo->format_);
@@ -209,7 +211,7 @@ void InitVideoOutput()
     ((sptr<VideoOutput> &)g_videoOutput)->SetCallback(std::make_shared<DemoDCameraVideoCallback>());
 }
 
-void ConfigCaptureSession()
+void ConfigCaptureSession(void)
 {
     g_captureSession->BeginConfig();
     g_captureSession->AddInput(g_cameraInput);
@@ -278,7 +280,7 @@ std::shared_ptr<PhotoCaptureSetting> ConfigPhotoCaptureSetting()
     return photoCaptureSettings;
 }
 
-void ReleaseResource()
+void ReleaseResource(void)
 {
     if (g_previewOutput != nullptr) {
         ((sptr<CameraStandard::PreviewOutput> &)g_previewOutput)->Stop();
@@ -358,3 +360,5 @@ bool IsValid(const CameraStandard::Size& size)
     return (size.width >= RESOLUTION_MIN_WIDTH) && (size.height >= RESOLUTION_MIN_HEIGHT) &&
         (size.width <= RESOLUTION_MAX_WIDTH_CONTINUOUS) && (size.height <= RESOLUTION_MAX_HEIGHT_CONTINUOUS);
 }
+} // namespace DistributedHardware
+} // namespace OHOS

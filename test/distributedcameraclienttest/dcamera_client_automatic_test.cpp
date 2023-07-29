@@ -27,6 +27,8 @@
 using namespace testing::ext;
 using namespace OHOS::DistributedHardware;
 
+namespace OHOS {
+namespace DistributedHardware {
 constexpr int32_t CAMERA_OK = 0;
 constexpr int32_t SLEEP_OK_SECOND = 2;
 constexpr int32_t SLEEP_FIVE_SECOND = 5;
@@ -300,3 +302,5 @@ HWTEST_F(DCameraClientAutomaticTest, DCameraTest_1000, TestSize.Level1)
         i--;
     }
 }
+} // namespace DistributedHardware
+} // namespace OHOS
