@@ -286,20 +286,20 @@ public:
         DHLOGI("DemoDCameraSessionCallback::OnFocusState state: %d", state);
     }
 };
-} // namespace DistributedHardware
-} // namespace OHOS
 
 int32_t InitCameraStandard(OHOS::CameraStandard::CameraPosition position);
 void InitCaptureInfo(int32_t width, int32_t height);
-void InitPhotoOutput();
-void InitPreviewOutput();
-void InitVideoOutput();
-void ConfigCaptureSession();
-void ReleaseResource();
+void InitPhotoOutput(void);
+void InitPreviewOutput(void);
+void InitVideoOutput(void);
+void ConfigCaptureSession(void);
+void ReleaseResource(void);
 int32_t Capture();
 int32_t Video();
 std::shared_ptr<OHOS::CameraStandard::PhotoCaptureSetting> ConfigPhotoCaptureSetting();
 void ConfigFocusFlashAndExposure(bool isVideo);
 int32_t GetPreviewProfiles(std::vector<OHOS::CameraStandard::Size> &previewResolution);
 bool IsValid(const OHOS::CameraStandard::Size& size);
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif // OHOS_DCAMERA_CLIENT_DEMO_H
