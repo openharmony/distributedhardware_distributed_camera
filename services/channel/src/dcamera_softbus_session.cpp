@@ -286,7 +286,7 @@ void DCameraSoftbusSession::PostData(std::shared_ptr<DataBuffer>& buffer)
 void DCameraSoftbusSession::GetFragDataLen(uint8_t *ptrPacket, SessionDataHeader& headerPara)
 {
     headerPara.version = U16Get(ptrPacket);
-    headerPara.fragFlag = ptrPacket[static_cast<int32_t>(BINARY_HEADER_FRAG_OFFSET)];
+    headerPara.fragFlag = ptrPacket[BINARY_HEADER_FRAG_OFFSET];
     headerPara.dataType = U32Get(ptrPacket + BINARY_HEADER_DATATYPE_OFFSET);
     headerPara.seqNum = U32Get(ptrPacket + BINARY_HEADER_SEQNUM_OFFSET);
     headerPara.totalLen = U32Get(ptrPacket + BINARY_HEADER_TOTALLEN_OFFSET);
