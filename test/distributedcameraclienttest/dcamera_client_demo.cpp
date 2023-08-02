@@ -308,12 +308,8 @@ void ReleaseResource(void)
     if (g_cameraManager != nullptr) {
         g_cameraManager->SetCallback(nullptr);
     }
-    if (g_cameraInfo != nullptr) {
-        g_cameraInfo = nullptr;
-    }
-    if (g_cameraManager != nullptr) {
-        g_cameraManager = nullptr;
-    }
+    g_cameraInfo = nullptr;
+    g_cameraManager = nullptr;
 }
 
 int32_t Capture()
