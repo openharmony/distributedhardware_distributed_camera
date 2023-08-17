@@ -271,7 +271,7 @@ static std::shared_ptr<PhotoCaptureSetting> ConfigPhotoCaptureSetting()
     return photoCaptureSettings;
 }
 
-int main()
+static void SetPermissions()
 {
     uint64_t tokenId;
     const char *perms[2];
@@ -290,8 +290,12 @@ int main()
     tokenId = GetAccessTokenId(&infoInstance);
     SetSelfTokenID(tokenId);
     OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
+}
 
+int main()
+{
     DHLOGI("========== Distributed Camera Demo Start ==========");
+    SetPermissions();
     int32_t ret = InitCameraStandard();
     if (ret != DCAMERA_OK) {
         std::cout << "have no remote camera" << std::endl;
