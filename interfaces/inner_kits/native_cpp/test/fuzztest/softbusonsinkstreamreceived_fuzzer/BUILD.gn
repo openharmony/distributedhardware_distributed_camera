@@ -34,7 +34,6 @@ ohos_fuzztest("SoftbusOnSinkStreamReceivedFuzzTest") {
     "${common_path}/include/utils",
     "//foundation//communication//dsoftbus//core//common//include",
     "${fwk_innerkits_path}/include",
-    "//third_party/json/include",
     "${feeding_smoother_path}/base",
     "${feeding_smoother_path}/derived",
     "${feeding_smoother_path}/utils",
