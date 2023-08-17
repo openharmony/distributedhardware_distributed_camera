@@ -67,17 +67,11 @@ int32_t DCameraSourceInput::ConfigStreams(std::vector<std::shared_ptr<DCStreamIn
             "format: %d, dataspace: %d, encodeType:%d streamType: %d", GetAnonyString(devId_).c_str(),
             GetAnonyString(dhId_).c_str(), streamInfo->streamId_, streamInfo->width_, streamInfo->height_,
             streamInfo->format_, streamInfo->dataspace_, streamInfo->encodeType_, streamInfo->type_);
-        switch (streamInfo->type_) {
-            case CONTINUOUS_FRAME: {
-                continueStreams.push_back(streamInfo);
-                break;
-            }
-            case SNAPSHOT_FRAME: {
-                snapStreams.push_back(streamInfo);
-                break;
-            }
-            default:
-                break;
+        if (streamInfo->type_ == CONTINUOUS_FRAME) {
+            continueStreams.push_back(streamInfo);
+        }
+        if (streamInfo->type_ == SNAPSHOT_FRAME) {
+            snapStreams.push_back(streamInfo);
         }
     }
 

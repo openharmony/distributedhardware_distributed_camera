@@ -63,6 +63,7 @@ private:
         std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSetting);
     void SetPhotoCaptureLocation(const std::shared_ptr<Camera::CameraMetadata>& cameraMetadata,
         std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSetting);
+    void StopOutput();
     void ReleaseCaptureSession();
     int32_t CameraServiceErrorType(const int32_t errorType);
     CameraStandard::CameraFormat ConvertToCameraFormat(int32_t format);

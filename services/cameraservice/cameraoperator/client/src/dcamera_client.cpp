@@ -217,31 +217,7 @@ int32_t DCameraClient::CameraServiceErrorType(const int32_t errorType)
 int32_t DCameraClient::StopCapture()
 {
     DHLOGI("StopCapture cameraId: %s", GetAnonyString(cameraId_).c_str());
-    if (previewOutput_ != nullptr) {
-        DHLOGI("StopCapture %s stop previewOutput", GetAnonyString(cameraId_).c_str());
-        int32_t ret = ((sptr<CameraStandard::PreviewOutput> &)previewOutput_)->Stop();
-        if (ret != DCAMERA_OK) {
-            DHLOGE("StopCapture videoOutput stop failed, cameraId: %s, ret: %d",
-                   GetAnonyString(cameraId_).c_str(), ret);
-        }
-        DHLOGI("StopCapture %s release previewOutput", GetAnonyString(cameraId_).c_str());
-        ret = previewOutput_->Release();
-        if (ret != DCAMERA_OK) {
-            DHLOGE("StopCapture previewOutput Release failed, cameraId: %s, ret: %d",
-                   GetAnonyString(cameraId_).c_str(), ret);
-        }
-        previewOutput_ = nullptr;
-    }
-
-    if (photoOutput_ != nullptr) {
-        DHLOGI("StopCapture %s release photoOutput", GetAnonyString(cameraId_).c_str());
-        int32_t ret = photoOutput_->Release();
-        if (ret != DCAMERA_OK) {
-            DHLOGE("StopCapture photoOutput Release failed, cameraId: %s, ret: %d",
-                   GetAnonyString(cameraId_).c_str(), ret);
-        }
-        photoOutput_ = nullptr;
-    }
+    StopOutput();
 
     if (cameraInput_ != nullptr) {
         DHLOGI("StopCapture %s release cameraInput", GetAnonyString(cameraId_).c_str());
@@ -279,6 +255,35 @@ int32_t DCameraClient::StopCapture()
 
     DHLOGI("StopCapture %s success", GetAnonyString(cameraId_).c_str());
     return DCAMERA_OK;
+}
+
+void DCameraClient::StopOutput()
+{
+    if (previewOutput_ != nullptr) {
+        DHLOGI("StopCapture %s stop previewOutput", GetAnonyString(cameraId_).c_str());
+        int32_t ret = ((sptr<CameraStandard::PreviewOutput> &)previewOutput_)->Stop();
+        if (ret != DCAMERA_OK) {
+            DHLOGE("StopCapture videoOutput stop failed, cameraId: %s, ret: %d",
+                   GetAnonyString(cameraId_).c_str(), ret);
+        }
+        DHLOGI("StopCapture %s release previewOutput", GetAnonyString(cameraId_).c_str());
+        ret = previewOutput_->Release();
+        if (ret != DCAMERA_OK) {
+            DHLOGE("StopCapture previewOutput Release failed, cameraId: %s, ret: %d",
+                   GetAnonyString(cameraId_).c_str(), ret);
+        }
+        previewOutput_ = nullptr;
+    }
+
+    if (photoOutput_ != nullptr) {
+        DHLOGI("StopCapture %s release photoOutput", GetAnonyString(cameraId_).c_str());
+        int32_t ret = photoOutput_->Release();
+        if (ret != DCAMERA_OK) {
+            DHLOGE("StopCapture photoOutput Release failed, cameraId: %s, ret: %d",
+                   GetAnonyString(cameraId_).c_str(), ret);
+        }
+        photoOutput_ = nullptr;
+    }
 }
 
 void DCameraClient::ReleaseCaptureSession()

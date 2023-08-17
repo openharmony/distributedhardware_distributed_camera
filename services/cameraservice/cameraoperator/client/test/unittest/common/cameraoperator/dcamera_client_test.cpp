@@ -104,6 +104,7 @@ public:
     void SetUp();
     void TearDown();
     void SetTokenID();
+    void SetCaptureInfo(std::shared_ptr<DCameraCaptureInfo>& info);
 
     std::shared_ptr<DCameraClient> client_;
     std::shared_ptr<DCameraCaptureInfo> photoInfo_false_;
@@ -187,6 +188,33 @@ void DCameraClientTest::SetTokenID()
     tokenId = GetAccessTokenId(&infoInstance);
     SetSelfTokenID(tokenId);
     OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
+}
+
+void DCameraClientTest::SetCaptureInfo(std::shared_ptr<DCameraCaptureInfo>& info)
+{
+    auto metaData = std::make_shared<Camera::CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
+    int32_t orientation = OHOS_CAMERA_JPEG_ROTATION_180;
+    metaData->addEntry(OHOS_JPEG_ORIENTATION, &orientation, sizeof(orientation));
+    uint8_t quality = OHOS_CAMERA_JPEG_LEVEL_HIGH;
+    metaData->addEntry(OHOS_JPEG_QUALITY, &quality, sizeof(quality));
+    std::vector<double> gps;
+    gps.push_back(LATITUDE);
+    gps.push_back(LONGITUDE);
+    gps.push_back(ALTITUDE);
+    metaData->addEntry(OHOS_JPEG_GPS_COORDINATES, gps.data(), gps.size());
+    std::string abilityString = Camera::MetadataUtils::EncodeToString(metaData);
+    std::vector<std::shared_ptr<DCameraSettings>> settings;
+    auto setting = std::make_shared<DCameraSettings>();
+    setting->type_ = UPDATE_METADATA;
+    setting->value_ = Base64Encode(reinterpret_cast<const unsigned char *>(abilityString.c_str()),
+        abilityString.length());
+    settings.push_back(setting);
+    info->width_ = TEST_WIDTH;
+    info->height_ = TEST_HEIGHT;
+    info->format_ = TEST_FORMAT_PHOTO;
+    info->isCapture_ = true;
+    info->streamType_ = SNAPSHOT_FRAME;
+    info->captureSettings_ = settings;
 }
 
 /**
@@ -583,31 +611,8 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_013, TestSize.Level1)
 
     sleep(TEST_SLEEP_SEC);
 
-    auto metaData = std::make_shared<Camera::CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
-    int32_t orientation = OHOS_CAMERA_JPEG_ROTATION_180;
-    metaData->addEntry(OHOS_JPEG_ORIENTATION, &orientation, sizeof(orientation));
-    uint8_t quality = OHOS_CAMERA_JPEG_LEVEL_HIGH;
-    metaData->addEntry(OHOS_JPEG_QUALITY, &quality, sizeof(quality));
-    std::vector<double> gps;
-    gps.push_back(LATITUDE);
-    gps.push_back(LONGITUDE);
-    gps.push_back(ALTITUDE);
-    metaData->addEntry(OHOS_JPEG_GPS_COORDINATES, gps.data(), gps.size());
-    std::string abilityString = Camera::MetadataUtils::EncodeToString(metaData);
-    std::vector<std::shared_ptr<DCameraSettings>> settings;
-    auto setting = std::make_shared<DCameraSettings>();
-    setting->type_ = UPDATE_METADATA;
-    setting->value_ = Base64Encode(reinterpret_cast<const unsigned char *>(abilityString.c_str()),
-        abilityString.length());
-    settings.push_back(setting);
-
     auto info = std::make_shared<DCameraCaptureInfo>();
-    info->width_ = TEST_WIDTH;
-    info->height_ = TEST_HEIGHT;
-    info->format_ = TEST_FORMAT_PHOTO;
-    info->isCapture_ = true;
-    info->streamType_ = SNAPSHOT_FRAME;
-    info->captureSettings_ = settings;
+    SetCaptureInfo(info);
     ret = client_->StartPhotoOutput(info);
     EXPECT_EQ(DCAMERA_OK, ret);
 
