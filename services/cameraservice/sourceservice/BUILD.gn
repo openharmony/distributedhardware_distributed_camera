@@ -50,7 +50,6 @@ ohos_shared_library("distributed_camera_source") {
     "${graphicstandard_path}/frameworks/surface/include",
     "${fwk_common_path}/utils/include",
     "${fwk_innerkits_path}/include",
-    "//third_party/json/include",
   ]
 
   sources = [

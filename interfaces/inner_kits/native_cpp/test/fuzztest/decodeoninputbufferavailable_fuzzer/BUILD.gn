@@ -45,7 +45,6 @@ ohos_fuzztest("DecodeOnInputBufferAvailableFuzzTest") {
     "${feeding_smoother_path}/derived",
     "${feeding_smoother_path}/utils",
     "${innerkits_path}/native_cpp/camera_source/include",
-    "//third_party/json/include",
   ]
 
   cflags = [
