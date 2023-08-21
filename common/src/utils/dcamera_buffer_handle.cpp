@@ -24,26 +24,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-#ifdef DCAMERA_MMAP_RESERVE
-void* DCameraMemoryMap(const BufferHandle *buffer)
-{
-    if (buffer == nullptr) {
-        DHLOGE("mmap the buffer handle is NULL");
-        return nullptr;
-    }
-    void* virAddr = nullptr;
-    if (buffer->reserveFds <= 0) {
-        virAddr = mmap(NULL, buffer->size, PROT_READ | PROT_WRITE, MAP_SHARED, buffer->fd, 0);
-    } else {
-        virAddr = mmap(NULL, buffer->size, PROT_READ | PROT_WRITE, MAP_SHARED, buffer->reserve[0], 0);
-    }
-    if (virAddr == MAP_FAILED) {
-        DHLOGE("mmap failed errno %s, fd : %d", strerror(errno), buffer->fd);
-        return nullptr;
-    }
-    return virAddr;
-}
-#else
 void* DCameraMemoryMap(const BufferHandle *buffer)
 {
     if (buffer == nullptr) {
@@ -58,7 +38,6 @@ void* DCameraMemoryMap(const BufferHandle *buffer)
     }
     return virAddr;
 }
-#endif
 
 void DCameraMemoryUnmap(BufferHandle *buffer)
 {
