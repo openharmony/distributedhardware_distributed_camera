@@ -60,6 +60,24 @@ const int32_t TEST_WIDTH = 1920;
 const int32_t TEST_HEIGTH = 1080;
 const int32_t TEST_WIDTH2 = 640;
 const int32_t TEST_HEIGTH2 = 480;
+
+VideoConfigParams SRC_PARAMS1(VideoCodecType::CODEC_H264,
+                            Videoformat::NV12,
+                            DCAMERA_PRODUCER_FPS_DEFAULT,
+                            TEST_WIDTH,
+                            TEST_HEIGTH);
+VideoConfigParams DEST_PARAMS1(VideoCodecType::CODEC_H264,
+                                Videoformat::NV21,
+                                DCAMERA_PRODUCER_FPS_DEFAULT,
+                                TEST_WIDTH,
+                                TEST_HEIGTH);
+VideoConfigParams DEST_PARAMS2(VideoCodecType::CODEC_H264,
+                                Videoformat::NV21,
+                                DCAMERA_PRODUCER_FPS_DEFAULT,
+                                TEST_WIDTH2,
+                                TEST_HEIGTH2);
+
+VideoConfigParams PROC_CONFIG;
 }
 /**
  * @tc.name: scale_convert_process_test_001
@@ -69,20 +87,7 @@ const int32_t TEST_HEIGTH2 = 480;
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_001, TestSize.Level1)
 {
-    EXPECT_EQ(false, testScaleConvertProcess_ == nullptr);
-
-    VideoConfigParams srcParams(VideoCodecType::CODEC_H264,
-                                Videoformat::NV12,
-                                DCAMERA_PRODUCER_FPS_DEFAULT,
-                                TEST_WIDTH,
-                                TEST_HEIGTH);
-    VideoConfigParams destParams(VideoCodecType::CODEC_H264,
-                                 Videoformat::NV21,
-                                 DCAMERA_PRODUCER_FPS_DEFAULT,
-                                 TEST_WIDTH,
-                                 TEST_HEIGTH);
-    VideoConfigParams procConfig;
-    int32_t rc = testScaleConvertProcess_->InitNode(srcParams, destParams, procConfig);
+    int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS1, PROC_CONFIG);
     EXPECT_EQ(rc, DCAMERA_OK);
 }
 
@@ -94,20 +99,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_001, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_002, TestSize.Level1)
 {
-    EXPECT_EQ(false, testScaleConvertProcess_ == nullptr);
-
-    VideoConfigParams srcParams(VideoCodecType::CODEC_H264,
-                                Videoformat::NV12,
-                                DCAMERA_PRODUCER_FPS_DEFAULT,
-                                TEST_WIDTH,
-                                TEST_HEIGTH);
-    VideoConfigParams destParams(VideoCodecType::CODEC_H264,
-                                 Videoformat::NV21,
-                                 DCAMERA_PRODUCER_FPS_DEFAULT,
-                                 TEST_WIDTH2,
-                                 TEST_HEIGTH2);
-    VideoConfigParams procConfig;
-    int32_t rc = testScaleConvertProcess_->InitNode(srcParams, destParams, procConfig);
+    int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS2, PROC_CONFIG);
     EXPECT_EQ(rc, DCAMERA_OK);
 }
 
@@ -119,8 +111,6 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_002, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_003, TestSize.Level1)
 {
-    EXPECT_EQ(false, testScaleConvertProcess_ == nullptr);
-
     std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
     int32_t rc = testScaleConvertProcess_->ProcessData(inputBuffers);
     EXPECT_EQ(rc, DCAMERA_DISABLE_PROCESS);
@@ -134,20 +124,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_003, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_004, TestSize.Level1)
 {
-    EXPECT_EQ(false, testScaleConvertProcess_ == nullptr);
-
-    VideoConfigParams srcParams(VideoCodecType::CODEC_H264,
-                                Videoformat::NV12,
-                                DCAMERA_PRODUCER_FPS_DEFAULT,
-                                TEST_WIDTH,
-                                TEST_HEIGTH);
-    VideoConfigParams destParams(VideoCodecType::CODEC_H264,
-                                 Videoformat::NV21,
-                                 DCAMERA_PRODUCER_FPS_DEFAULT,
-                                 TEST_WIDTH,
-                                 TEST_HEIGTH);
-    VideoConfigParams procConfig;
-    int32_t rc = testScaleConvertProcess_->InitNode(srcParams, destParams, procConfig);
+    int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS1, PROC_CONFIG);
     EXPECT_EQ(rc, DCAMERA_OK);
 
     std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
@@ -163,20 +140,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_004, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_005, TestSize.Level1)
 {
-    EXPECT_EQ(false, testScaleConvertProcess_ == nullptr);
-
-    VideoConfigParams srcParams(VideoCodecType::CODEC_H264,
-                                Videoformat::NV12,
-                                DCAMERA_PRODUCER_FPS_DEFAULT,
-                                TEST_WIDTH,
-                                TEST_HEIGTH);
-    VideoConfigParams destParams(VideoCodecType::CODEC_H264,
-                                 Videoformat::NV21,
-                                 DCAMERA_PRODUCER_FPS_DEFAULT,
-                                 TEST_WIDTH,
-                                 TEST_HEIGTH);
-    VideoConfigParams procConfig;
-    int32_t rc = testScaleConvertProcess_->InitNode(srcParams, destParams, procConfig);
+    int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS1, PROC_CONFIG);
     EXPECT_EQ(rc, DCAMERA_OK);
 
     size_t capacity = 100;
@@ -195,20 +159,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_005, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_006, TestSize.Level1)
 {
-    EXPECT_EQ(false, testScaleConvertProcess_ == nullptr);
-
-    VideoConfigParams srcParams(VideoCodecType::CODEC_H264,
-                                Videoformat::NV12,
-                                DCAMERA_PRODUCER_FPS_DEFAULT,
-                                TEST_WIDTH,
-                                TEST_HEIGTH);
-    VideoConfigParams destParams(VideoCodecType::CODEC_H264,
-                                 Videoformat::NV21,
-                                 DCAMERA_PRODUCER_FPS_DEFAULT,
-                                 TEST_WIDTH2,
-                                 TEST_HEIGTH2);
-    VideoConfigParams procConfig;
-    int32_t rc = testScaleConvertProcess_->InitNode(srcParams, destParams, procConfig);
+    int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS2, PROC_CONFIG);
     EXPECT_EQ(rc, DCAMERA_OK);
 
     size_t capacity = 100;
@@ -227,20 +178,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_006, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_007, TestSize.Level1)
 {
-    EXPECT_EQ(false, testScaleConvertProcess_ == nullptr);
-
-    VideoConfigParams srcParams(VideoCodecType::CODEC_H264,
-                                Videoformat::NV12,
-                                DCAMERA_PRODUCER_FPS_DEFAULT,
-                                TEST_WIDTH,
-                                TEST_HEIGTH);
-    VideoConfigParams destParams(VideoCodecType::CODEC_H264,
-                                 Videoformat::NV21,
-                                 DCAMERA_PRODUCER_FPS_DEFAULT,
-                                 TEST_WIDTH2,
-                                 TEST_HEIGTH2);
-    VideoConfigParams procConfig;
-    int32_t rc = testScaleConvertProcess_->InitNode(srcParams, destParams, procConfig);
+    int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS2, PROC_CONFIG);
     EXPECT_EQ(rc, DCAMERA_OK);
 
     size_t capacity = 3200000;
@@ -268,20 +206,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_007, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_008, TestSize.Level1)
 {
-    EXPECT_EQ(false, testScaleConvertProcess_ == nullptr);
-
-    VideoConfigParams srcParams(VideoCodecType::CODEC_H264,
-                                Videoformat::NV12,
-                                DCAMERA_PRODUCER_FPS_DEFAULT,
-                                TEST_WIDTH,
-                                TEST_HEIGTH);
-    VideoConfigParams destParams(VideoCodecType::CODEC_H264,
-                                 Videoformat::NV21,
-                                 DCAMERA_PRODUCER_FPS_DEFAULT,
-                                 TEST_WIDTH2,
-                                 TEST_HEIGTH2);
-    VideoConfigParams procConfig;
-    int32_t rc = testScaleConvertProcess_->InitNode(srcParams, destParams, procConfig);
+    int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS2, PROC_CONFIG);
     EXPECT_EQ(rc, DCAMERA_OK);
 
     size_t capacity = 3200000;
@@ -302,8 +227,6 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_008, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_009, TestSize.Level1)
 {
-    EXPECT_EQ(false, testScaleConvertProcess_ == nullptr);
-
     ImageUnitInfo srcImgInfo {Videoformat::YUVI420, 0, 0, 0, 0, 0, 0, nullptr};
     std::shared_ptr<DataBuffer> imgBuf = nullptr;
     int32_t rc = testScaleConvertProcess_->GetImageUnitInfo(srcImgInfo, imgBuf);
@@ -327,8 +250,6 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_009, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_010, TestSize.Level1)
 {
-    EXPECT_EQ(false, testScaleConvertProcess_ == nullptr);
-
     ImageUnitInfo srcImgInfo {Videoformat::YUVI420, 0, 0, 0, 0, 0, 0, nullptr};
     size_t capacity = 100;
     std::shared_ptr<DataBuffer> imgBuf = std::make_shared<DataBuffer>(capacity);
@@ -351,8 +272,6 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_010, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_011, TestSize.Level1)
 {
-    EXPECT_EQ(false, testScaleConvertProcess_ == nullptr);
-
     ImageUnitInfo srcImgInfo {Videoformat::YUVI420, 0, 0, 0, 0, 0, 0, nullptr};
     size_t capacity = 100;
     std::shared_ptr<DataBuffer> imgBuf = std::make_shared<DataBuffer>(capacity);
@@ -376,8 +295,6 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_011, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_012, TestSize.Level1)
 {
-    EXPECT_EQ(false, testScaleConvertProcess_ == nullptr);
-
     ImageUnitInfo srcImgInfo {Videoformat::NV12, TEST_WIDTH, TEST_HEIGTH, 0, 0, 0, 0, nullptr};
     ImageUnitInfo dstImgInfo {Videoformat::NV12, TEST_WIDTH, TEST_HEIGTH, 0, 0, 0, 0, nullptr};
 
@@ -399,8 +316,6 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_012, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_013, TestSize.Level1)
 {
-    EXPECT_EQ(false, testScaleConvertProcess_ == nullptr);
-
     std::shared_ptr<DataBuffer> imgData = std::make_shared<DataBuffer>(10);
     ImageUnitInfo srcImgInfo {Videoformat::NV12, TEST_WIDTH, TEST_HEIGTH, 0, 0, 0, 0, imgData};
     ImageUnitInfo dstImgInfo {Videoformat::NV12, TEST_WIDTH, TEST_HEIGTH, 0, 0, 0, 0, imgData};
@@ -417,8 +332,6 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_013, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_014, TestSize.Level1)
 {
-    EXPECT_EQ(false, testScaleConvertProcess_ == nullptr);
-
     ImageUnitInfo srcImgInfo {Videoformat::NV12, TEST_WIDTH, TEST_HEIGTH, 0, 0, 0, 0, nullptr};
     ImageUnitInfo dstImgInfo {Videoformat::NV12, TEST_WIDTH, TEST_HEIGTH, 0, 0, 0, 0, nullptr};
 
@@ -434,8 +347,6 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_014, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_015, TestSize.Level1)
 {
-    EXPECT_EQ(false, testScaleConvertProcess_ == nullptr);
-
     ImageUnitInfo srcImgInfo {};
     std::shared_ptr<DataBuffer> dtBuf = std::make_shared<DataBuffer>(10);
     srcImgInfo.alignedWidth = TEST_WIDTH2;
@@ -457,8 +368,6 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_015, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_016, TestSize.Level1)
 {
-    EXPECT_EQ(false, testScaleConvertProcess_ == nullptr);
-
     Videoformat colorFormat = Videoformat::NV21;
     AVPixelFormat f = testScaleConvertProcess_->GetAVPixelFormat(colorFormat);
     colorFormat = Videoformat::RGBA_8888;
