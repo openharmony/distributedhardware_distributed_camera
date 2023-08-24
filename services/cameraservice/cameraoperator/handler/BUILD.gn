@@ -64,6 +64,7 @@ ohos_shared_library("distributed_camera_handler") {
     "camera_framework:camera_framework",
     "drivers_interface_camera:metadata",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
+    "drivers_peripheral_display:hdi_gralloc_client",
     "graphic_2d:surface",
     "ipc:ipc_core",
     "player_framework:media_client",
