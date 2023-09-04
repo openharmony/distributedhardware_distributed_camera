@@ -96,6 +96,7 @@ ohos_shared_library("distributed_camera_source") {
     "${common_path}:distributed_camera_utils",
     "${services_path}/channel:distributed_camera_channel",
     "${services_path}/data_process:distributed_camera_data_process",
+    "//third_party/cJSON:cjson",
     "//third_party/jsoncpp:jsoncpp",
   ]
 
