@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,8 +14,7 @@
  */
 
 #include "dcamera_info_cmd.h"
-
-#include "json/json.h"
+#include "cJSON.h"
 
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
@@ -25,58 +24,72 @@ namespace OHOS {
 namespace DistributedHardware {
 int32_t DCameraInfoCmd::Marshal(std::string& jsonStr)
 {
-    Json::Value rootValue;
-    rootValue["Type"] = Json::Value(type_);
-    rootValue["dhId"] = Json::Value(dhId_);
-    rootValue["Command"] = Json::Value(command_);
+    cJSON *rootValue = cJSON_CreateObject();
+    if (rootValue == nullptr) {
+        return DCAMERA_BAD_VALUE;
+    }
+    cJSON_AddStringToObject(rootValue, "Type", type_.c_str());
+    cJSON_AddStringToObject(rootValue, "dhId", dhId_.c_str());
+    cJSON_AddStringToObject(rootValue, "Command", command_.c_str());
 
-    Json::Value info;
-    info["State"] = Json::Value(value_->state_);
-    rootValue["Value"] = info;
-
-    jsonStr = rootValue.toStyledString();
+    cJSON *info = cJSON_CreateObject();
+    if (info == nullptr) {
+        cJSON_Delete(rootValue);
+        return DCAMERA_BAD_VALUE;
+    }
+    cJSON_AddNumberToObject(info, "State", value_->state_);
+    cJSON_AddItemToObject(rootValue, "Value", info);
+    
+    char *jsonstr = cJSON_Print(rootValue);
+    if (jsonstr == nullptr) {
+        cJSON_Delete(rootValue);
+        return DCAMERA_BAD_VALUE;
+    }
+    jsonStr = jsonstr;
+    cJSON_Delete(rootValue);
+    cJSON_free(jsonstr);
     return DCAMERA_OK;
 }
 
 int32_t DCameraInfoCmd::Unmarshal(const std::string& jsonStr)
 {
-    JSONCPP_STRING errs;
-    Json::CharReaderBuilder readerBuilder;
-    Json::Value rootValue;
-
-    std::unique_ptr<Json::CharReader> const jsonReader(readerBuilder.newCharReader());
-    if (!jsonReader->parse(jsonStr.c_str(), jsonStr.c_str() + jsonStr.length(), &rootValue, &errs) ||
-        !rootValue.isObject()) {
+    cJSON *rootValue = cJSON_Parse(jsonStr.c_str());
+    if (rootValue == nullptr) {
         return DCAMERA_BAD_VALUE;
     }
-
-    if (!rootValue.isMember("Type") || !rootValue["Type"].isString()) {
+    cJSON *type = cJSON_GetObjectItemCaseSensitive(rootValue, "Type");
+    if (type == nullptr || !cJSON_IsString(type) || (type->valuestring == nullptr)) {
+        cJSON_Delete(rootValue);
         return DCAMERA_BAD_VALUE;
     }
-    type_ = rootValue["Type"].asString();
-
-    if (!rootValue.isMember("dhId") || !rootValue["dhId"].isString()) {
+    type_ = type->valuestring;
+    cJSON *dhId = cJSON_GetObjectItemCaseSensitive(rootValue, "dhId");
+    if (dhId == nullptr || !cJSON_IsString(dhId) || (dhId->valuestring == nullptr)) {
+        cJSON_Delete(rootValue);
         return DCAMERA_BAD_VALUE;
     }
-    dhId_ = rootValue["dhId"].asString();
-
-    if (!rootValue.isMember("Command") || !rootValue["Command"].isString()) {
+    dhId_ = dhId->valuestring;
+    cJSON *command = cJSON_GetObjectItemCaseSensitive(rootValue, "Command");
+    if (command == nullptr || !cJSON_IsString(command) || (command->valuestring == nullptr)) {
+        cJSON_Delete(rootValue);
         return DCAMERA_BAD_VALUE;
     }
-    command_ = rootValue["Command"].asString();
-
-    if (!rootValue.isMember("Value") || !rootValue["Value"].isObject()) {
+    command_ = command->valuestring;
+    cJSON *valueJson = cJSON_GetObjectItemCaseSensitive(rootValue, "Value");
+    if (valueJson == nullptr || !cJSON_IsObject(valueJson)) {
+        cJSON_Delete(rootValue);
         return DCAMERA_BAD_VALUE;
     }
-    Json::Value valueJson = rootValue["Value"];
-
-    if (!valueJson.isMember("State") || !valueJson["State"].isInt()) {
+    cJSON *state = cJSON_GetObjectItemCaseSensitive(valueJson, "State");
+    if (state == nullptr || !cJSON_IsNumber(state)) {
+        cJSON_Delete(rootValue);
         return DCAMERA_BAD_VALUE;
     }
     std::shared_ptr<DCameraInfo> info = std::make_shared<DCameraInfo>();
-    info->state_ = valueJson["State"].asInt();
+    info->state_ = state->valueint;
 
     value_ = info;
+    cJSON_Delete(rootValue);
     return DCAMERA_OK;
 }
 } // namespace DistributedHardware

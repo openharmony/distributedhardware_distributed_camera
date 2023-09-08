@@ -49,6 +49,7 @@
                 "access_token"
             ],
             "third_party": [
+                "cJSON",
                 "ffmpeg",
                 "jsoncpp",
                 "libyuv"
