@@ -21,8 +21,7 @@ import(
 ohos_fuzztest("SinkServiceChannelNegFuzzTest") {
   module_out_path = "distributed_camera/sinkservicechannelneg"
 
-  fuzz_config_file =
-      "${innerkits_path}/native_cpp/test/sinkfuzztest/sinkservicechannelneg_fuzzer"
+  fuzz_config_file = "${innerkits_path}/native_cpp/test/sinkfuzztest/sinkservicechannelneg_fuzzer"
 
   include_dirs = [ "${fwk_common_path}/utils/include" ]
 
@@ -35,6 +34,7 @@ ohos_fuzztest("SinkServiceChannelNegFuzzTest") {
     "${services_path}/cameraservice/sinkservice/include/distributedcamera",
     "${services_path}/cameraservice/sinkservice/include/distributedcameramgr",
     "${services_path}/cameraservice/sinkservice/include/distributedcameramgr/interface",
+    "//third_party/cJSON",
     "//third_party/jsoncpp/include",
   ]
 

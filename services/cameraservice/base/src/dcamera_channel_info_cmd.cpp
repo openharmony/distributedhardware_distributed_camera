@@ -54,7 +54,7 @@ int32_t DCameraChannelInfoCmd::Marshal(std::string& jsonStr)
         cJSON_AddStringToObject(detail, "DataSessionFlag", iter->dataSessionFlag_.c_str());
         cJSON_AddNumberToObject(detail, "StreamType", iter->streamType_);
         cJSON_AddItemToArray(details, detail);
-    }   
+    }
     
     char *jsonstr = cJSON_Print(rootValue);
     if (jsonstr == nullptr) {
@@ -108,16 +108,26 @@ int32_t DCameraChannelInfoCmd::Unmarshal(const std::string& jsonStr)
         cJSON_Delete(rootValue);
         return DCAMERA_BAD_VALUE;
     }
+    if (UnmarshalDetails(details, channelInfo) != DCAMERA_OK) {
+        cJSON_Delete(rootValue);
+        return DCAMERA_BAD_VALUE;
+    }
+    value_ = channelInfo;
+    cJSON_Delete(rootValue);
+    return DCAMERA_OK;
+}
+       
+int32_t DCameraChannelInfoCmd::UnmarshalDetails(cJSON *details, std::shared_ptr<DCameraChannelInfo> channelInfo)
+{
     cJSON *detail = nullptr;
     cJSON_ArrayForEach(detail, details) {
         cJSON *dataSessionFlag = cJSON_GetObjectItemCaseSensitive(detail, "DataSessionFlag");
         cJSON *streamType = cJSON_GetObjectItemCaseSensitive(detail, "StreamType");
-        if (dataSessionFlag == nullptr || !cJSON_IsString(dataSessionFlag) || (dataSessionFlag->valuestring == nullptr)){
-            cJSON_Delete(rootValue);
+        if (dataSessionFlag == nullptr || !cJSON_IsString(dataSessionFlag) ||
+            (dataSessionFlag->valuestring == nullptr)) {
             return DCAMERA_BAD_VALUE;
         }
-        if (streamType == nullptr || !cJSON_IsNumber(streamType)){
-            cJSON_Delete(rootValue);
+        if (streamType == nullptr || !cJSON_IsNumber(streamType)) {
             return DCAMERA_BAD_VALUE;
         }
         DCameraChannelDetail channelDetail;
@@ -125,8 +135,6 @@ int32_t DCameraChannelInfoCmd::Unmarshal(const std::string& jsonStr)
         channelDetail.streamType_ = static_cast<DCStreamType>(streamType->valueint);
         channelInfo->detail_.push_back(channelDetail);
     }
-    value_ = channelInfo;
-    cJSON_Delete(rootValue);
     return DCAMERA_OK;
 }
 } // namespace DistributedHardware
