@@ -19,7 +19,7 @@ import(
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SourceProxyDCameraNotifyFuzzTest") {
-  module_out_path = "distributed_camera/sourceproxydcameranotify"
+  module_out_path = "${fuzz_test_output_path}/sourceproxydcameranotify"
 
   fuzz_config_file = "${innerkits_path}/native_cpp/test/sourcefuzztest/sourceproxydcameranotify_fuzzer"
 

@@ -19,10 +19,9 @@ import(
 
 ##############################fuzztest##########################################
 ohos_fuzztest("OnSinkLocalCamSrvDiedFuzzTest") {
-  module_out_path = "distributed_camera/onsinklocalcamsrvdied"
+  module_out_path = "${fuzz_test_output_path}/onsinklocalcamsrvdied"
 
-  fuzz_config_file =
-      "${innerkits_path}/native_cpp/test/sinkfuzztest/onsinklocalcamsrvdied_fuzzer"
+  fuzz_config_file = "${innerkits_path}/native_cpp/test/sinkfuzztest/onsinklocalcamsrvdied_fuzzer"
 
   include_dirs = [
     "${fwk_utils_path}/include",

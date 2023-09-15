@@ -19,7 +19,7 @@ import(
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SoftbusOnSinkMessageReceivedFuzzTest") {
-  module_out_path = "distributed_camera/softbusonsinkmessagereceived"
+  module_out_path = "${fuzz_test_output_path}/softbusonsinkmessagereceived"
 
   fuzz_config_file = "${innerkits_path}/native_cpp/test/sinkfuzztest/softbusonsinkmessagereceived_fuzzer"
 

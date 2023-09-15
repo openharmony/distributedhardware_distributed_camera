@@ -19,10 +19,9 @@ import(
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SinkServiceStopCaptureFuzzTest") {
-  module_out_path = "distributed_camera/sinkservicestopcapture"
+  module_out_path = "${fuzz_test_output_path}/sinkservicestopcapture"
 
-  fuzz_config_file =
-      "${innerkits_path}/native_cpp/test/sinkfuzztest/sinkservicestopcapture_fuzzer"
+  fuzz_config_file = "${innerkits_path}/native_cpp/test/sinkfuzztest/sinkservicestopcapture_fuzzer"
 
   include_dirs = [ "${fwk_common_path}/utils/include" ]
 

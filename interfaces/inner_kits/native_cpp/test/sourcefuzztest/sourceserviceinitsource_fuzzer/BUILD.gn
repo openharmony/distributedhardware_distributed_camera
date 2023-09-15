@@ -19,7 +19,7 @@ import(
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SourceServiceInitSourceFuzzTest") {
-  module_out_path = "distributed_camera/sourceserviceinitsource"
+  module_out_path = "${fuzz_test_output_path}/sourceserviceinitsource"
 
   fuzz_config_file = "${innerkits_path}/native_cpp/test/sourcefuzztest/sourceserviceinitsource_fuzzer"
 

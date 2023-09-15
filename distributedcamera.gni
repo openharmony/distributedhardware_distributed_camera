@@ -15,7 +15,7 @@ distributedcamera_path = "//foundation/distributedhardware/distributed_camera"
 
 distributedhardwarefwk_path =
     "//foundation/distributedhardware/distributed_hardware_fwk"
-
+fuzz_test_output_path = "distributed_camera/distributed_camera"
 camera_hdf_path = "//drivers/peripheral"
 
 camerastandard_path = "//foundation/multimedia/camera_framework"

@@ -19,7 +19,7 @@ import(
 
 ##############################fuzztest##########################################
 ohos_fuzztest("EncodeOnOutputBufferAvailableFuzzTest") {
-  module_out_path = "distributed_camera/encodeonoutputbufferavailable"
+  module_out_path = "${fuzz_test_output_path}/encodeonoutputbufferavailable"
 
   fuzz_config_file = "${innerkits_path}/native_cpp/test/sinkfuzztest/encodeonoutputbufferavailable_fuzzer"
 

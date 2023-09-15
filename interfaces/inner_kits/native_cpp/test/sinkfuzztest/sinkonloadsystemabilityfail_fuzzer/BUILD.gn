@@ -19,7 +19,7 @@ import(
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SinkOnLoadSystemAbilityFailFuzzTest") {
-  module_out_path = "distributed_camera/sinkonloadsystemabilityfail"
+  module_out_path = "${fuzz_test_output_path}/sinkonloadsystemabilityfail"
 
   fuzz_config_file = "${innerkits_path}/native_cpp/test/sinkfuzztest/sinkonloadsystemabilityfail_fuzzer"
 

@@ -19,7 +19,7 @@ import(
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SinkHandlerSubscribeLocalHardwareFuzzTest") {
-  module_out_path = "distributed_camera/sinkhandlersubscribelocalhardware"
+  module_out_path = "${fuzz_test_output_path}/sinkhandlersubscribelocalhardware"
 
   fuzz_config_file = "${innerkits_path}/native_cpp/test/sinkfuzztest/sinkhandlersubscribelocalhardware_fuzzer"
 
