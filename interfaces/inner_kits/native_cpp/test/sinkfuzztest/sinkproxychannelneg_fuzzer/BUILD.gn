@@ -19,10 +19,9 @@ import(
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SinkProxyChannelNegFuzzTest") {
-  module_out_path = "distributed_camera/sinkproxychannelneg"
+  module_out_path = "${fuzz_test_output_path}/sinkproxychannelneg"
 
-  fuzz_config_file =
-      "${innerkits_path}/native_cpp/test/sinkfuzztest/sinkproxychannelneg_fuzzer"
+  fuzz_config_file = "${innerkits_path}/native_cpp/test/sinkfuzztest/sinkproxychannelneg_fuzzer"
 
   include_dirs = [ "${fwk_common_path}/utils/include" ]
 

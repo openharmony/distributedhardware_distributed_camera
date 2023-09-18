@@ -19,7 +19,7 @@ import(
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SinkProxyInitSinkFuzzTest") {
-  module_out_path = "distributed_camera/sinkproxyinitsink"
+  module_out_path = "${fuzz_test_output_path}/sinkproxyinitsink"
 
   fuzz_config_file =
       "${innerkits_path}/native_cpp/test/sinkfuzztest/sinkproxyinitsink_fuzzer"

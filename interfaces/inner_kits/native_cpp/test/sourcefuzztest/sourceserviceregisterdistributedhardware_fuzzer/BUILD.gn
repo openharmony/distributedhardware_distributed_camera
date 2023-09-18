@@ -20,7 +20,7 @@ import(
 ##############################fuzztest##########################################
 ohos_fuzztest("SourceServiceRegisterDistributedHardwareFuzzTest") {
   module_out_path =
-      "distributed_camera/sourceserviceregisterdistributedhardware"
+      "${fuzz_test_output_path}/sourceserviceregisterdistributedhardware"
 
   fuzz_config_file = "${innerkits_path}/native_cpp/test/sourcefuzztest/sourceserviceregisterdistributedhardware_fuzzer"
 

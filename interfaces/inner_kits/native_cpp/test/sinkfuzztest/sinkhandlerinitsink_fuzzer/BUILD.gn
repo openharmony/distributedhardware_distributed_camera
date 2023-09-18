@@ -19,10 +19,9 @@ import(
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SinkHandlerInitSinkFuzzTest") {
-  module_out_path = "distributed_camera/sinkhandlerinitsink"
+  module_out_path = "${fuzz_test_output_path}/sinkhandlerinitsink"
 
-  fuzz_config_file =
-      "${innerkits_path}/native_cpp/test/sinkfuzztest/sinkhandlerinitsink_fuzzer"
+  fuzz_config_file = "${innerkits_path}/native_cpp/test/sinkfuzztest/sinkhandlerinitsink_fuzzer"
 
   include_dirs = [
     "${innerkits_path}/native_cpp",

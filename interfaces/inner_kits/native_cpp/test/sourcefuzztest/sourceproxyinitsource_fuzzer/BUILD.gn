@@ -19,10 +19,9 @@ import(
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SourceProxyInitSourceFuzzTest") {
-  module_out_path = "distributed_camera/sourceproxyinitsource"
+  module_out_path = "${fuzz_test_output_path}/sourceproxyinitsource"
 
-  fuzz_config_file =
-      "${innerkits_path}/native_cpp/test/sourcefuzztest/sourceproxyinitsource_fuzzer"
+  fuzz_config_file = "${innerkits_path}/native_cpp/test/sourcefuzztest/sourceproxyinitsource_fuzzer"
 
   include_dirs = [
     "${innerkits_path}/native_cpp/camera_source/include/callback",

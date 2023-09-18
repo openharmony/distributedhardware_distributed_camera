@@ -19,7 +19,7 @@ import(
 
 ##############################fuzztest##########################################
 ohos_fuzztest("OnSourceLocalCamSrvDiedFuzzTest") {
-  module_out_path = "distributed_camera/onsourcelocalcamsrvdied"
+  module_out_path = "${fuzz_test_output_path}/onsourcelocalcamsrvdied"
 
   fuzz_config_file = "${innerkits_path}/native_cpp/test/sourcefuzztest/onsourcelocalcamsrvdied_fuzzer"
 
