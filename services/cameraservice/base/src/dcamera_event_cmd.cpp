@@ -59,16 +59,13 @@ int32_t DCameraEventCmd::Unmarshal(const std::string& jsonStr)
         return DCAMERA_BAD_VALUE;
     }
     cJSON *type = cJSON_GetObjectItemCaseSensitive(rootValue, "Type");
-    if (type == nullptr || !cJSON_IsString(type) || (type->valuestring == nullptr)) {
+    cJSON *dhId = cJSON_GetObjectItemCaseSensitive(rootValue, "dhId");
+    if (type == nullptr || !cJSON_IsString(type) || (type->valuestring == nullptr) ||
+        dhId == nullptr || !cJSON_IsString(dhId) || (dhId->valuestring == nullptr)) {
         cJSON_Delete(rootValue);
         return DCAMERA_BAD_VALUE;
     }
     type_ = type->valuestring;
-    cJSON *dhId = cJSON_GetObjectItemCaseSensitive(rootValue, "dhId");
-    if (dhId == nullptr || !cJSON_IsString(dhId) || (dhId->valuestring == nullptr)) {
-        cJSON_Delete(rootValue);
-        return DCAMERA_BAD_VALUE;
-    }
     dhId_ = dhId->valuestring;
     cJSON *command = cJSON_GetObjectItemCaseSensitive(rootValue, "Command");
     if (command == nullptr || !cJSON_IsString(command) || (command->valuestring == nullptr)) {
@@ -100,7 +97,6 @@ int32_t DCameraEventCmd::Unmarshal(const std::string& jsonStr)
         return DCAMERA_BAD_VALUE;
     }
     event->eventContent_ = eventContent->valuestring;
-
     value_ = event;
     cJSON_Delete(rootValue);
     return DCAMERA_OK;

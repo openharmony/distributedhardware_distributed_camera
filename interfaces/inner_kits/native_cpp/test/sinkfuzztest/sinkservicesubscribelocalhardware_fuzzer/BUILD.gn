@@ -34,6 +34,7 @@ ohos_fuzztest("SinkServiceSubscribeLocalHardwareFuzzTest") {
     "${services_path}/cameraservice/sinkservice/include/distributedcamera",
     "${services_path}/cameraservice/sinkservice/include/distributedcameramgr",
     "${services_path}/cameraservice/sinkservice/include/distributedcameramgr/interface",
+    "//third_party/cJSON",
     "//third_party/jsoncpp/include",
   ]
 

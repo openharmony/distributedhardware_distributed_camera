@@ -36,14 +36,14 @@ int32_t DCameraMetadataSettingCmd::Marshal(std::string& jsonStr)
     if (settings == nullptr) {
         cJSON_Delete(rootValue);
         return DCAMERA_BAD_VALUE;
-    } 
+    }
     cJSON_AddItemToObject(rootValue, "Value", settings);
     for (auto iter = value_.begin(); iter != value_.end(); iter++) {
         cJSON *setting = cJSON_CreateObject();
         if (setting == nullptr) {
             cJSON_Delete(rootValue);
             return DCAMERA_BAD_VALUE;
-        } 
+        }
         cJSON_AddNumberToObject(setting, "SettingType", (*iter)->type_);
         cJSON_AddStringToObject(setting, "SettingValue", (*iter)->value_.c_str());
         cJSON_AddItemToArray(settings, setting);
@@ -93,11 +93,11 @@ int32_t DCameraMetadataSettingCmd::Unmarshal(const std::string& jsonStr)
     cJSON_ArrayForEach(subSetting, settings) {
         cJSON *settingType = cJSON_GetObjectItemCaseSensitive(subSetting, "SettingType");
         cJSON *settingValue = cJSON_GetObjectItemCaseSensitive(subSetting, "SettingValue");
-        if (settingType == nullptr || !cJSON_IsNumber(settingType)){
+        if (settingType == nullptr || !cJSON_IsNumber(settingType)) {
             cJSON_Delete(rootValue);
             return DCAMERA_BAD_VALUE;
         }
-        if (settingValue == nullptr ||  !cJSON_IsString(settingValue) || (settingValue->valuestring == nullptr)){
+        if (settingValue == nullptr || !cJSON_IsString(settingValue) || (settingValue->valuestring == nullptr)) {
             cJSON_Delete(rootValue);
             return DCAMERA_BAD_VALUE;
         }

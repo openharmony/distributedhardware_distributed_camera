@@ -47,6 +47,7 @@ ohos_fuzztest("SourceServiceUnregisterDistributedHardwareFuzzTest") {
     "${fwk_utils_path}/include",
     "${fwk_utils_path}/include/eventbus",
     "${fwk_common_path}/utils/include",
+    "//third_party/cJSON",
     "//third_party/jsoncpp/include",
   ]
 

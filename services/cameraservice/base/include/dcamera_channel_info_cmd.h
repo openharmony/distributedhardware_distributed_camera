@@ -19,7 +19,7 @@
 #include <memory>
 #include <string>
 #include <vector>
-
+#include "cJSON.h"
 #include "v1_0/dcamera_types.h"
 
 namespace OHOS {
@@ -52,6 +52,9 @@ public:
 public:
     int32_t Marshal(std::string& jsonStr);
     int32_t Unmarshal(const std::string& jsonStr);
+
+private:
+    int32_t UnmarshalDetails(cJSON *details, std::shared_ptr<DCameraChannelInfo> channelInfo);
 };
 } // namespace DistributedHardware
 } // namespace OHOS
