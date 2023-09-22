@@ -102,7 +102,7 @@ int32_t DCameraMetadataSettingCmd::Unmarshal(const std::string& jsonStr)
             return DCAMERA_BAD_VALUE;
         }
         std::shared_ptr<DCameraSettings> setting = std::make_shared<DCameraSettings>();
-        setting->type_ = (DCSettingsType)settingValue->valueint;
+        setting->type_ = (DCSettingsType)settingType->valueint;
         setting->value_ = settingValue->valuestring;
         value_.push_back(setting);
     }
