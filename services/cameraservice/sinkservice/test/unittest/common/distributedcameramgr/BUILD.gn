@@ -65,6 +65,10 @@ ohos_unittest("DCameraSinkMgrTest") {
     "dcamera_sink_dev_test.cpp",
     "dcamera_sink_output_test.cpp",
     "dcamera_sink_service_ipc_test.cpp",
+    "eventbus/dcamera_frame_trigger_event_test.cpp",
+    "eventbus/dcamera_photo_output_event_test.cpp",
+    "eventbus/dcamera_post_authorization_event_test.cpp",
+    "eventbus/dcamera_video_output_event_test.cpp",
   ]
 
   configs = [ ":module_private_config" ]
