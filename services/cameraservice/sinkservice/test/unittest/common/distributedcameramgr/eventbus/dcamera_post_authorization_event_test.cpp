@@ -15,9 +15,7 @@
 
 #include <gtest/gtest.h>
 
-#define private public
 #include "dcamera_post_authorization_event.h"
-#undef private
 #include "dcamera_capture_info_cmd.h"
 #include "distributed_hardware_log.h"
 

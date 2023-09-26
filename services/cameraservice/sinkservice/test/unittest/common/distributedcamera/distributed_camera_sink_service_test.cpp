@@ -228,5 +228,147 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_007, TestSi
     int ret = sinkService_->Dump(fd, args);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
+/**
+ * @tc.name: dcamera_sink_service_test_008
+ * @tc.desc: Verify the SubscribeLocalHardware function can't find id.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MT
+ */
+HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_008, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_service_test_008");
+    EXPECT_EQ(sinkService_ == nullptr, false);
+
+    int32_t ret = sinkService_->InitSink(g_testParams);
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    ret = sinkService_->SubscribeLocalHardware("", g_testParams);
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
+
+    ret = sinkService_->ReleaseSink();
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_service_test_009
+ * @tc.desc: Verify the UnsubscribeLocalHardware function can't find id.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MT
+ */
+HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_009, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_service_test_009");
+    EXPECT_EQ(sinkService_ == nullptr, false);
+
+    int32_t ret = sinkService_->InitSink(g_testParams);
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    ret = sinkService_->UnsubscribeLocalHardware("");
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
+
+    ret = sinkService_->ReleaseSink();
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_service_test_010
+ * @tc.desc: Verify the ChannelNeg function can't find id.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_010, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_service_test_010");
+    EXPECT_EQ(sinkService_ == nullptr, false);
+
+    int32_t ret = sinkService_->InitSink(g_testParams);
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    ret = sinkService_->ChannelNeg("", g_testChannelInfoContinue);
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
+
+    ret = sinkService_->ReleaseSink();
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_service_test_011
+ * @tc.desc: Verify the GetCameraInfo function can't find id.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_011, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_service_test_011");
+    EXPECT_EQ(sinkService_ == nullptr, false);
+
+    int32_t ret = sinkService_->InitSink(g_testParams);
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    ret = sinkService_->GetCameraInfo("", g_testCameraInfo);
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
+
+    ret = sinkService_->ReleaseSink();
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_service_test_012
+ * @tc.desc: Verify the OpenChannel and CloseChannel function can't find id.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_012, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_service_test_012");
+    EXPECT_EQ(sinkService_ == nullptr, false);
+
+    int32_t ret = sinkService_->InitSink(g_testParams);
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    ret = sinkService_->OpenChannel("", g_testOpenInfoService);
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
+
+    ret = sinkService_->CloseChannel("");
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
+
+    ret = sinkService_->ReleaseSink();
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_service_test_013
+ * @tc.desc: Verify the Dump function with large arg.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_013, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_service_test_013");
+    EXPECT_EQ(sinkService_ == nullptr, false);
+
+    int32_t fd = 1;
+    std::vector<std::u16string> args(sinkService_->DUMP_MAX_SIZE, u"");
+    std::u16string str(u"");
+    args.push_back(str);
+    int ret = sinkService_->Dump(fd, args);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_service_test_014
+ * @tc.desc: Verify the StopCapture function can't find id.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_014, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_service_test_014");
+    EXPECT_EQ(sinkService_ == nullptr, false);
+
+    int32_t ret = sinkService_->InitSink(g_testParams);
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    ret = sinkService_->StopCapture("");
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
+
+    ret = sinkService_->ReleaseSink();
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

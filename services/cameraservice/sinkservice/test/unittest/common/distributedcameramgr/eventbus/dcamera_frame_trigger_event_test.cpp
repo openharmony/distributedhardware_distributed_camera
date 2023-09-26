@@ -15,9 +15,7 @@
 
 #include <gtest/gtest.h>
 
-#define private public
 #include "dcamera_frame_trigger_event.h"
-#undef private
 #include "distributed_hardware_log.h"
 
 using namespace testing::ext;

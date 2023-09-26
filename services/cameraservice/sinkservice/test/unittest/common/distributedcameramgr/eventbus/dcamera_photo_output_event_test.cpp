@@ -15,9 +15,7 @@
 
 #include <gtest/gtest.h>
 
-#define private public
 #include "dcamera_photo_output_event.h"
-#undef private
 #include "data_buffer.h"
 #include "distributed_hardware_log.h"
 
