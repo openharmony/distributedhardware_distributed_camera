@@ -23,6 +23,7 @@
 #include "icamera_controller.h"
 #include "icamera_state_listener.h"
 #include "icamera_input.h"
+#include "idistributed_camera_source.h"
 
 #include "v1_0/id_camera_provider_callback.h"
 #include "v1_0/id_camera_provider.h"
@@ -37,7 +38,7 @@ public:
 
     int32_t InitDCameraSourceDev();
     int32_t RegisterDistributedHardware(const std::string& devId, const std::string& dhId, const std::string& reqId,
-        const std::string& ver, const std::string attrs);
+        const EnableParam& param);
     int32_t UnRegisterDistributedHardware(const std::string devId, const std::string dhId, const std::string reqId);
     int32_t DCameraNotify(std::string& eventStr);
 

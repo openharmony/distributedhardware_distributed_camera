@@ -112,8 +112,10 @@ HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_003, TestSize.Lev
     std::string devId = TEST_DEVICE_ID;
     std::string dhId = TEST_CAMERA_DH_ID_0;
     EnableParam param;
-    param.version = TEST_VER;
-    param.attrs = TEST_ATTRS;
+    param.sourceVersion = TEST_VER;
+    param.sourceAttrs = TEST_ATTRS;
+    param.sinkVersion = TEST_VER;
+    param.sinkAttrs = TEST_ATTRS;
     std::shared_ptr<RegisterCallback> callback = std::make_shared<MockComponentEnable>();
     int32_t ret = DCameraSourceHandler::GetInstance().RegisterDistributedHardware(devId, dhId, param, callback);
     EXPECT_NE(DCAMERA_OK, ret);

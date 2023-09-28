@@ -52,8 +52,8 @@ namespace {
 const std::string TEST_DEVICE_ID = "bb536a637105409e904d4da83790a4a7";
 const std::string TEST_CAMERA_DH_ID_0 = "camera_0";
 const std::string TEST_REQID = "0xFFFF";
-const std::string TEST_PARAM = "0xFFFF";
-
+const std::string TEST_SINK_PARAM = "0xFFFF";
+const std::string TEST_SRC_PARAM = "0xFFFF";
 }
 
 void DCameraSourceConfigStreamStateTest::SetUpTestCase(void)
@@ -69,7 +69,8 @@ void DCameraSourceConfigStreamStateTest::SetUp(void)
     stateListener_ = std::make_shared<MockDCameraSourceStateListener>();
     camDev_ = std::make_shared<MockDCameraSourceDev>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, stateListener_);
     stateMachine_ = std::make_shared<DCameraSourceStateMachine>(camDev_);
-    g_registParam = std::make_shared<DCameraRegistParam>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, TEST_REQID, TEST_PARAM);
+    g_registParam = std::make_shared<DCameraRegistParam>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, TEST_REQID,
+        TEST_SINK_PARAM, TEST_SRC_PARAM);
 }
 
 void DCameraSourceConfigStreamStateTest::TearDown(void)

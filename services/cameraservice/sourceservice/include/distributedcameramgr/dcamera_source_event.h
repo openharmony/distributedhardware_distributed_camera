@@ -43,14 +43,15 @@ typedef enum {
 class DCameraRegistParam {
 public:
     DCameraRegistParam() = default;
-    DCameraRegistParam(std::string devId, std::string dhId, std::string reqId, std::string param)
-        : devId_(devId), dhId_(dhId), reqId_(reqId), param_(param)
+    DCameraRegistParam(std::string devId, std::string dhId, std::string reqId, std::string sinkParam,
+        std::string srcParam) : devId_(devId), dhId_(dhId), reqId_(reqId), sinkParam_(sinkParam), srcParam_(srcParam)
     {}
     ~DCameraRegistParam() = default;
     std::string devId_;
     std::string dhId_;
     std::string reqId_;
-    std::string param_;
+    std::string sinkParam_;
+    std::string srcParam_;
 };
 
 class DCameraSourceEvent : public Event {
