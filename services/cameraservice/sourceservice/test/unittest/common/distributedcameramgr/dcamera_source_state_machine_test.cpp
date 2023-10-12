@@ -58,7 +58,8 @@ namespace {
 const std::string TEST_DEVICE_ID = "bb536a637105409e904d4da83790a4a7";
 const std::string TEST_CAMERA_DH_ID_0 = "camera_0";
 const std::string TEST_REQID = "0xFFFF";
-const std::string TEST_PARAM = "0xFFFF";
+const std::string TEST_SINK_PARAM = "0xFFFF";
+const std::string TEST_SRC_PARAM = "0xFFFF";
 const int32_t TEST_WIDTH = 1920;
 const int32_t TEST_HEIGTH = 1080;
 const int32_t TEST_STREAMID = 2;
@@ -143,7 +144,8 @@ void DCameraSourceStateMachineTest::SetCaptureInfos()
     g_streamIdSnap.push_back(1);
     g_streamIdSnap.push_back(TEST_STREAMID);
 
-    g_registParam = std::make_shared<DCameraRegistParam>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, TEST_REQID, TEST_PARAM);
+    g_registParam = std::make_shared<DCameraRegistParam>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, TEST_REQID,
+        TEST_SINK_PARAM, TEST_SRC_PARAM);
 }
 
 void DCameraSourceStateMachineTest::TearDownTestCase(void)

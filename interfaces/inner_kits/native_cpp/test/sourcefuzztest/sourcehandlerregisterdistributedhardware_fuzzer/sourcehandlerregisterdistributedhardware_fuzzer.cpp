@@ -34,11 +34,15 @@ void SourceHandlerRegisterDistributedHardwareFuzzTest(const uint8_t* data, size_
     }
     std::string devId(reinterpret_cast<const char*>(data), size);
     std::string dhId(reinterpret_cast<const char*>(data), size);
-    std::string version(reinterpret_cast<const char*>(data), size);
-    std::string attrs(reinterpret_cast<const char*>(data), size);
+    std::string sourceVersion(reinterpret_cast<const char*>(data), size);
+    std::string sourceAttrs(reinterpret_cast<const char*>(data), size);
+    std::string sinkVersion(reinterpret_cast<const char*>(data), size);
+    std::string sinkAttrs(reinterpret_cast<const char*>(data), size);
     EnableParam param;
-    param.version = version;
-    param.attrs = attrs;
+    param.sourceVersion = sourceVersion;
+    param.sourceAttrs = sourceAttrs;
+    param.sinkVersion = sinkVersion;
+    param.sinkAttrs = sinkAttrs;
     std::shared_ptr<RegisterCallback> callback = std::make_shared<MockComponentEnable>();
 
     DCameraSourceHandler::GetInstance().RegisterDistributedHardware(devId, dhId, param, callback);

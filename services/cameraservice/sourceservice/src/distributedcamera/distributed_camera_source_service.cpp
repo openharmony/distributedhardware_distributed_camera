@@ -127,8 +127,8 @@ int32_t DistributedCameraSourceService::ReleaseSource()
 int32_t DistributedCameraSourceService::RegisterDistributedHardware(const std::string& devId, const std::string& dhId,
     const std::string& reqId, const EnableParam& param)
 {
-    DHLOGI("RegisterDistributedHardware devId: %s, dhId: %s, version: %s",
-        GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), param.version.c_str());
+    DHLOGI("RegisterDistributedHardware devId: %s, dhId: %s, sinkVersion: %s",
+        GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), param.sinkVersion.c_str());
     if (GetCamDevNum() > MAX_CAMERAS_NUMBER) {
         DHLOGE("cameras exceed the upper limit");
         return DCAMERA_BAD_VALUE;
@@ -137,8 +137,8 @@ int32_t DistributedCameraSourceService::RegisterDistributedHardware(const std::s
     int32_t ret = DCAMERA_OK;
     std::shared_ptr<DCameraSourceDev> camDev = GetCamDevByIndex(camIndex);
     if (camDev == nullptr) {
-        DHLOGI("new dev devId: %s, dhId: %s, version: %s",
-            GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), param.version.c_str());
+        DHLOGI("new dev devId: %s, dhId: %s, sinkVersion: %s",
+            GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), param.sinkVersion.c_str());
         camDev = std::make_shared<DCameraSourceDev>(devId, dhId, listener_);
         ret = camDev->InitDCameraSourceDev();
         if (ret != DCAMERA_OK) {
@@ -148,20 +148,20 @@ int32_t DistributedCameraSourceService::RegisterDistributedHardware(const std::s
         }
         CamDevInsert(camIndex, camDev);
     } else {
-        DHLOGE("RegisterDistributedHardware exist devId: %s, dhId: %s, version: %s",
-            GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), param.version.c_str());
+        DHLOGE("RegisterDistributedHardware exist devId: %s, dhId: %s, sinkVersion: %s",
+            GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), param.sinkVersion.c_str());
         return DCAMERA_ALREADY_EXISTS;
     }
 
-    ret = camDev->RegisterDistributedHardware(devId, dhId, reqId, param.version, param.attrs);
+    ret = camDev->RegisterDistributedHardware(devId, dhId, reqId, param);
     if (ret != DCAMERA_OK) {
         DHLOGE("RegisterDistributedHardware failed, ret: %d", ret);
-        ReportRegisterCameraFail(DCAMERA_REGISTER_FAIL, GetAnonyString(devId), dhId, param.version,
+        ReportRegisterCameraFail(DCAMERA_REGISTER_FAIL, GetAnonyString(devId), dhId, param.sinkVersion,
             "dcamera source RegisterDistributedHardware fail.");
         CamDevErase(camIndex);
     }
-    DHLOGI("RegisterDistributedHardware end devId: %s, dhId: %s, version: %s",
-        GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), param.version.c_str());
+    DHLOGI("RegisterDistributedHardware end devId: %s, dhId: %s, sinkVersion: %s",
+        GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), param.sinkVersion.c_str());
     return ret;
 }
 

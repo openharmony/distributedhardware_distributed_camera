@@ -49,7 +49,8 @@ const std::string TEST_DEVICE_ID = "bb536a637105409e904d4da83790a4a7";
 const std::string TEST_CAMERA_DH_ID_0 = "camera_0";
 const std::string TEST_REQID = "";
 const std::string TEST_VER = "1.0";
-const std::string TEST_ATTRS = "";
+const std::string TEST_SINK_ATTRS = "";
+const std::string TEST_SRC_ATTRS = "";
 const int32_t TEST_WIDTH = 1920;
 const int32_t TEST_HEIGTH = 1080;
 const int32_t TEST_SLEEP_SEC = 200000;
@@ -124,8 +125,12 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_001, TestSize.Level1)
 HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_002, TestSize.Level1)
 {
     camDev_->InitDCameraSourceDev();
-    int32_t ret = camDev_->RegisterDistributedHardware(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, TEST_REQID,
-        TEST_VER, TEST_ATTRS);
+    EnableParam param;
+    param.sinkVersion = TEST_VER;
+    param.sinkAttrs = TEST_SINK_ATTRS;
+    param.sourceAttrs = TEST_SRC_ATTRS;
+    param.sourceVersion = TEST_VER;
+    int32_t ret = camDev_->RegisterDistributedHardware(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, TEST_REQID, param);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
@@ -361,8 +366,10 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_013, TestSize.Level1)
     std::string devId = TEST_DEVICE_ID;
     std::string dhId = TEST_CAMERA_DH_ID_0;
     std::string reqId = TEST_REQID;
-    std::string params = TEST_VER;
-    std::shared_ptr<DCameraRegistParam> param = std::make_shared<DCameraRegistParam>(devId, dhId, reqId, params);
+    std::string sinkParams = TEST_VER;
+    std::string srcParams = TEST_VER;
+    std::shared_ptr<DCameraRegistParam> param = std::make_shared<DCameraRegistParam>(devId, dhId, reqId, sinkParams,
+        srcParams);
     int32_t ret = camDev_->Register(param);
     EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
 }
@@ -379,8 +386,10 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_014, TestSize.Level1)
     std::string devId = TEST_DEVICE_ID;
     std::string dhId = TEST_CAMERA_DH_ID_0;
     std::string reqId = TEST_REQID;
-    std::string params = TEST_VER;
-    std::shared_ptr<DCameraRegistParam> param = std::make_shared<DCameraRegistParam>(devId, dhId, reqId, params);
+    std::string sinkParams = TEST_VER;
+    std::string srcParams = TEST_VER;
+    std::shared_ptr<DCameraRegistParam> param = std::make_shared<DCameraRegistParam>(devId, dhId, reqId, sinkParams,
+        srcParams);
     int32_t ret = camDev_->UnRegister(param);
     EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
 }

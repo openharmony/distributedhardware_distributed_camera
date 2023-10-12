@@ -95,15 +95,16 @@ int32_t DCameraSourceDev::InitDCameraSourceDev()
 }
 
 int32_t DCameraSourceDev::RegisterDistributedHardware(const std::string& devId, const std::string& dhId,
-    const std::string& reqId, const std::string& ver, const std::string attrs)
+    const std::string& reqId, const EnableParam& param)
 {
     DHLOGI("DCameraSourceDev PostTask RegisterDistributedHardware devId %s dhId %s", GetAnonyString(devId).c_str(),
         GetAnonyString(dhId).c_str());
-    version_ = ver;
+    version_ = param.sinkVersion;
     DCameraIndex index(devId, dhId);
     actualDevInfo_.insert(index);
 
-    std::shared_ptr<DCameraRegistParam> regParam = std::make_shared<DCameraRegistParam>(devId, dhId, reqId, attrs);
+    std::shared_ptr<DCameraRegistParam> regParam = std::make_shared<DCameraRegistParam>(devId, dhId, reqId,
+        param.sinkAttrs, param.sourceAttrs);
     DCameraSourceEvent event(*this, DCAMERA_EVENT_REGIST, regParam);
     eventBus_->PostEvent<DCameraSourceEvent>(event);
     return DCAMERA_OK;
@@ -114,8 +115,10 @@ int32_t DCameraSourceDev::UnRegisterDistributedHardware(const std::string devId,
 {
     DHLOGI("DCameraSourceDev PostTask UnRegisterDistributedHardware devId %s dhId %s", GetAnonyString(devId).c_str(),
         GetAnonyString(dhId).c_str());
-    std::string param;
-    std::shared_ptr<DCameraRegistParam> regParam = std::make_shared<DCameraRegistParam>(devId, dhId, reqId, param);
+    std::string sinkAttrs;
+    std::string sourceAttrs;
+    std::shared_ptr<DCameraRegistParam> regParam = std::make_shared<DCameraRegistParam>(devId, dhId, reqId, sinkAttrs,
+        sourceAttrs);
     DCameraSourceEvent event(*this, DCAMERA_EVENT_UNREGIST, regParam);
     eventBus_->PostEvent<DCameraSourceEvent>(event);
     return DCAMERA_OK;
@@ -248,7 +251,7 @@ int32_t DCameraSourceDev::Register(std::shared_ptr<DCameraRegistParam>& param)
     DHBase dhBase;
     dhBase.deviceId_ = param->devId_;
     dhBase.dhId_ = param->dhId_;
-    int32_t retHdi = camHdiProvider->EnableDCameraDevice(dhBase, param->param_, hdiCallback_);
+    int32_t retHdi = camHdiProvider->EnableDCameraDevice(dhBase, param->sinkParam_, hdiCallback_);
     DHLOGI("DCameraSourceDev Execute Register register hal, ret: %d, devId: %s dhId: %s", retHdi,
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     if (retHdi != SUCCESS) {

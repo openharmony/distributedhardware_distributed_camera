@@ -107,8 +107,10 @@ int32_t DistributedCameraSourceStub::RegisterDistributedHardwareInner(MessagePar
         std::string dhId = data.ReadString();
         std::string reqId = data.ReadString();
         EnableParam params;
-        params.version = data.ReadString();
-        params.attrs = data.ReadString();
+        params.sinkVersion = data.ReadString();
+        params.sinkAttrs = data.ReadString();
+        params.sourceVersion = data.ReadString();
+        params.sourceAttrs = data.ReadString();
         if (!CheckRegParams(devId, dhId, reqId, params)) {
             DHLOGE("input is invalid");
             ret = DCAMERA_BAD_VALUE;
@@ -134,8 +136,10 @@ bool DistributedCameraSourceStub::CheckRegParams(const std::string& devId, const
         return false;
     }
 
-    if (param.version.empty() || param.version.size() > PARAM_MAX_SIZE ||
-        param.attrs.empty() || param.attrs.size() > PARAM_MAX_SIZE) {
+    if (param.sinkVersion.empty() || param.sinkVersion.size() > PARAM_MAX_SIZE ||
+        param.sinkAttrs.empty() || param.sinkAttrs.size() > PARAM_MAX_SIZE ||
+        param.sourceVersion.empty() || param.sourceVersion.size() > PARAM_MAX_SIZE ||
+        param.sourceAttrs.empty() || param.sourceAttrs.size() > PARAM_MAX_SIZE) {
         DHLOGE("param is invalid");
         return false;
     }

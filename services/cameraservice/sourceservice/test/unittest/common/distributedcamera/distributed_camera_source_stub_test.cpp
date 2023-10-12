@@ -100,8 +100,10 @@ HWTEST_F(DcameraSourceStubTest, dcamera_source_stub_test_003, TestSize.Level1)
     std::string dhId = "dhId000";
     std::string reqId = "reqId000";
     EnableParam param;
-    param.version = "1";
-    param.attrs = "attrs";
+    param.sourceVersion = "1";
+    param.sourceAttrs = "sourceattrs";
+    param.sinkVersion = "1";
+    param.sinkAttrs = "sinkattrs";
     int32_t ret = sourceProxy.RegisterDistributedHardware(devId, dhId, reqId, param);
     EXPECT_EQ(DCAMERA_OK, ret);
 }

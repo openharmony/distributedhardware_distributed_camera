@@ -141,7 +141,7 @@ int32_t DCameraSourceHandler::RegisterDistributedHardware(const std::string& dev
         callback_->PopRegCallback(reqId);
     }
     DHLOGI("end, ret: %d devId: %s dhId: %s version: %s",
-        ret, GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), param.version.c_str());
+        ret, GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), param.sinkVersion.c_str());
     return ret;
 }
 
