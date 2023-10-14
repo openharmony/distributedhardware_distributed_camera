@@ -231,6 +231,11 @@ public:
     {
         DHLOGI("DemoDCameraPreviewCallback::OnError errorCode: %d", errorCode);
     }
+
+    void OnSketchAvailable(CameraStandard::SketchData& sketchData) const
+    {
+        DHLOGI("DemoDCameraPreviewCallback::OnSketchAvailable.");
+    }
 };
 
 class DemoDCameraVideoCallback : public CameraStandard::VideoStateCallback {

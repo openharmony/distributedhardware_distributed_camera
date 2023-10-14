@@ -48,5 +48,10 @@ void DCameraPreviewCallback::OnError(const int32_t errorCode) const
     event->eventResult_ = DCAMERA_EVENT_DEVICE_ERROR;
     callback_->OnStateChanged(event);
 }
+
+void DCameraPreviewCallback::OnSketchAvailable(CameraStandard::SketchData& sketchData) const
+{
+    DHLOGI("enter");
+}
 } // namespace DistributedHardware
 } // namespace OHOS
