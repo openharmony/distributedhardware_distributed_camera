@@ -17,12 +17,6 @@ import(
     "//foundation/distributedhardware/distributed_camera/distributedcamera.gni")
 
 ohos_shared_library("distributed_camera_handler") {
-  sanitize = {
-    boundary_sanitize = true
-    integer_overflow = true
-    ubsan = true
-  }
-  stack_protector_ret = true
   include_dirs = [
     "//third_party/cJSON",
     "//third_party/jsoncpp/include",
