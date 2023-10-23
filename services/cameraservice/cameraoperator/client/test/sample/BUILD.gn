@@ -46,6 +46,12 @@ config("module_private_config") {
 }
 
 ohos_executable("dcamera_client_demo") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   install_enable = false
 
   sources = [ "main.cpp" ]
