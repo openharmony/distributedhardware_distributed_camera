@@ -18,6 +18,9 @@ import(
 
 ohos_shared_library("distributed_camera_sink") {
   sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
     boundary_sanitize = true
     integer_overflow = true
     ubsan = true
