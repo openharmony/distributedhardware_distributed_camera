@@ -46,13 +46,13 @@
                 "hitrace",
                 "safwk",
                 "drivers_interface_camera",
-                "access_token"
+                "access_token",
+                "libyuv"
             ],
             "third_party": [
                 "cJSON",
                 "ffmpeg",
-                "jsoncpp",
-                "libyuv"
+                "jsoncpp"
             ]
         },
         "build": {

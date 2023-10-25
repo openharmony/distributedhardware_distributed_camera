@@ -68,12 +68,10 @@ ohos_shared_library("distributed_camera_data_process") {
   deps = [ "${common_path}:distributed_camera_utils" ]
 
   if (!distributed_camera_common) {
-    include_dirs += [ "//third_party/libyuv/files/include" ]
     sources += [
       "src/pipeline_node/multimedia_codec/decoder/decode_data_process.cpp",
       "src/pipeline_node/scale_conversion/scale_convert_process.cpp",
     ]
-    deps += [ "//third_party/libyuv:yuv" ]
   } else {
     include_dirs += [ "//third_party/ffmpeg/" ]
     sources += [
@@ -107,6 +105,9 @@ ohos_shared_library("distributed_camera_data_process") {
     "player_framework:media_client",
   ]
 
+  if (!distributed_camera_common) {
+    external_deps += [ "libyuv:yuv" ]
+  }
   subsystem_name = "distributedhardware"
 
   part_name = "distributed_camera"
