@@ -43,6 +43,7 @@ ohos_shared_library("distributed_camera_data_process") {
     "include/pipeline_node/multimedia_codec/encoder",
     "include/pipeline_node/fpscontroller",
     "include/pipeline_node/scale_conversion",
+    "//third_party/json/include",
     "${common_path}/include/constants",
     "${common_path}/include/utils",
     "${feeding_smoother_path}/base",
@@ -97,12 +98,12 @@ ohos_shared_library("distributed_camera_data_process") {
   ]
 
   external_deps = [
+    "av_codec:av_codec_client",
     "c_utils:utils",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "eventhandler:libeventhandler",
     "graphic_2d:surface",
     "hitrace:hitrace_meter",
-    "player_framework:media_client",
   ]
 
   if (!distributed_camera_common) {

@@ -56,11 +56,11 @@ ohos_unittest("DCameraDataProcessPipelineTest") {
   ]
 
   external_deps = [
+    "av_codec:av_codec_client",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "graphic_2d:surface",
     "hitrace:hitrace_meter",
-    "player_framework:media_client",
   ]
 
   defines = [

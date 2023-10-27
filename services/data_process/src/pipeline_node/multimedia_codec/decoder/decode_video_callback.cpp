@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-void DecodeVideoCallback::OnError(Media::AVCodecErrorType errorType, int32_t errorCode)
+void DecodeVideoCallback::OnError(MediaAVCodec::AVCodecErrorType errorType, int32_t errorCode)
 {
     DHLOGE("DecodeVideoCallback : OnError. Error type: %d. Error code: %d ", errorType, errorCode);
     std::shared_ptr<DecodeDataProcess> targetDecoderNode = decodeVideoNode_.lock();
@@ -30,7 +30,7 @@ void DecodeVideoCallback::OnError(Media::AVCodecErrorType errorType, int32_t err
     targetDecoderNode->OnError();
 }
 
-void DecodeVideoCallback::OnInputBufferAvailable(uint32_t index)
+void DecodeVideoCallback::OnInputBufferAvailable(uint32_t index, std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer)
 {
     DHLOGD("DecodeVideoCallback : OnInputBufferAvailable.");
     std::shared_ptr<DecodeDataProcess> targetDecoderNode = decodeVideoNode_.lock();
@@ -38,10 +38,10 @@ void DecodeVideoCallback::OnInputBufferAvailable(uint32_t index)
         DHLOGE("decodeVideoNode_ is nullptr.");
         return;
     }
-    targetDecoderNode->OnInputBufferAvailable(index);
+    targetDecoderNode->OnInputBufferAvailable(index, buffer);
 }
 
-void DecodeVideoCallback::OnOutputFormatChanged(const Media::Format &format)
+void DecodeVideoCallback::OnOutputFormatChanged(const MediaAVCodec::Format &format)
 {
     DHLOGD("DecodeVideoCallback : OnOutputFormatChanged.");
     std::shared_ptr<DecodeDataProcess> targetDecoderNode = decodeVideoNode_.lock();
@@ -52,8 +52,8 @@ void DecodeVideoCallback::OnOutputFormatChanged(const Media::Format &format)
     targetDecoderNode->OnOutputFormatChanged(format);
 }
 
-void DecodeVideoCallback::OnOutputBufferAvailable(uint32_t index, Media::AVCodecBufferInfo info,
-    Media::AVCodecBufferFlag flag)
+void DecodeVideoCallback::OnOutputBufferAvailable(uint32_t index, MediaAVCodec::AVCodecBufferInfo info,
+    MediaAVCodec::AVCodecBufferFlag flag, std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer)
 {
     DHLOGD("DecodeVideoCallback : OnOutputBufferAvailable. Only relaese buffer when using surface output.");
     std::shared_ptr<DecodeDataProcess> targetDecoderNode = decodeVideoNode_.lock();
@@ -61,7 +61,7 @@ void DecodeVideoCallback::OnOutputBufferAvailable(uint32_t index, Media::AVCodec
         DHLOGE("decodeVideoNode_ is nullptr.");
         return;
     }
-    targetDecoderNode->OnOutputBufferAvailable(index, info, flag);
+    targetDecoderNode->OnOutputBufferAvailable(index, info, flag, buffer);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

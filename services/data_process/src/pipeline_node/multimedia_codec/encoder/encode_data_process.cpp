@@ -136,20 +136,20 @@ int32_t EncodeDataProcess::ConfigureVideoEncoder()
         return ret;
     }
 
-    videoEncoder_ = Media::VideoEncoderFactory::CreateByMime(processType_);
+    videoEncoder_ = MediaAVCodec::VideoEncoderFactory::CreateByMime(processType_);
     if (videoEncoder_ == nullptr) {
         DHLOGE("Create video encoder failed.");
         return DCAMERA_INIT_ERR;
     }
     encodeVideoCallback_ = std::make_shared<EncodeVideoCallback>(shared_from_this());
     ret = videoEncoder_->SetCallback(encodeVideoCallback_);
-    if (ret != Media::MediaServiceErrCode::MSERR_OK) {
+    if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
         DHLOGE("Set video encoder callback failed. Error code %d.", ret);
         return DCAMERA_INIT_ERR;
     }
 
     ret = videoEncoder_->Configure(metadataFormat_);
-    if (ret != Media::MediaServiceErrCode::MSERR_OK) {
+    if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
         DHLOGE("Set video encoder metadata format failed. Error code %d.", ret);
         return DCAMERA_INIT_ERR;
     }
@@ -169,17 +169,17 @@ int32_t EncodeDataProcess::InitEncoderMetadataFormat()
     switch (targetConfig_.GetVideoCodecType()) {
         case VideoCodecType::CODEC_H264:
             processType_ = "video/avc";
-            metadataFormat_.PutIntValue("codec_profile", Media::AVCProfile::AVC_PROFILE_BASELINE);
+            metadataFormat_.PutIntValue("codec_profile", MediaAVCodec::AVCProfile::AVC_PROFILE_BASELINE);
             processedConfig_.SetVideoCodecType(VideoCodecType::CODEC_H264);
             break;
         case VideoCodecType::CODEC_H265:
             processType_ = "video/hevc";
-            metadataFormat_.PutIntValue("codec_profile", Media::HEVCProfile::HEVC_PROFILE_MAIN);
+            metadataFormat_.PutIntValue("codec_profile", MediaAVCodec::HEVCProfile::HEVC_PROFILE_MAIN);
             processedConfig_.SetVideoCodecType(VideoCodecType::CODEC_H265);
             break;
         case VideoCodecType::CODEC_MPEG4_ES:
             processType_ = "video/mp4v-es";
-            metadataFormat_.PutIntValue("codec_profile", Media::MPEG4Profile::MPEG4_PROFILE_ADVANCED_CODING);
+            metadataFormat_.PutIntValue("codec_profile", MediaAVCodec::MPEG4Profile::MPEG4_PROFILE_ADVANCED_CODING);
             processedConfig_.SetVideoCodecType(VideoCodecType::CODEC_MPEG4_ES);
             break;
         default:
@@ -188,19 +188,19 @@ int32_t EncodeDataProcess::InitEncoderMetadataFormat()
     }
     switch (sourceConfig_.GetVideoformat()) {
         case Videoformat::YUVI420:
-            metadataFormat_.PutIntValue("pixel_format", Media::VideoPixelFormat::YUVI420);
+            metadataFormat_.PutIntValue("pixel_format", MediaAVCodec::VideoPixelFormat::YUVI420);
             metadataFormat_.PutLongValue("max_input_size", NORM_YUV420_BUFFER_SIZE);
             break;
         case Videoformat::NV12:
-            metadataFormat_.PutIntValue("pixel_format", Media::VideoPixelFormat::NV12);
+            metadataFormat_.PutIntValue("pixel_format", MediaAVCodec::VideoPixelFormat::NV12);
             metadataFormat_.PutLongValue("max_input_size", NORM_YUV420_BUFFER_SIZE);
             break;
         case Videoformat::NV21:
-            metadataFormat_.PutIntValue("pixel_format", Media::VideoPixelFormat::NV21);
+            metadataFormat_.PutIntValue("pixel_format", MediaAVCodec::VideoPixelFormat::NV21);
             metadataFormat_.PutLongValue("max_input_size", NORM_YUV420_BUFFER_SIZE);
             break;
         case Videoformat::RGBA_8888:
-            metadataFormat_.PutIntValue("pixel_format",  Media::VideoPixelFormat::RGBA);
+            metadataFormat_.PutIntValue("pixel_format",  MediaAVCodec::VideoPixelFormat::RGBA);
             metadataFormat_.PutLongValue("max_input_size", NORM_RGB32_BUFFER_SIZE);
             break;
         default:
@@ -222,7 +222,7 @@ int32_t EncodeDataProcess::InitEncoderBitrateFormat()
         return DCAMERA_BAD_VALUE;
     }
     metadataFormat_.PutIntValue("i_frame_interval", IDR_FRAME_INTERVAL_MS);
-    metadataFormat_.PutIntValue("video_encode_bitrate_mode", Media::VideoEncodeBitrateMode::VBR);
+    metadataFormat_.PutIntValue("video_encode_bitrate_mode", MediaAVCodec::VideoEncodeBitrateMode::VBR);
 
     if (ENCODER_BITRATE_TABLE.empty()) {
         DHLOGD("ENCODER_BITRATE_TABLE is null, use the default bitrate of the encoder.");
@@ -256,12 +256,12 @@ int32_t EncodeDataProcess::StartVideoEncoder()
     }
 
     int32_t ret = videoEncoder_->Prepare();
-    if (ret != Media::MediaServiceErrCode::MSERR_OK) {
+    if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
         DHLOGE("Video encoder prepare failed. Error code %d.", ret);
         return DCAMERA_INIT_ERR;
     }
     ret = videoEncoder_->Start();
-    if (ret != Media::MediaServiceErrCode::MSERR_OK) {
+    if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
         DHLOGE("Video encoder start failed. Error code %d.", ret);
         return DCAMERA_INIT_ERR;
     }
@@ -277,12 +277,12 @@ int32_t EncodeDataProcess::StopVideoEncoder()
 
     bool isSuccess = true;
     int32_t ret = videoEncoder_->Flush();
-    if (ret != Media::MediaServiceErrCode::MSERR_OK) {
+    if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
         DHLOGE("VideoEncoder flush failed. Error type: %d.", ret);
         isSuccess = isSuccess && false;
     }
     ret = videoEncoder_->Stop();
-    if (ret != Media::MediaServiceErrCode::MSERR_OK) {
+    if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
         DHLOGE("VideoEncoder stop failed. Error type: %d.", ret);
         isSuccess = isSuccess && false;
     }
@@ -308,7 +308,7 @@ void EncodeDataProcess::ReleaseVideoEncoder()
         DHLOGE("StopVideoEncoder failed.");
     }
     ret = videoEncoder_->Release();
-    if (ret != Media::MediaServiceErrCode::MSERR_OK) {
+    if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
         DHLOGE("VideoEncoder release failed. Error type: %d.", ret);
     }
     encodeProducerSurface_ = nullptr;
@@ -472,16 +472,15 @@ void EncodeDataProcess::ReduceWaitEncodeCnt()
     DHLOGD("Wait encoder output frames number is %d.", waitEncoderOutputCount_);
 }
 
-int32_t EncodeDataProcess::GetEncoderOutputBuffer(uint32_t index, Media::AVCodecBufferInfo info,
-    Media::AVCodecBufferFlag flag)
+int32_t EncodeDataProcess::GetEncoderOutputBuffer(uint32_t index, MediaAVCodec::AVCodecBufferInfo info,
+    MediaAVCodec::AVCodecBufferFlag flag, std::shared_ptr<MediaAVCodec::AVSharedMemory>& buffer)
 {
     DHLOGD("Get encoder output buffer.");
     if (videoEncoder_ == nullptr) {
         DHLOGE("The video encoder does not exist before output encoded data.");
         return DCAMERA_BAD_VALUE;
     }
-    std::shared_ptr<Media::AVSharedMemory> sharedMemoryOutput = videoEncoder_->GetOutputBuffer(index);
-    if (sharedMemoryOutput == nullptr) {
+    if (buffer == nullptr) {
         DHLOGE("Failed to get the output shared memory, index : %u", index);
         return DCAMERA_BAD_OPERATE;
     }
@@ -495,14 +494,14 @@ int32_t EncodeDataProcess::GetEncoderOutputBuffer(uint32_t index, Media::AVCodec
     DHLOGD("Encoder output buffer size : %d", outputMemoDataSize);
     std::shared_ptr<DataBuffer> bufferOutput = std::make_shared<DataBuffer>(outputMemoDataSize);
     errno_t err = memcpy_s(bufferOutput->Data(), bufferOutput->Size(),
-        sharedMemoryOutput->GetBase(), outputMemoDataSize);
+        buffer->GetBase(), outputMemoDataSize);
     if (err != EOK) {
         DHLOGE("memcpy_s buffer failed.");
         return DCAMERA_MEMORY_OPT_ERROR;
     }
     int64_t timeStamp = info.presentationTimeUs;
     struct timespec time = {0, 0};
-    clock_gettime(CLOCK_MONOTONIC, &time);
+    clock_gettime(CLOCK_REALTIME, &time);
     int64_t timeNs = static_cast<int64_t>(time.tv_sec) * S2NS + static_cast<int64_t>(time.tv_nsec);
     int64_t encodeT = timeNs / static_cast<int64_t>(US2NS) - timeStamp;
     int64_t finishEncodeT = GetNowTimeStampUs();
@@ -560,12 +559,12 @@ void EncodeDataProcess::OnError()
     targetPipelineSink->OnError(DataProcessErrorType::ERROR_PIPELINE_ENCODER);
 }
 
-void EncodeDataProcess::OnInputBufferAvailable(uint32_t index)
+void EncodeDataProcess::OnInputBufferAvailable(uint32_t index, std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer)
 {
     DHLOGD("The available input buffer index : %u. No operation when using surface input.", index);
 }
 
-void EncodeDataProcess::OnOutputFormatChanged(const Media::Format &format)
+void EncodeDataProcess::OnOutputFormatChanged(const MediaAVCodec::Format &format)
 {
     if (encodeOutputFormat_.GetFormatMap().empty()) {
         DHLOGE("The first changed video encoder output format is null.");
@@ -574,8 +573,8 @@ void EncodeDataProcess::OnOutputFormatChanged(const Media::Format &format)
     encodeOutputFormat_ = format;
 }
 
-void EncodeDataProcess::OnOutputBufferAvailable(uint32_t index, Media::AVCodecBufferInfo info,
-    Media::AVCodecBufferFlag flag)
+void EncodeDataProcess::OnOutputBufferAvailable(uint32_t index, MediaAVCodec::AVCodecBufferInfo info,
+    MediaAVCodec::AVCodecBufferFlag flag, std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer)
 {
     if (!isEncoderProcess_.load()) {
         DHLOGE("EncodeNode occurred error or start release.");
@@ -583,7 +582,7 @@ void EncodeDataProcess::OnOutputBufferAvailable(uint32_t index, Media::AVCodecBu
     }
     DHLOGD("Video encode buffer info: presentation TimeUs %lld, size %d, offset %d, flag %d",
         info.presentationTimeUs, info.size, info.offset, flag);
-    int32_t err = GetEncoderOutputBuffer(index, info, flag);
+    int32_t err = GetEncoderOutputBuffer(index, info, flag, buffer);
     if (err != DCAMERA_OK) {
         DHLOGE("Get encode output Buffer failed.");
         return;
@@ -593,7 +592,7 @@ void EncodeDataProcess::OnOutputBufferAvailable(uint32_t index, Media::AVCodecBu
         return;
     }
     int32_t errRelease = videoEncoder_->ReleaseOutputBuffer(index);
-    if (errRelease != Media::MediaServiceErrCode::MSERR_OK) {
+    if (errRelease != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
         DHLOGE("The video encoder release output buffer failed, index : [%u].", index);
     }
 }

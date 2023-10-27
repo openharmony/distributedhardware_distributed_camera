@@ -30,7 +30,8 @@ void EncodeOnInputBufferAvailableFuzzTest(const uint8_t* data, size_t size)
     std::shared_ptr<EncodeDataProcess> encodeDataProcess = std::make_shared<EncodeDataProcess>(sinkPipeline);
     std::shared_ptr<EncodeVideoCallback> encodeVideoCallback = std::make_shared<EncodeVideoCallback>(encodeDataProcess);
 
-    encodeVideoCallback->OnInputBufferAvailable(index);
+    std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer = nullptr;
+    encodeVideoCallback->OnInputBufferAvailable(index, buffer);
 }
 }
 }

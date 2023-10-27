@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -159,7 +159,7 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_004, TestSize.Level1)
                                  TEST_HEIGTH2);
     VideoConfigParams procConfig;
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_OK);
+    EXPECT_EQ(rc, DCAMERA_INIT_ERR);
 
     rc = testEncodeDataProcess_->InitEncoderMetadataFormat();
     EXPECT_EQ(rc, DCAMERA_OK);
@@ -437,9 +437,10 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_013, TestSize.Level1)
     testEncodeDataProcess_->IncreaseWaitEncodeCnt();
     testEncodeDataProcess_->ReduceWaitEncodeCnt();
     uint32_t index = time;
-    Media::AVCodecBufferInfo info;
-    Media::AVCodecBufferFlag flag = Media::AVCODEC_BUFFER_FLAG_CODEC_DATA;
-    int32_t rc = testEncodeDataProcess_->GetEncoderOutputBuffer(index, info, flag);
+    MediaAVCodec::AVCodecBufferInfo info;
+    std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer = nullptr;
+    MediaAVCodec::AVCodecBufferFlag flag = MediaAVCodec::AVCODEC_BUFFER_FLAG_CODEC_DATA;
+    int32_t rc = testEncodeDataProcess_->GetEncoderOutputBuffer(index, info, flag, buffer);
     EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
 }
 
@@ -492,14 +493,15 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_015, TestSize.Level1)
     EXPECT_EQ(rc, DCAMERA_OK);
 
     uint32_t index = 0;
-    Media::AVCodecBufferInfo info;
-    Media::AVCodecBufferFlag flag = Media::AVCODEC_BUFFER_FLAG_CODEC_DATA;
-    testEncodeDataProcess_->OnOutputBufferAvailable(index, info, flag);
+    MediaAVCodec::AVCodecBufferInfo info;
+    MediaAVCodec::AVCodecBufferFlag flag = MediaAVCodec::AVCODEC_BUFFER_FLAG_CODEC_DATA;
+    std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer = nullptr;
+    testEncodeDataProcess_->OnOutputBufferAvailable(index, info, flag, buffer);
     testEncodeDataProcess_->OnError();
-    testEncodeDataProcess_->OnInputBufferAvailable(index);
-    Media::Format format;
+    testEncodeDataProcess_->OnInputBufferAvailable(index, buffer);
+    MediaAVCodec::Format format;
     testEncodeDataProcess_->OnOutputFormatChanged(format);
-    testEncodeDataProcess_->OnOutputBufferAvailable(index, info, flag);
+    testEncodeDataProcess_->OnOutputBufferAvailable(index, info, flag, buffer);
     EXPECT_EQ(rc, DCAMERA_OK);
 }
 } // namespace DistributedHardware

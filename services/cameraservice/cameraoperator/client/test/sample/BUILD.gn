@@ -84,13 +84,13 @@ ohos_executable("dcamera_client_demo") {
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "access_token:libtoken_setproc",
+    "av_codec:av_codec_client",
     "c_utils:utils",
     "drivers_interface_camera:metadata",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "drivers_peripheral_display:hdi_gralloc_client",
     "hilog:libhilog",
     "ipc:ipc_core",
-    "player_framework:media_client",
   ]
 
   defines = [

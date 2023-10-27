@@ -31,7 +31,6 @@
                 "ipc",
                 "eventhandler",
                 "camera_framework",
-                "player_framework",
                 "graphic_2d",
                 "distributed_hardware_fwk",
                 "hdf_core",
@@ -47,6 +46,7 @@
                 "safwk",
                 "drivers_interface_camera",
                 "access_token",
+                "av_codec",
                 "libyuv"
             ],
             "third_party": [

@@ -18,7 +18,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-void EncodeVideoCallback::OnError(Media::AVCodecErrorType errorType, int32_t errorCode)
+void EncodeVideoCallback::OnError(MediaAVCodec::AVCodecErrorType errorType, int32_t errorCode)
 {
     DHLOGD("EncodeVideoCallback : OnError. Error type: %d. Error code: %d ", errorType, errorCode);
     std::shared_ptr<EncodeDataProcess> targetEncoderNode = encodeVideoNode_.lock();
@@ -29,7 +29,7 @@ void EncodeVideoCallback::OnError(Media::AVCodecErrorType errorType, int32_t err
     targetEncoderNode->OnError();
 }
 
-void EncodeVideoCallback::OnInputBufferAvailable(uint32_t index)
+void EncodeVideoCallback::OnInputBufferAvailable(uint32_t index, std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer)
 {
     DHLOGD("EncodeVideoCallback : OnInputBufferAvailable. No operation when using surface input.");
     std::shared_ptr<EncodeDataProcess> targetEncoderNode = encodeVideoNode_.lock();
@@ -37,10 +37,10 @@ void EncodeVideoCallback::OnInputBufferAvailable(uint32_t index)
         DHLOGE("encodeVideoNode_ is nullptr.");
         return;
     }
-    targetEncoderNode->OnInputBufferAvailable(index);
+    targetEncoderNode->OnInputBufferAvailable(index, buffer);
 }
 
-void EncodeVideoCallback::OnOutputFormatChanged(const Media::Format &format)
+void EncodeVideoCallback::OnOutputFormatChanged(const MediaAVCodec::Format &format)
 {
     DHLOGD("EncodeVideoCallback : OnOutputFormatChanged.");
     std::shared_ptr<EncodeDataProcess> targetEncoderNode = encodeVideoNode_.lock();
@@ -51,8 +51,8 @@ void EncodeVideoCallback::OnOutputFormatChanged(const Media::Format &format)
     targetEncoderNode->OnOutputFormatChanged(format);
 }
 
-void EncodeVideoCallback::OnOutputBufferAvailable(uint32_t index, Media::AVCodecBufferInfo info,
-    Media::AVCodecBufferFlag flag)
+void EncodeVideoCallback::OnOutputBufferAvailable(uint32_t index, MediaAVCodec::AVCodecBufferInfo info,
+    MediaAVCodec::AVCodecBufferFlag flag, std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer)
 {
     DHLOGD("EncodeVideoCallback : OnOutputBufferAvailable.");
     std::shared_ptr<EncodeDataProcess> targetEncoderNode = encodeVideoNode_.lock();
@@ -60,7 +60,7 @@ void EncodeVideoCallback::OnOutputBufferAvailable(uint32_t index, Media::AVCodec
         DHLOGE("encodeVideoNode_ is nullptr.");
         return;
     }
-    targetEncoderNode->OnOutputBufferAvailable(index, info, flag);
+    targetEncoderNode->OnOutputBufferAvailable(index, info, flag, buffer);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
