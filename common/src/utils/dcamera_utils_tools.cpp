@@ -78,9 +78,9 @@ int32_t GetAlignedHeight(int32_t width)
 
 std::string Base64Encode(const unsigned char *toEncode, unsigned int len)
 {
-    std::string ret;
-    if (len < 0 || toEncode == nullptr || strlen(reinterpret_cast<const char *>(toEncode)) != len) {
-        DHLOGE("toEncode is empty or len is zero");
+    std::string ret = "";
+    if (len == 0 || toEncode == nullptr) {
+        DHLOGE("toEncode is null or len is zero.");
         return ret;
     }
     int32_t length = len;
@@ -127,7 +127,11 @@ std::string Base64Encode(const unsigned char *toEncode, unsigned int len)
 
 std::string Base64Decode(const std::string& basicString)
 {
-    std::string ret;
+    std::string ret = "";
+    if (basicString.empty()) {
+        DHLOGE("basicString is empty.");
+        return ret;
+    }
     uint32_t i = 0;
     int index = 0;
     int len = static_cast<int>(basicString.size());
