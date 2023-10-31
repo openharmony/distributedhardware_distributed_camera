@@ -12,4 +12,5 @@
 # limitations under the License.
 
 [cfi]
-src:*/foundation/*
+src:*/foundation/distributedhardware/distributed_hardware_fwk/utils/include/eventbus/event_bus.h
+src:*/foundation/distributedhardware/distributed_hardware_fwk/utils/include/eventbus/eventbus_handler.h
