@@ -78,8 +78,8 @@ int32_t DistributedCameraSinkStub::OnRemoteRequest(uint32_t code, MessageParcel 
 int32_t DistributedCameraSinkStub::InitSinkInner(MessageParcel &data, MessageParcel &reply)
 {
     if (!HasEnableDHPermission()) {
-    DHLOGE("The caller has no ENABLE_DISTRIBUTED_HARDWARE permission.");
-    return DCAMERA_PERMISSION_CHECK_FAIL;
+        DHLOGE("The caller has no ENABLE_DISTRIBUTED_HARDWARE permission.");
+        return DCAMERA_PERMISSION_CHECK_FAIL;
     }
     DHLOGD("enter");
     int32_t ret = DCAMERA_OK;
@@ -99,8 +99,8 @@ int32_t DistributedCameraSinkStub::InitSinkInner(MessageParcel &data, MessagePar
 int32_t DistributedCameraSinkStub::ReleaseSinkInner(MessageParcel &data, MessageParcel &reply)
 {
     if (!HasEnableDHPermission()) {
-    DHLOGE("The caller has no ENABLE_DISTRIBUTED_HARDWARE permission.");
-    return DCAMERA_PERMISSION_CHECK_FAIL;
+        DHLOGE("The caller has no ENABLE_DISTRIBUTED_HARDWARE permission.");
+        return DCAMERA_PERMISSION_CHECK_FAIL;
     }
     DHLOGD("enter");
     int32_t ret = ReleaseSink();
