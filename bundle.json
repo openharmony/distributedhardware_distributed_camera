@@ -28,6 +28,8 @@
         ],
         "deps": {
             "components": [
+                "access_token",
+                "accessibility",
                 "ipc",
                 "eventhandler",
                 "camera_framework",

@@ -39,6 +39,7 @@ private:
     int32_t GetCameraInfoInner(MessageParcel &data, MessageParcel &reply);
     int32_t OpenChannelInner(MessageParcel &data, MessageParcel &reply);
     int32_t CloseChannelInner(MessageParcel &data, MessageParcel &reply);
+    bool HasEnableDHPermission();
 
     using DCameraFunc = int32_t (DistributedCameraSinkStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, DCameraFunc> memberFuncMap_;
