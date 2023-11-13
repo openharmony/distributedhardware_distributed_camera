@@ -283,7 +283,7 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_008, TestSize.Level1)
                                  TEST_HEIGTH);
     VideoConfigParams procConfig;
     int32_t rc = testDecodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_OK);
+    EXPECT_EQ(rc, DCAMERA_INIT_ERR);
 
     rc = testDecodeDataProcess_->InitDecoderMetadataFormat();
     EXPECT_EQ(rc, DCAMERA_OK);
@@ -429,7 +429,8 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_012, TestSize.Level1)
     EXPECT_EQ(rc, DCAMERA_OK);
 
     uint32_t index = 1;
-    testDecodeDataProcess_->OnInputBufferAvailable(index);
+    std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer = nullptr;
+    testDecodeDataProcess_->OnInputBufferAvailable(index, buffer);
     size_t capacity = 100;
     std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
     std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
@@ -440,6 +441,7 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_012, TestSize.Level1)
     int64_t time = testDecodeDataProcess_->GetDecoderTimeStamp();
     testDecodeDataProcess_->lastFeedDecoderInputBufferTimeUs_ = 1;
     time = testDecodeDataProcess_->GetDecoderTimeStamp();
+    EXPECT_EQ(time, DCAMERA_OK);
     testDecodeDataProcess_->ReduceWaitDecodeCnt();
     sptr<IConsumerSurface> surface;
     testDecodeDataProcess_->GetDecoderOutputBuffer(surface);
@@ -582,12 +584,13 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_016, TestSize.Level1)
     EXPECT_EQ(rc, DCAMERA_OK);
 
     uint32_t index = 1;
-    testDecodeDataProcess_->OnInputBufferAvailable(index);
-    Media::Format format;
+    std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer = nullptr;
+    testDecodeDataProcess_->OnInputBufferAvailable(index, buffer);
+    MediaAVCodec::Format format;
     testDecodeDataProcess_->OnOutputFormatChanged(format);
-    Media::AVCodecBufferInfo info;
-    Media::AVCodecBufferFlag flag = Media::AVCODEC_BUFFER_FLAG_CODEC_DATA;
-    testDecodeDataProcess_->OnOutputBufferAvailable(index, info, flag);
+    MediaAVCodec::AVCodecBufferInfo info;
+    MediaAVCodec::AVCodecBufferFlag flag = MediaAVCodec::AVCODEC_BUFFER_FLAG_CODEC_DATA;
+    testDecodeDataProcess_->OnOutputBufferAvailable(index, info, flag, buffer);
     testDecodeDataProcess_->OnError();
     EXPECT_EQ(rc, DCAMERA_OK);
 }

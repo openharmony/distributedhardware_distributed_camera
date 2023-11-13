@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,7 @@
 #ifndef OHOS_DECODE_VIDEO_CALLBACK_H
 #define OHOS_DECODE_VIDEO_CALLBACK_H
 
-#include "media_errors.h"
+#include "avcodec_errors.h"
 #include "avcodec_common.h"
 #include "format.h"
 
@@ -26,17 +26,17 @@ namespace OHOS {
 namespace DistributedHardware {
 class EncodeDataProcess;
 
-class EncodeVideoCallback : public Media::AVCodecCallback {
+class EncodeVideoCallback : public MediaAVCodec::AVCodecCallback {
 public:
     explicit EncodeVideoCallback(const std::weak_ptr<EncodeDataProcess>& encodeVideoNode)
         : encodeVideoNode_(encodeVideoNode) {}
     ~EncodeVideoCallback() override = default;
 
-    void OnError(Media::AVCodecErrorType errorType, int32_t errorCode) override;
-    void OnInputBufferAvailable(uint32_t index) override;
-    void OnOutputFormatChanged(const Media::Format &format) override;
-    void OnOutputBufferAvailable(uint32_t index, Media::AVCodecBufferInfo info,
-        Media::AVCodecBufferFlag flag) override;
+    void OnError(MediaAVCodec::AVCodecErrorType errorType, int32_t errorCode) override;
+    void OnInputBufferAvailable(uint32_t index, std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer) override;
+    void OnOutputFormatChanged(const MediaAVCodec::Format &format) override;
+    void OnOutputBufferAvailable(uint32_t index, MediaAVCodec::AVCodecBufferInfo info,
+        MediaAVCodec::AVCodecBufferFlag flag, std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer) override;
 private:
     std::weak_ptr<EncodeDataProcess> encodeVideoNode_;
 };

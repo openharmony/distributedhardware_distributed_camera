@@ -29,7 +29,6 @@ config("module_private_config") {
     "${camerastandard_path}/services/camera_service/binder/client/include",
     "${camerastandard_path}/services/camera_service/binder/server/include",
     "${camerastandard_path}/services/camera_service/include",
-    "${mediastandard_path}/interfaces/innerkits/native/media/include",
     "${services_path}/cameraservice/sinkservice/include/distributedcameramgr",
     "${services_path}/cameraservice/sinkservice/include/distributedcameramgr/callback",
     "${services_path}/cameraservice/sinkservice/include/distributedcameramgr/eventbus",
@@ -85,13 +84,13 @@ ohos_unittest("DCameraSinkMgrTest") {
   ]
 
   external_deps = [
+    "av_codec:av_codec_client",
     "c_utils:utils",
     "drivers_interface_camera:metadata",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "drivers_peripheral_display:hdi_gralloc_client",
     "eventhandler:libeventhandler",
     "ipc:ipc_core",
-    "player_framework:media_client",
   ]
 
   defines = [

@@ -34,7 +34,7 @@
 #include "format.h"
 #include "ibuffer_consumer_listener.h"
 #include "iconsumer_surface.h"
-#include "media_errors.h"
+#include "avcodec_errors.h"
 #include "securec.h"
 #include "surface.h"
 
@@ -65,10 +65,10 @@ public:
     void OnEvent(DCameraCodecEvent& ev) override;
 
     void OnError();
-    void OnInputBufferAvailable(uint32_t index);
-    void OnOutputFormatChanged(const Media::Format &format);
-    void OnOutputBufferAvailable(uint32_t index, const Media::AVCodecBufferInfo& info,
-        const Media::AVCodecBufferFlag& flag);
+    void OnInputBufferAvailable(uint32_t index, std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer);
+    void OnOutputFormatChanged(const MediaAVCodec::Format &format);
+    void OnOutputBufferAvailable(uint32_t index, const MediaAVCodec::AVCodecBufferInfo& info,
+        const MediaAVCodec::AVCodecBufferFlag& flag, std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer);
     void GetDecoderOutputBuffer(const sptr<IConsumerSurface>& surface);
     VideoConfigParams GetSourceConfig() const;
     VideoConfigParams GetTargetConfig() const;
@@ -129,8 +129,8 @@ private:
     std::shared_ptr<EventBus> eventBusDecode_ = nullptr;
     std::shared_ptr<EventRegistration> eventBusRegHandleDecode_ = nullptr;
     std::shared_ptr<EventRegistration> eventBusRegHandlePipeline2Decode_ = nullptr;
-    std::shared_ptr<Media::AVCodecVideoDecoder> videoDecoder_ = nullptr;
-    std::shared_ptr<Media::AVCodecCallback> decodeVideoCallback_ = nullptr;
+    std::shared_ptr<MediaAVCodec::AVCodecVideoDecoder> videoDecoder_ = nullptr;
+    std::shared_ptr<MediaAVCodec::AVCodecCallback> decodeVideoCallback_ = nullptr;
     sptr<IConsumerSurface> decodeConsumerSurface_ = nullptr;
     sptr<Surface> decodeProducerSurface_ = nullptr;
     sptr<IBufferConsumerListener> decodeSurfaceListener_ = nullptr;
@@ -141,10 +141,11 @@ private:
     int64_t lastFeedDecoderInputBufferTimeUs_ = 0;
     int64_t outputTimeStampUs_ = 0;
     std::string processType_;
-    Media::Format metadataFormat_;
-    Media::Format decodeOutputFormat_;
-    Media::AVCodecBufferInfo outputInfo_;
+    MediaAVCodec::Format metadataFormat_;
+    MediaAVCodec::Format decodeOutputFormat_;
+    MediaAVCodec::AVCodecBufferInfo outputInfo_;
     std::queue<std::shared_ptr<DataBuffer>> inputBuffersQueue_;
+    std::queue<std::shared_ptr<MediaAVCodec::AVSharedMemory>> availableInputBufferQueue_;
     std::queue<uint32_t> availableInputIndexsQueue_;
     std::deque<DCameraFrameInfo> frameInfoDeque_;
 };

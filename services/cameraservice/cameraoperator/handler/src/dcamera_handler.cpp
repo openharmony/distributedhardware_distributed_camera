@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -141,14 +141,15 @@ int32_t DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraDevice>& info, D
     root[CAMERA_PROTOCOL_VERSION_KEY] = Json::Value(CAMERA_PROTOCOL_VERSION_VALUE);
     root[CAMERA_POSITION_KEY] = Json::Value(GetCameraPosition(info->GetPosition()));
 
-    std::shared_ptr<Media::AVCodecList> avCodecList = Media::AVCodecListFactory::CreateAVCodecList();
-    std::vector<std::shared_ptr<Media::VideoCaps>> videoCapsList = avCodecList->GetVideoEncoderCaps();
-    for (auto& videoCaps : videoCapsList) {
-        std::shared_ptr<Media::AVCodecInfo> codecInfo = videoCaps->GetCodecInfo();
-        std::string name = codecInfo->GetName();
-        std::string mimeType = codecInfo->GetMimeType();
-        root[CAMERA_CODEC_TYPE_KEY].append(mimeType);
-        DHLOGI("codec name: %s, mimeType: %s", name.c_str(), mimeType.c_str());
+    std::shared_ptr<MediaAVCodec::AVCodecList> avCodecList = MediaAVCodec::AVCodecListFactory::CreateAVCodecList();
+    const std::vector<std::string> encoderName = {std::string(MediaAVCodec::CodecMimeType::VIDEO_AVC),
+                                                  std::string(MediaAVCodec::CodecMimeType::VIDE_HEVC)};
+    for (auto &coder : encoderName) {
+        MediaAVCodec::CapabilityData *capData = avCodecList->GetCapability(coder, true,
+            MediaAVCodec::AVCodecCategory::AVCODEC_HARDWARE);
+        std::string mimeType = capData->mimeType;
+        root[CAMERA_POSITION_KEY].append(mimeType);
+        DHLOGI("codec name: %s, mimeType: %s", coder.c_str(), mimeType.c_str());
     }
 
     sptr<CameraStandard::CameraOutputCapability> capability = cameraManager_->GetSupportedOutputCapability(info);

@@ -24,7 +24,7 @@
 #include "avcodec_video_encoder.h"
 #include "avsharedmemory.h"
 #include "format.h"
-#include "media_errors.h"
+#include "avcodec_errors.h"
 #include "securec.h"
 #include "surface.h"
 
@@ -55,9 +55,10 @@ public:
     void ReleaseProcessNode() override;
 
     void OnError();
-    void OnInputBufferAvailable(uint32_t index);
-    void OnOutputFormatChanged(const Media::Format &format);
-    void OnOutputBufferAvailable(uint32_t index, Media::AVCodecBufferInfo info, Media::AVCodecBufferFlag flag);
+    void OnInputBufferAvailable(uint32_t index, std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer);
+    void OnOutputFormatChanged(const MediaAVCodec::Format &format);
+    void OnOutputBufferAvailable(uint32_t index, MediaAVCodec::AVCodecBufferInfo info,
+        MediaAVCodec::AVCodecBufferFlag flag, std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer);
     VideoConfigParams GetSourceConfig() const;
     VideoConfigParams GetTargetConfig() const;
 
@@ -78,7 +79,8 @@ private:
     int64_t GetEncoderTimeStamp();
     void IncreaseWaitEncodeCnt();
     void ReduceWaitEncodeCnt();
-    int32_t GetEncoderOutputBuffer(uint32_t index, Media::AVCodecBufferInfo info, Media::AVCodecBufferFlag flag);
+    int32_t GetEncoderOutputBuffer(uint32_t index, MediaAVCodec::AVCodecBufferInfo info,
+        MediaAVCodec::AVCodecBufferFlag flag, std::shared_ptr<MediaAVCodec::AVSharedMemory>& buffer);
     int32_t EncodeDone(std::vector<std::shared_ptr<DataBuffer>>& outputBuffers);
 
 private:
@@ -125,8 +127,8 @@ private:
     VideoConfigParams sourceConfig_;
     VideoConfigParams targetConfig_;
     VideoConfigParams processedConfig_;
-    std::shared_ptr<Media::AVCodecVideoEncoder> videoEncoder_ = nullptr;
-    std::shared_ptr<Media::AVCodecCallback> encodeVideoCallback_ = nullptr;
+    std::shared_ptr<MediaAVCodec::AVCodecVideoEncoder> videoEncoder_ = nullptr;
+    std::shared_ptr<MediaAVCodec::AVCodecCallback> encodeVideoCallback_ = nullptr;
     sptr<Surface> encodeProducerSurface_ = nullptr;
 
     std::atomic<bool> isEncoderProcess_ = false;
@@ -134,8 +136,8 @@ private:
     int64_t lastFeedEncoderInputBufferTimeUs_ = 0;
     int64_t inputTimeStampUs_ = 0;
     std::string processType_;
-    Media::Format metadataFormat_;
-    Media::Format encodeOutputFormat_;
+    MediaAVCodec::Format metadataFormat_;
+    MediaAVCodec::Format encodeOutputFormat_;
     std::string surfaceStr_ = "surface";
     int32_t index_ = FRAME_HEAD;
 };

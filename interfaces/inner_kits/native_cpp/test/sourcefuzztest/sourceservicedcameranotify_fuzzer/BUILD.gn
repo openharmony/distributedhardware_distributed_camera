@@ -62,6 +62,7 @@ ohos_fuzztest("SourceServiceDCameraNotifyFuzzTest") {
   deps = [
     "${common_path}:distributed_camera_utils",
     "${services_path}/cameraservice/sourceservice:distributed_camera_source",
+    "//third_party/jsoncpp:jsoncpp",
   ]
 
   defines = [

@@ -30,13 +30,13 @@ void EncodeOnOutputBufferAvailableFuzzTest(const uint8_t* data, size_t size)
     int32_t infoSize = *(reinterpret_cast<const int32_t*>(data));
     int32_t offset = *(reinterpret_cast<const int32_t*>(data));
     int32_t bufferFlag = *(reinterpret_cast<const int32_t*>(data));
-    Media::AVCodecBufferInfo info = { presentTimeUs, infoSize, offset};
-    Media::AVCodecBufferFlag flag = static_cast<Media::AVCodecBufferFlag>(bufferFlag);
+    MediaAVCodec::AVCodecBufferInfo info = { presentTimeUs, infoSize, offset};
+    MediaAVCodec::AVCodecBufferFlag flag = static_cast<MediaAVCodec::AVCodecBufferFlag>(bufferFlag);
     std::shared_ptr<DCameraPipelineSink> sinkPipeline = std::make_shared<DCameraPipelineSink>();
     std::shared_ptr<EncodeDataProcess> encodeDataProcess = std::make_shared<EncodeDataProcess>(sinkPipeline);
     std::shared_ptr<EncodeVideoCallback> encodeVideoCallback = std::make_shared<EncodeVideoCallback>(encodeDataProcess);
-
-    encodeVideoCallback->OnOutputBufferAvailable(index, info, flag);
+    std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer = nullptr;
+    encodeVideoCallback->OnOutputBufferAvailable(index, info, flag, buffer);
 }
 }
 }
