@@ -109,11 +109,14 @@ int32_t DistributedCameraSourceStub::ReleaseSourceInner(MessageParcel &data, Mes
 {
     DHLOGD("enter");
     (void)data;
-    int32_t ret = ReleaseSource();
+    int32_t ret;
     if (!HasEnableDHPermission()) {
         DHLOGE("The caller has no ENABLE_DISTRIBUTED_HARDWARE permission.");
         ret = DCAMERA_BAD_VALUE;
+        reply.WriteInt32(ret);
+        return DCAMERA_BAD_VALUE
     }
+    ret = ReleaseSource();
     reply.WriteInt32(ret);
     return DCAMERA_OK;
 }
