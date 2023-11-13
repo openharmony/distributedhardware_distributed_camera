@@ -81,9 +81,9 @@ int32_t DistributedCameraSinkStub::InitSinkInner(MessageParcel &data, MessagePar
     int32_t ret = DCAMERA_OK;
     do {
         if (!HasEnableDHPermission()) {
-        DHLOGE("The caller has no ENABLE_DISTRIBUTED_HARDWARE permission.");
-        ret = DCAMERA_BAD_VALUE;
-        break;
+            DHLOGE("The caller has no ENABLE_DISTRIBUTED_HARDWARE permission.");
+            ret = DCAMERA_BAD_VALUE;
+            break;
         }
         std::string params = data.ReadString();
         if (params.empty() || params.size() > PARAM_MAX_SIZE) {
@@ -104,7 +104,6 @@ int32_t DistributedCameraSinkStub::ReleaseSinkInner(MessageParcel &data, Message
     if (!HasEnableDHPermission()) {
         DHLOGE("The caller has no ENABLE_DISTRIBUTED_HARDWARE permission.");
         ret = DCAMERA_BAD_VALUE;
-        reply.WriteInt32(ret);
     }
     reply.WriteInt32(ret);
     return DCAMERA_OK;
