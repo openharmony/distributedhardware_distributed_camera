@@ -35,7 +35,6 @@ namespace DistributedHardware {
         DCAMERA_UNREGIST_HAL_FAILED = -13,
         DCAMERA_ALLOC_ERROR = -14,
         DCAMERA_DEVICE_BUSY = -15,
-        DCAMERA_PERMISSION_CHECK_FAIL = -16,
     };
 } // namespace DistributedHardware
 } // namespace OHOS
