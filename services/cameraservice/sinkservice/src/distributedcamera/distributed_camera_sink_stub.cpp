@@ -100,11 +100,14 @@ int32_t DistributedCameraSinkStub::InitSinkInner(MessageParcel &data, MessagePar
 int32_t DistributedCameraSinkStub::ReleaseSinkInner(MessageParcel &data, MessageParcel &reply)
 {
     DHLOGD("enter");
-    int32_t ret = ReleaseSink();
+    int32_t ret;
     if (!HasEnableDHPermission()) {
         DHLOGE("The caller has no ENABLE_DISTRIBUTED_HARDWARE permission.");
         ret = DCAMERA_BAD_VALUE;
+        reply.WriteInt32(ret);
+        return DCAMERA_BAD_VALUE;
     }
+    ret = ReleaseSink();
     reply.WriteInt32(ret);
     return DCAMERA_OK;
 }
