@@ -71,12 +71,14 @@ int32_t DistributedCameraSourceStub::OnRemoteRequest(uint32_t code, MessageParce
 
 int32_t DistributedCameraSourceStub::InitSourceInner(MessageParcel &data, MessageParcel &reply)
 {
-    if (!HasEnableDHPermission()) {
-        DHLOGE("The caller has no ENABLE_DISTRIBUTED_HARDWARE permission.");
-        return DCAMERA_PERMISSION_CHECK_FAIL;
-    }
     DHLOGD("enter");
     int32_t ret = DCAMERA_OK;
+    if (!HasEnableDHPermission()) {
+        DHLOGE("The caller has no ENABLE_DISTRIBUTED_HARDWARE permission.");
+        ret = DCAMERA_BAD_VALUE;
+        reply.WriteInt32(ret);
+        return DCAMERA_PERMISSION_CHECK_FAIL;
+    }
     do {
         std::string params = data.ReadString();
         if (params.empty() || params.size() > PARAM_MAX_SIZE) {
@@ -106,25 +108,29 @@ int32_t DistributedCameraSourceStub::InitSourceInner(MessageParcel &data, Messag
 
 int32_t DistributedCameraSourceStub::ReleaseSourceInner(MessageParcel &data, MessageParcel &reply)
 {
-    if (!HasEnableDHPermission()) {
-        DHLOGE("The caller has no ENABLE_DISTRIBUTED_HARDWARE permission.");
-        return DCAMERA_PERMISSION_CHECK_FAIL;
-    }
     DHLOGD("enter");
     (void)data;
     int32_t ret = ReleaseSource();
+    if (!HasEnableDHPermission()) {
+        DHLOGE("The caller has no ENABLE_DISTRIBUTED_HARDWARE permission.");
+        ret = DCAMERA_BAD_VALUE;
+        reply.WriteInt32(ret);
+        return DCAMERA_PERMISSION_CHECK_FAIL;
+    }
     reply.WriteInt32(ret);
     return DCAMERA_OK;
 }
 
 int32_t DistributedCameraSourceStub::RegisterDistributedHardwareInner(MessageParcel &data, MessageParcel &reply)
 {
-    if (!HasEnableDHPermission()) {
-        DHLOGE("The caller has no ENABLE_DISTRIBUTED_HARDWARE permission.");
-        return DCAMERA_PERMISSION_CHECK_FAIL;
-    }
     DHLOGD("enter");
     int32_t ret = DCAMERA_OK;
+    if (!HasEnableDHPermission()) {
+        DHLOGE("The caller has no ENABLE_DISTRIBUTED_HARDWARE permission.");
+        ret = DCAMERA_BAD_VALUE;
+        reply.WriteInt32(ret);
+        return DCAMERA_PERMISSION_CHECK_FAIL;
+    }
     do {
         std::string devId = data.ReadString();
         std::string dhId = data.ReadString();
@@ -171,12 +177,14 @@ bool DistributedCameraSourceStub::CheckRegParams(const std::string& devId, const
 
 int32_t DistributedCameraSourceStub::UnregisterDistributedHardwareInner(MessageParcel &data, MessageParcel &reply)
 {
-    if (!HasEnableDHPermission()) {
-        DHLOGE("The caller has no ENABLE_DISTRIBUTED_HARDWARE permission.");
-        return DCAMERA_PERMISSION_CHECK_FAIL;
-    }
     DHLOGD("enter");
     int32_t ret = DCAMERA_OK;
+    if (!HasEnableDHPermission()) {
+        DHLOGE("The caller has no ENABLE_DISTRIBUTED_HARDWARE permission.");
+        ret = DCAMERA_BAD_VALUE;
+        reply.WriteInt32(ret);
+        return DCAMERA_PERMISSION_CHECK_FAIL;
+    }
     do {
         std::string devId = data.ReadString();
         std::string dhId = data.ReadString();
