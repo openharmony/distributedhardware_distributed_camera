@@ -135,6 +135,7 @@ int32_t DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraDevice>& info, D
 {
     std::string id = info->GetID();
     item.dhId = CAMERA_ID_PREFIX + id;
+    item.subtype = "camera";
     DHLOGI("camera id: %s", GetAnonyString(id).c_str());
 
     Json::Value root;
