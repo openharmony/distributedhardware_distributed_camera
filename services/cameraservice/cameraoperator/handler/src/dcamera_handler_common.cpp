@@ -149,7 +149,7 @@ int32_t DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraDevice>& info, D
         MediaAVCodec::CapabilityData *capData = avCodecList->GetCapability(coder, true,
             MediaAVCodec::AVCodecCategory::AVCODEC_HARDWARE);
         std::string mimeType = capData->mimeType;
-        root[CAMERA_POSITION_KEY].append(mimeType);
+        root[CAMERA_CODEC_TYPE_KEY].append(mimeType);
         DHLOGI("codec name: %s, mimeType: %s", coder.c_str(), mimeType.c_str());
     }
 
