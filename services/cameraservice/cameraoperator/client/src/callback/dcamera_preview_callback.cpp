@@ -49,7 +49,7 @@ void DCameraPreviewCallback::OnError(const int32_t errorCode) const
     callback_->OnStateChanged(event);
 }
 
-void DCameraPreviewCallback::OnSketchAvailable(CameraStandard::SketchData& sketchData) const
+void DCameraPreviewCallback::OnSketchStatusDataChanged(CameraStandard::SketchStatusData statusData) const
 {
     DHLOGI("enter");
 }
