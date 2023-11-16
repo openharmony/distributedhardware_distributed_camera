@@ -144,7 +144,7 @@ int32_t DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraDevice>& info, D
 
     std::shared_ptr<MediaAVCodec::AVCodecList> avCodecList = MediaAVCodec::AVCodecListFactory::CreateAVCodecList();
     const std::vector<std::string> encoderName = {std::string(MediaAVCodec::CodecMimeType::VIDEO_AVC),
-                                                  std::string(MediaAVCodec::CodecMimeType::VIDE_HEVC)};
+                                                  std::string(MediaAVCodec::CodecMimeType::VIDEO_HEVC)};
     for (auto &coder : encoderName) {
         MediaAVCodec::CapabilityData *capData = avCodecList->GetCapability(coder, true,
             MediaAVCodec::AVCodecCategory::AVCODEC_HARDWARE);
