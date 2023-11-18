@@ -50,6 +50,7 @@ private:
 
 private:
     int32_t CreateDHItem(sptr<CameraStandard::CameraDevice>& info, DHItem& item);
+    int32_t CreateAVCodecList(Json::Value& root);
     std::string GetCameraPosition(CameraStandard::CameraPosition position);
     void ConfigFormatAndResolution(const DCStreamType type, Json::Value& root,
         std::vector<CameraStandard::Profile>& profileList);
