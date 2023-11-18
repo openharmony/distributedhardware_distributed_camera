@@ -145,6 +145,26 @@ int32_t DCameraSinkHandler::UnsubscribeLocalHardware(const std::string& dhId)
     return dCameraSinkSrv->UnsubscribeLocalHardware(dhId);
 }
 
+int32_t DCameraSinkHandler::RegisterPrivacyResources(std::shared_ptr<PrivacyResourcesListener> listener)
+{
+    return DCAMERA_OK;
+}
+
+int32_t DCameraSinkHandler::PauseDistributedHardware(const std::string &networkId)
+{
+    return DCAMERA_OK;
+}
+
+int32_t DCameraSinkHandler::ResumeDistributedHardware(const std::string &networkId)
+{
+    return DCAMERA_OK;
+}
+
+int32_t DCameraSinkHandler::StopDistributedHardware(const std::string &networkId)
+{
+    return DCAMERA_OK;
+}
+
 IDistributedHardwareSink *GetSinkHardwareHandler()
 {
     DHLOGI("DCameraSinkHandler::GetSinkHardwareHandler");

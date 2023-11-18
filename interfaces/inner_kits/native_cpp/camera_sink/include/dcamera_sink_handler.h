@@ -32,6 +32,10 @@ public:
     int32_t ReleaseSink() override;
     int32_t SubscribeLocalHardware(const std::string& dhId, const std::string& parameters) override;
     int32_t UnsubscribeLocalHardware(const std::string& dhId) override;
+    int32_t RegisterPrivacyResources(std::shared_ptr<PrivacyResourcesListener> listener) override;
+    int32_t PauseDistributedHardware(const std::string &networkId) override;
+    int32_t ResumeDistributedHardware(const std::string &networkId) override;
+    int32_t StopDistributedHardware(const std::string &networkId) override;
 private:
     typedef enum {
         DCAMERA_SA_STATE_STOP = 0,
