@@ -108,7 +108,7 @@ int32_t DistributedCameraSinkStub::ReleaseSinkInner(MessageParcel &data, Message
             break;
         }
         ret = ReleaseSink();
-    } while (0);    
+    } while (0);
     reply.WriteInt32(ret);
     return DCAMERA_OK;
 }
