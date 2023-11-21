@@ -18,6 +18,8 @@
 #include <securec.h>
 
 #include "data_buffer.h"
+#include "dcamera_hidumper.h"
+#include "dcamera_utils_tools.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
 
@@ -26,6 +28,7 @@ namespace DistributedHardware {
 DCameraPhotoSurfaceListener::DCameraPhotoSurfaceListener(const sptr<IConsumerSurface>& surface,
     const std::shared_ptr<ResultCallback>& callback) : surface_(surface), callback_(callback)
 {
+    photoCount_ = COUNT_INIT_NUM;
 }
 
 void DCameraPhotoSurfaceListener::OnBufferAvailable()
@@ -57,7 +60,6 @@ void DCameraPhotoSurfaceListener::OnBufferAvailable()
             DHLOGE("DCameraPhotoSurfaceListener invalid params, size: %d", size);
             break;
         }
-
         DHLOGI("DCameraPhotoSurfaceListener size: %d", size);
         std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(size);
         int32_t ret = memcpy_s(dataBuffer->Data(), dataBuffer->Capacity(), address, size);
@@ -65,7 +67,12 @@ void DCameraPhotoSurfaceListener::OnBufferAvailable()
             DHLOGE("DCameraPhotoSurfaceListener Memory Copy failed, ret: %d", ret);
             break;
         }
-
+#ifdef DUMP_DCAMERA_FILE
+        std::string fileName = DUMP_PHOTO_PATH + std::to_string(photoCount_++) + SINK_PHOTO;
+        if (DcameraHidumper::GetInstance().GetDumpFlag() && (IsUnderDumpMaxSize(fileName) == DCAMERA_OK)) {
+            DumpBufferToFile(fileName, dataBuffer->Data(), dataBuffer->Size());
+        }
+#endif
         callback_->OnPhotoResult(dataBuffer);
     } while (0);
     surface_->ReleaseBuffer(buffer, -1);

@@ -32,6 +32,7 @@ private:
     sptr<IConsumerSurface> surface_;
     std::shared_ptr<ResultCallback> callback_;
     const int32_t SURFACE_BUFFER_MAX_SIZE = 50 * 1024 * 1024;
+    uint32_t photoCount_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

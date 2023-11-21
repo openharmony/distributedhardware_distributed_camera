@@ -115,11 +115,13 @@ const int32_t RESOLUTION_MAX_WIDTH_CONTINUOUS = 1920;
 const int32_t RESOLUTION_MAX_HEIGHT_CONTINUOUS = 1080;
 const int32_t RESOLUTION_MIN_WIDTH = 320;
 const int32_t RESOLUTION_MIN_HEIGHT = 240;
+const int32_t DUMP_FILE_MAX_SIZE = 295 * 1024 *1024;
 
 const uint32_t DCAMERA_SHIFT_32 = 32;
 const uint32_t DCAMERA_SHIFT_24 = 24;
 const uint32_t DCAMERA_SHIFT_16 = 16;
 const uint32_t DCAMERA_SHIFT_8 = 8;
+const uint32_t COUNT_INIT_NUM = 1;
 
 const uint32_t UINT32_SHIFT_MASK_24 = 0xff000000;
 const uint32_t UINT32_SHIFT_MASK_16 = 0x00ff0000;
@@ -134,6 +136,12 @@ const std::string SINK_START_EVENT = "sinkStartEvent";
 const std::string SOURCE_START_EVENT = "srcStartEvent";
 const std::string UNREGISTER_SERVICE_NOTIFY = "unregSvcNotify";
 const std::string LOOPER_SMOOTH = "looperSmooth";
+const std::string DUMP_PATH = "/data/data/dcamera/";
+const std::string DUMP_PHOTO_PATH = "/data/data/dcamera/photodump/";
+const std::string TO_DISPLAY = "AfterDecodeToDisplay.yuv";
+const std::string SINK_PHOTO = "_SinkPhoto.jpg";
+const std::string AFTER_ENCODE = "SinkAfterEncode.h265";
+const std::string BEFORE_DECODE = "SourceBeforeDecode.h265";
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DISTRIBUTED_CAMERA_CONSTANTS_H

@@ -47,6 +47,7 @@ ohos_shared_library("distributed_camera_utils") {
     "src/utils/anonymous_string.cpp",
     "src/utils/data_buffer.cpp",
     "src/utils/dcamera_buffer_handle.cpp",
+    "src/utils/dcamera_hidumper.cpp",
     "src/utils/dcamera_hisysevent_adapter.cpp",
     "src/utils/dcamera_hitrace_adapter.cpp",
     "src/utils/dcamera_utils_tools.cpp",
@@ -66,6 +67,8 @@ ohos_shared_library("distributed_camera_utils") {
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
   ]
 
   cflags_cc = cflags

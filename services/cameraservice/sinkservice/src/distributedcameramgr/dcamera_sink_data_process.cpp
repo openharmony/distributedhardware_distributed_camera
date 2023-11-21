@@ -19,6 +19,8 @@
 #include "dcamera_channel_sink_impl.h"
 #include "dcamera_pipeline_sink.h"
 #include "dcamera_sink_data_process_listener.h"
+#include "dcamera_hidumper.h"
+#include "dcamera_utils_tools.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -155,6 +157,11 @@ void DCameraSinkDataProcess::SendDataAsync(const std::shared_ptr<DataBuffer>& bu
 
 void DCameraSinkDataProcess::OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult)
 {
+#ifdef DUMP_DCAMERA_FILE
+    if (DcameraHidumper::GetInstance().GetDumpFlag() && (IsUnderDumpMaxSize(DUMP_PATH + AFTER_ENCODE) == DCAMERA_OK)) {
+        DumpBufferToFile(DUMP_PATH + AFTER_ENCODE, videoResult->Data(), videoResult->Size());
+    }
+#endif
     SendDataAsync(videoResult);
 }
 

@@ -19,6 +19,7 @@
 #include "distributed_camera_constants.h"
 #include "distributed_hardware_log.h"
 #include "dcamera_hisysevent_adapter.h"
+#include "dcamera_hidumper.h"
 #include "dcamera_utils_tools.h"
 #include "decode_surface_listener.h"
 #include "decode_video_callback.h"
@@ -405,6 +406,20 @@ int32_t DecodeDataProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>&
     return DCAMERA_OK;
 }
 
+void DecodeDataProcess::BeforeDecodeDump(uint8_t *buffer, size_t bufSize)
+{
+#ifdef DUMP_DCAMERA_FILE
+    if (buffer == nullptr) {
+        DHLOGE("dumpsaving : input param nullptr.");
+        return;
+    }
+    if (DcameraHidumper::GetInstance().GetDumpFlag() && (IsUnderDumpMaxSize(DUMP_PATH + BEFORE_DECODE) == DCAMERA_OK)) {
+        DumpBufferToFile(DUMP_PATH + BEFORE_DECODE, buffer, bufSize);
+    }
+#endif
+    return;
+}
+
 int32_t DecodeDataProcess::FeedDecoderInputBuffer()
 {
     DHLOGD("Feed decoder input buffer.");
@@ -433,6 +448,7 @@ int32_t DecodeDataProcess::FeedDecoderInputBuffer()
                 DHLOGE("Failed to obtain the input shared memory corresponding to the [%u] index.", index);
                 return DCAMERA_BAD_VALUE;
             }
+            BeforeDecodeDump(buffer->Data(), buffer->Size());
             size_t inputMemoDataSize = static_cast<size_t>(sharedMemoryInput->GetSize());
             errno_t err = memcpy_s(sharedMemoryInput->GetBase(), inputMemoDataSize, buffer->Data(), buffer->Size());
             if (err != EOK) {
@@ -574,7 +590,13 @@ void DecodeDataProcess::CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int3
     bufferOutput->SetInt32("alignedHeight", processedConfig_.GetHeight());
     bufferOutput->SetInt32("width", processedConfig_.GetWidth());
     bufferOutput->SetInt32("height", processedConfig_.GetHeight());
-
+#ifdef DUMP_DCAMERA_FILE
+    std::string fileName = "SourceAfterDecode_width(" + std::to_string(processedConfig_.GetWidth())
+        + ")height(" + std::to_string(processedConfig_.GetHeight()) + ").yuv";
+    if (DcameraHidumper::GetInstance().GetDumpFlag() && (IsUnderDumpMaxSize(DUMP_PATH + fileName) == DCAMERA_OK)) {
+        DumpBufferToFile(DUMP_PATH + fileName, bufferOutput->Data(), bufferOutput->Size());
+    }
+#endif
     PostOutputDataBuffers(bufferOutput);
 }
 

@@ -18,6 +18,7 @@
 
 #include <cstdint>
 #include <string>
+#include <fstream>
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -29,7 +30,9 @@ int64_t GetNowTimeStampUs();
 int32_t GetAlignedHeight(int32_t width);
 std::string Base64Encode(const unsigned char *toEncode, unsigned int len);
 std::string Base64Decode(const std::string& basicString);
+void DumpBufferToFile(std::string fileName, uint8_t *buffer, size_t bufSize);
 bool IsBase64(unsigned char c);
+int32_t IsUnderDumpMaxSize(std::string fileName);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DCAMERA_UTILS_TOOL_H

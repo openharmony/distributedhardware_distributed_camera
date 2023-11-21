@@ -97,6 +97,10 @@ ohos_shared_library("distributed_camera_data_process") {
     "LOG_DOMAIN=0xD004100",
   ]
 
+  if (build_variant == "root") {
+    defines += [ "DUMP_DCAMERA_FILE" ]
+  }
+
   external_deps = [
     "av_codec:av_codec_client",
     "c_utils:utils",
@@ -104,6 +108,8 @@ ohos_shared_library("distributed_camera_data_process") {
     "eventhandler:libeventhandler",
     "graphic_2d:surface",
     "hitrace:hitrace_meter",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
   ]
 
   if (!distributed_camera_common) {
