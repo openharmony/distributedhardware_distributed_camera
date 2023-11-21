@@ -131,6 +131,29 @@ std::vector<std::string> DCameraHandler::GetCameras()
     return cameras;
 }
 
+int32_t DCameraHandler::CreateAVCodecList(Json::Value& root)
+{
+    std::shared_ptr<MediaAVCodec::AVCodecList> avCodecList = MediaAVCodec::AVCodecListFactory::CreateAVCodecList();
+    if (avCodecList == nullptr) {
+        DHLOGI("Create avCodecList failed");
+        return DCAMERA_BAD_VALUE;
+    }
+    const std::vector<std::string> encoderName = {std::string(MediaAVCodec::CodecMimeType::VIDEO_AVC),
+                                                  std::string(MediaAVCodec::CodecMimeType::VIDEO_HEVC)};
+    for (auto &coder : encoderName) {
+        MediaAVCodec::CapabilityData *capData = avCodecList->GetCapability(coder, true,
+            MediaAVCodec::AVCodecCategory::AVCODEC_HARDWARE);
+        if (capData == nullptr) {
+            DHLOGI("capData is nullptr");
+            return DCAMERA_BAD_VALUE;
+        }
+        std::string mimeType = capData->mimeType;
+        root[CAMERA_CODEC_TYPE_KEY].append(mimeType);
+        DHLOGI("codec name: %s, mimeType: %s", coder.c_str(), mimeType.c_str());
+    }
+    return DCAMERA_OK;
+}
+
 int32_t DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraDevice>& info, DHItem& item)
 {
     std::string id = info->GetID();
@@ -141,18 +164,11 @@ int32_t DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraDevice>& info, D
     Json::Value root;
     root[CAMERA_PROTOCOL_VERSION_KEY] = Json::Value(CAMERA_PROTOCOL_VERSION_VALUE);
     root[CAMERA_POSITION_KEY] = Json::Value(GetCameraPosition(info->GetPosition()));
-
-    std::shared_ptr<MediaAVCodec::AVCodecList> avCodecList = MediaAVCodec::AVCodecListFactory::CreateAVCodecList();
-    const std::vector<std::string> encoderName = {std::string(MediaAVCodec::CodecMimeType::VIDEO_AVC),
-                                                  std::string(MediaAVCodec::CodecMimeType::VIDEO_HEVC)};
-    for (auto &coder : encoderName) {
-        MediaAVCodec::CapabilityData *capData = avCodecList->GetCapability(coder, true,
-            MediaAVCodec::AVCodecCategory::AVCODEC_HARDWARE);
-        std::string mimeType = capData->mimeType;
-        root[CAMERA_CODEC_TYPE_KEY].append(mimeType);
-        DHLOGI("codec name: %s, mimeType: %s", coder.c_str(), mimeType.c_str());
+    int32_t ret = CreateAVCodecList(root);
+    if (ret != DCAMERA_OK) {
+        DHLOGI("CreateAVCodecList failed");
+        return DCAMERA_BAD_VALUE;
     }
-
     sptr<CameraStandard::CameraOutputCapability> capability = cameraManager_->GetSupportedOutputCapability(info);
     if (capability == nullptr) {
         DHLOGI("get supported capability is null");
