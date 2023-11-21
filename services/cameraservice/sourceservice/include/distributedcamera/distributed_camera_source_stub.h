@@ -39,6 +39,7 @@ private:
         const std::string& reqId, const EnableParam& param);
     bool CheckUnregParams(const std::string& devId, const std::string& dhId, const std::string& reqId);
     bool CheckNotifyParams(const std::string& devId, const std::string& dhId, std::string& events);
+    bool HasEnableDHPermission();
 
     using DCameraFunc = int32_t (DistributedCameraSourceStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, DCameraFunc> memberFuncMap_;

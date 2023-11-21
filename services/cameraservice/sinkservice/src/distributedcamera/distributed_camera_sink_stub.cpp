@@ -13,10 +13,12 @@
  * limitations under the License.
  */
 
+#include "accesstoken_kit.h"
 #include "dcamera_ipc_interface_code.h"
 #include "distributed_camera_sink_stub.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
+#include "ipc_skeleton.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -45,6 +47,15 @@ DistributedCameraSinkStub::DistributedCameraSinkStub()
 DistributedCameraSinkStub::~DistributedCameraSinkStub()
 {}
 
+bool DistributedCameraSinkStub::HasEnableDHPermission()
+{
+    Security::AccessToken::AccessTokenID callerToken = IPCSkeleton::GetCallingTokenID();
+    const std::string permissionName = "ohos.permission.ENABLE_DISTRIBUTED_HARDWARE";
+    int32_t result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken,
+        permissionName);
+    return (result == Security::AccessToken::PERMISSION_GRANTED);
+}
+
 int32_t DistributedCameraSinkStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
@@ -69,6 +80,11 @@ int32_t DistributedCameraSinkStub::InitSinkInner(MessageParcel &data, MessagePar
     DHLOGD("enter");
     int32_t ret = DCAMERA_OK;
     do {
+        if (!HasEnableDHPermission()) {
+            DHLOGE("The caller has no ENABLE_DISTRIBUTED_HARDWARE permission.");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
         std::string params = data.ReadString();
         if (params.empty() || params.size() > PARAM_MAX_SIZE) {
             DHLOGE("params is invalid");
@@ -84,7 +100,15 @@ int32_t DistributedCameraSinkStub::InitSinkInner(MessageParcel &data, MessagePar
 int32_t DistributedCameraSinkStub::ReleaseSinkInner(MessageParcel &data, MessageParcel &reply)
 {
     DHLOGD("enter");
-    int32_t ret = ReleaseSink();
+    int32_t ret = DCAMERA_OK;
+    do {
+        if (!HasEnableDHPermission()) {
+            DHLOGE("The caller has no ENABLE_DISTRIBUTED_HARDWARE permission.");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
+        ret = ReleaseSink();
+    } while (0);
     reply.WriteInt32(ret);
     return DCAMERA_OK;
 }
