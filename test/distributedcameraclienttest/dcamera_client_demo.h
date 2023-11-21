@@ -199,6 +199,11 @@ public:
         DHLOGI("DemoDCameraPhotoCallback::OnCaptureStarted captureID: %d", captureID);
     }
 
+    void OnCaptureStarted(const int32_t captureID, uint32_t exposureTime) const
+    {
+        DHLOGI("DemoDCameraPhotoCallback::OnCaptureStarted captureID: %d, exposureTime: %u", captureID, exposureTime);
+    }
+
     void OnCaptureEnded(const int32_t captureID, int32_t frameCount) const
     {
         DHLOGI("DemoDCameraPhotoCallback::OnCaptureEnded captureID: %d frameCount: %d", captureID, frameCount);
