@@ -29,6 +29,11 @@ void DCameraPhotoCallback::OnCaptureStarted(const int32_t captureID) const
     DHLOGI("enter, captureID: %d", captureID);
 }
 
+void DCameraPhotoCallback::OnCaptureStarted(const int32_t captureID, uint32_t exposureTime) const
+{
+    DHLOGI("enter, captureID: %d, exposureTime: %u", captureID, exposureTime);
+}
+
 void DCameraPhotoCallback::OnCaptureEnded(const int32_t captureID, const int32_t frameCount) const
 {
     DHLOGI("enter, captureID: %d, frameCount: %d", captureID, frameCount);
