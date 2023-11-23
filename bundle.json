@@ -35,6 +35,8 @@
                 "camera_framework",
                 "graphic_2d",
                 "distributed_hardware_fwk",
+                "device_security_level",
+                "device_manager",
                 "hdf_core",
                 "drivers_interface_display",
                 "drivers_interface_distributed_camera",

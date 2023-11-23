@@ -38,11 +38,18 @@ config("module_private_config") {
     "${common_path}/include/utils",
     "${fwk_common_path}/utils/include",
     "${innerkits_path}/native_cpp/camera_sink/include",
+    "${innerkits_path}/native_cpp/camera_sink/include/callback",
     "${services_path}/cameraservice/base/include",
+    "${services_path}/cameraservice/cameraoperator/client/include",
     "${services_path}/cameraservice/cameraoperator/handler/include",
     "${services_path}/cameraservice/sinkservice/include/distributedcamera",
     "${services_path}/cameraservice/sinkservice/include/distributedcameramgr",
     "${services_path}/cameraservice/sinkservice/include/distributedcameramgr/interface",
+    "${services_path}/cameraservice/sinkservice/include/distributedcameramgr/eventbus",
+    "${services_path}/data_process/include/eventbus",
+    "${services_path}/channel/include",
+    "${fwk_utils_path}/include/eventbus",
+    "${feeding_smoother_path}/base",
   ]
 }
 

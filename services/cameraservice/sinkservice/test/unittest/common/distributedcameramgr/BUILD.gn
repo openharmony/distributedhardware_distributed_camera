@@ -45,6 +45,7 @@ config("module_private_config") {
     "${common_path}/include/utils",
     "${innerkits_path}/native_cpp/camera_source/include",
     "${innerkits_path}/native_cpp/camera_source/include/callback",
+    "${innerkits_path}/native_cpp/camera_sink/include/callback",
 
     "${fwk_common_path}/utils/include",
     "${fwk_utils_path}/include/eventbus",
@@ -76,6 +77,7 @@ ohos_unittest("DCameraSinkMgrTest") {
     "${camerastandard_path}/frameworks/native/camera:camera_framework",
     "${common_path}:distributed_camera_utils",
     "${graphicstandard_path}:libsurface",
+    "${innerkits_path}/native_cpp/camera_sink:distributed_camera_sink_sdk",
     "${services_path}/cameraservice/cameraoperator/handler:distributed_camera_handler",
     "${services_path}/cameraservice/sinkservice:distributed_camera_sink",
     "${services_path}/channel:distributed_camera_channel",
@@ -86,6 +88,7 @@ ohos_unittest("DCameraSinkMgrTest") {
   external_deps = [
     "av_codec:av_codec_client",
     "c_utils:utils",
+    "device_manager:devicemanagersdk",
     "drivers_interface_camera:metadata",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "drivers_peripheral_display:hdi_gralloc_client",

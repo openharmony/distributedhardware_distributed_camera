@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,8 +26,11 @@
 #include "icamera_sink_access_control.h"
 #include "icamera_sink_output.h"
 #include <mutex>
-
+#include <atomic>
+#include "device_manager.h"
+#include "device_manager_callback.h"
 #include "property_carrier.h"
+#include "idcamera_sink_callback.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -36,7 +39,8 @@ class DCameraSinkController : public ICameraController, public EventSender,
     public DistributedHardware::EventBusHandler<DCameraPostAuthorizationEvent>,
     public std::enable_shared_from_this<DCameraSinkController> {
 public:
-    explicit DCameraSinkController(std::shared_ptr<ICameraSinkAccessControl>& accessControl);
+    explicit DCameraSinkController(std::shared_ptr<ICameraSinkAccessControl>& accessControl,
+        const sptr<IDCameraSinkCallback> &sinkCallback);
     ~DCameraSinkController() override;
 
     int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos) override;
@@ -49,6 +53,9 @@ public:
     int32_t CloseChannel() override;
     int32_t Init(std::vector<DCameraIndex>& indexs) override;
     int32_t UnInit() override;
+    int32_t PauseDistributedHardware(const std::string &networkId) override;
+    int32_t ResumeDistributedHardware(const std::string &networkId) override;
+    int32_t StopDistributedHardware(const std::string &networkId) override;
 
     void OnEvent(DCameraFrameTriggerEvent& event) override;
     void OnEvent(DCameraPostAuthorizationEvent& event) override;
@@ -65,6 +72,9 @@ private:
     int32_t DCameraNotifyInner(int32_t type, int32_t result, std::string content);
     int32_t HandleReceivedData(std::shared_ptr<DataBuffer>& dataBuffer);
     void PostAuthorization(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos);
+    bool CheckDeviceSecurityLevel(const std::string &srcDeviceId, const std::string &dstDeviceId);
+    int32_t GetDeviceSecurityLevel(const std::string &udid);
+    std::string GetUdidByNetworkId(const std::string &networkId);
 
     bool isInit_;
     int32_t sessionState_;
@@ -78,10 +88,19 @@ private:
     std::shared_ptr<ICameraOperator> operator_;
     std::shared_ptr<ICameraSinkAccessControl> accessControl_;
     std::shared_ptr<ICameraSinkOutput> output_;
+    sptr<IDCameraSinkCallback> sinkCallback_;
+    std::atomic<bool> isPageStatus_ = false;
+    std::shared_ptr<DmInitCallback> initCallback_;
+    bool isSensitive_;
+    bool isSameAccount_;
 
     const std::string SESSION_FLAG = "control";
     const std::string SRC_TYPE = "camera";
     const size_t DATABUFF_MAX_SIZE = 100 * 1024 * 1024;
+};
+
+class DeviceInitCallback : public DmInitCallback {
+    void OnRemoteDied() override;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

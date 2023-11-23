@@ -34,6 +34,8 @@
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
+#include "device_security_defines.h"
+#include "device_security_info.h"
 #include "idistributed_camera_source.h"
 #include "json/json.h"
 #include "dcamera_low_latency.h"
@@ -41,8 +43,12 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-DCameraSinkController::DCameraSinkController(std::shared_ptr<ICameraSinkAccessControl>& accessControl)
-    : isInit_(false), sessionState_(DCAMERA_CHANNEL_STATE_DISCONNECTED), accessControl_(accessControl)
+const int DEFAULT_DEVICE_SECURITY_LEVEL = -1;
+
+DCameraSinkController::DCameraSinkController(std::shared_ptr<ICameraSinkAccessControl>& accessControl,
+    const sptr<IDCameraSinkCallback> &sinkCallback)
+    : isInit_(false), sessionState_(DCAMERA_CHANNEL_STATE_DISCONNECTED), accessControl_(accessControl),
+      sinkCallback_(sinkCallback)
 {
 }
 
@@ -93,7 +99,17 @@ int32_t DCameraSinkController::StopCapture()
         DCameraNotifyInner(DCAMERA_MESSAGE, DCAMERA_EVENT_DEVICE_ERROR, std::string("output stop capture failed"));
         return ret;
     }
-
+    if (isPageStatus_.load()) {
+        std::string subtype = "camera";
+        bool isSensitive = false;
+        bool isSameAccout = false;
+        ret = sinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_CLOSE_PAGE, subtype, srcDevId_,
+            isSensitive, isSameAccout);
+        if (ret != DCAMERA_OK) {
+            DHLOGE("close page failed, ret: %d", ret);
+        }
+    }
+    isPageStatus_.store(false);
     DHLOGI("StopCapture %s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
 }
@@ -185,14 +201,37 @@ int32_t DCameraSinkController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& ope
         DHLOGE("wrong state, dhId: %s, sessionState: %d", GetAnonyString(dhId_).c_str(), sessionState_);
         return DCAMERA_WRONG_STATE;
     }
-    DCameraLowLatency::GetInstance().EnableLowLatency();
     srcDevId_ = openInfo->sourceDevId_;
+    std::string subtype = "camera";
+    int32_t ret = sinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_QUERY_RESOURCE, subtype, srcDevId_,
+        isSensitive_, isSameAccount_);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("Query resource failed, ret: %d", ret);
+        return ret;
+    }
+    DHLOGI("OpenChannel isSensitive: %d, isSameAccout: %d", isSensitive_, isSameAccount_);
+    if (isSensitive_ && !isSameAccount_) {
+        DHLOGE("Privacy resource must be logged in with the same account.");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    std::string sinkDevId;
+    ret = GetLocalDeviceNetworkId(sinkDevId);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("GetLocalDeviceNetworkId failed, ret: %d", ret);
+        return ret;
+    }
+    if (isSensitive_ && !CheckDeviceSecurityLevel(srcDevId_, sinkDevId)) {
+        DHLOGE("Check device security level failed!");
+        return DCAMERA_BAD_VALUE;
+    }
+    DCameraLowLatency::GetInstance().EnableLowLatency();
     std::vector<DCameraIndex> indexs;
     indexs.push_back(DCameraIndex(srcDevId_, dhId_));
     auto controller = std::shared_ptr<DCameraSinkController>(shared_from_this());
     std::shared_ptr<ICameraChannelListener> listener =
         std::make_shared<DCameraSinkControllerChannelListener>(controller);
-    int32_t ret = channel_->CreateSession(indexs, SESSION_FLAG, DCAMERA_SESSION_MODE_CTRL, listener);
+    ret = channel_->CreateSession(indexs, SESSION_FLAG, DCAMERA_SESSION_MODE_CTRL, listener);
     if (ret != DCAMERA_OK) {
         DHLOGE("channel create session failed, dhId: %s, ret: %d", GetAnonyString(dhId_).c_str(), ret);
         return ret;
@@ -253,6 +292,7 @@ int32_t DCameraSinkController::Init(std::vector<DCameraIndex>& indexs)
     eventBus_->AddHandler<DCameraPostAuthorizationEvent>(authEvent.GetType(), *this);
 
     isInit_ = true;
+    initCallback_ = std::make_shared<DeviceInitCallback>();
     DHLOGI("DCameraSinkController Init %s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
 }
@@ -441,6 +481,18 @@ int32_t DCameraSinkController::StartCaptureInner(std::vector<std::shared_ptr<DCa
     }
 
     DCameraNotifyInner(DCAMERA_MESSAGE, DCAMERA_EVENT_CAMERA_SUCCESS, std::string("operator start capture success"));
+    if (isSensitive_) {
+        std::string subtype = "camera";
+        bool isSensitive = false;
+        bool isSameAccout = false;
+        ret = sinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_PULL_UP_PAGE, subtype, srcDevId_,
+            isSensitive, isSameAccout);
+        if (ret != DCAMERA_OK) {
+            DHLOGE("pull up page failed, ret %d", ret);
+            return ret;
+        }
+        isPageStatus_.store(true);
+    }
     DHLOGI("DCameraSinkController::StartCaptureInner %s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
 }
@@ -495,6 +547,126 @@ int32_t DCameraSinkController::HandleReceivedData(std::shared_ptr<DataBuffer>& d
         return UpdateSettings(metadataSettingCmd.value_);
     }
     return DCAMERA_BAD_VALUE;
+}
+
+int32_t DCameraSinkController::PauseDistributedHardware(const std::string &networkId)
+{
+    DHLOGI("Pause distributed hardware dhId: %s", GetAnonyString(dhId_).c_str());
+    if (networkId.empty()) {
+        DHLOGE("networkId is empty");
+        return DCAMERA_BAD_VALUE;
+    }
+    int32_t ret = operator_->PauseCapture();
+    if (ret != DCAMERA_OK) {
+        DHLOGE("Pause distributed hardware failed, dhId: %s, ret: %d", GetAnonyString(dhId_).c_str(), ret);
+    }
+    return ret;
+}
+
+int32_t DCameraSinkController::ResumeDistributedHardware(const std::string &networkId)
+{
+    DHLOGI("Resume distributed hardware dhId: %s", GetAnonyString(dhId_).c_str());
+    if (networkId.empty()) {
+        DHLOGE("networkId is empty");
+        return DCAMERA_BAD_VALUE;
+    }
+    int32_t ret = operator_->ResumeCapture();
+    if (ret != DCAMERA_OK) {
+        DHLOGE("Resume distributed hardware failed, dhId: %s, ret: %d", GetAnonyString(dhId_).c_str(), ret);
+    }
+    return ret;
+}
+
+int32_t DCameraSinkController::StopDistributedHardware(const std::string &networkId)
+{
+    DHLOGI("Stop distributed hardware dhId: %s", GetAnonyString(dhId_).c_str());
+    if (networkId.empty()) {
+        DHLOGE("networkId is empty");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    isPageStatus_.store(false);
+    return DCameraNotifyInner(DCAMERA_SINK_STOP, DCAMERA_EVENT_SINK_STOP, std::string("sink stop dcamera business"));
+}
+
+bool DCameraSinkController::CheckDeviceSecurityLevel(const std::string &srcDeviceId, const std::string &dstDeviceId)
+{
+    DHLOGD("CheckDeviceSecurityLevel srcDeviceId %s, dstDeviceId %s.", srcDeviceId.c_str(), dstDeviceId.c_str());
+    std::string srcUdid = GetUdidByNetworkId(srcDeviceId);
+    if (srcUdid.empty()) {
+        DHLOGE("src udid is empty");
+        return false;
+    }
+    std::string dstUdid = GetUdidByNetworkId(dstDeviceId);
+    if (dstUdid.empty()) {
+        DHLOGE("dst udid is empty");
+        return false;
+    }
+    DHLOGD("CheckDeviceSecurityLevel srcUdid %s, dstUdid %s.", srcUdid.c_str(), dstUdid.c_str());
+    int32_t srcDeviceSecurityLevel = GetDeviceSecurityLevel(srcUdid);
+    int32_t dstDeviceSecurityLevel = GetDeviceSecurityLevel(dstUdid);
+    DHLOGI("srcDeviceSecurityLevel is %d, dstDeviceSecurityLevel is %d.",
+        srcDeviceSecurityLevel, dstDeviceSecurityLevel);
+    if (srcDeviceSecurityLevel == DEFAULT_DEVICE_SECURITY_LEVEL ||
+        srcDeviceSecurityLevel < dstDeviceSecurityLevel) {
+        DHLOGE("The device security of source device is lower.");
+        return false;
+    }
+    return true;
+}
+
+int32_t DCameraSinkController::GetDeviceSecurityLevel(const std::string &udid)
+{
+    DeviceIdentify devIdentify;
+    devIdentify.length = DEVICE_ID_MAX_LEN;
+    int32_t ret = memcpy_s(devIdentify.identity, DEVICE_ID_MAX_LEN, udid.c_str(), DEVICE_ID_MAX_LEN);
+    if (ret != 0) {
+        DHLOGE("str copy failed %d", ret);
+        return DEFAULT_DEVICE_SECURITY_LEVEL;
+    }
+    DeviceSecurityInfo *info = nullptr;
+    ret = RequestDeviceSecurityInfo(&devIdentify, nullptr, &info);
+    if (ret != SUCCESS) {
+        DHLOGE("Request device security info failed %d", ret);
+        FreeDeviceSecurityInfo(info);
+        info = nullptr;
+        return DEFAULT_DEVICE_SECURITY_LEVEL;
+    }
+    int32_t level = 0;
+    ret = GetDeviceSecurityLevelValue(info, &level);
+    DHLOGD("Get device security level, level is %d", level);
+    FreeDeviceSecurityInfo(info);
+    info = nullptr;
+    if (ret != SUCCESS) {
+        DHLOGE("Get device security level failed %d", ret);
+        return DEFAULT_DEVICE_SECURITY_LEVEL;
+    }
+    return level;
+}
+
+std::string DCameraSinkController::GetUdidByNetworkId(const std::string &networkId)
+{
+    if (networkId.empty()) {
+        DHLOGE("networkId is empty!");
+        return "";
+    }
+    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(DCAMERA_PKG_NAME, initCallback_);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("InitDeviceManager failed ret = %d", ret);
+        return "";
+    }
+    std::string udid = "";
+    ret = DeviceManager::GetInstance().GetUdidByNetworkId(DCAMERA_PKG_NAME, networkId, udid);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("GetUdidByNetworkId failed ret = %d", ret);
+        return "";
+    }
+    return udid;
+}
+
+void DeviceInitCallback::OnRemoteDied()
+{
+    DHLOGI("DeviceInitCallback OnRemoteDied");
 }
 } // namespace DistributedHardware
 } // namespace OHOS

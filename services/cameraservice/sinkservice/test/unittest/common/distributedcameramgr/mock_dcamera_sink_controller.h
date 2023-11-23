@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -68,6 +68,18 @@ public:
         return DCAMERA_OK;
     }
     int32_t UnInit()
+    {
+        return DCAMERA_OK;
+    }
+    int32_t PauseDistributedHardware(const std::string &networkId)
+    {
+        return DCAMERA_OK;
+    }
+    int32_t ResumeDistributedHardware(const std::string &networkId)
+    {
+        return DCAMERA_OK;
+    }
+    int32_t StopDistributedHardware(const std::string &networkId)
     {
         return DCAMERA_OK;
     }

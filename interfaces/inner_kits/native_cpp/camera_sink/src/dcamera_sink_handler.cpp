@@ -36,6 +36,14 @@ namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(DCameraSinkHandler);
 
+DCameraSinkHandler::DCameraSinkHandler()
+{
+    DHLOGI("DCameraSinkHandler ctor.");
+    if (!dCameraSinkCallback_) {
+        dCameraSinkCallback_ = new DCameraSinkCallback();
+    }
+}
+
 DCameraSinkHandler::~DCameraSinkHandler()
 {
     DHLOGI("~DCameraSinkHandler");
@@ -86,7 +94,7 @@ void DCameraSinkHandler::FinishStartSA(const std::string& params)
         DHLOGE("get Service failed");
         return;
     }
-    dCameraSinkSrv->InitSink(params);
+    dCameraSinkSrv->InitSink(params, dCameraSinkCallback_);
     std::unique_lock<std::mutex> lock(producerMutex_);
     state_ = DCAMERA_SA_STATE_START;
     producerCon_.notify_one();
@@ -147,22 +155,42 @@ int32_t DCameraSinkHandler::UnsubscribeLocalHardware(const std::string& dhId)
 
 int32_t DCameraSinkHandler::RegisterPrivacyResources(std::shared_ptr<PrivacyResourcesListener> listener)
 {
+    DHLOGI("RegisterPrivacyResources start.");
+    dCameraSinkCallback_->PushPrivacyResCallback(listener);
     return DCAMERA_OK;
 }
 
 int32_t DCameraSinkHandler::PauseDistributedHardware(const std::string &networkId)
 {
-    return DCAMERA_OK;
+    DHLOGI("pause distributed hardware.");
+    sptr<IDistributedCameraSink> dCameraSinkSrv = DCameraSinkHandlerIpc::GetInstance().GetSinkLocalCamSrv();
+    if (dCameraSinkSrv == nullptr) {
+        DHLOGE("get Service failed");
+        return DCAMERA_BAD_VALUE;
+    }
+    return dCameraSinkSrv->PauseDistributedHardware(networkId);
 }
 
 int32_t DCameraSinkHandler::ResumeDistributedHardware(const std::string &networkId)
 {
-    return DCAMERA_OK;
+    DHLOGI("resume distributed hardware.");
+    sptr<IDistributedCameraSink> dCameraSinkSrv = DCameraSinkHandlerIpc::GetInstance().GetSinkLocalCamSrv();
+    if (dCameraSinkSrv == nullptr) {
+        DHLOGE("get Service failed");
+        return DCAMERA_BAD_VALUE;
+    }
+    return dCameraSinkSrv->ResumeDistributedHardware(networkId);
 }
 
 int32_t DCameraSinkHandler::StopDistributedHardware(const std::string &networkId)
 {
-    return DCAMERA_OK;
+    DHLOGI("stop distributed hardware.");
+    sptr<IDistributedCameraSink> dCameraSinkSrv = DCameraSinkHandlerIpc::GetInstance().GetSinkLocalCamSrv();
+    if (dCameraSinkSrv == nullptr) {
+        DHLOGE("get Service failed");
+        return DCAMERA_BAD_VALUE;
+    }
+    return dCameraSinkSrv->StopDistributedHardware(networkId);
 }
 
 IDistributedHardwareSink *GetSinkHardwareHandler()

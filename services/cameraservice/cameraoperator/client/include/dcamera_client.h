@@ -47,6 +47,8 @@ public:
     int32_t StopCapture() override;
     int32_t SetStateCallback(std::shared_ptr<StateCallback>& callback) override;
     int32_t SetResultCallback(std::shared_ptr<ResultCallback>& callback) override;
+    int32_t PauseCapture() override;
+    int32_t ResumeCapture() override;
 
 private:
     int32_t ConfigCaptureSession(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos);

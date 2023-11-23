@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,6 +40,10 @@ private:
     int32_t OpenChannelInner(MessageParcel &data, MessageParcel &reply);
     int32_t CloseChannelInner(MessageParcel &data, MessageParcel &reply);
     bool HasEnableDHPermission();
+    int32_t PauseDistributedHardwareInner(MessageParcel &data, MessageParcel &reply);
+    int32_t ResumeDistributedHardwareInner(MessageParcel &data, MessageParcel &reply);
+    int32_t StopDistributedHardwareInner(MessageParcel &data, MessageParcel &reply);
+    bool HasAccessDHPermission();
 
     using DCameraFunc = int32_t (DistributedCameraSinkStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, DCameraFunc> memberFuncMap_;

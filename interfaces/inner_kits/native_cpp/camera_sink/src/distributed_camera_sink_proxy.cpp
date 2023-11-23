@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-int32_t DistributedCameraSinkProxy::InitSink(const std::string& params)
+int32_t DistributedCameraSinkProxy::InitSink(const std::string& params, const sptr<IDCameraSinkCallback> &sinkCallback)
 {
     DHLOGI("start");
     if (params.empty() || params.size() > PARAM_MAX_SIZE) {
@@ -46,6 +46,10 @@ int32_t DistributedCameraSinkProxy::InitSink(const std::string& params)
     }
     if (!data.WriteString(params)) {
         DHLOGE("write params failed");
+        return DCAMERA_BAD_VALUE;
+    }
+    if (!data.WriteRemoteObject(sinkCallback->AsObject())) {
+        DHLOGE("write sinkCallback failed");
         return DCAMERA_BAD_VALUE;
     }
     remote->SendRequest(static_cast<uint32_t>(IDCameraSinkInterfaceCode::INIT_SINK), data, reply, option);
@@ -279,6 +283,84 @@ int32_t DistributedCameraSinkProxy::CloseChannel(const std::string& dhId)
         return DCAMERA_BAD_VALUE;
     }
     remote->SendRequest(static_cast<uint32_t>(IDCameraSinkInterfaceCode::CLOSE_CHANNEL), data, reply, option);
+    int32_t result = reply.ReadInt32();
+    return result;
+}
+
+int32_t DistributedCameraSinkProxy::PauseDistributedHardware(const std::string &networkId)
+{
+    DHLOGI("networkId: %s", GetAnonyString(networkId).c_str());
+    sptr<IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        DHLOGE("remote service is null");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(DistributedCameraSinkProxy::GetDescriptor())) {
+        DHLOGE("write token failed");
+        return DCAMERA_BAD_VALUE;
+    }
+    if (!data.WriteString(networkId)) {
+        DHLOGE("write params failed");
+        return DCAMERA_BAD_VALUE;
+    }
+    remote->SendRequest(static_cast<uint32_t>(IDCameraSinkInterfaceCode::PAUSE_DISTRIBUTED_HARDWARE),
+        data, reply, option);
+    int32_t result = reply.ReadInt32();
+    return result;
+}
+
+int32_t DistributedCameraSinkProxy::ResumeDistributedHardware(const std::string &networkId)
+{
+    DHLOGI("networkId: %s", GetAnonyString(networkId).c_str());
+    sptr<IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        DHLOGE("remote service is null");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(DistributedCameraSinkProxy::GetDescriptor())) {
+        DHLOGE("write token failed");
+        return DCAMERA_BAD_VALUE;
+    }
+    if (!data.WriteString(networkId)) {
+        DHLOGE("write params failed");
+        return DCAMERA_BAD_VALUE;
+    }
+    remote->SendRequest(static_cast<uint32_t>(IDCameraSinkInterfaceCode::RESUME_DISTRIBUTED_HARDWARE),
+        data, reply, option);
+    int32_t result = reply.ReadInt32();
+    return result;
+}
+
+int32_t DistributedCameraSinkProxy::StopDistributedHardware(const std::string &networkId)
+{
+    DHLOGI("networkId: %s", GetAnonyString(networkId).c_str());
+    sptr<IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        DHLOGE("remote service is null");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(DistributedCameraSinkProxy::GetDescriptor())) {
+        DHLOGE("write token failed");
+        return DCAMERA_BAD_VALUE;
+    }
+    if (!data.WriteString(networkId)) {
+        DHLOGE("write params failed");
+        return DCAMERA_BAD_VALUE;
+    }
+    remote->SendRequest(static_cast<uint32_t>(IDCameraSinkInterfaceCode::STOP_DISTRIBUTED_HARDWARE),
+        data, reply, option);
     int32_t result = reply.ReadInt32();
     return result;
 }

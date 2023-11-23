@@ -19,6 +19,7 @@
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
 #include "ipc_skeleton.h"
+#include "dcamera_sink_callback_proxy.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -42,6 +43,12 @@ DistributedCameraSinkStub::DistributedCameraSinkStub()
         &DistributedCameraSinkStub::OpenChannelInner;
     memberFuncMap_[static_cast<uint32_t>(IDCameraSinkInterfaceCode::CLOSE_CHANNEL)] =
         &DistributedCameraSinkStub::CloseChannelInner;
+    memberFuncMap_[static_cast<uint32_t>(IDCameraSinkInterfaceCode::PAUSE_DISTRIBUTED_HARDWARE)] =
+        &DistributedCameraSinkStub::PauseDistributedHardwareInner;
+    memberFuncMap_[static_cast<uint32_t>(IDCameraSinkInterfaceCode::RESUME_DISTRIBUTED_HARDWARE)] =
+        &DistributedCameraSinkStub::ResumeDistributedHardwareInner;
+    memberFuncMap_[static_cast<uint32_t>(IDCameraSinkInterfaceCode::STOP_DISTRIBUTED_HARDWARE)] =
+        &DistributedCameraSinkStub::StopDistributedHardwareInner;
 }
 
 DistributedCameraSinkStub::~DistributedCameraSinkStub()
@@ -91,7 +98,15 @@ int32_t DistributedCameraSinkStub::InitSinkInner(MessageParcel &data, MessagePar
             ret = DCAMERA_BAD_VALUE;
             break;
         }
-        ret = InitSink(params);
+        sptr<IRemoteObject> remoteObject = data.ReadRemoteObject();
+        if (remoteObject == nullptr) {
+            DHLOGE("Read ReadRemoteObject failed.");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
+
+        sptr<DCameraSinkCallbackProxy> dCameraSinkCallbackProxy(new DCameraSinkCallbackProxy(remoteObject));
+        ret = InitSink(params, dCameraSinkCallbackProxy);
     } while (0);
     reply.WriteInt32(ret);
     return DCAMERA_OK;
@@ -234,6 +249,81 @@ int32_t DistributedCameraSinkStub::CloseChannelInner(MessageParcel &data, Messag
             break;
         }
         ret = CloseChannel(dhId);
+    } while (0);
+    reply.WriteInt32(ret);
+    return DCAMERA_OK;
+}
+
+bool DistributedCameraSinkStub::HasAccessDHPermission()
+{
+    Security::AccessToken::AccessTokenID callerToken = IPCSkeleton::GetCallingTokenID();
+    const std::string permissionName = "ohos.permission.ACCESS_DISTRIBUTED_HARDWARE";
+    int32_t result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken,
+        permissionName);
+    return (result == Security::AccessToken::PERMISSION_GRANTED);
+}
+
+int32_t DistributedCameraSinkStub::PauseDistributedHardwareInner(MessageParcel &data, MessageParcel &reply)
+{
+    DHLOGD("enter");
+    int32_t ret = DCAMERA_OK;
+    do {
+        if (!HasAccessDHPermission()) {
+            DHLOGE("The caller has no ACCESS_DISTRIBUTED_HARDWARE permission.");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
+        std::string networkId = data.ReadString();
+        if (networkId.empty() || networkId.size() > DID_MAX_SIZE) {
+            DHLOGE("params is invalid");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
+        ret = PauseDistributedHardware(networkId);
+    } while (0);
+    reply.WriteInt32(ret);
+    return DCAMERA_OK;
+}
+
+int32_t DistributedCameraSinkStub::ResumeDistributedHardwareInner(MessageParcel &data, MessageParcel &reply)
+{
+    DHLOGD("enter");
+    int32_t ret = DCAMERA_OK;
+    do {
+        if (!HasAccessDHPermission()) {
+            DHLOGE("The caller has no ACCESS_DISTRIBUTED_HARDWARE permission.");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
+        std::string networkId = data.ReadString();
+        if (networkId.empty() || networkId.size() > DID_MAX_SIZE) {
+            DHLOGE("params is invalid");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
+        ret = ResumeDistributedHardware(networkId);
+    } while (0);
+    reply.WriteInt32(ret);
+    return DCAMERA_OK;
+}
+
+int32_t DistributedCameraSinkStub::StopDistributedHardwareInner(MessageParcel &data, MessageParcel &reply)
+{
+    DHLOGD("enter");
+    int32_t ret = DCAMERA_OK;
+    do {
+        if (!HasAccessDHPermission()) {
+            DHLOGE("The caller has no ACCESS_DISTRIBUTED_HARDWARE permission.");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
+        std::string networkId = data.ReadString();
+        if (networkId.empty() || networkId.size() > DID_MAX_SIZE) {
+            DHLOGE("params is invalid");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
+        ret = StopDistributedHardware(networkId);
     } while (0);
     reply.WriteInt32(ret);
     return DCAMERA_OK;
