@@ -67,6 +67,7 @@ private:
     std::deque<std::shared_ptr<DataBuffer>> buffers_;
     DCameraProducerState state_;
     uint32_t interval_;
+    uint32_t photoCount_;
     int32_t streamId_;
     DCStreamType streamType_;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_;

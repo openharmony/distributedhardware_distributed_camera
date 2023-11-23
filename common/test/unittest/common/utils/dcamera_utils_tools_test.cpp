@@ -15,6 +15,8 @@
 
 #include <gtest/gtest.h>
 
+#include <cstring>
+
 #include "accesstoken_kit.h"
 #include "anonymous_string.h"
 #include "dcamera_utils_tools.h"
@@ -177,5 +179,23 @@ HWTEST_F(DcameraUtilsToolsTest, GetAnonyInt32_001, TestSize.Level1)
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
+/**
+ * @tc.name: IsOverDumpSize_001
+ * @tc.desc: Verify the IsUnderDumpMaxSize function failed.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DcameraUtilsToolsTest, IsOverDumpSize_001, TestSize.Level1)
+{
+    std::string fileName = "";
+    uint8_t *buf = nullptr;
+    size_t size = 0;
+    DumpBufferToFile(fileName, buf, size);
+    EXPECT_EQ(DCAMERA_INIT_ERR, IsUnderDumpMaxSize(fileName));
+    fileName = "test";
+    uint8_t str[] = "test";
+    size = strlen(reinterpret_cast<const char*>(str));
+    DumpBufferToFile(fileName, str, size);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -31,6 +31,8 @@ enum class HidumpFlag {
     GET_REGISTERED_INFO,
     GET_CURRENTSTATE_INFO,
     GET_VERSION_INFO,
+    START_DUMP,
+    STOP_DUMP,
 };
 
 typedef enum {

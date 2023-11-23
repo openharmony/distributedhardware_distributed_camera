@@ -20,6 +20,7 @@
 
 #include "anonymous_string.h"
 #include "dcamera_buffer_handle.h"
+#include "dcamera_hidumper.h"
 #include "dcamera_utils_tools.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
@@ -38,6 +39,7 @@ DCameraStreamDataProcessProducer::DCameraStreamDataProcessProducer(std::string d
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_);
     state_ = DCAMERA_PRODUCER_STATE_STOP;
     interval_ = DCAMERA_PRODUCER_ONE_MINUTE_MS / DCAMERA_PRODUCER_FPS_DEFAULT;
+    photoCount_ = COUNT_INIT_NUM;
 }
 
 DCameraStreamDataProcessProducer::~DCameraStreamDataProcessProducer()
@@ -166,6 +168,13 @@ void DCameraStreamDataProcessProducer::LooperSnapShot()
                 GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_, state_);
             continue;
         }
+#ifdef DUMP_DCAMERA_FILE
+    std::string fileName = DUMP_PHOTO_PATH +
+        "SourceCapture_streamId(" + std::to_string(streamId_) + ")_" + std::to_string(photoCount_++) + ".jpg";
+    if (DcameraHidumper::GetInstance().GetDumpFlag() && (IsUnderDumpMaxSize(fileName) == DCAMERA_OK)) {
+        DumpBufferToFile(fileName, buffer->Data(), buffer->Size());
+    }
+#endif
         int32_t ret = FeedStreamToDriver(dhBase, buffer);
         if (ret != DCAMERA_OK) {
             std::this_thread::sleep_for(std::chrono::milliseconds(DCAMERA_PRODUCER_RETRY_SLEEP_MS));
@@ -260,6 +269,12 @@ void DCameraStreamDataProcessProducer::OnSmoothFinished(const std::shared_ptr<IF
     DHBase dhBase;
     dhBase.deviceId_ = devId_;
     dhBase.dhId_ = dhId_;
+#ifdef DUMP_DCAMERA_FILE
+    if (DcameraHidumper::GetInstance().GetDumpFlag() &&
+        (IsUnderDumpMaxSize(DUMP_PATH + TO_DISPLAY) == DCAMERA_OK)) {
+        DumpBufferToFile(DUMP_PATH + TO_DISPLAY, buffer->Data(), buffer->Size());
+    }
+#endif
     auto feedFunc = [this, dhBase, buffer]() {
         FeedStreamToDriver(dhBase, buffer);
     };

@@ -31,6 +31,8 @@ enum class HidumpFlag {
     GET_CAMERA_INFO,
     GET_OPENED_INFO,
     GET_VERSION_INFO,
+    START_DUMP,
+    STOP_DUMP,
 };
 
 struct CameraDumpInfo {

@@ -90,6 +90,7 @@ private:
     void ReleaseVideoDecoder();
     void ReleaseDecoderSurface();
     void ReleaseCodecEvent();
+    void BeforeDecodeDump(uint8_t *buffer, size_t bufSize);
     int32_t FeedDecoderInputBuffer();
     int64_t GetDecoderTimeStamp();
     void IncreaseWaitDecodeCnt();

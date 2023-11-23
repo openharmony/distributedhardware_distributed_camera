@@ -15,6 +15,7 @@
 
 #include "dcamera_source_hidumper.h"
 
+#include "dcamera_hidumper.h"
 #include "distributed_camera_errno.h"
 #include "distributed_camera_source_service.h"
 #include "distributed_hardware_log.h"
@@ -28,6 +29,8 @@ const std::string ARGS_HELP = "-h";
 const std::string ARGS_VERSION_INFO = "--version";
 const std::string ARGS_REGISTERED_INFO = "--registered";
 const std::string ARGS_CURRENTSTATE_INFO = "--curState";
+const std::string ARGS_START_DUMP = "--startdump";
+const std::string ARGS_STOP_DUMP = "--stopdump";
 const std::string STATE_INT = "Init";
 const std::string STATE_REGISTERED = "Registered";
 const std::string STATE_OPENED = "Opened";
@@ -39,6 +42,8 @@ const std::map<std::string, HidumpFlag> ARGS_MAP = {
     { ARGS_REGISTERED_INFO, HidumpFlag::GET_REGISTERED_INFO },
     { ARGS_CURRENTSTATE_INFO, HidumpFlag::GET_CURRENTSTATE_INFO },
     { ARGS_VERSION_INFO, HidumpFlag::GET_VERSION_INFO },
+    { ARGS_START_DUMP, HidumpFlag::START_DUMP },
+    { ARGS_STOP_DUMP, HidumpFlag::STOP_DUMP },
 };
 
 const std::map<int32_t, std::string> STATE_MAP = {
@@ -108,6 +113,16 @@ int32_t DcameraSourceHidumper::ProcessDump(const std::string& args, std::string&
             ret = GetVersionInfo(result);
             break;
         }
+        case HidumpFlag::START_DUMP: {
+            ret = DcameraHidumper::GetInstance().StartDump();
+            result.append("Send dump order ok\n");
+            break;
+        }
+        case HidumpFlag::STOP_DUMP: {
+            ret = DcameraHidumper::GetInstance().StopDump();
+            result.append("Send stop dump order ok\n");
+            break;
+        }
         default: {
             ret = ShowIllegalInfomation(result);
             break;
@@ -161,15 +176,19 @@ void DcameraSourceHidumper::ShowHelp(std::string& result)
 {
     DHLOGI("ShowHelp Dump.");
     result.append("Usage:dump  <command> [options]\n")
-          .append("Description:\n")
-          .append("-h           ")
-          .append(": show help\n")
-          .append("--version    ")
-          .append(": dump camera version in the system\n")
-          .append("--registered ")
-          .append(": dump number of registered cameras in the system\n")
-          .append("--curState   ")
-          .append(": dump current state of the camera in the system\n");
+        .append("Description:\n")
+        .append("-h           ")
+        .append(": show help\n")
+        .append("--version    ")
+        .append(": dump camera version in the system\n")
+        .append("--registered ")
+        .append(": dump number of registered cameras in the system\n")
+        .append("--curState   ")
+        .append(": dump current state of the camera in the system\n")
+        .append("--startdump  ")
+        .append(": dump camera data in /data/data/dcamera\n")
+        .append("--stopdump   ")
+        .append(": stop dump camera data\n");
 }
 
 int32_t DcameraSourceHidumper::ShowIllegalInfomation(std::string& result)

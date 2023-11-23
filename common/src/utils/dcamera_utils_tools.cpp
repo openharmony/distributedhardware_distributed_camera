@@ -181,5 +181,47 @@ bool IsBase64(unsigned char c)
 {
     return (isalnum(c) || (c == '+') || (c == '/'));
 }
+
+void DumpBufferToFile(std::string fileName, uint8_t *buffer, size_t bufSize)
+{
+    if (fileName.empty() || buffer == nullptr) {
+        DHLOGE("dumpsaving : input param err.");
+        return;
+    }
+    std::ofstream ofs(fileName, std::ios::binary | std::ios::out | std::ios::app);
+    if (!ofs.is_open()) {
+        DHLOGE("dumpsaving : open file failed.");
+        return;
+    }
+    ofs.write(reinterpret_cast<const char*>(buffer), bufSize);
+    ofs.close();
+    return;
+}
+
+int32_t IsUnderDumpMaxSize(std::string fileName)
+{
+    if (fileName.empty()) {
+        DHLOGE("dumpsaving : input fileName empty.");
+        return DCAMERA_INIT_ERR;
+    }
+    std::ofstream ofs(fileName, std::ios::binary | std::ios::out | std::ios::app);
+    if (!ofs.is_open()) {
+        DHLOGE("dumpsaving : open file failed.");
+        return DCAMERA_INIT_ERR;
+    }
+    ofs.seekp(0, std::ios::end);
+    std::ofstream::pos_type fileSize = ofs.tellp();
+    if (fileSize < 0) {
+        DHLOGE("filesize get err");
+        fileSize = 0;
+        return DCAMERA_INIT_ERR;
+    }
+    ofs.close();
+    if (static_cast<int32_t>(fileSize) <= DUMP_FILE_MAX_SIZE) {
+        return DCAMERA_OK;
+    } else {
+        return DCAMERA_BAD_VALUE;
+    }
+}
 } // namespace DistributedHardware
 } // namespace OHOS
