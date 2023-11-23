@@ -237,7 +237,7 @@ public:
         DHLOGI("DemoDCameraPreviewCallback::OnError errorCode: %d", errorCode);
     }
 
-    void OnSketchStatusDataChanged(CameraStandard::SketchStatusData statusData) const
+    void OnSketchStatusDataChanged(const CameraStandard::SketchStatusData& statusData) const
     {
         DHLOGI("DemoDCameraPreviewCallback::OnSketchStatusDataChanged.");
     }
