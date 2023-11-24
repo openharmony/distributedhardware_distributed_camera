@@ -21,6 +21,7 @@
 #include "iservice_registry.h"
 #include "string_ex.h"
 #include "system_ability_definition.h"
+#include "xcollie/watchdog.h"
 
 #include "anonymous_string.h"
 #include "dcamera_hdf_operate.h"
@@ -72,6 +73,10 @@ bool DistributedCameraSourceService::Init()
         registerToService_ = true;
     }
     listener_ = std::make_shared<DCameraServiceStateListener>();
+    if (!isHicollieRunning_.load()) {
+        isHicollieRunning_.store(true);
+        hicollieThread_ = std::thread(&DistributedCameraSourceService::StartHicollieThread, this);
+    }
     DHLOGI("DistributedCameraSourceService init success");
     return true;
 }
@@ -83,6 +88,10 @@ void DistributedCameraSourceService::OnStop()
     registerToService_ = false;
     listener_ = nullptr;
     DCameraSourceServiceIpc::GetInstance().UnInit();
+    isHicollieRunning_.store(false);
+    if (hicollieThread_.joinable()) {
+        hicollieThread_.join();
+    }
 }
 
 int32_t DistributedCameraSourceService::InitSource(const std::string& params,
@@ -299,6 +308,35 @@ uint32_t DistributedCameraSourceService::GetCamDevNum()
 {
     std::lock_guard<std::mutex> camLock(camDevMutex_);
     return camerasMap_.size();
+}
+
+void DistributedCameraSourceService::StartHicollieThread()
+{
+    auto taskFunc = [this]() {
+        std::lock_guard<std::mutex> lock(camDevMutex_);
+        for (auto &iter : camerasMap_) {
+            if (iter.second->GetHicollieFlag()) {
+                iter.second->SetHicollieFlag(false);
+            } else {
+                DHLOGE("Hicollie : Flag = false, exit the current process");
+                _Exit(0);
+            }
+        }
+    };
+    OHOS::HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask(CAMERA_HICOLLIE, taskFunc,
+        HICOLLIE_INTERVAL_TIME_MS, HICOLLIE_DELAY_TIME_MS);
+
+    while (isHicollieRunning_.load()) {
+        {
+            std::lock_guard<std::mutex> lock(camDevMutex_);
+            if (!camerasMap_.empty()) {
+                for (auto &iter : camerasMap_) {
+                    iter.second->PostHicollieEvent();
+                }
+            }
+        }
+        usleep(HICOLLIE_SLEEP_TIME_MS);
+    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

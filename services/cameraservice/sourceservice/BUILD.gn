@@ -130,6 +130,7 @@ ohos_shared_library("distributed_camera_source") {
     "graphic_2d:surface",
     "hdf_core:libhdi",
     "hdf_core:libpub_utils",
+    "hicollie:libhicollie",
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",

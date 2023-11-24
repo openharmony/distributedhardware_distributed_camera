@@ -26,6 +26,7 @@
 #include "distributed_hardware_log.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
+#include "xcollie/watchdog.h"
 
 using namespace testing::ext;
 
@@ -154,6 +155,7 @@ HWTEST_F(DistributedCameraSourceServiceTest, dcamera_source_service_test_005, Te
     int32_t ret = 0;
     testSrcService_->registerToService_ = true;
     testSrcService_->Init();
+    testSrcService_->OnStop();
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
