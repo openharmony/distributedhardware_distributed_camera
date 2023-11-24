@@ -25,6 +25,7 @@
 #include "dcamera_sink_dev.h"
 #undef private
 
+#include "dcamera_sink_callback.h"
 #include "dcamera_handler.h"
 #include "dcamera_utils_tools.h"
 #include "distributed_camera_errno.h"
@@ -79,7 +80,8 @@ void DCameraSinkDevTest::SetUp(void)
 {
     DCameraHandler::GetInstance().Initialize();
     std::vector<std::string> cameras = DCameraHandler::GetInstance().GetCameras();
-    dev_ = std::make_shared<DCameraSinkDev>(cameras[0]);
+    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
+    dev_ = std::make_shared<DCameraSinkDev>(cameras[0], sinkCallback);
 
     dev_->accessControl_ = std::make_shared<DCameraSinkAccessControl>();
     dev_->controller_ = std::make_shared<MockDCameraSinkController>(dev_->accessControl_);

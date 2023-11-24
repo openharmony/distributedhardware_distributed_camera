@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_IDCAMERA_SOURCE_CALLBACL_H
-#define OHOS_IDCAMERA_SOURCE_CALLBACL_H
+#ifndef OHOS_IDCAMERA_SOURCE_CALLBACK_H
+#define OHOS_IDCAMERA_SOURCE_CALLBACK_H
 
 #include "iremote_broker.h"
 
@@ -36,4 +36,4 @@ public:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_IDCAMERA_SOURCE_CALLBACL_H
+#endif // OHOS_IDCAMERA_SOURCE_CALLBACK_H

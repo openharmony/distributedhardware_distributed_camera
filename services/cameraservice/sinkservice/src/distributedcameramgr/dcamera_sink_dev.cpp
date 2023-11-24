@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,7 +26,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-DCameraSinkDev::DCameraSinkDev(const std::string& dhId) : dhId_(dhId)
+DCameraSinkDev::DCameraSinkDev(const std::string& dhId, const sptr<IDCameraSinkCallback> &sinkCallback)
+    : dhId_(dhId), sinkCallback_(sinkCallback)
 {
     DHLOGI("DCameraSinkDev Constructor dhId: %s", GetAnonyString(dhId_).c_str());
     isInit_ = false;
@@ -43,7 +44,7 @@ int32_t DCameraSinkDev::Init()
 {
     DHLOGI("Init dhId: %s", GetAnonyString(dhId_).c_str());
     accessControl_ = std::make_shared<DCameraSinkAccessControl>();
-    controller_ = std::make_shared<DCameraSinkController>(accessControl_);
+    controller_ = std::make_shared<DCameraSinkController>(accessControl_, sinkCallback_);
     DCameraIndex index("", dhId_);
     std::vector<DCameraIndex> indexs;
     indexs.push_back(index);
@@ -158,6 +159,39 @@ int32_t DCameraSinkDev::CloseChannel()
 std::string DCameraSinkDev::GetDhid()
 {
     return GetAnonyString(dhId_);
+}
+
+int32_t DCameraSinkDev::PauseDistributedHardware(const std::string &networkId)
+{
+    DHLOGI("Pause distributed hardware dhId: %s", GetAnonyString(dhId_).c_str());
+    if (networkId.empty()) {
+        DHLOGE("networkId is empty");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    return controller_->PauseDistributedHardware(networkId);
+}
+
+int32_t DCameraSinkDev::ResumeDistributedHardware(const std::string &networkId)
+{
+    DHLOGI("Resume distributed hardware dhId: %s", GetAnonyString(dhId_).c_str());
+    if (networkId.empty()) {
+        DHLOGE("networkId is empty");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    return controller_->ResumeDistributedHardware(networkId);
+}
+
+int32_t DCameraSinkDev::StopDistributedHardware(const std::string &networkId)
+{
+    DHLOGI("Stop distributed hardware dhId: %s", GetAnonyString(dhId_).c_str());
+    if (networkId.empty()) {
+        DHLOGE("networkId is empty");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    return controller_->StopDistributedHardware(networkId);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

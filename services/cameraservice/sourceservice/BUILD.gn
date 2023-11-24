@@ -51,6 +51,7 @@ ohos_shared_library("distributed_camera_source") {
     "${common_path}/include/utils",
     "${innerkits_path}/native_cpp/camera_source/include",
     "${innerkits_path}/native_cpp/camera_sink/include",
+    "${innerkits_path}/native_cpp/camera_sink/include/callback",
     "${innerkits_path}/native_cpp/camera_source/include/callback",
     "${services_path}/cameraservice/base/include",
     "${services_path}/channel/include",
@@ -105,6 +106,7 @@ ohos_shared_library("distributed_camera_source") {
 
   deps = [
     "${common_path}:distributed_camera_utils",
+    "${innerkits_path}/native_cpp/camera_sink:distributed_camera_sink_sdk",
     "${services_path}/channel:distributed_camera_channel",
     "${services_path}/data_process:distributed_camera_data_process",
     "//third_party/cJSON:cjson",

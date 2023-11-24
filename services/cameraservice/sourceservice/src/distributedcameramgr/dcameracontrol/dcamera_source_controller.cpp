@@ -180,6 +180,10 @@ int32_t DCameraSourceController::DCameraNotify(std::shared_ptr<DCameraEvent>& ev
     DHBase dhBase;
     dhBase.deviceId_ = devId_;
     dhBase.dhId_ = dhId_;
+    if (events->eventType_ == DCAMERA_SINK_STOP && events->eventResult_ == DCAMERA_EVENT_SINK_STOP) {
+        events->eventType_ = DCAMERA_OPERATION;
+        events->eventResult_ = DCAMERA_EVENT_DEVICE_ERROR;
+    }
     DCameraHDFEvent hdiEvent;
     hdiEvent.type_ = events->eventType_;
     hdiEvent.result_ = events->eventResult_;
@@ -506,6 +510,21 @@ void DCameraSourceController::PostChannelDisconnectedEvent()
         return;
     }
     camDev->OnChannelDisconnectedEvent();
+}
+
+int32_t DCameraSourceController::PauseDistributedHardware(const std::string &networkId)
+{
+    return DCAMERA_OK;
+}
+
+int32_t DCameraSourceController::ResumeDistributedHardware(const std::string &networkId)
+{
+    return DCAMERA_OK;
+}
+
+int32_t DCameraSourceController::StopDistributedHardware(const std::string &networkId)
+{
+    return DCAMERA_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

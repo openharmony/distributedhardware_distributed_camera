@@ -25,9 +25,10 @@ class MockDistributedCameraSinkStub : public DistributedCameraSinkStub {
 public:
     MockDistributedCameraSinkStub() = default;
     virtual ~MockDistributedCameraSinkStub() = default;
-    int32_t InitSink(const std::string &params)
+    int32_t InitSink(const std::string &params, const sptr<IDCameraSinkCallback> &sinkCallback)
     {
         (void)params;
+        (void)sinkCallback;
         return DCAMERA_OK;
     }
 
@@ -81,9 +82,25 @@ public:
         (void)dhId;
         return DCAMERA_OK;
     }
+
+    int32_t PauseDistributedHardware(const std::string &networkId)
+    {
+        (void)networkId;
+        return DCAMERA_OK;
+    }
+
+    int32_t ResumeDistributedHardware(const std::string &networkId)
+    {
+        (void)networkId;
+        return DCAMERA_OK;
+    }
+
+    int32_t StopDistributedHardware(const std::string &networkId)
+    {
+        (void)networkId;
+        return DCAMERA_OK;
+    }
 };
-
-
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_MOCK_DISTRIBUTED_CAMERA_SINK_STUB_H

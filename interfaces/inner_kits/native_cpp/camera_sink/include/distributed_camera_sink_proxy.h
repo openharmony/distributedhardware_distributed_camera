@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,7 +32,7 @@ public:
     }
 
     ~DistributedCameraSinkProxy() {}
-    int32_t InitSink(const std::string& params) override;
+    int32_t InitSink(const std::string& params, const sptr<IDCameraSinkCallback> &sinkCallback) override;
     int32_t ReleaseSink() override;
     int32_t SubscribeLocalHardware(const std::string& dhId, const std::string& parameters) override;
     int32_t UnsubscribeLocalHardware(const std::string& dhId) override;
@@ -41,6 +41,9 @@ public:
     int32_t GetCameraInfo(const std::string& dhId, std::string& cameraInfo) override;
     int32_t OpenChannel(const std::string& dhId, std::string& openInfo) override;
     int32_t CloseChannel(const std::string& dhId) override;
+    int32_t PauseDistributedHardware(const std::string &networkId) override;
+    int32_t ResumeDistributedHardware(const std::string &networkId) override;
+    int32_t StopDistributedHardware(const std::string &networkId) override;
 
 private:
     static inline BrokerDelegator<DistributedCameraSinkProxy> delegator_;

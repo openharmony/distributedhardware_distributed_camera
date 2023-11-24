@@ -16,6 +16,7 @@
 #ifndef OHOS_IDISTRIBUTED_CAMERA_SINK_H
 #define OHOS_IDISTRIBUTED_CAMERA_SINK_H
 
+#include "idcamera_sink_callback.h"
 #include "iremote_broker.h"
 
 namespace OHOS {
@@ -26,7 +27,7 @@ public:
 
     IDistributedCameraSink() = default;
     virtual ~IDistributedCameraSink() = default;
-    virtual int32_t InitSink(const std::string& params) = 0;
+    virtual int32_t InitSink(const std::string& params, const sptr<IDCameraSinkCallback> &sinkCallback) = 0;
     virtual int32_t ReleaseSink() = 0;
     virtual int32_t SubscribeLocalHardware(const std::string& dhId, const std::string& parameters) = 0;
     virtual int32_t UnsubscribeLocalHardware(const std::string& dhId) = 0;
@@ -35,6 +36,9 @@ public:
     virtual int32_t GetCameraInfo(const std::string& dhId, std::string& cameraInfo) = 0;
     virtual int32_t OpenChannel(const std::string& dhId, std::string& openInfo) = 0;
     virtual int32_t CloseChannel(const std::string& dhId) = 0;
+    virtual int32_t PauseDistributedHardware(const std::string &networkId) = 0;
+    virtual int32_t ResumeDistributedHardware(const std::string &networkId) = 0;
+    virtual int32_t StopDistributedHardware(const std::string &networkId) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

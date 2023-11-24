@@ -18,6 +18,7 @@
 #include <cstddef>
 #include <cstdint>
 
+#include "dcamera_sink_callback.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_sink_service.h"
 #include "if_system_ability_manager.h"
@@ -35,8 +36,8 @@ void SinkServiceInitSinkFuzzTest(const uint8_t* data, size_t size)
 
     std::shared_ptr<DistributedCameraSinkService> sinkService =
         std::make_shared<DistributedCameraSinkService>(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, true);
-
-    sinkService->InitSink(param);
+    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
+    sinkService->InitSink(param, sinkCallback);
 }
 }
 }

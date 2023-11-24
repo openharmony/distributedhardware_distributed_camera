@@ -34,7 +34,7 @@ public:
     DistributedCameraSinkService(int32_t saId, bool runOnCreate);
     ~DistributedCameraSinkService() override = default;
 
-    int32_t InitSink(const std::string& params) override;
+    int32_t InitSink(const std::string& params, const sptr<IDCameraSinkCallback> &sinkCallback) override;
     int32_t ReleaseSink() override;
     int32_t SubscribeLocalHardware(const std::string& dhId, const std::string& parameters) override;
     int32_t UnsubscribeLocalHardware(const std::string& dhId) override;
@@ -45,6 +45,9 @@ public:
     int32_t CloseChannel(const std::string& dhId) override;
     int Dump(int32_t fd, const std::vector<std::u16string>& args) override;
     static void GetCamDumpInfo(CameraDumpInfo& camDump);
+    int32_t PauseDistributedHardware(const std::string &networkId) override;
+    int32_t ResumeDistributedHardware(const std::string &networkId) override;
+    int32_t StopDistributedHardware(const std::string &networkId) override;
 
 protected:
     void OnStart() override;
@@ -52,6 +55,8 @@ protected:
     DISALLOW_COPY_AND_MOVE(DistributedCameraSinkService);
 
 private:
+    bool IsCurSinkDev(std::shared_ptr<DCameraSinkDev> sinkDevice);
+
     bool Init();
     void GetCamIds();
     bool registerToService_ = false;

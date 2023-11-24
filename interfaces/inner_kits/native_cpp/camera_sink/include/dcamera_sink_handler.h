@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,7 @@
 #include <condition_variable>
 
 #include "idistributed_hardware_sink.h"
+#include "dcamera_sink_callback.h"
 #include "single_instance.h"
 
 namespace OHOS {
@@ -41,7 +42,7 @@ private:
         DCAMERA_SA_STATE_STOP = 0,
         DCAMERA_SA_STATE_START = 1,
     } DCameraSAState;
-    DCameraSinkHandler() = default;
+    DCameraSinkHandler();
     ~DCameraSinkHandler();
     void FinishStartSA(const std::string &params);
     void FinishStartSAFailed(const int32_t systemAbilityId);
@@ -50,6 +51,7 @@ private:
     std::mutex producerMutex_;
     DCameraSAState state_ = DCAMERA_SA_STATE_STOP;
     friend class DCameraSinkLoadCallback;
+    sptr<DCameraSinkCallback> dCameraSinkCallback_ = nullptr;
 };
 
 #ifdef __cplusplus

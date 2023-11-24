@@ -30,11 +30,14 @@ ohos_shared_library("distributed_camera_sink_sdk") {
 
   include_dirs += [
     "include",
+    "include/callback",
     "${common_path}/include/constants",
     "${common_path}/include/utils",
   ]
 
   sources = [
+    "src/callback/dcamera_sink_callback.cpp",
+    "src/callback/dcamera_sink_callback_stub.cpp",
     "src/dcamera_sink_handler.cpp",
     "src/dcamera_sink_handler_ipc.cpp",
     "src/dcamera_sink_load_callback.cpp",

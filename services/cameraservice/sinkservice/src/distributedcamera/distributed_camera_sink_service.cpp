@@ -15,6 +15,7 @@
 
 #include "distributed_camera_sink_service.h"
 
+#include "icamera_channel_listener.h"
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
 #include "ipc_types.h"
@@ -81,7 +82,8 @@ void DistributedCameraSinkService::OnStop()
     DCameraSinkServiceIpc::GetInstance().UnInit();
 }
 
-int32_t DistributedCameraSinkService::InitSink(const std::string& params)
+int32_t DistributedCameraSinkService::InitSink(const std::string& params,
+    const sptr<IDCameraSinkCallback> &sinkCallback)
 {
     DHLOGI("start");
     sinkVer_ = params;
@@ -99,7 +101,7 @@ int32_t DistributedCameraSinkService::InitSink(const std::string& params)
     }
     g_camDump.camNumber = static_cast<int32_t>(cameras.size());
     for (auto& dhId : cameras) {
-        std::shared_ptr<DCameraSinkDev> sinkDevice = std::make_shared<DCameraSinkDev>(dhId);
+        std::shared_ptr<DCameraSinkDev> sinkDevice = std::make_shared<DCameraSinkDev>(dhId, sinkCallback);
         ret = sinkDevice->Init();
         if (ret != DCAMERA_OK) {
             DHLOGE("sink device init failed, ret: %d", ret);
@@ -349,6 +351,93 @@ void DistributedCameraSinkService::GetCamDumpInfo(CameraDumpInfo& camDump)
 {
     dcSinkService->GetCamIds();
     camDump = g_camDump;
+}
+
+bool DistributedCameraSinkService::IsCurSinkDev(std::shared_ptr<DCameraSinkDev> sinkDevice)
+{
+    std::string camInfoJson;
+    int32_t ret = sinkDevice->GetCameraInfo(camInfoJson);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("GetCameraInfo failed, ret: %d", ret);
+        return false;
+    }
+    DCameraInfoCmd cmd;
+    ret = cmd.Unmarshal(camInfoJson);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("DCameraInfoCmd Unmarshal failed: %d", ret);
+        return false;
+    }
+    std::shared_ptr<DCameraInfo> camInfo = cmd.value_;
+    if (camInfo->state_ == DCAMERA_CHANNEL_STATE_CONNECTED) {
+        return true;
+    }
+    return false;
+}
+
+int32_t DistributedCameraSinkService::PauseDistributedHardware(const std::string &networkId)
+{
+    DHLOGI("start.");
+    std::shared_ptr<DCameraSinkDev> sinkDevice = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(mapMutex_);
+        for (auto iter = camerasMap_.begin(); iter != camerasMap_.end(); iter++) {
+            if (IsCurSinkDev(iter->second)) {
+                sinkDevice = iter->second;
+            }
+        }
+    }
+
+    int32_t ret = sinkDevice->PauseDistributedHardware(networkId);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("PauseDistributedHardware failed, ret: %d", ret);
+        return ret;
+    }
+    DHLOGI("PauseDistributedHardware success");
+    return DCAMERA_OK;
+}
+
+int32_t DistributedCameraSinkService::ResumeDistributedHardware(const std::string &networkId)
+{
+    DHLOGI("start.");
+    std::shared_ptr<DCameraSinkDev> sinkDevice = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(mapMutex_);
+        for (auto iter = camerasMap_.begin(); iter != camerasMap_.end(); iter++) {
+            if (IsCurSinkDev(iter->second)) {
+                sinkDevice = iter->second;
+            }
+        }
+    }
+
+    int32_t ret = sinkDevice->ResumeDistributedHardware(networkId);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("ResumeDistributedHardware failed, ret: %d", ret);
+        return ret;
+    }
+    DHLOGI("ResumeDistributedHardware success");
+    return DCAMERA_OK;
+}
+
+int32_t DistributedCameraSinkService::StopDistributedHardware(const std::string &networkId)
+{
+    DHLOGI("start.");
+    std::shared_ptr<DCameraSinkDev> sinkDevice = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(mapMutex_);
+        for (auto iter = camerasMap_.begin(); iter != camerasMap_.end(); iter++) {
+            if (IsCurSinkDev(iter->second)) {
+                sinkDevice = iter->second;
+            }
+        }
+    }
+
+    int32_t ret = sinkDevice->StopDistributedHardware(networkId);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("StopDistributedHardware failed, ret: %d", ret);
+        return ret;
+    }
+    DHLOGI("StopDistributedHardware success");
+    return DCAMERA_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

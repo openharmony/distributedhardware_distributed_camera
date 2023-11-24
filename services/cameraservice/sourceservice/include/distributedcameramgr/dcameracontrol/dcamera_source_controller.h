@@ -45,6 +45,9 @@ public:
     int32_t CloseChannel() override;
     int32_t Init(std::vector<DCameraIndex>& indexs) override;
     int32_t UnInit() override;
+    int32_t PauseDistributedHardware(const std::string &networkId) override;
+    int32_t ResumeDistributedHardware(const std::string &networkId) override;
+    int32_t StopDistributedHardware(const std::string &networkId) override;
 
     void OnSessionState(int32_t state);
     void OnSessionError(int32_t eventType, int32_t eventReason, std::string detail);

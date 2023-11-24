@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,12 +22,13 @@
 
 #include "icamera_controller.h"
 #include "icamera_sink_access_control.h"
+#include "idcamera_sink_callback.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 class DCameraSinkDev {
 public:
-    explicit DCameraSinkDev(const std::string& dhId);
+    explicit DCameraSinkDev(const std::string& dhId, const sptr<IDCameraSinkCallback> &sinkCallback);
     ~DCameraSinkDev();
 
     int32_t Init();
@@ -40,12 +41,16 @@ public:
     int32_t OpenChannel(std::string& openInfo);
     int32_t CloseChannel();
     std::string GetDhid();
+    int32_t PauseDistributedHardware(const std::string &networkId);
+    int32_t ResumeDistributedHardware(const std::string &networkId);
+    int32_t StopDistributedHardware(const std::string &networkId);
 
 private:
     bool isInit_;
     std::string dhId_;
     std::shared_ptr<ICameraController> controller_;
     std::shared_ptr<ICameraSinkAccessControl> accessControl_;
+    sptr<IDCameraSinkCallback> sinkCallback_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -25,7 +25,7 @@
 #include "mock_camera_channel.h"
 #include "mock_camera_operator.h"
 #include "mock_dcamera_sink_output.h"
-
+#include "dcamera_sink_callback.h"
 #include "dcamera_handler.h"
 #include "dcamera_metadata_setting_cmd.h"
 #include "dcamera_sink_access_control.h"
@@ -122,7 +122,8 @@ void DCameraSinkControllerTest::TearDownTestCase(void)
 void DCameraSinkControllerTest::SetUp(void)
 {
     accessControl_ = std::make_shared<DCameraSinkAccessControl>();
-    controller_ = std::make_shared<DCameraSinkController>(accessControl_);
+    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
+    controller_ = std::make_shared<DCameraSinkController>(accessControl_, sinkCallback);
 
     DCameraHandler::GetInstance().Initialize();
     std::vector<std::string> cameras = DCameraHandler::GetInstance().GetCameras();

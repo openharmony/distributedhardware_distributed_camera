@@ -18,6 +18,7 @@
 #include <cstddef>
 #include <cstdint>
 
+#include "dcamera_sink_callback.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_sink_proxy.h"
 #include "if_system_ability_manager.h"
@@ -38,8 +39,8 @@ void SinkProxyInitSinkFuzzTest(const uint8_t* data, size_t size)
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID);
     std::shared_ptr<DistributedCameraSinkProxy> dCSinkProxy =
         std::make_shared<DistributedCameraSinkProxy>(remoteObject);
-
-    dCSinkProxy->InitSink(param);
+    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
+    dCSinkProxy->InitSink(param, sinkCallback);
 }
 }
 }

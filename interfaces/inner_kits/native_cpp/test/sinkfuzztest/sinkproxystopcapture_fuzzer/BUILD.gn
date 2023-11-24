@@ -30,6 +30,7 @@ ohos_fuzztest("SinkProxyStopCaptureFuzzTest") {
     "${common_path}/include",
     "${common_path}/include/constants",
     "${innerkits_path}/native_cpp/camera_sink/include",
+    "${innerkits_path}/native_cpp/camera_sink/include/callback",
   ]
 
   cflags = [

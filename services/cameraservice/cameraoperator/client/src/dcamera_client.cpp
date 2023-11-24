@@ -645,5 +645,25 @@ void DCameraClient::SetPhotoCaptureLocation(const std::shared_ptr<Camera::Camera
             item.data.d[latitudeIndex], item.data.d[longitudeIndex], item.data.d[altitudeIndex]);
     }
 }
+
+int32_t DCameraClient::PauseCapture()
+{
+    int32_t ret = captureSession_->Stop();
+    if (ret != DCAMERA_OK) {
+        DHLOGE("PauseCapture captureSession stop failed, cameraId: %s, ret: %d",
+               GetAnonyString(cameraId_).c_str(), ret);
+    }
+    return ret;
+}
+
+int32_t DCameraClient::ResumeCapture()
+{
+    int32_t ret = captureSession_->Start();
+    if (ret != DCAMERA_OK) {
+        DHLOGE("ResumeCapture captureSession Start failed, cameraId: %s, ret: %d",
+            GetAnonyString(cameraId_).c_str(), ret);
+    }
+    return ret;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

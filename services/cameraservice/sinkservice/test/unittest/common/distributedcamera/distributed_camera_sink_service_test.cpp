@@ -19,6 +19,7 @@
 #define private public
 #include "distributed_camera_sink_service.h"
 #undef private
+#include "dcamera_sink_callback.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
 #include "idistributed_camera_sink.h"
@@ -89,7 +90,8 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_001, TestSi
     DHLOGI("dcamera_sink_service_test_001");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
-    int32_t ret = sinkService_->InitSink(g_testParams);
+    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
+    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     ret = sinkService_->SubscribeLocalHardware(g_dhId, g_testParams);
@@ -110,7 +112,8 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_002, TestSi
     DHLOGI("dcamera_sink_service_test_002");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
-    int32_t ret = sinkService_->InitSink(g_testParams);
+    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
+    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     ret = sinkService_->UnsubscribeLocalHardware(g_dhId);
@@ -131,7 +134,8 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_003, TestSi
     DHLOGI("dcamera_sink_service_test_003");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
-    int32_t ret = sinkService_->InitSink(g_testParams);
+    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
+    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     ret = sinkService_->StopCapture(g_dhId);
@@ -152,7 +156,8 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_004, TestSi
     DHLOGI("dcamera_sink_service_test_004");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
-    int32_t ret = sinkService_->InitSink(g_testParams);
+    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
+    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     ret = sinkService_->ChannelNeg(g_dhId, g_testChannelInfoContinue);
@@ -173,7 +178,8 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_005, TestSi
     DHLOGI("dcamera_sink_service_test_005");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
-    int32_t ret = sinkService_->InitSink(g_testParams);
+    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
+    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     ret = sinkService_->GetCameraInfo(g_dhId, g_testCameraInfo);
@@ -194,7 +200,8 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_006, TestSi
     DHLOGI("dcamera_sink_service_test_006");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
-    int32_t ret = sinkService_->InitSink(g_testParams);
+    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
+    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     ret = sinkService_->OpenChannel(g_dhId, g_testOpenInfoService);
@@ -239,7 +246,8 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_008, TestSi
     DHLOGI("dcamera_sink_service_test_008");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
-    int32_t ret = sinkService_->InitSink(g_testParams);
+    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
+    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     ret = sinkService_->SubscribeLocalHardware("", g_testParams);
@@ -260,7 +268,8 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_009, TestSi
     DHLOGI("dcamera_sink_service_test_009");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
-    int32_t ret = sinkService_->InitSink(g_testParams);
+    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
+    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     ret = sinkService_->UnsubscribeLocalHardware("");
@@ -280,7 +289,8 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_010, TestSi
     DHLOGI("dcamera_sink_service_test_010");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
-    int32_t ret = sinkService_->InitSink(g_testParams);
+    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
+    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     ret = sinkService_->ChannelNeg("", g_testChannelInfoContinue);
@@ -300,7 +310,8 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_011, TestSi
     DHLOGI("dcamera_sink_service_test_011");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
-    int32_t ret = sinkService_->InitSink(g_testParams);
+    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
+    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     ret = sinkService_->GetCameraInfo("", g_testCameraInfo);
@@ -320,7 +331,8 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_012, TestSi
     DHLOGI("dcamera_sink_service_test_012");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
-    int32_t ret = sinkService_->InitSink(g_testParams);
+    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
+    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     ret = sinkService_->OpenChannel("", g_testOpenInfoService);
@@ -361,7 +373,8 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_014, TestSi
     DHLOGI("dcamera_sink_service_test_014");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
-    int32_t ret = sinkService_->InitSink(g_testParams);
+    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
+    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     ret = sinkService_->StopCapture("");

@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 
+#include "dcamera_sink_callback.h"
 #include "distributed_camera_sink_proxy.h"
 #include "distributed_camera_sink_stub.h"
 #include "distributed_hardware_log.h"
@@ -61,10 +62,11 @@ void DcameraSinkStubTest::TearDown(void)
 HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_001, TestSize.Level1)
 {
     DHLOGI("dcamera_sink_stub_test_001");
+    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
     sptr<IRemoteObject> sinkStubPtr(new MockDistributedCameraSinkStub());
     DistributedCameraSinkProxy sinkProxy(sinkStubPtr);
     std::string params = "params000";
-    int32_t ret = sinkProxy.InitSink(params);
+    int32_t ret = sinkProxy.InitSink(params, sinkCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 

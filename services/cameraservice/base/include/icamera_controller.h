@@ -40,6 +40,9 @@ public:
     virtual int32_t CloseChannel() = 0;
     virtual int32_t Init(std::vector<DCameraIndex>& indexs) = 0;
     virtual int32_t UnInit() = 0;
+    virtual int32_t PauseDistributedHardware(const std::string &networkId) = 0;
+    virtual int32_t ResumeDistributedHardware(const std::string &networkId) = 0;
+    virtual int32_t StopDistributedHardware(const std::string &networkId) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
