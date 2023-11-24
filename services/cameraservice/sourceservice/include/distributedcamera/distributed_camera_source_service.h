@@ -54,6 +54,7 @@ public:
     static std::shared_ptr<DCameraSourceDev> GetCamDevByIndex(DCameraIndex& index);
     static void CamDevErase(DCameraIndex& index);
     static uint32_t GetCamDevNum();
+    void StartHicollieThread();
 
 protected:
     void OnStart() override;
@@ -75,6 +76,8 @@ private:
 
     static std::map<DCameraIndex, std::shared_ptr<DCameraSourceDev>> camerasMap_;
     static std::mutex camDevMutex_;
+    std::thread hicollieThread_;
+    std::atomic<bool> isHicollieRunning_ = false;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

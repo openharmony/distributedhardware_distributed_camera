@@ -208,6 +208,10 @@ void DCameraSourceDev::OnEvent(DCameraSourceEvent& event)
 {
     DHLOGI("DCameraSourceDev OnEvent devId %s dhId %s eventType: %d", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str(), event.GetEventType());
+    if (event.GetEventType() == DCAMERA_EVENT_HICOLLIE) {
+        SetHicollieFlag(true);
+        return;
+    }
     int32_t ret = stateMachine_->Execute(event.GetEventType(), event);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev OnEvent failed, ret: %d, devId: %s dhId: %s", ret,
@@ -630,6 +634,24 @@ int32_t DCameraSourceDev::OnChannelDisconnectedEvent()
     DCameraSourceEvent eventNotify(*this, DCAMERA_EVENT_NOFIFY, camEvent);
     eventBus_->PostEvent<DCameraSourceEvent>(eventNotify);
     return DCAMERA_OK;
+}
+
+int32_t DCameraSourceDev::PostHicollieEvent()
+{
+    DCameraIndex camIndex(devId_, dhId_);
+    DCameraSourceEvent event(*this, DCAMERA_EVENT_HICOLLIE, camIndex);
+    eventBus_->PostEvent<DCameraSourceEvent>(event);
+    return DCAMERA_OK;
+}
+
+void DCameraSourceDev::SetHicollieFlag(bool flag)
+{
+    hicollieFlag_.store(flag);
+}
+
+bool DCameraSourceDev::GetHicollieFlag()
+{
+    return hicollieFlag_.load();
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -43,6 +43,7 @@
                 "drivers_peripheral_display",
                 "c_utils",
                 "dsoftbus",
+                "hicollie",
                 "hisysevent",
                 "hilog",
                 "samgr",

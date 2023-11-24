@@ -637,5 +637,19 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_022, TestSize.Level1)
     camDev_->NotifyResult(eventType, event, result);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
+
+/**
+ * @tc.name: SetHicollieFlag_001
+ * @tc.desc: Verify source dev SetHicollieFlag.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceDevTest, SetHicollieFlag_001, TestSize.Level1)
+{
+    camDev_->SetHicollieFlag(true);
+    EXPECT_EQ(true, camDev_->GetHicollieFlag());
+    camDev_->SetHicollieFlag(false);
+    EXPECT_EQ(false, camDev_->GetHicollieFlag());
 }
-}
+} // namespace DistributedHardware
+} // namespace OHOS

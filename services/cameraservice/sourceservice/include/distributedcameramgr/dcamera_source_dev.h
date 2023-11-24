@@ -55,6 +55,9 @@ public:
     std::string GetVersion();
     int32_t OnChannelConnectedEvent();
     int32_t OnChannelDisconnectedEvent();
+    int32_t PostHicollieEvent();
+    void SetHicollieFlag(bool flag);
+    bool GetHicollieFlag();
 
 public:
     virtual int32_t Register(std::shared_ptr<DCameraRegistParam>& param);
@@ -89,6 +92,7 @@ private:
     std::shared_ptr<DCameraSourceStateMachine> stateMachine_;
     std::shared_ptr<ICameraController> controller_;
     std::shared_ptr<ICameraInput> input_;
+    std::atomic<bool> hicollieFlag_ = false;
     sptr<IDCameraProviderCallback> hdiCallback_;
 
     std::map<uint32_t, DCameraNotifyFunc> memberFuncMap_;

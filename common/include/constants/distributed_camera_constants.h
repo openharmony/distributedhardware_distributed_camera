@@ -118,6 +118,9 @@ const int32_t RESOLUTION_MAX_HEIGHT_CONTINUOUS = 1080;
 const int32_t RESOLUTION_MIN_WIDTH = 320;
 const int32_t RESOLUTION_MIN_HEIGHT = 240;
 const int32_t DUMP_FILE_MAX_SIZE = 295 * 1024 *1024;
+const int32_t HICOLLIE_INTERVAL_TIME_MS = 20 * 1000;
+const int32_t HICOLLIE_DELAY_TIME_MS = 5 * 1000;
+const size_t HICOLLIE_SLEEP_TIME_MS = 5 * 1000;
 
 const uint32_t DCAMERA_SHIFT_32 = 32;
 const uint32_t DCAMERA_SHIFT_24 = 24;
@@ -144,6 +147,7 @@ const std::string TO_DISPLAY = "AfterDecodeToDisplay.yuv";
 const std::string SINK_PHOTO = "_SinkPhoto.jpg";
 const std::string AFTER_ENCODE = "SinkAfterEncode.h265";
 const std::string BEFORE_DECODE = "SourceBeforeDecode.h265";
+const std::string CAMERA_HICOLLIE = "CameraHicollie";
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DISTRIBUTED_CAMERA_CONSTANTS_H
