@@ -24,6 +24,7 @@
 #include "dcamera_source_state_machine.h"
 #include "event_bus.h"
 #include "icamera_channel.h"
+#include "iremote_object.h"
 
 #include "v1_0/id_camera_provider.h"
 
@@ -57,6 +58,11 @@ private:
     void HandleMetaDataResult(std::string& jsonStr);
     void PostChannelDisconnectedEvent();
     int32_t WaitforSessionResult(const std::string& devId);
+    class DCameraHdiRecipient : public IRemoteObject::DeathRecipient {
+    public:
+        void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
+    };
+    sptr<DCameraHdiRecipient> cameraHdiRecipient_;
 
 private:
     std::string devId_;
@@ -68,6 +74,7 @@ private:
     std::weak_ptr<DCameraSourceDev> camDev_;
     int32_t channelState_;
     sptr<IDCameraProvider> camHdiProvider_;
+    sptr<IRemoteObject> remote_;
 
     bool isInit;
     const std::string SESSION_FLAG = "control";
