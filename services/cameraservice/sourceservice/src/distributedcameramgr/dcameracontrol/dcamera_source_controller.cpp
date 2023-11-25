@@ -17,6 +17,10 @@
 
 #include <securec.h>
 #include "json/json.h"
+#include <cstdlib>
+#include "iservice_registry.h"
+#include "iservmgr_hdi.h"
+#include "iproxy_broker.h"
 
 #include "dcamera_capture_info_cmd.h"
 #include "dcamera_channel_source_impl.h"
@@ -44,6 +48,7 @@ DCameraSourceController::DCameraSourceController(std::string devId, std::string 
     DHLOGI("DCameraSourceController create devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     isInit = false;
+    cameraHdiRecipient_ = new DCameraHdiRecipient();
 }
 
 DCameraSourceController::~DCameraSourceController()
@@ -368,6 +373,11 @@ int32_t DCameraSourceController::Init(std::vector<DCameraIndex>& indexs)
     if (camHdiProvider_ == nullptr) {
         DHLOGE("camHdiProvider_ is null.");
     }
+    remote_ = OHOS::HDI::hdi_objcast<IDCameraProvider>(camHdiProvider_);
+    if (remote_ != nullptr) {
+        remote_->AddDeathRecipient(cameraHdiRecipient_);
+    }
+
     indexs_.assign(indexs.begin(), indexs.end());
     std::string dhId = indexs_.begin()->dhId_;
     std::string devId = indexs_.begin()->devId_;
@@ -386,6 +396,9 @@ int32_t DCameraSourceController::UnInit()
     indexs_.clear();
     isInit = false;
     isChannelConnected_.store(false);
+    if (remote_ != nullptr) {
+        remote_->RemoveDeathRecipient(cameraHdiRecipient_);
+    }
     return DCAMERA_OK;
 }
 
@@ -525,6 +538,12 @@ int32_t DCameraSourceController::ResumeDistributedHardware(const std::string &ne
 int32_t DCameraSourceController::StopDistributedHardware(const std::string &networkId)
 {
     return DCAMERA_OK;
+}
+
+void DCameraSourceController::DCameraHdiRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
+{
+    DHLOGE("Exit the current process.");
+    _Exit(0);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
