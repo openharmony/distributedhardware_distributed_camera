@@ -55,13 +55,11 @@ void DCameraSessionCallback::OnFocusState(FocusState state)
         return;
     }
 
-    int32_t itemCapacity = 10;
-    int32_t dataCapacity = 100;
-    int32_t dataCount = 1;
+    int32_t dataCountStartNum = 1;
     uint8_t focusState = iter->second;
     std::shared_ptr<Camera::CameraMetadata> cameraMetadata =
-        std::make_shared<Camera::CameraMetadata>(itemCapacity, dataCapacity);
-    if (!cameraMetadata->addEntry(OHOS_CONTROL_FOCUS_STATE, &focusState, dataCount)) {
+        std::make_shared<Camera::CameraMetadata>(CAMERA_META_DATA_ITEM_CAPACITY, CAMERA_META_DATA_DATA_CAPACITY);
+    if (!cameraMetadata->addEntry(OHOS_CONTROL_FOCUS_STATE, &focusState, dataCountStartNum)) {
         DHLOGE("cameraMetadata add entry failed");
         return;
     }
