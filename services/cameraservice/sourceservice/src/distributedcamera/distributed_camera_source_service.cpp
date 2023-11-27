@@ -335,7 +335,7 @@ void DistributedCameraSourceService::StartHicollieThread()
                 }
             }
         }
-        usleep(HICOLLIE_SLEEP_TIME_MS);
+        usleep(HICOLLIE_SLEEP_TIME_US);
     }
 }
 } // namespace DistributedHardware

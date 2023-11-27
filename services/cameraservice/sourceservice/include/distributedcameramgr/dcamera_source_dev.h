@@ -92,7 +92,7 @@ private:
     std::shared_ptr<DCameraSourceStateMachine> stateMachine_;
     std::shared_ptr<ICameraController> controller_;
     std::shared_ptr<ICameraInput> input_;
-    std::atomic<bool> hicollieFlag_ = false;
+    std::atomic<bool> hicollieFlag_ = true;
     sptr<IDCameraProviderCallback> hdiCallback_;
 
     std::map<uint32_t, DCameraNotifyFunc> memberFuncMap_;
