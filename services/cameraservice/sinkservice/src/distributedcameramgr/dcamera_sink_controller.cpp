@@ -677,7 +677,6 @@ bool DCameraSinkController::CheckPermission()
 {
     DHLOGI("DCameraSinkController CheckPermission Start");
     auto uid = IPCSkeleton::GetCallingUid();
-    DHLOGI("uid is:%{public}d", uid);
     if (uid == DCAMERA_UID) {
         DHLOGI("DCameraSinkController CheckPermission Success");
         return true;
