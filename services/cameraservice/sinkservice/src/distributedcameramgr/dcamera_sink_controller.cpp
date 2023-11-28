@@ -677,12 +677,7 @@ bool DCameraSinkController::CheckPermission()
 {
     DHLOGI("DCameraSinkController CheckPermission Start");
     auto uid = IPCSkeleton::GetCallingUid();
-    if (uid == DCAMERA_UID) {
-        DHLOGI("DCameraSinkController CheckPermission Success");
-        return true;
-    }
-    DHLOGI("DCameraSinkController CheckPermission Fail,Uid Cannot Pass");
-    return false;
+    return uid == DCAMERA_UID;
 }
 
 void DeviceInitCallback::OnRemoteDied()
