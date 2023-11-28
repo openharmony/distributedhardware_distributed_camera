@@ -677,12 +677,12 @@ bool DCameraSinkController::CheckPermission()
 {
     DHLOGI("DCameraSinkController CheckPermission Start");
     auto uid = IPCSkeleton::GetCallingUid();
-    auto pid = IPCSkeleton::GetCallingPid();
-    DHLOGI("uid is:%{public}d, pid is: %{public},", uid, pid);
-    if (uid == DCAMERA_HOST_UID || uid == DCAMERA_UID) {
+    DHLOGI("uid is:%{public}d", uid);
+    if (uid == DCAMERA_UID) {
+        DHLOGI("DCameraSinkController CheckPermission Success");
         return true;
     }
-    DHLOGI("DCameraSinkController CheckPermission Start");
+    DHLOGI("DCameraSinkController CheckPermission Fail,Uid Cannot Pass");
     return false;
 }
 
