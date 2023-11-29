@@ -76,6 +76,7 @@ private:
     int32_t GetDeviceSecurityLevel(const std::string &udid);
     std::string GetUdidByNetworkId(const std::string &networkId);
     int32_t PullUpPage();
+    bool CheckPermission();
 
     bool isInit_;
     int32_t sessionState_;
