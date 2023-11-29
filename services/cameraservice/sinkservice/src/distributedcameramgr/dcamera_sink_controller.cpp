@@ -44,6 +44,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 const int DEFAULT_DEVICE_SECURITY_LEVEL = -1;
+const std::string PAGE_SUBTYPE = "camera";
 
 DCameraSinkController::DCameraSinkController(std::shared_ptr<ICameraSinkAccessControl>& accessControl,
     const sptr<IDCameraSinkCallback> &sinkCallback)
@@ -99,17 +100,6 @@ int32_t DCameraSinkController::StopCapture()
         DCameraNotifyInner(DCAMERA_MESSAGE, DCAMERA_EVENT_DEVICE_ERROR, std::string("output stop capture failed"));
         return ret;
     }
-    if (isPageStatus_.load()) {
-        std::string subtype = "camera";
-        bool isSensitive = false;
-        bool isSameAccout = false;
-        ret = sinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_CLOSE_PAGE, subtype, srcDevId_,
-            isSensitive, isSameAccout);
-        if (ret != DCAMERA_OK) {
-            DHLOGE("close page failed, ret: %d", ret);
-        }
-    }
-    isPageStatus_.store(false);
     DHLOGI("StopCapture %s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
 }
@@ -202,9 +192,8 @@ int32_t DCameraSinkController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& ope
         return DCAMERA_WRONG_STATE;
     }
     srcDevId_ = openInfo->sourceDevId_;
-    std::string subtype = "camera";
-    int32_t ret = sinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_QUERY_RESOURCE, subtype, srcDevId_,
-        isSensitive_, isSameAccount_);
+    int32_t ret = sinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_QUERY_RESOURCE, PAGE_SUBTYPE,
+        srcDevId_, isSensitive_, isSameAccount_);
     if (ret != DCAMERA_OK) {
         DHLOGE("Query resource failed, ret: %d", ret);
         return ret;
@@ -236,7 +225,27 @@ int32_t DCameraSinkController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& ope
         DHLOGE("channel create session failed, dhId: %s, ret: %d", GetAnonyString(dhId_).c_str(), ret);
         return ret;
     }
+    ret = PullUpPage();
+    if (ret != DCAMERA_OK) {
+        return ret;
+    }
     DHLOGI("OpenChannel %s success", GetAnonyString(dhId_).c_str());
+    return DCAMERA_OK;
+}
+
+int32_t DCameraSinkController::PullUpPage()
+{
+    if (isSensitive_) {
+        bool isSensitive = false;
+        bool isSameAccout = false;
+        int32_t ret = sinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_PULL_UP_PAGE, PAGE_SUBTYPE,
+            srcDevId_, isSensitive, isSameAccout);
+        if (ret != DCAMERA_OK) {
+            DHLOGE("pull up page failed, ret %d", ret);
+            return ret;
+        }
+        isPageStatus_.store(true);
+    }
     return DCAMERA_OK;
 }
 
@@ -259,6 +268,16 @@ int32_t DCameraSinkController::CloseChannel()
                GetAnonyString(dhId_).c_str(), ret);
     }
     sessionState_ = DCAMERA_CHANNEL_STATE_DISCONNECTED;
+    if (isPageStatus_.load()) {
+        bool isSensitive = false;
+        bool isSameAccout = false;
+        ret = sinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_CLOSE_PAGE, PAGE_SUBTYPE, srcDevId_,
+            isSensitive, isSameAccout);
+        if (ret != DCAMERA_OK) {
+            DHLOGE("close page failed, ret: %d", ret);
+        }
+    }
+    isPageStatus_.store(false);
     DHLOGI("CloseChannel %s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
 }
@@ -481,18 +500,6 @@ int32_t DCameraSinkController::StartCaptureInner(std::vector<std::shared_ptr<DCa
     }
 
     DCameraNotifyInner(DCAMERA_MESSAGE, DCAMERA_EVENT_CAMERA_SUCCESS, std::string("operator start capture success"));
-    if (isSensitive_) {
-        std::string subtype = "camera";
-        bool isSensitive = false;
-        bool isSameAccout = false;
-        ret = sinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_PULL_UP_PAGE, subtype, srcDevId_,
-            isSensitive, isSameAccout);
-        if (ret != DCAMERA_OK) {
-            DHLOGE("pull up page failed, ret %d", ret);
-            return ret;
-        }
-        isPageStatus_.store(true);
-    }
     DHLOGI("DCameraSinkController::StartCaptureInner %s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
 }
