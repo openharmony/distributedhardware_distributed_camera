@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -55,13 +55,11 @@ void DCameraSessionCallback::OnFocusState(FocusState state)
         return;
     }
 
-    int32_t itemCapacity = 10;
-    int32_t dataCapacity = 100;
-    int32_t dataCount = 1;
+    int32_t dataCountStartNum = 1;
     uint8_t focusState = iter->second;
     std::shared_ptr<Camera::CameraMetadata> cameraMetadata =
-        std::make_shared<Camera::CameraMetadata>(itemCapacity, dataCapacity);
-    if (!cameraMetadata->addEntry(OHOS_CONTROL_FOCUS_STATE, &focusState, dataCount)) {
+        std::make_shared<Camera::CameraMetadata>(CAMERA_META_DATA_ITEM_CAPACITY, CAMERA_META_DATA_DATA_CAPACITY);
+    if (!cameraMetadata->addEntry(OHOS_CONTROL_FOCUS_STATE, &focusState, dataCountStartNum)) {
         DHLOGE("cameraMetadata add entry failed");
         return;
     }
