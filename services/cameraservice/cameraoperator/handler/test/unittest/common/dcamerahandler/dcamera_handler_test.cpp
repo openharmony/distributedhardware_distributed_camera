@@ -36,9 +36,9 @@ public:
     DCameraHandlerTestPluginListener() = default;
     virtual ~DCameraHandlerTestPluginListener() = default;
 
-    void PluginHardware(const std::string &dhId, const std::string &attrs) override
+    void PluginHardware(const std::string &dhId, const std::string &attrs, const std::string &subtype) override
     {
-        DHLOGI("dhId: %s, attrs: %s", GetAnonyString(dhId).c_str(), attrs.c_str());
+        DHLOGI("dhId: %s, attrs: %s, subtype: %s.", GetAnonyString(dhId).c_str(), attrs.c_str(), subtype.c_str());
     }
 
     void UnPluginHardware(const std::string &dhId) override
