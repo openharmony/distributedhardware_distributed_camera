@@ -193,6 +193,12 @@ int32_t DCameraSinkHandler::StopDistributedHardware(const std::string &networkId
     return dCameraSinkSrv->StopDistributedHardware(networkId);
 }
 
+void DCameraSinkHandler::SetSAState()
+{
+    std::unique_lock<std::mutex> lock(producerMutex_);
+    state_ = DCAMERA_SA_STATE_STOP;
+}
+
 IDistributedHardwareSink *GetSinkHardwareHandler()
 {
     DHLOGI("DCameraSinkHandler::GetSinkHardwareHandler");

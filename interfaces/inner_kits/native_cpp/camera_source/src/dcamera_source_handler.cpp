@@ -179,6 +179,12 @@ int32_t DCameraSourceHandler::ConfigDistributedHardware(const std::string& devId
     return DCAMERA_OK;
 }
 
+void DCameraSourceHandler::SetSAState()
+{
+    std::unique_lock<std::mutex> lock(producerMutex_);
+    state_ = DCAMERA_SA_STATE_STOP;
+}
+
 IDistributedHardwareSource *GetSourceHardwareHandler()
 {
     DHLOGI("DCameraSourceHandler GetSourceHardwareHandler Start");

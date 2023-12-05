@@ -18,6 +18,7 @@
 #include <cstdint>
 #include <new>
 
+#include "dcamera_sink_handler.h"
 #include "distributed_camera_constants.h"
 #include "distributed_hardware_log.h"
 #include "if_system_ability_manager.h"
@@ -143,6 +144,7 @@ void DCameraSinkHandlerIpc::OnSinkLocalCamSrvDied(const wptr<IRemoteObject>& rem
     DHLOGI("OnSinkLocalCamSrvDied Clear");
     localSink_->AsObject()->RemoveDeathRecipient(sinkLocalRecipient_);
     localSink_ = nullptr;
+    DCameraSinkHandler::GetInstance().SetSAState();
 }
 } // namespace DistributedHardware
 } // namespace OHOS

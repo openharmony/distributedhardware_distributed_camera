@@ -20,6 +20,7 @@
 
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
+#include "dcamera_source_handler.h"
 #include "distributed_camera_constants.h"
 #include "distributed_hardware_log.h"
 #include "iremote_broker.h"
@@ -142,6 +143,7 @@ void DCameraSourceHandlerIpc::OnSourceLocalCamSrvDied(const wptr<IRemoteObject>&
     DHLOGI("OnSourceLocalCamSrvDied Clear");
     localSource_->AsObject()->RemoveDeathRecipient(sourceLocalRecipient_);
     localSource_ = nullptr;
+    DCameraSourceHandler::GetInstance().SetSAState();
 }
 } // namespace DistributedHardware
 } // namespace OHOS
