@@ -383,8 +383,13 @@ int32_t DistributedCameraSinkService::PauseDistributedHardware(const std::string
         for (auto iter = camerasMap_.begin(); iter != camerasMap_.end(); iter++) {
             if (IsCurSinkDev(iter->second)) {
                 sinkDevice = iter->second;
+                break;
             }
         }
+    }
+    if (sinkDevice == nullptr) {
+        DHLOGE("PauseDistributedHardware sinkDevice is nullptr.");
+        return DCAMERA_BAD_VALUE;
     }
 
     int32_t ret = sinkDevice->PauseDistributedHardware(networkId);
@@ -405,8 +410,13 @@ int32_t DistributedCameraSinkService::ResumeDistributedHardware(const std::strin
         for (auto iter = camerasMap_.begin(); iter != camerasMap_.end(); iter++) {
             if (IsCurSinkDev(iter->second)) {
                 sinkDevice = iter->second;
+                break;
             }
         }
+    }
+    if (sinkDevice == nullptr) {
+        DHLOGE("ResumeDistributedHardware sinkDevice is nullptr.");
+        return DCAMERA_BAD_VALUE;
     }
 
     int32_t ret = sinkDevice->ResumeDistributedHardware(networkId);
@@ -427,8 +437,13 @@ int32_t DistributedCameraSinkService::StopDistributedHardware(const std::string 
         for (auto iter = camerasMap_.begin(); iter != camerasMap_.end(); iter++) {
             if (IsCurSinkDev(iter->second)) {
                 sinkDevice = iter->second;
+                break;
             }
         }
+    }
+    if (sinkDevice == nullptr) {
+        DHLOGE("StopDistributedHardware sinkDevice is nullptr.");
+        return DCAMERA_BAD_VALUE;
     }
 
     int32_t ret = sinkDevice->StopDistributedHardware(networkId);

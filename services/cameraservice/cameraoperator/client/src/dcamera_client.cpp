@@ -648,6 +648,10 @@ void DCameraClient::SetPhotoCaptureLocation(const std::shared_ptr<Camera::Camera
 
 int32_t DCameraClient::PauseCapture()
 {
+    if (captureSession_ == nullptr) {
+        DHLOGE("PauseCapture captureSession_ is nullptr.");
+        return DCAMERA_BAD_VALUE;
+    }
     int32_t ret = captureSession_->Stop();
     if (ret != DCAMERA_OK) {
         DHLOGE("PauseCapture captureSession stop failed, cameraId: %s, ret: %d",
@@ -658,6 +662,10 @@ int32_t DCameraClient::PauseCapture()
 
 int32_t DCameraClient::ResumeCapture()
 {
+    if (captureSession_ == nullptr) {
+        DHLOGE("ResumeCapture captureSession_ is nullptr.");
+        return DCAMERA_BAD_VALUE;
+    }
     int32_t ret = captureSession_->Start();
     if (ret != DCAMERA_OK) {
         DHLOGE("ResumeCapture captureSession Start failed, cameraId: %s, ret: %d",

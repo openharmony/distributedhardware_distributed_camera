@@ -572,6 +572,10 @@ int32_t DCameraSinkController::PauseDistributedHardware(const std::string &netwo
         DHLOGE("networkId is empty");
         return DCAMERA_BAD_VALUE;
     }
+    if (operator_ == nullptr) {
+        DHLOGE("operator_ is nullptr.");
+        return DCAMERA_BAD_VALUE;
+    }
     int32_t ret = operator_->PauseCapture();
     if (ret != DCAMERA_OK) {
         DHLOGE("Pause distributed hardware failed, dhId: %s, ret: %d", GetAnonyString(dhId_).c_str(), ret);
@@ -584,6 +588,10 @@ int32_t DCameraSinkController::ResumeDistributedHardware(const std::string &netw
     DHLOGI("Resume distributed hardware dhId: %s", GetAnonyString(dhId_).c_str());
     if (networkId.empty()) {
         DHLOGE("networkId is empty");
+        return DCAMERA_BAD_VALUE;
+    }
+    if (operator_ == nullptr) {
+        DHLOGE("operator_ is nullptr.");
         return DCAMERA_BAD_VALUE;
     }
     int32_t ret = operator_->ResumeCapture();
@@ -607,7 +615,8 @@ int32_t DCameraSinkController::StopDistributedHardware(const std::string &networ
 
 bool DCameraSinkController::CheckDeviceSecurityLevel(const std::string &srcDeviceId, const std::string &dstDeviceId)
 {
-    DHLOGD("CheckDeviceSecurityLevel srcDeviceId %s, dstDeviceId %s.", srcDeviceId.c_str(), dstDeviceId.c_str());
+    DHLOGD("CheckDeviceSecurityLevel srcDeviceId %s, dstDeviceId %s.",
+        GetAnonyString(srcDeviceId).c_str(), GetAnonyString(dstDeviceId).c_str());
     std::string srcUdid = GetUdidByNetworkId(srcDeviceId);
     if (srcUdid.empty()) {
         DHLOGE("src udid is empty");
@@ -618,7 +627,8 @@ bool DCameraSinkController::CheckDeviceSecurityLevel(const std::string &srcDevic
         DHLOGE("dst udid is empty");
         return false;
     }
-    DHLOGD("CheckDeviceSecurityLevel srcUdid %s, dstUdid %s.", srcUdid.c_str(), dstUdid.c_str());
+    DHLOGD("CheckDeviceSecurityLevel srcUdid %s, dstUdid %s.",
+        GetAnonyString(srcUdid).c_str(), GetAnonyString(dstUdid).c_str());
     int32_t srcDeviceSecurityLevel = GetDeviceSecurityLevel(srcUdid);
     int32_t dstDeviceSecurityLevel = GetDeviceSecurityLevel(dstUdid);
     DHLOGI("srcDeviceSecurityLevel is %d, dstDeviceSecurityLevel is %d.",
