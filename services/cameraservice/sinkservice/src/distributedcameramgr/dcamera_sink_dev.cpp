@@ -168,6 +168,10 @@ int32_t DCameraSinkDev::PauseDistributedHardware(const std::string &networkId)
         DHLOGE("networkId is empty");
         return DCAMERA_BAD_VALUE;
     }
+    if (controller_ == nullptr) {
+        DHLOGE("controller_ is nullptr.");
+        return DCAMERA_BAD_VALUE;
+    }
 
     return controller_->PauseDistributedHardware(networkId);
 }
@@ -179,6 +183,10 @@ int32_t DCameraSinkDev::ResumeDistributedHardware(const std::string &networkId)
         DHLOGE("networkId is empty");
         return DCAMERA_BAD_VALUE;
     }
+    if (controller_ == nullptr) {
+        DHLOGE("controller_ is nullptr.");
+        return DCAMERA_BAD_VALUE;
+    }
 
     return controller_->ResumeDistributedHardware(networkId);
 }
@@ -188,6 +196,10 @@ int32_t DCameraSinkDev::StopDistributedHardware(const std::string &networkId)
     DHLOGI("Stop distributed hardware dhId: %s", GetAnonyString(dhId_).c_str());
     if (networkId.empty()) {
         DHLOGE("networkId is empty");
+        return DCAMERA_BAD_VALUE;
+    }
+    if (controller_ == nullptr) {
+        DHLOGE("controller_ is nullptr.");
         return DCAMERA_BAD_VALUE;
     }
 
