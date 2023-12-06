@@ -40,6 +40,7 @@ public:
         std::shared_ptr<UnregisterCallback> callback) override;
     int32_t ConfigDistributedHardware(const std::string& devId, const std::string& dhId, const std::string& key,
         const std::string& value) override;
+    void SetSAState();
 private:
     typedef enum {
         DCAMERA_SA_STATE_STOP = 0,

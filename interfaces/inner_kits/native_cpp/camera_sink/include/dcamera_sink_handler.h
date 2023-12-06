@@ -37,6 +37,7 @@ public:
     int32_t PauseDistributedHardware(const std::string &networkId) override;
     int32_t ResumeDistributedHardware(const std::string &networkId) override;
     int32_t StopDistributedHardware(const std::string &networkId) override;
+    void SetSAState();
 private:
     typedef enum {
         DCAMERA_SA_STATE_STOP = 0,
