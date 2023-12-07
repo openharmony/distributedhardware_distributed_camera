@@ -75,12 +75,13 @@ void DCameraSinkHandlerTest::TearDown(void)
 void DCameraSinkHandlerTest::SetTokenID()
 {
     uint64_t tokenId;
-    const char *perms[2];
+    int32_t numberOfPermissions = 2;
+    const char *perms[numberOfPermissions];
     perms[0] = "ohos.permission.DISTRIBUTED_DATASYNC";
     perms[1] = "ohos.permission.CAMERA";
     NativeTokenInfoParams infoInstance = {
         .dcapsNum = 0,
-        .permsNum = 2,
+        .permsNum = numberOfPermissions,
         .aclsNum = 0,
         .dcaps = NULL,
         .perms = perms,
