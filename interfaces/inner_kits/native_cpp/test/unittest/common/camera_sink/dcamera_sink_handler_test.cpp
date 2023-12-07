@@ -20,6 +20,10 @@
 #undef private
 
 #include "anonymous_string.h"
+#include "accesstoken_kit.h"
+#include "nativetoken_kit.h"
+#include "token_setproc.h"
+#include "softbus_common.h"
 #include "dcamera_hisysevent_adapter.h"
 #include "dcamera_sink_handler_ipc.h"
 #include "dcamera_sink_load_callback.h"
@@ -42,6 +46,7 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
+    void SetTokenID();
 };
 
 namespace {
@@ -67,6 +72,28 @@ void DCameraSinkHandlerTest::TearDown(void)
     DHLOGI("enter");
 }
 
+void DCameraSinkHandlerTest::SetTokenID()
+{
+    uint64_t tokenId;
+    int32_t numberOfPermissions = 2;
+    const char *perms[numberOfPermissions];
+    perms[0] = "ohos.permission.DISTRIBUTED_DATASYNC";
+    perms[1] = "ohos.permission.CAMERA";
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = numberOfPermissions,
+        .aclsNum = 0,
+        .dcaps = NULL,
+        .perms = perms,
+        .acls = NULL,
+        .processName = "dcamera_client_demo",
+        .aplStr = "system_basic",
+    };
+    tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
+    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
+}
+
 /**
  * @tc.name: dcamera_sink_handler_test_001
  * @tc.desc: Verify the InitSource function.
@@ -89,6 +116,7 @@ HWTEST_F(DCameraSinkHandlerTest, dcamera_sink_handler_test_001, TestSize.Level1)
 HWTEST_F(DCameraSinkHandlerTest, dcamera_sink_handler_test_002, TestSize.Level1)
 {
     std::string params = "test002";
+    SetTokenID();
     int32_t ret = DCameraSinkHandler::GetInstance().InitSink(params);
     EXPECT_EQ(DCAMERA_OK, ret);
 
@@ -161,6 +189,7 @@ HWTEST_F(DCameraSinkHandlerTest, dcamera_sink_handler_test_005, TestSize.Level1)
 HWTEST_F(DCameraSinkHandlerTest, dcamera_sink_handler_test_006, TestSize.Level1)
 {
     std::string params = "test006";
+    SetTokenID();
     int32_t systemAbilityId = 4804;
     sptr<DCameraSinkLoadCallback> loadCallback(new DCameraSinkLoadCallback(params));
     loadCallback->OnLoadSystemAbilityFail(systemAbilityId);

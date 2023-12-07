@@ -22,6 +22,10 @@
 #include "dcamera_sink_controller.h"
 #undef private
 
+#include "accesstoken_kit.h"
+#include "nativetoken_kit.h"
+#include "token_setproc.h"
+#include "softbus_common.h"
 #include "mock_camera_channel.h"
 #include "mock_camera_operator.h"
 #include "mock_dcamera_sink_output.h"
@@ -47,6 +51,7 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
+    void SetTokenID();
 
     std::shared_ptr<DCameraSinkController> controller_;
     std::shared_ptr<ICameraSinkAccessControl> accessControl_;
@@ -140,6 +145,28 @@ void DCameraSinkControllerTest::TearDown(void)
     controller_ = nullptr;
 }
 
+void DCameraSinkControllerTest::SetTokenID()
+{
+    uint64_t tokenId;
+    int32_t numberOfPermissions = 2;
+    const char *perms[numberOfPermissions];
+    perms[0] = "ohos.permission.DISTRIBUTED_DATASYNC";
+    perms[1] = "ohos.permission.CAMERA";
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = numberOfPermissions,
+        .aclsNum = 0,
+        .dcaps = NULL,
+        .perms = perms,
+        .acls = NULL,
+        .processName = "dcamera_client_demo",
+        .aplStr = "system_basic",
+    };
+    tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
+    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
+}
+
 /**
  * @tc.name: dcamera_sink_controller_test_001
  * @tc.desc: Verify the Init and UnInit function.
@@ -208,6 +235,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_004, TestSize.L
  */
 HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_005, TestSize.Level1)
 {
+    SetTokenID();
     DCameraCaptureInfoCmd cmd;
     cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON);
     int32_t ret = controller_->StartCapture(cmd.value_);
@@ -327,6 +355,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_011, TestSize.L
  */
 HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_012, TestSize.Level1)
 {
+    SetTokenID();
     DCameraOpenInfoCmd cmd;
     cmd.Unmarshal(TEST_OPEN_INFO_CMD_JSON);
     int32_t ret = controller_->OpenChannel(cmd.value_);
@@ -375,6 +404,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_014, TestSize.L
  */
 HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_015, TestSize.Level1)
 {
+    SetTokenID();
     DCameraCaptureInfoCmd cmd;
     cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON);
     int32_t ret = controller_->StartCapture(cmd.value_);
@@ -395,6 +425,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_015, TestSize.L
  */
 HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_016, TestSize.Level1)
 {
+    SetTokenID();
     DCameraOpenInfoCmd cmd;
     cmd.Unmarshal(TEST_OPEN_INFO_CMD_JSON);
     g_channelStr = "test016";
