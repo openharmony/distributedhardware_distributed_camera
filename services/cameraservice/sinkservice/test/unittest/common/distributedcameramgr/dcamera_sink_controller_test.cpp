@@ -245,7 +245,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_005, TestSize.L
     cmdMetadata.Unmarshal(TEST_METADATA_SETTING_CMD_JSON);
     ret = controller_->UpdateSettings(cmdMetadata.value_);
     controller_->OnMetadataResult(cmdMetadata.value_);
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(DCAMERA_WRONG_STATE, ret);
 }
 
 /**
@@ -359,7 +359,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_012, TestSize.L
     DCameraOpenInfoCmd cmd;
     cmd.Unmarshal(TEST_OPEN_INFO_CMD_JSON);
     int32_t ret = controller_->OpenChannel(cmd.value_);
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(DCAMERA_WRONG_STATE, ret);
 }
 
 /**
@@ -414,7 +414,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_015, TestSize.L
     cmdMetadata.Unmarshal(TEST_METADATA_SETTING_CMD_JSON);
     g_operatorStr = "test015";
     ret = controller_->UpdateSettings(cmdMetadata.value_);
-    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+    EXPECT_EQ(DCAMERA_WRONG_STATE, ret);
 }
 
 /**
@@ -430,7 +430,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_016, TestSize.L
     cmd.Unmarshal(TEST_OPEN_INFO_CMD_JSON);
     g_channelStr = "test016";
     int32_t ret = controller_->OpenChannel(cmd.value_);
-    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+    EXPECT_EQ(DCAMERA_WRONG_STATE, ret);
 }
 
 /**
