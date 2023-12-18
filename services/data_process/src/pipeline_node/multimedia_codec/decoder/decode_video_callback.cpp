@@ -30,7 +30,7 @@ void DecodeVideoCallback::OnError(MediaAVCodec::AVCodecErrorType errorType, int3
     targetDecoderNode->OnError();
 }
 
-void DecodeVideoCallback::OnInputBufferAvailable(uint32_t index, std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer)
+void DecodeVideoCallback::OnInputBufferAvailable(uint32_t index, std::shared_ptr<Media::AVSharedMemory> buffer)
 {
     DHLOGD("DecodeVideoCallback : OnInputBufferAvailable.");
     std::shared_ptr<DecodeDataProcess> targetDecoderNode = decodeVideoNode_.lock();
@@ -41,7 +41,7 @@ void DecodeVideoCallback::OnInputBufferAvailable(uint32_t index, std::shared_ptr
     targetDecoderNode->OnInputBufferAvailable(index, buffer);
 }
 
-void DecodeVideoCallback::OnOutputFormatChanged(const MediaAVCodec::Format &format)
+void DecodeVideoCallback::OnOutputFormatChanged(const Media::Format &format)
 {
     DHLOGD("DecodeVideoCallback : OnOutputFormatChanged.");
     std::shared_ptr<DecodeDataProcess> targetDecoderNode = decodeVideoNode_.lock();
@@ -53,7 +53,7 @@ void DecodeVideoCallback::OnOutputFormatChanged(const MediaAVCodec::Format &form
 }
 
 void DecodeVideoCallback::OnOutputBufferAvailable(uint32_t index, MediaAVCodec::AVCodecBufferInfo info,
-    MediaAVCodec::AVCodecBufferFlag flag, std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer)
+    MediaAVCodec::AVCodecBufferFlag flag, std::shared_ptr<Media::AVSharedMemory> buffer)
 {
     DHLOGD("DecodeVideoCallback : OnOutputBufferAvailable. Only relaese buffer when using surface output.");
     std::shared_ptr<DecodeDataProcess> targetDecoderNode = decodeVideoNode_.lock();

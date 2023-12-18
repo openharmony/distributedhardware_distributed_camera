@@ -188,19 +188,19 @@ int32_t EncodeDataProcess::InitEncoderMetadataFormat()
     }
     switch (sourceConfig_.GetVideoformat()) {
         case Videoformat::YUVI420:
-            metadataFormat_.PutIntValue("pixel_format", MediaAVCodec::VideoPixelFormat::YUVI420);
+            metadataFormat_.PutIntValue("pixel_format", static_cast<int32_t>(MediaAVCodec::VideoPixelFormat::YUVI420));
             metadataFormat_.PutLongValue("max_input_size", NORM_YUV420_BUFFER_SIZE);
             break;
         case Videoformat::NV12:
-            metadataFormat_.PutIntValue("pixel_format", MediaAVCodec::VideoPixelFormat::NV12);
+            metadataFormat_.PutIntValue("pixel_format", static_cast<int32_t>(MediaAVCodec::VideoPixelFormat::NV12));
             metadataFormat_.PutLongValue("max_input_size", NORM_YUV420_BUFFER_SIZE);
             break;
         case Videoformat::NV21:
-            metadataFormat_.PutIntValue("pixel_format", MediaAVCodec::VideoPixelFormat::NV21);
+            metadataFormat_.PutIntValue("pixel_format", static_cast<int32_t>(MediaAVCodec::VideoPixelFormat::NV21));
             metadataFormat_.PutLongValue("max_input_size", NORM_YUV420_BUFFER_SIZE);
             break;
         case Videoformat::RGBA_8888:
-            metadataFormat_.PutIntValue("pixel_format",  MediaAVCodec::VideoPixelFormat::RGBA);
+            metadataFormat_.PutIntValue("pixel_format", static_cast<int32_t>(MediaAVCodec::VideoPixelFormat::RGBA));
             metadataFormat_.PutLongValue("max_input_size", NORM_RGB32_BUFFER_SIZE);
             break;
         default:
@@ -473,7 +473,7 @@ void EncodeDataProcess::ReduceWaitEncodeCnt()
 }
 
 int32_t EncodeDataProcess::GetEncoderOutputBuffer(uint32_t index, MediaAVCodec::AVCodecBufferInfo info,
-    MediaAVCodec::AVCodecBufferFlag flag, std::shared_ptr<MediaAVCodec::AVSharedMemory>& buffer)
+    MediaAVCodec::AVCodecBufferFlag flag, std::shared_ptr<Media::AVSharedMemory>& buffer)
 {
     DHLOGD("Get encoder output buffer.");
     if (videoEncoder_ == nullptr) {
@@ -559,12 +559,12 @@ void EncodeDataProcess::OnError()
     targetPipelineSink->OnError(DataProcessErrorType::ERROR_PIPELINE_ENCODER);
 }
 
-void EncodeDataProcess::OnInputBufferAvailable(uint32_t index, std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer)
+void EncodeDataProcess::OnInputBufferAvailable(uint32_t index, std::shared_ptr<Media::AVSharedMemory> buffer)
 {
     DHLOGD("The available input buffer index : %u. No operation when using surface input.", index);
 }
 
-void EncodeDataProcess::OnOutputFormatChanged(const MediaAVCodec::Format &format)
+void EncodeDataProcess::OnOutputFormatChanged(const Media::Format &format)
 {
     if (encodeOutputFormat_.GetFormatMap().empty()) {
         DHLOGE("The first changed video encoder output format is null.");
@@ -574,7 +574,7 @@ void EncodeDataProcess::OnOutputFormatChanged(const MediaAVCodec::Format &format
 }
 
 void EncodeDataProcess::OnOutputBufferAvailable(uint32_t index, MediaAVCodec::AVCodecBufferInfo info,
-    MediaAVCodec::AVCodecBufferFlag flag, std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer)
+    MediaAVCodec::AVCodecBufferFlag flag, std::shared_ptr<Media::AVSharedMemory> buffer)
 {
     if (!isEncoderProcess_.load()) {
         DHLOGE("EncodeNode occurred error or start release.");

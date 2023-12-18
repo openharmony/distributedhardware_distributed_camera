@@ -438,7 +438,7 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_013, TestSize.Level1)
     testEncodeDataProcess_->ReduceWaitEncodeCnt();
     uint32_t index = time;
     MediaAVCodec::AVCodecBufferInfo info;
-    std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer = nullptr;
+    std::shared_ptr<Media::AVSharedMemory> buffer = nullptr;
     MediaAVCodec::AVCodecBufferFlag flag = MediaAVCodec::AVCODEC_BUFFER_FLAG_CODEC_DATA;
     int32_t rc = testEncodeDataProcess_->GetEncoderOutputBuffer(index, info, flag, buffer);
     EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
@@ -495,11 +495,11 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_015, TestSize.Level1)
     uint32_t index = 0;
     MediaAVCodec::AVCodecBufferInfo info;
     MediaAVCodec::AVCodecBufferFlag flag = MediaAVCodec::AVCODEC_BUFFER_FLAG_CODEC_DATA;
-    std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer = nullptr;
+    std::shared_ptr<Media::AVSharedMemory> buffer = nullptr;
     testEncodeDataProcess_->OnOutputBufferAvailable(index, info, flag, buffer);
     testEncodeDataProcess_->OnError();
     testEncodeDataProcess_->OnInputBufferAvailable(index, buffer);
-    MediaAVCodec::Format format;
+    Media::Format format;
     testEncodeDataProcess_->OnOutputFormatChanged(format);
     testEncodeDataProcess_->OnOutputBufferAvailable(index, info, flag, buffer);
     EXPECT_EQ(rc, DCAMERA_OK);

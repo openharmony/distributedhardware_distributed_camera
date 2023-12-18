@@ -18,7 +18,7 @@
 
 #include "avcodec_errors.h"
 #include "avcodec_common.h"
-#include "format.h"
+#include "meta/format.h"
 
 #include "encode_data_process.h"
 
@@ -33,10 +33,10 @@ public:
     ~EncodeVideoCallback() override = default;
 
     void OnError(MediaAVCodec::AVCodecErrorType errorType, int32_t errorCode) override;
-    void OnInputBufferAvailable(uint32_t index, std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer) override;
-    void OnOutputFormatChanged(const MediaAVCodec::Format &format) override;
+    void OnInputBufferAvailable(uint32_t index, std::shared_ptr<Media::AVSharedMemory> buffer) override;
+    void OnOutputFormatChanged(const Media::Format &format) override;
     void OnOutputBufferAvailable(uint32_t index, MediaAVCodec::AVCodecBufferInfo info,
-        MediaAVCodec::AVCodecBufferFlag flag, std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer) override;
+        MediaAVCodec::AVCodecBufferFlag flag, std::shared_ptr<Media::AVSharedMemory> buffer) override;
 private:
     std::weak_ptr<EncodeDataProcess> encodeVideoNode_;
 };

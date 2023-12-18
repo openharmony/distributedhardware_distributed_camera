@@ -429,7 +429,7 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_012, TestSize.Level1)
     EXPECT_EQ(rc, DCAMERA_OK);
 
     uint32_t index = 1;
-    std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer = nullptr;
+    std::shared_ptr<Media::AVSharedMemory> buffer = nullptr;
     testDecodeDataProcess_->OnInputBufferAvailable(index, buffer);
     size_t capacity = 100;
     std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
@@ -583,9 +583,9 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_016, TestSize.Level1)
     EXPECT_EQ(rc, DCAMERA_OK);
 
     uint32_t index = 1;
-    std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer = nullptr;
+    std::shared_ptr<Media::AVSharedMemory> buffer = nullptr;
     testDecodeDataProcess_->OnInputBufferAvailable(index, buffer);
-    MediaAVCodec::Format format;
+    Media::Format format;
     testDecodeDataProcess_->OnOutputFormatChanged(format);
     MediaAVCodec::AVCodecBufferInfo info;
     MediaAVCodec::AVCodecBufferFlag flag = MediaAVCodec::AVCODEC_BUFFER_FLAG_CODEC_DATA;
