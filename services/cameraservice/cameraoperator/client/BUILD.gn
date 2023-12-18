@@ -28,7 +28,7 @@ ohos_shared_library("distributed_camera_client") {
   }
   stack_protector_ret = true
   include_dirs = [
-    "${graphicstandard_path}/frameworks/surface/include",
+    "${graphicsurface_path}/surface/include",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include/input",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include/output",
@@ -84,7 +84,7 @@ ohos_shared_library("distributed_camera_client") {
     "drivers_interface_camera:metadata",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "drivers_peripheral_display:hdi_gralloc_client",
-    "graphic_2d:surface",
+    "graphic_surface:surface",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",

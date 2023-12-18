@@ -59,7 +59,7 @@ ohos_shared_library("distributed_camera_source") {
     "${services_path}/data_process/include/interfaces",
     "${services_path}/data_process/include/pipeline",
     "${services_path}/data_process/include/utils",
-    "${graphicstandard_path}/frameworks/surface/include",
+    "${graphicsurface_path}/surface/include",
     "${fwk_common_path}/utils/include",
     "${fwk_innerkits_path}/include",
   ]
@@ -129,7 +129,7 @@ ohos_shared_library("distributed_camera_source") {
     "c_utils:utils",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "eventhandler:libeventhandler",
-    "graphic_2d:surface",
+    "graphic_surface:surface",
     "hdf_core:libhdi",
     "hdf_core:libpub_utils",
     "hicollie:libhicollie",

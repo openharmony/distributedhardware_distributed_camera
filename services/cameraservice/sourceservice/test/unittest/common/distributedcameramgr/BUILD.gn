@@ -48,7 +48,7 @@ config("module_private_config") {
     "//third_party/cJSON",
     "//third_party/jsoncpp/include",
     "//drivers/peripheral/base/",
-    "${graphicstandard_path}/frameworks/surface/include",
+    "${graphicsurface_path}/surface/include",
     "${feeding_smoother_path}",
     "${feeding_smoother_path}/base",
     "${feeding_smoother_path}/derived",

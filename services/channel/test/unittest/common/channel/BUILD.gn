@@ -47,7 +47,7 @@ config("module_private_config") {
     "${services_path}/data_process/include/utils",
     "${innerkits_path}/native_cpp/camera_source/include",
     "${innerkits_path}/native_cpp/camera_source/include/callback",
-    "${graphicstandard_path}/frameworks/surface/include",
+    "${graphicsurface_path}/surface/include",
     "//third_party/cJSON",
     "//third_party/jsoncpp/include",
     "${feeding_smoother_path}/base",

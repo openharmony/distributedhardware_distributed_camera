@@ -20,7 +20,7 @@ module_out_path = "distributed_camera/dcamera_sink_mgr_test"
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
-    "${graphicstandard_path}/frameworks/surface/include",
+    "${graphicsurface_path}/surface/include",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include/input",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include/output",

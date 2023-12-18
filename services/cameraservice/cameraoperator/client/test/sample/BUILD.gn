@@ -20,7 +20,7 @@ config("module_private_config") {
   include_dirs = [
     "//third_party/cJSON",
     "//third_party/jsoncpp/include",
-    "${graphicstandard_path}/frameworks/surface/include",
+    "${graphicsurface_path}/surface/include",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include/input",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include/output",

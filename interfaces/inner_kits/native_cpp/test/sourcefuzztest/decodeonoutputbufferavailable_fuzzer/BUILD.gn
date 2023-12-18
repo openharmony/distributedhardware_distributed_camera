@@ -26,7 +26,7 @@ ohos_fuzztest("DecodeOnOutputBufferAvailableFuzzTest") {
   include_dirs = [
     "${fwk_common_path}/utils/include",
     "${fwk_utils_path}/include/eventbus",
-    "${graphicstandard_path}/frameworks/surface/include",
+    "${graphicsurface_path}/surface/include",
     "${services_path}/cameraservice/base/include",
   ]
 
@@ -71,7 +71,7 @@ ohos_fuzztest("DecodeOnOutputBufferAvailableFuzzTest") {
     "av_codec:av_codec_client",
     "c_utils:utils",
     "eventhandler:libeventhandler",
-    "graphic_2d:surface",
+    "graphic_surface:surface",
     "hitrace:hitrace_meter",
   ]
 }
