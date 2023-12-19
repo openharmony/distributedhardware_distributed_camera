@@ -46,7 +46,6 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    void SetTokenID();
 };
 
 namespace {
@@ -65,21 +64,12 @@ void DCameraSinkHandlerTest::TearDownTestCase(void)
 void DCameraSinkHandlerTest::SetUp(void)
 {
     DHLOGI("enter");
-}
-
-void DCameraSinkHandlerTest::TearDown(void)
-{
-    DHLOGI("enter");
-}
-
-void DCameraSinkHandlerTest::SetTokenID()
-{
     uint64_t tokenId;
     int32_t numberOfPermissions = 3;
     const char *perms[numberOfPermissions];
     perms[0] = "ohos.permission.ENABLE_DISTRIBUTED_HARDWARE";
-    perms[1] = "ohos.permission.DISTRIBUTED_DATASYNC";
-    perms[2] = "ohos.permission.CAMERA";
+    perms[1] = OHOS_PERMISSION_DISTRIBUTED_DATASYNC;
+    perms[2] = "ohos.permission.ACCESS_DISTRIBUTED_HARDWARE";
     NativeTokenInfoParams infoInstance = {
         .dcapsNum = 0,
         .permsNum = numberOfPermissions,
@@ -87,13 +77,19 @@ void DCameraSinkHandlerTest::SetTokenID()
         .dcaps = NULL,
         .perms = perms,
         .acls = NULL,
-        .processName = "dcamera_client_demo",
+        .processName = "dcamera_sink_handler",
         .aplStr = "system_basic",
     };
     tokenId = GetAccessTokenId(&infoInstance);
     SetSelfTokenID(tokenId);
     OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 }
+
+void DCameraSinkHandlerTest::TearDown(void)
+{
+    DHLOGI("enter");
+}
+
 
 /**
  * @tc.name: dcamera_sink_handler_test_001
@@ -117,7 +113,6 @@ HWTEST_F(DCameraSinkHandlerTest, dcamera_sink_handler_test_001, TestSize.Level1)
 HWTEST_F(DCameraSinkHandlerTest, dcamera_sink_handler_test_002, TestSize.Level1)
 {
     std::string params = "test002";
-    SetTokenID();
     int32_t ret = DCameraSinkHandler::GetInstance().InitSink(params);
     EXPECT_EQ(DCAMERA_OK, ret);
 
@@ -190,7 +185,6 @@ HWTEST_F(DCameraSinkHandlerTest, dcamera_sink_handler_test_005, TestSize.Level1)
 HWTEST_F(DCameraSinkHandlerTest, dcamera_sink_handler_test_006, TestSize.Level1)
 {
     std::string params = "test006";
-    SetTokenID();
     int32_t systemAbilityId = 4804;
     sptr<DCameraSinkLoadCallback> loadCallback(new DCameraSinkLoadCallback(params));
     loadCallback->OnLoadSystemAbilityFail(systemAbilityId);
