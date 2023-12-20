@@ -22,8 +22,8 @@
 
 #include "avcodec_common.h"
 #include "avcodec_video_encoder.h"
-#include "avsharedmemory.h"
-#include "format.h"
+#include "buffer/avsharedmemory.h"
+#include "meta/format.h"
 #include "avcodec_errors.h"
 #include "securec.h"
 #include "surface.h"
@@ -55,10 +55,10 @@ public:
     void ReleaseProcessNode() override;
 
     void OnError();
-    void OnInputBufferAvailable(uint32_t index, std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer);
-    void OnOutputFormatChanged(const MediaAVCodec::Format &format);
+    void OnInputBufferAvailable(uint32_t index, std::shared_ptr<Media::AVSharedMemory> buffer);
+    void OnOutputFormatChanged(const Media::Format &format);
     void OnOutputBufferAvailable(uint32_t index, MediaAVCodec::AVCodecBufferInfo info,
-        MediaAVCodec::AVCodecBufferFlag flag, std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer);
+        MediaAVCodec::AVCodecBufferFlag flag, std::shared_ptr<Media::AVSharedMemory> buffer);
     VideoConfigParams GetSourceConfig() const;
     VideoConfigParams GetTargetConfig() const;
 
@@ -80,7 +80,7 @@ private:
     void IncreaseWaitEncodeCnt();
     void ReduceWaitEncodeCnt();
     int32_t GetEncoderOutputBuffer(uint32_t index, MediaAVCodec::AVCodecBufferInfo info,
-        MediaAVCodec::AVCodecBufferFlag flag, std::shared_ptr<MediaAVCodec::AVSharedMemory>& buffer);
+        MediaAVCodec::AVCodecBufferFlag flag, std::shared_ptr<Media::AVSharedMemory>& buffer);
     int32_t EncodeDone(std::vector<std::shared_ptr<DataBuffer>>& outputBuffers);
 
 private:
@@ -136,8 +136,8 @@ private:
     int64_t lastFeedEncoderInputBufferTimeUs_ = 0;
     int64_t inputTimeStampUs_ = 0;
     std::string processType_;
-    MediaAVCodec::Format metadataFormat_;
-    MediaAVCodec::Format encodeOutputFormat_;
+    Media::Format metadataFormat_;
+    Media::Format encodeOutputFormat_;
     std::string surfaceStr_ = "surface";
     int32_t index_ = FRAME_HEAD;
 };

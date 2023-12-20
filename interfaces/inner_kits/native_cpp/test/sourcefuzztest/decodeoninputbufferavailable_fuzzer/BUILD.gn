@@ -72,6 +72,7 @@ ohos_fuzztest("DecodeOnInputBufferAvailableFuzzTest") {
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "graphic_2d:surface",
+    "histreamer:media_foundation",
     "hitrace:hitrace_meter",
   ]
 }

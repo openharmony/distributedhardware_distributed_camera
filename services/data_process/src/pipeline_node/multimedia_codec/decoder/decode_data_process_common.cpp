@@ -181,19 +181,19 @@ int32_t DecodeDataProcess::InitDecoderMetadataFormat()
     DHLOGI("Init video decoder metadata format. videoformat: %d", processedConfig_.GetVideoformat());
     switch (processedConfig_.GetVideoformat()) {
         case Videoformat::YUVI420:
-            metadataFormat_.PutIntValue("pixel_format", MediaAVCodec::VideoPixelFormat::YUVI420);
+            metadataFormat_.PutIntValue("pixel_format", static_cast<int32_t>(MediaAVCodec::VideoPixelFormat::YUVI420));
             metadataFormat_.PutIntValue("max_input_size", MAX_YUV420_BUFFER_SIZE);
             break;
         case Videoformat::NV12:
-            metadataFormat_.PutIntValue("pixel_format", MediaAVCodec::VideoPixelFormat::NV12);
+            metadataFormat_.PutIntValue("pixel_format", static_cast<int32_t>(MediaAVCodec::VideoPixelFormat::NV12));
             metadataFormat_.PutIntValue("max_input_size", MAX_YUV420_BUFFER_SIZE);
             break;
         case Videoformat::NV21:
-            metadataFormat_.PutIntValue("pixel_format", MediaAVCodec::VideoPixelFormat::NV21);
+            metadataFormat_.PutIntValue("pixel_format", static_cast<int32_t>(MediaAVCodec::VideoPixelFormat::NV21));
             metadataFormat_.PutIntValue("max_input_size", MAX_YUV420_BUFFER_SIZE);
             break;
         case Videoformat::RGBA_8888:
-            metadataFormat_.PutIntValue("pixel_format", MediaAVCodec::VideoPixelFormat::RGBA);
+            metadataFormat_.PutIntValue("pixel_format", static_cast<int32_t>(MediaAVCodec::VideoPixelFormat::RGBA));
             metadataFormat_.PutIntValue("max_input_size", MAX_RGB32_BUFFER_SIZE);
             break;
         default:
@@ -365,7 +365,7 @@ void DecodeDataProcess::ReleaseProcessNode()
     processType_ = "";
     std::queue<std::shared_ptr<DataBuffer>>().swap(inputBuffersQueue_);
     std::queue<uint32_t>().swap(availableInputIndexsQueue_);
-    std::queue<std::shared_ptr<MediaAVCodec::AVSharedMemory>>().swap(availableInputBufferQueue_);
+    std::queue<std::shared_ptr<Media::AVSharedMemory>>().swap(availableInputBufferQueue_);
     std::deque<DCameraFrameInfo>().swap(frameInfoDeque_);
     waitDecoderOutputCount_ = 0;
     lastFeedDecoderInputBufferTimeUs_ = 0;
@@ -464,7 +464,7 @@ int32_t DecodeDataProcess::FeedDecoderInputBuffer()
                 return DCAMERA_OK;
             }
             uint32_t index = availableInputIndexsQueue_.front();
-            std::shared_ptr<MediaAVCodec::AVSharedMemory> sharedMemoryInput = availableInputBufferQueue_.front();
+            std::shared_ptr<Media::AVSharedMemory> sharedMemoryInput = availableInputBufferQueue_.front();
             if (sharedMemoryInput == nullptr) {
                 DHLOGE("Failed to obtain the input shared memory corresponding to the [%u] index.", index);
                 return DCAMERA_BAD_VALUE;
@@ -712,7 +712,7 @@ void DecodeDataProcess::OnError()
     targetPipelineSource->OnError(DataProcessErrorType::ERROR_PIPELINE_DECODER);
 }
 
-void DecodeDataProcess::OnInputBufferAvailable(uint32_t index, std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer)
+void DecodeDataProcess::OnInputBufferAvailable(uint32_t index, std::shared_ptr<Media::AVSharedMemory> buffer)
 {
     DHLOGD("DecodeDataProcess::OnInputBufferAvailable");
     std::lock_guard<std::mutex> lck(mtxHoldCount_);
@@ -725,7 +725,7 @@ void DecodeDataProcess::OnInputBufferAvailable(uint32_t index, std::shared_ptr<M
     availableInputBufferQueue_.push(buffer);
 }
 
-void DecodeDataProcess::OnOutputFormatChanged(const MediaAVCodec::Format &format)
+void DecodeDataProcess::OnOutputFormatChanged(const Media::Format &format)
 {
     if (decodeOutputFormat_.GetFormatMap().empty()) {
         DHLOGE("The first changed video decoder output format is null.");
@@ -735,7 +735,7 @@ void DecodeDataProcess::OnOutputFormatChanged(const MediaAVCodec::Format &format
 }
 
 void DecodeDataProcess::OnOutputBufferAvailable(uint32_t index, const MediaAVCodec::AVCodecBufferInfo& info,
-    const MediaAVCodec::AVCodecBufferFlag& flag, std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer)
+    const MediaAVCodec::AVCodecBufferFlag& flag, std::shared_ptr<Media::AVSharedMemory> buffer)
 {
     int64_t finishDecodeT = GetNowTimeStampUs();
     if (!isDecoderProcess_.load()) {

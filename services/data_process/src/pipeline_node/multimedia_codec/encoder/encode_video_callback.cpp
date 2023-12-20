@@ -29,7 +29,7 @@ void EncodeVideoCallback::OnError(MediaAVCodec::AVCodecErrorType errorType, int3
     targetEncoderNode->OnError();
 }
 
-void EncodeVideoCallback::OnInputBufferAvailable(uint32_t index, std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer)
+void EncodeVideoCallback::OnInputBufferAvailable(uint32_t index, std::shared_ptr<Media::AVSharedMemory> buffer)
 {
     DHLOGD("EncodeVideoCallback : OnInputBufferAvailable. No operation when using surface input.");
     std::shared_ptr<EncodeDataProcess> targetEncoderNode = encodeVideoNode_.lock();
@@ -40,7 +40,7 @@ void EncodeVideoCallback::OnInputBufferAvailable(uint32_t index, std::shared_ptr
     targetEncoderNode->OnInputBufferAvailable(index, buffer);
 }
 
-void EncodeVideoCallback::OnOutputFormatChanged(const MediaAVCodec::Format &format)
+void EncodeVideoCallback::OnOutputFormatChanged(const Media::Format &format)
 {
     DHLOGD("EncodeVideoCallback : OnOutputFormatChanged.");
     std::shared_ptr<EncodeDataProcess> targetEncoderNode = encodeVideoNode_.lock();
@@ -52,7 +52,7 @@ void EncodeVideoCallback::OnOutputFormatChanged(const MediaAVCodec::Format &form
 }
 
 void EncodeVideoCallback::OnOutputBufferAvailable(uint32_t index, MediaAVCodec::AVCodecBufferInfo info,
-    MediaAVCodec::AVCodecBufferFlag flag, std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer)
+    MediaAVCodec::AVCodecBufferFlag flag, std::shared_ptr<Media::AVSharedMemory> buffer)
 {
     DHLOGD("EncodeVideoCallback : OnOutputBufferAvailable.");
     std::shared_ptr<EncodeDataProcess> targetEncoderNode = encodeVideoNode_.lock();

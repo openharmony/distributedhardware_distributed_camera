@@ -35,7 +35,7 @@ void EncodeOnOutputBufferAvailableFuzzTest(const uint8_t* data, size_t size)
     std::shared_ptr<DCameraPipelineSink> sinkPipeline = std::make_shared<DCameraPipelineSink>();
     std::shared_ptr<EncodeDataProcess> encodeDataProcess = std::make_shared<EncodeDataProcess>(sinkPipeline);
     std::shared_ptr<EncodeVideoCallback> encodeVideoCallback = std::make_shared<EncodeVideoCallback>(encodeDataProcess);
-    std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer = nullptr;
+    std::shared_ptr<Media::AVSharedMemory> buffer = nullptr;
     encodeVideoCallback->OnOutputBufferAvailable(index, info, flag, buffer);
 }
 }

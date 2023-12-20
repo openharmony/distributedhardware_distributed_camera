@@ -37,7 +37,7 @@ void DecodeOnOutputBufferAvailableFuzzTest(const uint8_t* data, size_t size)
     std::shared_ptr<DecodeDataProcess> decodeDataProcess =
         std::make_shared<DecodeDataProcess>(eventBusPipeline, sourcePipeline);
     std::shared_ptr<DecodeVideoCallback> decodeVideoCallback = std::make_shared<DecodeVideoCallback>(decodeDataProcess);
-    std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer = nullptr;
+    std::shared_ptr<Media::AVSharedMemory> buffer = nullptr;
 
     decodeVideoCallback->OnOutputBufferAvailable(index, info, flag, buffer);
 }
