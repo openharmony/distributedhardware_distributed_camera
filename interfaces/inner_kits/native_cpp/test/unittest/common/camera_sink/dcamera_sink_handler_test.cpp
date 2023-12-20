@@ -90,7 +90,6 @@ void DCameraSinkHandlerTest::TearDown(void)
     DHLOGI("enter");
 }
 
-
 /**
  * @tc.name: dcamera_sink_handler_test_001
  * @tc.desc: Verify the InitSource function.
