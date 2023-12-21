@@ -45,6 +45,7 @@
                 "c_utils",
                 "dsoftbus",
                 "hicollie",
+                "histreamer",
                 "hisysevent",
                 "hilog",
                 "samgr",

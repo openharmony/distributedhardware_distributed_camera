@@ -25,13 +25,13 @@
 
 #include "avcodec_common.h"
 #include "avcodec_video_decoder.h"
-#include "avsharedmemory.h"
+#include "buffer/avsharedmemory.h"
 #include "event.h"
 #include "event_bus.h"
 #include "event_sender.h"
 #include "event_registration.h"
 #include "eventbus_handler.h"
-#include "format.h"
+#include "meta/format.h"
 #include "ibuffer_consumer_listener.h"
 #include "iconsumer_surface.h"
 #include "avcodec_errors.h"
@@ -65,10 +65,10 @@ public:
     void OnEvent(DCameraCodecEvent& ev) override;
 
     void OnError();
-    void OnInputBufferAvailable(uint32_t index, std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer);
-    void OnOutputFormatChanged(const MediaAVCodec::Format &format);
+    void OnInputBufferAvailable(uint32_t index, std::shared_ptr<Media::AVSharedMemory> buffer);
+    void OnOutputFormatChanged(const Media::Format &format);
     void OnOutputBufferAvailable(uint32_t index, const MediaAVCodec::AVCodecBufferInfo& info,
-        const MediaAVCodec::AVCodecBufferFlag& flag, std::shared_ptr<MediaAVCodec::AVSharedMemory> buffer);
+        const MediaAVCodec::AVCodecBufferFlag& flag, std::shared_ptr<Media::AVSharedMemory> buffer);
     void GetDecoderOutputBuffer(const sptr<IConsumerSurface>& surface);
     VideoConfigParams GetSourceConfig() const;
     VideoConfigParams GetTargetConfig() const;
@@ -142,11 +142,11 @@ private:
     int64_t lastFeedDecoderInputBufferTimeUs_ = 0;
     int64_t outputTimeStampUs_ = 0;
     std::string processType_;
-    MediaAVCodec::Format metadataFormat_;
-    MediaAVCodec::Format decodeOutputFormat_;
+    Media::Format metadataFormat_;
+    Media::Format decodeOutputFormat_;
     MediaAVCodec::AVCodecBufferInfo outputInfo_;
     std::queue<std::shared_ptr<DataBuffer>> inputBuffersQueue_;
-    std::queue<std::shared_ptr<MediaAVCodec::AVSharedMemory>> availableInputBufferQueue_;
+    std::queue<std::shared_ptr<Media::AVSharedMemory>> availableInputBufferQueue_;
     std::queue<uint32_t> availableInputIndexsQueue_;
     std::deque<DCameraFrameInfo> frameInfoDeque_;
 };
