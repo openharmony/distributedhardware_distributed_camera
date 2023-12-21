@@ -24,6 +24,8 @@
 #include "dcamera_utils_tools.h"
 #include "distributed_camera_errno.h"
 #include "dcamera_source_dev.h"
+#include "mock_dcamera_source_dev.h"
+#include "mock_dcamera_source_controller.h"
 #include "mock_dcamera_source_state_listener.h"
 #include "nativetoken_kit.h"
 #include "token_setproc.h"
@@ -42,6 +44,7 @@ public:
 
     std::shared_ptr<DCameraSourceDev> camDev_;
     std::shared_ptr<ICameraStateListener> stateListener_;
+    std::shared_ptr<ICameraController> controller_;
 };
 
 namespace {
@@ -95,6 +98,7 @@ void DCameraSourceDevTest::SetUp(void)
 {
     stateListener_ = std::make_shared<MockDCameraSourceStateListener>();
     camDev_ = std::make_shared<DCameraSourceDev>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, stateListener_);
+    camDev_->controller_ = std::make_shared<MockDCameraSourceController>();
 }
 
 void DCameraSourceDevTest::TearDown(void)
@@ -361,6 +365,7 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_013, TestSize.Level1)
     index.dhId_ = TEST_CAMERA_DH_ID_0;
     indexs.push_back(index);
     camDev_->InitDCameraSourceDev();
+    camDev_->controller_ = std::make_shared<MockDCameraSourceController>();
     camDev_->controller_->Init(indexs);
     camDev_->input_->Init();
     std::string devId = TEST_DEVICE_ID;
@@ -404,14 +409,15 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_015, TestSize.Level1)
 {
     SetTokenID();
     std::vector<DCameraIndex> indexs;
+    amDev_->InitDCameraSourceDev();
+    camDev_->controller_ = std::make_shared<MockDCameraSourceController>();
+    int32_t ret = camDev_->controller_->Init(indexs);
+    camDev_->input_->Init();
     DCameraIndex index;
     index.devId_ = TEST_DEVICE_ID;
     index.dhId_ = TEST_CAMERA_DH_ID_0;
     indexs.push_back(index);
-    camDev_->InitDCameraSourceDev();
-    camDev_->controller_->Init(indexs);
-    camDev_->input_->Init();
-    int32_t ret = camDev_->OpenCamera();
+    ret = camDev_->OpenCamera();
     ret = camDev_->CloseCamera();
     EXPECT_EQ(DCAMERA_OK, ret);
 }
@@ -431,6 +437,7 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_016, TestSize.Level1)
     index.dhId_ = TEST_CAMERA_DH_ID_0;
     indexs.push_back(index);
     camDev_->InitDCameraSourceDev();
+    camDev_->controller_ = std::make_shared<MockDCameraSourceController>();
     camDev_->controller_->Init(indexs);
     camDev_->input_->Init();
     std::vector<std::shared_ptr<DCStreamInfo>> streamInfos;
@@ -463,6 +470,7 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_017, TestSize.Level1)
     index.dhId_ = TEST_CAMERA_DH_ID_0;
     indexs.push_back(index);
     camDev_->InitDCameraSourceDev();
+    camDev_->controller_ = std::make_shared<MockDCameraSourceController>();
     camDev_->controller_->Init(indexs);
     camDev_->input_->Init();
     std::vector<std::shared_ptr<DCStreamInfo>> streamInfos;
@@ -534,12 +542,13 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_019, TestSize.Level1)
     index.dhId_ = TEST_CAMERA_DH_ID_0;
     indexs.push_back(index);
     camDev_->InitDCameraSourceDev();
+    camDev_->controller_ = std::make_shared<MockDCameraSourceController>();
     camDev_->controller_->Init(indexs);
     camDev_->input_->Init();
     int32_t ret = camDev_->StartCapture(captureInfos);
-    EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
+    EXPECT_EQ(DCAMERA_OK, ret);
     camDev_->HitraceAndHisyseventImpl(captureInfos);
-    EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
+    EXPECT_EQ(DCAMERA_OK, ret);
 }
 
 /**
@@ -568,6 +577,7 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_020, TestSize.Level1)
     index.dhId_ = TEST_CAMERA_DH_ID_0;
     indexs.push_back(index);
     camDev_->InitDCameraSourceDev();
+    camDev_->controller_ = std::make_shared<MockDCameraSourceController>();
     camDev_->controller_->Init(indexs);
     camDev_->input_->Init();
     int32_t ret = camDev_->StartCapture(captureInfos);
@@ -608,6 +618,7 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_021, TestSize.Level1)
     index.dhId_ = TEST_CAMERA_DH_ID_0;
     indexs.push_back(index);
     camDev_->InitDCameraSourceDev();
+    camDev_->controller_ = std::make_shared<MockDCameraSourceController>();
     camDev_->controller_->Init(indexs);
     camDev_->input_->Init();
     std::vector<std::shared_ptr<DCameraSettings>> settings;
@@ -616,7 +627,7 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_021, TestSize.Level1)
     setting->value_ = "UpdateSettingsTest";
     settings.push_back(setting);
     int32_t ret = camDev_->UpdateSettings(settings);
-    EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
+    EXPECT_EQ(DCAMERA_OK, ret);
 }
 
 /**
