@@ -15,11 +15,17 @@
 
 #include <gtest/gtest.h>
 
+#include "accesstoken_kit.h"
+#include "nativetoken_kit.h"
+#include "token_setproc.h"
+#include "softbus_common.h"
+#include "if_system_ability_manager.h"
 #include "dcamera_source_callback.h"
 #include "distributed_camera_source_proxy.h"
 #include "distributed_camera_source_stub.h"
 #include "distributed_hardware_log.h"
 #include "mock_distributed_camera_source_stub.h"
+
 
 using namespace testing::ext;
 
@@ -46,6 +52,25 @@ void DcameraSourceStubTest::TearDownTestCase(void)
 void DcameraSourceStubTest::SetUp(void)
 {
     DHLOGI("DcameraSourceStubTest::SetUp");
+    uint64_t tokenId;
+    int32_t numberOfPermissions = 3;
+    const char *perms[numberOfPermissions];
+    perms[0] = "ohos.permission.ENABLE_DISTRIBUTED_HARDWARE";
+    perms[1] = OHOS_PERMISSION_DISTRIBUTED_DATASYNC;
+    perms[2] = "ohos.permission.ACCESS_DISTRIBUTED_HARDWARE";
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = numberOfPermissions,
+        .aclsNum = 0,
+        .dcaps = NULL,
+        .perms = perms,
+        .acls = NULL,
+        .processName = "dcamera_sink_handler",
+        .aplStr = "system_basic",
+    };
+    tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
+    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 }
 
 void DcameraSourceStubTest::TearDown(void)
