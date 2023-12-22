@@ -409,7 +409,7 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_015, TestSize.Level1)
 {
     SetTokenID();
     std::vector<DCameraIndex> indexs;
-    amDev_->InitDCameraSourceDev();
+    camDev_->InitDCameraSourceDev();
     camDev_->controller_ = std::make_shared<MockDCameraSourceController>();
     int32_t ret = camDev_->controller_->Init(indexs);
     camDev_->input_->Init();
