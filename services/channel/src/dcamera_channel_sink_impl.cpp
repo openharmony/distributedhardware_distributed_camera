@@ -58,25 +58,26 @@ int32_t DCameraChannelSinkImpl::CreateSession(std::vector<DCameraIndex>& camInde
         DHLOGI("DCameraChannelSinkImpl session has already create %s", sessionFlag.c_str());
         return DCAMERA_OK;
     }
+    DHLOGI("DCameraChannelSinkImpl CreateSession Listen Start, devId: %s", GetAnonyString(myDevId).c_str());
     camIndexs_.assign(camIndexs.begin(), camIndexs.end());
     listener_ = listener;
     mySessionName_ = SESSION_HEAD + camIndexs[0].dhId_ + std::string("_") + sessionFlag;
     mode_ = sessionMode;
     std::string myDevId;
     DCameraSoftbusAdapter::GetInstance().GetLocalNetworkId(myDevId);
-    DHLOGI("DCameraChannelSinkImpl session create name: %s devId: %s", GetAnonyString(mySessionName_).c_str(),
-        GetAnonyString(myDevId).c_str());
-    int32_t ret = DCameraSoftbusAdapter::GetInstance().CreateSoftbusSessionServer(mySessionName_,
-        DCAMERA_CHANNLE_ROLE_SINK);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraChannelSinkImpl CreateSession %s failed, ret: %d", GetAnonyString(mySessionName_).c_str(), ret);
-        return ret;
-    }
     std::string peerDevId = camIndexs[0].devId_;
     std::string peerSessionName = SESSION_HEAD + sessionFlag;
+    // sink_server_listen
+    int32_t ret = DCameraSoftbusAdapter::GetInstance().CreatSoftBusSinkSocketServer(mySessionName_,
+        DCAMERA_CHANNLE_ROLE_SINK, sessionMode, peerDevId, peerSessionName);
+    if (ret != DECAMERA_OK) {
+        DHLOGE("DCameraChannelSinkImpl CreateSession Error, ret %d", ret);
+        return ret;
+    }
     softbusSession_ = std::make_shared<DCameraSoftbusSession>(myDevId, mySessionName_, peerDevId, peerSessionName,
         listener, sessionMode);
     DCameraSoftbusAdapter::GetInstance().sinkSessions_[mySessionName_] = softbusSession_;
+    DHLOGI("DCameraChannelSinkImpl CreateSession Listen End, devId: %s", GetAnonyString(myDevId).c_str());
     return DCAMERA_OK;
 }
 
