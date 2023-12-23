@@ -372,6 +372,7 @@ int32_t DCameraSourceController::Init(std::vector<DCameraIndex>& indexs)
     camHdiProvider_ = IDCameraProvider::Get(HDF_DCAMERA_EXT_SERVICE);
     if (camHdiProvider_ == nullptr) {
         DHLOGE("camHdiProvider_ is null.");
+        return DCAMERA_INIT_ERR;
     }
     remote_ = OHOS::HDI::hdi_objcast<IDCameraProvider>(camHdiProvider_);
     if (remote_ != nullptr) {
