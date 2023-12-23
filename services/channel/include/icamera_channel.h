@@ -32,7 +32,6 @@ class ICameraChannel {
 public:
     virtual ~ICameraChannel() = default;
 
-    virtual int32_t OpenSession() = 0;
     virtual int32_t CloseSession() = 0;
     virtual int32_t CreateSession(std::vector<DCameraIndex>& camIndexs, std::string sessionFlag,
         DCameraSessionMode sessionMode, std::shared_ptr<ICameraChannelListener>& listener) = 0;
