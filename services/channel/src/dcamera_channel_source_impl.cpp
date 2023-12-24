@@ -61,14 +61,14 @@ int32_t DCameraChannelSourceImpl::CreateSession(std::vector<DCameraIndex>& camIn
         DHLOGI("DCameraChannelSourceImpl session has already create %s", sessionFlag.c_str());
         return DCAMERA_OK;
     }
-    DHLOGI("DCameraChannelSourceImpl CreateSession Start, name: %s devId: %s", GetAnonyString(mySessionName_).c_str(),
-        GetAnonyString(myDevId).c_str());
     camIndexs_.assign(camIndexs.begin(), camIndexs.end());
     listener_ = listener;
     mySessionName_ = SESSION_HEAD + sessionFlag;
     mode_ = sessionMode;
     std::string myDevId;
     DCameraSoftbusAdapter::GetInstance().GetLocalNetworkId(myDevId);
+    DHLOGI("DCameraChannelSourceImpl CreateSession Start, name: %s devId: %s", GetAnonyString(mySessionName_).c_str(),
+        GetAnonyString(myDevId).c_str());
     for (auto iter = camIndexs.begin(); iter != camIndexs.end(); iter++) {
         std::string peerDevId = (*iter).devId_;
         std::string peerSessionName = SESSION_HEAD + (*iter).dhId_ + std::string("_") + sessionFlag;
