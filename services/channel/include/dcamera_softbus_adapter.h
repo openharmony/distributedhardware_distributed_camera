@@ -81,7 +81,7 @@ private:
     DCameraSoftbusAdapter();
     ~DCameraSoftbusAdapter();
 
-    int32_t DCameraSoftBusGetSessionByPeerSocket(int32_t socket, std::shared_ptr<DCameraSoftbusSession> session,
+    int32_t DCameraSoftBusGetSessionByPeerSocket(int32_t socket, std::shared_ptr<DCameraSoftbusSession> &session,
         PeerSocketInfo info);
     int32_t DCameraSoftbusSourceGetSession(int32_t socket, std::shared_ptr<DCameraSoftbusSession>& session);
     int32_t DCameraSoftbusSinkGetSession(int32_t socket, std::shared_ptr<DCameraSoftbusSession>& session);
@@ -102,7 +102,7 @@ private:
     int32_t sourceSocketId_;
     std::map<DCameraSessionMode, TransDataType> sessionModeAndDataTypeMap_;
     std::mutex mySessionNamePeerDevIdLock_;
-    std::map<std::string, std::string> peerDevIdMySessionNameMap;
+    std::map<std::string, std::string> peerDevIdMySessionNameMap_;
     std::mutex mySessionNameLock_;
     std::set<std::string> mySessionNameSet_;
 };
