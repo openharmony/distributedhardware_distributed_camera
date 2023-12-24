@@ -312,11 +312,10 @@ int32_t DCameraSoftbusAdapter::SourceOnBind(int32_t socket, PeerSocketInfo info)
 {
     DHLOGI("DCameraSoftbusAdapter SourceOnBind socket: %d", socket);
     std::shared_ptr<DCameraSoftbusSession> session = nullptr;
-    // 从PeerSocketInfo取
     int32_t ret = DCameraSoftbusSourceGetSession(socket, session);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSoftbusAdapter SourceOnBind not find socket %d", socket);
-        return DCAMERA_OK;
+        return DCAMERA_NOT_FOUND;
     }
 
     ret = session->OnSessionOpened(socket, info);
