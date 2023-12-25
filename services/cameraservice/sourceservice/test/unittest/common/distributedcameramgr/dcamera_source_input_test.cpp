@@ -393,21 +393,6 @@ HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_012, TestSize.Level1)
 }
 
 /**
- * @tc.name: dcamera_source_input_test_013
- * @tc.desc: Verify source inptut WaitforSessionResult.
- * @tc.type: FUNC
- * @tc.require: Issue Number
- */
-HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_013, TestSize.Level1)
-{
-    int32_t rc = camDev_->InitDCameraSourceDev();
-    EXPECT_EQ(rc, DCAMERA_OK);
-
-    rc = testInput_->WaitforSessionResult();
-    EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
-}
-
-/**
  * @tc.name: dcamera_source_input_test_014
  * @tc.desc: Verify source inptut EstablishContinuousFrameSession.
  * @tc.type: FUNC

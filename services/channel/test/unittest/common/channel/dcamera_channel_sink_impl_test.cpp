@@ -93,9 +93,7 @@ HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_001, TestSiz
     output_ = std::make_shared<DCameraSinkOutput>(TEST_CAMERA_DH_ID_0, operator_);
 
     listener_ = std::make_shared<DCameraSinkOutputChannelListener>(CONTINUOUS_FRAME, output_);
-    channel_->CreateSession(camIndexs, sessionFlag, sessionMode, listener_);
-
-    int32_t ret = channel_->OpenSession();
+    int32_t ret = channel_->CreateSession(camIndexs, sessionFlag, sessionMode, listener_);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
@@ -118,9 +116,7 @@ HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_002, TestSiz
     output_ = std::make_shared<DCameraSinkOutput>(TEST_CAMERA_DH_ID_0, operator_);
 
     listener_ = std::make_shared<DCameraSinkOutputChannelListener>(CONTINUOUS_FRAME, output_);
-    channel_->CreateSession(camIndexs, sessionFlag, sessionMode, listener_);
-
-    int32_t ret = channel_->OpenSession();
+    int32_t ret = channel_->CreateSession(camIndexs, sessionFlag, sessionMode, listener_);
     ret = channel_->CloseSession();
     EXPECT_EQ(DCAMERA_OK, ret);
 }
@@ -169,9 +165,7 @@ HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_004, TestSiz
     output_ = std::make_shared<DCameraSinkOutput>(TEST_CAMERA_DH_ID_0, operator_);
 
     listener_ = std::make_shared<DCameraSinkOutputChannelListener>(CONTINUOUS_FRAME, output_);
-    channel_->CreateSession(camIndexs, sessionFlag, sessionMode, listener_);
-
-    int32_t ret = channel_->OpenSession();
+    int32_t ret = channel_->CreateSession(camIndexs, sessionFlag, sessionMode, listener_);
     usleep(TEST_SLEEP_SEC);
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);
@@ -180,18 +174,6 @@ HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_004, TestSiz
     channel_->CloseSession();
     ret = channel_->ReleaseSession();
     EXPECT_EQ(DCAMERA_OK, ret);
-}
-
-/**
- * @tc.name: dcamera_channel_sink_impl_test_005
- * @tc.desc: Verify the OpenSession function.
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_005, TestSize.Level1)
-{
-    int32_t ret = channel_->OpenSession();
-    EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
 }
 
 /**

@@ -110,9 +110,13 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_001, TestSize.L
 HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_002, TestSize.Level1)
 {
     int32_t sessionId = 1;
-    int32_t result = -6;
-    int32_t ret = softbusSession_->OnSessionOpend(sessionId, result);
-    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
+    PeerSocketInfo info = {
+        .name = (char *)std::string("dcamera_softbus_session_test_002").c_str(),
+        .pkgName = (char *)std::string("ohos.dhardware.dcamera").c_str(),
+        .networkId = (char *)std::string("abcd").c_str(),
+    };
+    int32_t ret = softbusSession_->OnSessionOpened(sessionId, info);
+    EXPECT_EQ(DCAMERA_OK, ret);
 }
 
 /**
