@@ -75,7 +75,7 @@ int32_t DCameraChannelSourceImpl::CreateSession(std::vector<DCameraIndex>& camIn
         // source_bind
         int32_t ret = DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDevId, peerSessionName,
             peerDevId, sessionMode, DCAMERA_CHANNLE_ROLE_SOURCE);
-        if (ret != DECAMERA_OK) {
+        if (ret != DCAMERA_OK) {
             DHLOGE("DCameraChannelSourceImpl CreateSession failed, ret: %d", ret);
             return ret;
         }
