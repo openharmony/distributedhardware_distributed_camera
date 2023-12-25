@@ -29,12 +29,12 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-namespace{
-    static QosTV g_qosInfo[] = {
-        { .qos = QOS_TYPE_MIN_BW, .value = DCAMERA_QOS_TYPE_MIN_BW },
-        { .qos = QOS_TYPE_MAX_LATENCY, .value = DCAMERA_QOS_TYPE_MAX_LATENCY },
-        { .qos = QOS_TYPE_MIN_LATENCY, .value = DCAMERA_QOS_TYPE_MIN_LATENCY}
-    };
+namespace {
+static QosTV g_qosInfo[] = {
+    { .qos = QOS_TYPE_MIN_BW, .value = DCAMERA_QOS_TYPE_MIN_BW },
+    { .qos = QOS_TYPE_MAX_LATENCY, .value = DCAMERA_QOS_TYPE_MAX_LATENCY },
+    { .qos = QOS_TYPE_MIN_LATENCY, .value = DCAMERA_QOS_TYPE_MIN_LATENCY}
+};
 static uint32_t g_QosTV_Param_Index = static_cast<uint32_t>(sizeof(g_qosInfo) / sizeof(g_qosInfo[0]));
 }
 IMPLEMENT_SINGLE_INSTANCE(DCameraSoftbusAdapter);
@@ -63,7 +63,7 @@ static void DCameraSourceOnMessage(int32_t socket, const void *data, uint32_t da
 }
 
 static void DCameraSourceOnStream(int32_t socket, const StreamData *data, const StreamData *ext,
-    const StreamFrameInfo *param)
+        const StreamFrameInfo *param)
 {
     DCameraSoftbusAdapter::GetInstance().SourceOnStream(socket, data, ext, param);
     return;
@@ -95,7 +95,7 @@ static void DCameraSinkOnMessage(int32_t socket, const void *data, uint32_t data
 }
 
 static void DCameraSinkOnStream(int32_t socket, const StreamData *data, const StreamData *ext,
-    const StreamFrameInfo *param)
+        const StreamFrameInfo *param)
 {
     DCameraSoftbusAdapter::GetInstance().SinkOnStream(socket, data, ext, param);
     return;

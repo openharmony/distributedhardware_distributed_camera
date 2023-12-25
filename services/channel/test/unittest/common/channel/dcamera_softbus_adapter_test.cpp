@@ -326,7 +326,7 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_012, TestSize.L
     DCAMERA_CHANNEL_ROLE role = DCAMERA_CHANNLE_ROLE_SOURCE;
     std::string mySessName = "sourcetest03";
     std::string peerSessName = "sinktest02";
-   DCameraSessionMode sessionMode = DCameraSessionMode::DCAMERA_SESSION_MODE_VIDEO;
+    DCameraSessionMode sessionMode = DCameraSessionMode::DCAMERA_SESSION_MODE_VIDEO;
     std::string peerDevId = TEST_DEVICE_ID;
     std::string myDevId = "abcde";
     int32_t ret = DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDevId, peerSessName, peerDevId,
