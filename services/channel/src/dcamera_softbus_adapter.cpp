@@ -55,7 +55,7 @@ static void DCameraSourceOnMessage(int32_t socket, const void *data, uint32_t da
 }
 
 static void DCameraSourceOnStream(int32_t socket, const StreamData *data, const StreamData *ext,
-        const StreamFrameInfo *param)
+    const StreamFrameInfo *param)
 {
     DCameraSoftbusAdapter::GetInstance().SourceOnStream(socket, data, ext, param);
     return;
@@ -87,7 +87,7 @@ static void DCameraSinkOnMessage(int32_t socket, const void *data, uint32_t data
 }
 
 static void DCameraSinkOnStream(int32_t socket, const StreamData *data, const StreamData *ext,
-        const StreamFrameInfo *param)
+    const StreamFrameInfo *param)
 {
     DCameraSoftbusAdapter::GetInstance().SinkOnStream(socket, data, ext, param);
     return;

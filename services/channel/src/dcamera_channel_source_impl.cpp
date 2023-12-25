@@ -43,7 +43,8 @@ int32_t DCameraChannelSourceImpl::CloseSession()
     for (auto iter = softbusSessions_.begin(); iter != softbusSessions_.end(); iter++) {
         int32_t retOpen = (*iter)->CloseSession();
         if (retOpen != DCAMERA_OK) {
-            DHLOGE("DCameraChannelSourceImpl CloseSession %s failed, ret: %d", GetAnonyString(mySessionName_).c_str(), retOpen);
+            DHLOGE("DCameraChannelSourceImpl CloseSession %s failed, ret: %d", GetAnonyString(mySessionName_).c_str(),
+                retOpen);
             ret = DCAMERA_BAD_OPERATE;
         }
     }
