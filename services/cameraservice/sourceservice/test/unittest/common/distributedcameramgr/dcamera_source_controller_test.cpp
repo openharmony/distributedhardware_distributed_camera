@@ -482,7 +482,7 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_017, TestSi
 HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_018, TestSize.Level1)
 {
     int32_t ret = camDev_->InitDCameraSourceDev();
-    controller_->WaitforSessionResult(TEST_DEVICE_ID);
+    controller_->PublishEnableLatencyMsg(TEST_DEVICE_ID);
     ret = controller_->UnInit();
     EXPECT_EQ(ret, DCAMERA_OK);
 }

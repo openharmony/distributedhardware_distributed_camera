@@ -29,6 +29,14 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+namespace{
+    static QosTV g_qosInfo[] = {
+        { .qos = QOS_TYPE_MIN_BW, .value = DCAMERA_QOS_TYPE_MIN_BW },
+        { .qos = QOS_TYPE_MAX_LATENCY, .value = DCAMERA_QOS_TYPE_MAX_LATENCY },
+        { .qos = QOS_TYPE_MIN_LATENCY, .value = DCAMERA_QOS_TYPE_MIN_LATENCY}
+    };
+static uint32_t g_QosTV_Param_Index = static_cast<uint32_t>(sizeof(g_qosInfo) / sizeof(g_qosInfo[0]));
+}
 IMPLEMENT_SINGLE_INSTANCE(DCameraSoftbusAdapter);
 
 static void DCameraSourceOnBind(int32_t socket, PeerSocketInfo info)
@@ -127,23 +135,18 @@ int32_t DCameraSoftbusAdapter::CreatSoftBusSinkSocketServer(std::string mySessio
         GetAnonyString(mySessionName).c_str(), GetAnonyString(peerSessionName).c_str());
     {
         std::lock_guard<std::mutex> autoLock(mySessionNameLock_);
-        if (mySessionNameSet_.find(mySessionName) ==mySessionNameSet_.end()) {
+        if (mySessionNameSet_.find(mySessionName) == mySessionNameSet_.end()) {
             mySessionNameSet_.insert(mySessionName);
         } else {
             DHLOGI("current mySessionName had Listened");
             return DCAMERA_OK;
         }
     }
-    QosTV qos[] = {
-        { .qos = QOS_TYPE_MIN_BW, .value = 160 * 1024 * 1024 },
-        { .qos = QOS_TYPE_MAX_LATENCY, .value = 4000 },
-        { .qos = QOS_TYPE_MIN_LATENCY, .value = 2000}
-    };
     SocketInfo serverSocketInfo = {
-        .name = (char *)mySessionName.c_str(),
-        .pkgName = (char *)PKG_NAME.c_str(),
-        .peerNetworkId = (char *)peerDevId.c_str(),
-        .peerName = (char *)peerSessionName.c_str(),
+        .name =  const_cast<char*>(mySessionName.c_str()),
+        .pkgName = const_cast<char*>(PKG_NAME.c_str()),
+        .peerNetworkId = const_cast<char*>(peerDevId.c_str()),
+        .peerName = const_cast<char*>(peerSessionName.c_str()),
         .dataType = sessionModeAndDataTypeMap_[sessionMode],
     };
     int socketId = Socket(serverSocketInfo);
@@ -151,7 +154,7 @@ int32_t DCameraSoftbusAdapter::CreatSoftBusSinkSocketServer(std::string mySessio
         DHLOGE("DCameraSoftbusAdapter CreatSoftBusSinkSocketServer Error, socket is invalid");
         return DCAMERA_BAD_VALUE;
     }
-    int ret = Listen(socketId, qos, sizeof(qos) / sizeof(qos[0]), &sessListeners_[role]);
+    int ret = Listen(socketId, g_qosInfo, g_QosTV_Param_Index, &sessListeners_[role]);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSoftbusAdapter CreatSoftBusSinkSocketServer Error");
         Shutdown(socketId);
@@ -172,17 +175,12 @@ int32_t DCameraSoftbusAdapter::CreateSoftBusSourceSocketClient(std::string myDev
 {
     DHLOGI("CreateSoftBusSourceSocketClient start, myDevId: %s, peerSessionName: %s",
         GetAnonyString(myDevId).c_str(), GetAnonyString(peerSessionName).c_str());
-    QosTV qos[] = {
-        { .qos = QOS_TYPE_MIN_BW, .value = 160 * 1024 * 1024 },
-        { .qos = QOS_TYPE_MAX_LATENCY, .value = 4000 },
-        { .qos = QOS_TYPE_MIN_LATENCY, .value = 2000}
-    };
     std::string myDevIdPeerSessionName = myDevId + std::string("_") + peerSessionName;
     SocketInfo clientSocketInfo = {
-        .name = (char *)myDevIdPeerSessionName.c_str(),
-        .pkgName = (char *)PKG_NAME.c_str(),
-        .peerNetworkId = (char *)peerDevId.c_str(),
-        .peerName = (char *)peerSessionName.c_str(),
+        .name = const_cast<char*>(myDevIdPeerSessionName.c_str()),
+        .pkgName = const_cast<char*>(PKG_NAME.c_str()),
+        .peerNetworkId = const_cast<char*>(peerDevId.c_str()),
+        .peerName = const_cast<char*>(peerSessionName.c_str()),
         .dataType = sessionModeAndDataTypeMap_[sessionMode],
     };
     int socketId = Socket(clientSocketInfo);
@@ -190,7 +188,7 @@ int32_t DCameraSoftbusAdapter::CreateSoftBusSourceSocketClient(std::string myDev
         DHLOGE("DCameraSoftbusAdapter CreateSoftBusSourceSocketClient Error, socket is invalid");
         return DCAMERA_BAD_VALUE;
     }
-    int ret = Bind(socketId, qos, sizeof(qos) / sizeof(qos[0]), &sessListeners_[role]);
+    int ret = Bind(socketId, g_qosInfo, g_QosTV_Param_Index, &sessListeners_[role]);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSoftbusAdapter CreateSoftBusSourceSocketClient Error");
         Shutdown(socketId);

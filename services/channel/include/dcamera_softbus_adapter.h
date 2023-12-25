@@ -21,13 +21,11 @@
 #include <set>
 #include <unistd.h>
 
-#include "icamera_channel.h"
-#include "transport/socket.h"
-#include "transport/trans_type.h"
-
-#include "single_instance.h"
-
 #include "dcamera_softbus_session.h"
+#include "icamera_channel.h"
+#include "single_instance.h"
+#include "socket.h"
+#include "trans_type.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -40,10 +38,8 @@ class DCameraSoftbusAdapter {
 DECLARE_SINGLE_INSTANCE_BASE(DCameraSoftbusAdapter);
 
 public:
-    // sink_server_Listen
     int32_t CreatSoftBusSinkSocketServer(std::string mySessionName, DCAMERA_CHANNEL_ROLE role,
         DCameraSessionMode sessionMode, std::string peerDevId, std::string peerSessionName);
-    // source_client_Bind
     int32_t CreateSoftBusSourceSocketClient(std::string myDevId, std::string peerSessionName,
         std::string peerDevId, DCameraSessionMode sessionMode, DCAMERA_CHANNEL_ROLE role);
 

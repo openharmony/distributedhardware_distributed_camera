@@ -316,11 +316,11 @@ int32_t DCameraSourceController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& o
     indexs.push_back(DCameraIndex(devId, dhId));
     ret = channel_->CreateSession(indexs, SESSION_FLAG, DCAMERA_SESSION_MODE_CTRL, listener_);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceController Bind Socket failed,ret: %d", ret);
+        DHLOGE("DCameraSourceController Bind Socket failed, ret: %d", ret);
         PostChannelDisconnectedEvent();
         return ret;
     }
-    return WaitforSessionResult(devId);
+    return PublishEnableLatencyMsg(devId);
 }
 
 int32_t DCameraSourceController::CloseChannel()
@@ -492,13 +492,13 @@ void DCameraSourceController::HandleMetaDataResult(std::string& jsonStr)
     }
 }
 
-int32_t DCameraSourceController::WaitforSessionResult(const std::string& devId)
+int32_t DCameraSourceController::PublishEnableLatencyMsg(const std::string& devId)
 {
-    DHLOGI("DCameraSourceController Waiting Session Connect Start,devId: %s", GetAnonyString(devId_).c_str());
+    DHLOGI("DCameraSourceController PublishEnableLatencyMsg Start,devId: %s", GetAnonyString(devId_).c_str());
     isChannelConnected_.store(false);
     DCameraLowLatency::GetInstance().EnableLowLatency();
     DCameraSoftbusLatency::GetInstance().StartSoftbusTimeSync(devId);
-    DHLOGI("DCameraSourceController Waiting Session Connect End,devId: %s", GetAnonyString(devId_).c_str());
+    DHLOGI("DCameraSourceController PublishEnableLatencyMsg End,devId: %s", GetAnonyString(devId_).c_str());
     return DCAMERA_OK;
 }
 

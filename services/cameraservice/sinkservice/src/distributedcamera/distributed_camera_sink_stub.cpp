@@ -220,7 +220,7 @@ int32_t DistributedCameraSinkStub::GetCameraInfoInner(MessageParcel &data, Messa
 
 int32_t DistributedCameraSinkStub::OpenChannelInner(MessageParcel &data, MessageParcel &reply)
 {
-    DHLOGD("enter");
+    DHLOGD("DistributedCameraSinkStub OpenChannelInner Begin");
     int32_t ret = DCAMERA_OK;
     do {
         std::string dhId = data.ReadString();
@@ -234,6 +234,7 @@ int32_t DistributedCameraSinkStub::OpenChannelInner(MessageParcel &data, Message
         ret = OpenChannel(dhId, openInfo);
     } while (0);
     reply.WriteInt32(ret);
+    DHLOGD("DistributedCameraSinkStub OpenChannelInner End");
     return DCAMERA_OK;
 }
 
