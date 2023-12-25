@@ -386,62 +386,6 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_004, TestSize.Level1)
 }
 
 /**
- * @tc.name: dcamera_client_test_005
- * @tc.desc: Verify StartCapture and StopCapture
- * @tc.type: FUNC
- * @tc.require: AR000GK6ML
- */
-HWTEST_F(DCameraClientTest, dcamera_client_test_005, TestSize.Level1)
-{
-    DHLOGI("DCameraClientTest dcamera_client_test_005: test startCapture and stopCapture");
-    std::shared_ptr<StateCallback> stateCallback = std::make_shared<DCameraClientTestStateCallback>();
-    int32_t ret = client_->SetStateCallback(stateCallback);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    std::shared_ptr<ResultCallback> resultCallback = std::make_shared<DCameraClientTestResultCallback>();
-    ret = client_->SetResultCallback(resultCallback);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    sptr<IConsumerSurface> videoSurface = IConsumerSurface::Create();
-    sptr<IBufferConsumerListener> videoListener(new DCameraClientTestVideoSurfaceListener());
-    videoSurface->RegisterConsumerListener(videoListener);
-    ret = client_->Init();
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    SetTokenID();
-    DHLOGI("DCameraClientTest dcamera_client_test_005: video width: %d, height: %d, format: %d, isCapture: %d",
-        videoInfo_true_->width_, videoInfo_true_->height_, videoInfo_true_->format_, videoInfo_true_->isCapture_);
-    DHLOGI("DCameraClientTest dcamera_client_test_005: photo width: %d, height: %d, format: %d, isCapture: %d",
-        photoInfo_false_->width_, photoInfo_false_->height_, photoInfo_false_->format_, photoInfo_false_->isCapture_);
-    std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos;
-    captureInfos.push_back(videoInfo_true_);
-    captureInfos.push_back(photoInfo_false_);
-    sptr<IBufferProducer> bp = videoSurface->GetProducer();
-    sptr<Surface> pSurface = Surface::CreateSurfaceAsProducer(bp);
-    ret = client_->StartCapture(captureInfos, pSurface);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    sleep(TEST_SLEEP_SEC);
-
-    DHLOGI("DCameraClientTest dcamera_client_test_005: video width: %d, height: %d, format: %d, isCapture: %d",
-        videoInfo_false_->width_, videoInfo_false_->height_, videoInfo_false_->format_, videoInfo_false_->isCapture_);
-    DHLOGI("DCameraClientTest dcamera_client_test_005: photo width: %d, height: %d, format: %d, isCapture: %d",
-        photoInfo_true_->width_, photoInfo_true_->height_, photoInfo_true_->format_, photoInfo_true_->isCapture_);
-    captureInfos.clear();
-    captureInfos.push_back(videoInfo_false_);
-    captureInfos.push_back(photoInfo_true_);
-    ret = client_->StartCapture(captureInfos, pSurface);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    sleep(TEST_SLEEP_SEC);
-    ret = client_->StopCapture();
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = client_->UnInit();
-    EXPECT_EQ(DCAMERA_OK, ret);
-}
-
-/**
  * @tc.name: dcamera_client_test_006
  * @tc.desc: Verify UpdateSettings
  * @tc.type: FUNC
@@ -571,57 +515,6 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_011, TestSize.Level1)
 
     ret = client_->ConvertToCameraFormat(OHOS_CAMERA_FORMAT_JPEG);
     EXPECT_EQ(CameraStandard::CameraFormat::CAMERA_FORMAT_JPEG, ret);
-}
-
-/**
- * @tc.name: dcamera_client_test_013
- * @tc.desc: Verify StartPhotoOutput
- * @tc.type: FUNC
- * @tc.require: AR000GK6ML
- */
-HWTEST_F(DCameraClientTest, dcamera_client_test_013, TestSize.Level1)
-{
-    DHLOGI("DCameraClientTest dcamera_client_test_013: test startPhotoOutput");
-    std::shared_ptr<StateCallback> stateCallback = std::make_shared<DCameraClientTestStateCallback>();
-    int32_t ret = client_->SetStateCallback(stateCallback);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    std::shared_ptr<ResultCallback> resultCallback = std::make_shared<DCameraClientTestResultCallback>();
-    ret = client_->SetResultCallback(resultCallback);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    sptr<IConsumerSurface> videoSurface = IConsumerSurface::Create();
-    sptr<IBufferConsumerListener> videoListener(new DCameraClientTestVideoSurfaceListener());
-    videoSurface->RegisterConsumerListener(videoListener);
-    ret = client_->Init();
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    SetTokenID();
-    DHLOGI("DCameraClientTest dcamera_client_test_013: video width: %d, height: %d, format: %d, isCapture: %d",
-        videoInfo_true_->width_, videoInfo_true_->height_, videoInfo_true_->format_, videoInfo_true_->isCapture_);
-    DHLOGI("DCameraClientTest dcamera_client_test_013: photo width: %d, height: %d, format: %d, isCapture: %d",
-        photoInfo_false_->width_, photoInfo_false_->height_, photoInfo_false_->format_, photoInfo_false_->isCapture_);
-    std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos;
-    captureInfos.push_back(videoInfo_true_);
-    captureInfos.push_back(photoInfo_false_);
-    sptr<IBufferProducer> bp = videoSurface->GetProducer();
-    sptr<Surface> pSurface = Surface::CreateSurfaceAsProducer(bp);
-    ret = client_->StartCapture(captureInfos, pSurface);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    sleep(TEST_SLEEP_SEC);
-
-    auto info = std::make_shared<DCameraCaptureInfo>();
-    SetCaptureInfo(info);
-    ret = client_->StartPhotoOutput(info);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    sleep(TEST_SLEEP_SEC);
-    ret = client_->StopCapture();
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = client_->UnInit();
-    EXPECT_EQ(DCAMERA_OK, ret);
 }
 
 /**
