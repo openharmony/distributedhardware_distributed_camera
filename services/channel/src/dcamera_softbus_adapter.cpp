@@ -304,7 +304,7 @@ int32_t DCameraSoftbusAdapter::DCameraSoftbusSourceGetSession(int32_t socket,
         return DCAMERA_NOT_FOUND;
     }
     session = iter->second;
-    return DCAMERA_NOT_FOUND;
+    return DCAMERA_OK;
 }
 
 // source
