@@ -43,7 +43,7 @@
 #ifndef SOCKET_H
 #define SOCKET_H
 
-#include <stdint.h>
+#include <cstdint>
 #include "trans_type.h"
 
 #ifdef __cplusplus

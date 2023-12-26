@@ -14,7 +14,7 @@
  */
 #ifndef SOCKET_TYPE_H
 #define SOCKET_TYPE_H
-#include <stdint.h>
+#include <cstdint>
 
 #ifdef __cplusplus
 extern "C" {
