@@ -385,7 +385,6 @@ void DCameraSoftbusAdapter::SourceOnStream(int32_t socket, const StreamData *dat
         DHLOGE("DCameraSoftbusAdapter::OnSourceStreamReceived, data is null, socket: %d.", socket);
         return;
     }
-    DHLOGI("DCameraSoftbusAdapter SourceOnStream Start socket: %d", socket);
     int32_t dataLen = data->bufLen;
     if (dataLen <= 0 || dataLen > static_cast<int32_t>(DCAMERA_MAX_RECV_DATA_LEN)) {
         DHLOGE("DCameraSoftbusAdapter OnSourceStreamReceived dataLen: %d, socket: %d", dataLen, socket);
@@ -410,7 +409,6 @@ void DCameraSoftbusAdapter::SourceOnStream(int32_t socket, const StreamData *dat
         DHLOGE("Handle source stream ext failed, ret is: %d", ret);
     }
     session->OnDataReceived(buffer);
-    DHLOGI("DCameraSoftbusAdapter SourceOnStream End socket: %d", socket);
 }
 
 int32_t DCameraSoftbusAdapter::HandleSourceStreamExt(std::shared_ptr<DataBuffer>& buffer, const StreamData *ext)
@@ -572,7 +570,6 @@ void DCameraSoftbusAdapter::SinkOnStream(int32_t socket, const StreamData *data,
         DHLOGE("DCameraSoftbusAdapter::SinkOnStream, data is null, socket: %d.", socket);
         return;
     }
-    DHLOGI("DCameraSoftbusAdapter SinkOnStream Start socket: %d", socket);
     int32_t dataLen = data->bufLen;
     if (dataLen <= 0 || dataLen > static_cast<int32_t>(DCAMERA_MAX_RECV_DATA_LEN)) {
         DHLOGE("DCameraSoftbusAdapter SinkOnStream dataLen: %d socket: %d", dataLen, socket);
@@ -592,7 +589,6 @@ void DCameraSoftbusAdapter::SinkOnStream(int32_t socket, const StreamData *data,
         return;
     }
     session->OnDataReceived(buffer);
-    DHLOGI("DCameraSoftbusAdapter SinkOnStream End socket: %d", socket);
     return;
 }
 

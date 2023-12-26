@@ -255,7 +255,7 @@ int32_t DistributedCameraSinkProxy::OpenChannel(const std::string& dhId, std::st
     }
     remote->SendRequest(static_cast<uint32_t>(IDCameraSinkInterfaceCode::OPEN_CHANNEL), data, reply, option);
     int32_t result = reply.ReadInt32();
-    DHLOGI("DistributedCameraSinkProxy OpenChannel End,dhId: %s", GetAnonyString(dhId).c_str());
+    DHLOGI("DistributedCameraSinkProxy OpenChannel End,result: %d", result);
     return result;
 }
 
