@@ -135,12 +135,11 @@ int32_t DCameraSoftbusAdapter::CreatSoftBusSinkSocketServer(std::string mySessio
         GetAnonyString(mySessionName).c_str(), GetAnonyString(peerSessionName).c_str());
     {
         std::lock_guard<std::mutex> autoLock(mySessionNameLock_);
-        if (mySessionNameSet_.find(mySessionName) == mySessionNameSet_.end()) {
-            mySessionNameSet_.insert(mySessionName);
-        } else {
+        if (mySessionNameSet_.find(mySessionName) != mySessionNameSet_.end()) {
             DHLOGI("current mySessionName had Listened");
             return DCAMERA_OK;
         }
+        mySessionNameSet_.insert(mySessionName);
     }
     SocketInfo serverSocketInfo = {
         .name =  const_cast<char*>(mySessionName.c_str()),
