@@ -27,7 +27,7 @@ void SoftbusOnSourceSessionClosedFuzzTest(const uint8_t* data, size_t size)
 
     int32_t sessionId = *(reinterpret_cast<const int32_t*>(data));
 
-    DCameraSoftbusAdapter::GetInstance().OnSourceSessionClosed(sessionId);
+    DCameraSoftbusAdapter::GetInstance().SourceOnShutDown(sessionId, ShutdownReason::SHUTDOWN_REASON_LOCAL);
 }
 }
 }

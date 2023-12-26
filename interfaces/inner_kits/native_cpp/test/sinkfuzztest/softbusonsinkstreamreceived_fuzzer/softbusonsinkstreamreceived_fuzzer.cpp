@@ -39,7 +39,7 @@ void SoftbusOnSinkStreamReceivedFuzzTest(const uint8_t* data, size_t size)
         *(reinterpret_cast<const int*>(data)), nullptr
     };
 
-    DCameraSoftbusAdapter::GetInstance().OnSinkStreamReceived(sessionId, &receivedData, &ext, &param);
+    DCameraSoftbusAdapter::GetInstance().SinkOnStream(sessionId, &receivedData, &ext, &param);
 }
 }
 }

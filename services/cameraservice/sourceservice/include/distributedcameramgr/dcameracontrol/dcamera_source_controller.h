@@ -57,7 +57,7 @@ public:
 private:
     void HandleMetaDataResult(std::string& jsonStr);
     void PostChannelDisconnectedEvent();
-    int32_t WaitforSessionResult(const std::string& devId);
+    int32_t PublishEnableLatencyMsg(const std::string& devId);
     class DCameraHdiRecipient : public IRemoteObject::DeathRecipient {
     public:
         void OnRemoteDied(const wptr<IRemoteObject> &remote) override;

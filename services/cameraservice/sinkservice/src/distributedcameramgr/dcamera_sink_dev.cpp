@@ -135,7 +135,7 @@ int32_t DCameraSinkDev::GetCameraInfo(std::string& cameraInfo)
 
 int32_t DCameraSinkDev::OpenChannel(std::string& openInfo)
 {
-    DHLOGI("OpenChannel dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("DCameraSinkDev OpenChannel Begin, dhId: %s", GetAnonyString(dhId_).c_str());
     if (openInfo.empty()) {
         DHLOGE("openInfo is empty");
         return DCAMERA_BAD_VALUE;

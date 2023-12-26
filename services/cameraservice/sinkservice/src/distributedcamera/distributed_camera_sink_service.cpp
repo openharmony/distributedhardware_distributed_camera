@@ -262,7 +262,7 @@ int32_t DistributedCameraSinkService::GetCameraInfo(const std::string& dhId, std
 
 int32_t DistributedCameraSinkService::OpenChannel(const std::string& dhId, std::string& openInfo)
 {
-    DHLOGI("dhId: %s", GetAnonyString(dhId).c_str());
+    DHLOGI("DistributedCameraSinkService OpenChannel Begin,dhId: %s", GetAnonyString(dhId).c_str());
     std::shared_ptr<DCameraSinkDev> sinkDevice = nullptr;
     {
         std::lock_guard<std::mutex> lock(mapMutex_);
@@ -281,7 +281,7 @@ int32_t DistributedCameraSinkService::OpenChannel(const std::string& dhId, std::
             CreateMsg("sink service open channel failed, dhId: %s", GetAnonyString(dhId).c_str()));
         return ret;
     }
-    DHLOGI("OpenChannel success");
+    DHLOGI("DistributedCameraSinkService OpenChannel success");
     return DCAMERA_OK;
 }
 

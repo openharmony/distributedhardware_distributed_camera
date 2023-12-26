@@ -39,7 +39,7 @@ DCameraProviderCallbackImpl::~DCameraProviderCallbackImpl()
 
 int32_t DCameraProviderCallbackImpl::OpenSession(const DHBase& dhBase)
 {
-    DHLOGI("OpenSession devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
+    DHLOGI("DCameraProviderCallbackImpl OpenSession Start, devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     if (!CheckDHBase(dhBase)) {
         DHLOGE("input is invalid");
@@ -58,6 +58,8 @@ int32_t DCameraProviderCallbackImpl::OpenSession(const DHBase& dhBase)
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return FAILED;
     }
+    DHLOGI("DCameraProviderCallbackImpl OpenSession End, devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
+        GetAnonyString(dhId_).c_str());
     return SUCCESS;
 }
 

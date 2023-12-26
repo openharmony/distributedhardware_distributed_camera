@@ -26,9 +26,9 @@ void SoftbusOnSinkSessionOpenedFuzzTest(const uint8_t* data, size_t size)
     }
 
     int32_t sessionId = *(reinterpret_cast<const int32_t*>(data));
-    int32_t result = *(reinterpret_cast<const int32_t*>(data));
+    PeerSocketInfo socketInfo = *(reinterpret_cast<const PeerSocketInfo*>(data));
 
-    DCameraSoftbusAdapter::GetInstance().OnSinkSessionOpened(sessionId, result);
+    DCameraSoftbusAdapter::GetInstance().SinkOnBind(sessionId, socketInfo);
 }
 }
 }

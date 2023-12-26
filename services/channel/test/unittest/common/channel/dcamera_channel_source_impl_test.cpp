@@ -103,9 +103,7 @@ HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_001, Tes
     input_ = std::make_shared<DCameraSourceInput>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, camDev_);
 
     listener_ = std::make_shared<DCameraSourceInputChannelListener>(input_, CONTINUOUS_FRAME);
-    channel_->CreateSession(camIndexs, sessionFlag, sessionMode, listener_);
-
-    int32_t ret = channel_->OpenSession();
+    int32_t ret = channel_->CreateSession(camIndexs, sessionFlag, sessionMode, listener_);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
@@ -133,9 +131,7 @@ HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_002, Tes
     input_ = std::make_shared<DCameraSourceInput>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, camDev_);
 
     listener_ = std::make_shared<DCameraSourceInputChannelListener>(input_, CONTINUOUS_FRAME);
-    channel_->CreateSession(camIndexs, sessionFlag, sessionMode, listener_);
-
-    int32_t ret = channel_->OpenSession();
+    int32_t ret = channel_->CreateSession(camIndexs, sessionFlag, sessionMode, listener_);
     ret = channel_->CloseSession();
     EXPECT_EQ(DCAMERA_OK, ret);
 }
@@ -193,8 +189,7 @@ HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_004, Tes
     input_ = std::make_shared<DCameraSourceInput>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, camDev_);
 
     listener_ = std::make_shared<DCameraSourceInputChannelListener>(input_, CONTINUOUS_FRAME);
-    channel_->CreateSession(camIndexs, sessionFlag, sessionMode, listener_);
-    int32_t ret = channel_->OpenSession();
+    int32_t ret = channel_->CreateSession(camIndexs, sessionFlag, sessionMode, listener_);
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);
     ret = channel_->SendData(dataBuffer);
@@ -202,18 +197,6 @@ HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_004, Tes
     channel_->CloseSession();
     ret = channel_->ReleaseSession();
     EXPECT_EQ(DCAMERA_OK, ret);
-}
-
-/**
- * @tc.name: dcamera_channel_source_impl_test_005
- * @tc.desc: Verify the OpenSession function.
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_005, TestSize.Level1)
-{
-    int32_t ret = channel_->OpenSession();
-    EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
 }
 
 /**

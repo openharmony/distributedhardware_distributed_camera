@@ -21,6 +21,7 @@
 
 #include "icamera_channel.h"
 #include "icamera_channel_listener.h"
+#include "transport/trans_type.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -35,9 +36,9 @@ public:
     DCameraSoftbusSession(std::string myDevId, std::string mySessionName, std::string peerDevId,
         std::string peerSessionName, std::shared_ptr<ICameraChannelListener> listener, DCameraSessionMode mode);
     ~DCameraSoftbusSession();
-    int32_t OpenSession();
     int32_t CloseSession();
-    int32_t OnSessionOpend(int32_t sessionId, int32_t result);
+    int32_t OnSessionOpened(int32_t socket, PeerSocketInfo info);
+    int32_t RefreshSessionStatus(int32_t socket);
     int32_t OnSessionClose(int32_t sessionId);
     int32_t OnDataReceived(std::shared_ptr<DataBuffer>& buffer);
     int32_t SendData(DCameraSessionMode mode, std::shared_ptr<DataBuffer>& buffer);
