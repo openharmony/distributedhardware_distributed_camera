@@ -20,6 +20,7 @@
 
 #include "dcamera_source_state.h"
 #include "dcamera_utils_tools.h"
+#include "mock_camera_channel.h"
 #include "icamera_state_listener.h"
 #include "dcamera_source_controller_channel_listener.h"
 #include "distributed_camera_errno.h"
@@ -30,6 +31,7 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace DistributedHardware {
+std::string g_channelStr = "";
 class DCameraSourceControllerTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -70,6 +72,7 @@ void DCameraSourceControllerTest::SetUp(void)
     stateMachine_ = std::make_shared<DCameraSourceStateMachine>(camDev_);
     controller_ = std::make_shared<DCameraSourceController>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, stateMachine_,
         camDev_);
+    controller_->channel_ = std::make_shared<MockCameraChannel>();
     DCameraIndex index;
     index.devId_ = TEST_DEVICE_ID;
     index.dhId_ = TEST_CAMERA_DH_ID_0;
@@ -94,7 +97,7 @@ void DCameraSourceControllerTest::TearDown(void)
 HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_001, TestSize.Level1)
 {
     int32_t ret = controller_->Init(indexs_);
-    EXPECT_EQ(ret, DCAMERA_OK);
+    EXPECT_EQ(ret, DCAMERA_INIT_ERR);
 }
 /**
  * @tc.name: dcamera_source_controller_test_002
@@ -105,7 +108,7 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_001, TestSi
 HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_002, TestSize.Level1)
 {
     int32_t ret = controller_->Init(indexs_);
-    EXPECT_EQ(ret, DCAMERA_OK);
+    EXPECT_EQ(ret, DCAMERA_INIT_ERR);
     ret = controller_->UnInit();
     EXPECT_EQ(ret, DCAMERA_OK);
 }
@@ -128,10 +131,15 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_003, TestSi
     capture->streamType_ = DCStreamType::SNAPSHOT_FRAME;
     captureInfos.push_back(capture);
 
-    controller_->Init(indexs_);
-    int32_t ret = controller_->StartCapture(captureInfos);
+    int32_t ret = controller_->Init(indexs_);
+    EXPECT_EQ(ret, DCAMERA_INIT_ERR);
+    DCameraIndex index1;
+    index1.devId_ = TEST_DEVICE_ID;
+    index1.dhId_ = TEST_CAMERA_DH_ID_0;
+    controller_->indexs_.push_back(index1);
+    ret = controller_->StartCapture(captureInfos);
     controller_->UnInit();
-    EXPECT_EQ(ret, DCAMERA_BAD_OPERATE);
+    EXPECT_EQ(ret, DCAMERA_OK);
 }
 /**
  * @tc.name: dcamera_source_controller_test_004
@@ -151,8 +159,13 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_004, TestSi
     capture->encodeType_ = DCEncodeType::ENCODE_TYPE_H264;
     capture->streamType_ = DCStreamType::SNAPSHOT_FRAME;
     captureInfos.push_back(capture);
-    controller_->Init(indexs_);
-    int32_t ret = controller_->StartCapture(captureInfos);
+    int32_t ret = controller_->Init(indexs_);
+    EXPECT_EQ(ret, DCAMERA_INIT_ERR);
+    DCameraIndex index1;
+    index1.devId_ = TEST_DEVICE_ID;
+    index1.dhId_ = TEST_CAMERA_DH_ID_0;
+    controller_->indexs_.push_back(index1);
+    ret = controller_->StartCapture(captureInfos);
 
     ret = controller_->StopCapture();
     controller_->UnInit();
@@ -167,13 +180,19 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_004, TestSi
  */
 HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_005, TestSize.Level1)
 {
+    DHLOGI("start execute dcamera_source_controller_test_005");
     std::shared_ptr<DCameraChannelInfo> chanInfo = std::make_shared<DCameraChannelInfo>();
     int32_t ret = GetLocalDeviceNetworkId(chanInfo->sourceDevId_);
     DCameraChannelDetail continueChInfo(CONTINUE_SESSION_FLAG, CONTINUOUS_FRAME);
     DCameraChannelDetail snapShotChInfo(SNAP_SHOT_SESSION_FLAG, SNAPSHOT_FRAME);
     chanInfo->detail_.push_back(continueChInfo);
     chanInfo->detail_.push_back(snapShotChInfo);
-    controller_->Init(indexs_);
+    ret = controller_->Init(indexs_);
+    EXPECT_EQ(ret, DCAMERA_INIT_ERR);
+    DCameraIndex index1;
+    index1.devId_ = TEST_DEVICE_ID;
+    index1.dhId_ = TEST_CAMERA_DH_ID_0;
+    controller_->indexs_.push_back(index1);
     ret = controller_->ChannelNeg(chanInfo);
     controller_->UnInit();
     EXPECT_EQ(ret, DCAMERA_BAD_OPERATE);
@@ -187,6 +206,7 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_005, TestSi
  */
 HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_006, TestSize.Level1)
 {
+    DHLOGI("start execute dcamera_source_controller_test_006");
     std::shared_ptr<DCameraChannelInfo> chanInfo = std::make_shared<DCameraChannelInfo>();
     std::vector<std::shared_ptr<DCameraSettings>> settings;
     std::shared_ptr<DCameraSettings> setting = std::make_shared<DCameraSettings>();
@@ -194,10 +214,15 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_006, TestSi
     setting->value_ = "UpdateSettingsTest";
     settings.push_back(setting);
 
-    controller_->Init(indexs_);
-    int32_t ret = controller_->UpdateSettings(settings);
+    int32_t ret = controller_->Init(indexs_);
+    EXPECT_EQ(ret, DCAMERA_INIT_ERR);
+    DCameraIndex index1;
+    index1.devId_ = TEST_DEVICE_ID;
+    index1.dhId_ = TEST_CAMERA_DH_ID_0;
+    controller_->indexs_.push_back(index1);
+    ret = controller_->UpdateSettings(settings);
     controller_->UnInit();
-    EXPECT_EQ(ret, DCAMERA_BAD_OPERATE);
+    EXPECT_EQ(ret, DCAMERA_OK);
 }
 
 /**
@@ -208,10 +233,16 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_006, TestSi
  */
 HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_007, TestSize.Level1)
 {
-    controller_->Init(indexs_);
+    DHLOGI("start execute dcamera_source_controller_test_006");
+    int32_t ret = controller_->Init(indexs_);
+    EXPECT_EQ(ret, DCAMERA_INIT_ERR);
+    DCameraIndex index1;
+    index1.devId_ = TEST_DEVICE_ID;
+    index1.dhId_ = TEST_CAMERA_DH_ID_0;
+    controller_->indexs_.push_back(index1);
     std::shared_ptr<DCameraInfo> camInfo = std::make_shared<DCameraInfo>();
     camInfo->state_ = 1;
-    int32_t ret = controller_->GetCameraInfo(camInfo);
+    ret = controller_->GetCameraInfo(camInfo);
     controller_->UnInit();
     EXPECT_EQ(ret, DCAMERA_BAD_OPERATE);
 }
@@ -224,9 +255,14 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_007, TestSi
  */
 HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_008, TestSize.Level1)
 {
-    controller_->Init(indexs_);
+    int32_t ret = controller_->Init(indexs_);
+    EXPECT_EQ(ret, DCAMERA_INIT_ERR);
+    DCameraIndex index1;
+    index1.devId_ = TEST_DEVICE_ID;
+    index1.dhId_ = TEST_CAMERA_DH_ID_0;
+    controller_->indexs_.push_back(index1);
     std::shared_ptr<DCameraOpenInfo> openInfo = std::make_shared<DCameraOpenInfo>();
-    int32_t ret = GetLocalDeviceNetworkId(openInfo->sourceDevId_);
+    ret = GetLocalDeviceNetworkId(openInfo->sourceDevId_);
     ret = controller_->OpenChannel(openInfo);
     controller_->UnInit();
     EXPECT_EQ(ret, DCAMERA_BAD_OPERATE);
@@ -240,9 +276,14 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_008, TestSi
  */
 HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_009, TestSize.Level1)
 {
-    controller_->Init(indexs_);
+    int32_t ret = controller_->Init(indexs_);
+    EXPECT_EQ(ret, DCAMERA_INIT_ERR);
+    DCameraIndex index1;
+    index1.devId_ = TEST_DEVICE_ID;
+    index1.dhId_ = TEST_CAMERA_DH_ID_0;
+    controller_->indexs_.push_back(index1);
     std::shared_ptr<DCameraOpenInfo> openInfo = std::make_shared<DCameraOpenInfo>();
-    int32_t ret = GetLocalDeviceNetworkId(openInfo->sourceDevId_);
+    ret = GetLocalDeviceNetworkId(openInfo->sourceDevId_);
     controller_->OpenChannel(openInfo);
     ret = controller_->CloseChannel();
     controller_->UnInit();
@@ -441,7 +482,7 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_017, TestSi
 HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_018, TestSize.Level1)
 {
     int32_t ret = camDev_->InitDCameraSourceDev();
-    controller_->WaitforSessionResult(TEST_DEVICE_ID);
+    controller_->PublishEnableLatencyMsg(TEST_DEVICE_ID);
     ret = controller_->UnInit();
     EXPECT_EQ(ret, DCAMERA_OK);
 }

@@ -60,22 +60,6 @@ DCameraSoftbusSession::~DCameraSoftbusSession()
     eventHandler_ = nullptr;
 }
 
-int32_t DCameraSoftbusSession::OpenSession()
-{
-    DHLOGI("DCameraSoftbusSession OpenSession peerDevId: %s peerSessionName: %s",
-        GetAnonyString(peerDevId_).c_str(), GetAnonyString(peerSessionName_).c_str());
-    int32_t ret = DCameraSoftbusAdapter::GetInstance().OpenSoftbusSession(mySessionName_, peerSessionName_, mode_,
-        peerDevId_);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSoftbusSession OpenSession failed, ret: %d, peerDevId: %s peerSessionName: %s", ret,
-            GetAnonyString(peerDevId_).c_str(), GetAnonyString(peerSessionName_).c_str());
-        return ret;
-    }
-
-    listener_->OnSessionState(DCAMERA_CHANNEL_STATE_CONNECTING);
-    return DCAMERA_OK;
-}
-
 int32_t DCameraSoftbusSession::CloseSession()
 {
     DHLOGI("DCameraSoftbusSession CloseSession sessionId: %d peerDevId: %s peerSessionName: %s", sessionId_,
@@ -97,22 +81,32 @@ int32_t DCameraSoftbusSession::CloseSession()
     return DCAMERA_OK;
 }
 
-int32_t DCameraSoftbusSession::OnSessionOpend(int32_t sessionId, int32_t result)
+int32_t DCameraSoftbusSession::OnSessionOpened(int32_t socket, PeerSocketInfo info)
 {
-    DHLOGI("DCameraSoftbusSession OnSessionOpend sessionId: %d result: %d peerDevId: %s peerSessionName: %s",
-        sessionId, result, GetAnonyString(peerDevId_).c_str(), GetAnonyString(peerSessionName_).c_str());
-    if (result != DCAMERA_OK) {
-        DHLOGE("DCameraSoftbusSession OnSessionOpend sessionId: %d result: %d peerDevId: %s peerSessionName: %s",
-            sessionId_, result, GetAnonyString(peerDevId_).c_str(), GetAnonyString(peerSessionName_).c_str());
+    DHLOGI("DCameraSoftbusSession OnSessionOpened Start, socket is: %d", socket);
+    if (info.networkId == nullptr) {
+        DHLOGE("DCameraSoftbusSession OnSessionOpened error, PeerDevId is null", socket);
         listener_->OnSessionState(DCAMERA_CHANNEL_STATE_DISCONNECTED);
         listener_->OnSessionError(DCAMERA_MESSAGE, DCAMERA_EVENT_OPEN_CHANNEL_ERROR,
             std::string("softbus internal error"));
-        return result;
+        return DCAMERA_WRONG_STATE;
     }
-
-    sessionId_ = sessionId;
+    DHLOGI("peerDevId: %s peerSessionName: %s", GetAnonyString(info.networkId).c_str(),
+        GetAnonyString(info.name).c_str());
+    sessionId_ = socket;
     state_ = DCAMERA_SOFTBUS_STATE_OPENED;
     listener_->OnSessionState(DCAMERA_CHANNEL_STATE_CONNECTED);
+    DHLOGI("DCameraSoftbusSession OnSessionOpened End, socket: %d", socket);
+    return DCAMERA_OK;
+}
+
+int32_t DCameraSoftbusSession::RefreshSessionStatus(int32_t socket)
+{
+    DHLOGI("DCameraSoftbusSession RefreshSessionStatus Start, socket: %d", socket);
+    sessionId_ = socket;
+    state_ = DCAMERA_SOFTBUS_STATE_OPENED;
+    listener_->OnSessionState(DCAMERA_CHANNEL_STATE_CONNECTED);
+    DHLOGI("DCameraSoftbusSession RefreshSessionStatus End, socket: %d", socket);
     return DCAMERA_OK;
 }
 

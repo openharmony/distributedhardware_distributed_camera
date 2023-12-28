@@ -33,7 +33,6 @@
                 "ipc",
                 "eventhandler",
                 "camera_framework",
-                "graphic_2d",
                 "graphic_surface",
                 "distributed_hardware_fwk",
                 "device_security_level",

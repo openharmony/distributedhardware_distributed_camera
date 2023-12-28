@@ -29,7 +29,7 @@ void SoftbusOnSourceBytesReceivedFuzzTest(const uint8_t* data, size_t size)
     const void *receivedData = reinterpret_cast<const void*>(data);
     uint32_t dataLen = *(reinterpret_cast<const uint32_t*>(data));
 
-    DCameraSoftbusAdapter::GetInstance().OnSourceBytesReceived(sessionId, receivedData, dataLen);
+    DCameraSoftbusAdapter::GetInstance().SourceOnBytes(sessionId, receivedData, dataLen);
 }
 }
 }

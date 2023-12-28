@@ -29,7 +29,7 @@ void SoftbusOnSinkBytesReceivedFuzzTest(const uint8_t* data, size_t size)
     const void *receivedData = reinterpret_cast<const void*>(data);
     uint32_t dataLen = *(reinterpret_cast<const uint32_t*>(data));
 
-    DCameraSoftbusAdapter::GetInstance().OnSinkBytesReceived(sessionId, receivedData, dataLen);
+    DCameraSoftbusAdapter::GetInstance().SinkOnBytes(sessionId, receivedData, dataLen);
 }
 }
 }

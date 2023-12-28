@@ -83,7 +83,6 @@ ohos_unittest("DCameraSourceMgrTest") {
 
   deps = [
     "${common_path}:distributed_camera_utils",
-    "${graphicstandard_path}:libsurface",
     "${services_path}/cameraservice/sourceservice:distributed_camera_source",
     "${services_path}/channel:distributed_camera_channel",
     "${services_path}/data_process:distributed_camera_data_process",
@@ -100,6 +99,7 @@ ohos_unittest("DCameraSourceMgrTest") {
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
+    "graphic_surface:surface",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_core",

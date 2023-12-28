@@ -52,7 +52,6 @@ public:
 private:
     void FinshFrameAsyncTrace(DCStreamType streamType);
     void PostChannelDisconnectedEvent();
-    int32_t WaitforSessionResult();
     int32_t EstablishContinuousFrameSession(std::vector<DCameraIndex>& indexs);
     int32_t EstablishSnapshotFrameSession(std::vector<DCameraIndex>& indexs);
 

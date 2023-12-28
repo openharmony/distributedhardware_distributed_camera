@@ -191,7 +191,7 @@ int32_t DCameraSinkController::GetCameraInfo(std::shared_ptr<DCameraInfo>& camIn
 
 int32_t DCameraSinkController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& openInfo)
 {
-    DHLOGI("OpenChannel dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("DCameraSinkController OpenChannel Start, dhId: %s", GetAnonyString(dhId_).c_str());
     if (!CheckPermission()) {
         DHLOGE("DCameraSinkController OpenChannel fail, CheckPermission fail");
         return DCAMERA_WRONG_STATE;
@@ -238,7 +238,7 @@ int32_t DCameraSinkController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& ope
     if (ret != DCAMERA_OK) {
         return ret;
     }
-    DHLOGI("OpenChannel %s success", GetAnonyString(dhId_).c_str());
+    DHLOGI("DCameraSinkController OpenChannel %s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
 }
 
@@ -260,7 +260,7 @@ int32_t DCameraSinkController::PullUpPage()
 
 int32_t DCameraSinkController::CloseChannel()
 {
-    DHLOGI("CloseChannel dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("DCameraSinkController CloseChannel Start, dhId: %s", GetAnonyString(dhId_).c_str());
     std::lock_guard<std::mutex> autoLock(channelLock_);
     DCameraLowLatency::GetInstance().DisableLowLatency();
     DCameraSinkServiceIpc::GetInstance().DeleteSourceRemoteCamSrv(srcDevId_);
@@ -287,7 +287,7 @@ int32_t DCameraSinkController::CloseChannel()
         }
     }
     isPageStatus_.store(false);
-    DHLOGI("CloseChannel %s success", GetAnonyString(dhId_).c_str());
+    DHLOGI("DCameraSinkController CloseChannel %s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
 }
 

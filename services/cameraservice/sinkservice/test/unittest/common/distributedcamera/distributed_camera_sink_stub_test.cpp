@@ -35,7 +35,6 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    void SetTokenID();
 };
 
 void DcameraSinkStubTest::SetUpTestCase(void)
@@ -51,21 +50,12 @@ void DcameraSinkStubTest::TearDownTestCase(void)
 void DcameraSinkStubTest::SetUp(void)
 {
     DHLOGI("enter");
-}
-
-void DcameraSinkStubTest::TearDown(void)
-{
-    DHLOGI("enter");
-}
-
-void DcameraSinkStubTest::SetTokenID()
-{
     uint64_t tokenId;
     int32_t numberOfPermissions = 3;
     const char *perms[numberOfPermissions];
     perms[0] = "ohos.permission.ENABLE_DISTRIBUTED_HARDWARE";
-    perms[1] = "ohos.permission.DISTRIBUTED_DATASYNC";
-    perms[2] = "ohos.permission.CAMERA";
+    perms[1] = OHOS_PERMISSION_DISTRIBUTED_DATASYNC;
+    perms[2] = "ohos.permission.ACCESS_DISTRIBUTED_HARDWARE";
     NativeTokenInfoParams infoInstance = {
         .dcapsNum = 0,
         .permsNum = numberOfPermissions,
@@ -73,12 +63,17 @@ void DcameraSinkStubTest::SetTokenID()
         .dcaps = NULL,
         .perms = perms,
         .acls = NULL,
-        .processName = "dcamera_client_demo",
+        .processName = "dcamera_sink_handler",
         .aplStr = "system_basic",
     };
     tokenId = GetAccessTokenId(&infoInstance);
     SetSelfTokenID(tokenId);
     OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
+}
+
+void DcameraSinkStubTest::TearDown(void)
+{
+    DHLOGI("enter");
 }
 
 /**
@@ -90,7 +85,6 @@ void DcameraSinkStubTest::SetTokenID()
 HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_001, TestSize.Level1)
 {
     DHLOGI("dcamera_sink_stub_test_001");
-    SetTokenID();
     sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
     sptr<IRemoteObject> sinkStubPtr(new MockDistributedCameraSinkStub());
     DistributedCameraSinkProxy sinkProxy(sinkStubPtr);
@@ -108,7 +102,6 @@ HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_001, TestSize.Level1)
 HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_002, TestSize.Level1)
 {
     DHLOGI("dcamera_sink_stub_test_002");
-    SetTokenID();
     sptr<IRemoteObject> sinkStubPtr(new MockDistributedCameraSinkStub());
     DistributedCameraSinkProxy sinkProxy(sinkStubPtr);
     int32_t ret = sinkProxy.ReleaseSink();

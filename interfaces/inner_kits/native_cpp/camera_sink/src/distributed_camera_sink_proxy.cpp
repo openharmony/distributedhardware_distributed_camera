@@ -230,7 +230,7 @@ int32_t DistributedCameraSinkProxy::GetCameraInfo(const std::string& dhId, std::
 
 int32_t DistributedCameraSinkProxy::OpenChannel(const std::string& dhId, std::string& openInfo)
 {
-    DHLOGI("dhId: %s", GetAnonyString(dhId).c_str());
+    DHLOGI("DistributedCameraSinkProxy OpenChannel Begin,dhId: %s", GetAnonyString(dhId).c_str());
     if (dhId.empty() || dhId.size() > DID_MAX_SIZE || openInfo.empty() ||
         openInfo.size() > PARAM_MAX_SIZE) {
         DHLOGE("params is invalid");
@@ -255,6 +255,7 @@ int32_t DistributedCameraSinkProxy::OpenChannel(const std::string& dhId, std::st
     }
     remote->SendRequest(static_cast<uint32_t>(IDCameraSinkInterfaceCode::OPEN_CHANNEL), data, reply, option);
     int32_t result = reply.ReadInt32();
+    DHLOGI("DistributedCameraSinkProxy OpenChannel End,result: %d", result);
     return result;
 }
 
