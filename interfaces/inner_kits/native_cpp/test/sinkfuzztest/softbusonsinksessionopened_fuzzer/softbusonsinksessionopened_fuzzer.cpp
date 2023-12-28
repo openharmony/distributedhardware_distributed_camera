@@ -27,7 +27,7 @@ void SoftbusOnSinkSessionOpenedFuzzTest(const uint8_t* data, size_t size)
 
     int32_t sessionId = *(reinterpret_cast<const int32_t*>(data));
     std::string peerSessionName(reinterpret_cast<const char*>(data), size);
-    std::string peerDevId(reinterpret_cast<const char*>(data), size);;
+    std::string peerDevId(reinterpret_cast<const char*>(data), size);
     std::string pkgName = "ohos.dhardware.dcamera";
     PeerSocketInfo socketInfo = {
         .name = const_cast<char*>(peerSessionName.c_str()),
