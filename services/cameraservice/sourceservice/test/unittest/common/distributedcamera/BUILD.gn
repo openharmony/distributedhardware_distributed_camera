@@ -47,7 +47,7 @@ config("module_private_config") {
     "//third_party/cJSON",
     "//third_party/jsoncpp/include",
     "//drivers/peripheral/base/",
-    "${graphicstandard_path}/frameworks/surface/include",
+    "${graphicsurface_path}/surface/include",
   ]
 }
 
@@ -71,7 +71,6 @@ ohos_unittest("DCameraSourceTest") {
 
   deps = [
     "${common_path}:distributed_camera_utils",
-    "${graphicstandard_path}:libsurface",
     "${innerkits_path}/native_cpp/camera_source:distributed_camera_source_sdk",
     "${services_path}/cameraservice/sourceservice:distributed_camera_source",
     "${services_path}/channel:distributed_camera_channel",
@@ -88,6 +87,7 @@ ohos_unittest("DCameraSourceTest") {
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
+    "graphic_surface:surface",
     "hicollie:libhicollie",
     "hilog:libhilog",
     "ipc:ipc_core",

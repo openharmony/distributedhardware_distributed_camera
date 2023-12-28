@@ -22,7 +22,7 @@ config("module_private_config") {
   include_dirs = [
     "//third_party/cJSON",
     "//third_party/jsoncpp/include",
-    "${graphicstandard_path}/frameworks/surface/include",
+    "${graphicsurface_path}/surface/include",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include/input",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include/output",
@@ -64,7 +64,6 @@ ohos_unittest("DCameraClientTest") {
   deps = [
     "${camerastandard_path}/frameworks/native/camera:camera_framework",
     "${common_path}:distributed_camera_utils",
-    "${graphicstandard_path}:libsurface",
     "${services_path}/cameraservice/cameraoperator/client:distributed_camera_client",
     "${services_path}/cameraservice/cameraoperator/handler:distributed_camera_handler",
     "${services_path}/cameraservice/sinkservice:distributed_camera_sink",
@@ -83,6 +82,7 @@ ohos_unittest("DCameraClientTest") {
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "drivers_peripheral_display:hdi_gralloc_client",
     "eventhandler:libeventhandler",
+    "graphic_surface:surface",
     "hilog:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",

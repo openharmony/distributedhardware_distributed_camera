@@ -26,7 +26,7 @@ ohos_fuzztest("EncodeOnInputBufferAvailableFuzzTest") {
   include_dirs = [
     "${fwk_common_path}/utils/include",
     "${fwk_utils_path}/include/eventbus",
-    "${graphicstandard_path}/frameworks/surface/include",
+    "${graphicsurface_path}/surface/include",
     "${services_path}/cameraservice/base/include",
   ]
 
@@ -72,7 +72,7 @@ ohos_fuzztest("EncodeOnInputBufferAvailableFuzzTest") {
     "c_utils:utils",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "eventhandler:libeventhandler",
-    "graphic_2d:surface",
+    "graphic_surface:surface",
     "histreamer:media_foundation",
     "hitrace:hitrace_meter",
   ]
