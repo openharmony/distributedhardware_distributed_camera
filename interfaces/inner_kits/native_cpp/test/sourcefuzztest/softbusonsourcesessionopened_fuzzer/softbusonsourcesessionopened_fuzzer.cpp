@@ -26,7 +26,15 @@ void SoftbusOnSourceSessionOpenedFuzzTest(const uint8_t* data, size_t size)
     }
 
     int32_t sessionId = *(reinterpret_cast<const int32_t*>(data));
-    PeerSocketInfo socketInfo = *(reinterpret_cast<const PeerSocketInfo*>(data));
+    std::string peerSessionName(reinterpret_cast<const char*>(data), size);
+    std::string peerDevId(reinterpret_cast<const char*>(data), size);
+    std::string pkgName = "ohos.dhardware.dcamera";
+    PeerSocketInfo socketInfo = {
+        .name = const_cast<char*>(peerSessionName.c_str()),
+        .networkId = const_cast<char*>(peerDevId.c_str()),
+        .pkgName = const_cast<char*>(pkgName.c_str()),
+        .dataType = TransDataType::DATA_TYPE_BYTES,
+    };
     DCameraSoftbusAdapter::GetInstance().SourceOnBind(sessionId, socketInfo);
 }
 }
