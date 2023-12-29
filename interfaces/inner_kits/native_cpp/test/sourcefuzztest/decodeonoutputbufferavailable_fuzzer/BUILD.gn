@@ -72,8 +72,8 @@ ohos_fuzztest("DecodeOnOutputBufferAvailableFuzzTest") {
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "graphic_surface:surface",
-    "media_foundation:media_foundation",
     "hitrace:hitrace_meter",
+    "media_foundation:media_foundation",
   ]
 }
 
