@@ -118,7 +118,7 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_002, TestSize.L
         .pkgName = const_cast<char*>(pkgName.c_str()),
         .networkId = const_cast<char*>(networkId.c_str()),
     };
-    int32_t ret = softbusSession_->OnSessionOpened(sessionId, info);
+    int32_t ret = softbusSession_->OnSessionOpened(sessionId);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 

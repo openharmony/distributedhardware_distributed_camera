@@ -83,8 +83,11 @@ int32_t DCameraChannelSourceImpl::CreateSession(std::vector<DCameraIndex>& camIn
         int32_t sourceSocket = DCameraSoftbusAdapter::GetInstance().GetSourceSocketId();
         std::shared_ptr<DCameraSoftbusSession> softbusSess = std::make_shared<DCameraSoftbusSession>(myDevId,
             mySessionName_, peerDevId, peerSessionName, listener, sessionMode);
-        DCameraSoftbusAdapter::GetInstance().sourceSocketIdSessionMap_[sourceSocket] = softbusSess;
-        softbusSess->RefreshSessionStatus(sourceSocket);
+        softbusSess->OnSessionOpened(sourceSocket);
+        std::map<int32_t,std::shared_ptr<DCameraSoftbusSession>> socketSessionMap =
+            DCameraSoftbusAdapter::GetInstance().GetSourceSocketSessionMap();
+        socketSessionMap[sourceSocket] = softbusSess;
+        DCameraSoftbusAdapter::GetInstance().SetSourceSocketSessionMap(socketSessionMap);
         softbusSessions_.push_back(softbusSess);
         DCameraSoftbusAdapter::GetInstance().sourceSessions_[peerDevId + peerSessionName] = softbusSess;
     }

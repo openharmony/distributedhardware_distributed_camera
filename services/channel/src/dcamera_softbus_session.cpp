@@ -41,7 +41,7 @@ DCameraSoftbusSession::DCameraSoftbusSession(std::string myDevId, std::string my
 {
     sendFuncMap_[DCAMERA_SESSION_MODE_CTRL] = &DCameraSoftbusSession::SendBytes;
     sendFuncMap_[DCAMERA_SESSION_MODE_VIDEO] = &DCameraSoftbusSession::SendStream;
-    sendFuncMap_[DCAMERA_SESSION_MODE_JPEG] = &DCameraSoftbusSession::SendStream;
+    sendFuncMap_[DCAMERA_SESSION_MODE_JPEG] = &DCameraSoftbusSession::SendBytes;
     auto runner = AppExecFwk::EventRunner::Create(mySessionName);
     eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
     ResetAssembleFrag();
@@ -81,32 +81,13 @@ int32_t DCameraSoftbusSession::CloseSession()
     return DCAMERA_OK;
 }
 
-int32_t DCameraSoftbusSession::OnSessionOpened(int32_t socket, PeerSocketInfo info)
+int32_t DCameraSoftbusSession::OnSessionOpened(int32_t socket)
 {
-    DHLOGI("DCameraSoftbusSession OnSessionOpened Start, socket is: %d", socket);
-    if (info.networkId == nullptr) {
-        DHLOGE("DCameraSoftbusSession OnSessionOpened error, PeerDevId is null", socket);
-        listener_->OnSessionState(DCAMERA_CHANNEL_STATE_DISCONNECTED);
-        listener_->OnSessionError(DCAMERA_MESSAGE, DCAMERA_EVENT_OPEN_CHANNEL_ERROR,
-            std::string("softbus internal error"));
-        return DCAMERA_WRONG_STATE;
-    }
-    DHLOGI("peerDevId: %s peerSessionName: %s", GetAnonyString(info.networkId).c_str(),
-        GetAnonyString(info.name).c_str());
+    DHLOGI("DCameraSoftbusSession OnSessionOpened Start, socket: %d", socket);
     sessionId_ = socket;
     state_ = DCAMERA_SOFTBUS_STATE_OPENED;
     listener_->OnSessionState(DCAMERA_CHANNEL_STATE_CONNECTED);
     DHLOGI("DCameraSoftbusSession OnSessionOpened End, socket: %d", socket);
-    return DCAMERA_OK;
-}
-
-int32_t DCameraSoftbusSession::RefreshSessionStatus(int32_t socket)
-{
-    DHLOGI("DCameraSoftbusSession RefreshSessionStatus Start, socket: %d", socket);
-    sessionId_ = socket;
-    state_ = DCAMERA_SOFTBUS_STATE_OPENED;
-    listener_->OnSessionState(DCAMERA_CHANNEL_STATE_CONNECTED);
-    DHLOGI("DCameraSoftbusSession RefreshSessionStatus End, socket: %d", socket);
     return DCAMERA_OK;
 }
 
@@ -452,6 +433,11 @@ std::string DCameraSoftbusSession::GetPeerSessionName()
 std::string DCameraSoftbusSession::GetMySessionName()
 {
     return mySessionName_;
+}
+
+int32_t DCameraSoftbusSession::GetSessionId()
+{
+    return sessionId_;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
