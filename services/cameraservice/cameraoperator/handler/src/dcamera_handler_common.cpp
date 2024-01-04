@@ -238,6 +238,9 @@ void DCameraHandler::ConfigFormatAndResolution(const DCStreamType type, Json::Va
         CameraStandard::CameraFormat format = profile.GetCameraFormat();
         CameraStandard::Size picSize = profile.GetSize();
         int32_t dformat = CovertToDcameraFormat(format);
+        if (dformat == INVALID_FORMAT) {
+            continue;
+        }
         formatSet.insert(dformat);
         DHLOGI("width: %d, height: %d, format: %d", picSize.width, picSize.height, dformat);
         std::string formatName = std::to_string(dformat);
@@ -278,6 +281,12 @@ int32_t DCameraHandler::CovertToDcameraFormat(CameraStandard::CameraFormat forma
             break;
         case CameraStandard::CameraFormat::CAMERA_FORMAT_JPEG:
             ret = camera_format_t::OHOS_CAMERA_FORMAT_JPEG;
+            break;
+        case CameraStandard::CameraFormat::CAMERA_FORMAT_YCBCR_P010:
+            ret = camera_format_t::OHOS_CAMERA_FORMAT_YCBCR_P010;
+            break;
+        case CameraStandard::CameraFormat::CAMERA_FORMAT_YCRCB_P010:
+            ret = camera_format_t::OHOS_CAMERA_FORMAT_YCRCB_P010;
             break;
         default:
             DHLOGE("invalid camera format");
