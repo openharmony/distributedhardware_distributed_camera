@@ -501,8 +501,8 @@ int32_t DCameraSoftbusAdapter::DCameraSoftBusGetSessionByPeerSocket(int32_t sock
         if (sessionNameIter == peerDevIdMySessionNameMap_.end()) {
             DHLOGE("DCameraSoftbusAdapter DCameraSoftBusGetSessionByPeerSocket error, socket %d", socket);
             return DCAMERA_NOT_FOUND;
-            mySessionName = sessionNameIter->second;
         }
+        mySessionName = sessionNameIter->second;
     }
     auto iter = sinkSessions_.find(std::string(mySessionName));
     if (iter == sinkSessions_.end()) {
