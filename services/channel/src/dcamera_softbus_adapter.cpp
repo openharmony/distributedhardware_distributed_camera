@@ -459,7 +459,7 @@ int32_t DCameraSoftbusAdapter::GetSourceSocketId()
     return sourceSocketId_;
 }
 
-std::map<int32_t,std::shared_ptr<DCameraSoftbusSession>> DCameraSoftbusAdapter::GetSourceSocketSessionMap()
+std::map<int32_t, std::shared_ptr<DCameraSoftbusSession>> DCameraSoftbusAdapter::GetSourceSocketSessionMap()
 {
     return sourceSocketSessionMap_;
 }
