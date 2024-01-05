@@ -226,7 +226,7 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_008, TestSize.L
     int32_t sessionId = 2;
     PeerSocketInfo info = {
         .name = const_cast<char*>(peerSessName.c_str()),
-        .pkgName = const_cast<char*>(PKG_NAME.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
         .networkId = const_cast<char*>(peerDevId.c_str()),
         .dataType = TransDataType::DATA_TYPE_VIDEO_STREAM,
     };
@@ -257,7 +257,7 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_009, TestSize.L
     int32_t sessionId = 2;
     PeerSocketInfo info = {
         .name = const_cast<char*>(peerSessName.c_str()),
-        .pkgName = const_cast<char*>(PKG_NAME.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
         .networkId = const_cast<char*>(peerDevId.c_str()),
         .dataType = TransDataType::DATA_TYPE_VIDEO_STREAM,
     };
@@ -288,7 +288,7 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_010, TestSize.L
     int32_t sessionId = 2;
     PeerSocketInfo info = {
         .name = const_cast<char*>(peerSessName.c_str()),
-        .pkgName = const_cast<char*>(PKG_NAME.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
         .networkId = const_cast<char*>(peerDevId.c_str()),
         .dataType = TransDataType::DATA_TYPE_VIDEO_STREAM,
     };
@@ -321,7 +321,7 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_011, TestSize.L
     int32_t sessionId = 2;
     PeerSocketInfo info = {
         .name = const_cast<char*>(peerSessName.c_str()),
-        .pkgName = const_cast<char*>(PKG_NAME.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
         .networkId = const_cast<char*>(peerDevId.c_str()),
         .dataType = TransDataType::DATA_TYPE_VIDEO_STREAM,
     };
@@ -354,7 +354,7 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_012, TestSize.L
     int32_t sessionId = 2;
     PeerSocketInfo info = {
         .name = const_cast<char*>(peerSessName.c_str()),
-        .pkgName = const_cast<char*>(PKG_NAME.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
         .networkId = const_cast<char*>(peerDevId.c_str()),
         .dataType = TransDataType::DATA_TYPE_VIDEO_STREAM,
     };
@@ -404,7 +404,7 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_013, TestSize.L
     int32_t sessionId = 2;
     PeerSocketInfo info = {
         .name = const_cast<char*>(peerSessName.c_str()),
-        .pkgName = const_cast<char*>(PKG_NAME.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
         .networkId = const_cast<char*>(peerDevId.c_str()),
         .dataType = TransDataType::DATA_TYPE_VIDEO_STREAM,
     };
@@ -434,7 +434,7 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_014, TestSize.L
     int32_t sessionId = 2;
     PeerSocketInfo info = {
         .name = const_cast<char*>(peerSessName.c_str()),
-        .pkgName = const_cast<char*>(PKG_NAME.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
         .networkId = const_cast<char*>(peerDevId.c_str()),
         .dataType = TransDataType::DATA_TYPE_VIDEO_STREAM,
     };
@@ -465,7 +465,7 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_015, TestSize.L
     int32_t sessionId = 2;
     PeerSocketInfo info = {
         .name = const_cast<char*>(peerSessName.c_str()),
-        .pkgName = const_cast<char*>(PKG_NAME.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
         .networkId = const_cast<char*>(peerDevId.c_str()),
         .dataType = TransDataType::DATA_TYPE_BYTES,
     };
@@ -498,7 +498,7 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_016, TestSize.L
     int32_t sessionId = 2;
     PeerSocketInfo info = {
         .name = const_cast<char*>(peerSessName.c_str()),
-        .pkgName = const_cast<char*>(PKG_NAME.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
         .networkId = const_cast<char*>(peerDevId.c_str()),
         .dataType = TransDataType::DATA_TYPE_BYTES,
     };
@@ -531,7 +531,7 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_017, TestSize.L
     int32_t sessionId = 2;
     PeerSocketInfo info = {
         .name = const_cast<char*>(peerSessName.c_str()),
-        .pkgName = const_cast<char*>(PKG_NAME.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
         .networkId = const_cast<char*>(peerDevId.c_str()),
         .dataType = TransDataType::DATA_TYPE_BYTES,
     };
@@ -575,7 +575,7 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_018, TestSize.L
     std::shared_ptr<DCameraSoftbusSession> session = std::make_shared<DCameraSoftbusSession>();
     PeerSocketInfo info = {
         .name = const_cast<char*>(peerSessName.c_str()),
-        .pkgName = const_cast<char*>(PKG_NAME.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
         .networkId = const_cast<char*>(peerDevId.c_str()),
         .dataType = TransDataType::DATA_TYPE_BYTES,
     };
@@ -606,7 +606,7 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_019, TestSize.L
     int32_t sessionId = 2;
     PeerSocketInfo info = {
         .name = const_cast<char*>(peerSessName.c_str()),
-        .pkgName = const_cast<char*>(PKG_NAME.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
         .networkId = const_cast<char*>(peerDevId.c_str()),
         .dataType = TransDataType::DATA_TYPE_BYTES,
     };
@@ -638,7 +638,7 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_020, TestSize.L
     int32_t sessionId = 2;
     PeerSocketInfo info = {
         .name = const_cast<char*>(peerSessName.c_str()),
-        .pkgName = const_cast<char*>(PKG_NAME.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
         .networkId = const_cast<char*>(peerDevId.c_str()),
         .dataType = TransDataType::DATA_TYPE_BYTES,
     };
@@ -670,7 +670,7 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_023, TestSize.L
     int32_t sessionId = -1;
     PeerSocketInfo info = {
         .name = const_cast<char*>(peerSessName.c_str()),
-        .pkgName = const_cast<char*>(PKG_NAME.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
         .networkId = const_cast<char*>(peerDevId.c_str()),
         .dataType = TransDataType::DATA_TYPE_BYTES,
     };
@@ -703,7 +703,7 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_027, TestSize.L
     std::shared_ptr<DCameraSoftbusSession> session = std::make_shared<DCameraSoftbusSession>();
     PeerSocketInfo info = {
         .name = const_cast<char*>(peerSessName.c_str()),
-        .pkgName = const_cast<char*>(PKG_NAME.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
         .networkId = const_cast<char*>(peerDevId.c_str()),
         .dataType = TransDataType::DATA_TYPE_BYTES,
     };
