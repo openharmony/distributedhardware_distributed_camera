@@ -143,9 +143,9 @@ int32_t DCameraSoftbusAdapter::CreatSoftBusSinkSocketServer(std::string mySessio
     }
     SocketInfo serverSocketInfo = {
         .name =  const_cast<char*>(mySessionName.c_str()),
-        .pkgName = const_cast<char*>(PKG_NAME.c_str()),
-        .peerNetworkId = const_cast<char*>(peerDevId.c_str()),
         .peerName = const_cast<char*>(peerSessionName.c_str()),
+        .peerNetworkId = const_cast<char*>(peerDevId.c_str()),
+        .pkgName = const_cast<char*>(PKG_NAME.c_str()),
         .dataType = sessionModeAndDataTypeMap_[sessionMode],
     };
     int socketId = Socket(serverSocketInfo);
@@ -177,9 +177,9 @@ int32_t DCameraSoftbusAdapter::CreateSoftBusSourceSocketClient(std::string myDev
     std::string myDevIdPeerSessionName = myDevId + std::string("_") + peerSessionName;
     SocketInfo clientSocketInfo = {
         .name = const_cast<char*>(myDevIdPeerSessionName.c_str()),
-        .pkgName = const_cast<char*>(PKG_NAME.c_str()),
-        .peerNetworkId = const_cast<char*>(peerDevId.c_str()),
         .peerName = const_cast<char*>(peerSessionName.c_str()),
+        .peerNetworkId = const_cast<char*>(peerDevId.c_str()),
+        .pkgName = const_cast<char*>(PKG_NAME.c_str()),
         .dataType = sessionModeAndDataTypeMap_[sessionMode],
     };
     int socketId = Socket(clientSocketInfo);
@@ -513,7 +513,7 @@ int32_t DCameraSoftbusAdapter::DCameraSoftBusGetSessionByPeerSocket(int32_t sock
     session = iter->second;
     {
         std::lock_guard<std::mutex> autoLock(sinkSocketLock_);
-        sinkSocketIdSessionMap_[socket] = session;
+        sinkSocketSessionMap_[socket] = session;
     }
     DHLOGI("DCameraSoftbusAdapter DCameraSoftBusGetSessionByPeerSocket End, socket %d", socket);
     return DCAMERA_OK;
