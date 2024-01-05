@@ -481,6 +481,10 @@ int32_t DCameraSoftbusAdapter::DCameraSoftbusSinkGetSession(int32_t socket,
             return DCAMERA_NOT_FOUND;
         }
         session = iter->second;
+        if (session -> GetSessionId() < 0) {
+            DHLOGE("DCameraSoftBusGetSessionByPeerSocket error, current sessionId is invalid");
+            return DCAMERA_BAD_VALUE;
+        }
     }
     DHLOGI("DCameraSoftbusAdapter DCameraSoftbusSinkGetSession End, socket: %d", socket);
     return DCAMERA_OK;
@@ -507,10 +511,6 @@ int32_t DCameraSoftbusAdapter::DCameraSoftBusGetSessionByPeerSocket(int32_t sock
         return DCAMERA_NOT_FOUND;
     }
     session = iter->second;
-    if (session -> GetSessionId() < 0) {
-        DHLOGE("DCameraSoftBusGetSessionByPeerSocket error, current sessionId is invalid");
-        return DCAMERA_BAD_VALUE;
-    }
     {
         std::lock_guard<std::mutex> autoLock(sinkSocketLock_);
         sinkSocketIdSessionMap_[socket] = session;
