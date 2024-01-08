@@ -219,6 +219,14 @@ HWTEST_F(DCameraHandlerTest, dcamera_handler_test_007, TestSize.Level1)
     ret = DCameraHandler::GetInstance().CovertToDcameraFormat(
         CameraStandard::CameraFormat::CAMERA_FORMAT_JPEG);
     EXPECT_EQ(ret, OHOS_CAMERA_FORMAT_JPEG);
+
+    ret = DCameraHandler::GetInstance().CovertToDcameraFormat(
+        CameraStandard::CameraFormat::CAMERA_FORMAT_YCBCR_P010);
+    EXPECT_EQ(ret, OHOS_CAMERA_FORMAT_YCBCR_P010);
+
+    ret = DCameraHandler::GetInstance().CovertToDcameraFormat(
+        CameraStandard::CameraFormat::CAMERA_FORMAT_YCRCB_P010);
+    EXPECT_EQ(ret, OHOS_CAMERA_FORMAT_YCRCB_P010);
 }
 
 /**
