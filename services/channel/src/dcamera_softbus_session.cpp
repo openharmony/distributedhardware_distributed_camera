@@ -62,16 +62,16 @@ DCameraSoftbusSession::~DCameraSoftbusSession()
 
 int32_t DCameraSoftbusSession::CloseSession()
 {
-    DHLOGI("DCameraSoftbusSession CloseSession sessionId: %d peerDevId: %s peerSessionName: %s", sessionId_,
+    DHLOGI("CloseSession sessionId: %d peerDevId: %s peerSessionName: %s", sessionId_,
         GetAnonyString(peerDevId_).c_str(), GetAnonyString(peerSessionName_).c_str());
     if (sessionId_ == -1) {
-        DHLOGI("DCameraSoftbusSession CloseSession has already close peerDevId: %s peerSessionName: %s",
+        DHLOGI("CloseSession has already close peerDevId: %s peerSessionName: %s",
             GetAnonyString(peerDevId_).c_str(), GetAnonyString(peerSessionName_).c_str());
         return DCAMERA_OK;
     }
     int32_t ret = DCameraSoftbusAdapter::GetInstance().CloseSoftbusSession(sessionId_);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSoftbusSession CloseSession failed, ret: %d, peerDevId: %s peerSessionName: %s", ret,
+        DHLOGE("CloseSession failed, ret: %d, peerDevId: %s peerSessionName: %s", ret,
             GetAnonyString(peerDevId_).c_str(), GetAnonyString(peerSessionName_).c_str());
         return ret;
     }
@@ -83,17 +83,17 @@ int32_t DCameraSoftbusSession::CloseSession()
 
 int32_t DCameraSoftbusSession::OnSessionOpened(int32_t socket)
 {
-    DHLOGI("DCameraSoftbusSession OnSessionOpened Start, socket: %d", socket);
+    DHLOGI("OnSessionOpened Start, socket: %d", socket);
     sessionId_ = socket;
     state_ = DCAMERA_SOFTBUS_STATE_OPENED;
     listener_->OnSessionState(DCAMERA_CHANNEL_STATE_CONNECTED);
-    DHLOGI("DCameraSoftbusSession OnSessionOpened End, socket: %d", socket);
+    DHLOGI("OnSessionOpened End, socket: %d", socket);
     return DCAMERA_OK;
 }
 
 int32_t DCameraSoftbusSession::OnSessionClose(int32_t sessionId)
 {
-    DHLOGI("DCameraSoftbusSession OnSessionClose sessionId: %d peerDevId: %s peerSessionName: %s", sessionId,
+    DHLOGI("OnSessionClose sessionId: %d peerDevId: %s peerSessionName: %s", sessionId,
         GetAnonyString(peerDevId_).c_str(), GetAnonyString(peerSessionName_).c_str());
     sessionId_ = -1;
     state_ = DCAMERA_SOFTBUS_STATE_CLOSED;
