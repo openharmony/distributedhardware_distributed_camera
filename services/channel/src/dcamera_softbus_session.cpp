@@ -349,7 +349,7 @@ void DCameraSoftbusSession::SetHeadParaDataLen(SessionDataHeader& headPara, cons
     const uint32_t offset)
 {
     if (totalLen - offset > BINARY_DATA_PACKET_MAX_LEN) {
-        headPara.dataLen = BINARY_DATA_PACKET_MAX_LEN;
+        headPara.dataLen = BINARY_DATA_PACKET_MAX_LEN - BINARY_DATA_PACKET_RESERVED_BUFFER;
     } else {
         headPara.fragFlag = FRAG_END;
         headPara.dataLen = totalLen - offset;

@@ -85,6 +85,7 @@ private:
     static const uint32_t BINARY_DATA_MAX_TOTAL_LEN = 100 * 1024 * 1024;
     static const uint32_t BINARY_DATA_MAX_LEN = 4 * 1024 * 1024;
     static const uint32_t BINARY_DATA_PACKET_MAX_LEN = 4 * 1024 * 1024;
+    static const uint32_t BINARY_DATA_PACKET_RESERVED_BUFFER = 512;
     static const uint16_t PROTOCOL_VERSION = 1;
     static const uint16_t HEADER_UINT8_NUM = 1;
     static const uint16_t HEADER_UINT16_NUM = 2;
