@@ -459,14 +459,16 @@ int32_t DCameraSoftbusAdapter::GetSourceSocketId()
     return sourceSocketId_;
 }
 
-std::map<int32_t, std::shared_ptr<DCameraSoftbusSession>> DCameraSoftbusAdapter::GetSourceSocketSessionMap()
+void DCameraSoftbusAdapter::RecordSourceSocketSession(int32_t socket, std::shared_ptr<DCameraSoftbusSession> session)
 {
-    return sourceSocketSessionMap_;
-}
-
-void DCameraSoftbusAdapter::SetSourceSocketSessionMap(std::map<int32_t, std::shared_ptr<DCameraSoftbusSession>> &map)
-{
-    sourceSocketSessionMap_ = map;
+    if (session == nullptr) {
+        DHLOGE("RecordSourceSocketSession error, session is null");
+        return;
+    }
+    {
+        std::lock_guard<std::mutex> autoLock(sourceSocketLock_);
+        sourceSocketSessionMap_[socket] = session;
+    }
 }
 
 int32_t DCameraSoftbusAdapter::DCameraSoftbusSinkGetSession(int32_t socket,

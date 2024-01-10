@@ -65,8 +65,7 @@ public:
 
     int32_t HandleSourceStreamExt(std::shared_ptr<DataBuffer>& buffer, const StreamData *ext);
     int32_t GetSourceSocketId();
-    std::map<int32_t, std::shared_ptr<DCameraSoftbusSession>> GetSourceSocketSessionMap();
-    void SetSourceSocketSessionMap(std::map<int32_t, std::shared_ptr<DCameraSoftbusSession>> &map);
+    void RecordSourceSocketSession(int32_t socket, std::shared_ptr<DCameraSoftbusSession> session);
 
 public:
     std::map<std::string, std::shared_ptr<DCameraSoftbusSession>> sourceSessions_;
