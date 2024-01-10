@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -283,10 +283,10 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_008, TestSize.Level1)
                                  TEST_HEIGTH);
     VideoConfigParams procConfig;
     int32_t rc = testDecodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_INIT_ERR);
+    EXPECT_EQ(rc, DCAMERA_NOT_FOUND);
 
     rc = testDecodeDataProcess_->InitDecoderMetadataFormat();
-    EXPECT_EQ(rc, DCAMERA_OK);
+    EXPECT_EQ(rc, DCAMERA_NOT_FOUND);
 }
 
 /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -399,6 +399,9 @@ AVPixelFormat ScaleConvertProcess::GetAVPixelFormat(Videoformat colorFormat)
             break;
         case Videoformat::NV21:
             format = AVPixelFormat::AV_PIX_FMT_NV21;
+            break;
+        case Videoformat::RGBA_8888:
+            format = AVPixelFormat::AV_PIX_FMT_RGBA;
             break;
         default:
             format = AVPixelFormat::AV_PIX_FMT_YUV420P;

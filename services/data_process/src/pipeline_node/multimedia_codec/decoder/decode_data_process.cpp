@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -162,17 +162,13 @@ int32_t DecodeDataProcess::InitDecoderMetadataFormat()
     DHLOGI("Init video decoder metadata format. codecType: %d", sourceConfig_.GetVideoCodecType());
     processedConfig_ = sourceConfig_;
     processedConfig_.SetVideoCodecType(VideoCodecType::NO_CODEC);
+    processedConfig_.SetVideoformat(Videoformat::YUVI420);
     switch (sourceConfig_.GetVideoCodecType()) {
         case VideoCodecType::CODEC_H264:
             processType_ = "video/avc";
-            processedConfig_.SetVideoformat(Videoformat::NV12);
             break;
         case VideoCodecType::CODEC_H265:
             processType_ = "video/hevc";
-            processedConfig_.SetVideoformat(Videoformat::NV12);
-            break;
-        case VideoCodecType::CODEC_MPEG4_ES:
-            processType_ = "video/mp4v-es";
             break;
         default:
             DHLOGE("The current codec type does not support decoding.");
@@ -568,10 +564,7 @@ void DecodeDataProcess::CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int3
     uint8_t *dstDataY = bufferOutput->Data();
     uint8_t *dstDataU = bufferOutput->Data() + dstSizeY;
     uint8_t *dstDataV = bufferOutput->Data() + dstSizeY + dstSizeUV;
-
-    int32_t ret = libyuv::NV12ToI420(
-        srcDataY, alignedWidth,
-        srcDataUV, alignedWidth,
+    int32_t ret = libyuv::NV12ToI420(srcDataY, alignedWidth, srcDataUV, alignedWidth,
         dstDataY, sourceConfig_.GetWidth(),
         dstDataU, static_cast<uint32_t>(sourceConfig_.GetWidth()) >> MEMORY_RATIO_UV,
         dstDataV, static_cast<uint32_t>(sourceConfig_.GetWidth()) >> MEMORY_RATIO_UV,
