@@ -62,16 +62,16 @@ DCameraSoftbusSession::~DCameraSoftbusSession()
 
 int32_t DCameraSoftbusSession::CloseSession()
 {
-    DHLOGI("CloseSession sessionId: %d peerDevId: %s peerSessionName: %s", sessionId_,
+    DHLOGI("close session sessionId: %d peerDevId: %s peerSessionName: %s", sessionId_,
         GetAnonyString(peerDevId_).c_str(), GetAnonyString(peerSessionName_).c_str());
     if (sessionId_ == -1) {
-        DHLOGI("CloseSession has already close peerDevId: %s peerSessionName: %s",
+        DHLOGI("current session has already close peerDevId: %s peerSessionName: %s",
             GetAnonyString(peerDevId_).c_str(), GetAnonyString(peerSessionName_).c_str());
         return DCAMERA_OK;
     }
     int32_t ret = DCameraSoftbusAdapter::GetInstance().CloseSoftbusSession(sessionId_);
     if (ret != DCAMERA_OK) {
-        DHLOGE("CloseSession failed, ret: %d, peerDevId: %s peerSessionName: %s", ret,
+        DHLOGE("close session failed, ret: %d, peerDevId: %s peerSessionName: %s", ret,
             GetAnonyString(peerDevId_).c_str(), GetAnonyString(peerSessionName_).c_str());
         return ret;
     }
@@ -83,11 +83,11 @@ int32_t DCameraSoftbusSession::CloseSession()
 
 int32_t DCameraSoftbusSession::OnSessionOpened(int32_t socket)
 {
-    DHLOGI("OnSessionOpened Start, socket: %d", socket);
+    DHLOGI("open current session start, socket: %d", socket);
     sessionId_ = socket;
     state_ = DCAMERA_SOFTBUS_STATE_OPENED;
     listener_->OnSessionState(DCAMERA_CHANNEL_STATE_CONNECTED);
-    DHLOGI("OnSessionOpened End, socket: %d", socket);
+    DHLOGI("open current session end, socket: %d", socket);
     return DCAMERA_OK;
 }
 
@@ -125,7 +125,7 @@ void DCameraSoftbusSession::DealRecvData(std::shared_ptr<DataBuffer>& buffer)
 void DCameraSoftbusSession::PackRecvData(std::shared_ptr<DataBuffer>& buffer)
 {
     if (buffer->Size() < BINARY_HEADER_FRAG_LEN) {
-        DHLOGE("DCameraSoftbusSession PackRecvData failed, size: %d, sess: %s peerSess: %s",
+        DHLOGE("pack recv data error, size: %d, sess: %s peerSess: %s",
             buffer->Size(), mySessionName_.c_str(), peerSessionName_.c_str());
         return;
     }
@@ -134,18 +134,18 @@ void DCameraSoftbusSession::PackRecvData(std::shared_ptr<DataBuffer>& buffer)
     GetFragDataLen(ptrPacket, headerPara);
     if (buffer->Size() != (headerPara.dataLen + BINARY_HEADER_FRAG_LEN) || headerPara.dataLen > headerPara.totalLen ||
         headerPara.dataLen > BINARY_DATA_MAX_LEN || headerPara.totalLen > BINARY_DATA_MAX_TOTAL_LEN) {
-        DHLOGE("DCameraSoftbusSession PackRecvData failed, size: %d, dataLen: %d, totalLen: %d sess: %s peerSess: %s",
+        DHLOGE("pack recv data failed, size: %d, dataLen: %d, totalLen: %d sess: %s peerSess: %s",
             buffer->Size(), headerPara.dataLen, headerPara.totalLen, mySessionName_.c_str(), peerSessionName_.c_str());
         return;
     }
-    DHLOGD("DCameraSoftbusSession PackRecvData Assemble, size: %d, dataLen: %d, totalLen: %d, nowTime: %lld start",
+    DHLOGD("pack recv data Assemble, size: %d, dataLen: %d, totalLen: %d, nowTime: %lld start",
         buffer->Size(), headerPara.dataLen, headerPara.totalLen, GetNowTimeStampUs());
     if (headerPara.fragFlag == FRAG_START_END) {
         AssembleNoFrag(buffer, headerPara);
     } else {
         AssembleFrag(buffer, headerPara);
     }
-    DHLOGD("DCameraSoftbusSession PackRecvData Assemble, size: %d, dataLen: %d, totalLen: %d, nowTime: %lld end",
+    DHLOGD("pack recv data Assemble, size: %d, dataLen: %d, totalLen: %d, nowTime: %lld end",
         buffer->Size(), headerPara.dataLen, headerPara.totalLen, GetNowTimeStampUs());
 }
 
