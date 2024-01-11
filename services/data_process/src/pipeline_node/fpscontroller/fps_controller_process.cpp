@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -93,7 +93,7 @@ int32_t FpsControllerProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer
 
     float curFrameRate = CalculateFrameRate(nowTimeMs);
     if (IsDropFrame(curFrameRate)) {
-        DHLOGD("frame control, currect frameRate %u, targetRate %u, drop it", curFrameRate, targetFrameRate_);
+        DHLOGD("frame control, currect frameRate %u, targetRate %d, drop it", curFrameRate, targetFrameRate_);
         return DCAMERA_OK;
     }
 

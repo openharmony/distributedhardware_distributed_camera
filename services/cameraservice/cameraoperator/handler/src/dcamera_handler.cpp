@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -133,6 +133,7 @@ std::vector<std::string> DCameraHandler::GetCameras()
 
 int32_t DCameraHandler::CreateAVCodecList(Json::Value& root)
 {
+    DHLOGI("Create avCodecList start");
     std::shared_ptr<MediaAVCodec::AVCodecList> avCodecList = MediaAVCodec::AVCodecListFactory::CreateAVCodecList();
     if (avCodecList == nullptr) {
         DHLOGI("Create avCodecList failed");
