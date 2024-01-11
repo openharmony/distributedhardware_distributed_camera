@@ -64,14 +64,12 @@ public:
         const StreamFrameInfo *param);
 
     int32_t HandleSourceStreamExt(std::shared_ptr<DataBuffer>& buffer, const StreamData *ext);
-    int32_t GetSinkSocketId();
     int32_t GetSourceSocketId();
+    void RecordSourceSocketSession(int32_t socket, std::shared_ptr<DCameraSoftbusSession> session);
 
 public:
     std::map<std::string, std::shared_ptr<DCameraSoftbusSession>> sourceSessions_;
     std::map<std::string, std::shared_ptr<DCameraSoftbusSession>> sinkSessions_;
-    std::map<int32_t, std::shared_ptr<DCameraSoftbusSession>> sinkSocketIdSessionMap_;
-    std::map<int32_t, std::shared_ptr<DCameraSoftbusSession>> sourceSocketIdSessionMap_;
 
 private:
     DCameraSoftbusAdapter();
@@ -94,13 +92,17 @@ private:
     std::mutex idMapLock_;
     std::map<int32_t, std::shared_ptr<DCameraSoftbusSession>> sessionIdMap_;
 
-    int32_t sinkSocketId_;
     int32_t sourceSocketId_;
     std::map<DCameraSessionMode, TransDataType> sessionModeAndDataTypeMap_;
     std::mutex mySessionNamePeerDevIdLock_;
     std::map<std::string, std::string> peerDevIdMySessionNameMap_;
     std::mutex mySessionNameLock_;
     std::set<std::string> mySessionNameSet_;
+
+    std::mutex sinkSocketLock_;
+    std::map<int32_t, std::shared_ptr<DCameraSoftbusSession>> sinkSocketSessionMap_;
+    std::mutex sourceSocketLock_;
+    std::map<int32_t, std::shared_ptr<DCameraSoftbusSession>> sourceSocketSessionMap_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

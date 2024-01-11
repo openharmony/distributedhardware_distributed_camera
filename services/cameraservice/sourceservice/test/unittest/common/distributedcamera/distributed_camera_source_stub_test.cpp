@@ -31,6 +31,11 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace DistributedHardware {
+namespace {
+static int32_t OHOS_PERMISSION_ENABLE_DISTRIBUTED_HARDWARE_INDEX = 0;
+static int32_t OHOS_PERMISSION_DISTRIBUTED_DATASYNC_INDEX = 1;
+static int32_t OHOS_PERMISSION_ACCESS_DISTRIBUTED_HARDWARE_INDEX = 2;
+}
 class DcameraSourceStubTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -55,9 +60,9 @@ void DcameraSourceStubTest::SetUp(void)
     uint64_t tokenId;
     int32_t numberOfPermissions = 3;
     const char *perms[numberOfPermissions];
-    perms[0] = "ohos.permission.ENABLE_DISTRIBUTED_HARDWARE";
-    perms[1] = OHOS_PERMISSION_DISTRIBUTED_DATASYNC;
-    perms[2] = "ohos.permission.ACCESS_DISTRIBUTED_HARDWARE";
+    perms[OHOS_PERMISSION_ENABLE_DISTRIBUTED_HARDWARE_INDEX] = "ohos.permission.ENABLE_DISTRIBUTED_HARDWARE";
+    perms[OHOS_PERMISSION_DISTRIBUTED_DATASYNC_INDEX] = OHOS_PERMISSION_DISTRIBUTED_DATASYNC;
+    perms[OHOS_PERMISSION_ACCESS_DISTRIBUTED_HARDWARE_INDEX] = "ohos.permission.ACCESS_DISTRIBUTED_HARDWARE";
     NativeTokenInfoParams infoInstance = {
         .dcapsNum = 0,
         .permsNum = numberOfPermissions,

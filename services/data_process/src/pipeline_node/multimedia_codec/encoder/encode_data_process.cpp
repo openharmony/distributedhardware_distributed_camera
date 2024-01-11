@@ -501,9 +501,9 @@ int32_t EncodeDataProcess::GetEncoderOutputBuffer(uint32_t index, MediaAVCodec::
     }
     int64_t timeStamp = info.presentationTimeUs;
     struct timespec time = {0, 0};
-    clock_gettime(CLOCK_REALTIME, &time);
+    clock_gettime(CLOCK_MONOTONIC, &time);
     int64_t timeNs = static_cast<int64_t>(time.tv_sec) * S2NS + static_cast<int64_t>(time.tv_nsec);
-    int64_t encodeT = timeNs / static_cast<int64_t>(US2NS) - timeStamp;
+    int64_t encodeT = (timeNs - timeStamp) / static_cast<int64_t>(US2NS);
     int64_t finishEncodeT = GetNowTimeStampUs();
     int64_t startEncodeT = finishEncodeT - encodeT;
     bufferOutput->SetInt64(START_ENCODE_TIME_US, startEncodeT);
