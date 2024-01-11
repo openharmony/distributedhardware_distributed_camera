@@ -483,7 +483,7 @@ int32_t DCameraSoftbusAdapter::DCameraSoftbusSinkGetSession(int32_t socket,
             return DCAMERA_NOT_FOUND;
         }
         session = iter->second;
-        if (session -> GetSessionId() < 0) {
+        if (session->GetSessionId() < 0) {
             DHLOGE("sink find session error, current sessionId is invalid");
             return DCAMERA_BAD_VALUE;
         }
