@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -125,7 +125,7 @@ int32_t DecodeDataProcess::ConfigureVideoDecoder()
 {
     int32_t ret = InitDecoderMetadataFormat();
     if (ret != DCAMERA_OK) {
-        DHLOGE("Init video decoder metadata format failed. Error code %d.", ret);
+        DHLOGE("Init video decoder metadata format failed. ret %d.", ret);
         return ret;
     }
 
@@ -137,19 +137,19 @@ int32_t DecodeDataProcess::ConfigureVideoDecoder()
     decodeVideoCallback_ = std::make_shared<DecodeVideoCallback>(shared_from_this());
     ret = videoDecoder_->SetCallback(decodeVideoCallback_);
     if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
-        DHLOGE("Set video decoder callback failed. Error code %d.", ret);
+        DHLOGE("Set video decoder callback failed. ret %d.", ret);
         return DCAMERA_INIT_ERR;
     }
 
     ret = videoDecoder_->Configure(metadataFormat_);
     if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
-        DHLOGE("Set video decoder metadata format failed. Error code %d.", ret);
+        DHLOGE("Set video decoder metadata format failed. ret %d.", ret);
         return DCAMERA_INIT_ERR;
     }
 
     ret = SetDecoderOutputSurface();
     if (ret != DCAMERA_OK) {
-        DHLOGE("Set decoder output surface failed. Error code %d.", ret);
+        DHLOGE("Set decoder output surface failed. ret %d.", ret);
         return ret;
     }
 
@@ -266,12 +266,12 @@ int32_t DecodeDataProcess::StartVideoDecoder()
 
     int32_t ret = videoDecoder_->Prepare();
     if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
-        DHLOGE("Video decoder prepare failed. Error code %d.", ret);
+        DHLOGE("Video decoder prepare failed. ret %d.", ret);
         return DCAMERA_INIT_ERR;
     }
     ret = videoDecoder_->Start();
     if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
-        DHLOGE("Video decoder start failed. Error code %d.", ret);
+        DHLOGE("Video decoder start failed. ret %d.", ret);
         return DCAMERA_INIT_ERR;
     }
     return DCAMERA_OK;
@@ -287,12 +287,12 @@ int32_t DecodeDataProcess::StopVideoDecoder()
     bool isSuccess = true;
     int32_t ret = videoDecoder_->Flush();
     if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
-        DHLOGE("VideoDecoder flush failed. Error type: %d.", ret);
+        DHLOGE("VideoDecoder flush failed. ret %d.", ret);
         isSuccess = isSuccess && false;
     }
     ret = videoDecoder_->Stop();
     if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
-        DHLOGE("VideoDecoder stop failed. Error type: %d.", ret);
+        DHLOGE("VideoDecoder stop failed. ret %d.", ret);
         isSuccess = isSuccess && false;
     }
     if (!isSuccess) {
@@ -317,7 +317,7 @@ void DecodeDataProcess::ReleaseVideoDecoder()
     }
     ret = videoDecoder_->Release();
     if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
-        DHLOGE("VideoDecoder release failed. Error type: %d.", ret);
+        DHLOGE("VideoDecoder release failed. ret %d.", ret);
     }
     videoDecoder_ = nullptr;
     decodeVideoCallback_ = nullptr;
@@ -332,7 +332,7 @@ void DecodeDataProcess::ReleaseDecoderSurface()
     }
     int32_t ret = decodeConsumerSurface_->UnregisterConsumerListener();
     if (ret != SURFACE_ERROR_OK) {
-        DHLOGE("Unregister consumer listener failed. Error type: %d.", ret);
+        DHLOGE("Unregister consumer listener failed. ret %d.", ret);
     }
     decodeConsumerSurface_ = nullptr;
     decodeProducerSurface_ = nullptr;
@@ -356,7 +356,7 @@ void DecodeDataProcess::ReleaseCodecEvent()
 
 void DecodeDataProcess::ReleaseProcessNode()
 {
-    DHLOGD("Start release [%d] node : DecodeNode.", nodeRank_);
+    DHLOGD("Start release [%zu] node : DecodeNode.", nodeRank_);
     isDecoderProcess_.store(false);
     ReleaseVideoDecoder();
     ReleaseDecoderSurface();
@@ -376,7 +376,7 @@ void DecodeDataProcess::ReleaseProcessNode()
         nextDataProcess_->ReleaseProcessNode();
         nextDataProcess_ = nullptr;
     }
-    DHLOGD("Release [%d] node : DecodeNode end.", nodeRank_);
+    DHLOGD("Release [%zu] node : DecodeNode end.", nodeRank_);
 }
 
 int32_t DecodeDataProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& inputBuffers)
@@ -616,7 +616,7 @@ bool DecodeDataProcess::IsCorrectSurfaceBuffer(const sptr<SurfaceBuffer>& surBuf
         RGB32_MEMORY_COEFFICIENT);
     size_t surfaceBufSize = static_cast<size_t>(surBuf->GetSize());
     if (rgbImageSize > surfaceBufSize) {
-        DHLOGE("Buffer size error, rgbImageSize %d, surBufSize %d.", rgbImageSize, surBuf->GetSize());
+        DHLOGE("Buffer size error, rgbImageSize %zu, surBufSize %d.", rgbImageSize, surBuf->GetSize());
         return false;
     }
     return true;

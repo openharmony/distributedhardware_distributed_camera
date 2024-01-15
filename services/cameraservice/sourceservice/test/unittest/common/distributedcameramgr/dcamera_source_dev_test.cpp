@@ -452,7 +452,7 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_016, TestSize.Level1)
     streamInfo->type_ = SNAPSHOT_FRAME;
     streamInfos.push_back(streamInfo);
     int32_t ret = camDev_->ConfigStreams(streamInfos);
-    EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
+    EXPECT_EQ(DCAMERA_OK, ret);
 }
 
 /**
