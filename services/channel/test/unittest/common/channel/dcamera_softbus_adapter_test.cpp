@@ -224,7 +224,12 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_008, TestSize.L
     int32_t ret = DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDevId, peerSessName, peerDevId,
         sessionMode, role);
     int32_t sessionId = 2;
-    PeerSocketInfo info = {};
+    PeerSocketInfo info = {
+        .name = const_cast<char*>(peerSessName.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
+        .networkId = const_cast<char*>(peerDevId.c_str()),
+        .dataType = TransDataType::DATA_TYPE_VIDEO_STREAM,
+    };
     std::shared_ptr<DCameraSoftbusSession> session = std::make_shared<DCameraSoftbusSession>();
     DCameraSoftbusAdapter::GetInstance().sourceSessions_.emplace(peerDevId + mySessName, session);
     ret = DCameraSoftbusAdapter::GetInstance().SourceOnBind(sessionId, info);
@@ -250,7 +255,12 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_009, TestSize.L
     int32_t ret = DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDevId, peerSessName, peerDevId,
         sessionMode, role);
     int32_t sessionId = 2;
-    PeerSocketInfo info = {};
+    PeerSocketInfo info = {
+        .name = const_cast<char*>(peerSessName.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
+        .networkId = const_cast<char*>(peerDevId.c_str()),
+        .dataType = TransDataType::DATA_TYPE_VIDEO_STREAM,
+    };
     DCameraSoftbusAdapter::GetInstance().SourceOnBind(sessionId, info);
 
     DCameraSoftbusAdapter::GetInstance().SourceOnShutDown(sessionId, ShutdownReason::SHUTDOWN_REASON_LOCAL);
@@ -276,7 +286,12 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_010, TestSize.L
     int32_t ret = DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDevId, peerSessName, peerDevId,
         sessionMode, role);
     int32_t sessionId = 2;
-    PeerSocketInfo info = {};
+    PeerSocketInfo info = {
+        .name = const_cast<char*>(peerSessName.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
+        .networkId = const_cast<char*>(peerDevId.c_str()),
+        .dataType = TransDataType::DATA_TYPE_VIDEO_STREAM,
+    };
     ret = DCameraSoftbusAdapter::GetInstance().SourceOnBind(sessionId, info);
     const void *data = "testdata";
     uint32_t dataLen = 8;
@@ -304,7 +319,12 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_011, TestSize.L
     int32_t ret = DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDevId, peerSessName, peerDevId,
         sessionMode, role);
     int32_t sessionId = 2;
-    PeerSocketInfo info = {};
+    PeerSocketInfo info = {
+        .name = const_cast<char*>(peerSessName.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
+        .networkId = const_cast<char*>(peerDevId.c_str()),
+        .dataType = TransDataType::DATA_TYPE_VIDEO_STREAM,
+    };
     ret = DCameraSoftbusAdapter::GetInstance().SourceOnBind(sessionId, info);
     const void *data = "testdata";
     uint32_t dataLen = 8;
@@ -332,7 +352,12 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_012, TestSize.L
     int32_t ret = DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDevId, peerSessName, peerDevId,
         sessionMode, role);
     int32_t sessionId = 2;
-    PeerSocketInfo info = {};
+    PeerSocketInfo info = {
+        .name = const_cast<char*>(peerSessName.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
+        .networkId = const_cast<char*>(peerDevId.c_str()),
+        .dataType = TransDataType::DATA_TYPE_VIDEO_STREAM,
+    };
     ret = DCameraSoftbusAdapter::GetInstance().SourceOnBind(sessionId, info);
     std::string buff01 = "testbuffer01";
     StreamData test01;
@@ -377,7 +402,12 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_013, TestSize.L
     int32_t ret = DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDevId, peerSessName, peerDevId,
         sessionMode, role);
     int32_t sessionId = 2;
-    PeerSocketInfo info = {};
+    PeerSocketInfo info = {
+        .name = const_cast<char*>(peerSessName.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
+        .networkId = const_cast<char*>(peerDevId.c_str()),
+        .dataType = TransDataType::DATA_TYPE_VIDEO_STREAM,
+    };
     std::shared_ptr<DCameraSoftbusSession> session = std::make_shared<DCameraSoftbusSession>();
     DCameraSoftbusAdapter::GetInstance().sinkSessions_.emplace(peerDevId + mySessName, session);
     ret = DCameraSoftbusAdapter::GetInstance().SinkOnBind(sessionId, info);
@@ -402,7 +432,12 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_014, TestSize.L
     int32_t ret = DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDevId, peerSessName, peerDevId,
         sessionMode, role);
     int32_t sessionId = 2;
-    PeerSocketInfo info = {};
+    PeerSocketInfo info = {
+        .name = const_cast<char*>(peerSessName.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
+        .networkId = const_cast<char*>(peerDevId.c_str()),
+        .dataType = TransDataType::DATA_TYPE_VIDEO_STREAM,
+    };
     DCameraSoftbusAdapter::GetInstance().SinkOnBind(sessionId, info);
 
     DCameraSoftbusAdapter::GetInstance().SinkOnShutDown(sessionId, ShutdownReason::SHUTDOWN_REASON_LOCAL);
@@ -428,7 +463,12 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_015, TestSize.L
     int32_t ret = DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDevId, peerSessName, peerDevId,
         sessionMode, role);
     int32_t sessionId = 2;
-    PeerSocketInfo info = {};
+    PeerSocketInfo info = {
+        .name = const_cast<char*>(peerSessName.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
+        .networkId = const_cast<char*>(peerDevId.c_str()),
+        .dataType = TransDataType::DATA_TYPE_BYTES,
+    };
     ret = DCameraSoftbusAdapter::GetInstance().SinkOnBind(sessionId, info);
     const void *data = "testdata";
     uint32_t dataLen = 8;
@@ -456,7 +496,12 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_016, TestSize.L
     int32_t ret = DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDevId, peerSessName, peerDevId,
         sessionMode, role);
     int32_t sessionId = 2;
-    PeerSocketInfo info = {};
+    PeerSocketInfo info = {
+        .name = const_cast<char*>(peerSessName.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
+        .networkId = const_cast<char*>(peerDevId.c_str()),
+        .dataType = TransDataType::DATA_TYPE_BYTES,
+    };
     ret = DCameraSoftbusAdapter::GetInstance().SinkOnBind(sessionId, info);
     const void *data = "testdata";
     uint32_t dataLen = 8;
@@ -484,7 +529,12 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_017, TestSize.L
     int32_t ret = DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDevId, peerSessName, peerDevId,
         sessionMode, role);
     int32_t sessionId = 2;
-    PeerSocketInfo info = {};
+    PeerSocketInfo info = {
+        .name = const_cast<char*>(peerSessName.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
+        .networkId = const_cast<char*>(peerDevId.c_str()),
+        .dataType = TransDataType::DATA_TYPE_BYTES,
+    };
     ret = DCameraSoftbusAdapter::GetInstance().SinkOnBind(sessionId, info);
     std::string buff01 = "testbuffer01";
     StreamData test01;
@@ -523,7 +573,12 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_018, TestSize.L
         sessionMode, role);
     int32_t sessionId = 2;
     std::shared_ptr<DCameraSoftbusSession> session = std::make_shared<DCameraSoftbusSession>();
-    PeerSocketInfo info = {};
+    PeerSocketInfo info = {
+        .name = const_cast<char*>(peerSessName.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
+        .networkId = const_cast<char*>(peerDevId.c_str()),
+        .dataType = TransDataType::DATA_TYPE_BYTES,
+    };
     ret = DCameraSoftbusAdapter::GetInstance().SourceOnBind(sessionId, info);
     ret = DCameraSoftbusAdapter::GetInstance().DCameraSoftbusSourceGetSession(sessionId, session);
 
@@ -549,7 +604,12 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_019, TestSize.L
     int32_t ret = DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDevId, peerSessName, peerDevId,
         sessionMode, role);
     int32_t sessionId = 2;
-    PeerSocketInfo info = {};
+    PeerSocketInfo info = {
+        .name = const_cast<char*>(peerSessName.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
+        .networkId = const_cast<char*>(peerDevId.c_str()),
+        .dataType = TransDataType::DATA_TYPE_BYTES,
+    };
     std::shared_ptr<DCameraSoftbusSession> session = std::make_shared<DCameraSoftbusSession>();
     ret = DCameraSoftbusAdapter::GetInstance().SinkOnBind(sessionId, info);
     ret = DCameraSoftbusAdapter::GetInstance().DCameraSoftbusSinkGetSession(sessionId, session);
@@ -576,7 +636,12 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_020, TestSize.L
     int32_t ret = DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDevId, peerSessName, peerDevId,
         sessionMode, role);
     int32_t sessionId = 2;
-    PeerSocketInfo info = {};
+    PeerSocketInfo info = {
+        .name = const_cast<char*>(peerSessName.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
+        .networkId = const_cast<char*>(peerDevId.c_str()),
+        .dataType = TransDataType::DATA_TYPE_BYTES,
+    };
     std::shared_ptr<DCameraSoftbusSession> session = std::make_shared<DCameraSoftbusSession>();
     ret = DCameraSoftbusAdapter::GetInstance().SinkOnBind(sessionId, info);
     ret = DCameraSoftbusAdapter::GetInstance().DCameraSoftbusGetSessionById(sessionId, session);
@@ -603,7 +668,12 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_023, TestSize.L
     int32_t ret = DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDevId, peerSessName, peerDevId,
         sessionMode, role);
     int32_t sessionId = -1;
-    PeerSocketInfo info = {};
+    PeerSocketInfo info = {
+        .name = const_cast<char*>(peerSessName.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
+        .networkId = const_cast<char*>(peerDevId.c_str()),
+        .dataType = TransDataType::DATA_TYPE_BYTES,
+    };
     std::shared_ptr<DCameraSoftbusSession> session = std::make_shared<DCameraSoftbusSession>();
     ret = DCameraSoftbusAdapter::GetInstance().SinkOnBind(sessionId, info);
     ret = DCameraSoftbusAdapter::GetInstance().DCameraSoftbusGetSessionById(sessionId, session);
@@ -631,7 +701,12 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_027, TestSize.L
         sessionMode, role);
     int32_t sessionId = 27;
     std::shared_ptr<DCameraSoftbusSession> session = std::make_shared<DCameraSoftbusSession>();
-    PeerSocketInfo info = {};
+    PeerSocketInfo info = {
+        .name = const_cast<char*>(peerSessName.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
+        .networkId = const_cast<char*>(peerDevId.c_str()),
+        .dataType = TransDataType::DATA_TYPE_BYTES,
+    };
     ret = DCameraSoftbusAdapter::GetInstance().SourceOnBind(sessionId, info);
     ret = DCameraSoftbusAdapter::GetInstance().DCameraSoftbusSourceGetSession(sessionId, session);
     EXPECT_EQ(DCAMERA_MEMORY_OPT_ERROR, ret);

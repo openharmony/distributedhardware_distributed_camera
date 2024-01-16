@@ -37,14 +37,14 @@ public:
         std::string peerSessionName, std::shared_ptr<ICameraChannelListener> listener, DCameraSessionMode mode);
     ~DCameraSoftbusSession();
     int32_t CloseSession();
-    int32_t OnSessionOpened(int32_t socket, PeerSocketInfo info);
-    int32_t RefreshSessionStatus(int32_t socket);
+    int32_t OnSessionOpened(int32_t socket);
     int32_t OnSessionClose(int32_t sessionId);
     int32_t OnDataReceived(std::shared_ptr<DataBuffer>& buffer);
     int32_t SendData(DCameraSessionMode mode, std::shared_ptr<DataBuffer>& buffer);
     std::string GetPeerDevId();
     std::string GetPeerSessionName();
     std::string GetMySessionName();
+    int32_t GetSessionId();
 
 private:
     struct SessionDataHeader {
@@ -83,8 +83,9 @@ private:
     };
 
     static const uint32_t BINARY_DATA_MAX_TOTAL_LEN = 100 * 1024 * 1024;
-    static const uint32_t BINARY_DATA_MAX_LEN = 1000 * 1024;
-    static const uint32_t BINARY_DATA_PACKET_MAX_LEN = 62 * 1024;
+    static const uint32_t BINARY_DATA_MAX_LEN = 4 * 1024 * 1024;
+    static const uint32_t BINARY_DATA_PACKET_MAX_LEN = 4 * 1024 * 1024;
+    static const uint32_t BINARY_DATA_PACKET_RESERVED_BUFFER = 512;
     static const uint16_t PROTOCOL_VERSION = 1;
     static const uint16_t HEADER_UINT8_NUM = 1;
     static const uint16_t HEADER_UINT16_NUM = 2;

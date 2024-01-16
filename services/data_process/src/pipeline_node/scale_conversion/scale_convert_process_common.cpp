@@ -84,7 +84,7 @@ bool ScaleConvertProcess::IsConvertible(const VideoConfigParams& sourceConfig, c
 
 void ScaleConvertProcess::ReleaseProcessNode()
 {
-    DHLOGI("Start release [%d] node : ScaleConvertNode.", nodeRank_);
+    DHLOGI("Start release [%zu] node : ScaleConvertNode.", nodeRank_);
     isScaleConvert_.store(false);
 
     {
@@ -101,7 +101,7 @@ void ScaleConvertProcess::ReleaseProcessNode()
         nextDataProcess_->ReleaseProcessNode();
         nextDataProcess_ = nullptr;
     }
-    DHLOGI("Release [%d] node : ScaleConvertNode end.", nodeRank_);
+    DHLOGI("Release [%zu] node : ScaleConvertNode end.", nodeRank_);
 }
 
 int ScaleConvertProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& inputBuffers)
@@ -193,7 +193,7 @@ int32_t ScaleConvertProcess::GetImageUnitInfo(ImageUnitInfo& imgInfo, const std:
         return DCAMERA_BAD_VALUE;
     }
     DHLOGD("ScaleConvertProcess imgBuf info : Videoformat %d, alignedWidth %d, alignedHeight %d, width %d, height %d" +
-        ", chromaOffset %d, imgSize %d.", imgInfo.colorFormat, imgInfo.alignedWidth, imgInfo.alignedHeight,
+        ", chromaOffset %zu, imgSize %zu.", imgInfo.colorFormat, imgInfo.alignedWidth, imgInfo.alignedHeight,
         imgInfo.width, imgInfo.height, imgInfo.chromaOffset, imgInfo.imgSize);
     return DCAMERA_OK;
 }
