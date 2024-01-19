@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -255,7 +255,12 @@ int32_t DCameraSourceDev::Register(std::shared_ptr<DCameraRegistParam>& param)
     DHBase dhBase;
     dhBase.deviceId_ = param->devId_;
     dhBase.dhId_ = param->dhId_;
-    int32_t retHdi = camHdiProvider->EnableDCameraDevice(dhBase, param->sinkParam_, hdiCallback_);
+    std::string ability;
+    ret = ParseEnableParam(param, ability);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("Parsing param failed.");
+    }
+    int32_t retHdi = camHdiProvider->EnableDCameraDevice(dhBase, ability, hdiCallback_);
     DHLOGI("DCameraSourceDev Execute Register register hal, ret: %d, devId: %s dhId: %s", retHdi,
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     if (retHdi != SUCCESS) {
@@ -263,6 +268,32 @@ int32_t DCameraSourceDev::Register(std::shared_ptr<DCameraRegistParam>& param)
         input_->UnInit();
         return DCAMERA_REGIST_HAL_FAILED;
     }
+    return DCAMERA_OK;
+}
+
+int32_t DCameraSourceDev::ParseEnableParam(std::shared_ptr<DCameraRegistParam>& param, std::string& ability)
+{
+    JSONCPP_STRING errs;
+    Json::CharReaderBuilder readerBuilder;
+    Json::Value sinkRootValue;
+
+    std::unique_ptr<Json::CharReader> const jsonReader(readerBuilder.newCharReader());
+    if (!jsonReader->parse(param->sinkParam_.c_str(), param->sinkParam_.c_str() + param->sinkParam_.length(),
+        &sinkRootValue, &errs) || !sinkRootValue.isObject()) {
+        DHLOGE("Input sink ablity info is not json object.");
+        return DCAMERA_INIT_ERR;
+    }
+
+    Json::Value srcRootValue;
+    if (!jsonReader->parse(param->srcParam_.c_str(), param->srcParam_.c_str() + param->srcParam_.length(),
+        &srcRootValue, &errs) || !srcRootValue.isObject()) {
+        DHLOGE("Input source ablity info is not json object.");
+        return DCAMERA_INIT_ERR;
+    }
+    Json::Value abilityRootValue;
+    abilityRootValue["SinkAbility"] = sinkRootValue;
+    abilityRootValue["SourceAbility"] = srcRootValue;
+    ability = abilityRootValue.toStyledString();
     return DCAMERA_OK;
 }
 

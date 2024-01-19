@@ -400,6 +400,9 @@ AVPixelFormat ScaleConvertProcess::GetAVPixelFormat(Videoformat colorFormat)
         case Videoformat::NV21:
             format = AVPixelFormat::AV_PIX_FMT_NV21;
             break;
+        case Videoformat::RGBA_8888:
+            format = AVPixelFormat::AV_PIX_FMT_RGBA;
+            break;
         default:
             format = AVPixelFormat::AV_PIX_FMT_YUV420P;
             break;

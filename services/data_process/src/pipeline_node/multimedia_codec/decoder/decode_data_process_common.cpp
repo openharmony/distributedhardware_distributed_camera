@@ -164,14 +164,9 @@ int32_t DecodeDataProcess::InitDecoderMetadataFormat()
     switch (sourceConfig_.GetVideoCodecType()) {
         case VideoCodecType::CODEC_H264:
             processType_ = "video/avc";
-            processedConfig_.SetVideoformat(Videoformat::NV12);
             break;
         case VideoCodecType::CODEC_H265:
             processType_ = "video/hevc";
-            processedConfig_.SetVideoformat(Videoformat::NV12);
-            break;
-        case VideoCodecType::CODEC_MPEG4_ES:
-            processType_ = "video/mp4v-es";
             break;
         default:
             DHLOGE("The current codec type does not support decoding.");
@@ -400,7 +395,7 @@ int32_t DecodeDataProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>&
         DHLOGE("video decoder input buffers queue over flow.");
         return DCAMERA_INDEX_OVERFLOW;
     }
-    if (inputBuffers[0]->Size() > MAX_RGB32_BUFFER_SIZE) {
+    if (inputBuffers[0]->Size() > MAX_BUFFER_SIZE) {
         DHLOGE("DecodeNode input buffer size %zu error.", inputBuffers[0]->Size());
         return DCAMERA_MEMORY_OPT_ERROR;
     }
@@ -575,11 +570,17 @@ void DecodeDataProcess::CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int3
         return;
     }
 
-    size_t rgbImageSize = static_cast<size_t>(sourceConfig_.GetWidth() * sourceConfig_.GetHeight() *
-        RGB32_MEMORY_COEFFICIENT);
-    std::shared_ptr<DataBuffer> bufferOutput = std::make_shared<DataBuffer>(rgbImageSize);
+    size_t imageSize = 0;
+    if (processedConfig_.GetVideoformat() == Videoformat::RGBA_8888) {
+        imageSize = static_cast<size_t>(sourceConfig_.GetWidth() * sourceConfig_.GetHeight() *
+            RGB32_MEMORY_COEFFICIENT);
+    } else {
+        imageSize = static_cast<size_t>(
+            sourceConfig_.GetWidth() * sourceConfig_.GetHeight() * YUV_BYTES_PER_PIXEL / Y2UV_RATIO);
+    }
+    std::shared_ptr<DataBuffer> bufferOutput = std::make_shared<DataBuffer>(imageSize);
     uint8_t *addr = static_cast<uint8_t *>(surBuf->GetVirAddr());
-    errno_t err = memcpy_s(bufferOutput->Data(), bufferOutput->Size(), addr, rgbImageSize);
+    errno_t err = memcpy_s(bufferOutput->Data(), bufferOutput->Size(), addr, imageSize);
     if (err != EOK) {
         DHLOGE("memcpy_s surface buffer failed.");
         return;
@@ -612,12 +613,25 @@ bool DecodeDataProcess::IsCorrectSurfaceBuffer(const sptr<SurfaceBuffer>& surBuf
         return false;
     }
 
-    size_t rgbImageSize = static_cast<size_t>(sourceConfig_.GetWidth() * sourceConfig_.GetHeight() *
-        RGB32_MEMORY_COEFFICIENT);
-    size_t surfaceBufSize = static_cast<size_t>(surBuf->GetSize());
-    if (rgbImageSize > surfaceBufSize) {
-        DHLOGE("Buffer size error, rgbImageSize %zu, surBufSize %d.", rgbImageSize, surBuf->GetSize());
-        return false;
+    if (processedConfig_.GetVideoformat() == Videoformat::RGBA_8888) {
+        size_t rgbImageSize = static_cast<size_t>(sourceConfig_.GetWidth() * sourceConfig_.GetHeight() *
+            RGB32_MEMORY_COEFFICIENT);
+        size_t surfaceBufSize = static_cast<size_t>(surBuf->GetSize());
+        if (rgbImageSize > surfaceBufSize) {
+            DHLOGE("Buffer size error, rgbImageSize %zu, surBufSize %zu.", rgbImageSize, surBuf->GetSize());
+            return false;
+        }
+    } else {
+        size_t surfaceBufSize = static_cast<size_t>(surBuf->GetSize());
+        size_t yuvImageAlignedSize = static_cast<size_t>(
+            alignedWidth * alignedHeight * YUV_BYTES_PER_PIXEL / Y2UV_RATIO);
+        size_t yuvImageSize = static_cast<size_t>(
+            sourceConfig_.GetWidth() * sourceConfig_.GetHeight() * YUV_BYTES_PER_PIXEL / Y2UV_RATIO);
+        if (yuvImageAlignedSize > surfaceBufSize || yuvImageAlignedSize < yuvImageSize) {
+            DHLOGE("Buffer size error, yuvImageSize %zu, yuvImageAlignedSize %zu, surBufSize %zu.",
+                yuvImageSize, yuvImageAlignedSize, surBuf->GetSize());
+            return false;
+        }
     }
     return true;
 }

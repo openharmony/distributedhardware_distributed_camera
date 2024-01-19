@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -104,6 +104,7 @@ private:
     constexpr static int32_t VIDEO_DECODER_QUEUE_MAX = 1000;
     constexpr static int32_t MAX_YUV420_BUFFER_SIZE = 1920 * 1080 * 3 / 2 * 2;
     constexpr static int32_t MAX_RGB32_BUFFER_SIZE = 1920 * 1080 * 4 * 2;
+    constexpr static int32_t MAX_BUFFER_SIZE = 1920 * 1080 * 4 * 2;
     constexpr static int32_t MIN_FRAME_RATE = 0;
     constexpr static int32_t MAX_FRAME_RATE = 30;
     constexpr static int32_t MIN_VIDEO_WIDTH = 320;

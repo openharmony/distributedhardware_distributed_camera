@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -375,6 +375,31 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_016, TestSize.Level
     std::vector<std::shared_ptr<DataBuffer>> outputBuffers;
     int32_t rc = testScaleConvertProcess_->ConvertDone(outputBuffers);
     EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
+}
+
+/**
+ * @tc.name: scale_convert_process_test_017
+ * @tc.desc: Verify scale convert process ConvertDone.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_017, TestSize.Level1)
+{
+    Videoformat colorFormat = Videoformat::NV12;
+    AVPixelFormat f = testScaleConvertProcess_->GetAVPixelFormat(colorFormat);
+    EXPECT_EQ(f, AVPixelFormat::AV_PIX_FMT_NV12);
+
+    colorFormat = Videoformat::NV21;
+    f = testScaleConvertProcess_->GetAVPixelFormat(colorFormat);
+    EXPECT_EQ(f, AVPixelFormat::AV_PIX_FMT_NV21);
+
+    colorFormat = Videoformat::RGBA_8888;
+    f = testScaleConvertProcess_->GetAVPixelFormat(colorFormat);
+    EXPECT_EQ(f, AVPixelFormat::AV_PIX_FMT_RGBA);
+
+    colorFormat = Videoformat::YUVI420;
+    f = testScaleConvertProcess_->GetAVPixelFormat(colorFormat);
+    EXPECT_EQ(f, AVPixelFormat::AV_PIX_FMT_YUV420P);
 }
 #endif
 } // namespace DistributedHardware

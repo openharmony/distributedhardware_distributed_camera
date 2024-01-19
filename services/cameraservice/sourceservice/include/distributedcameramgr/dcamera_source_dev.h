@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -81,6 +81,7 @@ private:
     void NotifyRegisterResult(DCAMERA_EVENT eventType, DCameraSourceEvent& event, int32_t result);
     void NotifyHalResult(DCAMERA_EVENT eventType, DCameraSourceEvent& event, int32_t result);
     void HitraceAndHisyseventImpl(std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos);
+    int32_t ParseEnableParam(std::shared_ptr<DCameraRegistParam>& param, std::string& ability);
 
 private:
     std::string devId_;
