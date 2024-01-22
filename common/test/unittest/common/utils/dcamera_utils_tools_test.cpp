@@ -196,6 +196,7 @@ HWTEST_F(DcameraUtilsToolsTest, IsOverDumpSize_001, TestSize.Level1)
     uint8_t str[] = "test";
     size = strlen(reinterpret_cast<const char*>(str));
     DumpBufferToFile(fileName, str, size);
+    IsUnderDumpMaxSize(fileName);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
