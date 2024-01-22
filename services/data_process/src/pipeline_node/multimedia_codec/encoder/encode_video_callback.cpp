@@ -15,6 +15,7 @@
 #include "encode_video_callback.h"
 
 #include "distributed_hardware_log.h"
+#include "dh_log.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -22,10 +23,7 @@ void EncodeVideoCallback::OnError(MediaAVCodec::AVCodecErrorType errorType, int3
 {
     DHLOGD("EncodeVideoCallback : OnError. Error type: %d. Error code: %d ", errorType, errorCode);
     std::shared_ptr<EncodeDataProcess> targetEncoderNode = encodeVideoNode_.lock();
-    if (targetEncoderNode == nullptr) {
-        DHLOGE("encodeVideoNode_ is nullptr.");
-        return;
-    }
+    CHECK_AND_RETURN_LOG(targetEncoderNode == nullptr, "%s", "encodeVideoNode_ is nullptr.");
     targetEncoderNode->OnError();
 }
 

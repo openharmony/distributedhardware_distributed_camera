@@ -24,6 +24,7 @@
 #include "decode_surface_listener.h"
 #include "decode_video_callback.h"
 #include "graphic_common_c.h"
+#include "dh_log.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -47,6 +48,7 @@ int32_t DecodeDataProcess::InitNode(const VideoConfigParams& sourceConfig, const
         DHLOGE("Source config or target config are invalid.");
         return DCAMERA_BAD_VALUE;
     }
+
     if (!IsConvertible(sourceConfig, targetConfig)) {
         DHLOGE("The DecodeNode can't convert %d to %d.", sourceConfig.GetVideoCodecType(),
             targetConfig_.GetVideoCodecType());
@@ -131,29 +133,18 @@ int32_t DecodeDataProcess::ConfigureVideoDecoder()
     }
 
     videoDecoder_ = MediaAVCodec::VideoDecoderFactory::CreateByMime(processType_);
-    if (videoDecoder_ == nullptr) {
-        DHLOGE("Create video decoder failed.");
-        return DCAMERA_INIT_ERR;
-    }
+    CHECK_AND_RETURN_RET_LOG(videoDecoder_ == nullptr, DCAMERA_INIT_ERR, "%s",
+        "Create video decoder failed.");
     decodeVideoCallback_ = std::make_shared<DecodeVideoCallback>(shared_from_this());
     ret = videoDecoder_->SetCallback(decodeVideoCallback_);
-    if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
-        DHLOGE("Set video decoder callback failed.  ret %d.", ret);
-        return DCAMERA_INIT_ERR;
-    }
-
+    CHECK_AND_RETURN_RET_LOG(ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK, DCAMERA_INIT_ERR,
+        "Set video decoder callback failed.  ret %d.", ret);
     ret = videoDecoder_->Configure(metadataFormat_);
-    if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
-        DHLOGE("Set video decoder metadata format failed. ret %d.", ret);
-        return DCAMERA_INIT_ERR;
-    }
-
+    CHECK_AND_RETURN_RET_LOG(ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK, DCAMERA_INIT_ERR,
+        "Set video decoder metadata format failed. ret %d.", ret);
     ret = SetDecoderOutputSurface();
-    if (ret != DCAMERA_OK) {
-        DHLOGE("Set decoder output surface failed. ret %d.", ret);
-        return ret;
-    }
-
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret,
+        "Set decoder output surface failed. ret %d.", ret);
     return DCAMERA_OK;
 }
 
@@ -201,10 +192,8 @@ int32_t DecodeDataProcess::SetDecoderOutputSurface()
         static_cast<int32_t>(sourceConfig_.GetHeight()));
     GSError ret = decodeConsumerSurface_->SetDefaultUsage(SurfaceBufferUsage::BUFFER_USAGE_MEM_MMZ_CACHE |
         SurfaceBufferUsage::BUFFER_USAGE_CPU_READ);
-    if (ret != GSERROR_OK || decodeConsumerSurface_ == nullptr) {
-        DHLOGE("Set Usage failed.");
-    }
-    
+    CHECK_AND_LOG(ret != GSERROR_OK || decodeConsumerSurface_ == nullptr, "%s", "Set Usage failed.");
+
     decodeSurfaceListener_ = new DecodeSurfaceListener(decodeConsumerSurface_, shared_from_this());
     if (decodeConsumerSurface_->RegisterConsumerListener(decodeSurfaceListener_) !=
         SURFACE_ERROR_OK) {
@@ -213,10 +202,8 @@ int32_t DecodeDataProcess::SetDecoderOutputSurface()
     }
 
     sptr<IBufferProducer> surfaceProducer = decodeConsumerSurface_->GetProducer();
-    if (surfaceProducer == nullptr) {
-        DHLOGE("Get the surface producer of the decode consumer surface failed.");
-        return DCAMERA_INIT_ERR;
-    }
+    CHECK_AND_RETURN_RET_LOG(surfaceProducer == nullptr, DCAMERA_INIT_ERR, "%s",
+        "Get the surface producer of the decode consumer surface failed.");
     decodeProducerSurface_ = Surface::CreateSurfaceAsProducer(surfaceProducer);
     if (decodeProducerSurface_ == nullptr) {
         DHLOGE("Create the decode producer surface of the decode consumer surface failed.");
@@ -225,10 +212,8 @@ int32_t DecodeDataProcess::SetDecoderOutputSurface()
 
     DHLOGD("Set the producer surface to video decoder output surface.");
     int32_t err = videoDecoder_->SetOutputSurface(decodeProducerSurface_);
-    if (err != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
-        DHLOGE("Set decoder output surface failed.");
-        return DCAMERA_INIT_ERR;
-    }
+    CHECK_AND_RETURN_RET_LOG(err != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK, DCAMERA_INIT_ERR, "%s",
+        "Set decoder output surface failed.");
     return DCAMERA_OK;
 }
 
@@ -240,15 +225,11 @@ int32_t DecodeDataProcess::StartVideoDecoder()
     }
 
     int32_t ret = videoDecoder_->Prepare();
-    if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
-        DHLOGE("Video decoder prepare failed. ret %d.", ret);
-        return DCAMERA_INIT_ERR;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK, DCAMERA_INIT_ERR,
+        "Video decoder prepare failed. ret %d.", ret);
     ret = videoDecoder_->Start();
-    if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
-        DHLOGE("Video decoder start failed. ret %d.", ret);
-        return DCAMERA_INIT_ERR;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK, DCAMERA_INIT_ERR,
+        "Video decoder start failed. ret %d.", ret);
     return DCAMERA_OK;
 }
 
@@ -287,13 +268,10 @@ void DecodeDataProcess::ReleaseVideoDecoder()
         return;
     }
     int32_t ret = StopVideoDecoder();
-    if (ret != DCAMERA_OK) {
-        DHLOGE("StopVideoDecoder failed.");
-    }
+    CHECK_AND_LOG(ret != DCAMERA_OK, "%s", "StopVideoDecoder failed.");
     ret = videoDecoder_->Release();
-    if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
-        DHLOGE("VideoDecoder release failed. ret %d.", ret);
-    }
+    CHECK_AND_LOG(ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK,
+        "VideoDecoder release failed. ret %d.", ret);
     videoDecoder_ = nullptr;
     decodeVideoCallback_ = nullptr;
 }
@@ -306,9 +284,7 @@ void DecodeDataProcess::ReleaseDecoderSurface()
         return;
     }
     int32_t ret = decodeConsumerSurface_->UnregisterConsumerListener();
-    if (ret != SURFACE_ERROR_OK) {
-        DHLOGE("Unregister consumer listener failed. ret %d.", ret);
-    }
+    CHECK_AND_LOG(ret != SURFACE_ERROR_OK, "VideoDecoder release failed. ret %d.", ret);
     decodeConsumerSurface_ = nullptr;
     decodeProducerSurface_ = nullptr;
 }
@@ -393,10 +369,8 @@ int32_t DecodeDataProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>&
         std::shared_ptr<CodecPacket> reFeedInputPacket = std::make_shared<CodecPacket>();
         reFeedInputPacket->SetVideoCodecType(sourceConfig_.GetVideoCodecType());
         DCameraCodecEvent dCamCodecEv(*this, reFeedInputPacket, VideoCodecAction::ACTION_ONCE_AGAIN);
-        if (eventBusPipeline_ == nullptr) {
-            DHLOGE("eventBusPipeline_ is nullptr.");
-            return DCAMERA_BAD_VALUE;
-        }
+        CHECK_AND_RETURN_RET_LOG(eventBusPipeline_ == nullptr, DCAMERA_BAD_VALUE,
+            "%s", "eventBusPipeline_ is nullptr.");
         eventBusPipeline_->PostEvent<DCameraCodecEvent>(dCamCodecEv, POSTMODE::POST_ASYNC);
     }
     return DCAMERA_OK;

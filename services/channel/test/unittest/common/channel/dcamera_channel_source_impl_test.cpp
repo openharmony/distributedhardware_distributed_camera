@@ -160,40 +160,10 @@ HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_003, Tes
     input_ = std::make_shared<DCameraSourceInput>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, camDev_);
 
     listener_ = std::make_shared<DCameraSourceInputChannelListener>(input_, CONTINUOUS_FRAME);
-    channel_->CreateSession(camIndexs, sessionFlag, sessionMode, listener_);
-    int32_t ret = channel_->ReleaseSession();
-    EXPECT_EQ(DCAMERA_OK, ret);
-}
-
-/**
- * @tc.name: dcamera_channel_source_impl_test_004
- * @tc.desc: Verify the SendData function.
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_004, TestSize.Level1)
-{
-    std::vector<DCameraIndex> camIndexs;
-    DCameraIndex index;
-    index.devId_ = TEST_DEVICE_ID;
-    index.dhId_ = TEST_CAMERA_DH_ID_0;
-    camIndexs.push_back(index);
-    std::string sessionFlag = "test004";
-    DCameraSessionMode sessionMode = DCAMERA_SESSION_MODE_JPEG;
-    eventBus_ = std::make_shared<EventBus>("SrcDevHandlerTest04");
-    stateListener_ = std::make_shared<MockDCameraSourceStateListener>();
-    camDev_ = std::make_shared<MockDCameraSourceDev>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, stateListener_);
-    DCameraSourceEvent event(*camDev_);
-    eventBus_->AddHandler<DCameraSourceEvent>(event.GetType(), *camDev_);
-
-    input_ = std::make_shared<DCameraSourceInput>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, camDev_);
-
-    listener_ = std::make_shared<DCameraSourceInputChannelListener>(input_, CONTINUOUS_FRAME);
     int32_t ret = channel_->CreateSession(camIndexs, sessionFlag, sessionMode, listener_);
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);
     ret = channel_->SendData(dataBuffer);
-    usleep(TEST_SLEEP_SEC);
     channel_->CloseSession();
     ret = channel_->ReleaseSession();
     EXPECT_EQ(DCAMERA_OK, ret);
