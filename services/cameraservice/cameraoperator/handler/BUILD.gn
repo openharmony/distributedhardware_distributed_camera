@@ -65,7 +65,7 @@ ohos_shared_library("distributed_camera_handler") {
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"dcamerahandler\"",
-    "LOG_DOMAIN=0xD004100",
+    "LOG_DOMAIN=0xD004150",
   ]
 
   external_deps = [
