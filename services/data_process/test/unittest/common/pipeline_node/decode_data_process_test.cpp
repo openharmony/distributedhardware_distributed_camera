@@ -148,6 +148,9 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_003, TestSize.Level1)
                                  TEST_WIDTH2,
                                  TEST_HEIGTH2);
     VideoConfigParams procConfig;
+    uint8_t *buffer = nullptr;
+    size_t bufferSize = 0;
+    testDecodeDataProcess_->BeforeDecodeDump(buffer, bufferSize);
     int32_t rc = testDecodeDataProcess_->InitNode(srcParams, destParams, procConfig);
     EXPECT_EQ(rc, DCAMERA_OK);
 }

@@ -100,6 +100,17 @@ static const std::string TEST_CAPTURE_INFO_CMD_JSON_LACK_VALUE = R"({
     "Command": "CAPTURE",
 })";
 
+static const std::string TEST_CAPTURE_INFO_CMD_JSON_VALUE_ARRAY = R"({
+    "Type": "OPERATION",
+    "dhId": "camrea_0",
+    "Command": "CAPTURE",
+    "Value":"[
+        {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": 1,
+        "IsCapture": true, "EncodeType": 1, "StreamType": 1,
+        "CaptureSettings": [{"SettingType": 1, "SettingValue": "TestSetting"}]}
+    ]"
+})";
+
 static const std::string TEST_CAPTURE_INFO_CMD_JSON_VALUE_EXCEPTION = R"({
     "Type": "OPERATION",
     "dhId": "camrea_0",
@@ -228,6 +239,17 @@ static const std::string TEST_CAPTURE_INFO_CMD_JSON_LACK_VALUE_BODY_ENCODETYPE =
     "Value": [
         {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": 1,
         "IsCapture": true, "StreamType": 1,
+        "CaptureSettings": [{"SettingType": 1, "SettingValue": "TestSetting"}]}
+    ]
+})";
+
+static const std::string TEST_CAPTURE_INFO_CMD_JSON_LACK_VALUE_BODY_STREAMTYPE = R"({
+    "Type": "OPERATION",
+    "dhId": "camrea_0",
+    "Command": "CAPTURE",
+    "Value": [
+        {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": 1,
+        "IsCapture": true, "EncodeType": 1,
         "CaptureSettings": [{"SettingType": 1, "SettingValue": "TestSetting"}]}
     ]
 })";
@@ -434,6 +456,12 @@ HWTEST_F(DCameraCaptureInfoCmdlTest, Unmarshal_003, TestSize.Level1)
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 
     ret = cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON_CAPTURESETTINGS_BODY_VALUE_EXCEPTION);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON_LACK_VALUE_BODY_STREAMTYPE);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON_VALUE_ARRAY);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 } // namespace DistributedHardware
