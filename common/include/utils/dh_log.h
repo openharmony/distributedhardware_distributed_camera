@@ -26,6 +26,28 @@ typedef enum {
 } DHLogLevel;
 
 void DHLog(DHLogLevel logLevel, const char *fmt, ...);
+#define CHECK_AND_RETURN_RET_LOG(cond, ret, fmt, ...)   \
+    do {                                                \
+        if ((cond)) {                                   \
+            DHLOGE(fmt, ##__VA_ARGS__);                 \
+            return (ret);                               \
+        }                                               \
+    } while (0)
+
+#define CHECK_AND_RETURN_LOG(cond, fmt, ...)   \
+    do {                                       \
+        if ((cond)) {                          \
+            DHLOGE(fmt, ##__VA_ARGS__);        \
+            return;                            \
+        }                                      \
+    } while (0)
+
+#define CHECK_AND_LOG(cond, fmt, ...)          \
+    do {                                       \
+        if ((cond)) {                          \
+            DHLOGE(fmt, ##__VA_ARGS__);        \
+        }                                      \
+    } while (0)
 
 #define ULOGD(fmt, ...) DHLog(DH_LOG_DEBUG, \
     (std::string("[") + DH_LOG_TAG + "][" + __FUNCTION__ + "]:" + fmt).c_str(), ##__VA_ARGS__)

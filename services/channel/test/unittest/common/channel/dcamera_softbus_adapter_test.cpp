@@ -709,10 +709,10 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_027, TestSize.L
     };
     ret = DCameraSoftbusAdapter::GetInstance().SourceOnBind(sessionId, info);
     ret = DCameraSoftbusAdapter::GetInstance().DCameraSoftbusSourceGetSession(sessionId, session);
-    EXPECT_EQ(DCAMERA_MEMORY_OPT_ERROR, ret);
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
     mySessName = "sourcetest0027";
     ret = DCameraSoftbusAdapter::GetInstance().DCameraSoftbusSourceGetSession(sessionId, session);
-    EXPECT_EQ(DCAMERA_MEMORY_OPT_ERROR, ret);
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
     sessionId = 2;
     DCameraSoftbusAdapter::GetInstance().sourceSessions_.clear();
     DCameraSoftbusAdapter::GetInstance().DestroySoftbusSessionServer(sessionName);

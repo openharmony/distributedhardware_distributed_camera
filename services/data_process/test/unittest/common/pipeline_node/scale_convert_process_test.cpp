@@ -401,6 +401,144 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_017, TestSize.Level
     f = testScaleConvertProcess_->GetAVPixelFormat(colorFormat);
     EXPECT_EQ(f, AVPixelFormat::AV_PIX_FMT_YUV420P);
 }
+#else
+namespace {
+const int32_t TEST_WIDTH = 1920;
+const int32_t TEST_HEIGTH = 1080;
+const int32_t TEST_WIDTH2 = 640;
+const int32_t TEST_HEIGTH2 = 480;
+
+VideoConfigParams SRC_PARAMS1(VideoCodecType::CODEC_H264,
+                            Videoformat::NV12,
+                            DCAMERA_PRODUCER_FPS_DEFAULT,
+                            TEST_WIDTH,
+                            TEST_HEIGTH);
+VideoConfigParams DEST_PARAMS1(VideoCodecType::CODEC_H264,
+                                Videoformat::NV21,
+                                DCAMERA_PRODUCER_FPS_DEFAULT,
+                                TEST_WIDTH,
+                                TEST_HEIGTH);
+VideoConfigParams DEST_PARAMS2(VideoCodecType::CODEC_H264,
+                                Videoformat::NV21,
+                                DCAMERA_PRODUCER_FPS_DEFAULT,
+                                TEST_WIDTH2,
+                                TEST_HEIGTH2);
+
+VideoConfigParams PROC_CONFIG;
+}
+/**
+ * @tc.name: scale_convert_process_test_018
+ * @tc.desc: Verify scale convert process InitNode IsConvertible true.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_018, TestSize.Level1)
+{
+    int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS1, PROC_CONFIG);
+    EXPECT_EQ(rc, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: scale_convert_process_test_019
+ * @tc.desc: Verify scale convert process ProcessData isScaleConvert_ false.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_019, TestSize.Level1)
+{
+    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
+    int32_t rc = testScaleConvertProcess_->ProcessData(inputBuffers);
+    EXPECT_EQ(rc, DCAMERA_DISABLE_PROCESS);
+}
+
+/**
+ * @tc.name: scale_convert_process_test_020
+ * @tc.desc: Verify scale convert process GetImageUnitInfo.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_020, TestSize.Level1)
+{
+    ImageUnitInfo srcImgInfo {Videoformat::YUVI420, 0, 0, 0, 0, 0, 0, nullptr};
+    std::shared_ptr<DataBuffer> imgBuf = nullptr;
+    int32_t rc = testScaleConvertProcess_->GetImageUnitInfo(srcImgInfo, imgBuf);
+    EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
+
+    size_t capacity = 100;
+    imgBuf = std::make_shared<DataBuffer>(capacity);
+    rc = testScaleConvertProcess_->GetImageUnitInfo(srcImgInfo, imgBuf);
+    EXPECT_EQ(rc, DCAMERA_NOT_FOUND);
+
+    imgBuf->SetInt32("Videoformat", static_cast<int32_t>(Videoformat::RGBA_8888));
+    rc = testScaleConvertProcess_->GetImageUnitInfo(srcImgInfo, imgBuf);
+    EXPECT_EQ(rc, DCAMERA_NOT_FOUND);
+}
+
+/**
+ * @tc.name: scale_convert_process_test_021
+ * @tc.desc: Verify scale convert process GetImageUnitInfo.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_021, TestSize.Level1)
+{
+    ImageUnitInfo srcImgInfo {Videoformat::YUVI420, 0, 0, 0, 0, 0, 0, nullptr};
+    size_t capacity = 100;
+    std::shared_ptr<DataBuffer> imgBuf = std::make_shared<DataBuffer>(capacity);
+    int64_t timeStamp = 10;
+    imgBuf->SetInt64("timeUs", timeStamp);
+    imgBuf->SetInt32("Videoformat", static_cast<int32_t>(Videoformat::NV12));
+    imgBuf->SetInt32("alignedWidth", TEST_WIDTH);
+    imgBuf->SetInt32("alignedHeight", TEST_HEIGTH);
+    imgBuf->SetInt32("width", TEST_WIDTH);
+    imgBuf->SetInt32("height", TEST_HEIGTH);
+
+    int32_t rc = testScaleConvertProcess_->GetImageUnitInfo(srcImgInfo, imgBuf);
+    EXPECT_EQ(rc, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: scale_convert_process_test_022
+ * @tc.desc: Verify scale convert process CheckScaleConvertInfo.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_022, TestSize.Level1)
+{
+    ImageUnitInfo srcImgInfo {Videoformat::NV12, TEST_WIDTH, TEST_HEIGTH, 0, 0, 0, 0, nullptr};
+    ImageUnitInfo dstImgInfo {Videoformat::NV12, TEST_WIDTH, TEST_HEIGTH, 0, 0, 0, 0, nullptr};
+
+    bool rc = testScaleConvertProcess_->CheckScaleConvertInfo(srcImgInfo, dstImgInfo);
+    EXPECT_EQ(rc, false);
+
+    std::shared_ptr<DataBuffer> dtBuf = std::make_shared<DataBuffer>(10);
+    srcImgInfo.imgData = dtBuf;
+    dstImgInfo.imgData = dtBuf;
+    rc = testScaleConvertProcess_->CheckScaleConvertInfo(srcImgInfo, dstImgInfo);
+    EXPECT_EQ(rc, false);
+}
+
+/**
+ * @tc.name: scale_convert_process_test_023
+ * @tc.desc: Verify scale convert process GetImageUnitInfo.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_023, TestSize.Level1)
+{
+    ImageUnitInfo srcImgInfo {Videoformat::YUVI420, 0, 0, 0, 0, 0, 0, nullptr};
+    size_t capacity = 100;
+    std::shared_ptr<DataBuffer> imgBuf = std::make_shared<DataBuffer>(capacity);
+    int64_t timeStamp = 10;
+    imgBuf->SetInt64("timeUs", timeStamp);
+    imgBuf->SetInt32("Videoformat", static_cast<int32_t>(Videoformat::NV12));
+    imgBuf->SetInt32("alignedWidth", TEST_WIDTH);
+    imgBuf->SetInt32("width", TEST_WIDTH);
+    imgBuf->SetInt32("height", TEST_HEIGTH);
+
+    int32_t rc = testScaleConvertProcess_->GetImageUnitInfo(srcImgInfo, imgBuf);
+    EXPECT_EQ(rc, DCAMERA_NOT_FOUND);
+}
 #endif
 } // namespace DistributedHardware
 } // namespace OHOS

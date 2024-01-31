@@ -21,6 +21,7 @@
 #include "encode_video_callback.h"
 #include "graphic_common_c.h"
 #include <ctime>
+#include "dh_log.h"
 
 #ifndef DH_LOG_TAG
 #define DH_LOG_TAG "DCDP_NODE_ENCODEC"
@@ -126,16 +127,11 @@ int32_t EncodeDataProcess::InitEncoder()
 int32_t EncodeDataProcess::ConfigureVideoEncoder()
 {
     int32_t ret = InitEncoderMetadataFormat();
-    if (ret != DCAMERA_OK) {
-        DHLOGE("Init video encoder metadata format failed. ret %d.", ret);
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret,
+        "Init video encoder metadata format failed. ret %d.", ret);
     ret = InitEncoderBitrateFormat();
-    if (ret != DCAMERA_OK) {
-        DHLOGE("Init video encoder bitrate format failed. ret %d.", ret);
-        return ret;
-    }
-
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret,
+        "Init video encoder bitrate format failed. ret %d.", ret);
     videoEncoder_ = MediaAVCodec::VideoEncoderFactory::CreateByMime(processType_);
     if (videoEncoder_ == nullptr) {
         DHLOGE("Create video encoder failed.");
@@ -149,16 +145,12 @@ int32_t EncodeDataProcess::ConfigureVideoEncoder()
     }
 
     ret = videoEncoder_->Configure(metadataFormat_);
-    if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
-        DHLOGE("Set video encoder metadata format failed. ret %d.", ret);
-        return DCAMERA_INIT_ERR;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK, DCAMERA_INIT_ERR,
+        "Set video encoder metadata format failed. ret %d.", ret);
 
     encodeProducerSurface_ = videoEncoder_->CreateInputSurface();
-    if (encodeProducerSurface_ == nullptr) {
-        DHLOGE("Get video encoder producer surface failed.");
-        return DCAMERA_INIT_ERR;
-    }
+    CHECK_AND_RETURN_RET_LOG(encodeProducerSurface_ == nullptr, DCAMERA_INIT_ERR,
+        "%s", "Get video encoder producer surface failed.");
 
     return DCAMERA_OK;
 }
@@ -217,17 +209,13 @@ int32_t EncodeDataProcess::InitEncoderMetadataFormat()
 int32_t EncodeDataProcess::InitEncoderBitrateFormat()
 {
     DHLOGD("Init video encoder bitrate format.");
-    if (!(IsInEncoderRange(sourceConfig_) && IsInEncoderRange(targetConfig_))) {
-        DHLOGE("Source config or target config are invalid.");
-        return DCAMERA_BAD_VALUE;
-    }
+    CHECK_AND_RETURN_RET_LOG(!(IsInEncoderRange(sourceConfig_) && IsInEncoderRange(targetConfig_)), DCAMERA_BAD_VALUE,
+        "%s", "Source config or target config are invalid.");
     metadataFormat_.PutIntValue("i_frame_interval", IDR_FRAME_INTERVAL_MS);
     metadataFormat_.PutIntValue("video_encode_bitrate_mode", MediaAVCodec::VideoEncodeBitrateMode::VBR);
 
-    if (ENCODER_BITRATE_TABLE.empty()) {
-        DHLOGD("ENCODER_BITRATE_TABLE is null, use the default bitrate of the encoder.");
-        return DCAMERA_OK;
-    }
+    CHECK_AND_RETURN_RET_LOG(ENCODER_BITRATE_TABLE.empty(), DCAMERA_OK, "%s",
+        "ENCODER_BITRATE_TABLE is null, use the default bitrate of the encoder.");
     int64_t pixelformat = static_cast<int64_t>(sourceConfig_.GetWidth() * sourceConfig_.GetHeight());
     int32_t matchedBitrate = BITRATE_6000000;
     int64_t minPixelformatDiff = WIDTH_1920_HEIGHT_1080 - pixelformat;
@@ -256,15 +244,11 @@ int32_t EncodeDataProcess::StartVideoEncoder()
     }
 
     int32_t ret = videoEncoder_->Prepare();
-    if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
-        DHLOGE("Video encoder prepare failed. ret %d.", ret);
-        return DCAMERA_INIT_ERR;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK, DCAMERA_INIT_ERR,
+        "Video encoder prepare failed. ret %d.", ret);
     ret = videoEncoder_->Start();
-    if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
-        DHLOGE("Video encoder start failed. ret %d.", ret);
-        return DCAMERA_INIT_ERR;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK, DCAMERA_INIT_ERR,
+        "Video encoder start failed. ret %d.", ret);
     return DCAMERA_OK;
 }
 
@@ -304,13 +288,9 @@ void EncodeDataProcess::ReleaseVideoEncoder()
         return;
     }
     int32_t ret = StopVideoEncoder();
-    if (ret != DCAMERA_OK) {
-        DHLOGE("StopVideoEncoder failed.");
-    }
+    CHECK_AND_LOG(ret != DCAMERA_OK, "%s", "StopVideoEncoder failed.");
     ret = videoEncoder_->Release();
-    if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
-        DHLOGE("VideoEncoder release failed. ret %d.", ret);
-    }
+    CHECK_AND_LOG(ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK, "VideoEncoder release failed. ret %d.", ret);
     encodeProducerSurface_ = nullptr;
     videoEncoder_ = nullptr;
     encodeVideoCallback_ = nullptr;
@@ -355,15 +335,10 @@ int32_t EncodeDataProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>&
         DHLOGE("EncodeNode input buffer size %d error.", inputBuffers[0]->Size());
         return DCAMERA_MEMORY_OPT_ERROR;
     }
-    if (!isEncoderProcess_.load()) {
-        DHLOGE("EncodeNode occurred error or start release.");
-        return DCAMERA_DISABLE_PROCESS;
-    }
+    CHECK_AND_RETURN_RET_LOG(!isEncoderProcess_.load(), DCAMERA_DISABLE_PROCESS, "%s",
+        "EncodeNode occurred error or start release.");
     int32_t err = FeedEncoderInputBuffer(inputBuffers[0]);
-    if (err != DCAMERA_OK) {
-        DHLOGE("Feed encoder input Buffer failed.");
-        return err;
-    }
+    CHECK_AND_RETURN_RET_LOG(err != DCAMERA_OK, err, "%s", "Feed encoder input Buffer failed.");
     return DCAMERA_OK;
 }
 
@@ -371,16 +346,11 @@ int32_t EncodeDataProcess::FeedEncoderInputBuffer(std::shared_ptr<DataBuffer>& i
 {
     std::lock_guard<std::mutex> lck(mtxEncoderState_);
     DHLOGD("Feed encoder input buffer, buffer size %d.", inputBuffer->Size());
-    if (encodeProducerSurface_ == nullptr) {
-        DHLOGE("Get encoder input producer surface failed.");
-        return DCAMERA_INIT_ERR;
-    }
-
+    CHECK_AND_RETURN_RET_LOG(encodeProducerSurface_ == nullptr, DCAMERA_INIT_ERR, "%s",
+        "Get encoder input producer surface failed.");
     sptr<SurfaceBuffer> surfacebuffer = GetEncoderInputSurfaceBuffer();
-    if (surfacebuffer == nullptr) {
-        DHLOGE("Get encoder input producer surface buffer failed.");
-        return DCAMERA_BAD_OPERATE;
-    }
+    CHECK_AND_RETURN_RET_LOG(surfacebuffer == nullptr, DCAMERA_BAD_OPERATE, "%s",
+        "Get encoder input producer surface buffer failed.");
     uint8_t *addr = static_cast<uint8_t *>(surfacebuffer->GetVirAddr());
     if (addr == nullptr) {
         DHLOGE("SurfaceBuffer address is nullptr");
@@ -389,10 +359,8 @@ int32_t EncodeDataProcess::FeedEncoderInputBuffer(std::shared_ptr<DataBuffer>& i
     }
     size_t size = static_cast<size_t>(surfacebuffer->GetSize());
     errno_t err = memcpy_s(addr, size, inputBuffer->Data(), inputBuffer->Size());
-    if (err != EOK) {
-        DHLOGE("memcpy_s encoder input producer surface buffer failed, surBufSize %zu.", size);
-        return DCAMERA_MEMORY_OPT_ERROR;
-    }
+    CHECK_AND_RETURN_RET_LOG(err != EOK, DCAMERA_MEMORY_OPT_ERROR,
+        "memcpy_s encoder input producer surface buffer failed, surBufSize %zu.", size);
 
     inputTimeStampUs_ = GetEncoderTimeStamp();
     DHLOGD("Encoder input buffer size %d, timeStamp %lld.", inputBuffer->Size(), (long long)inputTimeStampUs_);
@@ -400,10 +368,8 @@ int32_t EncodeDataProcess::FeedEncoderInputBuffer(std::shared_ptr<DataBuffer>& i
 
     BufferFlushConfig flushConfig = { {0, 0, sourceConfig_.GetWidth(), sourceConfig_.GetHeight()}, 0};
     SurfaceError ret = encodeProducerSurface_->FlushBuffer(surfacebuffer, -1, flushConfig);
-    if (ret != SURFACE_ERROR_OK) {
-        DHLOGE("Flush encoder input producer surface buffer failed.");
-        return DCAMERA_BAD_OPERATE;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != SURFACE_ERROR_OK, DCAMERA_BAD_OPERATE, "%s",
+        "Flush encoder input producer surface buffer failed.");
     return DCAMERA_OK;
 }
 
@@ -484,21 +450,15 @@ int32_t EncodeDataProcess::GetEncoderOutputBuffer(uint32_t index, MediaAVCodec::
         DHLOGE("Failed to get the output shared memory, index : %u", index);
         return DCAMERA_BAD_OPERATE;
     }
-
-    if (info.size <= 0 || info.size > DATABUFF_MAX_SIZE) {
-        DHLOGE("AVCodecBufferInfo error, buffer size : %d", info.size);
-        return DCAMERA_BAD_VALUE;
-    }
-
+    
+    CHECK_AND_RETURN_RET_LOG(info.size <= 0 || info.size > DATABUFF_MAX_SIZE, DCAMERA_BAD_VALUE,
+        "AVCodecBufferInfo error, buffer size : %d", info.size);
     size_t outputMemoDataSize = static_cast<size_t>(info.size);
     DHLOGD("Encoder output buffer size : %d", outputMemoDataSize);
     std::shared_ptr<DataBuffer> bufferOutput = std::make_shared<DataBuffer>(outputMemoDataSize);
     errno_t err = memcpy_s(bufferOutput->Data(), bufferOutput->Size(),
         buffer->GetBase(), outputMemoDataSize);
-    if (err != EOK) {
-        DHLOGE("memcpy_s buffer failed.");
-        return DCAMERA_MEMORY_OPT_ERROR;
-    }
+    CHECK_AND_RETURN_RET_LOG(err != EOK, DCAMERA_MEMORY_OPT_ERROR, "%s", "memcpy_s buffer failed.");
     int64_t timeStamp = info.presentationTimeUs;
     struct timespec time = {0, 0};
     clock_gettime(CLOCK_MONOTONIC, &time);
@@ -528,9 +488,7 @@ int32_t EncodeDataProcess::EncodeDone(std::vector<std::shared_ptr<DataBuffer>>& 
     if (nextDataProcess_ != nullptr) {
         DHLOGD("Send to the next node of the encoder for processing.");
         int32_t err = nextDataProcess_->ProcessData(outputBuffers);
-        if (err != DCAMERA_OK) {
-            DHLOGE("Someone node after the encoder processes failed.");
-        }
+        CHECK_AND_LOG(err != DCAMERA_OK, "%s", "Someone node after the encoder processes failed.");
         return err;
     }
     DHLOGD("The current node is the last node, and Output the processed video buffer");
@@ -552,10 +510,7 @@ void EncodeDataProcess::OnError()
         videoEncoder_->Stop();
     }
     std::shared_ptr<DCameraPipelineSink> targetPipelineSink = callbackPipelineSink_.lock();
-    if (targetPipelineSink == nullptr) {
-        DHLOGE("callbackPipelineSink_ is nullptr.");
-        return;
-    }
+    CHECK_AND_RETURN_LOG(targetPipelineSink == nullptr, "%s", "callbackPipelineSink_ is nullptr.");
     targetPipelineSink->OnError(DataProcessErrorType::ERROR_PIPELINE_ENCODER);
 }
 
@@ -587,14 +542,11 @@ void EncodeDataProcess::OnOutputBufferAvailable(uint32_t index, MediaAVCodec::AV
         DHLOGE("Get encode output Buffer failed.");
         return;
     }
-    if (videoEncoder_ == nullptr) {
-        DHLOGE("The video encoder does not exist before release output buffer index.");
-        return;
-    }
+    CHECK_AND_RETURN_LOG(videoEncoder_ == nullptr, "%s",
+        "The video encoder does not exist before release output buffer index.");
     int32_t errRelease = videoEncoder_->ReleaseOutputBuffer(index);
-    if (errRelease != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
-        DHLOGE("The video encoder release output buffer failed, index : [%u].", index);
-    }
+    CHECK_AND_LOG(errRelease != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK,
+        "The video encoder release output buffer failed, index : [%u].", index);
 }
 
 VideoConfigParams EncodeDataProcess::GetSourceConfig() const
@@ -612,10 +564,8 @@ int32_t EncodeDataProcess::GetProperty(const std::string& propertyName, Property
     if (propertyName != surfaceStr_) {
         return DCAMERA_OK;
     }
-    if (encodeProducerSurface_ == nullptr) {
-        DHLOGD("EncodeDataProcess::GetProperty: encode dataProcess get property fail, encode surface is nullptr.");
-        return DCAMERA_BAD_VALUE;
-    }
+    CHECK_AND_RETURN_RET_LOG(encodeProducerSurface_ == nullptr, DCAMERA_BAD_VALUE, "%s",
+        "EncodeDataProcess::GetProperty: encode dataProcess get property fail, encode surface is nullptr.");
     return propertyCarrier.CarrySurfaceProperty(encodeProducerSurface_);
 }
 } // namespace DistributedHardware
