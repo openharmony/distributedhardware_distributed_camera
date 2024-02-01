@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Copyright (c) 2023-2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -15,10 +15,16 @@ group("fuzztest") {
   testonly = true
 
   deps = [
+    "callbackonnotifyresourceinfo_fuzzer:fuzztest",
+    "callbacksinkonremoterequest_fuzzer:fuzztest",
     "encodeoninputbufferavailable_fuzzer:fuzztest",
     "encodeonoutputbufferavailable_fuzzer:fuzztest",
     "onsinklocalcamsrvdied_fuzzer:fuzztest",
     "sinkhandlerinitsink_fuzzer:fuzztest",
+    "sinkhandlerpausedistributedhardware_fuzzer:fuzztest",
+    "sinkhandlerreleasesink_fuzzer:fuzztest",
+    "sinkhandlerresumedistributedhardware_fuzzer:fuzztest",
+    "sinkhandlerstopdistributedhardware_fuzzer:fuzztest",
     "sinkhandlersubscribelocalhardware_fuzzer:fuzztest",
     "sinkhandlerunsubscribelocalhardware_fuzzer:fuzztest",
     "sinkonloadsystemabilityfail_fuzzer:fuzztest",
@@ -28,6 +34,7 @@ group("fuzztest") {
     "sinkproxygetcamerainfo_fuzzer:fuzztest",
     "sinkproxyinitsink_fuzzer:fuzztest",
     "sinkproxyopenchannel_fuzzer:fuzztest",
+    "sinkproxyreleasesink_fuzzer:fuzztest",
     "sinkproxystopcapture_fuzzer:fuzztest",
     "sinkproxysubscribelocalhardware_fuzzer:fuzztest",
     "sinkproxyunsubscribelocalhardware_fuzzer:fuzztest",
