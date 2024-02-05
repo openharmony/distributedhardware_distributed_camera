@@ -81,13 +81,17 @@ public:
 #ifdef DCAMERA_YUV
         const int32_t TEST_WIDTH = 1920;
         const int32_t TEST_HEIGHT = 1080;
+        const int32_t TEST_WIDTH_PHOTO = 1920;
+        const int32_t TEST_HEIGHT_PHOTO = 1080;
         const int32_t TEST_FORMAT_VIDEO = OHOS_CAMERA_FORMAT_YCRCB_420_SP;
         const int32_t TEST_FORMAT_PHOTO = OHOS_CAMERA_FORMAT_JPEG;
 #else
         const int32_t TEST_WIDTH = 640;
         const int32_t TEST_HEIGHT = 480;
+        const int32_t TEST_WIDTH_PHOTO = 1280;
+        const int32_t TEST_HEIGHT_PHOTO = 960;
         const int32_t TEST_FORMAT_VIDEO = OHOS_CAMERA_FORMAT_RGBA_8888;
-        const int32_t TEST_FORMAT_PHOTO = OHOS_CAMERA_FORMAT_RGBA_8888;
+        const int32_t TEST_FORMAT_PHOTO = OHOS_CAMERA_FORMAT_JPEG;
 #endif
 
 constexpr int32_t TEST_SLEEP_SEC = 2;
@@ -131,8 +135,8 @@ void DCameraClientTest::SetUp(void)
     client_ = std::make_shared<DCameraClient>(cameras[0]);
 
     photoInfo_false_ = std::make_shared<DCameraCaptureInfo>();
-    photoInfo_false_->width_ = TEST_WIDTH;
-    photoInfo_false_->height_ = TEST_HEIGHT;
+    photoInfo_false_->width_ = TEST_WIDTH_PHOTO;
+    photoInfo_false_->height_ = TEST_HEIGHT_PHOTO;
     photoInfo_false_->format_ = TEST_FORMAT_PHOTO;
     photoInfo_false_->isCapture_ = false;
     photoInfo_false_->streamType_ = SNAPSHOT_FRAME;
@@ -145,8 +149,8 @@ void DCameraClientTest::SetUp(void)
     videoInfo_false_->streamType_ = CONTINUOUS_FRAME;
 
     photoInfo_true_ = std::make_shared<DCameraCaptureInfo>();
-    photoInfo_true_->width_ = TEST_WIDTH;
-    photoInfo_true_->height_ = TEST_HEIGHT;
+    photoInfo_true_->width_ = TEST_WIDTH_PHOTO;
+    photoInfo_true_->height_ = TEST_HEIGHT_PHOTO;
     photoInfo_true_->format_ = TEST_FORMAT_PHOTO;
     photoInfo_true_->isCapture_ = true;
     photoInfo_true_->streamType_ = SNAPSHOT_FRAME;
@@ -209,8 +213,8 @@ void DCameraClientTest::SetCaptureInfo(std::shared_ptr<DCameraCaptureInfo>& info
     setting->value_ = Base64Encode(reinterpret_cast<const unsigned char *>(abilityString.c_str()),
         abilityString.length());
     settings.push_back(setting);
-    info->width_ = TEST_WIDTH;
-    info->height_ = TEST_HEIGHT;
+    info->width_ = TEST_WIDTH_PHOTO;
+    info->height_ = TEST_HEIGHT_PHOTO;
     info->format_ = TEST_FORMAT_PHOTO;
     info->isCapture_ = true;
     info->streamType_ = SNAPSHOT_FRAME;
