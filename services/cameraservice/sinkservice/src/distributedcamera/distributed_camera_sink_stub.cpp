@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-DistributedCameraSinkStub::DistributedCameraSinkStub()
+DistributedCameraSinkStub::DistributedCameraSinkStub() : IRemoteStub(true)
 {
     memberFuncMap_[static_cast<uint32_t>(IDCameraSinkInterfaceCode::INIT_SINK)] =
         &DistributedCameraSinkStub::InitSinkInner;
