@@ -43,7 +43,7 @@ ohos_fuzztest("SinkServiceInitSinkFuzzTest") {
     "${fwk_utils_path}/include/eventbus",
     "${feeding_smoother_path}/base",
     "//third_party/cJSON",
-    "//third_party/jsoncpp/include",
+
   ]
 
   cflags = [

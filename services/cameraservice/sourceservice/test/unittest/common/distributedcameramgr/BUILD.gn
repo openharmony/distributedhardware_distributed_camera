@@ -46,7 +46,6 @@ config("module_private_config") {
     "${fwk_utils_path}/include/eventbus",
     "${fwk_common_path}/utils/include",
     "//third_party/cJSON",
-    "//third_party/jsoncpp/include",
     "//drivers/peripheral/base/",
     "${graphicsurface_path}/surface/include",
     "${feeding_smoother_path}",
@@ -88,7 +87,6 @@ ohos_unittest("DCameraSourceMgrTest") {
     "${services_path}/data_process:distributed_camera_data_process",
     "//third_party/cJSON:cjson",
     "//third_party/googletest:gtest_main",
-    "//third_party/jsoncpp:jsoncpp",
   ]
 
   external_deps = [

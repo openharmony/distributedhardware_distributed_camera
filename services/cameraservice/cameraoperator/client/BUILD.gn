@@ -37,6 +37,7 @@ ohos_shared_library("distributed_camera_client") {
     "${camerastandard_path}/services/camera_service/binder/client/include",
     "${camerastandard_path}/services/camera_service/binder/server/include",
     "${camerastandard_path}/services/camera_service/include",
+    "//third_party/cJSON",
   ]
 
   include_dirs += [
@@ -51,8 +52,6 @@ ohos_shared_library("distributed_camera_client") {
     "${feeding_smoother_path}/utils",
   ]
 
-  configs = [ "//third_party/jsoncpp:jsoncpp_public_config" ]
-
   sources = [
     "src/callback/dcamera_input_callback.cpp",
     "src/callback/dcamera_manager_callback.cpp",
@@ -65,7 +64,10 @@ ohos_shared_library("distributed_camera_client") {
 
   sources += [ "src/dcamera_client.cpp" ]
 
-  deps = [ "${common_path}:distributed_camera_utils" ]
+  deps = [
+    "${common_path}:distributed_camera_utils",
+    "//third_party/cJSON:cjson",
+  ]
 
   defines = [
     "HI_LOG_ENABLE",

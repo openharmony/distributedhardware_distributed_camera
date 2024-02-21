@@ -17,6 +17,7 @@
 #define OHOS_DCAMERA_CAPTURE_INFO_H
 
 #include "distributed_camera_constants.h"
+#include "cJSON.h"
 #include "json/json.h"
 #include "v1_0/dcamera_types.h"
 
@@ -47,8 +48,8 @@ public:
     int32_t Unmarshal(const std::string& jsonStr);
 
 private:
-    int32_t UmarshalValue(Json::Value& rootValue);
-    int32_t UmarshalSettings(Json::Value& valueJson, std::shared_ptr<DCameraCaptureInfo>& captureInfo);
+    int32_t UmarshalValue(cJSON* rootValue);
+    int32_t UmarshalSettings(cJSON* valueJson, std::shared_ptr<DCameraCaptureInfo>& captureInfo);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

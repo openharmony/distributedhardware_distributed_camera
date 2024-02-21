@@ -86,7 +86,6 @@ ohos_unittest("DCameraSinkMgrTest") {
     "${services_path}/cameraservice/sinkservice:distributed_camera_sink",
     "${services_path}/channel:distributed_camera_channel",
     "//third_party/cJSON:cjson",
-    "//third_party/jsoncpp:jsoncpp",
   ]
 
   external_deps = [

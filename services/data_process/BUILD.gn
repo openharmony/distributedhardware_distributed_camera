@@ -32,6 +32,7 @@ ohos_shared_library("distributed_camera_data_process") {
     "${fwk_utils_path}/include/eventbus",
     "${graphicsurface_path}/surface/include",
     "${services_path}/cameraservice/base/include",
+    "//third_party/cJSON",
   ]
 
   include_dirs += [
@@ -43,7 +44,6 @@ ohos_shared_library("distributed_camera_data_process") {
     "include/pipeline_node/multimedia_codec/encoder",
     "include/pipeline_node/fpscontroller",
     "include/pipeline_node/scale_conversion",
-    "//third_party/json/include",
     "${common_path}/include/constants",
     "${common_path}/include/utils",
     "${feeding_smoother_path}/base",
@@ -66,7 +66,10 @@ ohos_shared_library("distributed_camera_data_process") {
     "src/utils/property_carrier.cpp",
   ]
 
-  deps = [ "${common_path}:distributed_camera_utils" ]
+  deps = [
+    "${common_path}:distributed_camera_utils",
+    "//third_party/cJSON:cjson",
+  ]
 
   if (!distributed_camera_common) {
     sources += [

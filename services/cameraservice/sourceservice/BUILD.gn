@@ -32,7 +32,6 @@ ohos_shared_library("distributed_camera_source") {
     "${fwk_common_path}/utils/include",
     "${fwk_utils_path}/include/eventbus",
     "//third_party/cJSON",
-    "//third_party/jsoncpp/include",
   ]
 
   include_dirs += [
@@ -110,7 +109,6 @@ ohos_shared_library("distributed_camera_source") {
     "${services_path}/channel:distributed_camera_channel",
     "${services_path}/data_process:distributed_camera_data_process",
     "//third_party/cJSON:cjson",
-    "//third_party/jsoncpp:jsoncpp",
   ]
 
   defines = [

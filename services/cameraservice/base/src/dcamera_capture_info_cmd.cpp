@@ -23,123 +23,159 @@ namespace OHOS {
 namespace DistributedHardware {
 int32_t DCameraCaptureInfoCmd::Marshal(std::string& jsonStr)
 {
-    Json::Value rootValue;
-    rootValue["Type"] = Json::Value(type_);
-    rootValue["dhId"] = Json::Value(dhId_);
-    rootValue["Command"] = Json::Value(command_);
-    Json::Value captureInfos;
-    for (auto iter = value_.begin(); iter != value_.end(); iter++) {
-        Json::Value captureInfo;
-        std::shared_ptr<DCameraCaptureInfo> capture = *iter;
-        captureInfo["Width"] = Json::Value(capture->width_);
-        captureInfo["Height"] = Json::Value(capture->height_);
-        captureInfo["Format"] = Json::Value(capture->format_);
-        captureInfo["DataSpace"] = Json::Value(capture->dataspace_);
-        captureInfo["IsCapture"] = Json::Value(capture->isCapture_);
-        captureInfo["EncodeType"] = Json::Value(capture->encodeType_);
-        captureInfo["StreamType"] = Json::Value(capture->streamType_);
+    cJSON *rootValue = cJSON_CreateObject();
+    if (rootValue == nullptr) {
+        return DCAMERA_BAD_VALUE;
+    }
+    cJSON_AddStringToObject(rootValue, "Type", type_.c_str());
+    cJSON_AddStringToObject(rootValue, "dhId", dhId_.c_str());
+    cJSON_AddStringToObject(rootValue, "Command", command_.c_str());
 
-        Json::Value captureSettings;
+    cJSON *captureInfos = cJSON_CreateArray();
+    if (captureInfos == nullptr) {
+        cJSON_Delete(rootValue);
+        return DCAMERA_BAD_VALUE;
+    }
+    for (auto iter = value_.begin(); iter != value_.end(); iter++) {
+        cJSON *captureInfo = cJSON_CreateObject();
+        if (captureInfo == nullptr) {
+            cJSON_Delete(rootValue);
+            return DCAMERA_BAD_VALUE;
+        }
+        std::shared_ptr<DCameraCaptureInfo> capture = *iter;
+        cJSON_AddNumberToObject(captureInfo, "Width", capture->width_);
+        cJSON_AddNumberToObject(captureInfo, "Height", capture->height_);
+        cJSON_AddNumberToObject(captureInfo, "Format", capture->format_);
+        cJSON_AddNumberToObject(captureInfo, "DataSpace", capture->dataspace_);
+        cJSON_AddNumberToObject(captureInfo, "IsCapture", capture->isCapture_);
+        cJSON_AddNumberToObject(captureInfo, "EncodeType", capture->encodeType_);
+        cJSON_AddNumberToObject(captureInfo, "StreamType", capture->streamType_);
+        cJSON *captureSettings = cJSON_CreateArray();
+        if (captureSettings == nullptr) {
+            cJSON_Delete(rootValue);
+            return DCAMERA_BAD_VALUE;
+        }
         for (auto settingIter = capture->captureSettings_.begin();
             settingIter != capture->captureSettings_.end(); settingIter++) {
-            Json::Value captureSetting;
-            captureSetting["SettingType"] = Json::Value((*settingIter)->type_);
-            captureSetting["SettingValue"] = Json::Value((*settingIter)->value_);
-            captureSettings.append(captureSetting);
+            cJSON *captureSetting = cJSON_CreateObject();
+            if (captureSetting == nullptr) {
+                cJSON_Delete(rootValue);
+                return DCAMERA_BAD_VALUE;
+            }
+            cJSON_AddNumberToObject(captureSetting, "SettingType", (*settingIter)->type_);
+            cJSON_AddStringToObject(captureSetting, "SettingValue", (*settingIter)->value_.c_str());
+            cJSON_AddItemToArray(captureSettings, captureSetting);
         }
-
-        captureInfo["CaptureSettings"] = captureSettings;
-        captureInfos.append(captureInfo);
+        cJSON_AddItemToObject(captureInfo, "CaptureSettings", captureSettings);
+        cJSON_AddItemToArray(captureInfos, captureInfo);
     }
 
-    rootValue["Value"] = captureInfos;
-    jsonStr = rootValue.toStyledString();
+    cJSON_AddItemToObject(rootValue, "Value", captureInfos);
+    char *jsonstr = cJSON_Print(rootValue);
+    if (jsonstr == nullptr) {
+        cJSON_Delete(rootValue);
+        return DCAMERA_BAD_VALUE;
+    }
+    jsonStr = jsonstr;
+    cJSON_Delete(rootValue);
+    cJSON_free(jsonstr);
     return DCAMERA_OK;
 }
 
 int32_t DCameraCaptureInfoCmd::Unmarshal(const std::string& jsonStr)
 {
-    JSONCPP_STRING errs;
-    Json::CharReaderBuilder readerBuilder;
-    Json::Value rootValue;
-
-    std::unique_ptr<Json::CharReader> const jsonReader(readerBuilder.newCharReader());
-    if (!jsonReader->parse(jsonStr.c_str(), jsonStr.c_str() + jsonStr.length(), &rootValue, &errs) ||
-        !rootValue.isObject()) {
+    cJSON *rootValue = cJSON_Parse(jsonStr.c_str());
+    if (rootValue == nullptr) {
         return DCAMERA_BAD_VALUE;
     }
-
-    if (!rootValue.isMember("Type") || !rootValue["Type"].isString()) {
+    cJSON *type = cJSON_GetObjectItemCaseSensitive(rootValue, "Type");
+    if (type == nullptr || !cJSON_IsString(type) || (type->valuestring == nullptr)) {
+        cJSON_Delete(rootValue);
         return DCAMERA_BAD_VALUE;
     }
-    type_ = rootValue["Type"].asString();
+    type_ = type->valuestring;
 
-    if (!rootValue.isMember("dhId") || !rootValue["dhId"].isString()) {
+    cJSON *dhId = cJSON_GetObjectItemCaseSensitive(rootValue, "dhId");
+    if (dhId == nullptr || !cJSON_IsString(dhId) || (dhId->valuestring == nullptr)) {
+        cJSON_Delete(rootValue);
         return DCAMERA_BAD_VALUE;
     }
-    dhId_ = rootValue["dhId"].asString();
+    dhId_ = dhId->valuestring;
 
-    if (!rootValue.isMember("Command") || !rootValue["Command"].isString()) {
+    cJSON *command = cJSON_GetObjectItemCaseSensitive(rootValue, "Command");
+    if (command == nullptr || !cJSON_IsString(command) || (command->valuestring == nullptr)) {
+        cJSON_Delete(rootValue);
         return DCAMERA_BAD_VALUE;
     }
-    command_ = rootValue["Command"].asString();
-
-    if (!rootValue.isMember("Value") || !rootValue["Value"].isArray()) {
-        return DCAMERA_BAD_VALUE;
-    }
+    command_ = command->valuestring;
 
     int32_t ret = UmarshalValue(rootValue);
     if (ret != DCAMERA_OK) {
+        cJSON_Delete(rootValue);
         return ret;
     }
+    cJSON_Delete(rootValue);
     return DCAMERA_OK;
 }
 
-int32_t DCameraCaptureInfoCmd::UmarshalValue(Json::Value& rootValue)
+int32_t DCameraCaptureInfoCmd::UmarshalValue(cJSON *rootValue)
 {
-    for (Json::ArrayIndex i = 0; i < rootValue["Value"].size(); i++) {
-        Json::Value valueJson = rootValue["Value"][i];
+    cJSON *valueJson = cJSON_GetObjectItemCaseSensitive(rootValue, "Value");
+    if (valueJson == nullptr || !cJSON_IsObject(valueJson)) {
+        cJSON_Delete(rootValue);
+        return DCAMERA_BAD_VALUE;
+    }
+    cJSON *capInfo = nullptr;
+    cJSON_ArrayForEach(capInfo, valueJson) {
         std::shared_ptr<DCameraCaptureInfo> captureInfo = std::make_shared<DCameraCaptureInfo>();
-        if (!valueJson.isMember("Width") || !valueJson["Width"].isInt()) {
+        cJSON *width = cJSON_GetObjectItemCaseSensitive(capInfo, "Width");
+        if (width == nullptr || !cJSON_IsNumber(width)) {
             return DCAMERA_BAD_VALUE;
         }
-        captureInfo->width_ = valueJson["Width"].asInt();
-
-        if (!valueJson.isMember("Height") || !valueJson["Height"].isInt()) {
+        captureInfo->width_ = width->valueint;
+        
+        cJSON *height = cJSON_GetObjectItemCaseSensitive(capInfo, "Height");
+        if (height == nullptr || !cJSON_IsNumber(height)) {
             return DCAMERA_BAD_VALUE;
         }
-        captureInfo->height_ = valueJson["Height"].asInt();
+        captureInfo->height_ = height->valueint;
 
-        if (!valueJson.isMember("Format") || !valueJson["Format"].isInt()) {
+        cJSON *format = cJSON_GetObjectItemCaseSensitive(capInfo, "Format");
+        if (format == nullptr || !cJSON_IsNumber(format)) {
             return DCAMERA_BAD_VALUE;
         }
-        captureInfo->format_ = valueJson["Format"].asInt();
+        captureInfo->format_ = format->valueint;
 
-        if (!valueJson.isMember("DataSpace") || !valueJson["DataSpace"].isInt()) {
+        cJSON *dataSpace = cJSON_GetObjectItemCaseSensitive(capInfo, "DataSpace");
+        if (dataSpace == nullptr || !cJSON_IsNumber(dataSpace)) {
             return DCAMERA_BAD_VALUE;
         }
-        captureInfo->dataspace_ = valueJson["DataSpace"].asInt();
+        captureInfo->dataspace_ = dataSpace->valueint;
 
-        if (!valueJson.isMember("IsCapture") || !valueJson["IsCapture"].isBool()) {
+        cJSON *isCapture = cJSON_GetObjectItemCaseSensitive(capInfo, "IsCapture");
+        if (isCapture == nullptr || !cJSON_IsNumber(isCapture)) {
             return DCAMERA_BAD_VALUE;
         }
-        captureInfo->isCapture_ = valueJson["IsCapture"].asBool();
+        captureInfo->isCapture_ = static_cast<bool>(isCapture->valueint);
 
-        if (!valueJson.isMember("EncodeType") || !valueJson["EncodeType"].isInt()) {
+        cJSON *encodeType = cJSON_GetObjectItemCaseSensitive(capInfo, "EncodeType");
+        if (encodeType == nullptr || !cJSON_IsNumber(encodeType)) {
             return DCAMERA_BAD_VALUE;
         }
-        captureInfo->encodeType_ = (DCEncodeType)valueJson["EncodeType"].asInt();
+        captureInfo->encodeType_ = static_cast<DCEncodeType>(encodeType->valueint);
 
-        if (!valueJson.isMember("StreamType") || !valueJson["StreamType"].isInt()) {
+        cJSON *streamType = cJSON_GetObjectItemCaseSensitive(capInfo, "StreamType");
+        if (streamType == nullptr || !cJSON_IsNumber(streamType)) {
             return DCAMERA_BAD_VALUE;
         }
-        captureInfo->streamType_ = (DCStreamType)valueJson["StreamType"].asInt();
+        captureInfo->streamType_ = static_cast<DCStreamType>(streamType->valueint);
 
-        if (!valueJson.isMember("CaptureSettings") || !valueJson["CaptureSettings"].isArray()) {
+        cJSON *captureSettings = cJSON_GetObjectItemCaseSensitive(capInfo, "CaptureSettings");
+        if (captureSettings == nullptr || !cJSON_IsArray(captureSettings)) {
             return DCAMERA_BAD_VALUE;
         }
 
-        int32_t ret = UmarshalSettings(valueJson, captureInfo);
+        int32_t ret = UmarshalSettings(captureSettings, captureInfo);
         if (ret != DCAMERA_OK) {
             return ret;
         }
@@ -148,20 +184,24 @@ int32_t DCameraCaptureInfoCmd::UmarshalValue(Json::Value& rootValue)
     return DCAMERA_OK;
 }
 
-int32_t DCameraCaptureInfoCmd::UmarshalSettings(Json::Value& valueJson,
+int32_t DCameraCaptureInfoCmd::UmarshalSettings(cJSON *valueJson,
     std::shared_ptr<DCameraCaptureInfo>& captureInfo)
 {
-    for (Json::ArrayIndex j = 0; j < valueJson["CaptureSettings"].size(); j++) {
-        Json::Value settingJson = valueJson["CaptureSettings"][j];
-        if (!settingJson.isMember("SettingType") || !settingJson["SettingType"].isInt()) {
+    cJSON *captureSetting = nullptr;
+    cJSON_ArrayForEach(captureSetting, valueJson) {
+        cJSON *settingType = cJSON_GetObjectItemCaseSensitive(captureSetting, "SettingType");
+        if (settingType == nullptr || !cJSON_IsNumber(settingType)) {
             return DCAMERA_BAD_VALUE;
         }
-        if (!settingJson.isMember("SettingValue") || !settingJson["SettingValue"].isString()) {
+
+        cJSON *settingValue = cJSON_GetObjectItemCaseSensitive(captureSetting, "SettingValue");
+        if (settingValue == nullptr || !cJSON_IsString(settingValue) ||
+            (settingValue->valuestring == nullptr)) {
             return DCAMERA_BAD_VALUE;
         }
         std::shared_ptr<DCameraSettings> setting = std::make_shared<DCameraSettings>();
-        setting->type_ = static_cast<DCSettingsType>(settingJson["SettingType"].asInt());
-        setting->value_ = settingJson["SettingValue"].asString();
+        setting->type_ = static_cast<DCSettingsType>(settingType->valueint);
+        setting->value_ = settingValue->valuestring;
         captureInfo->captureSettings_.push_back(setting);
     }
     return DCAMERA_OK;
