@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-DistributedCameraSourceStub::DistributedCameraSourceStub()
+DistributedCameraSourceStub::DistributedCameraSourceStub() : IRemoteStub(true)
 {
     memberFuncMap_[static_cast<uint32_t>(IDCameraSourceInterfaceCode::INIT_SOURCE)] =
         &DistributedCameraSourceStub::InitSourceInner;
