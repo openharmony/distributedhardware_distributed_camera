@@ -73,7 +73,6 @@ private:
 
 private:
     constexpr static uint32_t DCAMERA_MAX_METADATA_SIZE = 20;
-    constexpr static int32_t DCAMERA_CAPTURE_ROTATE_360 = 360;
 
     bool isInit_;
     std::string cameraId_;
