@@ -70,6 +70,7 @@ ohos_fuzztest("EncodeOnInputBufferAvailableFuzzTest") {
   external_deps = [
     "av_codec:av_codec_client",
     "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "eventhandler:libeventhandler",
     "graphic_surface:surface",

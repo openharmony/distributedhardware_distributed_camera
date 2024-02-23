@@ -58,6 +58,7 @@ ohos_unittest("DCameraDataProcessPipelineTest") {
   external_deps = [
     "av_codec:av_codec_client",
     "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "eventhandler:libeventhandler",
     "graphic_surface:surface",
     "hitrace:hitrace_meter",
