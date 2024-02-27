@@ -18,30 +18,14 @@ import(
 
 config("module_private_config") {
   include_dirs = [
-    "//third_party/cJSON",
-    "//third_party/jsoncpp/include",
-    "${graphicsurface_path}/surface/include",
-    "${camerastandard_path}/interfaces/inner_api/native/camera/include",
-    "${camerastandard_path}/interfaces/inner_api/native/camera/include/input",
-    "${camerastandard_path}/interfaces/inner_api/native/camera/include/output",
-    "${camerastandard_path}/interfaces/inner_api/native/camera/include/session",
-    "${camerastandard_path}/services/camera_service/binder/base/include",
-    "${camerastandard_path}/services/camera_service/binder/client/include",
-    "${camerastandard_path}/services/camera_service/binder/server/include",
-    "${camerastandard_path}/services/camera_service/include",
-    "${fwk_common_path}/log/include",
-    "${fwk_common_path}/utils/include",
-    "${fwk_utils_path}/include/log",
-    "${fwk_utils_path}/include",
-  ]
-
-  include_dirs += [
     "${common_path}/include/constants",
     "${common_path}/include/utils",
     "${services_path}/cameraservice/base/include",
     "${services_path}/cameraservice/cameraoperator/client/include",
     "${services_path}/cameraservice/cameraoperator/client/include/callback",
     "${services_path}/cameraservice/cameraoperator/client/include/listener",
+    "//third_party/cJSON",
+    "//third_party/jsoncpp/include",
   ]
 }
 
@@ -69,9 +53,7 @@ ohos_executable("dcamera_client_demo") {
   }
 
   deps = [
-    "${camerastandard_path}/frameworks/native/camera:camera_framework",
     "${common_path}:distributed_camera_utils",
-    "${fwk_utils_path}:distributedhardwareutils",
     "${services_path}/cameraservice/cameraoperator/client:distributed_camera_client",
     "${services_path}/cameraservice/sinkservice:distributed_camera_sink",
     "//third_party/cJSON:cjson",
@@ -86,6 +68,7 @@ ohos_executable("dcamera_client_demo") {
     "access_token:libtoken_setproc",
     "av_codec:av_codec_client",
     "c_utils:utils",
+    "camera_framework:camera_framework",
     "drivers_interface_camera:metadata",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "drivers_peripheral_display:hdi_gralloc_client",

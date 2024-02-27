@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,10 +19,10 @@
 #include <memory>
 #include <vector>
 
-#include "event.h"
-#include "event_bus.h"
-#include "event_sender.h"
-#include "eventbus_handler.h"
+#include "eventbus/event.h"
+#include "eventbus/event_bus.h"
+#include "eventbus/event_sender.h"
+#include "eventbus/eventbus_handler.h"
 
 #include "data_buffer.h"
 #include "image_common_type.h"

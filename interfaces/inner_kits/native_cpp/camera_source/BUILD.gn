@@ -26,9 +26,8 @@ ohos_shared_library("distributed_camera_source_sdk") {
     ubsan = true
   }
   stack_protector_ret = true
-  include_dirs = [ "${fwk_common_path}/utils/include" ]
 
-  include_dirs += [
+  include_dirs = [
     "include",
     "include/callback",
     "${common_path}/include/constants",
@@ -54,6 +53,7 @@ ohos_shared_library("distributed_camera_source_sdk") {
 
   external_deps = [
     "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]

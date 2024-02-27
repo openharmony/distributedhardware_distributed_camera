@@ -96,6 +96,7 @@ ohos_unittest("DCameraSinkMgrTest") {
     "av_codec:av_codec_client",
     "c_utils:utils",
     "device_manager:devicemanagersdk",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "drivers_interface_camera:metadata",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "drivers_peripheral_display:hdi_gralloc_client",

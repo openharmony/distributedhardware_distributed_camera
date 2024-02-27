@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,8 +22,8 @@
 #include "icamera_source_data_process.h"
 
 #include "dcamera_source_dev.h"
-#include "event_bus.h"
-#include "event_sender.h"
+#include "eventbus/event_bus.h"
+#include "eventbus/event_sender.h"
 
 namespace OHOS {
 namespace DistributedHardware {
