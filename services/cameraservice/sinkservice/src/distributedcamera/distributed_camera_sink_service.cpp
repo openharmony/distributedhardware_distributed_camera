@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,6 +29,7 @@
 #include "dcamera_sink_service_ipc.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
+#include "dh_log.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -45,10 +46,8 @@ DistributedCameraSinkService::DistributedCameraSinkService(int32_t saId, bool ru
 void DistributedCameraSinkService::OnStart()
 {
     DHLOGI("DistributedCameraSinkService OnStart");
-    if (state_ == DCameraServiceState::DCAMERA_SRV_STATE_RUNNING) {
-        DHLOGI("DistributedCameraSinkService has already started.");
-        return;
-    }
+    CHECK_AND_RETURN_LOG(state_ == DCameraServiceState::DCAMERA_SRV_STATE_RUNNING,
+        "sink service has already started.");
 
     if (!Init()) {
         DHLOGE("DistributedCameraSinkService init failed");
@@ -64,10 +63,7 @@ bool DistributedCameraSinkService::Init()
     DCameraSinkServiceIpc::GetInstance().Init();
     if (!registerToService_) {
         bool ret = Publish(this);
-        if (!ret) {
-            DHLOGE("DistributedCameraSinkService Publish service failed");
-            return false;
-        }
+        CHECK_AND_RETURN_RET_LOG(!ret, false, "Publish service failed");
         registerToService_ = true;
     }
     DHLOGI("DistributedCameraSinkService init success");
@@ -89,24 +85,15 @@ int32_t DistributedCameraSinkService::InitSink(const std::string& params,
     sinkVer_ = params;
     g_camDump.version = sinkVer_;
     int32_t ret = DCameraHandler::GetInstance().Initialize();
-    if (ret != DCAMERA_OK) {
-        DHLOGE("handler initialize failed, ret: %d", ret);
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "handler initialize failed, ret: %d", ret);
 
     std::vector<std::string> cameras = DCameraHandler::GetInstance().GetCameras();
-    if (cameras.empty()) {
-        DHLOGE("no camera device");
-        return DCAMERA_BAD_VALUE;
-    }
+    CHECK_AND_RETURN_RET_LOG(cameras.empty(), DCAMERA_BAD_VALUE, "no camera device");
     g_camDump.camNumber = static_cast<int32_t>(cameras.size());
     for (auto& dhId : cameras) {
         std::shared_ptr<DCameraSinkDev> sinkDevice = std::make_shared<DCameraSinkDev>(dhId, sinkCallback);
         ret = sinkDevice->Init();
-        if (ret != DCAMERA_OK) {
-            DHLOGE("sink device init failed, ret: %d", ret);
-            return ret;
-        }
+        CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "sink device init failed, ret: %d", ret);
         {
             std::lock_guard<std::mutex> lock(mapMutex_);
             camerasMap_.emplace(dhId, sinkDevice);
@@ -124,23 +111,16 @@ int32_t DistributedCameraSinkService::ReleaseSink()
         for (auto iter = camerasMap_.begin(); iter != camerasMap_.end(); iter++) {
             std::shared_ptr<DCameraSinkDev> sinkDevice = iter->second;
             int32_t ret = sinkDevice->UnInit();
-            if (ret != DCAMERA_OK) {
-                DHLOGE("release sink device failed, ret: %d", ret);
-            }
+            CHECK_AND_LOG(ret != DCAMERA_OK, "release sink device failed, ret: %d", ret);
         }
         camerasMap_.clear();
     }
 
     auto systemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (systemAbilityMgr == nullptr) {
-        DHLOGE("sink systemAbilityMgr is null");
-        return DCAMERA_BAD_VALUE;
-    }
+    CHECK_AND_RETURN_RET_LOG(systemAbilityMgr == nullptr, DCAMERA_BAD_VALUE, "sink systemAbilityMgr is null");
     int32_t ret = systemAbilityMgr->UnloadSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("sink systemAbilityMgr UnLoadSystemAbility failed, ret: %d", ret);
-        return DCAMERA_BAD_VALUE;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, DCAMERA_BAD_VALUE,
+        "sink systemAbilityMgr UnLoadSystemAbility failed, ret: %d", ret);
     DHLOGI("sink systemAbilityMgr UnLoadSystemAbility success");
     return DCAMERA_OK;
 }
@@ -160,10 +140,7 @@ int32_t DistributedCameraSinkService::SubscribeLocalHardware(const std::string& 
     }
 
     int32_t ret = sinkDevice->SubscribeLocalHardware(parameters);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("SubscribeLocalHardware failed, ret: %d", ret);
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "SubscribeLocalHardware failed, ret: %d", ret);
     DHLOGI("SubscribeLocalHardware success");
     return DCAMERA_OK;
 }
@@ -183,10 +160,7 @@ int32_t DistributedCameraSinkService::UnsubscribeLocalHardware(const std::string
     }
 
     int32_t ret = sinkDevice->UnsubscribeLocalHardware();
-    if (ret != DCAMERA_OK) {
-        DHLOGE("UnsubscribeLocalHardware failed, ret: %d", ret);
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "UnsubscribeLocalHardware failed, ret: %d", ret);
     DHLOGI("UnsubscribeLocalHardware success");
     return DCAMERA_OK;
 }
@@ -206,10 +180,7 @@ int32_t DistributedCameraSinkService::StopCapture(const std::string& dhId)
     }
 
     int32_t ret = sinkDevice->StopCapture();
-    if (ret != DCAMERA_OK) {
-        DHLOGE("StopCapture failed, ret: %d", ret);
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "StopCapture failed, ret: %d", ret);
     DHLOGI("StopCapture success");
     return DCAMERA_OK;
 }
@@ -229,10 +200,7 @@ int32_t DistributedCameraSinkService::ChannelNeg(const std::string& dhId, std::s
     }
 
     int32_t ret = sinkDevice->ChannelNeg(channelInfo);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("ChannelNeg failed, ret: %d", ret);
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "ChannelNeg failed, ret: %d", ret);
     DHLOGI("ChannelNeg success");
     return DCAMERA_OK;
 }
@@ -252,10 +220,7 @@ int32_t DistributedCameraSinkService::GetCameraInfo(const std::string& dhId, std
     }
 
     int32_t ret = sinkDevice->GetCameraInfo(cameraInfo);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("GetCameraInfo failed, ret: %d", ret);
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "GetCameraInfo failed, ret: %d", ret);
     DHLOGI("GetCameraInfo success");
     return DCAMERA_OK;
 }
@@ -300,10 +265,7 @@ int32_t DistributedCameraSinkService::CloseChannel(const std::string& dhId)
     }
 
     int32_t ret = sinkDevice->CloseChannel();
-    if (ret != DCAMERA_OK) {
-        DHLOGE("CloseChannel failed, ret: %d", ret);
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "CloseChannel failed, ret: %d", ret);
     DHLOGI("CloseChannel success");
     return DCAMERA_OK;
 }
@@ -327,10 +289,7 @@ int DistributedCameraSinkService::Dump(int32_t fd, const std::vector<std::u16str
     }
 
     int ret = dprintf(fd, "%s\n", result.c_str());
-    if (ret < 0) {
-        DHLOGE("dprintf error");
-        return DCAMERA_BAD_VALUE;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret < 0, DCAMERA_BAD_VALUE, "dprintf error");
 
     return DCAMERA_OK;
 }
@@ -357,16 +316,10 @@ bool DistributedCameraSinkService::IsCurSinkDev(std::shared_ptr<DCameraSinkDev> 
 {
     std::string camInfoJson;
     int32_t ret = sinkDevice->GetCameraInfo(camInfoJson);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("GetCameraInfo failed, ret: %d", ret);
-        return false;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, false, "GetCameraInfo failed, ret: %d", ret);
     DCameraInfoCmd cmd;
     ret = cmd.Unmarshal(camInfoJson);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraInfoCmd Unmarshal failed: %d", ret);
-        return false;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, false, "DCameraInfoCmd Unmarshal failed: %d", ret);
     std::shared_ptr<DCameraInfo> camInfo = cmd.value_;
     if (camInfo->state_ == DCAMERA_CHANNEL_STATE_CONNECTED) {
         return true;
@@ -387,16 +340,11 @@ int32_t DistributedCameraSinkService::PauseDistributedHardware(const std::string
             }
         }
     }
-    if (sinkDevice == nullptr) {
-        DHLOGE("PauseDistributedHardware sinkDevice is nullptr.");
-        return DCAMERA_BAD_VALUE;
-    }
+    CHECK_AND_RETURN_RET_LOG(sinkDevice == nullptr, DCAMERA_BAD_VALUE,
+        "PauseDistributedHardware sinkDevice is nullptr.");
 
     int32_t ret = sinkDevice->PauseDistributedHardware(networkId);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("PauseDistributedHardware failed, ret: %d", ret);
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "PauseDistributedHardware failed, ret: %d", ret);
     DHLOGI("PauseDistributedHardware success");
     return DCAMERA_OK;
 }
@@ -414,16 +362,11 @@ int32_t DistributedCameraSinkService::ResumeDistributedHardware(const std::strin
             }
         }
     }
-    if (sinkDevice == nullptr) {
-        DHLOGE("ResumeDistributedHardware sinkDevice is nullptr.");
-        return DCAMERA_BAD_VALUE;
-    }
+    CHECK_AND_RETURN_RET_LOG(sinkDevice == nullptr, DCAMERA_BAD_VALUE,
+        "ResumeDistributedHardware sinkDevice is nullptr.");
 
     int32_t ret = sinkDevice->ResumeDistributedHardware(networkId);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("ResumeDistributedHardware failed, ret: %d", ret);
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "ResumeDistributedHardware failed, ret: %d", ret);
     DHLOGI("ResumeDistributedHardware success");
     return DCAMERA_OK;
 }
@@ -441,16 +384,11 @@ int32_t DistributedCameraSinkService::StopDistributedHardware(const std::string 
             }
         }
     }
-    if (sinkDevice == nullptr) {
-        DHLOGE("StopDistributedHardware sinkDevice is nullptr.");
-        return DCAMERA_BAD_VALUE;
-    }
+    CHECK_AND_RETURN_RET_LOG(sinkDevice == nullptr, DCAMERA_BAD_VALUE,
+        "StopDistributedHardware sinkDevice is nullptr.");
 
     int32_t ret = sinkDevice->StopDistributedHardware(networkId);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("StopDistributedHardware failed, ret: %d", ret);
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "StopDistributedHardware failed, ret: %d", ret);
     DHLOGI("StopDistributedHardware success");
     return DCAMERA_OK;
 }
