@@ -282,11 +282,14 @@ int32_t DCameraSourceDev::ParseEnableParam(std::shared_ptr<DCameraRegistParam>& 
     cJSON *srcRootValue = cJSON_Parse(param->srcParam_.c_str());
     if (srcRootValue == nullptr) {
         DHLOGE("Input source ablity info is not json object.");
+        cJSON_Delete(sinkRootValue);
         return DCAMERA_INIT_ERR;
     }
 
     cJSON *abilityRootValue = cJSON_CreateObject();
     if (abilityRootValue == nullptr) {
+        cJSON_Delete(sinkRootValue);
+        cJSON_Delete(srcRootValue);
         return DCAMERA_BAD_VALUE;
     }
     cJSON_AddItemToObject(abilityRootValue, "SinkAbility", sinkRootValue);

@@ -18,7 +18,6 @@
 
 #include "distributed_camera_constants.h"
 #include "cJSON.h"
-#include "json/json.h"
 #include "v1_0/dcamera_types.h"
 
 namespace OHOS {

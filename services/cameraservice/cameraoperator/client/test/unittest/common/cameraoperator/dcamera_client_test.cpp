@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -476,6 +476,8 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_007, TestSize.Level1)
     uint8_t afMode = OHOS_CAMERA_FOCUS_MODE_AUTO;
     uint8_t aeMode = OHOS_CAMERA_EXPOSURE_MODE_CONTINUOUS_AUTO;
     uint8_t stabilizationMode = OHOS_CAMERA_VIDEO_STABILIZATION_OFF;
+    int32_t orientation = OHOS_CAMERA_JPEG_ROTATION_0;
+    metaData->addEntry(OHOS_JPEG_ORIENTATION, &orientation, sizeof(int32_t));
     metaData->addEntry(OHOS_CONTROL_FOCUS_MODE, &afMode, sizeof(afMode));
     metaData->addEntry(OHOS_CONTROL_EXPOSURE_MODE, &aeMode, sizeof(aeMode));
     metaData->addEntry(OHOS_CONTROL_VIDEO_STABILIZATION_MODE, &stabilizationMode, sizeof(stabilizationMode));

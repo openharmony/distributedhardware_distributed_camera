@@ -27,22 +27,15 @@ ohos_shared_library("distributed_camera_channel") {
     ubsan = true
   }
   stack_protector_ret = true
-  include_dirs = [
-    "${av_transport_path}/common/include",
-    "${fwk_common_path}/utils/include",
-    "${services_path}/cameraservice/base/include",
-    "//third_party/cJSON",
-  ]
 
-  include_dirs += [
+  include_dirs = [
     "include",
     "${common_path}/include/constants",
     "${common_path}/include/utils",
-    "//foundation//communication//dsoftbus//core//common//include",
-    "${fwk_innerkits_path}/include",
     "${feeding_smoother_path}/base",
     "${feeding_smoother_path}/derived",
     "${feeding_smoother_path}/utils",
+    "${services_path}/cameraservice/base/include",
   ]
 
   sources = [
@@ -68,6 +61,8 @@ ohos_shared_library("distributed_camera_channel") {
 
   external_deps = [
     "c_utils:utils",
+    "distributed_hardware_fwk:distributed_av_receiver",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "distributed_hardware_fwk:libdhfwk_sdk",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",

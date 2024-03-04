@@ -27,22 +27,7 @@ ohos_shared_library("distributed_camera_handler") {
     ubsan = true
   }
   stack_protector_ret = true
-  include_dirs = [
-    "//third_party/cJSON",
-    "//third_party/jsoncpp/include",
-    "//third_party/json/include",
-    "${graphicsurface_path}/surface/include",
-    "${camerastandard_path}/interfaces/inner_api/native/camera/include",
-    "${camerastandard_path}/interfaces/inner_api/native/camera/include/input",
-    "${camerastandard_path}/interfaces/inner_api/native/camera/include/output",
-    "${camerastandard_path}/interfaces/inner_api/native/camera/include/session",
-    "${camerastandard_path}/services/camera_service/binder/base/include",
-    "${camerastandard_path}/services/camera_service/binder/client/include",
-    "${camerastandard_path}/services/camera_service/binder/server/include",
-    "${camerastandard_path}/services/camera_service/include",
-    "${fwk_common_path}/utils/include",
-    "${fwk_utils_path}/include",
-  ]
+  include_dirs = [ "//third_party/cJSON" ]
 
   include_dirs += [
     "include",
@@ -59,7 +44,6 @@ ohos_shared_library("distributed_camera_handler") {
   deps = [
     "${common_path}:distributed_camera_utils",
     "//third_party/cJSON:cjson",
-    "//third_party/jsoncpp:jsoncpp",
   ]
 
   defines = [
@@ -72,6 +56,7 @@ ohos_shared_library("distributed_camera_handler") {
     "av_codec:av_codec_client",
     "c_utils:utils",
     "camera_framework:camera_framework",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "drivers_interface_camera:metadata",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "drivers_peripheral_display:hdi_gralloc_client",

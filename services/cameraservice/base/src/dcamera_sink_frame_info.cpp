@@ -34,14 +34,14 @@ void DCameraSinkFrameInfo::Marshal(std::string& jsonStr)
     cJSON_AddNumberToObject(frameInfo, FRAME_INFO_SENDT.c_str(), sendT_);
     cJSON_AddStringToObject(frameInfo, FRAME_INFO_VERSION.c_str(), ver_.c_str());
 
-    char *jsonstr = cJSON_Print(frameInfo);
-    if (jsonstr == nullptr) {
+    char *data = cJSON_Print(frameInfo);
+    if (data == nullptr) {
         cJSON_Delete(frameInfo);
         return;
     }
-    jsonStr = jsonstr;
+    jsonStr = std::string(data);
     cJSON_Delete(frameInfo);
-    cJSON_free(jsonstr);
+    cJSON_free(data);
 }
 
 int32_t DCameraSinkFrameInfo::Unmarshal(const std::string& jsonStr)

@@ -27,20 +27,8 @@ ohos_shared_library("distributed_camera_client") {
     ubsan = true
   }
   stack_protector_ret = true
-  include_dirs = [
-    "${graphicsurface_path}/surface/include",
-    "${camerastandard_path}/interfaces/inner_api/native/camera/include",
-    "${camerastandard_path}/interfaces/inner_api/native/camera/include/input",
-    "${camerastandard_path}/interfaces/inner_api/native/camera/include/output",
-    "${camerastandard_path}/interfaces/inner_api/native/camera/include/session",
-    "${camerastandard_path}/services/camera_service/binder/base/include",
-    "${camerastandard_path}/services/camera_service/binder/client/include",
-    "${camerastandard_path}/services/camera_service/binder/server/include",
-    "${camerastandard_path}/services/camera_service/include",
-    "//third_party/cJSON",
-  ]
 
-  include_dirs += [
+  include_dirs = [
     "include",
     "include/callback",
     "include/listener",

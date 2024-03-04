@@ -27,15 +27,8 @@ ohos_shared_library("distributed_camera_data_process") {
     ubsan = true
   }
   stack_protector_ret = true
-  include_dirs = [
-    "${fwk_common_path}/utils/include",
-    "${fwk_utils_path}/include/eventbus",
-    "${graphicsurface_path}/surface/include",
-    "${services_path}/cameraservice/base/include",
-    "//third_party/cJSON",
-  ]
 
-  include_dirs += [
+  include_dirs = [
     "include/interfaces",
     "include/eventbus",
     "include/pipeline",
@@ -50,6 +43,7 @@ ohos_shared_library("distributed_camera_data_process") {
     "${feeding_smoother_path}/derived",
     "${feeding_smoother_path}/utils",
     "${innerkits_path}/native_cpp/camera_source/include",
+    "${services_path}/cameraservice/base/include",
   ]
 
   sources = [
@@ -107,6 +101,7 @@ ohos_shared_library("distributed_camera_data_process") {
   external_deps = [
     "av_codec:av_codec_client",
     "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "eventhandler:libeventhandler",
     "graphic_surface:surface",

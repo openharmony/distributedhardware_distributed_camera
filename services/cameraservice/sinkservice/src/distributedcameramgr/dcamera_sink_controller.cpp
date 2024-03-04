@@ -38,7 +38,6 @@
 #include "device_security_info.h"
 #include "idistributed_camera_source.h"
 #include "ipc_skeleton.h"
-#include "json/json.h"
 #include "dcamera_low_latency.h"
 #include <sys/prctl.h>
 
@@ -538,6 +537,7 @@ int32_t DCameraSinkController::HandleReceivedData(std::shared_ptr<DataBuffer>& d
         return DCAMERA_BAD_VALUE;
     }
     std::string command = std::string(comvalue->valuestring);
+    cJSON_Delete(rootValue);
     if ((!command.empty()) && (command.compare(DCAMERA_PROTOCOL_CMD_CAPTURE) == 0)) {
         DCameraCaptureInfoCmd captureInfoCmd;
         int ret = captureInfoCmd.Unmarshal(jsonStr);
@@ -556,7 +556,6 @@ int32_t DCameraSinkController::HandleReceivedData(std::shared_ptr<DataBuffer>& d
         }
         return UpdateSettings(metadataSettingCmd.value_);
     }
-    cJSON_Delete(rootValue);
     return DCAMERA_BAD_VALUE;
 }
 

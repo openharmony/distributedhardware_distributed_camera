@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,7 @@
 #ifndef OHOS_DCAMERA_SINK_CONTROLLER_H
 #define OHOS_DCAMERA_SINK_CONTROLLER_H
 
-#include "event_bus.h"
+#include "eventbus/event_bus.h"
 #include "dcamera_frame_trigger_event.h"
 #include "dcamera_post_authorization_event.h"
 #include "icamera_controller.h"

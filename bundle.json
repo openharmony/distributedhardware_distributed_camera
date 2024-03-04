@@ -55,8 +55,7 @@
             ],
             "third_party": [
                 "cJSON",
-                "ffmpeg",
-                "jsoncpp"
+                "ffmpeg"
             ]
         },
         "build": {

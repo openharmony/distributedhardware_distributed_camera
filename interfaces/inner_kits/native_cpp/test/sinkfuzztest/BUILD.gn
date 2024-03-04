@@ -22,6 +22,7 @@ group("fuzztest") {
     "onsinklocalcamsrvdied_fuzzer:fuzztest",
     "sinkhandlerinitsink_fuzzer:fuzztest",
     "sinkhandlerpausedistributedhardware_fuzzer:fuzztest",
+    "sinkhandlerregisterprivacyresources_fuzzer:fuzztest",
     "sinkhandlerreleasesink_fuzzer:fuzztest",
     "sinkhandlerresumedistributedhardware_fuzzer:fuzztest",
     "sinkhandlerstopdistributedhardware_fuzzer:fuzztest",

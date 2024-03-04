@@ -23,7 +23,7 @@ namespace OHOS { class MessageOption; }
 
 namespace OHOS {
 namespace DistributedHardware {
-DCameraSourceCallbackStub::DCameraSourceCallbackStub()
+DCameraSourceCallbackStub::DCameraSourceCallbackStub() : IRemoteStub(true)
 {
     memberFuncMap_[NOTIFY_REG_RESULT] = &DCameraSourceCallbackStub::NotifyRegResultInner;
     memberFuncMap_[NOTIFY_UNREG_RESULT] = &DCameraSourceCallbackStub::NotifyUnregResultInner;

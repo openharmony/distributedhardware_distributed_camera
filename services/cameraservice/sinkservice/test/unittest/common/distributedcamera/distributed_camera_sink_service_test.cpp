@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,6 +39,7 @@ public:
 };
 
 std::string g_dhId;
+std::string g_networkId = "08647073e02e7a78f09473aa122ff57fc81c00";
 std::string g_testParams = "TestParams";
 std::string g_testCameraInfo = "";
 std::string g_testChannelInfoContinue = R"({
@@ -235,6 +236,7 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_007, TestSi
     int ret = sinkService_->Dump(fd, args);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
+
 /**
  * @tc.name: dcamera_sink_service_test_008
  * @tc.desc: Verify the SubscribeLocalHardware function can't find id.
@@ -379,6 +381,69 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_014, TestSi
 
     ret = sinkService_->StopCapture("");
     EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
+
+    ret = sinkService_->ReleaseSink();
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_service_test_015
+ * @tc.desc: Verify the PauseDistributedHardware function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_015, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_service_test_015");
+    EXPECT_EQ(sinkService_ == nullptr, false);
+
+    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
+    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    ret = sinkService_->PauseDistributedHardware(g_networkId);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = sinkService_->ReleaseSink();
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_service_test_016
+ * @tc.desc: Verify the ResumeDistributedHardware function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_016, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_service_test_016");
+    EXPECT_EQ(sinkService_ == nullptr, false);
+
+    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
+    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    ret = sinkService_->ResumeDistributedHardware(g_networkId);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = sinkService_->ReleaseSink();
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_service_test_017
+ * @tc.desc: Verify the StopDistributedHardware function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_017, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_service_test_017");
+    EXPECT_EQ(sinkService_ == nullptr, false);
+
+    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
+    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    ret = sinkService_->StopDistributedHardware(g_networkId);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 
     ret = sinkService_->ReleaseSink();
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);

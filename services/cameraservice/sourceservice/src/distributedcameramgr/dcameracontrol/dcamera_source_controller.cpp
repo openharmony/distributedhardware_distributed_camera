@@ -16,7 +16,6 @@
 #include "dcamera_source_controller.h"
 
 #include <securec.h>
-#include "json/json.h"
 #include <cstdlib>
 #include "iservice_registry.h"
 #include "iservmgr_hdi.h"

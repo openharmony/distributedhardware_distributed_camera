@@ -19,7 +19,7 @@
 #include "dcamera_index.h"
 #include "dcamera_source_event.h"
 #include "dcamera_source_state_machine.h"
-#include "event_bus.h"
+#include "eventbus/event_bus.h"
 #include "icamera_controller.h"
 #include "icamera_state_listener.h"
 #include "icamera_input.h"

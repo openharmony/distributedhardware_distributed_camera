@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+# Copyright (c) 2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -12,37 +12,31 @@
 # limitations under the License.
 
 #####################hydra-fuzz###################
+base_root = "../../../../../../../../../"
 import("//build/config/features.gni")
 import("//build/test.gni")
 import(
-    "//foundation/distributedhardware/distributed_camera/distributedcamera.gni")
+    "$base_root/foundation/distributedhardware/distributed_camera/distributedcamera.gni")
 
 ##############################fuzztest##########################################
-ohos_fuzztest("SinkServiceInitSinkFuzzTest") {
-  module_out_path = "${fuzz_test_output_path}/sinkserviceinitsink"
+ohos_fuzztest("SinkHandlerRegisterPrivacyResourcesFuzzTest") {
+  module_out_path =
+      "${fuzz_test_output_path}/sinkhandlerregisterprivacyresources"
 
-  fuzz_config_file = "${innerkits_path}/native_cpp/test/sinkfuzztest/sinkserviceinitsink_fuzzer"
+  fuzz_config_file = "${innerkits_path}/native_cpp/test/sinkfuzztest/sinkhandlerregisterprivacyresources_fuzzer"
 
-  include_dirs = [ "${fwk_common_path}/utils/include" ]
+  include_dirs = [
+    "${innerkits_path}/native_cpp",
+    "${fwk_common_path}/utils/include",
+  ]
 
   include_dirs += [
     "include",
+    "${common_path}/include",
     "${common_path}/include/constants",
-    "${common_path}/include/utils",
-    "${graphicsurface_path}/surface/include",
     "${innerkits_path}/native_cpp/camera_sink/include",
     "${innerkits_path}/native_cpp/camera_sink/include/callback",
-    "${services_path}/cameraservice/base/include",
-    "${services_path}/cameraservice/cameraoperator/client/include",
-    "${services_path}/cameraservice/sinkservice/include/distributedcamera",
-    "${services_path}/cameraservice/sinkservice/include/distributedcameramgr",
-    "${services_path}/cameraservice/sinkservice/include/distributedcameramgr/interface",
-    "${services_path}/cameraservice/sinkservice/include/distributedcameramgr/eventbus",
-    "${services_path}/data_process/include/utils",
-    "${services_path}/channel/include",
-    "${fwk_utils_path}/include/eventbus",
-    "${feeding_smoother_path}/base",
-    "//third_party/cJSON",
+    "${innerkits_path}/native_cpp/test/include",
   ]
 
   cflags = [
@@ -52,25 +46,21 @@ ohos_fuzztest("SinkServiceInitSinkFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
-  sources = [ "sinkserviceinitsink_fuzzer.cpp" ]
+  sources = [ "sinkhandlerregisterprivacyresources_fuzzer.cpp" ]
 
   deps = [
     "${common_path}:distributed_camera_utils",
     "${innerkits_path}/native_cpp/camera_sink:distributed_camera_sink_sdk",
-    "${services_path}/cameraservice/sinkservice:distributed_camera_sink",
   ]
 
   defines = [
     "HI_LOG_ENABLE",
-    "DH_LOG_TAG=\"SinkServiceInitSinkFuzzTest\"",
+    "DH_LOG_TAG=\"SinkHandlerRegisterPrivacyResourcesFuzzTest\"",
     "LOG_DOMAIN=0xD004150",
   ]
 
   external_deps = [
     "c_utils:utils",
-    "device_manager:devicemanagersdk",
-    "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
-    "graphic_surface:surface",
     "hilog:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
@@ -81,6 +71,6 @@ ohos_fuzztest("SinkServiceInitSinkFuzzTest") {
 ###############################################################################
 group("fuzztest") {
   testonly = true
-  deps = [ ":SinkServiceInitSinkFuzzTest" ]
+  deps = [ ":SinkHandlerRegisterPrivacyResourcesFuzzTest" ]
 }
 ###############################################################################
