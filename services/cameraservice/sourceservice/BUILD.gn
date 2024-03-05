@@ -52,7 +52,6 @@ ohos_shared_library("distributed_camera_source") {
     "${services_path}/data_process/include/interfaces",
     "${services_path}/data_process/include/pipeline",
     "${services_path}/data_process/include/utils",
-    "${graphicsurface_path}/surface/include",
     "//third_party/cJSON",
     "//third_party/jsoncpp/include",
   ]
