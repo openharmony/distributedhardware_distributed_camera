@@ -135,7 +135,8 @@ void DCameraSoftbusSession::PackRecvData(std::shared_ptr<DataBuffer>& buffer)
     if (buffer->Size() != (headerPara.dataLen + BINARY_HEADER_FRAG_LEN) || headerPara.dataLen > headerPara.totalLen ||
         headerPara.dataLen > BINARY_DATA_MAX_LEN || headerPara.totalLen > BINARY_DATA_MAX_TOTAL_LEN) {
         DHLOGE("pack recv data failed, size: %d, dataLen: %d, totalLen: %d sess: %s peerSess: %s",
-            buffer->Size(), headerPara.dataLen, headerPara.totalLen, mySessionName_.c_str(), peerSessionName_.c_str());
+            buffer->Size(), headerPara.dataLen, headerPara.totalLen, GetAnonyString(mySessionName_).c_str(),
+            GetAnonyString(peerSessionName_).c_str());
         return;
     }
     DHLOGD("pack recv data Assemble, size: %d, dataLen: %d, totalLen: %d, nowTime: %lld start",
@@ -153,7 +154,8 @@ void DCameraSoftbusSession::AssembleNoFrag(std::shared_ptr<DataBuffer>& buffer, 
 {
     if (headerPara.dataLen != headerPara.totalLen) {
         DHLOGE("DCameraSoftbusSession PackRecvData failed, dataLen: %d, totalLen: %d, sess: %s peerSess: %s",
-            headerPara.dataLen, headerPara.totalLen, mySessionName_.c_str(), peerSessionName_.c_str());
+            headerPara.dataLen, headerPara.totalLen, GetAnonyString(mySessionName_).c_str(),
+            GetAnonyString(peerSessionName_).c_str());
         return;
     }
     std::shared_ptr<DataBuffer> postData = std::make_shared<DataBuffer>(headerPara.dataLen);
@@ -161,7 +163,7 @@ void DCameraSoftbusSession::AssembleNoFrag(std::shared_ptr<DataBuffer>& buffer, 
         buffer->Size() - BINARY_HEADER_FRAG_LEN);
     if (ret != EOK) {
         DHLOGE("DCameraSoftbusSession PackRecvData failed, ret: %d, sess: %s peerSess: %s",
-            ret, mySessionName_.c_str(), peerSessionName_.c_str());
+            ret, GetAnonyString(mySessionName_).c_str(), GetAnonyString(peerSessionName_).c_str());
         return;
     }
     PostData(postData);
@@ -180,7 +182,7 @@ void DCameraSoftbusSession::AssembleFrag(std::shared_ptr<DataBuffer>& buffer, Se
             buffer->Size() - BINARY_HEADER_FRAG_LEN);
         if (ret != EOK) {
             DHLOGE("DCameraSoftbusSession AssembleFrag failed, ret: %d, sess: %s peerSess: %s",
-                ret, mySessionName_.c_str(), peerSessionName_.c_str());
+                ret, GetAnonyString(mySessionName_).c_str(), GetAnonyString(peerSessionName_).c_str());
             ResetAssembleFrag();
             return;
         }
@@ -199,7 +201,7 @@ void DCameraSoftbusSession::AssembleFrag(std::shared_ptr<DataBuffer>& buffer, Se
             buffer->Data() + BINARY_HEADER_FRAG_LEN, buffer->Size() - BINARY_HEADER_FRAG_LEN);
         if (ret != EOK) {
             DHLOGE("DCameraSoftbusSession AssembleFrag failed, memcpy_s ret: %d, sess: %s peerSess: %s",
-                ret, mySessionName_.c_str(), peerSessionName_.c_str());
+                ret, GetAnonyString(mySessionName_).c_str(), GetAnonyString(peerSessionName_).c_str());
             ResetAssembleFrag();
             return;
         }
@@ -216,26 +218,28 @@ int32_t DCameraSoftbusSession::CheckUnPackBuffer(SessionDataHeader& headerPara)
 {
     if (!isWaiting_) {
         DHLOGE("DCameraSoftbusSession AssembleFrag failed, not start one, sess: %s peerSess: %s",
-            mySessionName_.c_str(), peerSessionName_.c_str());
+            GetAnonyString(mySessionName_).c_str(), GetAnonyString(peerSessionName_).c_str());
         return DCAMERA_BAD_VALUE;
     }
 
     if (nowSeq_ != headerPara.seqNum) {
         DHLOGE("DCameraSoftbusSession AssembleFrag seq error nowSeq: %d actualSeq: %d, sess: %s peerSess: %s",
-            nowSeq_, headerPara.seqNum, mySessionName_.c_str(), peerSessionName_.c_str());
+            nowSeq_, headerPara.seqNum, GetAnonyString(mySessionName_).c_str(),
+            GetAnonyString(peerSessionName_).c_str());
         return DCAMERA_BAD_VALUE;
     }
 
     if (nowSubSeq_ + 1 != headerPara.subSeq) {
         DHLOGE("DCameraSoftbusSession AssembleFrag subSeq error nowSeq: %d actualSeq: %d, sess: %s peerSess: %s",
-            nowSubSeq_, headerPara.subSeq, mySessionName_.c_str(), peerSessionName_.c_str());
+            nowSubSeq_, headerPara.subSeq, GetAnonyString(mySessionName_).c_str(),
+            GetAnonyString(peerSessionName_).c_str());
         return DCAMERA_BAD_VALUE;
     }
 
     if (totalLen_ < headerPara.dataLen + offset_) {
         DHLOGE("DCameraSoftbusSession AssembleFrag len error cap: %d size: %d, dataLen: %d sess: %s peerSess: %s",
-            totalLen_, offset_, headerPara.dataLen, mySessionName_.c_str(),
-            peerSessionName_.c_str());
+            totalLen_, offset_, headerPara.dataLen, GetAnonyString(mySessionName_).c_str(),
+            GetAnonyString(peerSessionName_).c_str());
         return DCAMERA_BAD_VALUE;
     }
     return DCAMERA_OK;
@@ -309,7 +313,7 @@ int32_t DCameraSoftbusSession::UnPackSendData(std::shared_ptr<DataBuffer>& buffe
             buffer->Data(), buffer->Size());
         if (ret != EOK) {
             DHLOGE("DCameraSoftbusSession UnPackSendData START_END memcpy_s failed, ret: %d, sess: %s peerSess: %s",
-                ret, mySessionName_.c_str(), peerSessionName_.c_str());
+                ret, GetAnonyString(mySessionName_).c_str(), GetAnonyString(peerSessionName_).c_str());
             return ret;
         }
         return (this->*memberFunc)(unpackData);
@@ -327,13 +331,13 @@ int32_t DCameraSoftbusSession::UnPackSendData(std::shared_ptr<DataBuffer>& buffe
             buffer->Data() + offset, headPara.dataLen);
         if (ret != EOK) {
             DHLOGE("DCameraSoftbusSession UnPackSendData memcpy_s failed, ret: %d, sess: %s peerSess: %s",
-                ret, mySessionName_.c_str(), peerSessionName_.c_str());
+                ret, GetAnonyString(mySessionName_).c_str(), GetAnonyString(peerSessionName_).c_str());
             return ret;
         }
         ret = (this->*memberFunc)(unpackData);
         if (ret != DCAMERA_OK) {
             DHLOGE("DCameraSoftbusSession sendData failed, ret: %d, sess: %s peerSess: %s",
-                ret, mySessionName_.c_str(), peerSessionName_.c_str());
+                ret, GetAnonyString(mySessionName_).c_str(), GetAnonyString(peerSessionName_).c_str());
             return ret;
         }
         DHLOGD("DCameraSoftbusSession UnPackSendData, size: %d, dataLen: %d, totalLen: %d, nowTime: %lld end:",

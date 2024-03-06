@@ -18,6 +18,7 @@
 #include "hisysevent.h"
 #include "securec.h"
 
+#include "anonymous_string.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
 
@@ -57,7 +58,7 @@ void ReportRegisterCameraFail(const std::string& eventName, const std::string& d
         "VERSION", version,
         "MSG", errMsg);
     if (ret != DCAMERA_OK) {
-        DHLOGE("Write HiSysEvent error ret %d, devId %s, dhId %s, errMsg %s.", ret, devId.c_str(),
+        DHLOGE("Write HiSysEvent error ret %d, devId %s, dhId %s, errMsg %s.", ret, GetAnonyString(devId).c_str(),
             dhId.c_str(), errMsg.c_str());
     }
 }
