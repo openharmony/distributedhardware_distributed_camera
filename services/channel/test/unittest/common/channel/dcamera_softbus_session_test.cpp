@@ -29,7 +29,6 @@
 #include "icamera_channel.h"
 #include "mock_camera_operator.h"
 #include "session_bus_center.h"
-#include "session.h"
 
 using namespace testing::ext;
 

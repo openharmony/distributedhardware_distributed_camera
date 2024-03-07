@@ -170,7 +170,7 @@ int32_t DecodeDataProcess::InitDecoderMetadataFormat()
     metadataFormat_.PutStringValue("codec_mime", processType_);
     metadataFormat_.PutIntValue("width", sourceConfig_.GetWidth());
     metadataFormat_.PutIntValue("height", sourceConfig_.GetHeight());
-    metadataFormat_.PutIntValue("frame_rate", MAX_FRAME_RATE);
+    metadataFormat_.PutDoubleValue("frame_rate", MAX_FRAME_RATE);
 
     return DCAMERA_OK;
 }

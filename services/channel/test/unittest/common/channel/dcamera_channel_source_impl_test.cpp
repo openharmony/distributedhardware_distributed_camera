@@ -26,7 +26,6 @@
 #include "data_buffer.h"
 #include "icamera_channel.h"
 #include "session_bus_center.h"
-#include "session.h"
 
 #include "mock_dcamera_source_dev.h"
 #include "mock_dcamera_source_state_listener.h"
