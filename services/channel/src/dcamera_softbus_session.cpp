@@ -234,8 +234,7 @@ int32_t DCameraSoftbusSession::CheckUnPackBuffer(SessionDataHeader& headerPara)
 
     if (totalLen_ < headerPara.dataLen + offset_) {
         DHLOGE("DCameraSoftbusSession AssembleFrag len error cap: %d size: %d, dataLen: %d sess: %s peerSess: %s",
-            totalLen_, offset_, headerPara.dataLen, mySessionName_.c_str(),
-            peerSessionName_.c_str());
+            totalLen_, offset_, headerPara.dataLen, mySessionName_.c_str(), peerSessionName_.c_str());
         return DCAMERA_BAD_VALUE;
     }
     return DCAMERA_OK;
