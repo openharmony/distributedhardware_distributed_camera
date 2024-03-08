@@ -23,25 +23,25 @@ namespace OHOS {
 namespace DistributedHardware {
 bool DCameraSinkAccessControl::IsSensitiveSrcAccess(const std::string& srcType)
 {
-    DHLOGI("DCameraSinkAccessControl::IsSensitiveSrcAccess srcType: %s", srcType.c_str());
+    DHLOGI("DCameraSinkAccessControl::IsSensitiveSrcAccess srcType: %{public}s", srcType.c_str());
     return true;
 }
 
 bool DCameraSinkAccessControl::NotifySensitiveSrc(const std::string& srcType)
 {
-    DHLOGI("DCameraSinkAccessControl::NotifySensitiveSrc srcType: %s", srcType.c_str());
+    DHLOGI("DCameraSinkAccessControl::NotifySensitiveSrc srcType: %{public}s", srcType.c_str());
     return true;
 }
 
 int32_t DCameraSinkAccessControl::TriggerFrame(const std::string& deviceName)
 {
-    DHLOGI("DCameraSinkAccessControl::TriggerFrame deviceName: %s", deviceName.c_str());
+    DHLOGI("DCameraSinkAccessControl::TriggerFrame deviceName: %{public}s", deviceName.c_str());
     return DCAMERA_OK;
 }
 
 int32_t DCameraSinkAccessControl::GetAccessControlType(const std::string& accessType)
 {
-    DHLOGI("DCameraSinkAccessControl::GetAccessControlType accessType: %s", accessType.c_str());
+    DHLOGI("DCameraSinkAccessControl::GetAccessControlType accessType: %{public}s", accessType.c_str());
     return DCAMERA_SAME_ACCOUNT;
 }
 } // namespace DistributedHardware

@@ -47,7 +47,7 @@ class DCameraClientTestStateCallback : public StateCallback {
 public:
     void OnStateChanged(std::shared_ptr<DCameraEvent>& event) override
     {
-        DHLOGI("DCameraClientTestStateCallback::OnStateChanged type: %d, result: %d",
+        DHLOGI("DCameraClientTestStateCallback::OnStateChanged type: %{public}d, result: %{public}d",
             event->eventType_, event->eventResult_);
     }
 
@@ -360,8 +360,9 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_004, TestSize.Level1)
     EXPECT_EQ(DCAMERA_OK, ret);
 
     SetTokenID();
-    DHLOGI("DCameraClientTest dcamera_client_test_004: video width: %d, height: %d, format: %d, isCapture: %d",
-        videoInfo_true_->width_, videoInfo_true_->height_, videoInfo_true_->format_, videoInfo_true_->isCapture_);
+    DHLOGI("DCameraClientTest dcamera_client_test_004: video width: %{public}d, height: %{public}d, format: %{public}d,"
+        " isCapture: %{public}d", videoInfo_true_->width_, videoInfo_true_->height_, videoInfo_true_->format_,
+        videoInfo_true_->isCapture_);
     std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos;
     captureInfos.push_back(videoInfo_true_);
     sptr<IBufferProducer> bp = videoSurface->GetProducer();
@@ -413,10 +414,12 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_005, TestSize.Level1)
     EXPECT_EQ(DCAMERA_OK, ret);
 
     SetTokenID();
-    DHLOGI("DCameraClientTest dcamera_client_test_005: video width: %d, height: %d, format: %d, isCapture: %d",
-        videoInfo_true_->width_, videoInfo_true_->height_, videoInfo_true_->format_, videoInfo_true_->isCapture_);
-    DHLOGI("DCameraClientTest dcamera_client_test_005: photo width: %d, height: %d, format: %d, isCapture: %d",
-        photoInfo_false_->width_, photoInfo_false_->height_, photoInfo_false_->format_, photoInfo_false_->isCapture_);
+    DHLOGI("DCameraClientTest dcamera_client_test_005: video width: %{public}d, height: %{public}d, format: "
+        "%{public}d, isCapture: %{public}d", videoInfo_true_->width_, videoInfo_true_->height_,
+        videoInfo_true_->format_, videoInfo_true_->isCapture_);
+    DHLOGI("DCameraClientTest dcamera_client_test_005: photo width: %{public}d, height: %{public}d, format: "
+        "%{public}d, isCapture: %{public}d", photoInfo_false_->width_, photoInfo_false_->height_,
+        photoInfo_false_->format_, photoInfo_false_->isCapture_);
     std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos;
     captureInfos.push_back(videoInfo_true_);
     captureInfos.push_back(photoInfo_false_);
@@ -427,10 +430,12 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_005, TestSize.Level1)
 
     sleep(TEST_SLEEP_SEC);
 
-    DHLOGI("DCameraClientTest dcamera_client_test_005: video width: %d, height: %d, format: %d, isCapture: %d",
-        videoInfo_false_->width_, videoInfo_false_->height_, videoInfo_false_->format_, videoInfo_false_->isCapture_);
-    DHLOGI("DCameraClientTest dcamera_client_test_005: photo width: %d, height: %d, format: %d, isCapture: %d",
-        photoInfo_true_->width_, photoInfo_true_->height_, photoInfo_true_->format_, photoInfo_true_->isCapture_);
+    DHLOGI("DCameraClientTest dcamera_client_test_005: video width: %{public}d, height: %{public}d, format: "
+        "%{public}d, isCapture: %{public}d", videoInfo_true_->width_, videoInfo_true_->height_,
+        videoInfo_true_->format_, videoInfo_true_->isCapture_);
+    DHLOGI("DCameraClientTest dcamera_client_test_005: photo width: %{public}d, height: %{public}d, format: "
+        "%{public}d, isCapture: %{public}d", photoInfo_false_->width_, photoInfo_false_->height_,
+        photoInfo_false_->format_, photoInfo_false_->isCapture_);
     captureInfos.clear();
     captureInfos.push_back(videoInfo_false_);
     captureInfos.push_back(photoInfo_true_);
@@ -603,10 +608,12 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_013, TestSize.Level1)
     EXPECT_EQ(DCAMERA_OK, ret);
 
     SetTokenID();
-    DHLOGI("DCameraClientTest dcamera_client_test_013: video width: %d, height: %d, format: %d, isCapture: %d",
-        videoInfo_true_->width_, videoInfo_true_->height_, videoInfo_true_->format_, videoInfo_true_->isCapture_);
-    DHLOGI("DCameraClientTest dcamera_client_test_013: photo width: %d, height: %d, format: %d, isCapture: %d",
-        photoInfo_false_->width_, photoInfo_false_->height_, photoInfo_false_->format_, photoInfo_false_->isCapture_);
+    DHLOGI("DCameraClientTest dcamera_client_test_013: video width: %{public}d, height: %{public}d, format: "
+        "%{public}d, isCapture: %{public}d", videoInfo_true_->width_, videoInfo_true_->height_,
+        videoInfo_true_->format_, videoInfo_true_->isCapture_);
+    DHLOGI("DCameraClientTest dcamera_client_test_013: photo width: %{public}d, height: %{public}d, format: "
+        "%{public}d, isCapture: %{public}d", photoInfo_false_->width_, photoInfo_false_->height_,
+        photoInfo_false_->format_, photoInfo_false_->isCapture_);
     std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos;
     captureInfos.push_back(videoInfo_true_);
     captureInfos.push_back(photoInfo_false_);

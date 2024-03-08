@@ -30,7 +30,7 @@ int32_t DCameraLowLatency::EnableLowLatency()
     DHLOGD("Enable low latency start.");
     if (refCount_ > REF_INITIAL) {
         refCount_++;
-        DHLOGD("No need to enable low latency, refCount just plus one and now is: %d.", refCount_.load());
+        DHLOGD("No need to enable low latency, refCount just plus one and now is: %{public}d.", refCount_.load());
         return DCAMERA_OK;
     }
     std::shared_ptr<DistributedHardwareFwkKit> dHFwkKit = GetDHFwkKit();
@@ -44,7 +44,7 @@ int32_t DCameraLowLatency::EnableLowLatency()
     };
     dHFwkKit->PublishMessage(DHTopic::TOPIC_LOW_LATENCY, enable.dump());
     refCount_++;
-    DHLOGD("Enable low latency success and now refCount is: %d", refCount_.load());
+    DHLOGD("Enable low latency success and now refCount is: %{public}d", refCount_.load());
     return DCAMERA_OK;
 }
 
@@ -57,7 +57,7 @@ int32_t DCameraLowLatency::DisableLowLatency()
     }
     if (refCount_ > REF_NORMAL) {
         refCount_--;
-        DHLOGD("No need to disable low latency, refCount just minus one and now is: %d.", refCount_.load());
+        DHLOGD("No need to disable low latency, refCount just minus one and now is: %{public}d.", refCount_.load());
         return DCAMERA_OK;
     }
     std::shared_ptr<DistributedHardwareFwkKit> dHFwkKit = GetDHFwkKit();

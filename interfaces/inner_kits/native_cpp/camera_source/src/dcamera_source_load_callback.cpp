@@ -27,7 +27,7 @@ DCameraSourceLoadCallback::DCameraSourceLoadCallback(const std::string& params) 
 void DCameraSourceLoadCallback::OnLoadSystemAbilitySuccess(int32_t systemAbilityId,
     const sptr<IRemoteObject>& remoteObject)
 {
-    DHLOGI("OnLoadSystemAbilitySuccess systemAbilityId: %d, IRmoteObject result: %s",
+    DHLOGI("OnLoadSystemAbilitySuccess systemAbilityId: %{public}d, IRmoteObject result: %{public}s",
         systemAbilityId, (remoteObject != nullptr) ? "true" : "false");
     if (systemAbilityId != DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID) {
         DHLOGE("start systemabilityId is not sourceSAId!");
@@ -42,7 +42,7 @@ void DCameraSourceLoadCallback::OnLoadSystemAbilitySuccess(int32_t systemAbility
 
 void DCameraSourceLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId)
 {
-    DHLOGI("OnLoadSystemAbilityFail systemAbilityId: %d.", systemAbilityId);
+    DHLOGI("OnLoadSystemAbilityFail systemAbilityId: %{public}d.", systemAbilityId);
     if (systemAbilityId != DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID) {
         DHLOGE("start systemabilityId is not sourceSAId!");
         ReportDcamerInitFail(DCAMERA_INIT_FAIL, DCAMERA_SA_ERROR,

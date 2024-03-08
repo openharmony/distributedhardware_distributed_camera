@@ -30,18 +30,18 @@ DCameraSourceCallback::~DCameraSourceCallback()
 int32_t DCameraSourceCallback::OnNotifyRegResult(const std::string& devId, const std::string& dhId,
     const std::string& reqId, int32_t status, std::string& data)
 {
-    DHLOGI("DCameraSourceCallback OnNotifyRegResult devId: %s dhId: %s",
+    DHLOGI("DCameraSourceCallback OnNotifyRegResult devId: %{public}s dhId: %{public}s",
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
     std::lock_guard<std::mutex> lock(mapMutex_);
     auto iter = regCallbacks_.find(reqId);
     if (iter == regCallbacks_.end()) {
-        DHLOGE("DCameraSourceCallback OnNotifyRegResult not found devId: %s dhId: %s",
+        DHLOGE("DCameraSourceCallback OnNotifyRegResult not found devId: %{public}s dhId: %{public}s",
             GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
         return DCAMERA_NOT_FOUND;
     }
     int32_t ret = iter->second->OnRegisterResult(devId, dhId, status, data);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceCallback OnNotifyRegResult failed, devId: %s dhId: %s ret: %d",
+        DHLOGE("DCameraSourceCallback OnNotifyRegResult failed, devId: %{public}s dhId: %{public}s ret: %{public}d",
             GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), ret);
     }
     regCallbacks_.erase(iter);
@@ -51,18 +51,18 @@ int32_t DCameraSourceCallback::OnNotifyRegResult(const std::string& devId, const
 int32_t DCameraSourceCallback::OnNotifyUnregResult(const std::string& devId, const std::string& dhId,
     const std::string& reqId, int32_t status, std::string& data)
 {
-    DHLOGI("DCameraSourceCallback OnNotifyUnregResult devId: %s dhId: %s",
+    DHLOGI("DCameraSourceCallback OnNotifyUnregResult devId: %{public}s dhId: %{public}s",
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
     std::lock_guard<std::mutex> lock(mapMutex_);
     auto iter = unregCallbacks_.find(reqId);
     if (iter == unregCallbacks_.end()) {
-        DHLOGE("DCameraSourceCallback OnNotifyUnregResult not found devId: %s dhId: %s",
+        DHLOGE("DCameraSourceCallback OnNotifyUnregResult not found devId: %{public}s dhId: %{public}s",
             GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
         return DCAMERA_NOT_FOUND;
     }
     int32_t ret = iter->second->OnUnregisterResult(devId, dhId, status, data);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceCallback OnNotifyUnregResult failed, devId: %s dhId: %s ret: %d",
+        DHLOGE("DCameraSourceCallback OnNotifyUnregResult failed, devId: %{public}s dhId: %{public}s ret: %{public}d",
             GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), ret);
     }
     unregCallbacks_.erase(iter);

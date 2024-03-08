@@ -28,7 +28,7 @@ namespace DistributedHardware {
 DCameraStreamDataProcess::DCameraStreamDataProcess(std::string devId, std::string dhId, DCStreamType streamType)
     : devId_(devId), dhId_(dhId), streamType_(streamType)
 {
-    DHLOGI("DCameraStreamDataProcess Constructor devId %s dhId %s", GetAnonyString(devId_).c_str(),
+    DHLOGI("DCameraStreamDataProcess Constructor devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     pipeline_ = nullptr;
     listener_ = nullptr;
@@ -36,8 +36,8 @@ DCameraStreamDataProcess::DCameraStreamDataProcess(std::string devId, std::strin
 
 DCameraStreamDataProcess::~DCameraStreamDataProcess()
 {
-    DHLOGI("DCameraStreamDataProcess Destructor devId %s dhId %s streamType: %d", GetAnonyString(devId_).c_str(),
-        GetAnonyString(dhId_).c_str(), streamType_);
+    DHLOGI("DCameraStreamDataProcess Destructor devId %{public}s dhId %{public}s streamType: %{public}d",
+        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_);
     streamIds_.clear();
     producers_.clear();
     if (pipeline_ != nullptr) {
@@ -48,8 +48,10 @@ DCameraStreamDataProcess::~DCameraStreamDataProcess()
 void DCameraStreamDataProcess::FeedStream(std::shared_ptr<DataBuffer>& buffer)
 {
     for (auto streamId : streamIds_) {
-        DHLOGD("FeedStream devId %s dhId %s streamId %d streamType %d streamSize: %d",
-            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamId, streamType_, buffer->Size());
+        uint64_t buffersSize = static_cast<uint64_t>(buffer->Size());
+        DHLOGD("FeedStream devId %{public}s dhId %{public}s streamId %{public}d streamType %{public}d streamSize: "
+            "%{public}" PRIu64, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamId,
+            streamType_, buffersSize);
     }
     switch (streamType_) {
         case SNAPSHOT_FRAME: {
@@ -69,10 +71,10 @@ void DCameraStreamDataProcess::ConfigStreams(std::shared_ptr<DCameraStreamConfig
     std::set<int32_t>& streamIds)
 {
     for (auto streamId : streamIds) {
-        DHLOGI("ConfigStreams devId %s dhId %s streamId %d, width: %d, height: %d, " +
-            "format: %d, dataspace: %d, encodeType: %d, streamType: %d", GetAnonyString(devId_).c_str(),
-            GetAnonyString(dhId_).c_str(), streamId, dstConfig->width_, dstConfig->height_, dstConfig->format_,
-            dstConfig->dataspace_, dstConfig->encodeType_, dstConfig->type_);
+        DHLOGI("ConfigStreams devId %{public}s dhId %{public}s streamId %{public}d, width: %{public}d, height: "
+            "%{public}d, format: %{public}d, dataspace: %{public}d, encodeType: %{public}d, streamType: %{public}d",
+            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamId, dstConfig->width_,
+            dstConfig->height_, dstConfig->format_, dstConfig->dataspace_, dstConfig->encodeType_, dstConfig->type_);
     }
     dstConfig_ = dstConfig;
     streamIds_ = streamIds;
@@ -81,13 +83,13 @@ void DCameraStreamDataProcess::ConfigStreams(std::shared_ptr<DCameraStreamConfig
 void DCameraStreamDataProcess::ReleaseStreams(std::set<int32_t>& streamIds)
 {
     for (auto streamId : streamIds) {
-        DHLOGI("ReleaseStreams devId %s dhId %s streamId %d streamType %d",
+        DHLOGI("ReleaseStreams devId %{public}s dhId %{public}s streamId %{public}d streamType %{public}d",
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamId, streamType_);
     }
     std::lock_guard<std::mutex> autoLock(producerMutex_);
     for (auto iter = streamIds.begin(); iter != streamIds.end(); iter++) {
         int32_t streamId = *iter;
-        DHLOGI("ReleaseStreams devId %s dhId %s streamId: %d", GetAnonyString(devId_).c_str(),
+        DHLOGI("ReleaseStreams devId %{public}s dhId %{public}s streamId: %{public}d", GetAnonyString(devId_).c_str(),
             GetAnonyString(dhId_).c_str(), streamId);
         streamIds_.erase(streamId);
         auto producerIter = producers_.find(streamId);
@@ -103,8 +105,9 @@ void DCameraStreamDataProcess::StartCapture(std::shared_ptr<DCameraStreamConfig>
     std::set<int32_t>& streamIds)
 {
     for (auto iter = streamIds.begin(); iter != streamIds.end(); iter++) {
-        DHLOGI("StartCapture devId %s dhId %s streamType: %d streamId: %d, " +
-            "srcConfig: width: %d, height: %d, format: %d, dataspace: %d, streamType: %d, encodeType: %d",
+        DHLOGI("StartCapture devId %{public}s dhId %{public}s streamType: %{public}d streamId: %{public}d, "
+            "srcConfig: width: %{public}d, height: %{public}d, format: %{public}d, dataspace: %{public}d, "
+            "streamType: %{public}d, encodeType: %{public}d",
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, *iter,
             srcConfig->width_,  srcConfig->height_, srcConfig->format_, srcConfig->dataspace_,
             srcConfig->type_, srcConfig->encodeType_);
@@ -117,19 +120,19 @@ void DCameraStreamDataProcess::StartCapture(std::shared_ptr<DCameraStreamConfig>
         std::lock_guard<std::mutex> autoLock(producerMutex_);
         for (auto iter = streamIds_.begin(); iter != streamIds_.end(); iter++) {
             uint32_t streamId = *iter;
-            DHLOGI("StartCapture streamId: %d", streamId);
+            DHLOGI("StartCapture streamId: %{public}d", streamId);
             if (streamIds.find(streamId) == streamIds.end()) {
                 continue;
             }
 
-            DHLOGI("StartCapture findProducer devId %s dhId %s streamType: %d streamId: %d",
-                GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId);
+            DHLOGI("StartCapture findProducer devId %{public}s dhId %{public}s streamType: %{public}d streamId: "
+                "%{public}d", GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId);
             auto producerIter = producers_.find(streamId);
             if (producerIter != producers_.end()) {
                 continue;
             }
-            DHLOGI("StartCapture CreateProducer devId %s dhId %s streamType: %d streamId: %d",
-                GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId);
+            DHLOGI("StartCapture CreateProducer devId %{public}s dhId %{public}s streamType: %{public}d streamId: "
+                "%{public}d", GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId);
             producers_[streamId] =
                 std::make_shared<DCameraStreamDataProcessProducer>(devId_, dhId_, streamId, streamType_);
             producers_[streamId]->Start();
@@ -140,28 +143,28 @@ void DCameraStreamDataProcess::StartCapture(std::shared_ptr<DCameraStreamConfig>
 void DCameraStreamDataProcess::StopCapture(std::set<int32_t>& streamIds)
 {
     for (auto iter = streamIds.begin(); iter != streamIds.end(); iter++) {
-        DHLOGI("StopCapture devId %s dhId %s streamType: %d streamId: %d",
+        DHLOGI("StopCapture devId %{public}s dhId %{public}s streamType: %{public}d streamId: %{public}d",
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, *iter);
     }
     {
         std::lock_guard<std::mutex> autoLock(producerMutex_);
         for (auto iter = streamIds_.begin(); iter != streamIds_.end(); iter++) {
             uint32_t streamId = *iter;
-            DHLOGI("StopCapture streamId: %d", streamId);
+            DHLOGI("StopCapture streamId: %{public}d", streamId);
             if (streamIds.find(streamId) == streamIds.end()) {
                 continue;
             }
 
-            DHLOGI("StopCapture findProducer devId %s dhId %s streamType: %d streamId: %d",
-                GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId);
+            DHLOGI("StopCapture findProducer devId %{public}s dhId %{public}s streamType: %{public}d streamId: "
+                "%{public}d", GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId);
             auto producerIter = producers_.find(streamId);
             if (producerIter == producers_.end()) {
-                DHLOGE("StopCapture no producer, devId %s dhId %s streamType: %d streamId: %d",
-                    GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId);
+                DHLOGE("StopCapture no producer, devId %{public}s dhId %{public}s streamType: %{public}d streamId: "
+                    "%{public}d", GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId);
                 continue;
             }
-            DHLOGI("StopCapture stop producer, devId %s dhId %s streamType: %d streamId: %d",
-                GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId);
+            DHLOGI("StopCapture stop producer, devId %{public}s dhId %{public}s streamType: %{public}d streamId: "
+                "%{public}d", GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId);
             producerIter->second->Stop();
             producerIter = producers_.erase(producerIter);
         }
@@ -175,7 +178,7 @@ void DCameraStreamDataProcess::GetAllStreamIds(std::set<int32_t>& streamIds)
 
 int32_t DCameraStreamDataProcess::GetProducerSize()
 {
-    DHLOGI("DCameraStreamDataProcess GetProducerSize devId %s dhId %s",
+    DHLOGI("DCameraStreamDataProcess GetProducerSize devId %{public}s dhId %{public}s",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     std::lock_guard<std::mutex> autoLock(producerMutex_);
     return producers_.size();
@@ -183,8 +186,10 @@ int32_t DCameraStreamDataProcess::GetProducerSize()
 
 void DCameraStreamDataProcess::FeedStreamToSnapShot(const std::shared_ptr<DataBuffer>& buffer)
 {
-    DHLOGD("DCameraStreamDataProcess FeedStreamToSnapShot devId %s dhId %s streamType %d streamSize: %d",
-        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, buffer->Size());
+    uint64_t buffersSize = static_cast<uint64_t>(buffer->Size());
+    DHLOGD("DCameraStreamDataProcess FeedStreamToSnapShot devId %{public}s dhId %{public}s streamType %{public}d "
+        "streamSize: %{public}" PRIu64, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(),
+        streamType_, buffersSize);
     std::lock_guard<std::mutex> autoLock(producerMutex_);
     for (auto iter = producers_.begin(); iter != producers_.end(); iter++) {
         iter->second->FeedStream(buffer);
@@ -193,26 +198,31 @@ void DCameraStreamDataProcess::FeedStreamToSnapShot(const std::shared_ptr<DataBu
 
 void DCameraStreamDataProcess::FeedStreamToContinue(const std::shared_ptr<DataBuffer>& buffer)
 {
-    DHLOGD("DCameraStreamDataProcess FeedStreamToContinue devId %s dhId %s streamType %d streamSize: %d",
-        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, buffer->Size());
+    uint64_t buffersSize = static_cast<uint64_t>(buffer->Size());
+    DHLOGD("DCameraStreamDataProcess FeedStreamToContinue devId %{public}s dhId %{public}s streamType %{public}d "
+        "streamSize: %{public}" PRIu64, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(),
+        streamType_, buffersSize);
     std::lock_guard<std::mutex> autoLock(pipelineMutex_);
     std::vector<std::shared_ptr<DataBuffer>> buffers;
     buffers.push_back(buffer);
     if (pipeline_ == nullptr) {
-        DHLOGE("pipeline null devId %s dhId %s type: %d streamSize: %d",
-            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, buffer->Size());
+        buffersSize = static_cast<uint64_t>(buffer->Size());
+        DHLOGE("pipeline null devId %{public}s dhId %{public}s type: %{public}d streamSize: %{public}" PRIu64,
+            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, buffersSize);
         return;
     }
     int32_t ret = pipeline_->ProcessData(buffers);
     if (ret != DCAMERA_OK) {
-        DHLOGE("pipeline ProcessData failed, ret: %d", ret);
+        DHLOGE("pipeline ProcessData failed, ret: %{public}d", ret);
     }
 }
 
 void DCameraStreamDataProcess::OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult)
 {
-    DHLOGI("DCameraStreamDataProcess OnProcessedVideoBuffer devId %s dhId %s streamType: %d streamSize: %d",
-        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, videoResult->Size());
+    uint64_t resultSize = static_cast<uint64_t>(videoResult->Size());
+    DHLOGI("DCameraStreamDataProcess OnProcessedVideoBuffer devId %{public}s dhId %{public}s streamType: %{public}d "
+        "streamSize: %{public}" PRIu64, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(),
+        streamType_, resultSize);
     std::lock_guard<std::mutex> autoLock(producerMutex_);
     for (auto iter = producers_.begin(); iter != producers_.end(); iter++) {
         iter->second->FeedStream(videoResult);
@@ -221,16 +231,16 @@ void DCameraStreamDataProcess::OnProcessedVideoBuffer(const std::shared_ptr<Data
 
 void DCameraStreamDataProcess::OnError(const DataProcessErrorType errorType)
 {
-    DHLOGE("DCameraStreamDataProcess OnError pipeline errorType: %d", errorType);
+    DHLOGE("DCameraStreamDataProcess OnError pipeline errorType: %{public}d", errorType);
 }
 
 void DCameraStreamDataProcess::CreatePipeline()
 {
-    DHLOGI("DCameraStreamDataProcess CreatePipeline devId %s dhId %s",
+    DHLOGI("DCameraStreamDataProcess CreatePipeline devId %{public}s dhId %{public}s",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     std::lock_guard<std::mutex> autoLock(pipelineMutex_);
     if (pipeline_ != nullptr) {
-        DHLOGI("DCameraStreamDataProcess CreatePipeline already exist, devId %s dhId %s",
+        DHLOGI("DCameraStreamDataProcess CreatePipeline already exist, devId %{public}s dhId %{public}s",
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return;
     }
@@ -243,13 +253,14 @@ void DCameraStreamDataProcess::CreatePipeline()
         DCAMERA_PRODUCER_FPS_DEFAULT, dstConfig_->width_, dstConfig_->height_);
     int32_t ret = pipeline_->CreateDataProcessPipeline(PipelineType::VIDEO, srcParams, dstParams, listener_);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraStreamDataProcess CreateDataProcessPipeline type: %d failed, ret: %d", PipelineType::VIDEO, ret);
+        DHLOGE("DCameraStreamDataProcess CreateDataProcessPipeline type: %{public}d failed, ret: %{public}d",
+            PipelineType::VIDEO, ret);
     }
 }
 
 void DCameraStreamDataProcess::DestroyPipeline()
 {
-    DHLOGI("DCameraStreamDataProcess DestroyPipeline devId %s dhId %s",
+    DHLOGI("DCameraStreamDataProcess DestroyPipeline devId %{public}s dhId %{public}s",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     std::lock_guard<std::mutex> autoLock(pipelineMutex_);
     if (pipeline_ == nullptr) {

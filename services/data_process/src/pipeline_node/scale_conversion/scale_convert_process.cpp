@@ -44,8 +44,8 @@ int32_t ScaleConvertProcess::InitNode(const VideoConfigParams& sourceConfig, con
     processedConfig = processedConfig_;
 
     if (!IsConvertible(sourceConfig, targetConfig)) {
-        DHLOGI("sourceConfig: Videoformat %d Width %d, Height %d is the same as the targetConfig: "
-            "Videoformat %d Width %d, Height %d.",
+        DHLOGI("sourceConfig: Videoformat %{public}d Width %{public}d, Height %{public}d is the same as the "
+            "targetConfig: Videoformat %{public}d Width %{public}d, Height %{public}d.",
             sourceConfig.GetVideoformat(), sourceConfig.GetWidth(), sourceConfig.GetHeight(),
             targetConfig.GetVideoformat(), targetConfig.GetWidth(), targetConfig.GetHeight());
     }
@@ -63,14 +63,14 @@ bool ScaleConvertProcess::IsConvertible(const VideoConfigParams& sourceConfig, c
 
 void ScaleConvertProcess::ReleaseProcessNode()
 {
-    DHLOGI("Start release [%zu] node : ScaleConvertNode.", nodeRank_);
+    DHLOGI("Start release [%{public}zu] node : ScaleConvertNode.", nodeRank_);
     isScaleConvert_.store(false);
 
     if (nextDataProcess_ != nullptr) {
         nextDataProcess_->ReleaseProcessNode();
         nextDataProcess_ = nullptr;
     }
-    DHLOGI("Release [%zu] node : ScaleConvertNode end.", nodeRank_);
+    DHLOGI("Release [%{public}zu] node : ScaleConvertNode end.", nodeRank_);
 }
 
 int ScaleConvertProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& inputBuffers)
@@ -89,7 +89,8 @@ int ScaleConvertProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& i
     inputBuffers[0]->frameInfo_.timePonit.startScale = startScaleTime;
 
     if (!IsConvertible(sourceConfig_, processedConfig_)) {
-        DHLOGD("The target resolution: %dx%d format: %d is the same as the source resolution: %dx%d format: %d",
+        DHLOGD("The target resolution: %{public}dx%{public}d format: %{public}d is the same as the source "
+            "resolution: %{public}dx%{public}d format: %{public}d",
             processedConfig_.GetWidth(), processedConfig_.GetHeight(), processedConfig_.GetVideoformat(),
             sourceConfig_.GetWidth(), sourceConfig_.GetHeight(), sourceConfig_.GetVideoformat());
         return ConvertDone(inputBuffers);
@@ -152,7 +153,7 @@ int32_t ScaleConvertProcess::GetImageUnitInfo(ImageUnitInfo& imgInfo, const std:
     if (colorFormat != static_cast<int32_t>(Videoformat::YUVI420) &&
         colorFormat != static_cast<int32_t>(Videoformat::NV12) &&
         colorFormat != static_cast<int32_t>(Videoformat::NV21)) {
-        DHLOGE("GetImageUnitInfo failed, colorFormat %d are not supported.", colorFormat);
+        DHLOGE("GetImageUnitInfo failed, colorFormat %{public}d are not supported.", colorFormat);
         return DCAMERA_NOT_FOUND;
     }
     imgInfo.colorFormat = static_cast<Videoformat>(colorFormat);
@@ -161,8 +162,8 @@ int32_t ScaleConvertProcess::GetImageUnitInfo(ImageUnitInfo& imgInfo, const std:
     findErr = findErr && imgBuf->FindInt32("alignedWidth", imgInfo.alignedWidth);
     findErr = findErr && imgBuf->FindInt32("alignedHeight", imgInfo.alignedHeight);
     if (!findErr) {
-        DHLOGE("GetImageUnitInfo failed, width %d, height %d, alignedWidth %d, alignedHeight %d.",
-            imgInfo.width, imgInfo.height, imgInfo.alignedWidth, imgInfo.alignedHeight);
+        DHLOGE("GetImageUnitInfo failed, width %{public}d, height %{public}d, alignedWidth %{public}d, "
+            "alignedHeight %{public}d.", imgInfo.width, imgInfo.height, imgInfo.alignedWidth, imgInfo.alignedHeight);
         return DCAMERA_NOT_FOUND;
     }
 
@@ -170,8 +171,9 @@ int32_t ScaleConvertProcess::GetImageUnitInfo(ImageUnitInfo& imgInfo, const std:
     imgInfo.imgSize = imgBuf->Size();
     imgInfo.imgData = imgBuf;
 
-    DHLOGD("ScaleConvertProcess imgBuf info : Videoformat %d, alignedWidth %d, alignedHeight %d, width %d, height %d" +
-        ", chromaOffset %zu, imgSize %zu.", imgInfo.colorFormat, imgInfo.alignedWidth, imgInfo.alignedHeight,
+    DHLOGD("ScaleConvertProcess imgBuf info : Videoformat %{public}d, alignedWidth %{public}d, alignedHeight "
+        "%{public}d, width %{public}d, height %{public}d, chromaOffset %{public}zu, imgSize %{public}zu.",
+        imgInfo.colorFormat, imgInfo.alignedWidth, imgInfo.alignedHeight,
         imgInfo.width, imgInfo.height, imgInfo.chromaOffset, imgInfo.imgSize);
     return DCAMERA_OK;
 }
@@ -192,23 +194,23 @@ bool ScaleConvertProcess::CheckScaleConvertInfo(const ImageUnitInfo& srcImgInfo,
     }
 
     if (!IsCorrectImageUnitInfo(srcImgInfo)) {
-        DHLOGE("srcImginfo fail: width %d, height %d, alignedWidth %d, alignedHeight %d, chromaOffset %lld, " +
-            "imgSize %lld.", srcImgInfo.width, srcImgInfo.height, srcImgInfo.alignedWidth, srcImgInfo.alignedHeight,
-            srcImgInfo.chromaOffset, srcImgInfo.imgSize);
+        DHLOGE("srcImginfo fail: width %{public}d, height %{public}d, alignedWidth %{public}d, alignedHeight "
+            "%{public}d, chromaOffset %{public}zu, imgSize %{public}zu.", srcImgInfo.width, srcImgInfo.height,
+            srcImgInfo.alignedWidth, srcImgInfo.alignedHeight, srcImgInfo.chromaOffset, srcImgInfo.imgSize);
         return false;
     }
 
     if (!IsCorrectImageUnitInfo(dstImgInfo)) {
-        DHLOGE("dstImginfo fail: width %d, height %d, alignedWidth %d, alignedHeight %d, chromaOffset %lld, " +
-            "imgSize %lld.", dstImgInfo.width, dstImgInfo.height, dstImgInfo.alignedWidth, dstImgInfo.alignedHeight,
-            dstImgInfo.chromaOffset, dstImgInfo.imgSize);
+        DHLOGE("dstImginfo fail: width %{public}d, height %{public}d, alignedWidth %{public}d, alignedHeight "
+            "%{public}d, chromaOffset %{public}zu, imgSize %{public}zu.", dstImgInfo.width, dstImgInfo.height,
+            dstImgInfo.alignedWidth, dstImgInfo.alignedHeight, dstImgInfo.chromaOffset, dstImgInfo.imgSize);
         return false;
     }
 
     if ((dstImgInfo.width == srcImgInfo.alignedWidth) && (dstImgInfo.height == srcImgInfo.alignedHeight) &&
         (dstImgInfo.colorFormat == srcImgInfo.colorFormat)) {
-        DHLOGE("Comparison ImgInfo fail: dstwidth %d, dstheight %d, dstColorFormat %d, "
-            "srcAlignedWidth %d, srcAlignedHeight %d, srcColorFormat %d.",
+        DHLOGE("Comparison ImgInfo fail: dstwidth %{public}d, dstheight %{public}d, dstColorFormat %{public}d, "
+            "srcAlignedWidth %{public}d, srcAlignedHeight %{public}d, srcColorFormat %{public}d.",
             dstImgInfo.width, dstImgInfo.height, dstImgInfo.colorFormat,
             srcImgInfo.alignedWidth, srcImgInfo.alignedHeight, srcImgInfo.colorFormat);
         return false;
@@ -248,7 +250,7 @@ int32_t ScaleConvertProcess::ScaleConvert(ImageUnitInfo& srcImgInfo, ImageUnitIn
         ret = ConvertFormatToRGBA(srcImgInfo, dstImgInfo, dstBuf);
     }
     if (ret != DCAMERA_OK) {
-        DHLOGE("Convert I420 to format: %d failed.", processedConfig_.GetVideoformat());
+        DHLOGE("Convert I420 to format: %{public}d failed.", processedConfig_.GetVideoformat());
         return ret;
     }
 
@@ -265,8 +267,8 @@ int32_t ScaleConvertProcess::ConvertResolution(ImageUnitInfo& srcImgInfo, ImageU
         return DCAMERA_OK;
     }
 
-    DHLOGD("Convert I420 Scale: format=%d, width=[%d, %d], height=[%d, %d]", srcImgInfo.colorFormat,
-        srcImgInfo.width, srcImgInfo.alignedWidth, srcImgInfo.height, srcImgInfo.alignedHeight);
+    DHLOGD("Convert I420 Scale: format=%{public}d, width=[%{public}d, %{public}d], height=[%{public}d, %{public}d]",
+        srcImgInfo.colorFormat, srcImgInfo.width, srcImgInfo.alignedWidth, srcImgInfo.height, srcImgInfo.alignedHeight);
     int srcSizeY = srcImgInfo.width * srcImgInfo.height;
     int srcSizeUV = (static_cast<uint32_t>(srcImgInfo.width) >> MEMORY_RATIO_UV) *
                     (static_cast<uint32_t>(srcImgInfo.height) >> MEMORY_RATIO_UV);
@@ -315,8 +317,9 @@ int32_t ScaleConvertProcess::ConvertFormatToNV21(ImageUnitInfo& srcImgInfo, Imag
         return DCAMERA_OK;
     }
 
-    DHLOGD("Convert I420 to NV21: format=%d, width=[%d, %d], height=[%d, %d]", srcImgInfo.colorFormat,
-        srcImgInfo.width, srcImgInfo.alignedWidth, srcImgInfo.height, srcImgInfo.alignedHeight);
+    DHLOGD("Convert I420 to NV21: format=%{public}d, width=[%{public}d, %{public}d], height=[%{public}d, %{public}d]",
+        srcImgInfo.colorFormat, srcImgInfo.width, srcImgInfo.alignedWidth, srcImgInfo.height,
+        srcImgInfo.alignedHeight);
     int srcSizeY = srcImgInfo.width * srcImgInfo.height;
     int srcSizeUV = (static_cast<uint32_t>(srcImgInfo.width) >> MEMORY_RATIO_UV) *
                     (static_cast<uint32_t>(srcImgInfo.height) >> MEMORY_RATIO_UV);
@@ -352,8 +355,8 @@ int32_t ScaleConvertProcess::ConvertFormatToRGBA(ImageUnitInfo& srcImgInfo, Imag
         return DCAMERA_OK;
     }
 
-    DHLOGI("Convert I420 to RGBA: format=%d, width=[%d, %d], height=[%d, %d]", srcImgInfo.colorFormat,
-        srcImgInfo.width, srcImgInfo.alignedWidth, srcImgInfo.height, srcImgInfo.alignedHeight);
+    DHLOGI("Convert I420 to RGBA: format=%{public}d, width=[%{public}d, %{public}d], height=[%{public}d, %{public}d]",
+        srcImgInfo.colorFormat, srcImgInfo.width, srcImgInfo.alignedWidth, srcImgInfo.height, srcImgInfo.alignedHeight);
     int srcSizeY = srcImgInfo.width * srcImgInfo.height;
     int srcSizeUV = (static_cast<uint32_t>(srcImgInfo.width) >> MEMORY_RATIO_UV) *
                     (static_cast<uint32_t>(srcImgInfo.height) >> MEMORY_RATIO_UV);

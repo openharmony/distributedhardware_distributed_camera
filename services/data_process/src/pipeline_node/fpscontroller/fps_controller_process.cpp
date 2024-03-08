@@ -33,7 +33,7 @@ int32_t FpsControllerProcess::InitNode(const VideoConfigParams& sourceConfig, co
     VideoConfigParams& processedConfig)
 {
     if (targetConfig.GetFrameRate() > MAX_TARGET_FRAME_RATE) {
-        DHLOGE("The target framerate : %d is greater than the max framerate : %d.",
+        DHLOGE("The target framerate : %{public}d is greater than the max framerate : %{public}d.",
             targetConfig.GetFrameRate(), MAX_TARGET_FRAME_RATE);
         return DCAMERA_BAD_TYPE;
     }
@@ -49,7 +49,7 @@ int32_t FpsControllerProcess::InitNode(const VideoConfigParams& sourceConfig, co
 
 void FpsControllerProcess::ReleaseProcessNode()
 {
-    DHLOGD("Start release [%d] node : FPS controller.", nodeRank_);
+    DHLOGD("Start release [%{public}zu] node : FPS controller.", nodeRank_);
     isFpsControllerProcess_ = false;
     isFirstFrame_ = false;
     targetFrameRate_ = 0;
@@ -68,7 +68,7 @@ void FpsControllerProcess::ReleaseProcessNode()
         nextDataProcess_->ReleaseProcessNode();
         nextDataProcess_ = nullptr;
     }
-    DHLOGD("Release [%d] node : FPS controller end.", nodeRank_);
+    DHLOGD("Release [%{public}zu] node : FPS controller end.", nodeRank_);
 }
 
 int32_t FpsControllerProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& inputBuffers)
@@ -93,12 +93,14 @@ int32_t FpsControllerProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer
 
     float curFrameRate = CalculateFrameRate(nowTimeMs);
     if (IsDropFrame(curFrameRate)) {
-        DHLOGD("frame control, currect frameRate %u, targetRate %d, drop it", curFrameRate, targetFrameRate_);
+        DHLOGD("frame control, currect frameRate %{public}f, targetRate %{public}d, drop it",
+            curFrameRate, targetFrameRate_);
         return DCAMERA_OK;
     }
 
-    DHLOGD("frame control render PushVideoFrame, frame info width %d height %d, timeStampUs %lld, fps %d",
-        sourceConfig_.GetWidth(), sourceConfig_.GetHeight(), (long long)timeStampUs, curFrameRate);
+    DHLOGD("frame control render PushVideoFrame, frame info width %{public}d height %{public}d, timeStampUs "
+        "%{public}lld, fps %{public}f", sourceConfig_.GetWidth(), sourceConfig_.GetHeight(), (long long)timeStampUs,
+        curFrameRate);
     return FpsControllerDone(inputBuffers);
 }
 
@@ -106,7 +108,7 @@ void FpsControllerProcess::UpdateFPSControllerInfo(int64_t nowMs)
 {
     DHLOGD("Frame control, update control info.");
     if (targetFrameRate_ <= 0) {
-        DHLOGD("Frame control, targetFrameRate_ : %d", targetFrameRate_);
+        DHLOGD("Frame control, targetFrameRate_ : %{public}d", targetFrameRate_);
         return;
     }
 
@@ -117,7 +119,7 @@ void FpsControllerProcess::UpdateFPSControllerInfo(int64_t nowMs)
     }
     lastFrameIncomeTimeMs_ = nowMs;
     recentFrameTimeSpanMs_ = nowMs - lastFrameIncomeTimeMs_;
-    DHLOGD("Frame control, lastFrameIncomeTimeMs_ %lld, receive Frame after last frame(ms): %lld",
+    DHLOGD("Frame control, lastFrameIncomeTimeMs_ %{public}lld, receive Frame after last frame(ms): %{public}lld",
         (long long)lastFrameIncomeTimeMs_, (long long)recentFrameTimeSpanMs_);
     UpdateIncomingFrameTimes(nowMs);
     UpdateFrameRateCorrectionFactor(nowMs);
@@ -128,7 +130,7 @@ void FpsControllerProcess::UpdateFrameRateCorrectionFactor(int64_t nowMs)
 {
     DHLOGD("Frame control, update FPS correction factor.");
     if (targetFrameRate_ <= 0) {
-        DHLOGD("Frame control, targetFrameRate_ : %d", targetFrameRate_);
+        DHLOGD("Frame control, targetFrameRate_ : %{public}d", targetFrameRate_);
         return;
     }
     if (isFirstFrame_) {
@@ -155,13 +157,13 @@ void FpsControllerProcess::UpdateFrameRateCorrectionFactor(int64_t nowMs)
             frameRateCorrectionFactor_ = 0;
             keepCorrectionCount_++;
         }
-        DHLOGD("Frame control, instantaneousFrameRate %.3f is more than maxInstantaneousFrameRateThreshold %.3f, " +
-            "keepCorrectionCount %d", instantaneousFrameRate, maxInstantaneousFrameRateThreshold,
-            keepCorrectionCount_);
+        DHLOGD("Frame control, instantaneousFrameRate %{public}.3f is more than maxInstantaneousFrameRateThreshold "
+            "%{public}.3f, keepCorrectionCount %{public}d", instantaneousFrameRate,
+            maxInstantaneousFrameRateThreshold, keepCorrectionCount_);
     }
 
-    DHLOGD("Frame control, targetFramerate %d, maxInstantaneousFrameRateThreshold %.3f," +
-        "instantaneousFrameRate %.3f, frameRateCorrectionFactor %.3f", targetFrameRate_,
+    DHLOGD("Frame control, targetFramerate %{public}d, maxInstantaneousFrameRateThreshold %{public}.3f,"
+        "instantaneousFrameRate %{public}.3f, frameRateCorrectionFactor %{public}.3f", targetFrameRate_,
         maxInstantaneousFrameRateThreshold, instantaneousFrameRate, frameRateCorrectionFactor_);
     return;
 }
@@ -170,7 +172,7 @@ void FpsControllerProcess::UpdateIncomingFrameTimes(int64_t nowMs)
 {
     DHLOGD("Frame control, update incoming frame times array.");
     if (targetFrameRate_ <= 0) {
-        DHLOGD("Frame control, targetFrameRate_ : %d", targetFrameRate_);
+        DHLOGD("Frame control, targetFrameRate_ : %{public}d", targetFrameRate_);
         return;
     }
     if (isFirstFrame_) {
@@ -183,14 +185,14 @@ void FpsControllerProcess::UpdateIncomingFrameTimes(int64_t nowMs)
         intervalNewAndFirst = -intervalNewAndFirst;
     }
     if (intervalNewAndFirst > FRMAE_MAX_INTERVAL_TIME_WINDOW_MS) {
-        DHLOGD("frame control, nowMs: %lld mIncomingFrameT[0]: %lld intervalNewAndFirst: %lld",
-            (long long)nowMs, (long long)incomingFrameTimesMs_[0], (long long)intervalNewAndFirst);
+        DHLOGD("frame control, nowMs: %{public}lld mIncomingFrameT[0]: %{public}lld intervalNewAndFirst: "
+            "%{public}lld", (long long)nowMs, (long long)incomingFrameTimesMs_[0], (long long)intervalNewAndFirst);
         for (int i = 0; i < INCOME_FRAME_TIME_HISTORY_WINDOWS_SIZE; i++) {
             incomingFrameTimesMs_[i] = 0;
         }
     } else {
-        DHLOGD("frame control shift, nowMs: %lld mIncomingFrameT[0]: %lld intervalNewAndFirst: %lld",
-            (long long)nowMs, (long long)incomingFrameTimesMs_[0], (long long)intervalNewAndFirst);
+        DHLOGD("frame control shift, nowMs: %{public}lld mIncomingFrameT[0]: %{public}lld intervalNewAndFirst: "
+            "%{public}lld", (long long)nowMs, (long long)incomingFrameTimesMs_[0], (long long)intervalNewAndFirst);
         const int32_t windowLeftNum =  2;
         for (int i = (INCOME_FRAME_TIME_HISTORY_WINDOWS_SIZE - windowLeftNum); i >= 0; --i) {
             incomingFrameTimesMs_[i + 1] = incomingFrameTimesMs_[i];
@@ -204,7 +206,7 @@ float FpsControllerProcess::CalculateFrameRate(int64_t nowMs)
 {
     DHLOGD("Frame control, calculate frame rate.");
     if (targetFrameRate_ <= 0) {
-        DHLOGE("Frame control, targetFrameRate_ : %d", targetFrameRate_);
+        DHLOGE("Frame control, targetFrameRate_ : %{public}d", targetFrameRate_);
         return 0.0;
     }
 
@@ -253,7 +255,7 @@ bool FpsControllerProcess::IsDropFrame(float incomingFps)
         return false;
     }
     bool isDrop = ReduceFrameRateByUniformStrategy(incomingFrmRate);
-    DHLOGD("drop frame result: %s", isDrop ? "drop" : "no drop");
+    DHLOGD("drop frame result: %{public}s", isDrop ? "drop" : "no drop");
     return isDrop;
 }
 

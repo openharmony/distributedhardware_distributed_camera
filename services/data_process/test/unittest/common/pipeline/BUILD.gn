@@ -61,6 +61,7 @@ ohos_unittest("DCameraDataProcessPipelineTest") {
     "distributed_hardware_fwk:distributedhardwareutils",
     "eventhandler:libeventhandler",
     "graphic_surface:surface",
+    "hilog:libhilog",
     "hitrace:hitrace_meter",
   ]
 

@@ -53,7 +53,7 @@ bool DistributedCameraSourceStub::HasEnableDHPermission()
 int32_t DistributedCameraSourceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
-    DHLOGD("OnRemoteRequest code: %u", code);
+    DHLOGD("OnRemoteRequest code: %{public}u", code);
     std::u16string desc = DistributedCameraSourceStub::GetDescriptor();
     std::u16string remoteDesc = data.ReadInterfaceToken();
     if (desc != remoteDesc) {
@@ -146,7 +146,7 @@ int32_t DistributedCameraSourceStub::RegisterDistributedHardwareInner(MessagePar
             break;
         }
         ret = RegisterDistributedHardware(devId, dhId, reqId, params);
-        DHLOGI("DistributedCameraSourceStub RegisterDistributedHardware %d", ret);
+        DHLOGI("DistributedCameraSourceStub RegisterDistributedHardware %{public}d", ret);
     } while (0);
     reply.WriteInt32(ret);
     return DCAMERA_OK;

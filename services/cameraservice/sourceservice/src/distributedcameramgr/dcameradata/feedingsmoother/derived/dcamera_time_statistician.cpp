@@ -38,8 +38,10 @@ void DCameraTimeStatistician::CalProcessTime(const std::shared_ptr<IFeedableData
     averScaleTime_ = CalAverValue(scale, scaleTimeSum_);
     averRecv2FeedTime_ = CalAverValue(recv2Feed, recv2FeedTimeSum_);
     SetRecvTime(frameInfo.timePonit.recv);
-    DHLOGD("Encode %ld, trans %ld, decode %ld, decode2Scale %ld, scale %ld, recv2Feed %ld, averEncode %ld," +
-        " averTrans %ld, averDecode %ld, averDecode2Scale %ld, averScale %ld, averRecv2Feed %ld.", encode, trans,
+    DHLOGD("Encode %{public}" PRId64", trans %{public}" PRId64", decode %{public}" PRId64", decode2Scale %{public}"
+        PRId64", scale %{public}" PRId64", recv2Feed %{public}" PRId64", averEncode %{public}" PRId64
+        " averTrans %{public}" PRId64", averDecode %{public}" PRId64", averDecode2Scale %{public}" PRId64
+        ", averScale %{public}" PRId64", averRecv2Feed %{public}" PRId64, encode, trans,
         decode, decode2Scale, scale, recv2Feed, averEncodeTime_, averTransTime_, averDecodeTime_,
         averDecode2ScaleTime_, averScaleTime_, averRecv2FeedTime_);
 }
@@ -55,8 +57,9 @@ void DCameraTimeStatistician::CalWholeProcessTime(const std::shared_ptr<DataBuff
     averSmoothTime_ = CalAverValue(smooth, smoothTimeSum_);
     averSourceTime_ = CalAverValue(source, sourceTimeSum_);
     averWholeTime_ = CalAverValue(whole, wholeTimeSum_);
-    DHLOGD("Smooth %ld, sink %ld, source %ld, whole %ld, self %ld, averSmooth %ld, averSource %ld, averWhole %ld",
-        smooth, sink, source, whole, self, averSmoothTime_, averSourceTime_, averWholeTime_);
+    DHLOGD("Smooth %{public}" PRId64", sink %{public}" PRId64", source %{public}" PRId64", whole %{public}" PRId64
+        ", self %{public}" PRId64", averSmooth %{public}" PRId64", averSource %{public}" PRId64", averWhole %{public}"
+        PRId64, smooth, sink, source, whole, self, averSmoothTime_, averSourceTime_, averWholeTime_);
 }
 
 void DCameraTimeStatistician::SetFrameIndex(const int32_t index)

@@ -80,7 +80,7 @@ int32_t DistributedCameraSinkProxy::ReleaseSink()
 
 int32_t DistributedCameraSinkProxy::SubscribeLocalHardware(const std::string& dhId, const std::string& parameters)
 {
-    DHLOGI("dhId: %s", GetAnonyString(dhId).c_str());
+    DHLOGI("dhId: %{public}s", GetAnonyString(dhId).c_str());
     if (parameters.empty() || parameters.size() > PARAM_MAX_SIZE || dhId.empty() ||
         dhId.size() > DID_MAX_SIZE) {
         DHLOGE("params is invalid");
@@ -111,7 +111,7 @@ int32_t DistributedCameraSinkProxy::SubscribeLocalHardware(const std::string& dh
 
 int32_t DistributedCameraSinkProxy::UnsubscribeLocalHardware(const std::string& dhId)
 {
-    DHLOGI("dhId: %s", GetAnonyString(dhId).c_str());
+    DHLOGI("dhId: %{public}s", GetAnonyString(dhId).c_str());
     if (dhId.empty() || dhId.size() > DID_MAX_SIZE) {
         DHLOGE("params is invalid");
         return DCAMERA_BAD_VALUE;
@@ -141,7 +141,7 @@ int32_t DistributedCameraSinkProxy::UnsubscribeLocalHardware(const std::string& 
 
 int32_t DistributedCameraSinkProxy::StopCapture(const std::string& dhId)
 {
-    DHLOGI("dhId: %s", GetAnonyString(dhId).c_str());
+    DHLOGI("dhId: %{public}s", GetAnonyString(dhId).c_str());
     if (dhId.empty() || dhId.size() > DID_MAX_SIZE) {
         DHLOGE("params is invalid");
         return DCAMERA_BAD_VALUE;
@@ -165,13 +165,13 @@ int32_t DistributedCameraSinkProxy::StopCapture(const std::string& dhId)
     }
     remote->SendRequest(static_cast<uint32_t>(IDCameraSinkInterfaceCode::STOP_CAPTURE), data, reply, option);
     int32_t result = reply.ReadInt32();
-    DHLOGI("async dhId: %s", GetAnonyString(dhId).c_str());
+    DHLOGI("async dhId: %{public}s", GetAnonyString(dhId).c_str());
     return result;
 }
 
 int32_t DistributedCameraSinkProxy::ChannelNeg(const std::string& dhId, std::string& channelInfo)
 {
-    DHLOGI("dhId: %s", GetAnonyString(dhId).c_str());
+    DHLOGI("dhId: %{public}s", GetAnonyString(dhId).c_str());
     if (dhId.empty() || dhId.size() > DID_MAX_SIZE || channelInfo.empty() ||
         channelInfo.size() > PARAM_MAX_SIZE) {
         DHLOGE("params is invalid");
@@ -201,7 +201,7 @@ int32_t DistributedCameraSinkProxy::ChannelNeg(const std::string& dhId, std::str
 
 int32_t DistributedCameraSinkProxy::GetCameraInfo(const std::string& dhId, std::string& cameraInfo)
 {
-    DHLOGI("dhId: %s", GetAnonyString(dhId).c_str());
+    DHLOGI("dhId: %{public}s", GetAnonyString(dhId).c_str());
     if (dhId.empty() || dhId.size() > DID_MAX_SIZE) {
         DHLOGE("parmas is invalid");
         return DCAMERA_BAD_VALUE;
@@ -230,7 +230,7 @@ int32_t DistributedCameraSinkProxy::GetCameraInfo(const std::string& dhId, std::
 
 int32_t DistributedCameraSinkProxy::OpenChannel(const std::string& dhId, std::string& openInfo)
 {
-    DHLOGI("DistributedCameraSinkProxy OpenChannel Begin,dhId: %s", GetAnonyString(dhId).c_str());
+    DHLOGI("DistributedCameraSinkProxy OpenChannel Begin,dhId: %{public}s", GetAnonyString(dhId).c_str());
     if (dhId.empty() || dhId.size() > DID_MAX_SIZE || openInfo.empty() ||
         openInfo.size() > PARAM_MAX_SIZE) {
         DHLOGE("params is invalid");
@@ -255,13 +255,13 @@ int32_t DistributedCameraSinkProxy::OpenChannel(const std::string& dhId, std::st
     }
     remote->SendRequest(static_cast<uint32_t>(IDCameraSinkInterfaceCode::OPEN_CHANNEL), data, reply, option);
     int32_t result = reply.ReadInt32();
-    DHLOGI("DistributedCameraSinkProxy OpenChannel End,result: %d", result);
+    DHLOGI("DistributedCameraSinkProxy OpenChannel End,result: %{public}d", result);
     return result;
 }
 
 int32_t DistributedCameraSinkProxy::CloseChannel(const std::string& dhId)
 {
-    DHLOGI("dhId: %s", GetAnonyString(dhId).c_str());
+    DHLOGI("dhId: %{public}s", GetAnonyString(dhId).c_str());
     if (dhId.empty() || dhId.size() > DID_MAX_SIZE) {
         DHLOGE("params is invalid");
         return DCAMERA_BAD_VALUE;
@@ -290,7 +290,7 @@ int32_t DistributedCameraSinkProxy::CloseChannel(const std::string& dhId)
 
 int32_t DistributedCameraSinkProxy::PauseDistributedHardware(const std::string &networkId)
 {
-    DHLOGI("networkId: %s", GetAnonyString(networkId).c_str());
+    DHLOGI("networkId: %{public}s", GetAnonyString(networkId).c_str());
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
         DHLOGE("remote service is null");
@@ -316,7 +316,7 @@ int32_t DistributedCameraSinkProxy::PauseDistributedHardware(const std::string &
 
 int32_t DistributedCameraSinkProxy::ResumeDistributedHardware(const std::string &networkId)
 {
-    DHLOGI("networkId: %s", GetAnonyString(networkId).c_str());
+    DHLOGI("networkId: %{public}s", GetAnonyString(networkId).c_str());
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
         DHLOGE("remote service is null");
@@ -342,7 +342,7 @@ int32_t DistributedCameraSinkProxy::ResumeDistributedHardware(const std::string 
 
 int32_t DistributedCameraSinkProxy::StopDistributedHardware(const std::string &networkId)
 {
-    DHLOGI("networkId: %s", GetAnonyString(networkId).c_str());
+    DHLOGI("networkId: %{public}s", GetAnonyString(networkId).c_str());
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
         DHLOGE("remote service is null");

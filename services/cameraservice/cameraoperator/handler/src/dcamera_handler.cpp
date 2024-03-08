@@ -54,24 +54,26 @@ std::vector<DHItem> DCameraHandler::Query()
 {
     std::vector<DHItem> itemList;
     std::vector<sptr<CameraStandard::CameraDevice>> cameraList = cameraManager_->GetSupportedCameras();
-    DHLOGI("get %d cameras", cameraList.size());
+    uint64_t listSize = static_cast<uint64_t>(cameraList.size());
+    DHLOGI("get %{public}" PRIu64" cameras", listSize);
     if (cameraList.empty()) {
         DHLOGE("no camera device");
         return itemList;
     }
     for (auto& info : cameraList) {
         if (info->GetConnectionType() != CameraStandard::ConnectionType::CAMERA_CONNECTION_BUILT_IN) {
-            DHLOGI("connection type: %d", info->GetConnectionType());
+            DHLOGI("connection type: %{public}d", info->GetConnectionType());
             continue;
         }
-        DHLOGI("get %s, position: %d, cameraType: %d",
+        DHLOGI("get %{public}s, position: %{public}d, cameraType: %{public}d",
             GetAnonyString(info->GetID()).c_str(), info->GetPosition(), info->GetCameraType());
         DHItem item;
         if (CreateDHItem(info, item) == DCAMERA_OK) {
             itemList.emplace_back(item);
         }
     }
-    DHLOGI("success, get %d items", itemList.size());
+    listSize = static_cast<uint64_t>(itemList.size());
+    DHLOGI("success, get %{public}" PRIu64" items", listSize);
     return itemList;
 }
 
@@ -107,7 +109,8 @@ std::vector<std::string> DCameraHandler::GetCameras()
 {
     std::vector<std::string> cameras;
     std::vector<sptr<CameraStandard::CameraDevice>> cameraList = cameraManager_->GetSupportedCameras();
-    DHLOGI("get %d cameras", cameraList.size());
+    uint64_t listSize = static_cast<uint64_t>(cameraList.size());
+    DHLOGI("get %{public}" PRIu64" cameras", listSize);
     if (cameraList.empty()) {
         DHLOGE("no camera device");
         return cameras;
@@ -119,15 +122,16 @@ std::vector<std::string> DCameraHandler::GetCameras()
             continue;
         }
         if (info->GetConnectionType() != CameraStandard::ConnectionType::CAMERA_CONNECTION_BUILT_IN) {
-            DHLOGI("connection type: %d", info->GetConnectionType());
+            DHLOGI("connection type: %{public}d", info->GetConnectionType());
             continue;
         }
-        DHLOGI("get %s, position: %d, cameraType: %d",
+        DHLOGI("get %{public}s, position: %{public}d, cameraType: %{public}d",
             GetAnonyString(info->GetID()).c_str(), info->GetPosition(), info->GetCameraType());
         std::string dhId = CAMERA_ID_PREFIX + info->GetID();
         cameras.emplace_back(dhId);
     }
-    DHLOGI("success, get %d items", cameras.size());
+    listSize = static_cast<uint64_t>(cameras.size());
+    DHLOGI("success, get %{public}" PRIu64" items", listSize);
     return cameras;
 }
 
@@ -150,7 +154,7 @@ int32_t DCameraHandler::CreateAVCodecList(Json::Value& root)
         }
         std::string mimeType = capData->mimeType;
         root[CAMERA_CODEC_TYPE_KEY].append(mimeType);
-        DHLOGI("codec name: %s, mimeType: %s", coder.c_str(), mimeType.c_str());
+        DHLOGI("codec name: %{public}s, mimeType: %{public}s", coder.c_str(), mimeType.c_str());
     }
     return DCAMERA_OK;
 }
@@ -160,7 +164,7 @@ int32_t DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraDevice>& info, D
     std::string id = info->GetID();
     item.dhId = CAMERA_ID_PREFIX + id;
     item.subtype = "camera";
-    DHLOGI("camera id: %s", GetAnonyString(id).c_str());
+    DHLOGI("camera id: %{public}s", GetAnonyString(id).c_str());
 
     Json::Value root;
     root[CAMERA_PROTOCOL_VERSION_KEY] = Json::Value(CAMERA_PROTOCOL_VERSION_VALUE);
@@ -190,11 +194,11 @@ int32_t DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraDevice>& info, D
 
     std::hash<std::string> h;
     std::string abilityString = cameraInput->GetCameraSettings();
-    DHLOGI("abilityString hash: %zu, length: %zu", h(abilityString), abilityString.length());
+    DHLOGI("abilityString hash: %{public}zu, length: %{public}zu", h(abilityString), abilityString.length());
 
     std::string encodeString = Base64Encode(reinterpret_cast<const unsigned char *>(abilityString.c_str()),
         abilityString.length());
-    DHLOGI("encodeString hash: %zu, length: %zu", h(encodeString), encodeString.length());
+    DHLOGI("encodeString hash: %{public}zu, length: %{public}zu", h(encodeString), encodeString.length());
     root[CAMERA_METADATA_KEY] = Json::Value(encodeString);
 
     item.attrs = root.toStyledString();
@@ -206,7 +210,7 @@ int32_t DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraDevice>& info, D
 
 std::string DCameraHandler::GetCameraPosition(CameraStandard::CameraPosition position)
 {
-    DHLOGI("position: %d", position);
+    DHLOGI("position: %{public}d", position);
     std::string ret = "";
     switch (position) {
         case CameraStandard::CameraPosition::CAMERA_POSITION_BACK: {
@@ -226,14 +230,15 @@ std::string DCameraHandler::GetCameraPosition(CameraStandard::CameraPosition pos
             break;
         }
     }
-    DHLOGI("success ret: %s", ret.c_str());
+    DHLOGI("success ret: %{public}s", ret.c_str());
     return ret;
 }
 
 void DCameraHandler::ConfigFormatAndResolution(const DCStreamType type, Json::Value& root,
     std::vector<CameraStandard::Profile>& profileList)
 {
-    DHLOGI("type: %d, size: %d", type, profileList.size());
+    uint64_t listSize = static_cast<uint64_t>(profileList.size());
+    DHLOGI("type: %{public}d, size: %{public}" PRIu64, type, listSize);
     std::set<int32_t> formatSet;
     for (auto& profile : profileList) {
         CameraStandard::CameraFormat format = profile.GetCameraFormat();
@@ -243,7 +248,7 @@ void DCameraHandler::ConfigFormatAndResolution(const DCStreamType type, Json::Va
             continue;
         }
         formatSet.insert(dformat);
-        DHLOGI("width: %d, height: %d, format: %d", picSize.width, picSize.height, dformat);
+        DHLOGI("width: %{public}d, height: %{public}d, format: %{public}d", picSize.width, picSize.height, dformat);
         std::string formatName = std::to_string(dformat);
         if (IsValid(type, picSize)) {
             std::string resolutionValue = std::to_string(picSize.width) + "*" + std::to_string(picSize.height);
@@ -268,7 +273,7 @@ void DCameraHandler::ConfigFormatAndResolution(const DCStreamType type, Json::Va
 
 int32_t DCameraHandler::CovertToDcameraFormat(CameraStandard::CameraFormat format)
 {
-    DHLOGI("format: %d", format);
+    DHLOGI("format: %{public}d", format);
     int32_t ret = INVALID_FORMAT;
     switch (format) {
         case CameraStandard::CameraFormat::CAMERA_FORMAT_RGBA_8888:

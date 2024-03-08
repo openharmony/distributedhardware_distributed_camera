@@ -42,7 +42,8 @@ int32_t ScaleConvertProcess::InitNode(const VideoConfigParams& sourceConfig, con
     processedConfig = processedConfig_;
 
     if (!IsConvertible(sourceConfig, targetConfig)) {
-        DHLOGI("sourceConfig: Videoformat %d Width %d, Height %d, targetConfig: Videoformat %d Width %d, Height %d.",
+        DHLOGI("sourceConfig: Videoformat %{public}d Width %{public}d, Height %{public}d, targetConfig: "
+            "Videoformat %{public}d Width %{public}d, Height %{public}d.",
             sourceConfig.GetVideoformat(), sourceConfig.GetWidth(), sourceConfig.GetHeight(),
             targetConfig.GetVideoformat(), targetConfig.GetWidth(), targetConfig.GetHeight());
         isScaleConvert_.store(true);
@@ -84,7 +85,7 @@ bool ScaleConvertProcess::IsConvertible(const VideoConfigParams& sourceConfig, c
 
 void ScaleConvertProcess::ReleaseProcessNode()
 {
-    DHLOGI("Start release [%zu] node : ScaleConvertNode.", nodeRank_);
+    DHLOGI("Start release [%{public}zu] node : ScaleConvertNode.", nodeRank_);
     isScaleConvert_.store(false);
 
     {
@@ -101,7 +102,7 @@ void ScaleConvertProcess::ReleaseProcessNode()
         nextDataProcess_->ReleaseProcessNode();
         nextDataProcess_ = nullptr;
     }
-    DHLOGI("Release [%zu] node : ScaleConvertNode end.", nodeRank_);
+    DHLOGI("Release [%{public}zu] node : ScaleConvertNode end.", nodeRank_);
 }
 
 int ScaleConvertProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& inputBuffers)
@@ -120,7 +121,8 @@ int ScaleConvertProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& i
     inputBuffers[0]->frameInfo_.timePonit.startScale = startScaleTime;
 
     if (!IsConvertible(sourceConfig_, processedConfig_)) {
-        DHLOGD("The target resolution: %dx%d format: %d is the same as the source resolution: %dx%d format: %d",
+        DHLOGD("The target resolution: %{public}dx%{public}d format: %{public}d is the same as the source "
+            "resolution: %{public}dx%{public}d format: %{public}d",
             processedConfig_.GetWidth(), processedConfig_.GetHeight(), processedConfig_.GetVideoformat(),
             sourceConfig_.GetWidth(), sourceConfig_.GetHeight(), sourceConfig_.GetVideoformat());
         return ConvertDone(inputBuffers);
@@ -171,7 +173,7 @@ int32_t ScaleConvertProcess::GetImageUnitInfo(ImageUnitInfo& imgInfo, const std:
     if (colorFormat != static_cast<int32_t>(Videoformat::YUVI420) &&
         colorFormat != static_cast<int32_t>(Videoformat::NV12) &&
         colorFormat != static_cast<int32_t>(Videoformat::NV21)) {
-        DHLOGE("GetImageUnitInfo failed, colorFormat %d are not supported.", colorFormat);
+        DHLOGE("GetImageUnitInfo failed, colorFormat %{public}d are not supported.", colorFormat);
         return DCAMERA_NOT_FOUND;
     }
     imgInfo.colorFormat = static_cast<Videoformat>(colorFormat);
@@ -180,8 +182,8 @@ int32_t ScaleConvertProcess::GetImageUnitInfo(ImageUnitInfo& imgInfo, const std:
     findErr = findErr && imgBuf->FindInt32("alignedWidth", imgInfo.alignedWidth);
     findErr = findErr && imgBuf->FindInt32("alignedHeight", imgInfo.alignedHeight);
     if (!findErr) {
-        DHLOGE("GetImageUnitInfo failed, width %d, height %d, alignedWidth %d, alignedHeight %d.",
-            imgInfo.width, imgInfo.height, imgInfo.alignedWidth, imgInfo.alignedHeight);
+        DHLOGE("GetImageUnitInfo failed, width %{public}d, height %{public}d, alignedWidth %{public}d, "
+            "alignedHeight %{public}d.", imgInfo.width, imgInfo.height, imgInfo.alignedWidth, imgInfo.alignedHeight);
         return DCAMERA_NOT_FOUND;
     }
 
@@ -192,8 +194,9 @@ int32_t ScaleConvertProcess::GetImageUnitInfo(ImageUnitInfo& imgInfo, const std:
         DHLOGE("Get the imgData of the imgBuf failed.");
         return DCAMERA_BAD_VALUE;
     }
-    DHLOGD("ScaleConvertProcess imgBuf info : Videoformat %d, alignedWidth %d, alignedHeight %d, width %d, height %d" +
-        ", chromaOffset %zu, imgSize %zu.", imgInfo.colorFormat, imgInfo.alignedWidth, imgInfo.alignedHeight,
+    DHLOGD("ScaleConvertProcess imgBuf info : Videoformat %{public}d, alignedWidth %{public}d, alignedHeight "
+        "%{public}d, width %{public}d, height %{public}d, chromaOffset %{public}zu, imgSize %{public}zu.",
+        imgInfo.colorFormat, imgInfo.alignedWidth, imgInfo.alignedHeight,
         imgInfo.width, imgInfo.height, imgInfo.chromaOffset, imgInfo.imgSize);
     return DCAMERA_OK;
 }
@@ -214,23 +217,24 @@ bool ScaleConvertProcess::CheckScaleConvertInfo(const ImageUnitInfo& srcImgInfo,
     }
 
     if (!IsCorrectImageUnitInfo(srcImgInfo)) {
-        DHLOGE("srcImginfo fail: width %d, height %d, alignedWidth %d, alignedHeight %d, chromaOffset %lld, " +
-            "imgSize %lld.", srcImgInfo.width, srcImgInfo.height, srcImgInfo.alignedWidth, srcImgInfo.alignedHeight,
-            srcImgInfo.chromaOffset, srcImgInfo.imgSize);
+        DHLOGE("srcImginfo fail: width %{public}d, height %{public}d, alignedWidth %{public}d, alignedHeight "
+            "%{public}d, chromaOffset %{public}zu, imgSize %{public}zu.", srcImgInfo.width, srcImgInfo.height,
+            srcImgInfo.alignedWidth, srcImgInfo.alignedHeight, srcImgInfo.chromaOffset, srcImgInfo.imgSize);
         return false;
     }
 
     if (!IsCorrectImageUnitInfo(dstImgInfo)) {
-        DHLOGE("dstImginfo fail: width %d, height %d, alignedWidth %d, alignedHeight %d, chromaOffset %lld, " +
-            "imgSize %lld.", dstImgInfo.width, dstImgInfo.height, dstImgInfo.alignedWidth, dstImgInfo.alignedHeight,
-            dstImgInfo.chromaOffset, dstImgInfo.imgSize);
+        DHLOGE("dstImginfo fail: width %{public}d, height %{public}d, alignedWidth %{public}d, alignedHeight "
+            "%{public}d, chromaOffset %{public}zu, imgSize %{public}zu.", dstImgInfo.width, dstImgInfo.height,
+            dstImgInfo.alignedWidth, dstImgInfo.alignedHeight, dstImgInfo.chromaOffset, dstImgInfo.imgSize);
         return false;
     }
 
     if ((dstImgInfo.width == srcImgInfo.alignedWidth) && (dstImgInfo.height == srcImgInfo.alignedHeight) &&
         (dstImgInfo.colorFormat == srcImgInfo.colorFormat)) {
-        DHLOGE("Comparison ImgInfo fail: dstwidth %d, dstheight %d, srcAlignedWidth %d, srcAlignedHeight %d.",
-            dstImgInfo.width, dstImgInfo.height, srcImgInfo.alignedWidth, srcImgInfo.alignedHeight);
+        DHLOGE("Comparison ImgInfo fail: dstwidth %{public}d, dstheight %{public}d, srcAlignedWidth %{public}d, "
+            "srcAlignedHeight %{public}d.", dstImgInfo.width, dstImgInfo.height, srcImgInfo.alignedWidth,
+            srcImgInfo.alignedHeight);
         return false;
     }
 
@@ -289,7 +293,7 @@ int32_t ScaleConvertProcess::ScaleConvert(ImageUnitInfo& srcImgInfo, ImageUnitIn
         dstData_, dstLineSize_);
     int32_t ret = memcpy_s(dstImgInfo.imgData->Data(), dstImgInfo.imgSize, dstData_[0], dstBuffSize_);
     if (ret != EOK) {
-        DHLOGE("ScaleConvertProcess::ScaleConvert copy dst image info failed, ret = %d", ret);
+        DHLOGE("ScaleConvertProcess::ScaleConvert copy dst image info failed, ret = %{public}d", ret);
         return DCAMERA_MEMORY_OPT_ERROR;
     }
     return DCAMERA_OK;
@@ -300,7 +304,7 @@ int32_t ScaleConvertProcess::CopyYUV420SrcData(const ImageUnitInfo& srcImgInfo)
     int32_t ret = memcpy_s(srcData_[0], srcImgInfo.width * srcImgInfo.height,
         srcImgInfo.imgData->Data(), srcImgInfo.width * srcImgInfo.height);
     if (ret != EOK) {
-        DHLOGE("ScaleConvertProcess::CopyYUV420SrcData memory copy failed, ret = %d", ret);
+        DHLOGE("ScaleConvertProcess::CopyYUV420SrcData memory copy failed, ret = %{public}d", ret);
         return DCAMERA_MEMORY_OPT_ERROR;
     }
 
@@ -308,7 +312,7 @@ int32_t ScaleConvertProcess::CopyYUV420SrcData(const ImageUnitInfo& srcImgInfo)
         srcImgInfo.imgData->Data() + srcImgInfo.alignedWidth * srcImgInfo.alignedHeight,
         srcImgInfo.width * srcImgInfo.height / MEMORY_RATIO_YUV);
     if (ret != EOK) {
-        DHLOGE("ScaleConvertProcess::CopyYUV420SrcData memory copy failed, ret = %d", ret);
+        DHLOGE("ScaleConvertProcess::CopyYUV420SrcData memory copy failed, ret = %{public}d", ret);
         return DCAMERA_MEMORY_OPT_ERROR;
     }
 
@@ -317,7 +321,7 @@ int32_t ScaleConvertProcess::CopyYUV420SrcData(const ImageUnitInfo& srcImgInfo)
         srcImgInfo.alignedWidth * srcImgInfo.alignedHeight / MEMORY_RATIO_YUV,
         srcImgInfo.width * srcImgInfo.height / MEMORY_RATIO_YUV);
     if (ret != EOK) {
-        DHLOGE("ScaleConvertProcess::CopyYUV420SrcData memory copy failed, ret = %d", ret);
+        DHLOGE("ScaleConvertProcess::CopyYUV420SrcData memory copy failed, ret = %{public}d", ret);
         return DCAMERA_MEMORY_OPT_ERROR;
     }
     return DCAMERA_OK;
@@ -328,7 +332,7 @@ int32_t ScaleConvertProcess::CopyNV12SrcData(const ImageUnitInfo& srcImgInfo)
     int32_t ret = memcpy_s(srcData_[0], srcImgInfo.width * srcImgInfo.height,
         srcImgInfo.imgData->Data(), srcImgInfo.width * srcImgInfo.height);
     if (ret != EOK) {
-        DHLOGE("ScaleConvertProcess::CopyNV12SrcData memory copy failed, ret = %d", ret);
+        DHLOGE("ScaleConvertProcess::CopyNV12SrcData memory copy failed, ret = %{public}d", ret);
         return DCAMERA_MEMORY_OPT_ERROR;
     }
 
@@ -336,7 +340,7 @@ int32_t ScaleConvertProcess::CopyNV12SrcData(const ImageUnitInfo& srcImgInfo)
         srcImgInfo.imgData->Data() + srcImgInfo.alignedWidth * srcImgInfo.alignedHeight,
         srcImgInfo.width * srcImgInfo.height / MEMORY_RATIO_NV);
     if (ret != EOK) {
-        DHLOGE("ScaleConvertProcess::CopyNV12SrcData memory copy failed, ret = %d", ret);
+        DHLOGE("ScaleConvertProcess::CopyNV12SrcData memory copy failed, ret = %{public}d", ret);
         return DCAMERA_MEMORY_OPT_ERROR;
     }
     return DCAMERA_OK;
@@ -347,7 +351,7 @@ int32_t ScaleConvertProcess::CopyNV21SrcData(const ImageUnitInfo& srcImgInfo)
     int32_t ret = memcpy_s(srcData_[0], srcImgInfo.width * srcImgInfo.height,
         srcImgInfo.imgData->Data(), srcImgInfo.width * srcImgInfo.height);
     if (ret != EOK) {
-        DHLOGE("ScaleConvertProcess::CopyNV21SrcData memory copy failed, ret = %d", ret);
+        DHLOGE("ScaleConvertProcess::CopyNV21SrcData memory copy failed, ret = %{public}d", ret);
         return DCAMERA_MEMORY_OPT_ERROR;
     }
 
@@ -355,7 +359,7 @@ int32_t ScaleConvertProcess::CopyNV21SrcData(const ImageUnitInfo& srcImgInfo)
         srcImgInfo.imgData->Data() + srcImgInfo.alignedWidth * srcImgInfo.alignedHeight,
         srcImgInfo.width * srcImgInfo.height / MEMORY_RATIO_NV);
     if (ret != EOK) {
-        DHLOGE("ScaleConvertProcess::CopyNV21SrcData memory copy failed, ret = %d", ret);
+        DHLOGE("ScaleConvertProcess::CopyNV21SrcData memory copy failed, ret = %{public}d", ret);
         return DCAMERA_MEMORY_OPT_ERROR;
     }
     return DCAMERA_OK;

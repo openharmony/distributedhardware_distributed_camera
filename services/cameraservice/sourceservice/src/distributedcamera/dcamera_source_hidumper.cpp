@@ -62,10 +62,9 @@ void DcameraSourceHidumper::SetSourceDumpInfo(CameraDumpInfo& camDumpInfo_)
 
 bool DcameraSourceHidumper::Dump(const std::vector<std::string>& args, std::string& result)
 {
-    DHLOGI("DcameraSourceHidumper Dump args.size():%d.", args.size());
     result.clear();
     int32_t argsSize = static_cast<int32_t>(args.size());
-
+    DHLOGI("DcameraSourceHidumper Dump args.size():%{public}d.", argsSize);
     if (args.empty()) {
         ShowHelp(result);
         return true;
@@ -75,7 +74,7 @@ bool DcameraSourceHidumper::Dump(const std::vector<std::string>& args, std::stri
     }
 
     for (int32_t i = 0; i < argsSize; i++) {
-        DHLOGI("DcameraSourceHidumper Dump args[%d]: %s.", i, args.at(i).c_str());
+        DHLOGI("DcameraSourceHidumper Dump args[%{public}d]: %{public}s.", i, args.at(i).c_str());
     }
 
     if (ProcessDump(args[0], result) != DCAMERA_OK) {
@@ -150,7 +149,7 @@ int32_t DcameraSourceHidumper::GetCurrentStateInfo(std::string& result)
         int32_t camState = 0;
         deviceId = it->first;
         camState = it->second;
-        DHLOGI("GetCurrentStateInfo camState is %d.", camState);
+        DHLOGI("GetCurrentStateInfo camState is %{public}d.", camState);
         auto state = STATE_MAP.find(camState);
         std::string curState("");
         if (state != STATE_MAP.end()) {

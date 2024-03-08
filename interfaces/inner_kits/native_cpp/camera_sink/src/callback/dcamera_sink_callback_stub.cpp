@@ -34,7 +34,7 @@ DCameraSinkCallbackStub::~DCameraSinkCallbackStub()
 int32_t DCameraSinkCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
-    DHLOGI("DCameraSinkCallbackStub OnRemoteRequest code: %u", code);
+    DHLOGI("DCameraSinkCallbackStub OnRemoteRequest code: %{public}u", code);
     std::u16string desc = DCameraSinkCallbackStub::GetDescriptor();
     std::u16string remoteDesc = data.ReadInterfaceToken();
     if (desc != remoteDesc) {

@@ -32,12 +32,12 @@ void DCameraPreviewCallback::OnFrameStarted() const
 
 void DCameraPreviewCallback::OnFrameEnded(const int32_t frameCount) const
 {
-    DHLOGI("enter, frameCount: %d", frameCount);
+    DHLOGI("enter, frameCount: %{public}d", frameCount);
 }
 
 void DCameraPreviewCallback::OnError(const int32_t errorCode) const
 {
-    DHLOGE("enter, errorCode: %d", errorCode);
+    DHLOGE("enter, errorCode: %{public}d", errorCode);
     if (callback_ == nullptr) {
         DHLOGE("StateCallback is null");
         return;

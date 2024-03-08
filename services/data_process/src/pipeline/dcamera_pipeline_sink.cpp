@@ -99,7 +99,7 @@ int32_t DCameraPipelineSink::InitDCameraPipNodes(const VideoConfigParams& source
         VideoConfigParams curNodeProcessedCfg;
         int32_t err = pipNodeRanks_[i]->InitNode(curNodeSourceCfg, targetConfig, curNodeProcessedCfg);
         if (err != DCAMERA_OK) {
-            DHLOGE("Init sink DCamera pipeline Node [%d] failed.", i);
+            DHLOGE("Init sink DCamera pipeline Node [%{public}zu] failed.", i);
             return DCAMERA_INIT_ERR;
         }
         curNodeSourceCfg = curNodeProcessedCfg;
@@ -110,7 +110,7 @@ int32_t DCameraPipelineSink::InitDCameraPipNodes(const VideoConfigParams& source
 
         err = pipNodeRanks_[i - 1]->SetNextNode(pipNodeRanks_[i]);
         if (err != DCAMERA_OK) {
-            DHLOGE("Set the next node of Node [%d] failed in sink pipeline.", i - 1);
+            DHLOGE("Set the next node of Node [%{public}zu] failed in sink pipeline.", i - 1);
             return DCAMERA_INIT_ERR;
         }
     }

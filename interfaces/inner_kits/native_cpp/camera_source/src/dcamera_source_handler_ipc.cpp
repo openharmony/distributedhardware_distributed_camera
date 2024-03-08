@@ -92,7 +92,7 @@ sptr<IDistributedCameraSource> DCameraSourceHandlerIpc::GetSourceLocalCamSrv()
     int32_t ret = object->AddDeathRecipient(sourceLocalRecipient_);
     sptr<IDistributedCameraSource> localSource = iface_cast<IDistributedCameraSource>(object);
     if (localSource == nullptr) {
-        DHLOGI("GetSourceLocalCamSrv failed, localSource is null ret: %d", ret);
+        DHLOGI("GetSourceLocalCamSrv failed, localSource is null ret: %{public}d", ret);
         return nullptr;
     }
     {
@@ -102,7 +102,7 @@ sptr<IDistributedCameraSource> DCameraSourceHandlerIpc::GetSourceLocalCamSrv()
         }
         localSource_ = localSource;
     }
-    DHLOGI("success, AddDeathRecipient ret: %d", ret);
+    DHLOGI("success, AddDeathRecipient ret: %{public}d", ret);
     return localSource;
 }
 

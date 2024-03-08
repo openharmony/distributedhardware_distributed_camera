@@ -30,7 +30,7 @@ namespace DistributedHardware {
 DCameraSinkOutput::DCameraSinkOutput(const std::string& dhId, std::shared_ptr<ICameraOperator>& cameraOperator)
     : dhId_(dhId), operator_(cameraOperator)
 {
-    DHLOGI("DCameraSinkOutput Constructor dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("DCameraSinkOutput Constructor dhId: %{public}s", GetAnonyString(dhId_).c_str());
     isInit_ = false;
 }
 
@@ -43,7 +43,7 @@ DCameraSinkOutput::~DCameraSinkOutput()
 
 int32_t DCameraSinkOutput::Init()
 {
-    DHLOGI("Init dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("Init dhId: %{public}s", GetAnonyString(dhId_).c_str());
     auto output = std::shared_ptr<DCameraSinkOutput>(shared_from_this());
     std::shared_ptr<ResultCallback> resultCallback = std::make_shared<DCameraSinkOutputResultCallback>(output);
     operator_->SetResultCallback(resultCallback);
@@ -51,7 +51,7 @@ int32_t DCameraSinkOutput::Init()
     InitInner(CONTINUOUS_FRAME);
     InitInner(SNAPSHOT_FRAME);
     isInit_ = true;
-    DHLOGI("Init %s success", GetAnonyString(dhId_).c_str());
+    DHLOGI("Init %{public}s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
 }
 
@@ -67,18 +67,18 @@ void DCameraSinkOutput::InitInner(DCStreamType type)
 
 int32_t DCameraSinkOutput::UnInit()
 {
-    DHLOGI("UnInit dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("UnInit dhId: %{public}s", GetAnonyString(dhId_).c_str());
     channels_.clear();
     dataProcesses_.clear();
     sessionState_.clear();
     isInit_ = false;
-    DHLOGI("UnInit %s success", GetAnonyString(dhId_).c_str());
+    DHLOGI("UnInit %{public}s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
 }
 
 int32_t DCameraSinkOutput::OpenChannel(std::shared_ptr<DCameraChannelInfo>& info)
 {
-    DHLOGI("OpenChannel dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("OpenChannel dhId: %{public}s", GetAnonyString(dhId_).c_str());
     std::map<DCStreamType, DCameraSessionMode> modeMaps;
     modeMaps.emplace(CONTINUOUS_FRAME, DCAMERA_SESSION_MODE_VIDEO);
     modeMaps.emplace(SNAPSHOT_FRAME, DCAMERA_SESSION_MODE_JPEG);
@@ -86,7 +86,7 @@ int32_t DCameraSinkOutput::OpenChannel(std::shared_ptr<DCameraChannelInfo>& info
     indexs.push_back(DCameraIndex(info->sourceDevId_, dhId_));
     for (auto iter = info->detail_.begin(); iter != info->detail_.end(); iter++) {
         if (sessionState_[iter->streamType_] != DCAMERA_CHANNEL_STATE_DISCONNECTED) {
-            DHLOGE("wrong state, sessionState: %d", sessionState_[iter->streamType_]);
+            DHLOGE("wrong state, sessionState: %{public}d", sessionState_[iter->streamType_]);
             return DCAMERA_OK;
         }
         auto iterCh = channels_.find(iter->streamType_);
@@ -99,7 +99,7 @@ int32_t DCameraSinkOutput::OpenChannel(std::shared_ptr<DCameraChannelInfo>& info
         int32_t ret = iterCh->second->CreateSession(indexs, iter->dataSessionFlag_, modeMaps[iter->streamType_],
             channelListener);
         if (ret != DCAMERA_OK) {
-            DHLOGE("channel create session failed, dhId: %s, ret: %d",
+            DHLOGE("channel create session failed, dhId: %{public}s, ret: %{public}d",
                    GetAnonyString(dhId_).c_str(), ret);
             return ret;
         }
@@ -109,13 +109,13 @@ int32_t DCameraSinkOutput::OpenChannel(std::shared_ptr<DCameraChannelInfo>& info
 
 int32_t DCameraSinkOutput::CloseChannel()
 {
-    DHLOGI("CloseChannel dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("CloseChannel dhId: %{public}s", GetAnonyString(dhId_).c_str());
     auto iterCon = channels_.find(CONTINUOUS_FRAME);
     if (iterCon != channels_.end()) {
         int32_t ret = DCAMERA_OK;
         ret = iterCon->second->ReleaseSession();
         if (ret != DCAMERA_OK) {
-            DHLOGI("DCameraSinkOutput UnInit release continue session failed, dhId: %s, ret: %d",
+            DHLOGI("DCameraSinkOutput UnInit release continue session failed, dhId: %{public}s, ret: %{public}d",
                 GetAnonyString(dhId_).c_str(), ret);
         }
         sessionState_[CONTINUOUS_FRAME] = DCAMERA_CHANNEL_STATE_DISCONNECTED;
@@ -126,7 +126,7 @@ int32_t DCameraSinkOutput::CloseChannel()
         int32_t ret = DCAMERA_OK;
         ret = iterSnap->second->ReleaseSession();
         if (ret != DCAMERA_OK) {
-            DHLOGI("DCameraSinkOutput UnInit release snapshot session failed, dhId: %s, ret: %d",
+            DHLOGI("DCameraSinkOutput UnInit release snapshot session failed, dhId: %{public}s, ret: %{public}d",
                 GetAnonyString(dhId_).c_str(), ret);
         }
         sessionState_[SNAPSHOT_FRAME] = DCAMERA_CHANNEL_STATE_DISCONNECTED;
@@ -136,15 +136,15 @@ int32_t DCameraSinkOutput::CloseChannel()
 
 int32_t DCameraSinkOutput::StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos)
 {
-    DHLOGI("StartCapture dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("StartCapture dhId: %{public}s", GetAnonyString(dhId_).c_str());
     for (auto& info : captureInfos) {
         if (dataProcesses_.find(info->streamType_) == dataProcesses_.end()) {
-            DHLOGE("has no data process, streamType: %d", info->streamType_);
+            DHLOGE("has no data process, streamType: %{public}d", info->streamType_);
             break;
         }
         int32_t ret = dataProcesses_[info->streamType_]->StartCapture(info);
         if (ret != DCAMERA_OK) {
-            DHLOGE("StartCapture failed, dhId: %s, ret: %d", GetAnonyString(dhId_).c_str(), ret);
+            DHLOGE("StartCapture failed, dhId: %{public}s, ret: %{public}d", GetAnonyString(dhId_).c_str(), ret);
             return ret;
         }
     }
@@ -153,39 +153,39 @@ int32_t DCameraSinkOutput::StartCapture(std::vector<std::shared_ptr<DCameraCaptu
 
 int32_t DCameraSinkOutput::StopCapture()
 {
-    DHLOGI("StopCapture dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("StopCapture dhId: %{public}s", GetAnonyString(dhId_).c_str());
     auto iterCon = dataProcesses_.find(CONTINUOUS_FRAME);
     if (iterCon != dataProcesses_.end()) {
-        DHLOGI("StopCapture %s continuous frame stop capture", GetAnonyString(dhId_).c_str());
+        DHLOGI("StopCapture %{public}s continuous frame stop capture", GetAnonyString(dhId_).c_str());
         int32_t ret = iterCon->second->StopCapture();
         if (ret != DCAMERA_OK) {
-            DHLOGE("continuous data process stop capture failed, dhId: %s, ret: %d",
+            DHLOGE("continuous data process stop capture failed, dhId: %{public}s, ret: %{public}d",
                 GetAnonyString(dhId_).c_str(), ret);
         }
     }
 
     auto iterSnap = dataProcesses_.find(SNAPSHOT_FRAME);
     if (iterSnap != dataProcesses_.end()) {
-        DHLOGI("StopCapture %s snapshot frame stop capture", GetAnonyString(dhId_).c_str());
+        DHLOGI("StopCapture %{public}s snapshot frame stop capture", GetAnonyString(dhId_).c_str());
         int32_t ret = iterSnap->second->StopCapture();
         if (ret != DCAMERA_OK) {
-            DHLOGE("snapshot data process stop capture failed, dhId: %s, ret: %d",
+            DHLOGE("snapshot data process stop capture failed, dhId: %{public}s, ret: %{public}d",
                 GetAnonyString(dhId_).c_str(), ret);
         }
     }
-    DHLOGI("StopCapture %s success", GetAnonyString(dhId_).c_str());
+    DHLOGI("StopCapture %{public}s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
 }
 
 void DCameraSinkOutput::OnVideoResult(std::shared_ptr<DataBuffer>& buffer)
 {
     if (sessionState_[CONTINUOUS_FRAME] != DCAMERA_CHANNEL_STATE_CONNECTED) {
-        DHLOGE("OnVideoResult dhId: %s, channel state: %d",
+        DHLOGE("OnVideoResult dhId: %{public}s, channel state: %{public}d",
                GetAnonyString(dhId_).c_str(), sessionState_[CONTINUOUS_FRAME]);
         return;
     }
     if (dataProcesses_.find(CONTINUOUS_FRAME) == dataProcesses_.end()) {
-        DHLOGE("OnVideoResult %s has no continuous data process", GetAnonyString(dhId_).c_str());
+        DHLOGE("OnVideoResult %{public}s has no continuous data process", GetAnonyString(dhId_).c_str());
         return;
     }
     dataProcesses_[CONTINUOUS_FRAME]->FeedStream(buffer);
@@ -194,7 +194,7 @@ void DCameraSinkOutput::OnVideoResult(std::shared_ptr<DataBuffer>& buffer)
 void DCameraSinkOutput::OnPhotoResult(std::shared_ptr<DataBuffer>& buffer)
 {
     if (dataProcesses_.find(SNAPSHOT_FRAME) == dataProcesses_.end()) {
-        DHLOGE("OnPhotoResult %s has no snapshot data process", GetAnonyString(dhId_).c_str());
+        DHLOGE("OnPhotoResult %{public}s has no snapshot data process", GetAnonyString(dhId_).c_str());
         return;
     }
     dataProcesses_[SNAPSHOT_FRAME]->FeedStream(buffer);
@@ -202,27 +202,27 @@ void DCameraSinkOutput::OnPhotoResult(std::shared_ptr<DataBuffer>& buffer)
 
 void DCameraSinkOutput::OnSessionState(DCStreamType type, int32_t state)
 {
-    DHLOGI("OnSessionState dhId: %s, stream type: %d, state: %d",
+    DHLOGI("OnSessionState dhId: %{public}s, stream type: %{public}d, state: %{public}d",
            GetAnonyString(dhId_).c_str(), type, state);
     sessionState_[type] = state;
     switch (state) {
         case DCAMERA_CHANNEL_STATE_CONNECTING: {
-            DHLOGI("channel is connecting, dhId: %s, stream type: %d",
+            DHLOGI("channel is connecting, dhId: %{public}s, stream type: %{public}d",
                    GetAnonyString(dhId_).c_str(), type);
             break;
         }
         case DCAMERA_CHANNEL_STATE_CONNECTED: {
-            DHLOGI("channel is connected, dhId: %s, stream type: %d",
+            DHLOGI("channel is connected, dhId: %{public}s, stream type: %{public}d",
                    GetAnonyString(dhId_).c_str(), type);
             break;
         }
         case DCAMERA_CHANNEL_STATE_DISCONNECTED: {
-            DHLOGI("channel is disconnected, dhId: %s, stream type: %d",
+            DHLOGI("channel is disconnected, dhId: %{public}s, stream type: %{public}d",
                    GetAnonyString(dhId_).c_str(), type);
             break;
         }
         default: {
-            DHLOGE("OnSessionState %s unknown session state", GetAnonyString(dhId_).c_str());
+            DHLOGE("OnSessionState %{public}s unknown session state", GetAnonyString(dhId_).c_str());
             break;
         }
     }
@@ -230,8 +230,8 @@ void DCameraSinkOutput::OnSessionState(DCStreamType type, int32_t state)
 
 void DCameraSinkOutput::OnSessionError(DCStreamType type, int32_t eventType, int32_t eventReason, std::string detail)
 {
-    DHLOGI("OnSessionError dhId: %s, stream type: %d, eventType: %d, eventReason: %d, detail: %s",
-           GetAnonyString(dhId_).c_str(), type, eventType, eventReason, detail.c_str());
+    DHLOGI("OnSessionError dhId: %{public}s, stream type: %{public}d, eventType: %{public}d, eventReason: "
+        "%{public}d, detail: %{public}s", GetAnonyString(dhId_).c_str(), type, eventType, eventReason, detail.c_str());
 }
 
 void DCameraSinkOutput::OnDataReceived(DCStreamType type, std::vector<std::shared_ptr<DataBuffer>>& dataBuffers)

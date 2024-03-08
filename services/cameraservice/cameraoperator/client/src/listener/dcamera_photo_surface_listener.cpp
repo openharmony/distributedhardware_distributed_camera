@@ -57,14 +57,14 @@ void DCameraPhotoSurfaceListener::OnBufferAvailable()
             size = static_cast<int32_t>(buffer->GetSize());
         }
         if ((address == nullptr) || (size <= 0) || (size > SURFACE_BUFFER_MAX_SIZE)) {
-            DHLOGE("DCameraPhotoSurfaceListener invalid params, size: %d", size);
+            DHLOGE("DCameraPhotoSurfaceListener invalid params, size: %{public}d", size);
             break;
         }
-        DHLOGI("DCameraPhotoSurfaceListener size: %d", size);
+        DHLOGI("DCameraPhotoSurfaceListener size: %{public}d", size);
         std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(size);
         int32_t ret = memcpy_s(dataBuffer->Data(), dataBuffer->Capacity(), address, size);
         if (ret != EOK) {
-            DHLOGE("DCameraPhotoSurfaceListener Memory Copy failed, ret: %d", ret);
+            DHLOGE("DCameraPhotoSurfaceListener Memory Copy failed, ret: %{public}d", ret);
             break;
         }
 #ifdef DUMP_DCAMERA_FILE

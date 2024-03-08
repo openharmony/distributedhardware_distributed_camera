@@ -47,7 +47,7 @@ int32_t DecodeDataProcess::InitNode(const VideoConfigParams& sourceConfig, const
         return DCAMERA_BAD_VALUE;
     }
     if (!IsConvertible(sourceConfig, targetConfig)) {
-        DHLOGE("The DecodeNode can't convert %d to %d.", sourceConfig.GetVideoCodecType(),
+        DHLOGE("The DecodeNode can't convert %{public}d to %{public}d.", sourceConfig.GetVideoCodecType(),
             targetConfig_.GetVideoCodecType());
         return DCAMERA_BAD_TYPE;
     }
@@ -55,8 +55,8 @@ int32_t DecodeDataProcess::InitNode(const VideoConfigParams& sourceConfig, const
     sourceConfig_ = sourceConfig;
     targetConfig_ = targetConfig;
     if (sourceConfig_.GetVideoCodecType() == targetConfig_.GetVideoCodecType()) {
-        DHLOGD("Disable DecodeNode. The target video codec type %d is the same as the source video codec type %d.",
-            targetConfig_.GetVideoCodecType(), sourceConfig_.GetVideoCodecType());
+        DHLOGD("Disable DecodeNode. The target video codec type %{public}d is the same as the source video codec "
+            "type %{public}d.", targetConfig_.GetVideoCodecType(), sourceConfig_.GetVideoCodecType());
         processedConfig_ = sourceConfig;
         processedConfig = processedConfig_;
         isDecoderProcess_.store(true);
@@ -113,8 +113,8 @@ int32_t DecodeDataProcess::InitDecoder()
     if (ret != DCAMERA_OK) {
         DHLOGE("Start Video decoder failed.");
         ReportDcamerOptFail(DCAMERA_OPT_FAIL, DCAMERA_DECODE_ERROR,
-            CreateMsg("start video decoder failed, width: %d, height: %d, format: %s", sourceConfig_.GetWidth(),
-            sourceConfig_.GetHeight(),
+            CreateMsg("start video decoder failed, width: %d, height: %d, format: %s",
+            sourceConfig_.GetWidth(), sourceConfig_.GetHeight(),
             ENUM_VIDEOFORMAT_STRINGS[static_cast<int32_t>(sourceConfig_.GetVideoformat())].c_str()));
         return ret;
     }
@@ -125,7 +125,7 @@ int32_t DecodeDataProcess::ConfigureVideoDecoder()
 {
     int32_t ret = InitDecoderMetadataFormat();
     if (ret != DCAMERA_OK) {
-        DHLOGE("Init video decoder metadata format failed. ret %d.", ret);
+        DHLOGE("Init video decoder metadata format failed. ret %{public}d.", ret);
         return ret;
     }
 
@@ -137,19 +137,19 @@ int32_t DecodeDataProcess::ConfigureVideoDecoder()
     decodeVideoCallback_ = std::make_shared<DecodeVideoCallback>(shared_from_this());
     ret = videoDecoder_->SetCallback(decodeVideoCallback_);
     if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
-        DHLOGE("Set video decoder callback failed. ret %d.", ret);
+        DHLOGE("Set video decoder callback failed. ret %{public}d.", ret);
         return DCAMERA_INIT_ERR;
     }
 
     ret = videoDecoder_->Configure(metadataFormat_);
     if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
-        DHLOGE("Set video decoder metadata format failed. ret %d.", ret);
+        DHLOGE("Set video decoder metadata format failed. ret %{public}d.", ret);
         return DCAMERA_INIT_ERR;
     }
 
     ret = SetDecoderOutputSurface();
     if (ret != DCAMERA_OK) {
-        DHLOGE("Set decoder output surface failed. ret %d.", ret);
+        DHLOGE("Set decoder outputsurface failed. ret %{public}d.", ret);
         return ret;
     }
 
@@ -158,7 +158,7 @@ int32_t DecodeDataProcess::ConfigureVideoDecoder()
 
 int32_t DecodeDataProcess::InitDecoderMetadataFormat()
 {
-    DHLOGI("Init video decoder metadata format. codecType: %d", sourceConfig_.GetVideoCodecType());
+    DHLOGI("Init video decoder metadata format. codecType: %{public}d", sourceConfig_.GetVideoCodecType());
     processedConfig_ = sourceConfig_;
     processedConfig_.SetVideoCodecType(VideoCodecType::NO_CODEC);
     switch (sourceConfig_.GetVideoCodecType()) {
@@ -173,7 +173,7 @@ int32_t DecodeDataProcess::InitDecoderMetadataFormat()
             return DCAMERA_NOT_FOUND;
     }
 
-    DHLOGI("Init video decoder metadata format. videoformat: %d", processedConfig_.GetVideoformat());
+    DHLOGI("Init video decoder metadata format. videoformat: %{public}d", processedConfig_.GetVideoformat());
     switch (processedConfig_.GetVideoformat()) {
         case Videoformat::YUVI420:
             metadataFormat_.PutIntValue("pixel_format", static_cast<int32_t>(MediaAVCodec::VideoPixelFormat::YUVI420));
@@ -261,12 +261,12 @@ int32_t DecodeDataProcess::StartVideoDecoder()
 
     int32_t ret = videoDecoder_->Prepare();
     if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
-        DHLOGE("Video decoder prepare failed. ret %d.", ret);
+        DHLOGE("Video decoder prepare failed. ret %{public}d.", ret);
         return DCAMERA_INIT_ERR;
     }
     ret = videoDecoder_->Start();
     if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
-        DHLOGE("Video decoder start failed. ret %d.", ret);
+        DHLOGE("Video decoder start failed. ret %{public}d.", ret);
         return DCAMERA_INIT_ERR;
     }
     return DCAMERA_OK;
@@ -282,12 +282,12 @@ int32_t DecodeDataProcess::StopVideoDecoder()
     bool isSuccess = true;
     int32_t ret = videoDecoder_->Flush();
     if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
-        DHLOGE("VideoDecoder flush failed. ret %d.", ret);
+        DHLOGE("VideoDecoder flush failed. ret %{public}d.", ret);
         isSuccess = isSuccess && false;
     }
     ret = videoDecoder_->Stop();
     if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
-        DHLOGE("VideoDecoder stop failed. ret %d.", ret);
+        DHLOGE("VideoDecoder stop failed. ret %{public}d.", ret);
         isSuccess = isSuccess && false;
     }
     if (!isSuccess) {
@@ -312,7 +312,7 @@ void DecodeDataProcess::ReleaseVideoDecoder()
     }
     ret = videoDecoder_->Release();
     if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
-        DHLOGE("VideoDecoder release failed. ret %d.", ret);
+        DHLOGE("VideoDecoder release failed. ret %{public}d.", ret);
     }
     videoDecoder_ = nullptr;
     decodeVideoCallback_ = nullptr;
@@ -327,7 +327,7 @@ void DecodeDataProcess::ReleaseDecoderSurface()
     }
     int32_t ret = decodeConsumerSurface_->UnregisterConsumerListener();
     if (ret != SURFACE_ERROR_OK) {
-        DHLOGE("Unregister consumer listener failed. ret %d.", ret);
+        DHLOGE("Unregister consumer listener failed. ret %{public}d.", ret);
     }
     decodeConsumerSurface_ = nullptr;
     decodeProducerSurface_ = nullptr;
@@ -351,7 +351,7 @@ void DecodeDataProcess::ReleaseCodecEvent()
 
 void DecodeDataProcess::ReleaseProcessNode()
 {
-    DHLOGD("Start release [%zu] node : DecodeNode.", nodeRank_);
+    DHLOGD("Start release [%{public}zu] node : DecodeNode.", nodeRank_);
     isDecoderProcess_.store(false);
     ReleaseVideoDecoder();
     ReleaseDecoderSurface();
@@ -371,7 +371,7 @@ void DecodeDataProcess::ReleaseProcessNode()
         nextDataProcess_->ReleaseProcessNode();
         nextDataProcess_ = nullptr;
     }
-    DHLOGD("Release [%zu] node : DecodeNode end.", nodeRank_);
+    DHLOGD("Release [%{public}zu] node : DecodeNode end.", nodeRank_);
 }
 
 int32_t DecodeDataProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& inputBuffers)
@@ -382,7 +382,7 @@ int32_t DecodeDataProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>&
         return DCAMERA_BAD_VALUE;
     }
     if (sourceConfig_.GetVideoCodecType() == processedConfig_.GetVideoCodecType()) {
-        DHLOGD("The target VideoCodecType : %d is the same as the source VideoCodecType : %d.",
+        DHLOGD("The target VideoCodecType : %{public}d is the same as the source VideoCodecType : %{public}d.",
             sourceConfig_.GetVideoCodecType(), processedConfig_.GetVideoCodecType());
         return DecodeDone(inputBuffers);
     }
@@ -396,7 +396,7 @@ int32_t DecodeDataProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>&
         return DCAMERA_INDEX_OVERFLOW;
     }
     if (inputBuffers[0]->Size() > MAX_BUFFER_SIZE) {
-        DHLOGE("DecodeNode input buffer size %zu error.", inputBuffers[0]->Size());
+        DHLOGE("DecodeNode input buffer size %{public}zu error.", inputBuffers[0]->Size());
         return DCAMERA_MEMORY_OPT_ERROR;
     }
     if (!isDecoderProcess_.load()) {
@@ -404,7 +404,8 @@ int32_t DecodeDataProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>&
         return DCAMERA_DISABLE_PROCESS;
     }
     inputBuffersQueue_.push(inputBuffers[0]);
-    DHLOGD("Push inputBuf sucess. BufSize %zu, QueueSize %zu.", inputBuffers[0]->Size(), inputBuffersQueue_.size());
+    DHLOGD("Push inputBuf sucess. BufSize %{public}zu, QueueSize %{public}zu.", inputBuffers[0]->Size(),
+        inputBuffersQueue_.size());
     int32_t err = FeedDecoderInputBuffer();
     if (err != DCAMERA_OK) {
         int32_t sleepTimeUs = 5000;
@@ -442,7 +443,8 @@ int32_t DecodeDataProcess::FeedDecoderInputBuffer()
     while ((!inputBuffersQueue_.empty()) && (isDecoderProcess_.load())) {
         std::shared_ptr<DataBuffer> buffer = inputBuffersQueue_.front();
         if (buffer == nullptr || availableInputIndexsQueue_.empty() || availableInputBufferQueue_.empty()) {
-            DHLOGE("inputBuffersQueue size %zu, availableInputIndexsQueue size %zu, availableInputBufferQueue size %zu",
+            DHLOGE("inputBuffersQueue size %{public}zu, availableInputIndexsQueue size %{public}zu, "
+                "availableInputBufferQueue size %{public}zu",
                 inputBuffersQueue_.size(), availableInputIndexsQueue_.size(), availableInputBufferQueue_.size());
             return DCAMERA_BAD_VALUE;
         }
@@ -461,7 +463,7 @@ int32_t DecodeDataProcess::FeedDecoderInputBuffer()
             uint32_t index = availableInputIndexsQueue_.front();
             std::shared_ptr<Media::AVSharedMemory> sharedMemoryInput = availableInputBufferQueue_.front();
             if (sharedMemoryInput == nullptr) {
-                DHLOGE("Failed to obtain the input shared memory corresponding to the [%u] index.", index);
+                DHLOGE("Failed to obtain the input shared memory corresponding to the [%{public}u] index.", index);
                 return DCAMERA_BAD_VALUE;
             }
             BeforeDecodeDump(buffer->Data(), buffer->Size());
@@ -471,7 +473,7 @@ int32_t DecodeDataProcess::FeedDecoderInputBuffer()
                 DHLOGE("memcpy_s buffer failed.");
                 return DCAMERA_MEMORY_OPT_ERROR;
             }
-            DHLOGD("Decoder input buffer size %zu, timeStamp %ld us.", buffer->Size(), timeStamp);
+            DHLOGD("Decoder input buffer size %{public}zu, timeStamp %{public}" PRId64"us.", buffer->Size(), timeStamp);
             MediaAVCodec::AVCodecBufferInfo bufferInfo {timeStamp, static_cast<int32_t>(buffer->Size()), 0};
             int32_t ret = videoDecoder_->QueueInputBuffer(index, bufferInfo,
                 MediaAVCodec::AVCODEC_BUFFER_FLAG_NONE);
@@ -482,7 +484,7 @@ int32_t DecodeDataProcess::FeedDecoderInputBuffer()
         }
 
         inputBuffersQueue_.pop();
-        DHLOGD("Push inputBuffer sucess. inputBuffersQueue size is %d.", inputBuffersQueue_.size());
+        DHLOGD("Push inputBuffer sucess. inputBuffersQueue size is %{public}d.", inputBuffersQueue_.size());
 
         IncreaseWaitDecodeCnt();
     }
@@ -508,21 +510,21 @@ void DecodeDataProcess::IncreaseWaitDecodeCnt()
     availableInputIndexsQueue_.pop();
     availableInputBufferQueue_.pop();
     waitDecoderOutputCount_++;
-    DHLOGD("Wait decoder output frames number is %d.", waitDecoderOutputCount_);
+    DHLOGD("Wait decoder output frames number is %{public}d.", waitDecoderOutputCount_);
 }
 
 void DecodeDataProcess::ReduceWaitDecodeCnt()
 {
     std::lock_guard<std::mutex> lck(mtxHoldCount_);
     if (waitDecoderOutputCount_ <= 0) {
-        DHLOGE("The waitDecoderOutputCount_ = %d.", waitDecoderOutputCount_);
+        DHLOGE("The waitDecoderOutputCount_ = %{public}d.", waitDecoderOutputCount_);
     }
     if (outputTimeStampUs_ == 0) {
         waitDecoderOutputCount_ -= FIRST_FRAME_INPUT_NUM;
     } else {
         waitDecoderOutputCount_--;
     }
-    DHLOGD("Wait decoder output frames number is %d.", waitDecoderOutputCount_);
+    DHLOGD("Wait decoder output frames number is %{public}d.", waitDecoderOutputCount_);
 }
 
 void DecodeDataProcess::OnSurfaceOutputBufferAvailable(const sptr<IConsumerSurface>& surface)
@@ -554,7 +556,7 @@ void DecodeDataProcess::GetDecoderOutputBuffer(const sptr<IConsumerSurface>& sur
         return;
     }
     int32_t alignedHeight = alignedHeight_;
-    DHLOGD("OutputBuffer alignedWidth %d, alignedHeight %d, timeStamp %ld ns.",
+    DHLOGD("OutputBuffer alignedWidth %{public}d, alignedHeight %{public}d, timeStamp %{public}" PRId64" ns.",
         alignedWidth, alignedHeight, timeStamp);
     CopyDecodedImage(surfaceBuffer, alignedWidth, alignedHeight);
     surface->ReleaseBuffer(surfaceBuffer, -1);
@@ -618,7 +620,8 @@ bool DecodeDataProcess::IsCorrectSurfaceBuffer(const sptr<SurfaceBuffer>& surBuf
             RGB32_MEMORY_COEFFICIENT);
         size_t surfaceBufSize = static_cast<size_t>(surBuf->GetSize());
         if (rgbImageSize > surfaceBufSize) {
-            DHLOGE("Buffer size error, rgbImageSize %zu, surBufSize %zu.", rgbImageSize, surBuf->GetSize());
+            DHLOGE("Buffer size error, rgbImageSize %{public}zu, surBufSize %{public}zu.", rgbImageSize,
+                surBuf->GetSize());
             return false;
         }
     } else {
@@ -628,8 +631,8 @@ bool DecodeDataProcess::IsCorrectSurfaceBuffer(const sptr<SurfaceBuffer>& surBuf
         size_t yuvImageSize = static_cast<size_t>(
             sourceConfig_.GetWidth() * sourceConfig_.GetHeight() * YUV_BYTES_PER_PIXEL / Y2UV_RATIO);
         if (yuvImageAlignedSize > surfaceBufSize || yuvImageAlignedSize < yuvImageSize) {
-            DHLOGE("Buffer size error, yuvImageSize %zu, yuvImageAlignedSize %zu, surBufSize %zu.",
-                yuvImageSize, yuvImageAlignedSize, surBuf->GetSize());
+            DHLOGE("Buffer size error, yuvImageSize %{public}zu, yuvImageAlignedSize %{public}zu, surBufSize "
+                "%{public}zu.", yuvImageSize, yuvImageAlignedSize, surBuf->GetSize());
             return false;
         }
     }
@@ -685,7 +688,7 @@ void DecodeDataProcess::OnEvent(DCameraCodecEvent& ev)
     switch (action) {
         case VideoCodecAction::NO_ACTION: {
             if (receivedCodecPacket == nullptr) {
-                DHLOGE("the received codecPacket of action [%d] is null.", action);
+                DHLOGE("the received codecPacket of action [%{public}d] is null.", action);
                 OnError();
                 return;
             }
@@ -699,14 +702,14 @@ void DecodeDataProcess::OnEvent(DCameraCodecEvent& ev)
             return;
         case VideoCodecAction::ACTION_GET_DECODER_OUTPUT_BUFFER:
             if (receivedCodecPacket == nullptr) {
-                DHLOGE("the received codecPacket of action [%d] is null.", action);
+                DHLOGE("the received codecPacket of action [%{public}d] is null.", action);
                 OnError();
                 return;
             }
             GetDecoderOutputBuffer(receivedCodecPacket->GetSurface());
             break;
         default:
-            DHLOGD("The action : %d is not supported.", action);
+            DHLOGD("The action : %{public}d is not supported.", action);
             return;
     }
 }
@@ -734,7 +737,7 @@ void DecodeDataProcess::OnInputBufferAvailable(uint32_t index, std::shared_ptr<M
         DHLOGE("Video decoder available indexs queue overflow.");
         return;
     }
-    DHLOGD("Video decoder available indexs queue push index [%u].", index);
+    DHLOGD("Video decoder available indexs queue push index [%{public}u].", index);
     availableInputIndexsQueue_.push(index);
     availableInputBufferQueue_.push(buffer);
 }
@@ -756,8 +759,8 @@ void DecodeDataProcess::OnOutputBufferAvailable(uint32_t index, const MediaAVCod
         DHLOGE("Decoder node occurred error or start release.");
         return;
     }
-    DHLOGD("Video decode buffer info: presentation TimeUs %lld, size %d, offset %d, flag %d",
-        info.presentationTimeUs, info.size, info.offset, flag);
+    DHLOGD("Video decode buffer info: presentation TimeUs %{public}lld, size %{public}d, offset %{public}d, flag "
+        "%{public}d", info.presentationTimeUs, info.size, info.offset, flag);
     outputInfo_ = info;
     {
         std::lock_guard<std::mutex> lock(mtxDequeLock_);
@@ -780,7 +783,7 @@ void DecodeDataProcess::OnOutputBufferAvailable(uint32_t index, const MediaAVCod
         }
         int32_t errRelease = videoDecoder_->ReleaseOutputBuffer(index, true);
         if (errRelease != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
-            DHLOGE("The video decoder output decoded data to surface failed, index : [%u].", index);
+            DHLOGE("The video decoder output decoded data to surfacebuffer failed, index : [%{public}u].", index);
         }
     }
 }

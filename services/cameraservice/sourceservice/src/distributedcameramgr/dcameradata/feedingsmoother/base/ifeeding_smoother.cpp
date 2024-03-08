@@ -195,11 +195,11 @@ void IFeedingSmoother::AdjustSleepTime(const int64_t interval)
         int64_t sleep = sleep_ - adjustThre;
         delta_ -= (sleep < 0) ? sleep_ : adjustThre;
         sleep_ = sleep;
-        DHLOGD("Delta more than thre, adjust sleep to %ld us.", sleep_);
+        DHLOGD("Delta more than thre, adjust sleep to %{public}" PRId64" us.", sleep_);
     } else if (delta_ < -adjustThre) {
         sleep_ += delta_;
         delta_ = 0;
-        DHLOGD("Delta less than negative thre, adjust sleep to %ld us.", sleep_);
+        DHLOGD("Delta less than negative thre, adjust sleep to %{public}" PRId64" us.", sleep_);
     }
 }
 
@@ -210,13 +210,13 @@ void IFeedingSmoother::SyncClock(const int64_t timeStamp, const int64_t interval
     int64_t offset = timeStamp - sleep_ - clock;
     if (offset > waitThre || offset < -trackThre) {
         sleep_ += offset;
-        DHLOGD("Offset is not in the threshold range, adjust sleep to %ld us.", sleep_);
+        DHLOGD("Offset is not in the threshold range, adjust sleep to %{public}" PRId64" us.", sleep_);
     }
     if (sleep_ < 0) {
         sleep_ = 0;
         DHLOGD("Sleep less than zero, adjust sleep to zero.");
     }
-    DHLOGD("Offset is %ld us, sleep is %ld us after syncing clock.", offset, sleep_);
+    DHLOGD("Offset is %{public}" PRId64" us, sleep is %{public}" PRId64" us after syncing clock.", offset, sleep_);
 }
 
 void IFeedingSmoother::RecordTime(const int64_t enterTime, const int64_t timeStamp)

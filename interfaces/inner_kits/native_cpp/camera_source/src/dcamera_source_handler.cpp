@@ -59,7 +59,8 @@ int32_t DCameraSourceHandler::InitSource(const std::string& params)
     sptr<DCameraSourceLoadCallback> loadCallback(new DCameraSourceLoadCallback(params));
     int32_t ret = sm->LoadSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, loadCallback);
     if (ret != ERR_OK) {
-        DHLOGE("systemAbilityId: %d load failed, result code: %d.", DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, ret);
+        DHLOGE("systemAbilityId: %{public}d load failed, result code: %{public}d.",
+            DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, ret);
         return DCAMERA_INIT_ERR;
     }
     {
@@ -73,7 +74,7 @@ int32_t DCameraSourceHandler::InitSource(const std::string& params)
             return DCAMERA_INIT_ERR;
         }
     }
-    DHLOGI("end, result: %d", ret);
+    DHLOGI("end, result: %{public}d", ret);
     return DCAMERA_OK;
 }
 
@@ -94,7 +95,7 @@ void DCameraSourceHandler::FinishStartSA(const std::string &params)
 
 void DCameraSourceHandler::FinishStartSAFailed(const int32_t systemAbilityId)
 {
-    DHLOGE("SourceSA Start failed, systemAbilityId: %d.", systemAbilityId);
+    DHLOGE("SourceSA Start failed, systemAbilityId: %{public}d.", systemAbilityId);
     std::unique_lock<std::mutex> lock(producerMutex_);
     state_ = DCAMERA_SA_STATE_STOP;
     producerCon_.notify_one();
@@ -120,7 +121,7 @@ int32_t DCameraSourceHandler::ReleaseSource()
 int32_t DCameraSourceHandler::RegisterDistributedHardware(const std::string& devId, const std::string& dhId,
     const EnableParam& param, std::shared_ptr<RegisterCallback> callback)
 {
-    DHLOGI("devId: %s dhId: %s", GetAnonyString(devId).c_str(),
+    DHLOGI("devId: %{public}s dhId: %{public}s", GetAnonyString(devId).c_str(),
         GetAnonyString(dhId).c_str());
     if (callback == nullptr) {
         DHLOGI("RegisterCallback is null.");
@@ -140,7 +141,7 @@ int32_t DCameraSourceHandler::RegisterDistributedHardware(const std::string& dev
     if (ret != DCAMERA_OK) {
         callback_->PopRegCallback(reqId);
     }
-    DHLOGI("end, ret: %d devId: %s dhId: %s version: %s",
+    DHLOGI("end, ret: %{public}d devId: %{public}s dhId: %{public}s version: %{public}s",
         ret, GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), param.sinkVersion.c_str());
     return ret;
 }
@@ -148,7 +149,7 @@ int32_t DCameraSourceHandler::RegisterDistributedHardware(const std::string& dev
 int32_t DCameraSourceHandler::UnregisterDistributedHardware(const std::string& devId, const std::string& dhId,
     std::shared_ptr<UnregisterCallback> callback)
 {
-    DHLOGI("devId: %s dhId: %s", GetAnonyString(devId).c_str(),
+    DHLOGI("devId: %{public}s dhId: %{public}s", GetAnonyString(devId).c_str(),
         GetAnonyString(dhId).c_str());
     if (callback == nullptr) {
         DHLOGI("UnregisterCallback is null.");
@@ -168,7 +169,7 @@ int32_t DCameraSourceHandler::UnregisterDistributedHardware(const std::string& d
     if (ret != DCAMERA_OK) {
         callback_->PopUnregCallback(reqId);
     }
-    DHLOGI("end, ret: %d devId: %s dhId: %s", ret,
+    DHLOGI("end, ret: %{public}d devId: %{public}s dhId: %{public}s", ret,
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
     return ret;
 }

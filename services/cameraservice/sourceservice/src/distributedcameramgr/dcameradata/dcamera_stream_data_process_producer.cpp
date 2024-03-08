@@ -35,8 +35,8 @@ DCameraStreamDataProcessProducer::DCameraStreamDataProcessProducer(std::string d
     : devId_(devId), dhId_(dhId), streamId_(streamId), streamType_(streamType), eventHandler_(nullptr),
     camHdiProvider_(nullptr)
 {
-    DHLOGI("DCameraStreamDataProcessProducer Constructor devId %s dhId %s streamType: %d streamId: %d",
-        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_);
+    DHLOGI("DCameraStreamDataProcessProducer Constructor devId %{public}s dhId %{public}s streamType: %{public}d "
+        "streamId: %{public}d", GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_);
     state_ = DCAMERA_PRODUCER_STATE_STOP;
     interval_ = DCAMERA_PRODUCER_ONE_MINUTE_MS / DCAMERA_PRODUCER_FPS_DEFAULT;
     photoCount_ = COUNT_INIT_NUM;
@@ -44,8 +44,9 @@ DCameraStreamDataProcessProducer::DCameraStreamDataProcessProducer(std::string d
 
 DCameraStreamDataProcessProducer::~DCameraStreamDataProcessProducer()
 {
-    DHLOGI("DCameraStreamDataProcessProducer Destructor devId %s dhId %s state: %d streamType: %d streamId: %d",
-        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), state_, streamType_, streamId_);
+    DHLOGI("DCameraStreamDataProcessProducer Destructor devId %{public}s dhId %{public}s state: %{public}d streamType"
+        ": %{public}d streamId: %{public}d", GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), state_,
+        streamType_, streamId_);
     if (state_ == DCAMERA_PRODUCER_STATE_START) {
         Stop();
     }
@@ -53,8 +54,8 @@ DCameraStreamDataProcessProducer::~DCameraStreamDataProcessProducer()
 
 void DCameraStreamDataProcessProducer::Start()
 {
-    DHLOGI("DCameraStreamDataProcessProducer Start producer devId: %s dhId: %s streamType: %d streamId: %d",
-        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_);
+    DHLOGI("DCameraStreamDataProcessProducer Start producer devId: %{public}s dhId: %{public}s streamType: %{public}d "
+        "streamId: %{public}d", GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_);
     camHdiProvider_ = IDCameraProvider::Get(HDF_DCAMERA_EXT_SERVICE);
     if (camHdiProvider_ == nullptr) {
         DHLOGE("camHdiProvider_ is null.");
@@ -77,8 +78,9 @@ void DCameraStreamDataProcessProducer::Start()
 
 void DCameraStreamDataProcessProducer::Stop()
 {
-    DHLOGI("DCameraStreamDataProcessProducer Stop devId: %s dhId: %s streamType: %d streamId: %d state: %d",
-        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_, state_);
+    DHLOGI("DCameraStreamDataProcessProducer Stop devId: %{public}s dhId: %{public}s streamType: %{public}d "
+        "streamId: %{public}d state: %{public}d", GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(),
+        streamType_, streamId_, state_);
     {
         std::lock_guard<std::mutex> lock(bufferMutex_);
         state_ = DCAMERA_PRODUCER_STATE_STOP;
@@ -95,8 +97,9 @@ void DCameraStreamDataProcessProducer::Stop()
         producerThread_.join();
     }
     camHdiProvider_ = nullptr;
-    DHLOGI("DCameraStreamDataProcessProducer Stop end devId: %s dhId: %s streamType: %d streamId: %d state: %d",
-        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_, state_);
+    DHLOGI("DCameraStreamDataProcessProducer Stop end devId: %{public}s dhId: %{public}s streamType: %{public}d "
+        "streamId: %{public}d state: %{public}d", GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(),
+        streamType_, streamId_, state_);
 }
 
 void DCameraStreamDataProcessProducer::FeedStream(const std::shared_ptr<DataBuffer>& buffer)
@@ -104,13 +107,15 @@ void DCameraStreamDataProcessProducer::FeedStream(const std::shared_ptr<DataBuff
     buffer->frameInfo_.timePonit.startSmooth = GetNowTimeStampUs();
     {
         std::lock_guard<std::mutex> lock(bufferMutex_);
-        DHLOGD("DCameraStreamDataProcessProducer FeedStream devId %s dhId %s streamId: %d streamType: %d" +
-            " streamSize: %d", GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(),
-            streamId_, streamType_, buffer->Size());
+        uint64_t buffersSize = static_cast<uint64_t>(buffer->Size());
+        DHLOGD("DCameraStreamDataProcessProducer FeedStream devId %{public}s dhId %{public}s streamId: %{public}d "
+            "streamType: %{public}d streamSize: %{public}" PRIu64, GetAnonyString(devId_).c_str(),
+            GetAnonyString(dhId_).c_str(), streamId_, streamType_, buffersSize);
         if (buffers_.size() >= DCAMERA_PRODUCER_MAX_BUFFER_SIZE) {
-            DHLOGD("DCameraStreamDataProcessProducer FeedStream OverSize devId %s dhId %s streamType: %d" +
-                " streamSize: %d", GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(),
-                streamType_, buffer->Size());
+            buffersSize = static_cast<uint64_t>(buffer->Size());
+            DHLOGD("DCameraStreamDataProcessProducer FeedStream OverSize devId %{public}s dhId %{public}s streamType: "
+                "%{public}d streamSize: %{public}" PRIu64, GetAnonyString(devId_).c_str(),
+                GetAnonyString(dhId_).c_str(), streamType_, buffersSize);
             buffers_.pop_front();
         }
         if (streamType_ == SNAPSHOT_FRAME) {
@@ -137,14 +142,11 @@ void DCameraStreamDataProcessProducer::StartEvent()
 
 void DCameraStreamDataProcessProducer::LooperSnapShot()
 {
-    DHLOGI("LooperSnapShot producer devId: %s dhId: %s streamType: %d streamId: %d state: %d",
-        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_, state_);
     std::string name = PRODUCER + std::to_string(streamType_);
     prctl(PR_SET_NAME, name.c_str());
     DHBase dhBase;
     dhBase.deviceId_ = devId_;
     dhBase.dhId_ = dhId_;
-
     while (state_ == DCAMERA_PRODUCER_STATE_START) {
         std::shared_ptr<DataBuffer> buffer = nullptr;
         {
@@ -155,16 +157,16 @@ void DCameraStreamDataProcessProducer::LooperSnapShot()
             if (state_ == DCAMERA_PRODUCER_STATE_STOP) {
                 continue;
             }
-
             if (!buffers_.empty()) {
-                DHLOGI("LooperSnapShot producer get buffer devId: %s dhId: %s streamType: %d streamId: %d state: %d",
+                DHLOGI("LooperSnapShot producer get buffer devId: %{public}s dhId: %{public}s streamType: %{public}d "
+                    "streamId: %{public}d state: %{public}d",
                     GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_, state_);
                 buffer = buffers_.front();
             }
         }
-
         if (buffer == nullptr) {
-            DHLOGI("LooperSnapShot producer get buffer failed devId: %s dhId: %s streamType: %d streamId: %d state: %d",
+            DHLOGI("LooperSnapShot producer get buffer failed devId: %{public}s dhId: %{public}s streamType:"
+                " %{public}d streamId: %{public}d state: %{public}d",
                 GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_, state_);
             continue;
         }
@@ -185,15 +187,13 @@ void DCameraStreamDataProcessProducer::LooperSnapShot()
             buffers_.pop_front();
         }
     }
-    DHLOGI("LooperSnapShot producer end devId: %s dhId: %s streamType: %d streamId: %d state: %d",
-        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_, state_);
+    DHLOGI("LooperSnapShot producer end devId: %s dhId: %s streamType: %{public}d streamId: %{public}d state: "
+        "%{public}d", GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_, state_);
 }
 
 int32_t DCameraStreamDataProcessProducer::FeedStreamToDriver(const DHBase& dhBase,
     const std::shared_ptr<DataBuffer>& buffer)
 {
-    DHLOGD("LooperFeed devId %s dhId %s streamSize: %d streamType: %d, streamId: %d", GetAnonyString(devId_).c_str(),
-        GetAnonyString(dhId_).c_str(), buffer->Size(), streamType_, streamId_);
     if (camHdiProvider_ == nullptr) {
         DHLOGI("camHdiProvider is nullptr");
         return DCAMERA_BAD_VALUE;
@@ -201,46 +201,43 @@ int32_t DCameraStreamDataProcessProducer::FeedStreamToDriver(const DHBase& dhBas
     DCameraBuffer sharedMemory;
     int32_t ret = camHdiProvider_->AcquireBuffer(dhBase, streamId_, sharedMemory);
     if (ret != SUCCESS) {
-        DHLOGE("AcquireBuffer devId: %s dhId: %s streamId: %d ret: %d",
+        DHLOGE("AcquireBuffer devId: %{public}s dhId: %{public}s streamId: %{public}d ret: %{public}d",
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamId_, ret);
         return DCAMERA_BAD_OPERATE;
     }
-
     do {
         ret = CheckSharedMemory(sharedMemory, buffer);
         if (ret != DCAMERA_OK) {
-            DHLOGE("CheckSharedMemory failed devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
+            DHLOGE("CheckSharedMemory failed devId: %{public}s dhId: %{public}s", GetAnonyString(devId_).c_str(),
                 GetAnonyString(dhId_).c_str());
             break;
         }
         sharedMemory.bufferHandle_->GetBufferHandle()->virAddr =
             DCameraMemoryMap(sharedMemory.bufferHandle_->GetBufferHandle());
         if (sharedMemory.bufferHandle_->GetBufferHandle()->virAddr == nullptr) {
-            DHLOGE("mmap failed devId: %s dhId: %s", GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+            DHLOGE("mmap failed devId: %{public}s dhId: %{public}s", GetAnonyString(devId_).c_str(),
+                GetAnonyString(dhId_).c_str());
             break;
         }
         ret = memcpy_s(sharedMemory.bufferHandle_->GetBufferHandle()->virAddr, sharedMemory.size_, buffer->Data(),
             buffer->Size());
         if (ret != EOK) {
-            DHLOGE("memcpy_s devId: %s dhId: %s streamId: %d bufSize: %d, addressSize: %d",
-                GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamId_, buffer->Size(),
-                sharedMemory.size_);
+            DHLOGE("memcpy_s devId: %s dhId: %s streamId: %{public}d bufSize: %zu, addressSize: %{public}d",
+                GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamId_,
+                buffer->Size(), sharedMemory.size_);
             break;
         }
         sharedMemory.size_ = buffer->Size();
     } while (0);
-
     ret = camHdiProvider_->ShutterBuffer(dhBase, streamId_, sharedMemory);
     if (sharedMemory.bufferHandle_ != nullptr) {
         DCameraMemoryUnmap(sharedMemory.bufferHandle_->GetBufferHandle());
     }
     if (ret != SUCCESS) {
-        DHLOGE("ShutterBuffer devId: %s dhId: %s streamId: %d ret: %d",
+        DHLOGE("ShutterBuffer devId: %{public}s dhId: %{public}s streamId: %{public}d ret: %{public}d",
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamId_, ret);
         return DCAMERA_BAD_OPERATE;
     }
-    DHLOGD("LooperFeed end devId %s dhId %s streamSize: %d streamType: %d, streamId: %d",
-        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), buffer->Size(), streamType_, streamId_);
     return ret;
 }
 
@@ -248,15 +245,16 @@ int32_t DCameraStreamDataProcessProducer::CheckSharedMemory(const DCameraBuffer&
     const std::shared_ptr<DataBuffer>& buffer)
 {
     if (sharedMemory.bufferHandle_ == nullptr || sharedMemory.bufferHandle_->GetBufferHandle() == nullptr) {
-        DHLOGE("bufferHandle read failed devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
+        DHLOGE("bufferHandle read failed devId: %{public}s dhId: %{public}s", GetAnonyString(devId_).c_str(),
             GetAnonyString(dhId_).c_str());
         return DCAMERA_MEMORY_OPT_ERROR;
     }
 
     if (buffer->Size() > sharedMemory.size_) {
-        DHLOGE("sharedMemory devId: %s dhId: %s streamId: %d bufSize: %d, addressSize: %d",
-            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamId_, buffer->Size(),
-            sharedMemory.size_);
+        uint64_t buffersSize = static_cast<uint64_t>(buffer->Size());
+        DHLOGE("sharedMemory devId: %{public}s dhId: %{public}s streamId: %{public}d bufSize: %{public}" PRIu64
+            ", addressSize: %{public}d", GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamId_,
+            buffersSize, sharedMemory.size_);
         return DCAMERA_MEMORY_OPT_ERROR;
     }
 

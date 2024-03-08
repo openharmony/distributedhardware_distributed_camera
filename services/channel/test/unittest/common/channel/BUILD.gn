@@ -90,6 +90,7 @@ ohos_unittest("DCameraChannelTest") {
     "eventhandler:libeventhandler",
     "graphic_surface:surface",
     "hdf_core:libhdi",
+    "hilog:libhilog",
   ]
 
   defines = [

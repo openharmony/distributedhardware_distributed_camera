@@ -97,10 +97,10 @@ void DistributedCameraSourceService::OnStop()
 int32_t DistributedCameraSourceService::InitSource(const std::string& params,
     const sptr<IDCameraSourceCallback>& callback)
 {
-    DHLOGI("DistributedCameraSourceService InitSource param: %s", params.c_str());
+    DHLOGI("DistributedCameraSourceService InitSource param: %{public}s", params.c_str());
     int32_t ret = LoadDCameraHDF();
     if (ret != DCAMERA_OK) {
-        DHLOGE("DistributedCameraSourceService InitSource LoadHDF failed, ret: %d", ret);
+        DHLOGE("DistributedCameraSourceService InitSource LoadHDF failed, ret: %{public}d", ret);
         return ret;
     }
     sourceVer_ = params;
@@ -115,7 +115,7 @@ int32_t DistributedCameraSourceService::ReleaseSource()
     DHLOGI("enter");
     int32_t ret = UnLoadCameraHDF();
     if (ret != DCAMERA_OK) {
-        DHLOGE("DistributedCameraSourceService ReleaseSource UnLoadHDF failed, ret: %d", ret);
+        DHLOGE("DistributedCameraSourceService ReleaseSource UnLoadHDF failed, ret: %{public}d", ret);
         return ret;
     }
 
@@ -126,7 +126,7 @@ int32_t DistributedCameraSourceService::ReleaseSource()
     }
     ret = systemAbilityMgr->UnloadSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID);
     if (ret != DCAMERA_OK) {
-        DHLOGE("source systemAbilityMgr UnLoadSystemAbility failed, ret: %d", ret);
+        DHLOGE("source systemAbilityMgr UnLoadSystemAbility failed, ret: %{public}d", ret);
         return DCAMERA_BAD_VALUE;
     }
     DHLOGI("source systemAbilityMgr UnLoadSystemAbility success");
@@ -136,7 +136,7 @@ int32_t DistributedCameraSourceService::ReleaseSource()
 int32_t DistributedCameraSourceService::RegisterDistributedHardware(const std::string& devId, const std::string& dhId,
     const std::string& reqId, const EnableParam& param)
 {
-    DHLOGI("RegisterDistributedHardware devId: %s, dhId: %s, sinkVersion: %s",
+    DHLOGI("RegisterDistributedHardware devId: %{public}s, dhId: %{public}s, sinkVersion: %{public}s",
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), param.sinkVersion.c_str());
     if (GetCamDevNum() > MAX_CAMERAS_NUMBER) {
         DHLOGE("cameras exceed the upper limit");
@@ -146,30 +146,30 @@ int32_t DistributedCameraSourceService::RegisterDistributedHardware(const std::s
     int32_t ret = DCAMERA_OK;
     std::shared_ptr<DCameraSourceDev> camDev = GetCamDevByIndex(camIndex);
     if (camDev == nullptr) {
-        DHLOGI("new dev devId: %s, dhId: %s, sinkVersion: %s",
+        DHLOGI("new dev devId: %{public}s, dhId: %{public}s, sinkVersion: %{public}s",
             GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), param.sinkVersion.c_str());
         camDev = std::make_shared<DCameraSourceDev>(devId, dhId, listener_);
         ret = camDev->InitDCameraSourceDev();
         if (ret != DCAMERA_OK) {
-            DHLOGE("RegisterDistributedHardware failed %d InitDev devId: %s, dhId: %s",
+            DHLOGE("RegisterDistributedHardware failed %{public}d InitDev devId: %{public}s, dhId: %{public}s",
                 ret, GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
             return ret;
         }
         CamDevInsert(camIndex, camDev);
     } else {
-        DHLOGE("RegisterDistributedHardware exist devId: %s, dhId: %s, sinkVersion: %s",
+        DHLOGE("RegisterDistributedHardware exist devId: %{public}s, dhId: %{public}s, sinkVersion: %{public}s",
             GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), param.sinkVersion.c_str());
         return DCAMERA_ALREADY_EXISTS;
     }
 
     ret = camDev->RegisterDistributedHardware(devId, dhId, reqId, param);
     if (ret != DCAMERA_OK) {
-        DHLOGE("RegisterDistributedHardware failed, ret: %d", ret);
+        DHLOGE("RegisterDistributedHardware failed, ret: %{public}d", ret);
         ReportRegisterCameraFail(DCAMERA_REGISTER_FAIL, GetAnonyString(devId), dhId, param.sinkVersion,
             "dcamera source RegisterDistributedHardware fail.");
         CamDevErase(camIndex);
     }
-    DHLOGI("RegisterDistributedHardware end devId: %s, dhId: %s, sinkVersion: %s",
+    DHLOGI("RegisterDistributedHardware end devId: %{public}s, dhId: %{public}s, sinkVersion: %{public}s",
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), param.sinkVersion.c_str());
     return ret;
 }
@@ -177,7 +177,7 @@ int32_t DistributedCameraSourceService::RegisterDistributedHardware(const std::s
 int32_t DistributedCameraSourceService::UnregisterDistributedHardware(const std::string& devId, const std::string& dhId,
     const std::string& reqId)
 {
-    DHLOGI("UnregisterDistributedHardware devId: %s, dhId: %s",
+    DHLOGI("UnregisterDistributedHardware devId: %{public}s, dhId: %{public}s",
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
     DCameraIndex camIndex(devId, dhId);
     std::shared_ptr<DCameraSourceDev> camDev = GetCamDevByIndex(camIndex);
@@ -188,7 +188,7 @@ int32_t DistributedCameraSourceService::UnregisterDistributedHardware(const std:
 
     int32_t ret = camDev->UnRegisterDistributedHardware(devId, dhId, reqId);
     if (ret != DCAMERA_OK) {
-        DHLOGE("UnregisterDistributedHardware failed, ret: %d", ret);
+        DHLOGE("UnregisterDistributedHardware failed, ret: %{public}d", ret);
     }
     return ret;
 }
@@ -196,7 +196,7 @@ int32_t DistributedCameraSourceService::UnregisterDistributedHardware(const std:
 int32_t DistributedCameraSourceService::DCameraNotify(const std::string& devId, const std::string& dhId,
     std::string& events)
 {
-    DHLOGI("DCameraNotify devId: %s, dhId: %s", GetAnonyString(devId).c_str(),
+    DHLOGI("DCameraNotify devId: %{public}s, dhId: %{public}s", GetAnonyString(devId).c_str(),
         GetAnonyString(dhId).c_str());
     DCameraIndex camIndex(devId, dhId);
     std::shared_ptr<DCameraSourceDev> camDev = GetCamDevByIndex(camIndex);
@@ -207,7 +207,7 @@ int32_t DistributedCameraSourceService::DCameraNotify(const std::string& devId, 
 
     int32_t ret = camDev->DCameraNotify(events);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraNotify failed, ret: %d", ret);
+        DHLOGE("DCameraNotify failed, ret: %{public}d", ret);
     }
     return ret;
 }
@@ -218,7 +218,7 @@ int32_t DistributedCameraSourceService::LoadDCameraHDF()
     DHLOGI("load hdf driver start");
     int32_t ret = DCameraHdfOperate::GetInstance().LoadDcameraHDFImpl();
     if (ret != DCAMERA_OK) {
-        DHLOGE("load hdf driver failed, ret %d", ret);
+        DHLOGE("load hdf driver failed, ret %{public}d", ret);
         ReportDcamerInitFail(DCAMERA_INIT_FAIL, DCAMERA_HDF_ERROR, CreateMsg("dcamera load hdf driver fail."));
         return ret;
     }
@@ -231,7 +231,7 @@ int32_t DistributedCameraSourceService::UnLoadCameraHDF()
     DHLOGI("unload hdf driver start");
     int32_t ret = DCameraHdfOperate::GetInstance().UnLoadDcameraHDFImpl();
     if (ret != DCAMERA_OK) {
-        DHLOGE("unload hdf driver failed, ret %d", ret);
+        DHLOGE("unload hdf driver failed, ret %{public}d", ret);
         return ret;
     }
     DHLOGI("unload hdf driver end");

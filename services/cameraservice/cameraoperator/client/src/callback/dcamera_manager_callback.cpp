@@ -23,13 +23,13 @@ namespace OHOS {
 namespace DistributedHardware {
 void DCameraManagerCallback::OnCameraStatusChanged(const CameraStandard::CameraStatusInfo &cameraStatusInfo) const
 {
-    DHLOGI("enter, cameraStatus: %d", cameraStatusInfo.cameraStatus);
+    DHLOGI("enter, cameraStatus: %{public}d", cameraStatusInfo.cameraStatus);
 }
 
 void DCameraManagerCallback::OnFlashlightStatusChanged(const std::string &cameraID,
                                                        const CameraStandard::FlashStatus flashStatus) const
 {
-    DHLOGI("enter, cameraID: %s, flashStatus: %d", GetAnonyString(cameraID).c_str(), flashStatus);
+    DHLOGI("enter, cameraID: %{public}s, flashStatus: %{public}d", GetAnonyString(cameraID).c_str(), flashStatus);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

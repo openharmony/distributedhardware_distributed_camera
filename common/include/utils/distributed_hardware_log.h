@@ -16,32 +16,78 @@
 #ifndef OHOS_DCAMERA_SA_LOG_H
 #define OHOS_DCAMERA_SA_LOG_H
 
-#include <string>
-
-#include "dh_log.h"
+#include "hilog/log.h"
+#include <inttypes.h>
 
 namespace OHOS {
 namespace DistributedHardware {
+#undef LOG_TAG
+#define LOG_TAG "DCAMERA"
+
 #define DCAMERA_FILENAME (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
 #define _sl_(x) #x
 #define _strline_(x) _sl_(x)
 #define DCAMERA_STR_LINE _strline_(__LINE__)
 
-#define DHLOGD(fmt, ...) DHLog(DH_LOG_DEBUG, \
-    (std::string("[") + DH_LOG_TAG + "][" + __FUNCTION__ + "][" + DCAMERA_FILENAME + ":" + DCAMERA_STR_LINE + "]:" + \
-    fmt).c_str(), ##__VA_ARGS__)
+#define DHLOGD(fmt, ...) HILOG_DEBUG(LOG_CORE, "[%{public}s][%{public}s][%{public}s:%{public}s]:" fmt, \
+     DH_LOG_TAG, __FUNCTION__, DCAMERA_FILENAME, DCAMERA_STR_LINE, ##__VA_ARGS__)
 
-#define DHLOGI(fmt, ...) DHLog(DH_LOG_INFO, \
-    (std::string("[") + DH_LOG_TAG + "][" + __FUNCTION__ + "][" + DCAMERA_FILENAME + ":" + DCAMERA_STR_LINE + "]:" + \
-    fmt).c_str(), ##__VA_ARGS__)
+#define DHLOGI(fmt, ...) HILOG_INFO(LOG_CORE, "[%{public}s][%{public}s][%{public}s:%{public}s]:" fmt, \
+     DH_LOG_TAG, __FUNCTION__, DCAMERA_FILENAME, DCAMERA_STR_LINE, ##__VA_ARGS__)
 
-#define DHLOGW(fmt, ...) DHLog(DH_LOG_WARN, \
-    (std::string("[") + DH_LOG_TAG + "][" + __FUNCTION__ + "][" + DCAMERA_FILENAME + ":" + DCAMERA_STR_LINE + "]:" + \
-    fmt).c_str(), ##__VA_ARGS__)
+#define DHLOGW(fmt, ...) HILOG_WARN(LOG_CORE, "[%{public}s][%{public}s][%{public}s:%{public}s]:" fmt, \
+     DH_LOG_TAG, __FUNCTION__, DCAMERA_FILENAME, DCAMERA_STR_LINE, ##__VA_ARGS__)
 
-#define DHLOGE(fmt, ...) DHLog(DH_LOG_ERROR, \
-    (std::string("[") + DH_LOG_TAG + "][" + __FUNCTION__ + "][" + DCAMERA_FILENAME + ":" + DCAMERA_STR_LINE + "]:" + \
-    fmt).c_str(), ##__VA_ARGS__)
+#define DHLOGE(fmt, ...) HILOG_ERROR(LOG_CORE, "[%{public}s][%{public}s][%{public}s:%{public}s]:" fmt, \
+     DH_LOG_TAG, __FUNCTION__, DCAMERA_FILENAME, DCAMERA_STR_LINE, ##__VA_ARGS__)
+
+#define CHECK_AND_RETURN_RET_LOG(cond, ret, fmt, ...)   \
+    do {                                                \
+        if ((cond)) {                                   \
+            DHLOGE(fmt, ##__VA_ARGS__);                 \
+            return (ret);                               \
+        }                                               \
+    } while (0)
+
+#define CHECK_AND_RETURN_LOG(cond, fmt, ...)   \
+    do {                                       \
+        if ((cond)) {                          \
+            DHLOGE(fmt, ##__VA_ARGS__);        \
+            return;                            \
+        }                                      \
+    } while (0)
+
+#define CHECK_AND_LOG(cond, fmt, ...)          \
+    do {                                       \
+        if ((cond)) {                          \
+            DHLOGE(fmt, ##__VA_ARGS__);        \
+        }                                      \
+    } while (0)
+
+#define CHECK_NULL_RETURN(cond, ret, ...)       \
+    do {                                        \
+        if ((cond)) {                           \
+            return (ret);                       \
+        }                                       \
+    } while (0)
+
+#define CHECK_NULL_FREE_RETURN(ptr, ret, root, ...)    \
+    do {                                               \
+        if ((ptr) == nullptr) {                        \
+            DHLOGE("Address pointer is null");         \
+            cJSON_Delete((root));                      \
+            return (ret);                              \
+        }                                              \
+    } while (0)
+
+#define CHECK_AND_FREE_RETURN_RET_LOG(cond, ret, root, fmt, ...)    \
+    do {                                                            \
+        if ((cond)) {                                               \
+            DHLOGE(fmt, ##__VA_ARGS__);                             \
+            cJSON_Delete((root));                                   \
+            return (ret);                                           \
+        }                                                           \
+    } while (0)
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DCAMERA_SA_LOG_H

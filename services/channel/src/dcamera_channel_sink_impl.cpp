@@ -35,14 +35,15 @@ DCameraChannelSinkImpl::~DCameraChannelSinkImpl()
 
 int32_t DCameraChannelSinkImpl::CloseSession()
 {
-    DHLOGI("DCameraChannelSinkImpl CloseSession name: %s", GetAnonyString(mySessionName_).c_str());
+    DHLOGI("DCameraChannelSinkImpl CloseSession name: %{public}s", GetAnonyString(mySessionName_).c_str());
     if (softbusSession_ == nullptr) {
-        DHLOGE("DCameraChannelSinkImpl CloseSession %s failed", GetAnonyString(mySessionName_).c_str());
+        DHLOGE("DCameraChannelSinkImpl CloseSession %{public}s failed", GetAnonyString(mySessionName_).c_str());
         return DCAMERA_BAD_OPERATE;
     }
     int32_t ret = softbusSession_->CloseSession();
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraChannelSinkImpl CloseSession %s ret: %d", GetAnonyString(mySessionName_).c_str(), ret);
+        DHLOGE("DCameraChannelSinkImpl CloseSession %{public}s ret: %{public}d",
+            GetAnonyString(mySessionName_).c_str(), ret);
     }
 
     return ret;
@@ -55,7 +56,7 @@ int32_t DCameraChannelSinkImpl::CreateSession(std::vector<DCameraIndex>& camInde
         return DCAMERA_BAD_VALUE;
     }
     if (softbusSession_ != nullptr) {
-        DHLOGI("DCameraChannelSinkImpl session has already create %s", sessionFlag.c_str());
+        DHLOGI("DCameraChannelSinkImpl session has already create %{public}s", sessionFlag.c_str());
         return DCAMERA_OK;
     }
     camIndexs_.assign(camIndexs.begin(), camIndexs.end());
@@ -66,31 +67,32 @@ int32_t DCameraChannelSinkImpl::CreateSession(std::vector<DCameraIndex>& camInde
     DCameraSoftbusAdapter::GetInstance().GetLocalNetworkId(myDevId);
     std::string peerDevId = camIndexs[0].devId_;
     std::string peerSessionName = SESSION_HEAD + sessionFlag;
-    DHLOGI("DCameraChannelSinkImpl CreateSession Listen Start, devId: %s", GetAnonyString(myDevId).c_str());
+    DHLOGI("DCameraChannelSinkImpl CreateSession Listen Start, devId: %{public}s", GetAnonyString(myDevId).c_str());
     // sink_server_listen
     int32_t ret = DCameraSoftbusAdapter::GetInstance().CreatSoftBusSinkSocketServer(mySessionName_,
         DCAMERA_CHANNLE_ROLE_SINK, sessionMode, peerDevId, peerSessionName);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraChannelSinkImpl CreateSession Error, ret %d", ret);
+        DHLOGE("DCameraChannelSinkImpl CreateSession Error, ret %{public}d", ret);
         return ret;
     }
     softbusSession_ = std::make_shared<DCameraSoftbusSession>(myDevId, mySessionName_, peerDevId, peerSessionName,
         listener, sessionMode);
     DCameraSoftbusAdapter::GetInstance().sinkSessions_[mySessionName_] = softbusSession_;
-    DHLOGI("DCameraChannelSinkImpl CreateSession Listen End, devId: %s", GetAnonyString(myDevId).c_str());
+    DHLOGI("DCameraChannelSinkImpl CreateSession Listen End, devId: %{public}s", GetAnonyString(myDevId).c_str());
     return DCAMERA_OK;
 }
 
 int32_t DCameraChannelSinkImpl::ReleaseSession()
 {
-    DHLOGI("DCameraChannelSinkImpl ReleaseSession name: %s", GetAnonyString(mySessionName_).c_str());
+    DHLOGI("DCameraChannelSinkImpl ReleaseSession name: %{public}s", GetAnonyString(mySessionName_).c_str());
     if (softbusSession_ == nullptr) {
         return DCAMERA_OK;
     }
     DCameraSoftbusAdapter::GetInstance().sinkSessions_.erase(softbusSession_->GetMySessionName());
     int32_t ret = DCameraSoftbusAdapter::GetInstance().DestroySoftbusSessionServer(softbusSession_->GetMySessionName());
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraChannelSinkImpl ReleaseSession %s failed, ret: %d", GetAnonyString(mySessionName_).c_str(), ret);
+        DHLOGE("DCameraChannelSinkImpl ReleaseSession %{public}s failed, ret: %{public}d",
+            GetAnonyString(mySessionName_).c_str(), ret);
     }
     softbusSession_ = nullptr;
     return ret;
@@ -99,12 +101,13 @@ int32_t DCameraChannelSinkImpl::ReleaseSession()
 int32_t DCameraChannelSinkImpl::SendData(std::shared_ptr<DataBuffer>& buffer)
 {
     if (softbusSession_ == nullptr) {
-        DHLOGE("DCameraChannelSinkImpl SendData %s failed", GetAnonyString(mySessionName_).c_str());
+        DHLOGE("DCameraChannelSinkImpl SendData %{public}s failed", GetAnonyString(mySessionName_).c_str());
         return DCAMERA_BAD_OPERATE;
     }
     int32_t ret = softbusSession_->SendData(mode_, buffer);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraChannelSinkImpl SendData %s failed, ret: %d", GetAnonyString(mySessionName_).c_str(), ret);
+        DHLOGE("DCameraChannelSinkImpl SendData %{public}s failed, ret: %{public}d",
+            GetAnonyString(mySessionName_).c_str(), ret);
     }
     return ret;
 }

@@ -42,7 +42,7 @@ void ReportDcamerInitFail(const std::string& eventName, int32_t errCode, const s
         "ERRCODE", errCode,
         "MSG", errMsg);
     if (ret != DCAMERA_OK) {
-        DHLOGE("Write HiSysEvent error ret %d, errMsg %s.", ret, errMsg.c_str());
+        DHLOGE("Write HiSysEvent error ret %{public}d, errMsg %{public}s.", ret, errMsg.c_str());
     }
 }
 
@@ -57,7 +57,7 @@ void ReportRegisterCameraFail(const std::string& eventName, const std::string& d
         "VERSION", version,
         "MSG", errMsg);
     if (ret != DCAMERA_OK) {
-        DHLOGE("Write HiSysEvent error ret %d, devId %s, dhId %s, errMsg %s.", ret, devId.c_str(),
+        DHLOGE("Write HiSysEvent error ret %d, devId %s, dhId %s, errMsg %s.", ret, GetAnonyString(devId).c_str(),
             dhId.c_str(), errMsg.c_str());
     }
 }
@@ -70,7 +70,7 @@ void ReportDcamerOptFail(const std::string& eventName, int32_t errCode, const st
         "ERRCODE", errCode,
         "MSG", errMsg);
     if (ret != DCAMERA_OK) {
-        DHLOGE("Write HiSysEvent error ret %d, errMsg %s.", ret, errMsg.c_str());
+        DHLOGE("Write HiSysEvent error ret %{public}d, errMsg %{public}s.", ret, errMsg.c_str());
     }
 }
 
@@ -82,7 +82,7 @@ void ReportSaEvent(const std::string& eventName, int32_t saId, const std::string
         "SAID", saId,
         "MSG", errMsg);
     if (ret != DCAMERA_OK) {
-        DHLOGE("Write HiSysEvent error, ret:%d, errMsg %s.", ret, errMsg.c_str());
+        DHLOGE("Write HiSysEvent error, ret:%{public}d, errMsg %{public}s.", ret, errMsg.c_str());
     }
 }
 
@@ -97,7 +97,7 @@ void ReportRegisterCameraEvent(const std::string& eventName, const std::string& 
         "VERSION", version,
         "MSG", errMsg);
     if (ret != DCAMERA_OK) {
-        DHLOGE("Write HiSysEvent error, ret:%d, errMsg %s.", ret, errMsg.c_str());
+        DHLOGE("Write HiSysEvent error, ret:%{public}d, errMsg %{public}s.", ret, errMsg.c_str());
     }
 }
 
@@ -111,7 +111,7 @@ void ReportCameraOperaterEvent(const std::string& eventName, const std::string& 
         "DHID", dhId,
         "MSG", errMsg);
     if (ret != DCAMERA_OK) {
-        DHLOGE("Write HiSysEvent error, ret:%d, errMsg %s.", ret, errMsg.c_str());
+        DHLOGE("Write HiSysEvent error, ret:%{public}d, errMsg %{public}s.", ret, errMsg.c_str());
     }
 }
 
@@ -128,7 +128,7 @@ void ReportStartCaptureEvent(const std::string& eventName, EventCaptureInfo& cap
         "STREAMTYPE", ENUM_STREAMTYPE_STRINGS[capture.type_],
         "MSG", errMsg);
     if (ret != DCAMERA_OK) {
-        DHLOGE("Write HiSysEvent error, ret:%d, errMsg %s.", ret, errMsg.c_str());
+        DHLOGE("Write HiSysEvent error, ret:%{public}d, errMsg %{public}s.", ret, errMsg.c_str());
     }
 }
 

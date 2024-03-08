@@ -84,7 +84,7 @@ int32_t DistributedCameraSourceProxy::ReleaseSource()
 int32_t DistributedCameraSourceProxy::RegisterDistributedHardware(const std::string& devId, const std::string& dhId,
     const std::string& reqId, const EnableParam& param)
 {
-    DHLOGI("devId: %s dhId: %s", GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
+    DHLOGI("devId: %{public}s dhId: %{public}s", GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
     if (!CheckRegParams(devId, dhId, reqId, param)) {
         DHLOGE("input is invalid");
         return DCAMERA_BAD_VALUE;
@@ -140,7 +140,7 @@ bool DistributedCameraSourceProxy::CheckRegParams(const std::string& devId, cons
 int32_t DistributedCameraSourceProxy::UnregisterDistributedHardware(const std::string& devId, const std::string& dhId,
     const std::string& reqId)
 {
-    DHLOGI("devId: %s dhId: %s", GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
+    DHLOGI("devId: %{public}s dhId: %{public}s", GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
     if (!CheckUnregParams(devId, dhId, reqId)) {
         DHLOGE("input is invalid");
         return DCAMERA_BAD_VALUE;
@@ -186,7 +186,7 @@ bool DistributedCameraSourceProxy::CheckUnregParams(const std::string& devId, co
 int32_t DistributedCameraSourceProxy::DCameraNotify(const std::string& devId, const std::string& dhId,
     std::string& events)
 {
-    DHLOGI("DCameraNotify devId: %s dhId: %s events: %s",
+    DHLOGI("DCameraNotify devId: %{public}s dhId: %{public}s events: %{public}s",
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), events.c_str());
     if (!CheckNotifyParams(devId, dhId, events)) {
         DHLOGE("input is invalid");
