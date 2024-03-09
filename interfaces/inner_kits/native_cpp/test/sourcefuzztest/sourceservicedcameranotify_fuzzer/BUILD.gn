@@ -47,7 +47,6 @@ ohos_fuzztest("SourceServiceDCameraNotifyFuzzTest") {
     "${fwk_utils_path}/include/eventbus",
     "${fwk_common_path}/utils/include",
     "//third_party/cJSON",
-    "//third_party/jsoncpp/include",
   ]
 
   cflags = [
@@ -62,7 +61,6 @@ ohos_fuzztest("SourceServiceDCameraNotifyFuzzTest") {
   deps = [
     "${common_path}:distributed_camera_utils",
     "${services_path}/cameraservice/sourceservice:distributed_camera_source",
-    "//third_party/jsoncpp:jsoncpp",
   ]
 
   defines = [

@@ -25,7 +25,6 @@ config("module_private_config") {
     "${services_path}/cameraservice/cameraoperator/client/include/callback",
     "${services_path}/cameraservice/cameraoperator/client/include/listener",
     "//third_party/cJSON",
-    "//third_party/jsoncpp/include",
   ]
 }
 
@@ -57,7 +56,6 @@ ohos_executable("dcamera_client_demo") {
     "${services_path}/cameraservice/cameraoperator/client:distributed_camera_client",
     "${services_path}/cameraservice/sinkservice:distributed_camera_sink",
     "//third_party/cJSON:cjson",
-    "//third_party/jsoncpp:jsoncpp",
   ]
 
   external_deps = [

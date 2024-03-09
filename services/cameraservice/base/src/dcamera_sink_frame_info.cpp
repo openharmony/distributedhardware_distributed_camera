@@ -14,68 +14,91 @@
  */
 
 #include "dcamera_sink_frame_info.h"
-#include "nlohmann/json.hpp"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
-using json = nlohmann::json;
+#include "cJSON.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 void DCameraSinkFrameInfo::Marshal(std::string& jsonStr)
 {
-    json frameInfo;
-    frameInfo[FRAME_INFO_TYPE] = type_;
-    frameInfo[FRAME_INFO_INDEX] = index_;
-    frameInfo[FRAME_INFO_PTS] = pts_;
-    frameInfo[FRAME_INFO_START_ENCODE] = startEncodeT_;
-    frameInfo[FRAME_INFO_FINISH_ENCODE] = finishEncodeT_;
-    frameInfo[FRAME_INFO_SENDT] = sendT_;
-    frameInfo[FRAME_INFO_VERSION] = ver_;
-    jsonStr = frameInfo.dump();
+    cJSON *frameInfo = cJSON_CreateObject();
+    if (frameInfo == nullptr) {
+        return;
+    }
+    cJSON_AddNumberToObject(frameInfo, FRAME_INFO_TYPE.c_str(), type_);
+    cJSON_AddNumberToObject(frameInfo, FRAME_INFO_INDEX.c_str(), index_);
+    cJSON_AddNumberToObject(frameInfo, FRAME_INFO_PTS.c_str(), pts_);
+    cJSON_AddNumberToObject(frameInfo, FRAME_INFO_START_ENCODE.c_str(), startEncodeT_);
+    cJSON_AddNumberToObject(frameInfo, FRAME_INFO_FINISH_ENCODE.c_str(), finishEncodeT_);
+    cJSON_AddNumberToObject(frameInfo, FRAME_INFO_SENDT.c_str(), sendT_);
+    cJSON_AddStringToObject(frameInfo, FRAME_INFO_VERSION.c_str(), ver_.c_str());
+
+    char *data = cJSON_Print(frameInfo);
+    if (data == nullptr) {
+        cJSON_Delete(frameInfo);
+        return;
+    }
+    jsonStr = std::string(data);
+    cJSON_Delete(frameInfo);
+    cJSON_free(data);
 }
 
 int32_t DCameraSinkFrameInfo::Unmarshal(const std::string& jsonStr)
 {
-    json frameInfo = json::parse(jsonStr, nullptr, false);
-    if (frameInfo.is_discarded()) {
-        DHLOGE("FrameInfo json::parse error.");
+    cJSON *rootValue = cJSON_Parse(jsonStr.c_str());
+    if (rootValue == nullptr) {
+        DHLOGE("FrameInfo parse error.");
         return DCAMERA_BAD_VALUE;
     }
+    cJSON *type = cJSON_GetObjectItemCaseSensitive(rootValue, FRAME_INFO_TYPE.c_str());
+    if (type == nullptr || !cJSON_IsNumber(type)) {
+        cJSON_Delete(rootValue);
+        return DCAMERA_BAD_VALUE;
+    }
+    type_ = static_cast<int8_t>(type->valueint);
 
-    if (!frameInfo.contains(FRAME_INFO_TYPE) || !frameInfo[FRAME_INFO_TYPE].is_number_integer()) {
+    cJSON *index = cJSON_GetObjectItemCaseSensitive(rootValue, FRAME_INFO_INDEX.c_str());
+    if (index == nullptr || !cJSON_IsNumber(index)) {
+        cJSON_Delete(rootValue);
         return DCAMERA_BAD_VALUE;
     }
-    type_ = frameInfo[FRAME_INFO_TYPE].get<std::int8_t>();
+    index_ = static_cast<int32_t>(index->valueint);
 
-    if (!frameInfo.contains(FRAME_INFO_INDEX) || !frameInfo[FRAME_INFO_INDEX].is_number_integer()) {
+    cJSON *pts = cJSON_GetObjectItemCaseSensitive(rootValue, FRAME_INFO_PTS.c_str());
+    if (pts == nullptr || !cJSON_IsNumber(pts)) {
+        cJSON_Delete(rootValue);
         return DCAMERA_BAD_VALUE;
     }
-    index_ = frameInfo[FRAME_INFO_INDEX].get<std::int32_t>();
+    pts_ = static_cast<int64_t>(pts->valueint);
 
-    if (!frameInfo.contains(FRAME_INFO_PTS) || !frameInfo[FRAME_INFO_PTS].is_number_integer()) {
+    cJSON *startEncode = cJSON_GetObjectItemCaseSensitive(rootValue, FRAME_INFO_START_ENCODE.c_str());
+    if (startEncode == nullptr || !cJSON_IsNumber(startEncode)) {
+        cJSON_Delete(rootValue);
         return DCAMERA_BAD_VALUE;
     }
-    pts_ = frameInfo[FRAME_INFO_PTS].get<std::int64_t>();
+    startEncodeT_ = static_cast<int64_t>(startEncode->valueint);
 
-    if (!frameInfo.contains(FRAME_INFO_START_ENCODE) || !frameInfo[FRAME_INFO_START_ENCODE].is_number_integer()) {
+    cJSON *finishEncode = cJSON_GetObjectItemCaseSensitive(rootValue, FRAME_INFO_FINISH_ENCODE.c_str());
+    if (finishEncode == nullptr || !cJSON_IsNumber(finishEncode)) {
+        cJSON_Delete(rootValue);
         return DCAMERA_BAD_VALUE;
     }
-    startEncodeT_ = frameInfo[FRAME_INFO_START_ENCODE].get<std::int64_t>();
+    finishEncodeT_ = static_cast<int64_t>(finishEncode->valueint);
 
-    if (!frameInfo.contains(FRAME_INFO_FINISH_ENCODE) || !frameInfo[FRAME_INFO_FINISH_ENCODE].is_number_integer()) {
+    cJSON *sendT = cJSON_GetObjectItemCaseSensitive(rootValue, FRAME_INFO_SENDT.c_str());
+    if (sendT == nullptr || !cJSON_IsNumber(sendT)) {
+        cJSON_Delete(rootValue);
         return DCAMERA_BAD_VALUE;
     }
-    finishEncodeT_ = frameInfo[FRAME_INFO_FINISH_ENCODE].get<std::int64_t>();
+    sendT_ = static_cast<int64_t>(sendT->valueint);
 
-    if (!frameInfo.contains(FRAME_INFO_SENDT) || !frameInfo[FRAME_INFO_SENDT].is_number_integer()) {
+    cJSON *ver = cJSON_GetObjectItemCaseSensitive(rootValue, FRAME_INFO_VERSION.c_str());
+    if (ver == nullptr || !cJSON_IsString(ver)) {
+        cJSON_Delete(rootValue);
         return DCAMERA_BAD_VALUE;
     }
-    sendT_ = frameInfo[FRAME_INFO_SENDT].get<std::int64_t>();
-
-    if (!frameInfo.contains(FRAME_INFO_VERSION) || !frameInfo[FRAME_INFO_VERSION].is_string()) {
-        return DCAMERA_BAD_VALUE;
-    }
-    ver_ = frameInfo[FRAME_INFO_VERSION].get<std::string>();
+    ver_ = std::string(ver->valuestring);
     return DCAMERA_OK;
 }
 } // namespace DistributedHardware

@@ -16,7 +16,6 @@
 #include "dcamera_source_controller.h"
 
 #include <securec.h>
-#include "json/json.h"
 #include <cstdlib>
 #include "iservice_registry.h"
 #include "iservmgr_hdi.h"
@@ -445,23 +444,20 @@ void DCameraSourceController::OnDataReceived(std::vector<std::shared_ptr<DataBuf
     }
     std::shared_ptr<DataBuffer> buffer = *(buffers.begin());
     std::string jsonStr(reinterpret_cast<char *>(buffer->Data()));
-    JSONCPP_STRING errs;
-    Json::CharReaderBuilder readerBuilder;
-    Json::Value rootValue;
-
-    std::unique_ptr<Json::CharReader> const jsonReader(readerBuilder.newCharReader());
-    if (!jsonReader->parse(jsonStr.c_str(), jsonStr.c_str() + jsonStr.length(), &rootValue, &errs) ||
-        !rootValue.isObject()) {
+    cJSON *rootValue = cJSON_Parse(jsonStr.c_str());
+    if (rootValue == nullptr) {
         return;
     }
-
-    if (!rootValue.isMember("Command") || !rootValue["Command"].isString()) {
+    cJSON *comvalue = cJSON_GetObjectItemCaseSensitive(rootValue, "Command");
+    if (comvalue == nullptr || !cJSON_IsString(comvalue) || (comvalue->valuestring == nullptr)) {
+        cJSON_Delete(rootValue);
         return;
     }
-    std::string command = rootValue["Command"].asString();
+    std::string command = std::string(comvalue->valuestring);
     if (command == DCAMERA_PROTOCOL_CMD_METADATA_RESULT) {
         HandleMetaDataResult(jsonStr);
     }
+    cJSON_Delete(rootValue);
     return;
 }
 

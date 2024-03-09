@@ -26,6 +26,13 @@ typedef enum {
 } DHLogLevel;
 
 void DHLog(DHLogLevel logLevel, const char *fmt, ...);
+#define CHECK_NULL_RETURN(cond, ret, ...)       \
+    do {                                        \
+        if ((cond)) {                           \
+            return (ret);                       \
+        }                                       \
+    } while (0)
+
 #define CHECK_AND_RETURN_RET_LOG(cond, ret, fmt, ...)   \
     do {                                                \
         if ((cond)) {                                   \
@@ -47,6 +54,24 @@ void DHLog(DHLogLevel logLevel, const char *fmt, ...);
         if ((cond)) {                          \
             DHLOGE(fmt, ##__VA_ARGS__);        \
         }                                      \
+    } while (0)
+
+#define CHECK_NULL_FREE_RETURN(ptr, ret, root, ...)    \
+    do {                                               \
+        if ((ptr) == nullptr) {                        \
+            DHLOGE("Address pointer is null");         \
+            cJSON_Delete((root));                      \
+            return (ret);                              \
+        }                                              \
+    } while (0)
+
+#define CHECK_AND_FREE_RETURN_RET_LOG(cond, ret, root, fmt, ...)    \
+    do {                                                            \
+        if ((cond)) {                                               \
+            DHLOGE(fmt, ##__VA_ARGS__);                             \
+            cJSON_Delete((root));                                   \
+            return (ret);                                           \
+        }                                                           \
     } while (0)
 
 #define ULOGD(fmt, ...) DHLog(DH_LOG_DEBUG, \

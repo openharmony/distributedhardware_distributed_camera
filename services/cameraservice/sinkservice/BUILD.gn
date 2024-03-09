@@ -55,7 +55,6 @@ ohos_shared_library("distributed_camera_sink") {
     "${feeding_smoother_path}/derived",
     "${feeding_smoother_path}/utils",
     "//third_party/cJSON",
-    "//third_party/jsoncpp/include",
   ]
 
   sources = [
@@ -94,7 +93,6 @@ ohos_shared_library("distributed_camera_sink") {
     "${services_path}/channel:distributed_camera_channel",
     "${services_path}/data_process:distributed_camera_data_process",
     "//third_party/cJSON:cjson",
-    "//third_party/jsoncpp:jsoncpp",
   ]
 
   defines = [

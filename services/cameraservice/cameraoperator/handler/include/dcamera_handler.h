@@ -24,9 +24,9 @@
 #include "camera_input.h"
 #include "camera_manager.h"
 #include "camera_output_capability.h"
-#include "json/json.h"
 #include "single_instance.h"
 #include "v1_0/dcamera_types.h"
+#include "cJSON.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -51,9 +51,13 @@ private:
 private:
     const int32_t INVALID_FORMAT = -1;
     int32_t CreateDHItem(sptr<CameraStandard::CameraDevice>& info, DHItem& item);
-    int32_t CreateAVCodecList(Json::Value& root);
+    int32_t CreateAVCodecList(cJSON* root);
     std::string GetCameraPosition(CameraStandard::CameraPosition position);
-    void ConfigFormatAndResolution(const DCStreamType type, Json::Value& root,
+    void ProcessProfile(const DCStreamType type, std::map<std::string, std::list<std::string>>& formatMap,
+    std::vector<CameraStandard::Profile>& profileList, std::set<int32_t>& formatSet);
+    void ConfigFormatphoto(const DCStreamType type, cJSON* root,
+        std::vector<CameraStandard::Profile>& profileList);
+    void ConfigFormatvideo(const DCStreamType type, cJSON* root,
         std::vector<CameraStandard::Profile>& profileList);
     bool IsValid(const DCStreamType type, const CameraStandard::Size& size);
     int32_t CovertToDcameraFormat(CameraStandard::CameraFormat format);
