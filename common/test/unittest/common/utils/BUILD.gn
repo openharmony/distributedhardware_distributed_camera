@@ -54,6 +54,7 @@ ohos_unittest("CommonUtilsTest") {
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "hdf_core:libhdi",
     "safwk:system_ability_fwk",

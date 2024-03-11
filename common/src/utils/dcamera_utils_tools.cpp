@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,7 @@
 #include "dcamera_utils_tools.h"
 
 #include <chrono>
+#include <dlfcn.h>
 #include <string>
 
 #include "distributed_camera_constants.h"
@@ -26,6 +27,19 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+namespace {
+#if (defined(__aarch64__) || defined(__x86_64__))
+const std::string YUV_LIB_PATH = "/system/lib64/libyuv.z.so";
+#else
+const std::string YUV_LIB_PATH = "/system/lib/libyuv.z.so";
+#endif
+const std::string GET_IMAGE_CONVERTER_FUNC = "GetImageConverter";
+}
+
+#ifdef DCAMERA_MMAP_RESERVE
+using GetImageConverterFunc = OHOS::OpenSourceLibyuv::ImageConverter (*)();
+#endif
+
 const uint32_t OFFSET2 = 2;
 const uint32_t OFFSET4 = 4;
 const uint32_t OFFSET6 = 6;
@@ -223,5 +237,35 @@ int32_t IsUnderDumpMaxSize(std::string fileName)
         return DCAMERA_BAD_VALUE;
     }
 }
+
+#ifdef DCAMERA_MMAP_RESERVE
+IMPLEMENT_SINGLE_INSTANCE(ConverterHandle);
+void ConverterHandle::InitConverter()
+{
+    void *dlHandler = dlopen(YUV_LIB_PATH.c_str(), RTLD_LAZY | RTLD_NODELETE);
+    if (dlHandler == nullptr) {
+        DHLOGE("Dlopen failed.");
+        return;
+    }
+    GetImageConverterFunc getConverter = (GetImageConverterFunc)dlsym(dlHandler, GET_IMAGE_CONVERTER_FUNC.c_str());
+    if (getConverter == nullptr) {
+        DHLOGE("Function of converter is null, failed reason: %s.", dlerror());
+        dlclose(dlHandler);
+        dlHandler = nullptr;
+        return;
+    }
+    converter_ = getConverter();
+    DHLOGI("Initialize image converter success.");
+}
+
+const OHOS::OpenSourceLibyuv::ImageConverter& ConverterHandle::GetHandle()
+{
+    if (!isInited_.load()) {
+        InitConverter();
+        isInited_.store(true);
+    }
+    return converter_;
+}
+#endif
 } // namespace DistributedHardware
 } // namespace OHOS
