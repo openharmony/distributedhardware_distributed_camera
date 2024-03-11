@@ -38,7 +38,6 @@
 #include "device_security_info.h"
 #include "idistributed_camera_source.h"
 #include "ipc_skeleton.h"
-#include "json/json.h"
 #include "dcamera_low_latency.h"
 #include <sys/prctl.h>
 
@@ -532,23 +531,18 @@ int32_t DCameraSinkController::HandleReceivedData(std::shared_ptr<DataBuffer>& d
     DHLOGI("DCameraSinkController::HandleReceivedData dhId: %{public}s", GetAnonyString(dhId_).c_str());
     uint8_t *data = dataBuffer->Data();
     std::string jsonStr(reinterpret_cast<const char *>(data), dataBuffer->Capacity());
-
-    JSONCPP_STRING errs;
-    Json::CharReaderBuilder readerBuilder;
-    Json::Value root;
-    std::unique_ptr<Json::CharReader> const jsonReader(readerBuilder.newCharReader());
-    if ((!jsonReader->parse(jsonStr.c_str(), jsonStr.c_str() + jsonStr.length(), &root, &errs)) ||
-        (!root.isObject())) {
-        DHLOGE("parse json string failed");
+    cJSON *rootValue = cJSON_Parse(jsonStr.c_str());
+    if (rootValue == nullptr) {
         return DCAMERA_BAD_VALUE;
     }
-
-    if ((!root.isMember("Command")) || (!root["Command"].isString())) {
+    cJSON *comvalue = cJSON_GetObjectItemCaseSensitive(rootValue, "Command");
+    if (comvalue == nullptr || !cJSON_IsString(comvalue) || (comvalue->valuestring == nullptr)) {
+        cJSON_Delete(rootValue);
         DHLOGE("parse command failed");
         return DCAMERA_BAD_VALUE;
     }
-
-    std::string command = root["Command"].asString();
+    std::string command = std::string(comvalue->valuestring);
+    cJSON_Delete(rootValue);
     if ((!command.empty()) && (command.compare(DCAMERA_PROTOCOL_CMD_CAPTURE) == 0)) {
         DCameraCaptureInfoCmd captureInfoCmd;
         int ret = captureInfoCmd.Unmarshal(jsonStr);

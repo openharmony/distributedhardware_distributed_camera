@@ -273,27 +273,35 @@ int32_t DCameraSourceDev::Register(std::shared_ptr<DCameraRegistParam>& param)
 
 int32_t DCameraSourceDev::ParseEnableParam(std::shared_ptr<DCameraRegistParam>& param, std::string& ability)
 {
-    JSONCPP_STRING errs;
-    Json::CharReaderBuilder readerBuilder;
-    Json::Value sinkRootValue;
-
-    std::unique_ptr<Json::CharReader> const jsonReader(readerBuilder.newCharReader());
-    if (!jsonReader->parse(param->sinkParam_.c_str(), param->sinkParam_.c_str() + param->sinkParam_.length(),
-        &sinkRootValue, &errs) || !sinkRootValue.isObject()) {
+    cJSON *sinkRootValue = cJSON_Parse(param->sinkParam_.c_str());
+    if (sinkRootValue == nullptr) {
         DHLOGE("Input sink ablity info is not json object.");
         return DCAMERA_INIT_ERR;
     }
 
-    Json::Value srcRootValue;
-    if (!jsonReader->parse(param->srcParam_.c_str(), param->srcParam_.c_str() + param->srcParam_.length(),
-        &srcRootValue, &errs) || !srcRootValue.isObject()) {
+    cJSON *srcRootValue = cJSON_Parse(param->srcParam_.c_str());
+    if (srcRootValue == nullptr) {
         DHLOGE("Input source ablity info is not json object.");
+        cJSON_Delete(sinkRootValue);
         return DCAMERA_INIT_ERR;
     }
-    Json::Value abilityRootValue;
-    abilityRootValue["SinkAbility"] = sinkRootValue;
-    abilityRootValue["SourceAbility"] = srcRootValue;
-    ability = abilityRootValue.toStyledString();
+
+    cJSON *abilityRootValue = cJSON_CreateObject();
+    if (abilityRootValue == nullptr) {
+        cJSON_Delete(sinkRootValue);
+        cJSON_Delete(srcRootValue);
+        return DCAMERA_BAD_VALUE;
+    }
+    cJSON_AddItemToObject(abilityRootValue, "SinkAbility", sinkRootValue);
+    cJSON_AddItemToObject(abilityRootValue, "SourceAbility", srcRootValue);
+    char *jsonstr = cJSON_Print(abilityRootValue);
+    if (jsonstr == nullptr) {
+        cJSON_Delete(abilityRootValue);
+        return DCAMERA_BAD_VALUE;
+    }
+    ability = jsonstr;
+    cJSON_Delete(abilityRootValue);
+    cJSON_free(jsonstr);
     return DCAMERA_OK;
 }
 

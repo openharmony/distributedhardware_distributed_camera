@@ -30,7 +30,6 @@ ohos_moduletest_suite("SubDctsdisCameraClientTest") {
     "$base_root/foundation/distributedhardware/distributed_camera/services/cameraservice/cameraoperator/client/include",
     "$base_root/foundation/distributedhardware/distributed_camera/services/cameraservice/cameraoperator/client/include/callback",
     "$base_root/foundation/distributedhardware/distributed_camera/services/cameraservice/cameraoperator/client/include/listener",
-    "$base_root/third_party/jsoncpp/include",
   ]
 
   sources = [
@@ -51,7 +50,6 @@ ohos_moduletest_suite("SubDctsdisCameraClientTest") {
     "$base_root/foundation/distributedhardware/distributed_camera/common:distributed_camera_utils",
     "$base_root/foundation/distributedhardware/distributed_camera/services/cameraservice/cameraoperator/client:distributed_camera_client",
     "$base_root/foundation/distributedhardware/distributed_camera/services/cameraservice/sinkservice:distributed_camera_sink",
-    "$base_root/third_party/jsoncpp:jsoncpp",
   ]
 
   external_deps = [

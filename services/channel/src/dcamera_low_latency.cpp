@@ -19,7 +19,7 @@
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
 #include "ipublisher_listener.h"
-#include "nlohmann/json.hpp"
+#include "cJSON.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -38,13 +38,22 @@ int32_t DCameraLowLatency::EnableLowLatency()
         DHLOGE("Get dHFwkKit is null when enable low latency.");
         return DCAMERA_BAD_VALUE;
     }
-    nlohmann::json enable = {
-        {DH_TYPE, DHType::CAMERA},
-        {LOW_LATENCY_ENABLE, true},
-    };
-    dHFwkKit->PublishMessage(DHTopic::TOPIC_LOW_LATENCY, enable.dump());
+    cJSON *rootValue = cJSON_CreateObject();
+    if (rootValue == nullptr) {
+        return DCAMERA_BAD_VALUE;
+    }
+    cJSON_AddItemToObject(rootValue, DH_TYPE.c_str(), cJSON_CreateNumber(static_cast<uint32_t>(DHType::CAMERA)));
+    cJSON_AddItemToObject(rootValue, LOW_LATENCY_ENABLE.c_str(), cJSON_CreateBool(true));
+    char *jsonstr = cJSON_Print(rootValue);
+    if (jsonstr == nullptr) {
+        cJSON_Delete(rootValue);
+        return DCAMERA_BAD_VALUE;
+    }
+    dHFwkKit->PublishMessage(DHTopic::TOPIC_LOW_LATENCY, std::string(jsonstr));
     refCount_++;
-    DHLOGD("Enable low latency success and now refCount is: %{public}d", refCount_.load());
+    DHLOGD("Enable low latency success and now refCount is: %d", refCount_.load());
+    cJSON_Delete(rootValue);
+    cJSON_free(jsonstr);
     return DCAMERA_OK;
 }
 
@@ -65,13 +74,22 @@ int32_t DCameraLowLatency::DisableLowLatency()
         DHLOGE("Get dHFwkKit is null when disable low latency.");
         return DCAMERA_BAD_VALUE;
     }
-    nlohmann::json disable = {
-        {DH_TYPE, DHType::CAMERA},
-        {LOW_LATENCY_ENABLE, false},
-    };
-    dHFwkKit->PublishMessage(DHTopic::TOPIC_LOW_LATENCY, disable.dump());
+    cJSON *rootValue = cJSON_CreateObject();
+    if (rootValue == nullptr) {
+        return DCAMERA_BAD_VALUE;
+    }
+    cJSON_AddItemToObject(rootValue, DH_TYPE.c_str(), cJSON_CreateNumber(static_cast<uint32_t>(DHType::CAMERA)));
+    cJSON_AddItemToObject(rootValue, LOW_LATENCY_ENABLE.c_str(), cJSON_CreateBool(false));
+    char *jsonstr = cJSON_Print(rootValue);
+    if (jsonstr == nullptr) {
+        cJSON_Delete(rootValue);
+        return DCAMERA_BAD_VALUE;
+    }
+    dHFwkKit->PublishMessage(DHTopic::TOPIC_LOW_LATENCY, std::string(jsonstr));
     refCount_--;
     DHLOGD("Disable low latency success.");
+    cJSON_Delete(rootValue);
+    cJSON_free(jsonstr);
     return DCAMERA_OK;
 }
 

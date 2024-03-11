@@ -135,7 +135,7 @@ std::vector<std::string> DCameraHandler::GetCameras()
     return cameras;
 }
 
-int32_t DCameraHandler::CreateAVCodecList(Json::Value& root)
+int32_t DCameraHandler::CreateAVCodecList(cJSON *root)
 {
     DHLOGI("Create avCodecList start");
     std::shared_ptr<MediaAVCodec::AVCodecList> avCodecList = MediaAVCodec::AVCodecListFactory::CreateAVCodecList();
@@ -145,6 +145,12 @@ int32_t DCameraHandler::CreateAVCodecList(Json::Value& root)
     }
     const std::vector<std::string> encoderName = {std::string(MediaAVCodec::CodecMimeType::VIDEO_AVC),
                                                   std::string(MediaAVCodec::CodecMimeType::VIDEO_HEVC)};
+    cJSON *array = cJSON_CreateArray();
+    if (array == nullptr) {
+        DHLOGI("Create arrray failed");
+        return DCAMERA_BAD_VALUE;
+    }
+    cJSON_AddItemToObject(root, CAMERA_CODEC_TYPE_KEY.c_str(), array);
     for (auto &coder : encoderName) {
         MediaAVCodec::CapabilityData *capData = avCodecList->GetCapability(coder, true,
             MediaAVCodec::AVCodecCategory::AVCODEC_HARDWARE);
@@ -153,8 +159,8 @@ int32_t DCameraHandler::CreateAVCodecList(Json::Value& root)
             return DCAMERA_BAD_VALUE;
         }
         std::string mimeType = capData->mimeType;
-        root[CAMERA_CODEC_TYPE_KEY].append(mimeType);
-        DHLOGI("codec name: %{public}s, mimeType: %{public}s", coder.c_str(), mimeType.c_str());
+        cJSON_AddItemToArray(array, cJSON_CreateString(mimeType.c_str()));
+        DHLOGI("codec name: %s, mimeType: %s", coder.c_str(), mimeType.c_str());
     }
     return DCAMERA_OK;
 }
@@ -166,31 +172,23 @@ int32_t DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraDevice>& info, D
     item.subtype = "camera";
     DHLOGI("camera id: %{public}s", GetAnonyString(id).c_str());
 
-    Json::Value root;
-    root[CAMERA_PROTOCOL_VERSION_KEY] = Json::Value(CAMERA_PROTOCOL_VERSION_VALUE);
-    root[CAMERA_POSITION_KEY] = Json::Value(GetCameraPosition(info->GetPosition()));
+    cJSON *root = cJSON_CreateObject();
+    CHECK_AND_RETURN_RET_LOG(root == nullptr, DCAMERA_BAD_VALUE, "Create cJSON object failed");
+    cJSON_AddStringToObject(root, CAMERA_PROTOCOL_VERSION_KEY.c_str(), CAMERA_PROTOCOL_VERSION_VALUE.c_str());
+    cJSON_AddStringToObject(root, CAMERA_POSITION_KEY.c_str(), GetCameraPosition(info->GetPosition()).c_str());
     int32_t ret = CreateAVCodecList(root);
-    if (ret != DCAMERA_OK) {
-        DHLOGI("CreateAVCodecList failed");
-        return DCAMERA_BAD_VALUE;
-    }
+    CHECK_AND_FREE_RETURN_RET_LOG(ret != DCAMERA_OK, DCAMERA_BAD_VALUE, root, "CreateAVCodecList failed");
     sptr<CameraStandard::CameraOutputCapability> capability = cameraManager_->GetSupportedOutputCapability(info);
-    if (capability == nullptr) {
-        DHLOGI("get supported capability is null");
-        return DCAMERA_BAD_VALUE;
-    }
+    CHECK_AND_FREE_RETURN_RET_LOG(capability == nullptr, DCAMERA_BAD_VALUE, root, "get supported capability is null");
     std::vector<CameraStandard::Profile> photoProfiles = capability->GetPhotoProfiles();
-    ConfigFormatAndResolution(SNAPSHOT_FRAME, root, photoProfiles);
+    ConfigFormatphoto(SNAPSHOT_FRAME, root, photoProfiles);
 
     std::vector<CameraStandard::Profile> previewProfiles = capability->GetPreviewProfiles();
-    ConfigFormatAndResolution(CONTINUOUS_FRAME, root, previewProfiles);
+    ConfigFormatvideo(CONTINUOUS_FRAME, root, previewProfiles);
 
     sptr<CameraStandard::CameraInput> cameraInput = nullptr;
     int rv = cameraManager_->CreateCameraInput(info, &cameraInput);
-    if (rv != DCAMERA_OK) {
-        DHLOGE("create cameraInput failed");
-        return DCAMERA_BAD_VALUE;
-    }
+    CHECK_AND_FREE_RETURN_RET_LOG(rv != DCAMERA_OK, DCAMERA_BAD_VALUE, root, "create cameraInput failed");
 
     std::hash<std::string> h;
     std::string abilityString = cameraInput->GetCameraSettings();
@@ -198,13 +196,20 @@ int32_t DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraDevice>& info, D
 
     std::string encodeString = Base64Encode(reinterpret_cast<const unsigned char *>(abilityString.c_str()),
         abilityString.length());
-    DHLOGI("encodeString hash: %{public}zu, length: %{public}zu", h(encodeString), encodeString.length());
-    root[CAMERA_METADATA_KEY] = Json::Value(encodeString);
+    DHLOGI("encodeString hash: %zu, length: %zu", h(encodeString), encodeString.length());
+    cJSON_AddStringToObject(root, CAMERA_METADATA_KEY.c_str(), encodeString.c_str());
+    char *jsonstr = cJSON_Print(root);
+    if (jsonstr == nullptr) {
+        cJSON_Delete(root);
+        return DCAMERA_BAD_VALUE;
+    }
 
-    item.attrs = root.toStyledString();
+    item.attrs = jsonstr;
     if (cameraInput->Release() != DCAMERA_OK) {
         DHLOGE("cameraInput Release failed");
     }
+    cJSON_Delete(root);
+    cJSON_free(jsonstr);
     return DCAMERA_OK;
 }
 
@@ -234,12 +239,9 @@ std::string DCameraHandler::GetCameraPosition(CameraStandard::CameraPosition pos
     return ret;
 }
 
-void DCameraHandler::ConfigFormatAndResolution(const DCStreamType type, Json::Value& root,
-    std::vector<CameraStandard::Profile>& profileList)
+void DCameraHandler::ProcessProfile(const DCStreamType type, std::map<std::string, std::list<std::string>>& formatMap,
+    std::vector<CameraStandard::Profile>& profileList, std::set<int32_t>& formatSet)
 {
-    uint64_t listSize = static_cast<uint64_t>(profileList.size());
-    DHLOGI("type: %{public}d, size: %{public}" PRIu64, type, listSize);
-    std::set<int32_t> formatSet;
     for (auto& profile : profileList) {
         CameraStandard::CameraFormat format = profile.GetCameraFormat();
         CameraStandard::Size picSize = profile.GetSize();
@@ -252,23 +254,79 @@ void DCameraHandler::ConfigFormatAndResolution(const DCStreamType type, Json::Va
         std::string formatName = std::to_string(dformat);
         if (IsValid(type, picSize)) {
             std::string resolutionValue = std::to_string(picSize.width) + "*" + std::to_string(picSize.height);
-            if (type == SNAPSHOT_FRAME) {
-                root[CAMERA_FORMAT_PHOTO][CAMERA_RESOLUTION_KEY][formatName].append(resolutionValue);
-            } else if (type == CONTINUOUS_FRAME) {
-                root[CAMERA_FORMAT_PREVIEW][CAMERA_RESOLUTION_KEY][formatName].append(resolutionValue);
-                root[CAMERA_FORMAT_VIDEO][CAMERA_RESOLUTION_KEY][formatName].append(resolutionValue);
-            }
+            formatMap[formatName].push_back(resolutionValue);
         }
     }
+}
 
-    for (auto format : formatSet) {
-        if (type == SNAPSHOT_FRAME) {
-            root[CAMERA_FORMAT_PHOTO][CAMERA_FORMAT_KEY].append(format);
-        } else if (type == CONTINUOUS_FRAME) {
-            root[CAMERA_FORMAT_PREVIEW][CAMERA_FORMAT_KEY].append(format);
-            root[CAMERA_FORMAT_VIDEO][CAMERA_FORMAT_KEY].append(format);
+void DCameraHandler::ConfigFormatphoto(const DCStreamType type, cJSON* root,
+    std::vector<CameraStandard::Profile>& profileList)
+{
+    DHLOGI("type: %d, size: %d", type, profileList.size());
+    std::set<int32_t> formatSet;
+    cJSON* formatphotoObj = cJSON_CreateObject();
+    if (formatphotoObj == nullptr) {
+        return;
+    }
+    cJSON_AddItemToObject(root, CAMERA_FORMAT_PHOTO.c_str(), formatphotoObj);
+    std::map<std::string, std::list<std::string>> formatMap;
+    ProcessProfile(type, formatMap, profileList, formatSet);
+    cJSON* resolutionObj = cJSON_CreateObject();
+    if (resolutionObj == nullptr) {
+        return;
+    }
+    for (auto &pair : formatMap) {
+        cJSON* array = cJSON_CreateArray();
+        cJSON_AddItemToObject(resolutionObj, pair.first.c_str(), array);
+        for (auto &value : pair.second) {
+            cJSON_AddItemToArray(array, cJSON_CreateString(value.c_str()));
         }
     }
+    cJSON_AddItemToObject(formatphotoObj, CAMERA_RESOLUTION_KEY.c_str(), resolutionObj);
+    cJSON* array = cJSON_CreateArray();
+    if (array == nullptr) {
+        return;
+    }
+    for (auto format : formatSet) {
+        cJSON_AddItemToArray(array, cJSON_CreateNumber(format));
+    }
+    cJSON_AddItemToObject(formatphotoObj, CAMERA_FORMAT_KEY.c_str(), array);
+}
+
+void DCameraHandler::ConfigFormatvideo(const DCStreamType type, cJSON* root,
+    std::vector<CameraStandard::Profile>& profileList)
+{
+    DHLOGI("type: %d, size: %d", type, profileList.size());
+    std::set<int32_t> formatSet;
+    cJSON* formatpreviewObj = cJSON_CreateObject();
+    if (formatpreviewObj == nullptr) {
+        return;
+    }
+    cJSON_AddItemToObject(root, CAMERA_FORMAT_PREVIEW.c_str(), formatpreviewObj);
+    std::map<std::string, std::list<std::string>> formatMap;
+    ProcessProfile(type, formatMap, profileList, formatSet);
+    cJSON* resolutionObj = cJSON_CreateObject();
+    if (resolutionObj == nullptr) {
+        return;
+    }
+    for (auto &pair : formatMap) {
+        cJSON* array = cJSON_CreateArray();
+        cJSON_AddItemToObject(resolutionObj, pair.first.c_str(), array);
+        for (auto &value : pair.second) {
+            cJSON_AddItemToArray(array, cJSON_CreateString(value.c_str()));
+        }
+    }
+    cJSON_AddItemToObject(formatpreviewObj, CAMERA_RESOLUTION_KEY.c_str(), resolutionObj);
+    cJSON* array = cJSON_CreateArray();
+    if (array == nullptr) {
+        return;
+    }
+    for (auto format : formatSet) {
+        cJSON_AddItemToArray(array, cJSON_CreateNumber(format));
+    }
+    cJSON_AddItemToObject(formatpreviewObj, CAMERA_FORMAT_KEY.c_str(), array);
+    cJSON* formatvideoObj = cJSON_Duplicate(formatpreviewObj, 1);
+    cJSON_AddItemToObject(root, CAMERA_FORMAT_VIDEO.c_str(), formatvideoObj);
 }
 
 int32_t DCameraHandler::CovertToDcameraFormat(CameraStandard::CameraFormat format)

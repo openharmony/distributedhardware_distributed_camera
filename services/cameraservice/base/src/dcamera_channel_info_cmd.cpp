@@ -56,14 +56,14 @@ int32_t DCameraChannelInfoCmd::Marshal(std::string& jsonStr)
         cJSON_AddItemToArray(details, detail);
     }
     
-    char *jsonstr = cJSON_Print(rootValue);
-    if (jsonstr == nullptr) {
+    char *data = cJSON_Print(rootValue);
+    if (data == nullptr) {
         cJSON_Delete(rootValue);
         return DCAMERA_BAD_VALUE;
     }
-    jsonStr = jsonstr;
+    jsonStr = std::string(data);
     cJSON_Delete(rootValue);
-    cJSON_free(jsonstr);
+    cJSON_free(data);
     return DCAMERA_OK;
 }
 
