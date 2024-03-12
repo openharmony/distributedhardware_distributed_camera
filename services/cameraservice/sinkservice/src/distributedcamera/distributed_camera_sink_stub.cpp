@@ -66,7 +66,7 @@ bool DistributedCameraSinkStub::HasEnableDHPermission()
 int32_t DistributedCameraSinkStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
-    DHLOGD("remote request code: %d", code);
+    DHLOGD("remote request code: %{public}d", code);
     std::u16string desc = DistributedCameraSinkStub::GetDescriptor();
     std::u16string remoteDesc = data.ReadInterfaceToken();
     if (desc != remoteDesc) {

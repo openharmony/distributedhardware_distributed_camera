@@ -112,14 +112,15 @@ int32_t DCameraPipelineSource::InitDCameraPipNodes(const VideoConfigParams& sour
     VideoConfigParams curNodeSourceCfg = sourceConfig;
     for (size_t i = 0; i < pipNodeRanks_.size(); i++) {
         pipNodeRanks_[i]->SetNodeRank(i);
-        DHLOGI("DCameraPipelineSource::InitDCameraPipNodes Node %d Source Config: width %d height %d " +
-            "format %d codecType %d frameRate %d", i, curNodeSourceCfg.GetWidth(), curNodeSourceCfg.GetHeight(),
-            curNodeSourceCfg.GetVideoformat(), curNodeSourceCfg.GetVideoCodecType(), curNodeSourceCfg.GetFrameRate());
+        DHLOGI("DCameraPipelineSource::InitDCameraPipNodes Node %{public}zu Source Config: width %{public}d height "
+            "%{public}d format %{public}d codecType %{public}d frameRate %{public}d", i, curNodeSourceCfg.GetWidth(),
+            curNodeSourceCfg.GetHeight(), curNodeSourceCfg.GetVideoformat(), curNodeSourceCfg.GetVideoCodecType(),
+            curNodeSourceCfg.GetFrameRate());
 
         VideoConfigParams curNodeProcessedCfg;
         int32_t err = pipNodeRanks_[i]->InitNode(curNodeSourceCfg, targetConfig, curNodeProcessedCfg);
         if (err != DCAMERA_OK) {
-            DHLOGE("Init source DCamera pipeline Node [%d] failed.", i);
+            DHLOGE("Init source DCamera pipeline Node [%{public}zu] failed.", i);
             return DCAMERA_INIT_ERR;
         }
         curNodeSourceCfg = curNodeProcessedCfg;
@@ -130,12 +131,13 @@ int32_t DCameraPipelineSource::InitDCameraPipNodes(const VideoConfigParams& sour
 
         err = pipNodeRanks_[i - 1]->SetNextNode(pipNodeRanks_[i]);
         if (err != DCAMERA_OK) {
-            DHLOGE("Set the next node of Node [%d] failed in source pipeline.", i - 1);
+            DHLOGE("Set the next node of Node [%{public}zu] failed in source pipeline.", i - 1);
             return DCAMERA_INIT_ERR;
         }
     }
-    DHLOGD("All nodes have been linked in source pipeline, Target Config: " +
-        "width %d height %d format %d codecType %d frameRate %d", targetConfig.GetWidth(), targetConfig.GetHeight(),
+    DHLOGD("All nodes have been linked in source pipeline, Target Config: "
+        "width %{public}d height %{public}d format %{public}d codecType %{public}d frameRate %{public}d",
+        targetConfig.GetWidth(), targetConfig.GetHeight(),
         targetConfig.GetVideoformat(), targetConfig.GetVideoCodecType(), targetConfig.GetFrameRate());
     pipelineHead_ = pipNodeRanks_[0];
     return DCAMERA_OK;

@@ -34,7 +34,7 @@ namespace DistributedHardware {
 DCameraSourceDev::DCameraSourceDev(std::string devId, std::string dhId,
     std::shared_ptr<ICameraStateListener>& stateLisener) : devId_(devId), dhId_(dhId), stateListener_(stateLisener)
 {
-    DHLOGI("DCameraSourceDev Construct devId %s dhId %s", GetAnonyString(devId_).c_str(),
+    DHLOGI("DCameraSourceDev Construct devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     memberFuncMap_[DCAMERA_EVENT_REGIST] = &DCameraSourceDev::NotifyRegisterResult;
     memberFuncMap_[DCAMERA_EVENT_UNREGIST] = &DCameraSourceDev::NotifyRegisterResult;
@@ -57,7 +57,7 @@ DCameraSourceDev::DCameraSourceDev(std::string devId, std::string dhId,
 
 DCameraSourceDev::~DCameraSourceDev()
 {
-    DHLOGI("DCameraSourceDev Delete devId %s dhId %s", GetAnonyString(devId_).c_str(),
+    DHLOGI("DCameraSourceDev Delete devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     eventBus_ = nullptr;
     hdiCallback_ = nullptr;
@@ -68,13 +68,13 @@ DCameraSourceDev::~DCameraSourceDev()
 
     eventResultMap_.clear();
     memberFuncMap_.clear();
-    DHLOGI("DCameraSourceDev Delete devId %s dhId %s end", GetAnonyString(devId_).c_str(),
+    DHLOGI("DCameraSourceDev Delete devId %{public}s dhId %{public}s end", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
 }
 
 int32_t DCameraSourceDev::InitDCameraSourceDev()
 {
-    DHLOGI("DCameraSourceDev InitDCameraSourceDev devId %s dhId %s", GetAnonyString(devId_).c_str(),
+    DHLOGI("DCameraSourceDev InitDCameraSourceDev devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     eventBus_ = std::make_shared<EventBus>("SrcDevHandler");
     DCameraSourceEvent event(*this);
@@ -89,16 +89,16 @@ int32_t DCameraSourceDev::InitDCameraSourceDev()
         DHLOGE("DCameraSourceDev InitDCameraSourceDev failed, hdiCallback is null.");
         return DCAMERA_BAD_VALUE;
     }
-    DHLOGI("DCameraSourceDev InitDCameraSourceDev end devId %s dhId %s", GetAnonyString(devId_).c_str(),
-        GetAnonyString(dhId_).c_str());
+    DHLOGI("DCameraSourceDev InitDCameraSourceDev end devId %{public}s dhId %{public}s",
+        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
 }
 
 int32_t DCameraSourceDev::RegisterDistributedHardware(const std::string& devId, const std::string& dhId,
     const std::string& reqId, const EnableParam& param)
 {
-    DHLOGI("DCameraSourceDev PostTask RegisterDistributedHardware devId %s dhId %s", GetAnonyString(devId).c_str(),
-        GetAnonyString(dhId).c_str());
+    DHLOGI("DCameraSourceDev PostTask RegisterDistributedHardware devId %{public}s dhId %{public}s",
+        GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
     version_ = param.sinkVersion;
     DCameraIndex index(devId, dhId);
     actualDevInfo_.insert(index);
@@ -113,8 +113,8 @@ int32_t DCameraSourceDev::RegisterDistributedHardware(const std::string& devId, 
 int32_t DCameraSourceDev::UnRegisterDistributedHardware(const std::string devId, const std::string dhId,
     const std::string reqId)
 {
-    DHLOGI("DCameraSourceDev PostTask UnRegisterDistributedHardware devId %s dhId %s", GetAnonyString(devId).c_str(),
-        GetAnonyString(dhId).c_str());
+    DHLOGI("DCameraSourceDev PostTask UnRegisterDistributedHardware devId %{public}s dhId %{public}s",
+        GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
     std::string sinkAttrs;
     std::string sourceAttrs;
     std::shared_ptr<DCameraRegistParam> regParam = std::make_shared<DCameraRegistParam>(devId, dhId, reqId, sinkAttrs,
@@ -126,12 +126,12 @@ int32_t DCameraSourceDev::UnRegisterDistributedHardware(const std::string devId,
 
 int32_t DCameraSourceDev::DCameraNotify(std::string& eventStr)
 {
-    DHLOGI("DCameraSourceDev PostTask DCameraNotify devId %s dhId %s", GetAnonyString(devId_).c_str(),
+    DHLOGI("DCameraSourceDev PostTask DCameraNotify devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     DCameraEventCmd cmd;
     int32_t ret = cmd.Unmarshal(eventStr);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceDev DCameraNotify devId %s dhId %s marshal failed, ret: %d",
+        DHLOGE("DCameraSourceDev DCameraNotify devId %{public}s dhId %{public}s marshal failed, ret: %{public}d",
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), ret);
         return ret;
     }
@@ -143,7 +143,7 @@ int32_t DCameraSourceDev::DCameraNotify(std::string& eventStr)
 
 int32_t DCameraSourceDev::OpenSession(DCameraIndex& camIndex)
 {
-    DHLOGI("DCameraSourceDev PostTask OpenSession devId %s dhId %s", GetAnonyString(devId_).c_str(),
+    DHLOGI("DCameraSourceDev PostTask OpenSession devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     DCameraSourceEvent event(*this, DCAMERA_EVENT_OPEN, camIndex);
     eventBus_->PostEvent<DCameraSourceEvent>(event);
@@ -152,7 +152,7 @@ int32_t DCameraSourceDev::OpenSession(DCameraIndex& camIndex)
 
 int32_t DCameraSourceDev::CloseSession(DCameraIndex& camIndex)
 {
-    DHLOGI("DCameraSourceDev PostTask CloseSession devId %s dhId %s", GetAnonyString(devId_).c_str(),
+    DHLOGI("DCameraSourceDev PostTask CloseSession devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     DCameraSourceEvent event(*this, DCAMERA_EVENT_CLOSE, camIndex);
     eventBus_->PostEvent<DCameraSourceEvent>(event);
@@ -161,7 +161,7 @@ int32_t DCameraSourceDev::CloseSession(DCameraIndex& camIndex)
 
 int32_t DCameraSourceDev::ConfigCameraStreams(const std::vector<std::shared_ptr<DCStreamInfo>>& streamInfos)
 {
-    DHLOGI("DCameraSourceDev PostTask ConfigStreams devId %s dhId %s", GetAnonyString(devId_).c_str(),
+    DHLOGI("DCameraSourceDev PostTask ConfigStreams devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     DCameraSourceEvent event(*this, DCAMERA_EVENT_CONFIG_STREAMS, streamInfos);
     eventBus_->PostEvent<DCameraSourceEvent>(event);
@@ -170,7 +170,7 @@ int32_t DCameraSourceDev::ConfigCameraStreams(const std::vector<std::shared_ptr<
 
 int32_t DCameraSourceDev::ReleaseCameraStreams(const std::vector<int>& streamIds)
 {
-    DHLOGI("DCameraSourceDev PostTask ReleaseStreams devId %s dhId %s", GetAnonyString(devId_).c_str(),
+    DHLOGI("DCameraSourceDev PostTask ReleaseStreams devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     DCameraSourceEvent event(*this, DCAMERA_EVENT_RELEASE_STREAMS, streamIds);
     eventBus_->PostEvent<DCameraSourceEvent>(event);
@@ -179,7 +179,7 @@ int32_t DCameraSourceDev::ReleaseCameraStreams(const std::vector<int>& streamIds
 
 int32_t DCameraSourceDev::StartCameraCapture(const std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos)
 {
-    DHLOGI("DCameraSourceDev PostTask StartCapture devId %s dhId %s", GetAnonyString(devId_).c_str(),
+    DHLOGI("DCameraSourceDev PostTask StartCapture devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     DCameraSourceEvent event(*this, DCAMERA_EVENT_START_CAPTURE, captureInfos);
     eventBus_->PostEvent<DCameraSourceEvent>(event);
@@ -188,7 +188,7 @@ int32_t DCameraSourceDev::StartCameraCapture(const std::vector<std::shared_ptr<D
 
 int32_t DCameraSourceDev::StopCameraCapture(const std::vector<int>& streamIds)
 {
-    DHLOGI("DCameraSourceDev PostTask StopCapture devId %s dhId %s", GetAnonyString(devId_).c_str(),
+    DHLOGI("DCameraSourceDev PostTask StopCapture devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     DCameraSourceEvent event(*this, DCAMERA_EVENT_STOP_CAPTURE, streamIds);
     eventBus_->PostEvent<DCameraSourceEvent>(event);
@@ -197,8 +197,8 @@ int32_t DCameraSourceDev::StopCameraCapture(const std::vector<int>& streamIds)
 
 int32_t DCameraSourceDev::UpdateCameraSettings(const std::vector<std::shared_ptr<DCameraSettings>>& settings)
 {
-    DHLOGI("DCameraSourceDev PostTask UpdateCameraSettings devId %s dhId %s", GetAnonyString(devId_).c_str(),
-        GetAnonyString(dhId_).c_str());
+    DHLOGI("DCameraSourceDev PostTask UpdateCameraSettings devId %{public}s dhId %{public}s",
+        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     DCameraSourceEvent event(*this, DCAMERA_EVENT_UPDATE_SETTINGS, settings);
     eventBus_->PostEvent<DCameraSourceEvent>(event);
     return DCAMERA_OK;
@@ -206,15 +206,15 @@ int32_t DCameraSourceDev::UpdateCameraSettings(const std::vector<std::shared_ptr
 
 void DCameraSourceDev::OnEvent(DCameraSourceEvent& event)
 {
-    DHLOGI("DCameraSourceDev OnEvent devId %s dhId %s eventType: %d", GetAnonyString(devId_).c_str(),
-        GetAnonyString(dhId_).c_str(), event.GetEventType());
+    DHLOGI("DCameraSourceDev OnEvent devId %{public}s dhId %{public}s eventType: %{public}d",
+        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), event.GetEventType());
     if (event.GetEventType() == DCAMERA_EVENT_HICOLLIE) {
         SetHicollieFlag(true);
         return;
     }
     int32_t ret = stateMachine_->Execute(event.GetEventType(), event);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceDev OnEvent failed, ret: %d, devId: %s dhId: %s", ret,
+        DHLOGE("DCameraSourceDev OnEvent failed, ret: %{public}d, devId: %{public}s dhId: %{public}s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     }
     NotifyResult(event.GetEventType(), event, ret);
@@ -223,7 +223,7 @@ void DCameraSourceDev::OnEvent(DCameraSourceEvent& event)
 int32_t DCameraSourceDev::Register(std::shared_ptr<DCameraRegistParam>& param)
 {
     DCAMERA_SYNC_TRACE(DCAMERA_REGISTER_CAMERA);
-    DHLOGI("DCameraSourceDev Execute Register devId: %s dhId: %s",
+    DHLOGI("DCameraSourceDev Execute Register devId: %{public}s dhId: %{public}s",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     ReportRegisterCameraEvent(REGIST_CAMERA_EVENT, GetAnonyString(devId_), dhId_,
         version_, "execute register event.");
@@ -231,22 +231,22 @@ int32_t DCameraSourceDev::Register(std::shared_ptr<DCameraRegistParam>& param)
     actualDevInfo.assign(actualDevInfo_.begin(), actualDevInfo_.end());
     int32_t ret = controller_->Init(actualDevInfo);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceDev Execute Register controller init failed, ret: %d, devId: %s dhId: %s", ret,
-            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        DHLOGE("DCameraSourceDev Execute Register controller init failed, ret: %{public}d, devId: %{public}s dhId: "
+            "%{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return ret;
     }
 
     ret = input_->Init();
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceDev Execute Register input init failed, ret: %d, devId: %s dhId: %s", ret,
-            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        DHLOGE("DCameraSourceDev Execute Register input init failed, ret: %{public}d, devId: %{public}s dhId: "
+            "%{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         controller_->UnInit();
         return ret;
     }
 
     sptr<IDCameraProvider> camHdiProvider = IDCameraProvider::Get(HDF_DCAMERA_EXT_SERVICE);
     if (camHdiProvider == nullptr) {
-        DHLOGI("Register camHdiProvider is nullptr devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
+        DHLOGI("Register camHdiProvider is nullptr devId: %{public}s dhId: %{public}s", GetAnonyString(devId_).c_str(),
             GetAnonyString(dhId_).c_str());
         controller_->UnInit();
         input_->UnInit();
@@ -261,8 +261,8 @@ int32_t DCameraSourceDev::Register(std::shared_ptr<DCameraRegistParam>& param)
         DHLOGE("Parsing param failed.");
     }
     int32_t retHdi = camHdiProvider->EnableDCameraDevice(dhBase, ability, hdiCallback_);
-    DHLOGI("DCameraSourceDev Execute Register register hal, ret: %d, devId: %s dhId: %s", retHdi,
-        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+    DHLOGI("DCameraSourceDev Execute Register register hal, ret: %{public}d, devId: %{public}s dhId: %{public}s",
+        retHdi, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     if (retHdi != SUCCESS) {
         controller_->UnInit();
         input_->UnInit();
@@ -308,26 +308,26 @@ int32_t DCameraSourceDev::ParseEnableParam(std::shared_ptr<DCameraRegistParam>& 
 int32_t DCameraSourceDev::UnRegister(std::shared_ptr<DCameraRegistParam>& param)
 {
     DCAMERA_SYNC_TRACE(DCAMERA_UNREGISTER_CAMERA);
-    DHLOGI("DCameraSourceDev Execute UnRegister devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
+    DHLOGI("DCameraSourceDev Execute UnRegister devId: %{public}s dhId: %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     ReportRegisterCameraEvent(UNREGIST_CAMERA_EVENT, GetAnonyString(devId_), dhId_,
         version_, "execute unregister event.");
     int32_t ret = controller_->UnInit();
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceDev Execute UnRegister controller uninit failed, ret: %d, devId: %s dhId: %s", ret,
-            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        DHLOGE("DCameraSourceDev Execute UnRegister controller uninit failed, ret: %{public}d, devId: %{public}s "
+            "dhId: %{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     }
 
     ret = input_->UnInit();
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceDev Execute UnRegister input uninit failed, ret: %d, devId: %s dhId: %s", ret,
-            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        DHLOGE("DCameraSourceDev Execute UnRegister input uninit failed, ret: %{public}d, devId: %{public}s dhId: "
+            "%{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     }
 
     sptr<IDCameraProvider> camHdiProvider = IDCameraProvider::Get(HDF_DCAMERA_EXT_SERVICE);
     if (camHdiProvider == nullptr) {
-        DHLOGI("UnRegister camHdiProvider is nullptr devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
-            GetAnonyString(dhId_).c_str());
+        DHLOGI("UnRegister camHdiProvider is nullptr devId: %{public}s dhId: %{public}s",
+            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return DCAMERA_BAD_OPERATE;
     }
 
@@ -335,8 +335,8 @@ int32_t DCameraSourceDev::UnRegister(std::shared_ptr<DCameraRegistParam>& param)
     dhBase.deviceId_ = param->devId_;
     dhBase.dhId_ = param->dhId_;
     int32_t retHdi = camHdiProvider->DisableDCameraDevice(dhBase);
-    DHLOGI("DCameraSourceDev Execute UnRegister unregister hal, ret: %d, devId: %s dhId: %s", retHdi,
-        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+    DHLOGI("DCameraSourceDev Execute UnRegister unregister hal, ret: %{public}d, devId: %{public}s dhId: %{public}s",
+        retHdi, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     if (retHdi != SUCCESS) {
         return DCAMERA_UNREGIST_HAL_FAILED;
     }
@@ -345,13 +345,13 @@ int32_t DCameraSourceDev::UnRegister(std::shared_ptr<DCameraRegistParam>& param)
 
 int32_t DCameraSourceDev::OpenCamera()
 {
-    DHLOGI("DCameraSourceDev Execute OpenCamera devId %s dhId %s", GetAnonyString(devId_).c_str(),
+    DHLOGI("DCameraSourceDev Execute OpenCamera devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     ReportCameraOperaterEvent(OPEN_CAMERA_EVENT, GetAnonyString(devId_), dhId_, "execute open camera event.");
     std::shared_ptr<DCameraOpenInfo> openInfo = std::make_shared<DCameraOpenInfo>();
     int32_t ret = GetLocalDeviceNetworkId(openInfo->sourceDevId_);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceDev getMyId failed ret: %d, devId: %s, dhId: %s", ret,
+        DHLOGE("DCameraSourceDev getMyId failed ret: %{public}d, devId: %{public}s, dhId: %{public}s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return ret;
     }
@@ -359,8 +359,8 @@ int32_t DCameraSourceDev::OpenCamera()
     DcameraStartAsyncTrace(DCAMERA_OPEN_CHANNEL_CONTROL, DCAMERA_OPEN_CHANNEL_TASKID);
     ret = controller_->OpenChannel(openInfo);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceDev Execute OpenCamera OpenChannel failed, ret: %d, devId: %s dhId: %s", ret,
-            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        DHLOGE("DCameraSourceDev Execute OpenCamera OpenChannel failed, ret: %{public}d, devId: %{public}s dhId: "
+            "%{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         DcameraFinishAsyncTrace(DCAMERA_OPEN_CHANNEL_CONTROL, DCAMERA_OPEN_CHANNEL_TASKID);
         return DCAMERA_OPEN_CONFLICT;
     }
@@ -369,37 +369,37 @@ int32_t DCameraSourceDev::OpenCamera()
 
 int32_t DCameraSourceDev::CloseCamera()
 {
-    DHLOGI("DCameraSourceDev Execute CloseCamera devId %s dhId %s", GetAnonyString(devId_).c_str(),
+    DHLOGI("DCameraSourceDev Execute CloseCamera devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     ReportCameraOperaterEvent(CLOSE_CAMERA_EVENT, GetAnonyString(devId_), dhId_, "execute close camera event.");
     int32_t ret = input_->CloseChannel();
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceDev Execute CloseCamera input CloseChannel failed, ret: %d, devId: %s dhId: %s", ret,
-            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        DHLOGE("DCameraSourceDev Execute CloseCamera input CloseChannel failed, ret: %{public}d, devId: %{public}s "
+            "dhId: %{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     }
     ret = controller_->CloseChannel();
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceDev Execute CloseCamera controller CloseChannel failed, ret: %d, devId: %s dhId: %s", ret,
-            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        DHLOGE("DCameraSourceDev Execute CloseCamera controller CloseChannel failed, ret: %{public}d, devId: "
+            "%{public}s dhId: %{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     }
     return DCAMERA_OK;
 }
 
 int32_t DCameraSourceDev::ConfigStreams(std::vector<std::shared_ptr<DCStreamInfo>>& streamInfos)
 {
-    DHLOGI("DCameraSourceDev Execute ConfigStreams devId %s dhId %s", GetAnonyString(devId_).c_str(),
+    DHLOGI("DCameraSourceDev Execute ConfigStreams devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     int32_t ret = input_->ConfigStreams(streamInfos);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceDev Execute ConfigStreams ConfigStreams failed, ret: %d, devId: %s dhId: %s", ret,
-            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        DHLOGE("DCameraSourceDev Execute ConfigStreams ConfigStreams failed, ret: %{public}d, devId: %{public}s dhId: "
+            "%{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return ret;
     }
 
     std::shared_ptr<DCameraChannelInfo> chanInfo = std::make_shared<DCameraChannelInfo>();
     ret = GetLocalDeviceNetworkId(chanInfo->sourceDevId_);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceDev getLocalNetworkId failed ret: %d, devId: %s, dhId: %s", ret,
+        DHLOGE("DCameraSourceDev getLocalNetworkId failed ret: %{public}d, devId: %{public}s, dhId: %{public}s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return ret;
     }
@@ -410,7 +410,7 @@ int32_t DCameraSourceDev::ConfigStreams(std::vector<std::shared_ptr<DCStreamInfo
 
     ret = controller_->ChannelNeg(chanInfo);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceDev ChannelNeg failed ret: %d, devId: %s, dhId: %s", ret,
+        DHLOGE("DCameraSourceDev ChannelNeg failed ret: %{public}d, devId: %{public}s, dhId: %{public}s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return ret;
     }
@@ -419,8 +419,8 @@ int32_t DCameraSourceDev::ConfigStreams(std::vector<std::shared_ptr<DCStreamInfo
     actualDevInfo.assign(actualDevInfo_.begin(), actualDevInfo_.end());
     ret = input_->OpenChannel(actualDevInfo);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceDev ChannelNeg OpenChannel failed ret: %d, devId: %s, dhId: %s", ret,
-            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        DHLOGE("DCameraSourceDev ChannelNeg OpenChannel failed ret: %{public}d, devId: %{public}s, dhId: %{public}s",
+            ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return ret;
     }
     return DCAMERA_OK;
@@ -428,12 +428,12 @@ int32_t DCameraSourceDev::ConfigStreams(std::vector<std::shared_ptr<DCStreamInfo
 
 int32_t DCameraSourceDev::ReleaseStreams(std::vector<int>& streamIds, bool& isAllRelease)
 {
-    DHLOGI("DCameraSourceDev Execute ReleaseStreams devId %s dhId %s", GetAnonyString(devId_).c_str(),
+    DHLOGI("DCameraSourceDev Execute ReleaseStreams devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     int32_t ret = input_->ReleaseStreams(streamIds, isAllRelease);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceDev Execute ReleaseStreams failed ret: %d, devId: %s, dhId: %s", ret,
-            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        DHLOGE("DCameraSourceDev Execute ReleaseStreams failed ret: %{public}d, devId: %{public}s, dhId: %{public}s",
+            ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return ret;
     }
     return DCAMERA_OK;
@@ -441,12 +441,12 @@ int32_t DCameraSourceDev::ReleaseStreams(std::vector<int>& streamIds, bool& isAl
 
 int32_t DCameraSourceDev::ReleaseAllStreams()
 {
-    DHLOGI("DCameraSourceDev Execute ReleaseAllStreams devId %s dhId %s", GetAnonyString(devId_).c_str(),
-        GetAnonyString(dhId_).c_str());
+    DHLOGI("DCameraSourceDev Execute ReleaseAllStreams devId %{public}s dhId %{public}s",
+        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     int32_t ret = input_->ReleaseAllStreams();
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceDev Execute ReleaseAllStreams failed ret: %d, devId: %s, dhId: %s", ret,
-            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        DHLOGE("DCameraSourceDev Execute ReleaseAllStreams failed ret: %{public}d, devId: %{public}s, "
+            "dhId: %{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return ret;
     }
     return DCAMERA_OK;
@@ -455,11 +455,11 @@ int32_t DCameraSourceDev::ReleaseAllStreams()
 int32_t DCameraSourceDev::StartCapture(std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos)
 {
     HitraceAndHisyseventImpl(captureInfos);
-    DHLOGI("DCameraSourceDev Execute StartCapture devId %s dhId %s", GetAnonyString(devId_).c_str(),
+    DHLOGI("DCameraSourceDev Execute StartCapture devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     int32_t ret = input_->StartCapture(captureInfos);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceDev input StartCapture failed ret: %d, devId: %s, dhId: %s", ret,
+        DHLOGE("DCameraSourceDev input StartCapture failed ret: %{public}d, devId: %{public}s, dhId: %{public}s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         DcameraFinishAsyncTrace(DCAMERA_CONTINUE_FIRST_FRAME, DCAMERA_CONTINUE_FIRST_FRAME_TASKID);
         DcameraFinishAsyncTrace(DCAMERA_SNAPSHOT_FIRST_FRAME, DCAMERA_SNAPSHOT_FIRST_FRAME_TASKID);
@@ -475,7 +475,8 @@ int32_t DCameraSourceDev::StartCapture(std::vector<std::shared_ptr<DCCaptureInfo
         capture->isCapture_ = (*iter)->isCapture_;
         capture->encodeType_ = (*iter)->encodeType_;
         capture->streamType_ = (*iter)->type_;
-        DHLOGI("StartCapture devId %s dhId %s settings size: %d w: %d h: %d fmt: %d isC: %d enc: %d streamT: %d",
+        DHLOGI("StartCapture devId %{public}s dhId %{public}s settings size: %{public}zu w: %{public}d h: %{public}d "
+            "fmt: %{public}d isC: %{public}d enc: %{public}d streamT: %{public}d",
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), (*iter)->captureSettings_.size(),
             capture->width_, capture->height_, capture->format_, capture->isCapture_ ? 1 : 0, capture->encodeType_,
             capture->streamType_);
@@ -491,8 +492,8 @@ int32_t DCameraSourceDev::StartCapture(std::vector<std::shared_ptr<DCCaptureInfo
 
     ret = controller_->StartCapture(captures);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceDev Execute StartCapture StartCapture failed, ret: %d, devId: %s dhId: %s", ret,
-            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        DHLOGE("DCameraSourceDev Execute StartCapture StartCapture failed, ret: %{public}d, devId: %{public}s dhId: "
+            "%{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         DcameraFinishAsyncTrace(DCAMERA_CONTINUE_FIRST_FRAME, DCAMERA_CONTINUE_FIRST_FRAME_TASKID);
         DcameraFinishAsyncTrace(DCAMERA_SNAPSHOT_FIRST_FRAME, DCAMERA_SNAPSHOT_FIRST_FRAME_TASKID);
     }
@@ -522,18 +523,18 @@ void DCameraSourceDev::HitraceAndHisyseventImpl(std::vector<std::shared_ptr<DCCa
 
 int32_t DCameraSourceDev::StopCapture(std::vector<int>& streamIds, bool& isAllStop)
 {
-    DHLOGI("DCameraSourceDev Execute StopCapture devId %s dhId %s", GetAnonyString(devId_).c_str(),
+    DHLOGI("DCameraSourceDev Execute StopCapture devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     int32_t ret = input_->StopCapture(streamIds, isAllStop);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceDev Execute StopCapture input StopCapture failed, ret: %d, devId: %s dhId: %s", ret,
-            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        DHLOGE("DCameraSourceDev Execute StopCapture input StopCapture failed, ret: %{public}d, devId: %{public}s "
+            "dhId: %{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     }
     if (isAllStop) {
         ret = controller_->StopCapture();
         if (ret != DCAMERA_OK) {
-            DHLOGE("DCameraSourceDev Execute StopCapture controller StopCapture failed, ret: %d, devId: %s dhId: %s",
-                ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+            DHLOGE("DCameraSourceDev Execute StopCapture controller StopCapture failed, ret: %{public}d, devId: "
+                "%{public}s dhId: %{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         }
     }
     return DCAMERA_OK;
@@ -541,35 +542,35 @@ int32_t DCameraSourceDev::StopCapture(std::vector<int>& streamIds, bool& isAllSt
 
 int32_t DCameraSourceDev::StopAllCapture()
 {
-    DHLOGI("DCameraSourceDev Execute StopAllCapture devId %s dhId %s", GetAnonyString(devId_).c_str(),
+    DHLOGI("DCameraSourceDev Execute StopAllCapture devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     int32_t ret = input_->StopAllCapture();
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceDev Execute StopAllCapture input StopAllCapture failed, ret: %d, devId: %s dhId: %s",
-            ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        DHLOGE("DCameraSourceDev Execute StopAllCapture input StopAllCapture failed, ret: %{public}d, devId: "
+            "%{public}s dhId: %{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     }
     ret = controller_->StopCapture();
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceDev Execute StopAllCapture controller StopAllCapture failed, ret: %d, devId: %s dhId: %s",
-            ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        DHLOGE("DCameraSourceDev Execute StopAllCapture controller StopAllCapture failed, ret: %{public}d, devId: "
+            "%{public}s dhId: %{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     }
     return DCAMERA_OK;
 }
 
 int32_t DCameraSourceDev::UpdateSettings(std::vector<std::shared_ptr<DCameraSettings>>& settings)
 {
-    DHLOGI("DCameraSourceDev Execute UpdateSettings devId %s dhId %s", GetAnonyString(devId_).c_str(),
+    DHLOGI("DCameraSourceDev Execute UpdateSettings devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     int32_t ret = input_->UpdateSettings(settings);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceDev Execute UpdateSettings input UpdateSettings failed, ret: %d, devId: %s dhId: %s", ret,
-            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        DHLOGE("DCameraSourceDev Execute UpdateSettings input UpdateSettings failed, ret: %{public}d, devId: "
+            "%{public}s dhId: %{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return ret;
     }
     ret = controller_->UpdateSettings(settings);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceDev Execute UpdateSettings controller UpdateSettings failed, ret: %d, devId: %s dhId: %s",
-            ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        DHLOGE("DCameraSourceDev Execute UpdateSettings controller UpdateSettings failed, ret: %{public}d, "
+            "devId: %{public}s dhId: %{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return ret;
     }
     return DCAMERA_OK;
@@ -577,12 +578,12 @@ int32_t DCameraSourceDev::UpdateSettings(std::vector<std::shared_ptr<DCameraSett
 
 int32_t DCameraSourceDev::CameraEventNotify(std::shared_ptr<DCameraEvent>& events)
 {
-    DHLOGI("DCameraSourceDev Execute CameraEventNotify devId %s dhId %s", GetAnonyString(devId_).c_str(),
-        GetAnonyString(dhId_).c_str());
+    DHLOGI("DCameraSourceDev Execute CameraEventNotify devId %{public}s dhId %{public}s",
+        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     int32_t ret = controller_->DCameraNotify(events);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceDev Execute CameraEventNotify DCameraNotify failed, ret: %d, devId: %s dhId: %s", ret,
-            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        DHLOGE("DCameraSourceDev Execute CameraEventNotify DCameraNotify failed, ret: %{public}d, devId: %{public}s "
+            "dhId: %{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return ret;
     }
     return DCAMERA_OK;
@@ -592,7 +593,7 @@ void DCameraSourceDev::NotifyResult(DCAMERA_EVENT eventType, DCameraSourceEvent&
 {
     auto itFunc = memberFuncMap_.find(eventType);
     if (itFunc == memberFuncMap_.end()) {
-        DHLOGE("Notify func map not find, execute %d notify, devId: %s dhId: %s", eventType,
+        DHLOGE("Notify func map not find, execute %{public}d notify, devId: %{public}s dhId: %{public}s", eventType,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return;
     }
@@ -624,8 +625,8 @@ void DCameraSourceDev::NotifyRegisterResult(DCAMERA_EVENT eventType, DCameraSour
 
 void DCameraSourceDev::NotifyHalResult(DCAMERA_EVENT eventType, DCameraSourceEvent& event, int32_t result)
 {
-    DHLOGI("DCameraSourceDev NotifyHalResult eventType: %d, result: %d devId: %s dhId: %s", eventType, result,
-        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+    DHLOGI("DCameraSourceDev NotifyHalResult eventType: %{public}d, result: %{public}d devId: %{public}s dhId: "
+        "%{public}s", eventType, result, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     if (result == DCAMERA_OK) {
         return;
     }
@@ -643,7 +644,7 @@ void DCameraSourceDev::NotifyHalResult(DCAMERA_EVENT eventType, DCameraSourceEve
 
 int32_t DCameraSourceDev::GetStateInfo()
 {
-    DHLOGI("GetStateInfo In state %d", stateMachine_->GetCameraState());
+    DHLOGI("GetStateInfo In state %{public}d", stateMachine_->GetCameraState());
     return stateMachine_->GetCameraState();
 }
 

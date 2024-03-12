@@ -68,7 +68,8 @@ int32_t DCameraSinkHandler::InitSink(const std::string& params)
     sptr<DCameraSinkLoadCallback> loadCallback(new DCameraSinkLoadCallback(params));
     int32_t ret = sm->LoadSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, loadCallback);
     if (ret != DCAMERA_OK) {
-        DHLOGE("systemAbilityId: %d load filed, result code: %d.", DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, ret);
+        DHLOGE("systemAbilityId: %{public}d load filed, result code: %{public}d.",
+            DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, ret);
         return DCAMERA_INIT_ERR;
     }
     {
@@ -82,7 +83,7 @@ int32_t DCameraSinkHandler::InitSink(const std::string& params)
             return DCAMERA_INIT_ERR;
         }
     }
-    DHLOGI("end, result: %d", ret);
+    DHLOGI("end, result: %{public}d", ret);
     return DCAMERA_OK;
 }
 
@@ -102,7 +103,7 @@ void DCameraSinkHandler::FinishStartSA(const std::string& params)
 
 void DCameraSinkHandler::FinishStartSAFailed(const int32_t systemAbilityId)
 {
-    DHLOGI("SinkSA Start failed, systemAbilityId: %d.", systemAbilityId);
+    DHLOGI("SinkSA Start failed, systemAbilityId: %{public}d.", systemAbilityId);
     std::unique_lock<std::mutex> lock(producerMutex_);
     state_ = DCAMERA_SA_STATE_STOP;
     producerCon_.notify_one();
@@ -120,7 +121,7 @@ int32_t DCameraSinkHandler::ReleaseSink()
     ReportSaEvent(RELEASE_SA_EVENT, DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, "release sink sa event.");
     int32_t ret = dCameraSinkSrv->ReleaseSink();
     if (ret != DCAMERA_OK) {
-        DHLOGE("sink service release failed, ret: %d", ret);
+        DHLOGE("sink service release failed, ret: %{public}d", ret);
         return ret;
     }
 
@@ -133,7 +134,7 @@ int32_t DCameraSinkHandler::ReleaseSink()
 
 int32_t DCameraSinkHandler::SubscribeLocalHardware(const std::string& dhId, const std::string& parameters)
 {
-    DHLOGI("dhId: %s", GetAnonyString(dhId).c_str());
+    DHLOGI("dhId: %{public}s", GetAnonyString(dhId).c_str());
     sptr<IDistributedCameraSink> dCameraSinkSrv = DCameraSinkHandlerIpc::GetInstance().GetSinkLocalCamSrv();
     if (dCameraSinkSrv == nullptr) {
         DHLOGE("get Service failed");
@@ -144,7 +145,7 @@ int32_t DCameraSinkHandler::SubscribeLocalHardware(const std::string& dhId, cons
 
 int32_t DCameraSinkHandler::UnsubscribeLocalHardware(const std::string& dhId)
 {
-    DHLOGI("dhId: %s", GetAnonyString(dhId).c_str());
+    DHLOGI("dhId: %{public}s", GetAnonyString(dhId).c_str());
     sptr<IDistributedCameraSink> dCameraSinkSrv = DCameraSinkHandlerIpc::GetInstance().GetSinkLocalCamSrv();
     if (dCameraSinkSrv == nullptr) {
         DHLOGE("get Service failed");

@@ -92,7 +92,7 @@ sptr<IDistributedCameraSink> DCameraSinkHandlerIpc::GetSinkLocalCamSrv()
     int32_t ret = object->AddDeathRecipient(sinkLocalRecipient_);
     sptr<IDistributedCameraSink> localSink = iface_cast<IDistributedCameraSink>(object);
     if (localSink == nullptr) {
-        DHLOGI("GetSinkLocalCamSrv failed, localSink is null ret: %d", ret);
+        DHLOGI("GetSinkLocalCamSrv failed, localSink is null ret: %{public}d", ret);
         return nullptr;
     }
     {
@@ -102,7 +102,7 @@ sptr<IDistributedCameraSink> DCameraSinkHandlerIpc::GetSinkLocalCamSrv()
         }
         localSink_ = localSink;
     }
-    DHLOGI("GetSinkLocalCamSrv success, AddDeathRecipient ret: %d", ret);
+    DHLOGI("GetSinkLocalCamSrv success, AddDeathRecipient ret: %{public}d", ret);
     return localSink;
 }
 

@@ -56,6 +56,7 @@ ohos_unittest("CommonUtilsTest") {
     "c_utils:utils",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "hdf_core:libhdi",
+    "hilog:libhilog",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]

@@ -119,6 +119,7 @@ ohos_shared_library("distributed_camera_sink") {
     "drivers_peripheral_display:hdi_gralloc_client",
     "eventhandler:libeventhandler",
     "graphic_surface:surface",
+    "hilog:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",

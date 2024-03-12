@@ -107,10 +107,10 @@ public:
 protected:
     void SaveFile() const override
     {
-        DHLOGI("DemoDCameraPhotoSurfaceListener::SaveFile width: %d, height: %d, size: %d, dataSize: %d, " +
-            "actualSize: %d", width_, height_, size_, dataSize_, actualSize_);
+        DHLOGI("DemoDCameraPhotoSurfaceListener::SaveFile width: %{public}d, height: %{public}d, size: %{public}d, "
+            "dataSize: %{public}d, actualSize: %{public}d", width_, height_, size_, dataSize_, actualSize_);
         if ((address_ == nullptr) || (dataSize_ <= 0)) {
-            DHLOGE("DemoDCameraPhotoSurfaceListener invalid params, dataSize: %d", dataSize_);
+            DHLOGE("DemoDCameraPhotoSurfaceListener invalid params, dataSize: %{public}d", dataSize_);
             return;
         }
 
@@ -138,10 +138,10 @@ public:
 protected:
     void SaveFile() const override
     {
-        DHLOGI("DemoDCameraPreviewSurfaceListener::SaveFile width: %d, height: %d, size: %d, dataSize: %d, " +
-            "actualSize: %d", width_, height_, size_, dataSize_, actualSize_);
+        DHLOGI("DemoDCameraPreviewSurfaceListener::SaveFile width: %{public}d, height: %{public}d, size: %{public}d, "
+            "dataSize: %{public}d, actualSize: %{public}d", width_, height_, size_, dataSize_, actualSize_);
         if ((address_ == nullptr) || (actualSize_ <= 0)) {
-            DHLOGE("DemoDCameraPreviewSurfaceListener invalid params, actualSize: %d", actualSize_);
+            DHLOGE("DemoDCameraPreviewSurfaceListener invalid params, actualSize: %{public}d", actualSize_);
             return;
         }
 
@@ -170,10 +170,10 @@ public:
 protected:
     void SaveFile() const override
     {
-        DHLOGI("DemoDCameraVideoSurfaceListener::SaveFile width: %d, height: %d, size: %d, dataSize: %d, " +
-            "actualSize: %d", width_, height_, size_, dataSize_, actualSize_);
+        DHLOGI("DemoDCameraVideoSurfaceListener::SaveFile width: %{public}d, height: %{public}d, size: %{public}d, "
+            "dataSize: %{public}d, actualSize: %{public}d", width_, height_, size_, dataSize_, actualSize_);
         if ((address_ == nullptr) || (actualSize_ <= 0)) {
-            DHLOGE("DemoDCameraVideoSurfaceListener invalid params, actualSize: %d", actualSize_);
+            DHLOGE("DemoDCameraVideoSurfaceListener invalid params, actualSize: %{public}d", actualSize_);
             return;
         }
 
@@ -196,27 +196,31 @@ class DemoDCameraPhotoCallback : public CameraStandard::PhotoStateCallback {
 public:
     void OnCaptureStarted(const int32_t captureID) const
     {
-        DHLOGI("DemoDCameraPhotoCallback::OnCaptureStarted captureID: %d", captureID);
+        DHLOGI("DemoDCameraPhotoCallback::OnCaptureStarted captureID: %{public}d", captureID);
     }
 
     void OnCaptureStarted(const int32_t captureID, uint32_t exposureTime) const
     {
-        DHLOGI("DemoDCameraPhotoCallback::OnCaptureStarted captureID: %d, exposureTime: %u", captureID, exposureTime);
+        DHLOGI("DemoDCameraPhotoCallback::OnCaptureStarted captureID: %{public}d, exposureTime: %{public}u",
+            captureID, exposureTime);
     }
 
     void OnCaptureEnded(const int32_t captureID, int32_t frameCount) const
     {
-        DHLOGI("DemoDCameraPhotoCallback::OnCaptureEnded captureID: %d frameCount: %d", captureID, frameCount);
+        DHLOGI("DemoDCameraPhotoCallback::OnCaptureEnded captureID: %{public}d frameCount: %{public}d",
+            captureID, frameCount);
     }
 
     void OnFrameShutter(const int32_t captureId, const uint64_t timestamp) const
     {
-        DHLOGI("DemoDCameraPhotoCallback::OnFrameShutter captureID: %d timestamp: %llu", captureId, timestamp);
+        DHLOGI("DemoDCameraPhotoCallback::OnFrameShutter captureID: %{public}d timestamp: %{public}llu",
+            captureId, timestamp);
     }
 
     void OnCaptureError(const int32_t captureId, const int32_t errorCode) const
     {
-        DHLOGI("DemoDCameraPhotoCallback::OnCaptureError captureID: %d errorCode: %d", captureId, errorCode);
+        DHLOGI("DemoDCameraPhotoCallback::OnCaptureError captureID: %{public}d errorCode: %{public}d",
+            captureId, errorCode);
     }
 };
 
@@ -229,12 +233,12 @@ public:
 
     void OnFrameEnded(const int32_t frameCount) const
     {
-        DHLOGI("DemoDCameraPreviewCallback::OnFrameEnded frameCount: %d", frameCount);
+        DHLOGI("DemoDCameraPreviewCallback::OnFrameEnded frameCount: %{public}d", frameCount);
     }
 
     void OnError(const int32_t errorCode) const
     {
-        DHLOGI("DemoDCameraPreviewCallback::OnError errorCode: %d", errorCode);
+        DHLOGI("DemoDCameraPreviewCallback::OnError errorCode: %{public}d", errorCode);
     }
 
     void OnSketchStatusDataChanged(const CameraStandard::SketchStatusData& statusData) const
@@ -252,12 +256,12 @@ public:
 
     void OnFrameEnded(const int32_t frameCount) const
     {
-        DHLOGI("DemoDCameraVideoCallback::OnFrameEnded frameCount: %d", frameCount);
+        DHLOGI("DemoDCameraVideoCallback::OnFrameEnded frameCount: %{public}d", frameCount);
     }
 
     void OnError(const int32_t errorCode) const
     {
-        DHLOGI("DemoDCameraVideoCallback::OnError errorCode: %d", errorCode);
+        DHLOGI("DemoDCameraVideoCallback::OnError errorCode: %{public}d", errorCode);
     }
 };
 
@@ -265,7 +269,7 @@ class DemoDCameraInputCallback : public CameraStandard::ErrorCallback {
 public:
     void OnError(const int32_t errorType, const int32_t errorMsg) const
     {
-        DHLOGI("DemoDCameraInputCallback::OnError errorType: %d errorMsg: %d", errorType, errorMsg);
+        DHLOGI("DemoDCameraInputCallback::OnError errorType: %{public}d errorMsg: %{public}d", errorType, errorMsg);
     }
 };
 
@@ -273,13 +277,14 @@ class DemoDCameraManagerCallback : public CameraStandard::CameraManagerCallback 
 public:
     void OnCameraStatusChanged(const CameraStandard::CameraStatusInfo &cameraStatusInfo) const
     {
-        DHLOGI("DemoDCameraManagerCallback::OnCameraStatusChanged cameraStatus: %d", cameraStatusInfo.cameraStatus);
+        DHLOGI("DemoDCameraManagerCallback::OnCameraStatusChanged cameraStatus: %{public}d",
+            cameraStatusInfo.cameraStatus);
     }
 
     void OnFlashlightStatusChanged(const std::string &cameraID,
         const CameraStandard::FlashStatus flashStatus) const
     {
-        DHLOGI("DemoDCameraManagerCallback::OnFlashlightStatusChanged cameraID: %s, flashStatus: %d",
+        DHLOGI("DemoDCameraManagerCallback::OnFlashlightStatusChanged cameraID: %{public}s, flashStatus: %{public}d",
             GetAnonyString(cameraID).c_str(), flashStatus);
     }
 };
@@ -288,12 +293,12 @@ class DemoDCameraSessionCallback : public CameraStandard::SessionCallback, publi
 public:
     void OnError(int32_t errorCode)
     {
-        DHLOGI("DemoDCameraSessionCallback::OnError errorCode: %d", errorCode);
+        DHLOGI("DemoDCameraSessionCallback::OnError errorCode: %{public}d", errorCode);
     }
 
     void OnFocusState(FocusState state)
     {
-        DHLOGI("DemoDCameraSessionCallback::OnFocusState state: %d", state);
+        DHLOGI("DemoDCameraSessionCallback::OnFocusState state: %{public}d", state);
     }
 };
 

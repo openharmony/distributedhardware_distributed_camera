@@ -35,7 +35,7 @@ DCameraSourceStateMachine::~DCameraSourceStateMachine()
 
 int32_t DCameraSourceStateMachine::Execute(DCAMERA_EVENT eventType, DCameraSourceEvent& event)
 {
-    DHLOGI("In state %d execute event %d", currentState_->GetStateType(), eventType);
+    DHLOGI("In state %{public}d execute event %{public}d", currentState_->GetStateType(), eventType);
     std::shared_ptr<DCameraSourceDev> camDev = camDev_.lock();
     if (camDev == nullptr) {
         DHLOGE("DCameraSourceStateMachine execute failed, camDev is nullptr");
@@ -43,8 +43,8 @@ int32_t DCameraSourceStateMachine::Execute(DCAMERA_EVENT eventType, DCameraSourc
     }
     int32_t ret = currentState_->Execute(camDev, event.GetEventType(), event);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceStateMachine currentState_: %d execute event: %d failed", currentState_->GetStateType(),
-            event.GetEventType());
+        DHLOGE("DCameraSourceStateMachine currentState_: %{public}d execute event: %{public}d failed",
+            currentState_->GetStateType(), event.GetEventType());
     }
     return ret;
 }
@@ -52,9 +52,10 @@ int32_t DCameraSourceStateMachine::Execute(DCAMERA_EVENT eventType, DCameraSourc
 void DCameraSourceStateMachine::UpdateState(DCameraStateType stateType)
 {
     if (stateType != DCAMERA_STATE_INIT) {
-        DHLOGI("DCameraSourceStateMachine update state from %d to %d", currentState_->GetStateType(), stateType);
+        DHLOGI("DCameraSourceStateMachine update state from %{public}d to %{public}d",
+            currentState_->GetStateType(), stateType);
     } else {
-        DHLOGI("DCameraSourceStateMachine update state %d", stateType);
+        DHLOGI("DCameraSourceStateMachine update state %{public}d", stateType);
     }
     auto stateMachine = std::shared_ptr<DCameraSourceStateMachine>(shared_from_this());
     currentState_ = DCameraSourceStateFactory::GetInstance().CreateState(stateType, stateMachine);
@@ -62,7 +63,7 @@ void DCameraSourceStateMachine::UpdateState(DCameraStateType stateType)
 
 int32_t DCameraSourceStateMachine::GetCameraState()
 {
-    DHLOGI("GetCameraState In state %d", currentState_->GetStateType());
+    DHLOGI("GetCameraState In state %{public}d", currentState_->GetStateType());
     return currentState_->GetStateType();
 }
 } // namespace DistributedHardware

@@ -31,8 +31,8 @@ constexpr static int32_t MICROSECONDS = 1000;
 static void OnTimeSyncResult(const TimeSyncResultInfo *info, int32_t retCode)
 {
     int32_t microsecond = info->result.millisecond * MICROSECONDS + info->result.microsecond;
-    DHLOGD("DCameraSoftbusLatency OnTimeSyncResult retcode %d, millisecond: %d, microsecond %d microsecond_ %d",
-        retCode, info->result.millisecond, info->result.microsecond, microsecond);
+    DHLOGD("DCameraSoftbusLatency OnTimeSyncResult retcode %{public}d, millisecond: %{public}d, microsecond %{public}d "
+        "microsecond_ %{public}d", retCode, info->result.millisecond, info->result.microsecond, microsecond);
     DCameraSoftbusLatency::GetInstance().SetTimeSyncInfo(microsecond, info->target.targetNetworkId);
 }
 
@@ -43,7 +43,7 @@ int32_t DCameraSoftbusLatency::StartSoftbusTimeSync(const std::string& devId)
         std::lock_guard<std::mutex> lock(micLock_);
         if (refCount_[devId] > REF_INITIAL) {
             refCount_[devId]++;
-            DHLOGD("No need to start time offset, refCount just plus one and now is: %d.", refCount_[devId]);
+            DHLOGD("No need to start time offset, refCount just plus one and now is: %{public}d.", refCount_[devId]);
             return DCAMERA_OK;
         }
     }
@@ -52,7 +52,7 @@ int32_t DCameraSoftbusLatency::StartSoftbusTimeSync(const std::string& devId)
     int32_t ret = StartTimeSync(DCAMERA_PKG_NAME.c_str(), devId.c_str(), LOW_ACCURACY, NORMAL_PERIOD,
         &timeSyncCb);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSoftbusLatency:: StartSoftbusTimeSync failed networkId %s", devId.c_str());
+        DHLOGE("DCameraSoftbusLatency:: StartSoftbusTimeSync failed networkId %{public}s", devId.c_str());
     }
     {
         std::lock_guard<std::mutex> lock(micLock_);
@@ -74,13 +74,13 @@ int32_t DCameraSoftbusLatency::StopSoftbusTimeSync(const std::string& devId)
         }
         if (refCount_[devId] > REF_NORMAL) {
             refCount_[devId]--;
-            DHLOGD("No need to stop time offset, refCount just minus one and now is: %d.", refCount_[devId]);
+            DHLOGD("No need to stop time offset, refCount just minus one and now is: %{public}d.", refCount_[devId]);
             return DCAMERA_OK;
         }
     }
     int32_t ret = StopTimeSync(DCAMERA_PKG_NAME.c_str(), devId.c_str());
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSoftbusLatency:: StopSoftbusTimeSync failed ret:%d", ret);
+        DHLOGE("DCameraSoftbusLatency:: StopSoftbusTimeSync failed ret:%{public}d", ret);
     }
     {
         std::lock_guard<std::mutex> lock(micLock_);

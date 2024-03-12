@@ -31,12 +31,12 @@ namespace DistributedHardware {
 DCameraSinkDataProcess::DCameraSinkDataProcess(const std::string& dhId, std::shared_ptr<ICameraChannel>& channel)
     : dhId_(dhId), channel_(channel), eventHandler_(nullptr)
 {
-    DHLOGI("DCameraSinkDataProcess Constructor dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("DCameraSinkDataProcess Constructor dhId: %{public}s", GetAnonyString(dhId_).c_str());
 }
 
 DCameraSinkDataProcess::~DCameraSinkDataProcess()
 {
-    DHLOGI("DCameraSinkDataProcess delete dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("DCameraSinkDataProcess delete dhId: %{public}s", GetAnonyString(dhId_).c_str());
     if ((eventHandler_ != nullptr) && (eventHandler_->GetEventRunner() != nullptr)) {
         eventHandler_->GetEventRunner()->Stop();
     }
@@ -46,7 +46,7 @@ DCameraSinkDataProcess::~DCameraSinkDataProcess()
 
 void DCameraSinkDataProcess::Init()
 {
-    DHLOGI("DCameraSinkDataProcess Init dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("DCameraSinkDataProcess Init dhId: %{public}s", GetAnonyString(dhId_).c_str());
     eventThread_ = std::thread(&DCameraSinkDataProcess::StartEventHandler, this);
     std::unique_lock<std::mutex> lock(eventMutex_);
     eventCon_.wait(lock, [this] {
@@ -68,17 +68,17 @@ void DCameraSinkDataProcess::StartEventHandler()
 
 int32_t DCameraSinkDataProcess::StartCapture(std::shared_ptr<DCameraCaptureInfo>& captureInfo)
 {
-    DHLOGI("StartCapture dhId: %s, width: %d, height: %d, format: %d, stream: %d, encode: %d",
-           GetAnonyString(dhId_).c_str(), captureInfo->width_, captureInfo->height_, captureInfo->format_,
-           captureInfo->streamType_, captureInfo->encodeType_);
+    DHLOGI("StartCapture dhId: %{public}s, width: %{public}d, height: %{public}d, format: %{public}d, stream: "
+        "%{public}d, encode: %{public}d", GetAnonyString(dhId_).c_str(), captureInfo->width_, captureInfo->height_,
+        captureInfo->format_, captureInfo->streamType_, captureInfo->encodeType_);
     captureInfo_ = captureInfo;
     if (pipeline_ != nullptr) {
-        DHLOGI("StartCapture %s pipeline already exits", GetAnonyString(dhId_).c_str());
+        DHLOGI("StartCapture %{public}s pipeline already exits", GetAnonyString(dhId_).c_str());
         return DCAMERA_OK;
     }
 
     if (captureInfo->streamType_ == CONTINUOUS_FRAME) {
-        DHLOGI("StartCapture %s create data process pipeline", GetAnonyString(dhId_).c_str());
+        DHLOGI("StartCapture %{public}s create data process pipeline", GetAnonyString(dhId_).c_str());
         pipeline_ = std::make_shared<DCameraPipelineSink>();
         auto dataProcess = std::shared_ptr<DCameraSinkDataProcess>(shared_from_this());
         std::shared_ptr<DataProcessListener> listener = std::make_shared<DCameraSinkDataProcessListener>(dataProcess);
@@ -94,24 +94,24 @@ int32_t DCameraSinkDataProcess::StartCapture(std::shared_ptr<DCameraCaptureInfo>
                                      captureInfo->height_);
         int32_t ret = pipeline_->CreateDataProcessPipeline(PipelineType::VIDEO, srcParams, destParams, listener);
         if (ret != DCAMERA_OK) {
-            DHLOGE("create data process pipeline failed, dhId: %s, ret: %d",
+            DHLOGE("create data process pipeline failed, dhId: %{public}s, ret: %{public}d",
                    GetAnonyString(dhId_).c_str(), ret);
             return ret;
         }
     }
-    DHLOGI("StartCapture %s success", GetAnonyString(dhId_).c_str());
+    DHLOGI("StartCapture %{public}s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
 }
 
 int32_t DCameraSinkDataProcess::StopCapture()
 {
-    DHLOGI("StopCapture dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("StopCapture dhId: %{public}s", GetAnonyString(dhId_).c_str());
     if (pipeline_ != nullptr) {
         pipeline_->DestroyDataProcessPipeline();
         pipeline_ = nullptr;
     }
     if (eventHandler_ != nullptr) {
-        DHLOGI("StopCapture dhId: %s, remove all events", GetAnonyString(dhId_).c_str());
+        DHLOGI("StopCapture dhId: %{public}s, remove all events", GetAnonyString(dhId_).c_str());
         eventHandler_->RemoveAllEvents();
     }
     return DCAMERA_OK;
@@ -120,12 +120,13 @@ int32_t DCameraSinkDataProcess::StopCapture()
 int32_t DCameraSinkDataProcess::FeedStream(std::shared_ptr<DataBuffer>& dataBuffer)
 {
     DCStreamType type = captureInfo_->streamType_;
-    DHLOGD("FeedStream dhId: %s, stream type: %d", GetAnonyString(dhId_).c_str(), type);
+    DHLOGD("FeedStream dhId: %{public}s, stream type: %{public}d", GetAnonyString(dhId_).c_str(), type);
     switch (type) {
         case CONTINUOUS_FRAME: {
             int32_t ret = FeedStreamInner(dataBuffer);
             if (ret != DCAMERA_OK) {
-                DHLOGE("FeedStream continuous frame failed, dhId: %s, ret: %d", GetAnonyString(dhId_).c_str(), ret);
+                DHLOGE("FeedStream continuous frame failed, dhId: %{public}s, ret: %{public}d",
+                    GetAnonyString(dhId_).c_str(), ret);
                 return ret;
             }
             break;
@@ -135,7 +136,7 @@ int32_t DCameraSinkDataProcess::FeedStream(std::shared_ptr<DataBuffer>& dataBuff
             break;
         }
         default: {
-            DHLOGE("FeedStream %s unknown stream type: %d", GetAnonyString(dhId_).c_str(), type);
+            DHLOGE("FeedStream %{public}s unknown stream type: %{public}d", GetAnonyString(dhId_).c_str(), type);
             break;
         }
     }
@@ -147,8 +148,9 @@ void DCameraSinkDataProcess::SendDataAsync(const std::shared_ptr<DataBuffer>& bu
     auto sendFunc = [this, buffer]() mutable {
         std::shared_ptr<DataBuffer> sendBuffer = buffer;
         int32_t ret = channel_->SendData(sendBuffer);
-        DHLOGD("SendData type: %d output data ret: %d, dhId: %s, bufferSize: %d", captureInfo_->streamType_, ret,
-            GetAnonyString(dhId_).c_str(), buffer->Size());
+        uint64_t buffersSize = static_cast<uint64_t>(buffer->Size());
+        DHLOGD("SendData type: %{public}d output data ret: %{public}d, dhId: %{public}s, bufferSize: %{public}" PRIu64,
+            captureInfo_->streamType_, ret, GetAnonyString(dhId_).c_str(), buffersSize);
     };
     if (eventHandler_ != nullptr) {
         eventHandler_->PostTask(sendFunc);
@@ -167,7 +169,7 @@ void DCameraSinkDataProcess::OnProcessedVideoBuffer(const std::shared_ptr<DataBu
 
 void DCameraSinkDataProcess::OnError(DataProcessErrorType errorType)
 {
-    DHLOGE("OnError %s data process pipeline error, errorType: %d",
+    DHLOGE("OnError %{public}s data process pipeline error, errorType: %{public}d",
            GetAnonyString(dhId_).c_str(), errorType);
 }
 
@@ -177,7 +179,7 @@ int32_t DCameraSinkDataProcess::FeedStreamInner(std::shared_ptr<DataBuffer>& dat
     buffers.push_back(dataBuffer);
     int32_t ret = pipeline_->ProcessData(buffers);
     if (ret != DCAMERA_OK) {
-        DHLOGE("process data failed, dhId: %s, ret: %d", GetAnonyString(dhId_).c_str(), ret);
+        DHLOGE("process data failed, dhId: %{public}s, ret: %{public}d", GetAnonyString(dhId_).c_str(), ret);
         return ret;
     }
     return DCAMERA_OK;

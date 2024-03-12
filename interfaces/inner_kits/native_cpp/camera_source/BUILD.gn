@@ -54,6 +54,7 @@ ohos_shared_library("distributed_camera_source_sdk") {
   external_deps = [
     "c_utils:utils",
     "distributed_hardware_fwk:distributedhardwareutils",
+    "hilog:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]

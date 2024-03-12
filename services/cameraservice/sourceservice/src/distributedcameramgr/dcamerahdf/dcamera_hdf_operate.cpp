@@ -49,7 +49,7 @@ int32_t DCameraHdfOperate::LoadDcameraHDFImpl()
 
     ::OHOS::sptr<IServStatListener> listener(
         new DCameraHdfServStatListener(DCameraHdfServStatListener::StatusCallback([&](const ServiceStatus& status) {
-            DHLOGI("LoadCameraService service status callback, serviceName: %s, status: %d",
+            DHLOGI("LoadCameraService service status callback, serviceName: %{public}s, status: %{public}d",
                 status.serviceName.c_str(), status.status);
             std::unique_lock<std::mutex> lock(hdfOperateMutex_);
             if (status.serviceName == CAMERA_SERVICE_NAME) {
@@ -98,7 +98,7 @@ int32_t DCameraHdfOperate::WaitLoadCameraService()
     });
 
     if (cameraServStatus_ != OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START) {
-        DHLOGE("wait load cameraService failed, status %d", cameraServStatus_);
+        DHLOGE("wait load cameraService failed, status %{public}d", cameraServStatus_);
         return DCAMERA_BAD_OPERATE;
     }
 
@@ -114,7 +114,7 @@ int32_t DCameraHdfOperate::WaitLoadProviderService()
     });
 
     if (providerServStatus_ != OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START) {
-        DHLOGE("wait load providerService failed, status %d", providerServStatus_);
+        DHLOGE("wait load providerService failed, status %{public}d", providerServStatus_);
         return DCAMERA_BAD_OPERATE;
     }
 
@@ -132,7 +132,7 @@ int32_t DCameraHdfOperate::UnLoadDcameraHDFImpl()
 
     int32_t ret = devmgr->UnloadDevice(CAMERA_SERVICE_NAME);
     if (ret != 0) {
-        DHLOGE("Unload camera service failed, ret: %d", ret);
+        DHLOGE("Unload camera service failed, ret: %{public}d", ret);
     }
     ret = devmgr->UnloadDevice(PROVIDER_SERVICE_NAME);
     if (ret != 0) {

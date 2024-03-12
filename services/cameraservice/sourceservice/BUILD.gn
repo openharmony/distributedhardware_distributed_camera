@@ -126,6 +126,7 @@ ohos_shared_library("distributed_camera_source") {
     "hdf_core:libhdi",
     "hdf_core:libpub_utils",
     "hicollie:libhicollie",
+    "hilog:libhilog",
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",

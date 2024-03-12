@@ -54,7 +54,7 @@ std::shared_ptr<DCameraSourceState> DCameraSourceStateFactory::CreateState(DCame
             break;
         }
         default: {
-            DHLOGE("DCameraSourceStateFactory create state failed, wrong type %d", stateType);
+            DHLOGE("DCameraSourceStateFactory create state failed, wrong type %{public}d", stateType);
             return nullptr;
         }
     }

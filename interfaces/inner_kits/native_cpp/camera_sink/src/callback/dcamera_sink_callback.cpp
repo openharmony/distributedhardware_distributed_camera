@@ -29,8 +29,8 @@ DCameraSinkCallback::~DCameraSinkCallback()
 int32_t DCameraSinkCallback::OnNotifyResourceInfo(const ResourceEventType &type, const std::string &subtype,
     const std::string &networkId, bool &isSensitive, bool &isSameAccout)
 {
-    DHLOGI("DCameraSinkCallback OnNotifyResourceInfo type: %d, subtype: %s, networkId: %s, "
-        "isSensitive: %d, isSameAccout: %d", (uint32_t)type, subtype.c_str(),
+    DHLOGI("DCameraSinkCallback OnNotifyResourceInfo type: %{public}d, subtype: %{public}s, networkId: %{public}s, "
+        "isSensitive: %{public}d, isSameAccout: %{public}d", (uint32_t)type, subtype.c_str(),
         GetAnonyString(networkId).c_str(), isSensitive, isSameAccout);
     int32_t ret = DCAMERA_OK;
     std::lock_guard<std::mutex> lock(privacyResMutex_);

@@ -65,7 +65,7 @@ int32_t InitCameraStandard(CameraPosition position)
 
     int rv = g_cameraManager->CreateCaptureSession(&g_captureSession);
     if (rv != DCAMERA_OK) {
-        DHLOGE("InitCameraStandard create captureSession failed, rv: %d", rv);
+        DHLOGE("InitCameraStandard create captureSession failed, rv: %{public}d", rv);
         return rv;
     }
     std::shared_ptr<DemoDCameraSessionCallback> sessionCallback = std::make_shared<DemoDCameraSessionCallback>();
@@ -74,7 +74,8 @@ int32_t InitCameraStandard(CameraPosition position)
 
     std::vector<sptr<CameraDevice>> cameraObjList = g_cameraManager->GetSupportedCameras();
     for (auto info : cameraObjList) {
-        DHLOGI("Camera: %s, position: %d, camera type: %d, connection type: %d", GetAnonyString(info->GetID()).c_str(),
+        DHLOGI("Camera: %{public}s, position: %{public}d, camera type: %{public}d, connection type: %{public}d",
+            GetAnonyString(info->GetID()).c_str(),
             info->GetPosition(), info->GetCameraType(), info->GetConnectionType());
         // CAMERA_POSITION_BACK or CAMERA_POSITION_FRONT
         if ((info->GetPosition() == position) &&
@@ -91,12 +92,12 @@ int32_t InitCameraStandard(CameraPosition position)
 
     rv = g_cameraManager->CreateCameraInput(g_cameraInfo, &((sptr<CameraInput> &)g_cameraInput));
     if (rv != DCAMERA_OK) {
-        DHLOGE("InitCameraStandard create cameraInput failed, rv: %d", rv);
+        DHLOGE("InitCameraStandard create cameraInput failed, rv: %{public}d", rv);
         return rv;
     }
     int32_t ret = ((sptr<CameraInput> &)g_cameraInput)->Open();
     if (ret != DCAMERA_OK) {
-        DHLOGE("InitCameraStandard g_cameraInput Open failed, ret: %d", ret);
+        DHLOGE("InitCameraStandard g_cameraInput Open failed, ret: %{public}d", ret);
         return ret;
     }
     std::shared_ptr<DemoDCameraInputCallback> inputCallback = std::make_shared<DemoDCameraInputCallback>();
@@ -152,7 +153,7 @@ CameraFormat ConvertToCameraFormat(int32_t format)
 
 void InitPhotoOutput(void)
 {
-    DHLOGI("Distributed Camera Demo: Create PhotoOutput, width = %d, height = %d, format = %d",
+    DHLOGI("Distributed Camera Demo: Create PhotoOutput, width = %{public}d, height = %{public}d, format = %{public}d",
         g_photoInfo->width_, g_photoInfo->height_, g_photoInfo->format_);
     sptr<IConsumerSurface> photoSurface = IConsumerSurface::Create();
     sptr<IBufferConsumerListener> photoListener = new DemoDCameraPhotoSurfaceListener(photoSurface);
@@ -163,7 +164,7 @@ void InitPhotoOutput(void)
     sptr<IBufferProducer> photoProducer = photoSurface->GetProducer();
     int rv = g_cameraManager->CreatePhotoOutput(photoProfile, photoProducer, &((sptr<PhotoOutput> &)g_photoOutput));
     if (rv != DCAMERA_OK) {
-        DHLOGE("InitPhotoOutput create photoOutput failed, rv: %d", rv);
+        DHLOGE("InitPhotoOutput create photoOutput failed, rv: %{public}d", rv);
         return;
     }
     ((sptr<PhotoOutput> &)g_photoOutput)->SetCallback(std::make_shared<DemoDCameraPhotoCallback>());
@@ -171,8 +172,8 @@ void InitPhotoOutput(void)
 
 void InitPreviewOutput(void)
 {
-    DHLOGI("Distributed Camera Demo: Create PreviewOutput, width = %d, height = %d, format = %d",
-        g_previewInfo->width_, g_previewInfo->height_, g_previewInfo->format_);
+    DHLOGI("Distributed Camera Demo: Create PreviewOutput, width = %{public}d, height = %{public}d, format = "
+        "%{public}d", g_previewInfo->width_, g_previewInfo->height_, g_previewInfo->format_);
     sptr<IConsumerSurface> previewSurface = IConsumerSurface::Create();
     sptr<IBufferConsumerListener> previewListener = new DemoDCameraPreviewSurfaceListener(previewSurface);
     previewSurface->RegisterConsumerListener(previewListener);
@@ -184,7 +185,7 @@ void InitPreviewOutput(void)
     int rv = g_cameraManager->CreatePreviewOutput(
         previewProfile, previewProducerSurface, &((sptr<PreviewOutput> &)g_previewOutput));
     if (rv != DCAMERA_OK) {
-        DHLOGE("InitPhotoOutput create previewOutput failed, rv: %d", rv);
+        DHLOGE("InitPhotoOutput create previewOutput failed, rv: %{public}d", rv);
         return;
     }
     ((sptr<PreviewOutput> &)g_previewOutput)->SetCallback(std::make_shared<DemoDCameraPreviewCallback>());
@@ -192,7 +193,7 @@ void InitPreviewOutput(void)
 
 void InitVideoOutput(void)
 {
-    DHLOGI("Distributed Camera Demo: Create VideoOutput, width = %d, height = %d, format = %d",
+    DHLOGI("Distributed Camera Demo: Create VideoOutput, width = %{public}d, height = %{public}d, format = %{public}d",
         g_videoInfo->width_, g_videoInfo->height_, g_videoInfo->format_);
     sptr<IConsumerSurface> videoSurface = IConsumerSurface::Create();
     sptr<IBufferConsumerListener> videoListener = new DemoDCameraVideoSurfaceListener(videoSurface);
@@ -205,7 +206,7 @@ void InitVideoOutput(void)
     sptr<Surface> pSurface = Surface::CreateSurfaceAsProducer(videoProducer);
     int rv = g_cameraManager->CreateVideoOutput(videoSettings, pSurface, &((sptr<VideoOutput> &)g_videoOutput));
     if (rv != DCAMERA_OK) {
-        DHLOGE("InitPhotoOutput create videoOutput failed, rv: %d", rv);
+        DHLOGE("InitPhotoOutput create videoOutput failed, rv: %{public}d", rv);
         return;
     }
     ((sptr<VideoOutput> &)g_videoOutput)->SetCallback(std::make_shared<DemoDCameraVideoCallback>());
@@ -223,12 +224,12 @@ void ConfigCaptureSession(void)
     std::vector<VideoStabilizationMode> stabilizationModes;
     int32_t rv = g_captureSession->GetSupportedStabilizationMode(stabilizationModes);
     if (rv != DCAMERA_OK) {
-        DHLOGE("ConfigCaptureSession get supported stabilization mode failed, rv: %d", rv);
+        DHLOGE("ConfigCaptureSession get supported stabilization mode failed, rv: %{public}d", rv);
         return;
     }
     if (!stabilizationModes.empty()) {
         for (auto mode : stabilizationModes) {
-            DHLOGI("Distributed Camera Demo: video stabilization mode %d", mode);
+            DHLOGI("Distributed Camera Demo: video stabilization mode %{public}d", mode);
         }
         g_captureSession->SetVideoStabilizationMode(stabilizationModes.back());
     }
@@ -244,11 +245,11 @@ void ConfigFocusFlashAndExposure(bool isVideo)
     std::vector<float> biasRange;
     int32_t rv = g_captureSession->GetExposureBiasRange(biasRange);
     if (rv != DCAMERA_OK) {
-        DHLOGE("ConfigFocusAndExposure get exposure bias range failed, rv: %d", rv);
+        DHLOGE("ConfigFocusAndExposure get exposure bias range failed, rv: %{public}d", rv);
         return;
     }
     if (!biasRange.empty()) {
-        DHLOGI("Distributed Camera Demo: get %d exposure compensation range", biasRange.size());
+        DHLOGI("Distributed Camera Demo: get %{public}d exposure compensation range", biasRange.size());
         exposureValue = biasRange[0];
     }
     FlashMode flash = FLASH_MODE_OPEN;
@@ -316,7 +317,7 @@ int32_t Capture()
 {
     int32_t ret = ((sptr<PhotoOutput> &)g_photoOutput)->Capture(ConfigPhotoCaptureSetting());
     if (ret != DCAMERA_OK) {
-        DHLOGE("main g_photoOutput Capture failed, ret: %d", ret);
+        DHLOGE("main g_photoOutput Capture failed, ret: %{public}d", ret);
         return ret;
     }
     return DCAMERA_OK;
@@ -326,7 +327,7 @@ int32_t Video()
 {
     int32_t ret = ((sptr<VideoOutput> &)g_videoOutput)->Start();
     if (ret != DCAMERA_OK) {
-        DHLOGE("main VideoOutput Start failed, ret: %d", ret);
+        DHLOGE("main VideoOutput Start failed, ret: %{public}d", ret);
         return ret;
     }
     return DCAMERA_OK;
@@ -340,10 +341,10 @@ int32_t GetPreviewProfiles(std::vector<CameraStandard::Size> &previewResolution)
         return DCAMERA_BAD_VALUE;
     }
     std::vector<CameraStandard::Profile> previewProfiles = capability->GetPreviewProfiles();
-    DHLOGI("size: %d", previewProfiles.size());
+    DHLOGI("size: %{public}d", previewProfiles.size());
     for (auto& profile : previewProfiles) {
         CameraStandard::Size picSize = profile.GetSize();
-        DHLOGI("width: %d, height: %d", picSize.width, picSize.height);
+        DHLOGI("width: %{public}d, height: %{public}d", picSize.width, picSize.height);
         if (IsValid(picSize)) {
             previewResolution.push_back(picSize);
         }

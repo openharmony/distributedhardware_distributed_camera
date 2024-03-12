@@ -144,7 +144,7 @@ HWTEST_F(DCameraSinkDevTest, dcamera_sink_dev_test_004, TestSize.Level1)
 {
     int32_t ret = dev_->GetCameraInfo(g_testCameraInfo);
     EXPECT_EQ(DCAMERA_OK, ret);
-    DHLOGI("DCameraSinkDevTest::GetCameraInfo cameraInfo is %s", GetAnonyString(g_testCameraInfo).c_str());
+    DHLOGI("DCameraSinkDevTest::GetCameraInfo cameraInfo is %{public}s", GetAnonyString(g_testCameraInfo).c_str());
 }
 
 /**

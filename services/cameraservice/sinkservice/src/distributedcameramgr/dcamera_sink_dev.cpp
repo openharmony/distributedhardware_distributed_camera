@@ -29,7 +29,7 @@ namespace DistributedHardware {
 DCameraSinkDev::DCameraSinkDev(const std::string& dhId, const sptr<IDCameraSinkCallback> &sinkCallback)
     : dhId_(dhId), sinkCallback_(sinkCallback)
 {
-    DHLOGI("DCameraSinkDev Constructor dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("DCameraSinkDev Constructor dhId: %{public}s", GetAnonyString(dhId_).c_str());
     isInit_ = false;
 }
 
@@ -42,7 +42,7 @@ DCameraSinkDev::~DCameraSinkDev()
 
 int32_t DCameraSinkDev::Init()
 {
-    DHLOGI("Init dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("Init dhId: %{public}s", GetAnonyString(dhId_).c_str());
     accessControl_ = std::make_shared<DCameraSinkAccessControl>();
     controller_ = std::make_shared<DCameraSinkController>(accessControl_, sinkCallback_);
     DCameraIndex index("", dhId_);
@@ -50,12 +50,12 @@ int32_t DCameraSinkDev::Init()
     indexs.push_back(index);
     int32_t ret = controller_->Init(indexs);
     if (ret != DCAMERA_OK) {
-        DHLOGE("init controller failed, dhId: %s, ret: %d", GetAnonyString(dhId_).c_str(), ret);
+        DHLOGE("init controller failed, dhId: %{public}s, ret: %{public}d", GetAnonyString(dhId_).c_str(), ret);
         return ret;
     }
 
     isInit_ = true;
-    DHLOGI("DCameraSinkDev Init %s success", GetAnonyString(dhId_).c_str());
+    DHLOGI("DCameraSinkDev Init %{public}s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
 }
 
@@ -64,7 +64,7 @@ int32_t DCameraSinkDev::UnInit()
     if (controller_ != nullptr) {
         int32_t ret = controller_->UnInit();
         if (ret != DCAMERA_OK) {
-            DHLOGE("release controller failed, dhId: %s, ret: %d",
+            DHLOGE("release controller failed, dhId: %{public}s, ret: %{public}d",
                    GetAnonyString(dhId_).c_str(), ret);
         }
     }
@@ -87,13 +87,13 @@ int32_t DCameraSinkDev::UnsubscribeLocalHardware()
 
 int32_t DCameraSinkDev::StopCapture()
 {
-    DHLOGI("StopCapture dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("StopCapture dhId: %{public}s", GetAnonyString(dhId_).c_str());
     return controller_->StopCapture();
 }
 
 int32_t DCameraSinkDev::ChannelNeg(std::string& channelInfo)
 {
-    DHLOGI("ChannelNeg dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("ChannelNeg dhId: %{public}s", GetAnonyString(dhId_).c_str());
     if (channelInfo.empty()) {
         DHLOGE("channelInfo is empty");
         return DCAMERA_BAD_VALUE;
@@ -102,7 +102,7 @@ int32_t DCameraSinkDev::ChannelNeg(std::string& channelInfo)
     DCameraChannelInfoCmd channelInfoCmd;
     int32_t ret = channelInfoCmd.Unmarshal(channelInfo);
     if (ret != DCAMERA_OK) {
-        DHLOGE("channelInfo unmarshal failed, dhId: %s, ret: %d",
+        DHLOGE("channelInfo unmarshal failed, dhId: %{public}s, ret: %{public}d",
                GetAnonyString(dhId_).c_str(), ret);
         return ret;
     }
@@ -111,11 +111,11 @@ int32_t DCameraSinkDev::ChannelNeg(std::string& channelInfo)
 
 int32_t DCameraSinkDev::GetCameraInfo(std::string& cameraInfo)
 {
-    DHLOGI("GetCameraInfo dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("GetCameraInfo dhId: %{public}s", GetAnonyString(dhId_).c_str());
     std::shared_ptr<DCameraInfo> info = std::make_shared<DCameraInfo>();
     int32_t ret = controller_->GetCameraInfo(info);
     if (ret != DCAMERA_OK) {
-        DHLOGE("get state failed, dhId: %s, ret: %d", GetAnonyString(dhId_).c_str(), ret);
+        DHLOGE("get state failed, dhId: %{public}s, ret: %{public}d", GetAnonyString(dhId_).c_str(), ret);
         return ret;
     }
 
@@ -126,16 +126,16 @@ int32_t DCameraSinkDev::GetCameraInfo(std::string& cameraInfo)
     cameraInfoCmd.value_ = info;
     ret = cameraInfoCmd.Marshal(cameraInfo);
     if (ret != DCAMERA_OK) {
-        DHLOGE("cameraInfoCmd marshal failed, dhId: %s, ret: %d", GetAnonyString(dhId_).c_str(), ret);
+        DHLOGE("cameraInfoCmd marshal failed, dhId: %{public}s, ret: %{public}d", GetAnonyString(dhId_).c_str(), ret);
         return ret;
     }
-    DHLOGI("GetCameraInfo %s success", GetAnonyString(dhId_).c_str());
+    DHLOGI("GetCameraInfo %{public}s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
 }
 
 int32_t DCameraSinkDev::OpenChannel(std::string& openInfo)
 {
-    DHLOGI("DCameraSinkDev OpenChannel Begin, dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("DCameraSinkDev OpenChannel Begin, dhId: %{public}s", GetAnonyString(dhId_).c_str());
     if (openInfo.empty()) {
         DHLOGE("openInfo is empty");
         return DCAMERA_BAD_VALUE;
@@ -144,7 +144,7 @@ int32_t DCameraSinkDev::OpenChannel(std::string& openInfo)
     DCameraOpenInfoCmd cmd;
     int32_t ret = cmd.Unmarshal(openInfo);
     if (ret != DCAMERA_OK) {
-        DHLOGE("openInfo unmarshal failed, dhId: %s, ret: %d", GetAnonyString(dhId_).c_str(), ret);
+        DHLOGE("openInfo unmarshal failed, dhId: %{public}s, ret: %{public}d", GetAnonyString(dhId_).c_str(), ret);
         return ret;
     }
     return controller_->OpenChannel(cmd.value_);
@@ -152,7 +152,7 @@ int32_t DCameraSinkDev::OpenChannel(std::string& openInfo)
 
 int32_t DCameraSinkDev::CloseChannel()
 {
-    DHLOGI("CloseChannel dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("CloseChannel dhId: %{public}s", GetAnonyString(dhId_).c_str());
     return controller_->CloseChannel();
 }
 
@@ -163,7 +163,7 @@ std::string DCameraSinkDev::GetDhid()
 
 int32_t DCameraSinkDev::PauseDistributedHardware(const std::string &networkId)
 {
-    DHLOGI("Pause distributed hardware dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("Pause distributed hardware dhId: %{public}s", GetAnonyString(dhId_).c_str());
     if (networkId.empty()) {
         DHLOGE("networkId is empty");
         return DCAMERA_BAD_VALUE;
@@ -178,7 +178,7 @@ int32_t DCameraSinkDev::PauseDistributedHardware(const std::string &networkId)
 
 int32_t DCameraSinkDev::ResumeDistributedHardware(const std::string &networkId)
 {
-    DHLOGI("Resume distributed hardware dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("Resume distributed hardware dhId: %{public}s", GetAnonyString(dhId_).c_str());
     if (networkId.empty()) {
         DHLOGE("networkId is empty");
         return DCAMERA_BAD_VALUE;
@@ -193,7 +193,7 @@ int32_t DCameraSinkDev::ResumeDistributedHardware(const std::string &networkId)
 
 int32_t DCameraSinkDev::StopDistributedHardware(const std::string &networkId)
 {
-    DHLOGI("Stop distributed hardware dhId: %s", GetAnonyString(dhId_).c_str());
+    DHLOGI("Stop distributed hardware dhId: %{public}s", GetAnonyString(dhId_).c_str());
     if (networkId.empty()) {
         DHLOGE("networkId is empty");
         return DCAMERA_BAD_VALUE;

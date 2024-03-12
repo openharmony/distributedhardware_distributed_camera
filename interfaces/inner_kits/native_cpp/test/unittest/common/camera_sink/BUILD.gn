@@ -51,6 +51,7 @@ ohos_unittest("DCameraSinkHandlerTest") {
     "access_token:libtoken_setproc",
     "c_utils:utils",
     "dsoftbus:softbus_client",
+    "hilog:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]

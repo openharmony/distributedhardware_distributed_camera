@@ -42,14 +42,14 @@ int32_t DCameraSourceConfigStreamState::Execute(std::shared_ptr<DCameraSourceDev
 {
     auto itFunc = memberFuncMap_.find(eventType);
     if (itFunc == memberFuncMap_.end()) {
-        DHLOGE("DCameraSourceConfigStreamState execute %d in wrong state", eventType);
+        DHLOGE("DCameraSourceConfigStreamState execute %{public}d in wrong state", eventType);
         return DCAMERA_WRONG_STATE;
     }
 
     auto memberFunc = itFunc->second;
     int32_t ret = (this->*memberFunc)(camDev, event);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceConfigStreamState execute %d failed, ret: %d", eventType, ret);
+        DHLOGE("DCameraSourceConfigStreamState execute %{public}d failed, ret: %{public}d", eventType, ret);
     }
     return ret;
 }
@@ -74,19 +74,19 @@ int32_t DCameraSourceConfigStreamState::DoUnregisterTask(std::shared_ptr<DCamera
     camEvent->eventResult_ = DCAMERA_EVENT_CHANNEL_DISCONNECTED;
     int32_t ret = camDev->CameraEventNotify(camEvent);
     if (ret != DCAMERA_OK) {
-        DHLOGE("CameraEventNotify failed: %d", ret);
+        DHLOGE("CameraEventNotify failed: %{public}d", ret);
         return ret;
     }
 
     ret = camDev->CloseCamera();
     if (ret != DCAMERA_OK) {
-        DHLOGE("CloseCamera failed, ret: %d", ret);
+        DHLOGE("CloseCamera failed, ret: %{public}d", ret);
         return ret;
     }
 
     ret = camDev->ReleaseAllStreams();
     if (ret != DCAMERA_OK) {
-        DHLOGE("ReleaseAllStreams failed, ret: %d", ret);
+        DHLOGE("ReleaseAllStreams failed, ret: %{public}d", ret);
         return ret;
     }
 
@@ -97,7 +97,7 @@ int32_t DCameraSourceConfigStreamState::DoUnregisterTask(std::shared_ptr<DCamera
     }
     ret = camDev->UnRegister(param);
     if (ret != DCAMERA_OK) {
-        DHLOGE("UnRegister failed: %d", ret);
+        DHLOGE("UnRegister failed: %{public}d", ret);
         return ret;
     }
     std::shared_ptr<DCameraSourceStateMachine> stateMachine = stateMachine_.lock();
@@ -120,13 +120,13 @@ int32_t DCameraSourceConfigStreamState::DoCloseTask(std::shared_ptr<DCameraSourc
 {
     int32_t ret = camDev->CloseCamera();
     if (ret != DCAMERA_OK) {
-        DHLOGE("CloseCamera failed, ret: %d", ret);
+        DHLOGE("CloseCamera failed, ret: %{public}d", ret);
         return ret;
     }
 
     ret = camDev->ReleaseAllStreams();
     if (ret != DCAMERA_OK) {
-        DHLOGE("ReleaseAllStreams failed, ret: %d", ret);
+        DHLOGE("ReleaseAllStreams failed, ret: %{public}d", ret);
         return ret;
     }
     std::shared_ptr<DCameraSourceStateMachine> stateMachine = stateMachine_.lock();
@@ -149,7 +149,7 @@ int32_t DCameraSourceConfigStreamState::DoConfigStreamsTask(std::shared_ptr<DCam
 
     ret = camDev->ConfigStreams(streamInfos);
     if (ret != DCAMERA_OK) {
-        DHLOGE("ConfigStreams failed, ret: %d", ret);
+        DHLOGE("ConfigStreams failed, ret: %{public}d", ret);
         return ret;
     }
 
@@ -176,7 +176,7 @@ int32_t DCameraSourceConfigStreamState::DoReleaseStreamsTask(std::shared_ptr<DCa
     bool isAllRelease = false;
     ret = camDev->ReleaseStreams(streamIds, isAllRelease);
     if (ret != DCAMERA_OK) {
-        DHLOGE("ReleaseStreams failed, ret: %d", ret);
+        DHLOGE("ReleaseStreams failed, ret: %{public}d", ret);
         return ret;
     }
 
@@ -202,7 +202,7 @@ int32_t DCameraSourceConfigStreamState::DoStartCaptureTask(std::shared_ptr<DCame
 
     ret = camDev->StartCapture(captureInfos);
     if (ret != DCAMERA_OK) {
-        DHLOGE("StartCapture failed, ret: %d", ret);
+        DHLOGE("StartCapture failed, ret: %{public}d", ret);
         return ret;
     }
     std::shared_ptr<DCameraSourceStateMachine> stateMachine = stateMachine_.lock();
@@ -232,7 +232,7 @@ int32_t DCameraSourceConfigStreamState::DoUpdateSettingsTask(std::shared_ptr<DCa
 
     ret = camDev->UpdateSettings(settings);
     if (ret != DCAMERA_OK) {
-        DHLOGE("UpdateSettings failed, ret: %d", ret);
+        DHLOGE("UpdateSettings failed, ret: %{public}d", ret);
         return ret;
     }
     return DCAMERA_OK;
@@ -249,7 +249,7 @@ int32_t DCameraSourceConfigStreamState::DoEventNofityTask(std::shared_ptr<DCamer
 
     ret = camDev->CameraEventNotify(camEvent);
     if (ret != DCAMERA_OK) {
-        DHLOGE("CameraEventNotify failed, ret: %d", ret);
+        DHLOGE("CameraEventNotify failed, ret: %{public}d", ret);
         return ret;
     }
     return DCAMERA_OK;

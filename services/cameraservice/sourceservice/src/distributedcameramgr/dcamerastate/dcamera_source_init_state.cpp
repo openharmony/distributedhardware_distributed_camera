@@ -34,14 +34,14 @@ int32_t DCameraSourceInitState::Execute(std::shared_ptr<DCameraSourceDev>& camDe
 {
     auto itFunc = memberFuncMap_.find(eventType);
     if (itFunc == memberFuncMap_.end()) {
-        DHLOGE("DCameraSourceInitState execute %d in wrong state", eventType);
+        DHLOGE("DCameraSourceInitState execute %{public}d in wrong state", eventType);
         return DCAMERA_WRONG_STATE;
     }
 
     auto memberFunc = itFunc->second;
     int32_t ret = (this->*memberFunc)(camDev, event);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceInitState execute %d failed, ret: %d", eventType, ret);
+        DHLOGE("DCameraSourceInitState execute %{public}d failed, ret: %{public}d", eventType, ret);
     }
     return ret;
 }

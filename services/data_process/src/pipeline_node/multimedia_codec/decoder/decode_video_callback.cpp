@@ -16,15 +16,14 @@
 #include "decode_video_callback.h"
 
 #include "distributed_hardware_log.h"
-#include "dh_log.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 void DecodeVideoCallback::OnError(MediaAVCodec::AVCodecErrorType errorType, int32_t errorCode)
 {
-    DHLOGE("DecodeVideoCallback : OnError. Error type: %d. Error code: %d ", errorType, errorCode);
+    DHLOGE("DecodeVideoCallback : OnError. Error type: %{public}d. Error code: %{public}d ", errorType, errorCode);
     std::shared_ptr<DecodeDataProcess> targetDecoderNode = decodeVideoNode_.lock();
-    CHECK_AND_RETURN_LOG(targetDecoderNode == nullptr, "%s", "decodeVideoNode_ is nullptr.");
+    CHECK_AND_RETURN_LOG(targetDecoderNode == nullptr, "%{public}s", "decodeVideoNode_ is nullptr.");
     targetDecoderNode->OnError();
 }
 

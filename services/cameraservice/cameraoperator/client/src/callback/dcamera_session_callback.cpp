@@ -29,7 +29,7 @@ DCameraSessionCallback::DCameraSessionCallback(const std::shared_ptr<StateCallba
 
 void DCameraSessionCallback::OnError(int32_t errorCode)
 {
-    DHLOGE("enter, errorCode: %d", errorCode);
+    DHLOGE("enter, errorCode: %{public}d", errorCode);
     if (callback_ == nullptr) {
         DHLOGE("StateCallback is null");
         return;
@@ -43,7 +43,7 @@ void DCameraSessionCallback::OnError(int32_t errorCode)
 
 void DCameraSessionCallback::OnFocusState(FocusState state)
 {
-    DHLOGI("enter, state: %d", state);
+    DHLOGI("enter, state: %{public}d", state);
     if (callback_ == nullptr) {
         DHLOGE("StateCallback is null");
         return;
@@ -51,7 +51,7 @@ void DCameraSessionCallback::OnFocusState(FocusState state)
 
     auto iter = focusStateMap_.find(state);
     if (iter == focusStateMap_.end()) {
-        DHLOGE("focusStateMap find %d state failed", state);
+        DHLOGE("focusStateMap find %{public}d state failed", state);
         return;
     }
 

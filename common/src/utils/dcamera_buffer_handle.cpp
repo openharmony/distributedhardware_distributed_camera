@@ -33,7 +33,7 @@ void* DCameraMemoryMap(const BufferHandle *buffer)
 
     void* virAddr = mmap(NULL, buffer->size, PROT_READ | PROT_WRITE, MAP_SHARED, buffer->fd, 0);
     if (virAddr == MAP_FAILED) {
-        DHLOGE("mmap failed errno %s, fd : %d", strerror(errno), buffer->fd);
+        DHLOGE("mmap failed errno %{public}s, fd : %{public}d", strerror(errno), buffer->fd);
         return nullptr;
     }
     return virAddr;
@@ -48,7 +48,7 @@ void DCameraMemoryUnmap(BufferHandle *buffer)
     if (buffer->virAddr != nullptr) {
         int ret = munmap(buffer->virAddr, buffer->size);
         if (ret != 0) {
-            DHLOGE("munmap failed err: %s", strerror(errno));
+            DHLOGE("munmap failed err: %{public}s", strerror(errno));
         }
     }
     buffer->virAddr = nullptr;
