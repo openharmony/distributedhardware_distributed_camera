@@ -46,10 +46,13 @@ class ConverterHandle {
 
 public:
     void InitConverter();
+    void DeInitConverter();
     const OHOS::OpenSourceLibyuv::ImageConverter &GetHandle();
 
+    using DlHandle = void *;
 private:
     std::atomic<bool> isInited_ = false;
+    DlHandle dlHandler_ = nullptr;
     OHOS::OpenSourceLibyuv::ImageConverter converter_ = {0};
 };
 #endif

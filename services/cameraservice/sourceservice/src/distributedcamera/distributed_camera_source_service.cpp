@@ -29,6 +29,7 @@
 #include "dcamera_hitrace_adapter.h"
 #include "dcamera_service_state_listener.h"
 #include "dcamera_source_service_ipc.h"
+#include "dcamera_utils_tools.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
 
@@ -56,6 +57,9 @@ void DistributedCameraSourceService::OnStart()
         DHLOGE("DistributedCameraSourceService init failed");
         return;
     }
+#ifdef DCAMERA_MMAP_RESERVE
+    ConverterHandle::GetInstance().InitConverter();
+#endif
     state_ = DCameraServiceState::DCAMERA_SRV_STATE_RUNNING;
     DHLOGI("start service success.");
 }
@@ -92,6 +96,9 @@ void DistributedCameraSourceService::OnStop()
     if (hicollieThread_.joinable()) {
         hicollieThread_.join();
     }
+#ifdef DCAMERA_MMAP_RESERVE
+    ConverterHandle::GetInstance().DeInitConverter();
+#endif
 }
 
 int32_t DistributedCameraSourceService::InitSource(const std::string& params,

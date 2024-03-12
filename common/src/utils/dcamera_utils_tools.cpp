@@ -242,27 +242,36 @@ int32_t IsUnderDumpMaxSize(std::string fileName)
 IMPLEMENT_SINGLE_INSTANCE(ConverterHandle);
 void ConverterHandle::InitConverter()
 {
-    void *dlHandler = dlopen(YUV_LIB_PATH.c_str(), RTLD_LAZY | RTLD_NODELETE);
-    if (dlHandler == nullptr) {
+    dlHandler_ = dlopen(YUV_LIB_PATH.c_str(), RTLD_LAZY | RTLD_NODELETE);
+    if (dlHandler_ == nullptr) {
         DHLOGE("Dlopen failed.");
         return;
     }
-    GetImageConverterFunc getConverter = (GetImageConverterFunc)dlsym(dlHandler, GET_IMAGE_CONVERTER_FUNC.c_str());
+    GetImageConverterFunc getConverter = (GetImageConverterFunc)dlsym(dlHandler_, GET_IMAGE_CONVERTER_FUNC.c_str());
     if (getConverter == nullptr) {
         DHLOGE("Function of converter is null, failed reason: %s.", dlerror());
-        dlclose(dlHandler);
-        dlHandler = nullptr;
+        dlclose(dlHandler_);
+        dlHandler_ = nullptr;
         return;
     }
     converter_ = getConverter();
+    isInited_.store(true);
     DHLOGI("Initialize image converter success.");
+}
+
+void ConverterHandle::DeInitConverter()
+{
+    if (dlHandler_) {
+        dlclose(dlHandler_);
+        dlHandler_ = nullptr;
+    }
+    isInited_.store(false);
 }
 
 const OHOS::OpenSourceLibyuv::ImageConverter& ConverterHandle::GetHandle()
 {
     if (!isInited_.load()) {
         InitConverter();
-        isInited_.store(true);
     }
     return converter_;
 }
