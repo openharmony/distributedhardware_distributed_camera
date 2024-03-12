@@ -15,7 +15,6 @@
 
 #include "decode_data_process.h"
 
-#include "libyuv.h"
 #include "distributed_camera_constants.h"
 #include "distributed_hardware_log.h"
 #include "dcamera_hisysevent_adapter.h"
@@ -540,7 +539,9 @@ void DecodeDataProcess::CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int3
     uint8_t *dstDataY = bufferOutput->Data();
     uint8_t *dstDataU = bufferOutput->Data() + dstSizeY;
     uint8_t *dstDataV = bufferOutput->Data() + dstSizeY + dstSizeUV;
-    int32_t ret = libyuv::NV12ToI420(srcDataY, alignedWidth, srcDataUV, alignedWidth,
+    auto converter = ConverterHandle::GetInstance().GetHandle();
+    CHECK_AND_RETURN_LOG(converter.NV12ToI420 == nullptr, "converter is null.");
+    int32_t ret = converter.NV12ToI420(srcDataY, alignedWidth, srcDataUV, alignedWidth,
         dstDataY, sourceConfig_.GetWidth(),
         dstDataU, static_cast<uint32_t>(sourceConfig_.GetWidth()) >> MEMORY_RATIO_UV,
         dstDataV, static_cast<uint32_t>(sourceConfig_.GetWidth()) >> MEMORY_RATIO_UV,

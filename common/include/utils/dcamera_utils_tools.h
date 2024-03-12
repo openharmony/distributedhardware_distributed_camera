@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,9 +16,15 @@
 #ifndef OHOS_DCAMERA_UTILS_TOOL_H
 #define OHOS_DCAMERA_UTILS_TOOL_H
 
+#include <atomic>
 #include <cstdint>
 #include <string>
 #include <fstream>
+
+#ifdef DCAMERA_MMAP_RESERVE
+#include "image_converter.h"
+#include "single_instance.h"
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -33,6 +39,23 @@ std::string Base64Decode(const std::string& basicString);
 void DumpBufferToFile(std::string fileName, uint8_t *buffer, size_t bufSize);
 bool IsBase64(unsigned char c);
 int32_t IsUnderDumpMaxSize(std::string fileName);
+
+#ifdef DCAMERA_MMAP_RESERVE
+class ConverterHandle {
+    DECLARE_SINGLE_INSTANCE(ConverterHandle);
+
+public:
+    void InitConverter();
+    void DeInitConverter();
+    const OHOS::OpenSourceLibyuv::ImageConverter &GetHandle();
+
+    using DlHandle = void *;
+private:
+    std::atomic<bool> isInited_ = false;
+    DlHandle dlHandler_ = nullptr;
+    OHOS::OpenSourceLibyuv::ImageConverter converter_ = {0};
+};
+#endif
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DCAMERA_UTILS_TOOL_H

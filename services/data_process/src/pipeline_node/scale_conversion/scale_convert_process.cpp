@@ -15,7 +15,6 @@
 
 #include "scale_convert_process.h"
 
-#include "libyuv.h"
 #include "dcamera_utils_tools.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
@@ -283,7 +282,9 @@ int32_t ScaleConvertProcess::ConvertResolution(ImageUnitInfo& srcImgInfo, ImageU
     uint8_t *dstDataU = dstBuf->Data() + dstSizeY;
     uint8_t *dstDataV = dstBuf->Data() + dstSizeY + dstSizeUV;
 
-    int32_t ret = libyuv::I420Scale(
+    auto converter = ConverterHandle::GetInstance().GetHandle();
+    CHECK_AND_RETURN_RET_LOG(converter.I420Scale == nullptr, DCAMERA_BAD_VALUE, "converter is invalid.");
+    int32_t ret = converter.I420Scale(
         srcDataY, srcImgInfo.width,
         srcDataU, static_cast<uint32_t>(srcImgInfo.width) >> MEMORY_RATIO_UV,
         srcDataV, static_cast<uint32_t>(srcImgInfo.width) >> MEMORY_RATIO_UV,
@@ -292,7 +293,7 @@ int32_t ScaleConvertProcess::ConvertResolution(ImageUnitInfo& srcImgInfo, ImageU
         dstDataU, static_cast<uint32_t>(dstImgInfo.width) >> MEMORY_RATIO_UV,
         dstDataV, static_cast<uint32_t>(dstImgInfo.width) >> MEMORY_RATIO_UV,
         dstImgInfo.width, dstImgInfo.height,
-        libyuv::FilterMode::kFilterNone);
+        OpenSourceLibyuv::FilterMode::kFilterNone);
     if (ret != DCAMERA_OK) {
         DHLOGE("Convert I420 scale failed.");
         return DCAMERA_BAD_VALUE;
@@ -331,7 +332,9 @@ int32_t ScaleConvertProcess::ConvertFormatToNV21(ImageUnitInfo& srcImgInfo, Imag
     uint8_t *dstDataY = dstImgInfo.imgData->Data();
     uint8_t *dstDataUV = dstImgInfo.imgData->Data() + dstSizeY;
 
-    int32_t ret = libyuv::I420ToNV21(
+    auto converter = ConverterHandle::GetInstance().GetHandle();
+    CHECK_AND_RETURN_RET_LOG(converter.I420ToNV21 == nullptr, DCAMERA_BAD_VALUE, "converter is invalid.");
+    int32_t ret = converter.I420ToNV21(
         srcDataY, srcImgInfo.width,
         srcDataU, static_cast<uint32_t>(srcImgInfo.width) >> MEMORY_RATIO_UV,
         srcDataV, static_cast<uint32_t>(srcImgInfo.width) >> MEMORY_RATIO_UV,
@@ -365,7 +368,9 @@ int32_t ScaleConvertProcess::ConvertFormatToRGBA(ImageUnitInfo& srcImgInfo, Imag
     uint8_t *srcDataV = dstBuf->Data() + srcSizeY + srcSizeUV;
 
     uint8_t *dstDataRGBA = dstImgInfo.imgData->Data();
-    int32_t ret = libyuv::I420ToRGBA(
+    auto converter = ConverterHandle::GetInstance().GetHandle();
+    CHECK_AND_RETURN_RET_LOG(converter.I420ToRGBA == nullptr, DCAMERA_BAD_VALUE, "converter is invalid.");
+    int32_t ret = converter.I420ToRGBA(
         srcDataY, srcImgInfo.width,
         srcDataU, static_cast<uint32_t>(srcImgInfo.width) >> MEMORY_RATIO_UV,
         srcDataV, static_cast<uint32_t>(srcImgInfo.width) >> MEMORY_RATIO_UV,
