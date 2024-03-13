@@ -35,7 +35,7 @@ int32_t DCameraSinkCallbackProxy::OnNotifyResourceInfo(const ResourceEventType &
     MessageParcel reply;
     MessageOption option;
     if (!req.WriteInterfaceToken(DCameraSinkCallbackProxy::GetDescriptor())) {
-        DHLOGE("write token failed");
+        DHLOGE("Write token failed");
         return DCAMERA_BAD_VALUE;
     }
 
