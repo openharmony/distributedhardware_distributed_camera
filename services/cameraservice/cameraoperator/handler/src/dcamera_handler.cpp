@@ -15,7 +15,9 @@
 
 #include "dcamera_handler.h"
 
+#include <cmath>
 #include <functional>
+#include <limits>
 
 #include "anonymous_string.h"
 #include "avcodec_info.h"
@@ -30,6 +32,8 @@
 namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(DCameraHandler);
+
+const int32_t MULTIPLENUM = 2;
 
 DCameraHandler::~DCameraHandler()
 {
@@ -308,6 +312,10 @@ bool DCameraHandler::IsValid(const DCStreamType type, const CameraStandard::Size
             break;
         }
         case SNAPSHOT_FRAME: {
+            if (pow(size.width, MULTIPLENUM) > UINT_MAX) {
+                DHLOGE("square of size.width overflow.");
+                return ret;
+            }
             uint64_t dcResolution = static_cast<uint64_t>(size.width * size.width);
             uint64_t dcMaxResolution = static_cast<uint64_t>(RESOLUTION_MAX_WIDTH_SNAPSHOT *
                                                              RESOLUTION_MAX_HEIGHT_SNAPSHOT);
