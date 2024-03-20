@@ -245,6 +245,10 @@ HWTEST_F(DCameraHandlerTest, dcamera_handler_test_008, TestSize.Level1)
     ret = DCameraHandler::GetInstance().IsValid(SNAPSHOT_FRAME, size);
     EXPECT_EQ(ret, true);
 
+    CameraStandard::Size size1{ 65540, 480 };
+    ret = DCameraHandler::GetInstance().IsValid(SNAPSHOT_FRAME, size1);
+    EXPECT_EQ(ret, false);
+
     int32_t invalidParam = 2;
     auto type = static_cast<DCStreamType>(invalidParam);
     ret = DCameraHandler::GetInstance().IsValid(type, size);
