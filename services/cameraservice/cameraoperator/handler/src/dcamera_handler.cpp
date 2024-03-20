@@ -31,6 +31,8 @@ namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(DCameraHandler);
 
+const int32_t MAXWIDTHSIZE = 65535;
+
 DCameraHandler::~DCameraHandler()
 {
     DHLOGI("~DCameraHandler");
@@ -308,6 +310,10 @@ bool DCameraHandler::IsValid(const DCStreamType type, const CameraStandard::Size
             break;
         }
         case SNAPSHOT_FRAME: {
+            if (size.width > MAXWIDTHSIZE) {
+                DHLOGE("size width out of range.");
+                return ret;
+            }
             uint64_t dcResolution = static_cast<uint64_t>(size.width * size.width);
             uint64_t dcMaxResolution = static_cast<uint64_t>(RESOLUTION_MAX_WIDTH_SNAPSHOT *
                                                              RESOLUTION_MAX_HEIGHT_SNAPSHOT);
