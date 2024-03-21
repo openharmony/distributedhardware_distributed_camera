@@ -201,7 +201,7 @@ int32_t EncodeDataProcess::InitEncoderMetadataFormat()
     metadataFormat_.PutStringValue("codec_mime", processType_);
     metadataFormat_.PutIntValue("width", static_cast<int32_t>(sourceConfig_.GetWidth()));
     metadataFormat_.PutIntValue("height", static_cast<int32_t>(sourceConfig_.GetHeight()));
-    metadataFormat_.PutIntValue("frame_rate", MAX_FRAME_RATE);
+    metadataFormat_.PutDoubleValue("frame_rate", MAX_FRAME_RATE);
     return DCAMERA_OK;
 }
 

@@ -26,7 +26,6 @@
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "session_bus_center.h"
-#include "session.h"
 
 using namespace testing::ext;
 

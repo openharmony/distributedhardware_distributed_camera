@@ -106,7 +106,7 @@ private:
     constexpr static int32_t MAX_RGB32_BUFFER_SIZE = 1920 * 1080 * 4 * 2;
     constexpr static int32_t MAX_BUFFER_SIZE = 1920 * 1080 * 4 * 2;
     constexpr static int32_t MIN_FRAME_RATE = 0;
-    constexpr static int32_t MAX_FRAME_RATE = 30;
+    constexpr static double MAX_FRAME_RATE = 30;
     constexpr static int32_t MIN_VIDEO_WIDTH = 320;
     constexpr static int32_t MIN_VIDEO_HEIGHT = 240;
     constexpr static int32_t MAX_VIDEO_WIDTH = 1920;
