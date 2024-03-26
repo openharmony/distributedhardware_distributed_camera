@@ -213,8 +213,25 @@ public:
 
     void OnFrameShutter(const int32_t captureId, const uint64_t timestamp) const
     {
-        DHLOGI("DemoDCameraPhotoCallback::OnFrameShutter captureID: %{public}d timestamp: %{public}llu",
+        DHLOGI("DemoDCameraPhotoCallback::OnFrameShutter captureID: %{public}d timestamp: %{public}" PRIu64,
             captureId, timestamp);
+    }
+
+    void OnFrameShutterEnd(const int32_t captureId, const uint64_t timestamp) const
+    {
+        DHLOGI("DemoDCameraPhotoCallback::OnFrameShutterEnd captureID: %{public}d timestamp: %{public}" PRIu64,
+            captureId, timestamp);
+    }
+
+    void OnCaptureReady(const int32_t captureId, const uint64_t timestamp) const
+    {
+        DHLOGI("DemoDCameraPhotoCallback::OnFrameShutterEnd captureID: %{public}d timestamp: %{public}" PRIu64,
+            captureId, timestamp);
+    }
+
+    void OnEstimatedCaptureDuration(const int32_t duration) const
+    {
+        DHLOGI("DemoDCameraPhotoCallback::OnEstimatedCaptureDuration duration: %{public}d", duration);
     }
 
     void OnCaptureError(const int32_t captureId, const int32_t errorCode) const

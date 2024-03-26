@@ -44,6 +44,21 @@ void DCameraPhotoCallback::OnFrameShutter(const int32_t captureId, const uint64_
     DHLOGI("enter, captureId: %{public}d, timestamp: %{public}" PRIu64, captureId, timestamp);
 }
 
+void DCameraPhotoCallback::OnFrameShutterEnd(const int32_t captureId, const uint64_t timestamp) const
+{
+    DHLOGI("enter, captureId: %{public}d, timestamp: %{public}" PRIu64, captureId, timestamp);
+}
+
+void DCameraPhotoCallback::OnCaptureReady(const int32_t captureId, const uint64_t timestamp) const
+{
+    DHLOGI("enter, captureId: %{public}d, timestamp: %{public}" PRIu64, captureId, timestamp);
+}
+
+void DCameraPhotoCallback::OnEstimatedCaptureDuration(const int32_t duration) const
+{
+    DHLOGI("enter, duration: %{public}d", duration);
+}
+
 void DCameraPhotoCallback::OnCaptureError(const int32_t captureId, const int32_t errorCode) const
 {
     DHLOGE("enter, captureId: %{public}d, errorCode: %{public}d", captureId, errorCode);

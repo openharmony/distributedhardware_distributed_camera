@@ -29,7 +29,10 @@ public:
     void OnCaptureStarted(const int32_t captureID, uint32_t exposureTime) const override;
     void OnCaptureEnded(const int32_t captureID, const int32_t frameCount) const override;
     void OnFrameShutter(const int32_t captureId, const uint64_t timestamp) const override;
+    void OnFrameShutterEnd(const int32_t captureId, const uint64_t timestamp) const override;
+    void OnCaptureReady(const int32_t captureId, const uint64_t timestamp) const override;
     void OnCaptureError(const int32_t captureId, const int32_t errorCode) const override;
+    void OnEstimatedCaptureDuration(const int32_t duration) const override;
 
 private:
     std::shared_ptr<StateCallback> callback_;
