@@ -60,10 +60,7 @@ ohos_shared_library("distributed_camera_data_process") {
     "src/utils/property_carrier.cpp",
   ]
 
-  deps = [
-    "${common_path}:distributed_camera_utils",
-    "//third_party/cJSON:cjson",
-  ]
+  deps = [ "${common_path}:distributed_camera_utils" ]
 
   if (!distributed_camera_common) {
     sources += [
@@ -102,6 +99,7 @@ ohos_shared_library("distributed_camera_data_process") {
 
   external_deps = [
     "av_codec:av_codec_client",
+    "cJSON:cjson",
     "c_utils:utils",
     "distributed_hardware_fwk:distributedhardwareutils",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",

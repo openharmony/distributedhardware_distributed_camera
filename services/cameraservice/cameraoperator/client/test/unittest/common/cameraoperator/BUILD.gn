@@ -20,7 +20,6 @@ module_out_path = "distributed_camera/dcamera_client_test"
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
-    "//third_party/cJSON",
     "${graphicsurface_path}/surface/include",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include",
     "${camerastandard_path}/interfaces/inner_api/native/camera/include/input",
@@ -66,7 +65,6 @@ ohos_unittest("DCameraClientTest") {
     "${services_path}/cameraservice/cameraoperator/client:distributed_camera_client",
     "${services_path}/cameraservice/cameraoperator/handler:distributed_camera_handler",
     "${services_path}/cameraservice/sinkservice:distributed_camera_sink",
-    "//third_party/cJSON:cjson",
     "//third_party/googletest:gtest_main",
   ]
 
@@ -74,6 +72,7 @@ ohos_unittest("DCameraClientTest") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "cJSON:cjson",
     "c_utils:utils",
     "drivers_interface_camera:libcamera_proxy_1.0",
     "drivers_interface_camera:metadata",

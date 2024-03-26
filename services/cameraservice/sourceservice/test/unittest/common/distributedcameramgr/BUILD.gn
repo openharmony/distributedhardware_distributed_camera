@@ -45,7 +45,6 @@ config("module_private_config") {
     "${fwk_utils_path}/include",
     "${fwk_utils_path}/include/eventbus",
     "${fwk_common_path}/utils/include",
-    "//third_party/cJSON",
     "//drivers/peripheral/base/",
     "${graphicsurface_path}/surface/include",
     "${feeding_smoother_path}",
@@ -85,7 +84,6 @@ ohos_unittest("DCameraSourceMgrTest") {
     "${services_path}/cameraservice/sourceservice:distributed_camera_source",
     "${services_path}/channel:distributed_camera_channel",
     "${services_path}/data_process:distributed_camera_data_process",
-    "//third_party/cJSON:cjson",
     "//third_party/googletest:gtest_main",
   ]
 
@@ -93,6 +91,7 @@ ohos_unittest("DCameraSourceMgrTest") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "cJSON:cjson",
     "c_utils:utils",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "dsoftbus:softbus_client",

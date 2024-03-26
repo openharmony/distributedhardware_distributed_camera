@@ -48,10 +48,7 @@ ohos_shared_library("distributed_camera_channel") {
     "src/dcamera_softbus_session.cpp",
   ]
 
-  deps = [
-    "${common_path}:distributed_camera_utils",
-    "//third_party/cJSON:cjson",
-  ]
+  deps = [ "${common_path}:distributed_camera_utils" ]
 
   defines = [
     "HI_LOG_ENABLE",
@@ -60,6 +57,7 @@ ohos_shared_library("distributed_camera_channel") {
   ]
 
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
     "distributed_hardware_fwk:distributed_av_receiver",
     "distributed_hardware_fwk:distributedhardwareutils",

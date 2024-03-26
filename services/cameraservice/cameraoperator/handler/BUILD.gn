@@ -27,9 +27,8 @@ ohos_shared_library("distributed_camera_handler") {
     ubsan = true
   }
   stack_protector_ret = true
-  include_dirs = [ "//third_party/cJSON" ]
 
-  include_dirs += [
+  include_dirs = [
     "include",
     "${common_path}/include/constants",
     "${common_path}/include/utils",
@@ -41,10 +40,7 @@ ohos_shared_library("distributed_camera_handler") {
     "src/dcamera_handler.cpp",
   ]
 
-  deps = [
-    "${common_path}:distributed_camera_utils",
-    "//third_party/cJSON:cjson",
-  ]
+  deps = [ "${common_path}:distributed_camera_utils" ]
 
   defines = [
     "HI_LOG_ENABLE",
@@ -54,6 +50,7 @@ ohos_shared_library("distributed_camera_handler") {
 
   external_deps = [
     "av_codec:av_codec_client",
+    "cJSON:cjson",
     "c_utils:utils",
     "camera_framework:camera_framework",
     "distributed_hardware_fwk:distributedhardwareutils",
