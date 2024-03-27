@@ -24,7 +24,6 @@ config("module_private_config") {
     "${services_path}/cameraservice/cameraoperator/client/include",
     "${services_path}/cameraservice/cameraoperator/client/include/callback",
     "${services_path}/cameraservice/cameraoperator/client/include/listener",
-    "//third_party/cJSON",
   ]
 }
 
@@ -55,7 +54,6 @@ ohos_executable("dcamera_client_demo") {
     "${common_path}:distributed_camera_utils",
     "${services_path}/cameraservice/cameraoperator/client:distributed_camera_client",
     "${services_path}/cameraservice/sinkservice:distributed_camera_sink",
-    "//third_party/cJSON:cjson",
   ]
 
   external_deps = [
@@ -65,6 +63,7 @@ ohos_executable("dcamera_client_demo") {
     "access_token:libtoken_setproc",
     "access_token:libtoken_setproc",
     "av_codec:av_codec_client",
+    "cJSON:cjson",
     "c_utils:utils",
     "camera_framework:camera_framework",
     "drivers_interface_camera:metadata",

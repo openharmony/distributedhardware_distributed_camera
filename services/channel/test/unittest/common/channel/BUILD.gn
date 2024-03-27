@@ -48,7 +48,6 @@ config("module_private_config") {
     "${innerkits_path}/native_cpp/camera_source/include",
     "${innerkits_path}/native_cpp/camera_source/include/callback",
     "${graphicsurface_path}/surface/include",
-    "//third_party/cJSON",
     "${feeding_smoother_path}/base",
   ]
 }
@@ -79,10 +78,10 @@ ohos_unittest("DCameraChannelTest") {
     "${services_path}/cameraservice/sinkservice:distributed_camera_sink",
     "${services_path}/cameraservice/sourceservice:distributed_camera_source",
     "${services_path}/data_process:distributed_camera_data_process",
-    "//third_party/cJSON:cjson",
   ]
 
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "eventhandler:libeventhandler",

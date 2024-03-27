@@ -33,7 +33,6 @@ config("module_private_config") {
     "${services_path}/cameraservice/base/include",
     "${common_path}/include/constants",
     "${common_path}/include/utils",
-    "//third_party/cJSON",
   ]
 }
 
@@ -58,11 +57,11 @@ ohos_unittest("DCameraServicesBaseTest") {
     "${fwk_utils_path}:distributedhardwareutils",
     "${services_path}/cameraservice/sourceservice:distributed_camera_source",
     "${services_path}/channel:distributed_camera_channel",
-    "//third_party/cJSON:cjson",
     "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "dsoftbus:softbus_client",
