@@ -62,6 +62,21 @@ ohos_shared_library("distributed_camera_data_process") {
 
   deps = [ "${common_path}:distributed_camera_utils" ]
 
+  external_deps = [
+    "av_codec:av_codec_client",
+    "cJSON:cjson",
+    "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
+    "drivers_interface_display:libdisplay_composer_proxy_1.0",
+    "eventhandler:libeventhandler",
+    "graphic_surface:surface",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "media_foundation:media_foundation",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+
   if (!distributed_camera_common) {
     sources += [
       "src/pipeline_node/multimedia_codec/decoder/decode_data_process.cpp",
@@ -72,7 +87,7 @@ ohos_shared_library("distributed_camera_data_process") {
       "src/pipeline_node/multimedia_codec/decoder/decode_data_process_common.cpp",
       "src/pipeline_node/scale_conversion/scale_convert_process_common.cpp",
     ]
-    external_deps = [ "ffmpeg:libohosffmpeg" ]
+    external_deps += [ "ffmpeg:libohosffmpeg" ]
   }
 
   cflags = [
@@ -95,21 +110,6 @@ ohos_shared_library("distributed_camera_data_process") {
   if (build_variant == "root") {
     defines += [ "DUMP_DCAMERA_FILE" ]
   }
-
-  external_deps += [
-    "av_codec:av_codec_client",
-    "cJSON:cjson",
-    "c_utils:utils",
-    "distributed_hardware_fwk:distributedhardwareutils",
-    "drivers_interface_display:libdisplay_composer_proxy_1.0",
-    "eventhandler:libeventhandler",
-    "graphic_surface:surface",
-    "hilog:libhilog",
-    "hitrace:hitrace_meter",
-    "media_foundation:media_foundation",
-    "safwk:system_ability_fwk",
-    "samgr:samgr_proxy",
-  ]
 
   subsystem_name = "distributedhardware"
 
