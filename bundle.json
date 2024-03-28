@@ -42,6 +42,7 @@
                 "c_utils",
                 "cJSON",
                 "dsoftbus",
+                "ffmpeg",
                 "hicollie",
                 "media_foundation",
                 "hisysevent",

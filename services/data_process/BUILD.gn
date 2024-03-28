@@ -68,12 +68,11 @@ ohos_shared_library("distributed_camera_data_process") {
       "src/pipeline_node/scale_conversion/scale_convert_process.cpp",
     ]
   } else {
-    include_dirs += [ "//third_party/ffmpeg/" ]
     sources += [
       "src/pipeline_node/multimedia_codec/decoder/decode_data_process_common.cpp",
       "src/pipeline_node/scale_conversion/scale_convert_process_common.cpp",
     ]
-    deps += [ "//third_party/ffmpeg:libohosffmpeg" ]
+    external_deps = [ "ffmpeg:libohosffmpeg" ]
   }
 
   cflags = [
@@ -97,7 +96,7 @@ ohos_shared_library("distributed_camera_data_process") {
     defines += [ "DUMP_DCAMERA_FILE" ]
   }
 
-  external_deps = [
+  external_deps += [
     "av_codec:av_codec_client",
     "cJSON:cjson",
     "c_utils:utils",

@@ -52,7 +52,6 @@ ohos_unittest("DCameraDataProcessPipelineTest") {
   deps = [
     "${common_path}:distributed_camera_utils",
     "${services_path}/data_process:distributed_camera_data_process",
-    "//third_party/ffmpeg:libohosffmpeg",
   ]
 
   external_deps = [
@@ -60,6 +59,7 @@ ohos_unittest("DCameraDataProcessPipelineTest") {
     "c_utils:utils",
     "distributed_hardware_fwk:distributedhardwareutils",
     "eventhandler:libeventhandler",
+    "ffmpeg:libohosffmpeg",
     "graphic_surface:surface",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
