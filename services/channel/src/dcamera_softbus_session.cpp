@@ -324,10 +324,9 @@ int32_t DCameraSoftbusSession::UnPackSendData(std::shared_ptr<DataBuffer>& buffe
         return (this->*memberFunc)(unpackData);
     }
     uint32_t offset = 0;
-    uint64_t bufferSize;
     while (totalLen > offset) {
         SetHeadParaDataLen(headPara, totalLen, offset);
-        bufferSize = static_cast<uint64_t>(buffer->Size());
+        uint64_t bufferSize = static_cast<uint64_t>(buffer->Size());
         DHLOGD("DCameraSoftbusSession UnPackSendData, size: %" PRIu64", dataLen: %{public}d, totalLen: %{public}d, "
             "nowTime: %{public}" PRId64" start:", bufferSize, headPara.dataLen, headPara.totalLen, GetNowTimeStampUs());
         std::shared_ptr<DataBuffer> unpackData =
