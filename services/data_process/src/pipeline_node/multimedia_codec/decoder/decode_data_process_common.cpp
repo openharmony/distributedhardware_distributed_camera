@@ -484,7 +484,7 @@ int32_t DecodeDataProcess::FeedDecoderInputBuffer()
         }
 
         inputBuffersQueue_.pop();
-        DHLOGD("Push inputBuffer sucess. inputBuffersQueue size is %{public}d.", inputBuffersQueue_.size());
+        DHLOGD("Push inputBuffer sucess. inputBuffersQueue size is %{public}zu.", inputBuffersQueue_.size());
 
         IncreaseWaitDecodeCnt();
     }
@@ -620,7 +620,7 @@ bool DecodeDataProcess::IsCorrectSurfaceBuffer(const sptr<SurfaceBuffer>& surBuf
             RGB32_MEMORY_COEFFICIENT);
         size_t surfaceBufSize = static_cast<size_t>(surBuf->GetSize());
         if (rgbImageSize > surfaceBufSize) {
-            DHLOGE("Buffer size error, rgbImageSize %{public}zu, surBufSize %{public}zu.", rgbImageSize,
+            DHLOGE("Buffer size error, rgbImageSize %{public}zu, surBufSize %{public}" PRIu32, rgbImageSize,
                 surBuf->GetSize());
             return false;
         }
@@ -632,7 +632,7 @@ bool DecodeDataProcess::IsCorrectSurfaceBuffer(const sptr<SurfaceBuffer>& surBuf
             sourceConfig_.GetWidth() * sourceConfig_.GetHeight() * YUV_BYTES_PER_PIXEL / Y2UV_RATIO);
         if (yuvImageAlignedSize > surfaceBufSize || yuvImageAlignedSize < yuvImageSize) {
             DHLOGE("Buffer size error, yuvImageSize %{public}zu, yuvImageAlignedSize %{public}zu, surBufSize "
-                "%{public}zu.", yuvImageSize, yuvImageAlignedSize, surBuf->GetSize());
+                "%{public}" PRIu32, yuvImageSize, yuvImageAlignedSize, surBuf->GetSize());
             return false;
         }
     }
@@ -759,8 +759,8 @@ void DecodeDataProcess::OnOutputBufferAvailable(uint32_t index, const MediaAVCod
         DHLOGE("Decoder node occurred error or start release.");
         return;
     }
-    DHLOGD("Video decode buffer info: presentation TimeUs %{public}lld, size %{public}d, offset %{public}d, flag "
-        "%{public}d", info.presentationTimeUs, info.size, info.offset, flag);
+    DHLOGD("Video decode buffer info: presentation TimeUs %{public}" PRId64", size %{public}d, offset %{public}d, flag "
+        "%{public}" PRIu32, info.presentationTimeUs, info.size, info.offset, flag);
     outputInfo_ = info;
     {
         std::lock_guard<std::mutex> lock(mtxDequeLock_);

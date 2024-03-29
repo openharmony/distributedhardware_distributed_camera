@@ -264,7 +264,7 @@ void DCameraHandler::ProcessProfile(const DCStreamType type, std::map<std::strin
 void DCameraHandler::ConfigFormatphoto(const DCStreamType type, cJSON* root,
     std::vector<CameraStandard::Profile>& profileList)
 {
-    DHLOGI("type: %d, size: %d", type, profileList.size());
+    DHLOGI("type: %d, size: %{public}zu", type, profileList.size());
     std::set<int32_t> formatSet;
     cJSON* formatphotoObj = cJSON_CreateObject();
     if (formatphotoObj == nullptr) {
@@ -298,7 +298,7 @@ void DCameraHandler::ConfigFormatphoto(const DCStreamType type, cJSON* root,
 void DCameraHandler::ConfigFormatvideo(const DCStreamType type, cJSON* root,
     std::vector<CameraStandard::Profile>& profileList)
 {
-    DHLOGI("type: %d, size: %d", type, profileList.size());
+    DHLOGI("type: %d, size: %{public}zu", type, profileList.size());
     std::set<int32_t> formatSet;
     cJSON* formatpreviewObj = cJSON_CreateObject();
     if (formatpreviewObj == nullptr) {

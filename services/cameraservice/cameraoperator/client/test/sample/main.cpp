@@ -245,7 +245,7 @@ static void ConfigFocusAndExposure()
         return;
     }
     if (!biasRange.empty()) {
-        DHLOGI("Distributed Camera Demo: get %{public}d exposure compensation range", biasRange.size());
+        DHLOGI("Distributed Camera Demo: get %{public}zu exposure compensation range", biasRange.size());
         exposureValue = biasRange[0];
     }
     g_captureSession->SetFocusMode(focusMode);
