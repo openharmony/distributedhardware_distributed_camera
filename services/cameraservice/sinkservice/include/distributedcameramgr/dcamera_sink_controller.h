@@ -94,7 +94,7 @@ private:
     std::atomic<bool> isPageStatus_ = false;
     std::shared_ptr<DmInitCallback> initCallback_;
     bool isSensitive_;
-    bool isSameAccount_;
+    bool isSameAccount_ = false;
 
     const std::string SESSION_FLAG = "control";
     const std::string SRC_TYPE = "camera";
