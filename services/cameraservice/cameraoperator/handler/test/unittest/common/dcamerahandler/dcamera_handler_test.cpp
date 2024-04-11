@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -247,6 +247,9 @@ HWTEST_F(DCameraHandlerTest, dcamera_handler_test_008, TestSize.Level1)
 
     CameraStandard::Size size1{ 65540, 480 };
     ret = DCameraHandler::GetInstance().IsValid(SNAPSHOT_FRAME, size1);
+    EXPECT_EQ(ret, false);
+
+    ret = DCameraHandler::GetInstance().IsValid(CONTINUOUS_FRAME, size1);
     EXPECT_EQ(ret, false);
 
     int32_t invalidParam = 2;
