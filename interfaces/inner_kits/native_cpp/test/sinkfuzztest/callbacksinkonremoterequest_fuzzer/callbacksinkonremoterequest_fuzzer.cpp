@@ -53,6 +53,7 @@ void CallbackSinkOnRemoteRequestFuzzTest(const uint8_t* data, size_t size)
     pdata.ReadBool(isSameAccout);
 
     sptr<DCameraSinkCallback> dcameraSinkCallback(new (std::nothrow) DCameraSinkCallback());
+    dcameraSinkCallback->memberFuncMap_[code] = &DCameraSinkCallbackStub::OnNotifyResourceInfoInner;
     dcameraSinkCallback->OnRemoteRequest(code, pdata, reply, option);
 }
 }
