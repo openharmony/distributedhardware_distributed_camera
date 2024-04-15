@@ -48,7 +48,6 @@ int32_t DCameraSinkFrameInfo::Unmarshal(const std::string& jsonStr)
 {
     cJSON *rootValue = cJSON_Parse(jsonStr.c_str());
     if (rootValue == nullptr) {
-        DHLOGE("FrameInfo parse error.");
         return DCAMERA_BAD_VALUE;
     }
     cJSON *type = cJSON_GetObjectItemCaseSensitive(rootValue, FRAME_INFO_TYPE.c_str());
@@ -57,48 +56,43 @@ int32_t DCameraSinkFrameInfo::Unmarshal(const std::string& jsonStr)
         return DCAMERA_BAD_VALUE;
     }
     type_ = static_cast<int8_t>(type->valueint);
-
     cJSON *index = cJSON_GetObjectItemCaseSensitive(rootValue, FRAME_INFO_INDEX.c_str());
     if (index == nullptr || !cJSON_IsNumber(index)) {
         cJSON_Delete(rootValue);
         return DCAMERA_BAD_VALUE;
     }
     index_ = static_cast<int32_t>(index->valueint);
-
     cJSON *pts = cJSON_GetObjectItemCaseSensitive(rootValue, FRAME_INFO_PTS.c_str());
     if (pts == nullptr || !cJSON_IsNumber(pts)) {
         cJSON_Delete(rootValue);
         return DCAMERA_BAD_VALUE;
     }
     pts_ = static_cast<int64_t>(pts->valueint);
-
     cJSON *startEncode = cJSON_GetObjectItemCaseSensitive(rootValue, FRAME_INFO_START_ENCODE.c_str());
     if (startEncode == nullptr || !cJSON_IsNumber(startEncode)) {
         cJSON_Delete(rootValue);
         return DCAMERA_BAD_VALUE;
     }
     startEncodeT_ = static_cast<int64_t>(startEncode->valueint);
-
     cJSON *finishEncode = cJSON_GetObjectItemCaseSensitive(rootValue, FRAME_INFO_FINISH_ENCODE.c_str());
     if (finishEncode == nullptr || !cJSON_IsNumber(finishEncode)) {
         cJSON_Delete(rootValue);
         return DCAMERA_BAD_VALUE;
     }
     finishEncodeT_ = static_cast<int64_t>(finishEncode->valueint);
-
     cJSON *sendT = cJSON_GetObjectItemCaseSensitive(rootValue, FRAME_INFO_SENDT.c_str());
     if (sendT == nullptr || !cJSON_IsNumber(sendT)) {
         cJSON_Delete(rootValue);
         return DCAMERA_BAD_VALUE;
     }
     sendT_ = static_cast<int64_t>(sendT->valueint);
-
     cJSON *ver = cJSON_GetObjectItemCaseSensitive(rootValue, FRAME_INFO_VERSION.c_str());
     if (ver == nullptr || !cJSON_IsString(ver)) {
         cJSON_Delete(rootValue);
         return DCAMERA_BAD_VALUE;
     }
     ver_ = std::string(ver->valuestring);
+    cJSON_Delete(rootValue);
     return DCAMERA_OK;
 }
 } // namespace DistributedHardware

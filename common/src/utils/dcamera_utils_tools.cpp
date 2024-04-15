@@ -97,7 +97,7 @@ std::string Base64Encode(const unsigned char *toEncode, unsigned int len)
         DHLOGE("toEncode is null or len is zero.");
         return ret;
     }
-    int32_t length = len;
+    uint32_t length = len;
     uint32_t i = 0;
     unsigned char charArray3[3];
     unsigned char charArray4[4];
@@ -202,7 +202,12 @@ void DumpBufferToFile(std::string fileName, uint8_t *buffer, size_t bufSize)
         DHLOGE("dumpsaving : input param err.");
         return;
     }
-    std::ofstream ofs(fileName, std::ios::binary | std::ios::out | std::ios::app);
+    char path[PATH_MAX + 1] = {0x00};
+    if (fileName.length() > PATH_MAX || realpath(fileName.c_str(), path) == nullptr) {
+        DHLOGE("The file path is invalid.");
+        return;
+    }
+    std::ofstream ofs(path, std::ios::binary | std::ios::out | std::ios::app);
     if (!ofs.is_open()) {
         DHLOGE("dumpsaving : open file failed.");
         return;
@@ -218,7 +223,12 @@ int32_t IsUnderDumpMaxSize(std::string fileName)
         DHLOGE("dumpsaving : input fileName empty.");
         return DCAMERA_INIT_ERR;
     }
-    std::ofstream ofs(fileName, std::ios::binary | std::ios::out | std::ios::app);
+    char path[PATH_MAX + 1] = {0x00};
+    if (fileName.length() > PATH_MAX || realpath(fileName.c_str(), path) == nullptr) {
+        DHLOGE("The file path is invalid.");
+        return DCAMERA_INIT_ERR;
+    }
+    std::ofstream ofs(path, std::ios::binary | std::ios::out | std::ios::app);
     if (!ofs.is_open()) {
         DHLOGE("dumpsaving : open file failed.");
         return DCAMERA_INIT_ERR;

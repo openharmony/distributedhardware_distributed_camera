@@ -92,7 +92,7 @@ private:
     std::mutex idMapLock_;
     std::map<int32_t, std::shared_ptr<DCameraSoftbusSession>> sessionIdMap_;
 
-    int32_t sourceSocketId_;
+    int32_t sourceSocketId_ = -1;
     std::map<DCameraSessionMode, TransDataType> sessionModeAndDataTypeMap_;
     std::mutex mySessionNamePeerDevIdLock_;
     std::map<std::string, std::string> peerDevIdMySessionNameMap_;
