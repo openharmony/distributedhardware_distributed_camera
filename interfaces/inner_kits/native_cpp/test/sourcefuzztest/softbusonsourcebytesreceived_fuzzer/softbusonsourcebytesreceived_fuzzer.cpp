@@ -26,9 +26,11 @@ void SoftbusOnSourceBytesReceivedFuzzTest(const uint8_t* data, size_t size)
     }
 
     int32_t sessionId = *(reinterpret_cast<const int32_t*>(data));
+    int32_t socket = 1;
     const void *receivedData = reinterpret_cast<const void*>(data);
     uint32_t dataLen = *(reinterpret_cast<const uint32_t*>(data));
-
+    auto session = std::make_shared<DCameraSoftbusSession>();
+    DCameraSoftbusAdapter::GetInstance().sourceSocketSessionMap_[socket] = session;
     DCameraSoftbusAdapter::GetInstance().SourceOnBytes(sessionId, receivedData, dataLen);
 }
 }
