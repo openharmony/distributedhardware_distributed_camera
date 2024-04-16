@@ -44,6 +44,8 @@ ohos_fuzztest("SoftbusOnSourceStreamReceivedFuzzTest") {
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
+    "-Dprivate=public",
+    "-Dprotected=public",
   ]
 
   sources = [ "softbusonsourcestreamreceived_fuzzer.cpp" ]

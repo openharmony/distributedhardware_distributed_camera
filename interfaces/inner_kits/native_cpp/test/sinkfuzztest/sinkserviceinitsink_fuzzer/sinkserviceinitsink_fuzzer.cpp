@@ -37,7 +37,10 @@ void SinkServiceInitSinkFuzzTest(const uint8_t* data, size_t size)
     std::shared_ptr<DistributedCameraSinkService> sinkService =
         std::make_shared<DistributedCameraSinkService>(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, true);
     sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
+    sinkService->registerToService_ = false;
     sinkService->InitSink(param, sinkCallback);
+    sinkService->Init();
+    sinkService->OnStop();
 }
 }
 }

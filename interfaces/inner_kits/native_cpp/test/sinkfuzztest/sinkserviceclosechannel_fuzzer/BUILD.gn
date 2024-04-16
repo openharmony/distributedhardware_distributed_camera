@@ -32,6 +32,7 @@ ohos_fuzztest("SinkServiceCloseChannelFuzzTest") {
     "${graphicsurface_path}/surface/include",
     "${innerkits_path}/native_cpp/camera_sink/include",
     "${innerkits_path}/native_cpp/camera_sink/include/callback",
+    "${innerkits_path}/native_cpp/test/include",
     "${services_path}/cameraservice/base/include",
     "${services_path}/cameraservice/cameraoperator/client/include",
     "${services_path}/cameraservice/sinkservice/include/distributedcamera",
@@ -49,12 +50,15 @@ ohos_fuzztest("SinkServiceCloseChannelFuzzTest") {
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
+    "-Dprivate=public",
+    "-Dprotected=public",
   ]
 
   sources = [ "sinkserviceclosechannel_fuzzer.cpp" ]
 
   deps = [
     "${common_path}:distributed_camera_utils",
+    "${innerkits_path}/native_cpp/camera_sink:distributed_camera_sink_sdk",
     "${services_path}/cameraservice/sinkservice:distributed_camera_sink",
   ]
 

@@ -49,12 +49,15 @@ ohos_fuzztest("SinkServiceStopCaptureFuzzTest") {
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
+    "-Dprivate=public",
+    "-Dprotected=public",
   ]
 
   sources = [ "sinkservicestopcapture_fuzzer.cpp" ]
 
   deps = [
     "${common_path}:distributed_camera_utils",
+    "${innerkits_path}/native_cpp/camera_sink:distributed_camera_sink_sdk",
     "${services_path}/cameraservice/sinkservice:distributed_camera_sink",
   ]
 

@@ -38,7 +38,9 @@ void SoftbusOnSinkStreamReceivedFuzzTest(const uint8_t* data, size_t size)
         *(reinterpret_cast<const int*>(data)), *(reinterpret_cast<const int*>(data)),
         *(reinterpret_cast<const int*>(data)), nullptr
     };
-
+    int32_t socket = 1;
+    auto session = std::make_shared<DCameraSoftbusSession>();
+    DCameraSoftbusAdapter::GetInstance().sinkSocketSessionMap_[socket] = session;
     DCameraSoftbusAdapter::GetInstance().SinkOnStream(sessionId, &receivedData, &ext, &param);
 }
 }
