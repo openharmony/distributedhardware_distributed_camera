@@ -85,6 +85,9 @@ int32_t DCameraSinkController::StopCapture()
 {
     DHLOGI("StopCapture dhId: %{public}s", GetAnonyString(dhId_).c_str());
     std::lock_guard<std::mutex> autoLock(captureLock_);
+    if (operator_ == nullptr) {
+        return DCAMERA_BAD_VALUE;
+    }
     int32_t ret = operator_->StopCapture();
     if (ret != DCAMERA_OK) {
         DHLOGE("client stop capture failed, dhId: %{public}s, ret: %{public}d",
@@ -92,7 +95,9 @@ int32_t DCameraSinkController::StopCapture()
         DCameraNotifyInner(DCAMERA_MESSAGE, DCAMERA_EVENT_DEVICE_ERROR, std::string("operator stop capture failed."));
         return ret;
     }
-
+    if (output_ == nullptr) {
+        return DCAMERA_BAD_VALUE;
+    }
     ret = output_->StopCapture();
     if (ret != DCAMERA_OK) {
         DHLOGE("output stop capture failed, dhId: %{public}s, ret: %{public}d",
@@ -264,6 +269,9 @@ int32_t DCameraSinkController::CloseChannel()
     DCameraLowLatency::GetInstance().DisableLowLatency();
     DCameraSinkServiceIpc::GetInstance().DeleteSourceRemoteCamSrv(srcDevId_);
     srcDevId_.clear();
+    if (channel_ == nullptr) {
+        return DCAMERA_BAD_VALUE;
+    }
     int32_t ret = channel_->ReleaseSession();
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSinkController release channel failed, dhId: %{public}s, ret: %{public}d",
