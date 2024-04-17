@@ -18,6 +18,8 @@
 #include <cstddef>
 #include <cstdint>
 
+#include "dcamera_sink_controller.h"
+#include "dcamera_sink_access_control.h"
 #include "dcamera_sink_callback.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_sink_service.h"
@@ -37,6 +39,8 @@ void SinkServiceCloseChannelFuzzTest(const uint8_t* data, size_t size)
         std::make_shared<DistributedCameraSinkService>(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, true);
     sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
     std::shared_ptr<DCameraSinkDev> sinkDevice = std::make_shared<DCameraSinkDev>(dhId, sinkCallback);
+    sinkDevice->accessControl_ = std::make_shared<DCameraSinkAccessControl>();
+    sinkDevice->controller_ = std::make_shared<DCameraSinkController>(sinkDevice->accessControl_, sinkCallback);
     sinkService->camerasMap_.emplace(dhId, sinkDevice);
     sinkService->CloseChannel(dhId);
 }

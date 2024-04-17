@@ -71,6 +71,7 @@ ohos_fuzztest("SinkServiceInitSinkFuzzTest") {
     "cJSON:cjson",
     "c_utils:utils",
     "device_manager:devicemanagersdk",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "graphic_surface:surface",
     "hilog:libhilog",
