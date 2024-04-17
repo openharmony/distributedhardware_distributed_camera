@@ -97,7 +97,7 @@ std::string Base64Encode(const unsigned char *toEncode, unsigned int len)
         DHLOGE("toEncode is null or len is zero.");
         return ret;
     }
-    uint32_t length = len;
+    int32_t length = static_cast<int32_t>(len);
     uint32_t i = 0;
     unsigned char charArray3[3];
     unsigned char charArray4[4];
