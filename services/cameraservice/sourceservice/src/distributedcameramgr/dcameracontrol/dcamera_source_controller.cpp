@@ -21,6 +21,7 @@
 #include "iservmgr_hdi.h"
 #include "iproxy_broker.h"
 
+#include "anonymous_string.h"
 #include "dcamera_capture_info_cmd.h"
 #include "dcamera_channel_source_impl.h"
 #include "dcamera_hitrace_adapter.h"

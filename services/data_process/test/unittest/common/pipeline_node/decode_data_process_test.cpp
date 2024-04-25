@@ -34,7 +34,7 @@ public:
     void TearDown();
 
     std::shared_ptr<DecodeDataProcess> testDecodeDataProcess_;
-    std::shared_ptr<EventBus> eventBusPipeline_;
+    std::shared_ptr<DCameraPipelineSource::DCameraPipelineSrcEventHandler> pipeEventHandler_;
     std::shared_ptr<DCameraPipelineSource> sourcePipeline_;
 };
 
@@ -60,8 +60,10 @@ void DecodeDataProcessTest::SetUp(void)
 {
     DHLOGI("DecodeDataProcessTest SetUp");
     sourcePipeline_ = std::make_shared<DCameraPipelineSource>();
-    eventBusPipeline_ = std::make_shared<EventBus>("TestDecodeHandler");
-    testDecodeDataProcess_ = std::make_shared<DecodeDataProcess>(eventBusPipeline_, sourcePipeline_);
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(true);
+    pipeEventHandler_ = std::make_shared<DCameraPipelineSource::DCameraPipelineSrcEventHandler>(
+        runner, sourcePipeline_);
+    testDecodeDataProcess_ = std::make_shared<DecodeDataProcess>(pipeEventHandler_, sourcePipeline_);
 }
 
 void DecodeDataProcessTest::TearDown(void)
@@ -69,7 +71,7 @@ void DecodeDataProcessTest::TearDown(void)
     DHLOGI("DecodeDataProcessTest TearDown");
     usleep(SLEEP_TIME);
     sourcePipeline_ = nullptr;
-    eventBusPipeline_ = nullptr;
+    pipeEventHandler_ = nullptr;
     testDecodeDataProcess_ = nullptr;
 }
 

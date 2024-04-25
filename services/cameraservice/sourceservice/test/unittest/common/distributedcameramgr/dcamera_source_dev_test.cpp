@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -343,9 +343,8 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_011, TestSize.Level1)
 HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_012, TestSize.Level1)
 {
     std::shared_ptr<DCameraEvent> camEvent = std::make_shared<DCameraEvent>();
-    DCameraSourceEvent event(*camDev_, DCAMERA_EVENT_NOFIFY, camEvent);
+    DCameraSourceEvent event(DCAMERA_EVENT_NOFIFY, camEvent);
     camDev_->InitDCameraSourceDev();
-    camDev_->OnEvent(event);
     camDev_->GetVersion();
     int32_t ret = camDev_->GetStateInfo();
     EXPECT_EQ(DCAMERA_OK, ret);
@@ -642,7 +641,7 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_022, TestSize.Level1)
     int32_t result = 0;
     DCAMERA_EVENT eventType = DCAMERA_EVENT::DCAMERA_EVENT_OPEN;
     std::shared_ptr<DCameraEvent> camEvent = std::make_shared<DCameraEvent>();
-    DCameraSourceEvent event(*camDev_, DCAMERA_EVENT_NOFIFY, camEvent);
+    DCameraSourceEvent event(DCAMERA_EVENT_NOFIFY, camEvent);
     camDev_->NotifyResult(eventType, event, result);
     camDev_->memberFuncMap_.clear();
     camDev_->NotifyResult(eventType, event, result);

@@ -19,15 +19,9 @@
 #include <memory>
 #include <vector>
 
-#include "eventbus/event.h"
-#include "eventbus/event_bus.h"
-#include "eventbus/event_sender.h"
-#include "eventbus/eventbus_handler.h"
-
 #include "data_buffer.h"
 #include "image_common_type.h"
 #include "distributed_camera_errno.h"
-#include "dcamera_pipeline_event.h"
 #include "idata_process_pipeline.h"
 #include "abstract_data_process.h"
 #include "data_process_listener.h"

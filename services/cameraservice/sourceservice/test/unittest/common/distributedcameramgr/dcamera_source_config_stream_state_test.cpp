@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -89,7 +89,7 @@ void DCameraSourceConfigStreamStateTest::TearDown(void)
  */
 HWTEST_F(DCameraSourceConfigStreamStateTest, dcamera_source_config_stream_state_test_001, TestSize.Level1)
 {
-    DCameraSourceEvent event0(*camDev_, DCAMERA_EVENT_REGIST, g_registParam);
+    DCameraSourceEvent event0(DCAMERA_EVENT_REGIST, g_registParam);
     std::shared_ptr<DCameraSourceConfigStreamState> configstate =
         std::make_shared<DCameraSourceConfigStreamState>(stateMachine_);
     int32_t ret = configstate->DoUnregisterTask(camDev_, event0);
@@ -104,7 +104,7 @@ HWTEST_F(DCameraSourceConfigStreamStateTest, dcamera_source_config_stream_state_
  */
 HWTEST_F(DCameraSourceConfigStreamStateTest, dcamera_source_config_stream_state_test_002, TestSize.Level1)
 {
-    DCameraSourceEvent event0(*camDev_, DCAMERA_EVENT_REGIST, g_registParam);
+    DCameraSourceEvent event0(DCAMERA_EVENT_REGIST, g_registParam);
     std::shared_ptr<DCameraSourceConfigStreamState> configstate =
         std::make_shared<DCameraSourceConfigStreamState>(stateMachine_);
     int32_t ret = configstate->DoUpdateSettingsTask(camDev_, event0);
@@ -119,7 +119,7 @@ HWTEST_F(DCameraSourceConfigStreamStateTest, dcamera_source_config_stream_state_
  */
 HWTEST_F(DCameraSourceConfigStreamStateTest, dcamera_source_config_stream_state_test_003, TestSize.Level1)
 {
-    DCameraSourceEvent event0(*camDev_, DCAMERA_EVENT_REGIST, g_registParam);
+    DCameraSourceEvent event0(DCAMERA_EVENT_REGIST, g_registParam);
     std::shared_ptr<DCameraSourceConfigStreamState> configstate =
         std::make_shared<DCameraSourceConfigStreamState>(stateMachine_);
     int32_t ret = configstate->DoEventNofityTask(camDev_, event0);
@@ -134,7 +134,7 @@ HWTEST_F(DCameraSourceConfigStreamStateTest, dcamera_source_config_stream_state_
  */
 HWTEST_F(DCameraSourceConfigStreamStateTest, dcamera_source_config_stream_state_test_004, TestSize.Level1)
 {
-    DCameraSourceEvent event0(*camDev_, DCAMERA_EVENT_OPEN, g_registParam);
+    DCameraSourceEvent event0(DCAMERA_EVENT_OPEN, g_registParam);
     std::shared_ptr<DCameraSourceOpenedState> openState = std::make_shared<DCameraSourceOpenedState>(stateMachine_);
     int32_t ret = openState->DoUnregisterTask(camDev_, event0);
     EXPECT_EQ(DCAMERA_OK, ret);
@@ -148,7 +148,7 @@ HWTEST_F(DCameraSourceConfigStreamStateTest, dcamera_source_config_stream_state_
  */
 HWTEST_F(DCameraSourceConfigStreamStateTest, dcamera_source_config_stream_state_test_005, TestSize.Level1)
 {
-    DCameraSourceEvent event0(*camDev_, DCAMERA_EVENT_OPEN, g_registParam);
+    DCameraSourceEvent event0(DCAMERA_EVENT_OPEN, g_registParam);
     std::shared_ptr<DCameraSourceOpenedState> openState = std::make_shared<DCameraSourceOpenedState>(stateMachine_);
     int32_t ret = openState->DoUpdateSettingsTask(camDev_, event0);
     EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
@@ -162,7 +162,7 @@ HWTEST_F(DCameraSourceConfigStreamStateTest, dcamera_source_config_stream_state_
  */
 HWTEST_F(DCameraSourceConfigStreamStateTest, dcamera_source_config_stream_state_test_006, TestSize.Level1)
 {
-    DCameraSourceEvent event0(*camDev_, DCAMERA_EVENT_OPEN, g_registParam);
+    DCameraSourceEvent event0(DCAMERA_EVENT_OPEN, g_registParam);
     std::shared_ptr<DCameraSourceOpenedState> openState = std::make_shared<DCameraSourceOpenedState>(stateMachine_);
     int32_t ret = openState->DoEventNofityTask(camDev_, event0);
     EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
@@ -176,7 +176,7 @@ HWTEST_F(DCameraSourceConfigStreamStateTest, dcamera_source_config_stream_state_
  */
 HWTEST_F(DCameraSourceConfigStreamStateTest, dcamera_source_config_stream_state_test_007, TestSize.Level1)
 {
-    DCameraSourceEvent event0(*camDev_, DCAMERA_EVENT_OPEN, g_registParam);
+    DCameraSourceEvent event0(DCAMERA_EVENT_OPEN, g_registParam);
     std::shared_ptr<DCameraSourceCaptureState> captureState =
         std::make_shared<DCameraSourceCaptureState>(stateMachine_);
     int32_t ret = captureState->DoUnregisterTask(camDev_, event0);
@@ -191,7 +191,7 @@ HWTEST_F(DCameraSourceConfigStreamStateTest, dcamera_source_config_stream_state_
  */
 HWTEST_F(DCameraSourceConfigStreamStateTest, dcamera_source_config_stream_state_test_008, TestSize.Level1)
 {
-    DCameraSourceEvent event0(*camDev_, DCAMERA_EVENT_OPEN, g_registParam);
+    DCameraSourceEvent event0(DCAMERA_EVENT_OPEN, g_registParam);
     std::shared_ptr<DCameraSourceCaptureState> captureState =
         std::make_shared<DCameraSourceCaptureState>(stateMachine_);
     int32_t ret = captureState->DoStartCaptureTask(camDev_, event0);
@@ -206,7 +206,7 @@ HWTEST_F(DCameraSourceConfigStreamStateTest, dcamera_source_config_stream_state_
  */
 HWTEST_F(DCameraSourceConfigStreamStateTest, dcamera_source_config_stream_state_test_009, TestSize.Level1)
 {
-    DCameraSourceEvent event0(*camDev_, DCAMERA_EVENT_OPEN, g_registParam);
+    DCameraSourceEvent event0(DCAMERA_EVENT_OPEN, g_registParam);
     std::shared_ptr<DCameraSourceCaptureState> captureState =
         std::make_shared<DCameraSourceCaptureState>(stateMachine_);
     int32_t ret = captureState->DoStopCaptureTask(camDev_, event0);
@@ -221,7 +221,7 @@ HWTEST_F(DCameraSourceConfigStreamStateTest, dcamera_source_config_stream_state_
  */
 HWTEST_F(DCameraSourceConfigStreamStateTest, dcamera_source_config_stream_state_test_010, TestSize.Level1)
 {
-    DCameraSourceEvent event0(*camDev_, DCAMERA_EVENT_OPEN, g_registParam);
+    DCameraSourceEvent event0(DCAMERA_EVENT_OPEN, g_registParam);
     std::shared_ptr<DCameraSourceCaptureState> captureState =
         std::make_shared<DCameraSourceCaptureState>(stateMachine_);
     int32_t ret = captureState->DoUpdateSettingsTask(camDev_, event0);
@@ -236,7 +236,7 @@ HWTEST_F(DCameraSourceConfigStreamStateTest, dcamera_source_config_stream_state_
  */
 HWTEST_F(DCameraSourceConfigStreamStateTest, dcamera_source_config_stream_state_test_011, TestSize.Level1)
 {
-    DCameraSourceEvent event0(*camDev_, DCAMERA_EVENT_OPEN, g_registParam);
+    DCameraSourceEvent event0(DCAMERA_EVENT_OPEN, g_registParam);
     std::shared_ptr<DCameraSourceCaptureState> captureState =
         std::make_shared<DCameraSourceCaptureState>(stateMachine_);
     int32_t ret = captureState->DoEventNofityTask(camDev_, event0);

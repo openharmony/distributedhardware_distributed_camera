@@ -16,9 +16,7 @@
 #ifndef OHOS_DCAMERA_SINK_CONTROLLER_H
 #define OHOS_DCAMERA_SINK_CONTROLLER_H
 
-#include "eventbus/event_bus.h"
-#include "dcamera_frame_trigger_event.h"
-#include "dcamera_post_authorization_event.h"
+#include "event_handler.h"
 #include "icamera_controller.h"
 
 #include "icamera_channel.h"
@@ -34,10 +32,9 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-class DCameraSinkController : public ICameraController, public EventSender,
-    public DistributedHardware::EventBusHandler<DCameraFrameTriggerEvent>,
-    public DistributedHardware::EventBusHandler<DCameraPostAuthorizationEvent>,
-    public std::enable_shared_from_this<DCameraSinkController> {
+constexpr uint32_t EVENT_FRAME_TRIGGER = 1;
+constexpr uint32_t EVENT_AUTHORIZATION = 2;
+class DCameraSinkController : public ICameraController, public std::enable_shared_from_this<DCameraSinkController> {
 public:
     explicit DCameraSinkController(std::shared_ptr<ICameraSinkAccessControl>& accessControl,
         const sptr<IDCameraSinkCallback> &sinkCallback);
@@ -57,15 +54,22 @@ public:
     int32_t ResumeDistributedHardware(const std::string &networkId) override;
     int32_t StopDistributedHardware(const std::string &networkId) override;
 
-    void OnEvent(DCameraFrameTriggerEvent& event) override;
-    void OnEvent(DCameraPostAuthorizationEvent& event) override;
-
     void OnStateChanged(std::shared_ptr<DCameraEvent>& event);
     void OnMetadataResult(std::vector<std::shared_ptr<DCameraSettings>>& settings);
 
     void OnSessionState(int32_t state);
     void OnSessionError(int32_t eventType, int32_t eventReason, std::string detail);
     void OnDataReceived(std::vector<std::shared_ptr<DataBuffer>>& buffers);
+
+    class DCameraSinkContrEventHandler : public AppExecFwk::EventHandler {
+        public:
+            DCameraSinkContrEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
+                std::shared_ptr<DCameraSinkController> sinkContrPtr);
+            ~DCameraSinkContrEventHandler() override = default;
+            void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
+        private:
+            std::weak_ptr<DCameraSinkController> sinkContrWPtr_;
+    };
 
 private:
     int32_t StartCaptureInner(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos);
@@ -77,6 +81,8 @@ private:
     std::string GetUdidByNetworkId(const std::string &networkId);
     int32_t PullUpPage();
     bool CheckPermission();
+    void ProcessFrameTrigger(const AppExecFwk::InnerEvent::Pointer &event);
+    void ProcessPostAuthorization(const AppExecFwk::InnerEvent::Pointer &event);
 
     bool isInit_;
     int32_t sessionState_;
@@ -85,7 +91,7 @@ private:
     std::mutex channelLock_;
     std::string dhId_;
     std::string srcDevId_;
-    std::shared_ptr<EventBus> eventBus_;
+    std::shared_ptr<DCameraSinkContrEventHandler> sinkCotrEventHandler_;
     std::shared_ptr<ICameraChannel> channel_;
     std::shared_ptr<ICameraOperator> operator_;
     std::shared_ptr<ICameraSinkAccessControl> accessControl_;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,7 @@
 #include "dcamera_source_state.h"
 #include "dcamera_utils_tools.h"
 #include "mock_camera_channel.h"
+#include "distributed_hardware_log.h"
 #include "icamera_state_listener.h"
 #include "dcamera_source_controller_channel_listener.h"
 #include "distributed_camera_errno.h"
