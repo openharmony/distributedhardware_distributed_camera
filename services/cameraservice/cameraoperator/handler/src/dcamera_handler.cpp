@@ -52,6 +52,11 @@ int32_t DCameraHandler::Initialize()
     return DCAMERA_OK;
 }
 
+std::vector<DHItem> DCameraHandler::QueryMeta()
+{
+    return {};
+}
+
 std::vector<DHItem> DCameraHandler::Query()
 {
     std::vector<DHItem> itemList;

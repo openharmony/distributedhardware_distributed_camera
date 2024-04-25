@@ -180,6 +180,25 @@ int32_t DCameraSourceHandler::ConfigDistributedHardware(const std::string& devId
     return DCAMERA_OK;
 }
 
+void DCameraSourceHandler::RegisterDistributedHardwareStateListener(
+    std::shared_ptr<DistributedHardwareStateListener> listener)
+{
+    (void)listener;
+}
+
+void DCameraSourceHandler::UnregisterDistributedHardwareStateListener()
+{
+}
+
+void DCameraSourceHandler::RegisterDataSyncTriggerListener(std::shared_ptr<DataSyncTriggerListener> listener)
+{
+    (void)listener;
+}
+
+void DCameraSourceHandler::UnregisterDataSyncTriggerListener()
+{
+}
+
 void DCameraSourceHandler::SetSAState()
 {
     std::unique_lock<std::mutex> lock(producerMutex_);
