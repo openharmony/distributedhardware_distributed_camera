@@ -180,7 +180,8 @@ int32_t DCameraSourceHandler::ConfigDistributedHardware(const std::string& devId
     return DCAMERA_OK;
 }
 
-void DCameraSourceHandler::RegisterDistributedHardwareStateListener(std::shared_ptr<BusinessStateListener> listener)
+void DCameraSourceHandler::RegisterDistributedHardwareStateListener(
+    std::shared_ptr<DistributedHardwareStateListener> listener)
 {
     (void)listener;
 }
