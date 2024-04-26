@@ -51,6 +51,7 @@ private:
 
 private:
     const int32_t INVALID_FORMAT = -1;
+    int32_t CreateMetaDHItem(sptr<CameraStandard::CameraDevice>& info, DHItem& item);
     int32_t CreateDHItem(sptr<CameraStandard::CameraDevice>& info, DHItem& item);
     int32_t CreateAVCodecList(cJSON* root);
     std::string GetCameraPosition(CameraStandard::CameraPosition position);

@@ -54,7 +54,29 @@ int32_t DCameraHandler::Initialize()
 
 std::vector<DHItem> DCameraHandler::QueryMeta()
 {
-    return {};
+    std::vector<DHItem> itemList;
+    std::vector<sptr<CameraStandard::CameraDevice>> cameraList = cameraManager_->GetSupportedCameras();
+    uint64_t listSize = static_cast<uint64_t>(cameraList.size());
+    DHLOGI("get %{public}" PRIu64" cameras", listSize);
+    if (cameraList.empty()) {
+        DHLOGE("no camera device");
+        return itemList;
+    }
+    for (auto& info : cameraList) {
+        if (info->GetConnectionType() != CameraStandard::ConnectionType::CAMERA_CONNECTION_BUILT_IN) {
+            DHLOGI("connection type: %{public}d", info->GetConnectionType());
+            continue;
+        }
+        DHLOGI("get %{public}s, position: %{public}d, cameraType: %{public}d",
+            GetAnonyString(info->GetID()).c_str(), info->GetPosition(), info->GetCameraType());
+        DHItem item;
+        if (CreateMetaDHItem(info, item) == DCAMERA_OK) {
+            itemList.emplace_back(item);
+        }
+    }
+    listSize = static_cast<uint64_t>(itemList.size());
+    DHLOGI("success, get %{public}" PRIu64" items", listSize);
+    return itemList;
 }
 
 std::vector<DHItem> DCameraHandler::Query()
@@ -173,6 +195,27 @@ int32_t DCameraHandler::CreateAVCodecList(cJSON *root)
     return DCAMERA_OK;
 }
 
+int32_t DCameraHandler::CreateMetaDHItem(sptr<CameraStandard::CameraDevice>& info, DHItem& item)
+{
+    std::string id = info->GetID();
+    item.dhId = CAMERA_ID_PREFIX + id;
+    item.subtype = "camera";
+    DHLOGI("camera id: %{public}s", GetAnonyString(id).c_str());
+
+    cJSON *root = cJSON_CreateObject();
+    CHECK_AND_RETURN_RET_LOG(root == nullptr, DCAMERA_BAD_VALUE, "Create cJSON object failed");
+    cJSON_AddStringToObject(root, CAMERA_METADATA_KEY.c_str(), CAMERA_METADATA_KEY.c_str());
+    char *jsonstr = cJSON_Print(root);
+    if (jsonstr == nullptr) {
+        cJSON_Delete(root);
+        return DCAMERA_BAD_VALUE;
+    }
+    item.attrs = jsonstr;
+    cJSON_free(jsonstr);
+    cJSON_Delete(root);
+    return DCAMERA_OK;
+}
+
 int32_t DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraDevice>& info, DHItem& item)
 {
     std::string id = info->GetID();
@@ -216,8 +259,8 @@ int32_t DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraDevice>& info, D
     if (cameraInput->Release() != DCAMERA_OK) {
         DHLOGE("cameraInput Release failed");
     }
-    cJSON_Delete(root);
     cJSON_free(jsonstr);
+    cJSON_Delete(root);
     return DCAMERA_OK;
 }
 
