@@ -103,8 +103,7 @@ int32_t DistributedCameraSourceProxy::RegisterDistributedHardware(const std::str
     }
 
     if (!data.WriteString(devId) || !data.WriteString(dhId) || !data.WriteString(reqId) ||
-        !data.WriteString(param.sinkVersion) || !data.WriteString(param.sinkAttrs) ||
-        !data.WriteString(param.sourceVersion) || !data.WriteString(param.sourceAttrs)) {
+        !data.WriteString(param.sinkVersion) || !data.WriteString(param.sinkAttrs)) {
         DHLOGE("write params failed");
         return DCAMERA_BAD_VALUE;
     }
@@ -128,9 +127,7 @@ bool DistributedCameraSourceProxy::CheckRegParams(const std::string& devId, cons
     }
 
     if (param.sinkVersion.empty() || param.sinkVersion.size() > PARAM_MAX_SIZE ||
-        param.sinkAttrs.empty() || param.sinkAttrs.size() > PARAM_MAX_SIZE ||
-        param.sourceVersion.empty() || param.sourceVersion.size() > PARAM_MAX_SIZE ||
-        param.sourceAttrs.empty() || param.sourceAttrs.size() > PARAM_MAX_SIZE) {
+        param.sinkAttrs.empty() || param.sinkAttrs.size() > PARAM_MAX_SIZE) {
         DHLOGE("param is invalid");
         return false;
     }

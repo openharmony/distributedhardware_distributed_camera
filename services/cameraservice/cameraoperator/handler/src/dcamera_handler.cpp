@@ -68,8 +68,7 @@ std::vector<DHItem> DCameraHandler::Query()
         return itemList;
     }
     for (auto& info : cameraList) {
-        if ((info->GetConnectionType() != CameraStandard::ConnectionType::CAMERA_CONNECTION_BUILT_IN) &&
-            (info->GetConnectionType() != CameraStandard::ConnectionType::CAMERA_CONNECTION_USB_PLUGIN)) {
+        if ((info->GetConnectionType() != CameraStandard::ConnectionType::CAMERA_CONNECTION_BUILT_IN)) {
             DHLOGI("connection type: %{public}d", info->GetConnectionType());
             continue;
         }
