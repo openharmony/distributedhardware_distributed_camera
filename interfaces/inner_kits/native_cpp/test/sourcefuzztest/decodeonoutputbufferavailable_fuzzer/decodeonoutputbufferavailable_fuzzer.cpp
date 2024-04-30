@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,9 +33,11 @@ void DecodeOnOutputBufferAvailableFuzzTest(const uint8_t* data, size_t size)
     MediaAVCodec::AVCodecBufferInfo info = { presentTimeUs, infoSize, offset};
     MediaAVCodec::AVCodecBufferFlag flag = static_cast<MediaAVCodec::AVCodecBufferFlag>(bufferFlag);
     std::shared_ptr<DCameraPipelineSource> sourcePipeline = std::make_shared<DCameraPipelineSource>();
-    std::shared_ptr<EventBus> eventBusPipeline = nullptr;
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(true);
+    std::shared_ptr<DCameraPipelineSource::DCameraPipelineSrcEventHandler> pipeEventHandler =
+        std::make_shared<DCameraPipelineSource::DCameraPipelineSrcEventHandler>(runner, sourcePipeline);
     std::shared_ptr<DecodeDataProcess> decodeDataProcess =
-        std::make_shared<DecodeDataProcess>(eventBusPipeline, sourcePipeline);
+        std::make_shared<DecodeDataProcess>(pipeEventHandler, sourcePipeline);
     std::shared_ptr<DecodeVideoCallback> decodeVideoCallback = std::make_shared<DecodeVideoCallback>(decodeDataProcess);
     std::shared_ptr<Media::AVSharedMemory> buffer = nullptr;
 

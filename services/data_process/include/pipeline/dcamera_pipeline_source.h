@@ -18,11 +18,7 @@
 
 #include <memory>
 #include <vector>
-
-#include "eventbus/event.h"
-#include "eventbus/event_bus.h"
-#include "eventbus/event_sender.h"
-#include "eventbus/eventbus_handler.h"
+#include "event_handler.h"
 
 #include "data_buffer.h"
 #include "image_common_type.h"
@@ -35,9 +31,9 @@
 namespace OHOS {
 namespace DistributedHardware {
 class DecodeDataProcess;
+const uint32_t EVENT_PIPELINE_PROCESS_DATA = 0;
 
-class DCameraPipelineSource : public EventSender, public EventBusHandler<DCameraPipelineEvent>,
-    public IDataProcessPipeline, public std::enable_shared_from_this<DCameraPipelineSource> {
+class DCameraPipelineSource : public IDataProcessPipeline, public std::enable_shared_from_this<DCameraPipelineSource> {
 public:
     ~DCameraPipelineSource() override;
 
@@ -45,17 +41,27 @@ public:
         const VideoConfigParams& targetConfig, const std::shared_ptr<DataProcessListener>& listener) override;
     int32_t ProcessData(std::vector<std::shared_ptr<DataBuffer>>& dataBuffers) override;
     void DestroyDataProcessPipeline() override;
-    void OnEvent(DCameraPipelineEvent& ev) override;
 
     void OnError(DataProcessErrorType errorType);
     void OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult);
 
     int32_t GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier) override;
 
+    class DCameraPipelineSrcEventHandler : public AppExecFwk::EventHandler {
+        public:
+            DCameraPipelineSrcEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
+                std::shared_ptr<DCameraPipelineSource> pipeSourcePtr);
+            ~DCameraPipelineSrcEventHandler() override = default;
+            void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
+        private:
+            std::weak_ptr<DCameraPipelineSource> pipeSourceWPtr_;
+    };
+
 private:
     bool IsInRange(const VideoConfigParams& curConfig);
     void InitDCameraPipEvent();
     int32_t InitDCameraPipNodes(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig);
+    void DoProcessData(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
     const static std::string PIPELINE_OWNER;
@@ -68,7 +74,7 @@ private:
 
     std::shared_ptr<DataProcessListener> processListener_ = nullptr;
     std::shared_ptr<AbstractDataProcess> pipelineHead_ = nullptr;
-    std::shared_ptr<EventBus> eventBusSource_ = nullptr;
+    std::shared_ptr<DCameraPipelineSrcEventHandler> pipeEventHandler_ = nullptr;
 
     bool isProcess_ = false;
     PipelineType piplineType_ = PipelineType::VIDEO;

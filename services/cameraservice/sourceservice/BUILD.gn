@@ -21,7 +21,6 @@ ohos_shared_library("distributed_camera_source") {
     cfi = true
     cfi_cross_dso = true
     debug = false
-    blocklist = "./cfi_blocklist.txt"
     boundary_sanitize = true
     integer_overflow = true
     ubsan = true

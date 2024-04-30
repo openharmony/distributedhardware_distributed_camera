@@ -19,8 +19,7 @@
 #include <cstdint>
 #include <memory>
 
-#include "eventbus/event.h"
-#include "eventbus/event_bus.h"
+#include "event_handler.h"
 
 #include "data_buffer.h"
 #include "data_process_listener.h"
@@ -34,9 +33,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-class MockDCameraSinkDataProcess : public ICameraSinkDataProcess, public EventSender,
-    public DistributedHardware::EventBusHandler<DCameraPhotoOutputEvent>,
-    public DistributedHardware::EventBusHandler<DCameraVideoOutputEvent>,
+class MockDCameraSinkDataProcess : public ICameraSinkDataProcess,
     public std::enable_shared_from_this<MockDCameraSinkDataProcess> {
 public:
     explicit MockDCameraSinkDataProcess(const std::shared_ptr<ICameraChannel>& channel)

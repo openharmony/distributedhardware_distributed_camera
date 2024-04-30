@@ -18,7 +18,6 @@
 
 #include <variant>
 
-#include "eventbus/event.h"
 #include "v1_0/dcamera_types.h"
 
 #include "dcamera_event_cmd.h"
@@ -55,52 +54,50 @@ public:
     std::string srcParam_;
 };
 
-class DCameraSourceEvent : public Event {
-    TYPEINDENT(DCameraSourceEvent)
-
+class DCameraSourceEvent {
 public:
-    explicit DCameraSourceEvent(EventSender& sender) : Event(sender) {}
+    explicit DCameraSourceEvent() {}
     ~DCameraSourceEvent() = default;
-    explicit DCameraSourceEvent(EventSender& sender, DCAMERA_EVENT eventType)
-        : Event(sender), eventType_(eventType) {}
-    explicit DCameraSourceEvent(EventSender& sender, DCAMERA_EVENT eventType, DCameraIndex& index)
-        : Event(sender), eventType_(eventType)
+    explicit DCameraSourceEvent(DCAMERA_EVENT eventType)
+        : eventType_(eventType) {}
+    explicit DCameraSourceEvent(DCAMERA_EVENT eventType, DCameraIndex& index)
+        : eventType_(eventType)
     {
         eventParam_ = index;
     }
 
-    explicit DCameraSourceEvent(EventSender& sender, DCAMERA_EVENT eventType,
-        std::shared_ptr<DCameraRegistParam>& param) : Event(sender), eventType_(eventType)
+    explicit DCameraSourceEvent(DCAMERA_EVENT eventType,
+        std::shared_ptr<DCameraRegistParam>& param) : eventType_(eventType)
     {
         eventParam_ = param;
     }
 
-    explicit DCameraSourceEvent(EventSender& sender, DCAMERA_EVENT eventType,
-        const std::vector<std::shared_ptr<DCStreamInfo>>& streamInfos) : Event(sender), eventType_(eventType)
+    explicit DCameraSourceEvent(DCAMERA_EVENT eventType,
+        const std::vector<std::shared_ptr<DCStreamInfo>>& streamInfos) : eventType_(eventType)
     {
         eventParam_ = std::move(streamInfos);
     }
 
-    explicit DCameraSourceEvent(EventSender& sender, DCAMERA_EVENT eventType,
-        const std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos) : Event(sender), eventType_(eventType)
+    explicit DCameraSourceEvent(DCAMERA_EVENT eventType,
+        const std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos) : eventType_(eventType)
     {
         eventParam_ = std::move(captureInfos);
     }
 
-    explicit DCameraSourceEvent(EventSender& sender, DCAMERA_EVENT eventType,
-        const std::vector<std::shared_ptr<DCameraSettings>>& settings) : Event(sender), eventType_(eventType)
+    explicit DCameraSourceEvent(DCAMERA_EVENT eventType,
+        const std::vector<std::shared_ptr<DCameraSettings>>& settings) : eventType_(eventType)
     {
         eventParam_ = std::move(settings);
     }
 
-    explicit DCameraSourceEvent(EventSender& sender, DCAMERA_EVENT eventType, const std::vector<int>& streamIds)
-        : Event(sender), eventType_(eventType)
+    explicit DCameraSourceEvent(DCAMERA_EVENT eventType, const std::vector<int>& streamIds)
+        : eventType_(eventType)
     {
         eventParam_ = std::move(streamIds);
     }
 
-    explicit DCameraSourceEvent(EventSender& sender, DCAMERA_EVENT eventType, std::shared_ptr<DCameraEvent>& camEvent)
-        : Event(sender), eventType_(eventType)
+    explicit DCameraSourceEvent(DCAMERA_EVENT eventType, std::shared_ptr<DCameraEvent>& camEvent)
+        : eventType_(eventType)
     {
         eventParam_ = camEvent;
     }
