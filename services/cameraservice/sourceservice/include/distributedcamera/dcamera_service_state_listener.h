@@ -32,6 +32,8 @@ public:
         int32_t status, std::string& data) override;
     int32_t OnUnregisterNotify(const std::string& devId, const std::string& dhId, const std::string& reqId,
         int32_t status, std::string& data) override;
+    int32_t OnHardwareStateChanged(const std::string &devId, const std::string &dhId, int32_t status) override;
+    int32_t OnDataSyncTrigger(const std::string &devId) override;
     void SetCallback(sptr<IDCameraSourceCallback> callback) override;
 private:
     sptr<IDCameraSourceCallback> callbackProxy_;

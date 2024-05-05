@@ -30,6 +30,8 @@ public:
         int32_t status, std::string& data) = 0;
     virtual int32_t OnUnregisterNotify(const std::string& devId, const std::string& dhId, const std::string& reqId,
         int32_t status, std::string& data) = 0;
+    virtual int32_t OnHardwareStateChanged(const std::string &devId, const std::string &dhId, int32_t status) = 0;
+    virtual int32_t OnDataSyncTrigger(const std::string &devId) = 0;
     virtual void SetCallback(sptr<IDCameraSourceCallback> callback) = 0;
 };
 } // namespace DistributedHardware

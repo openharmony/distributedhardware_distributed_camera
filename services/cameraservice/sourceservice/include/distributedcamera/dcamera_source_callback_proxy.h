@@ -36,7 +36,10 @@ public:
         int32_t status, std::string& data) override;
     int32_t OnNotifyUnregResult(const std::string& devId, const std::string& dhId, const std::string& reqId,
         int32_t status, std::string& data) override;
+    int32_t OnHardwareStateChanged(const std::string &devId, const std::string &dhId, int32_t status) override;
+    int32_t OnDataSyncTrigger(const std::string &devId) override;
 private:
+    bool CheckParams(const std::string& devId, const std::string& dhId, int32_t status);
     bool CheckParams(const std::string& devId, const std::string& dhId,
         const std::string& reqId, std::string& data);
 

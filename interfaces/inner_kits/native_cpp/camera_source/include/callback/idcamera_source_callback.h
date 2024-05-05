@@ -26,6 +26,8 @@ public:
     enum {
         NOTIFY_REG_RESULT = 0,
         NOTIFY_UNREG_RESULT = 1,
+        NOTIFY_STATE_CHANGED = 2,
+        NOTIFY_DATASYNC_TRIGGER = 3,
     };
 
     virtual ~IDCameraSourceCallback() {}
@@ -33,6 +35,8 @@ public:
         int32_t status, std::string& data) = 0;
     virtual int32_t OnNotifyUnregResult(const std::string& devId, const std::string& dhId, const std::string& reqId,
         int32_t status, std::string& data) = 0;
+    virtual int32_t OnHardwareStateChanged(const std::string &devId, const std::string &dhId, int32_t status) = 0;
+    virtual int32_t OnDataSyncTrigger(const std::string &devId) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

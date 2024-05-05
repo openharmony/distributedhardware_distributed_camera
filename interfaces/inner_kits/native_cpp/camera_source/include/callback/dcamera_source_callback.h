@@ -33,15 +33,26 @@ public:
         int32_t status, std::string& data) override;
     int32_t OnNotifyUnregResult(const std::string& devId, const std::string& dhId, const std::string& reqId,
         int32_t status, std::string& data) override;
+    int32_t OnHardwareStateChanged(const std::string &devId, const std::string &dhId, int32_t status) override;
+    int32_t OnDataSyncTrigger(const std::string &devId) override;
 
     void PushRegCallback(std::string& reqId, std::shared_ptr<RegisterCallback>& callback);
     void PopRegCallback(std::string& reqId);
     void PushUnregCallback(std::string& reqId, std::shared_ptr<UnregisterCallback>& callback);
     void PopUnregCallback(std::string& reqId);
+    void RegisterStateListener(const std::shared_ptr<DistributedHardwareStateListener> listener);
+    void UnRegisterStateListener();
+    void RegisterTriggerListener(const std::shared_ptr<DataSyncTriggerListener> listener);
+    void UnRegisterTriggerListener();
 private:
     std::map<std::string, std::shared_ptr<RegisterCallback>> regCallbacks_;
     std::map<std::string, std::shared_ptr<UnregisterCallback>> unregCallbacks_;
     std::mutex mapMutex_;
+    std::mutex stateListenerMtx_;
+    std::shared_ptr<DistributedHardwareStateListener> stateListener_ = nullptr;
+    std::mutex triggerListenerMtx_;
+    std::shared_ptr<DataSyncTriggerListener> triggerListener_ = nullptr;
+    const size_t DID_MAX_SIZE = 256;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
