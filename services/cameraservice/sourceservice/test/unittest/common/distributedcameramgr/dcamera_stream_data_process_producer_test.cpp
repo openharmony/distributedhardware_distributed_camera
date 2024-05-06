@@ -94,6 +94,10 @@ HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_produ
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
     ret = streamProcess2->FeedStreamToDriver(dhBase, buffer);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+    streamProcess1 = nullptr;
+    auto listener = std::make_shared<FeedingSmootherListener>(streamProcess1);
+    buffer = nullptr;
+    EXPECT_EQ(NOTIFY_FAILED, listener->OnSmoothFinished(buffer));
 }
 
 /**

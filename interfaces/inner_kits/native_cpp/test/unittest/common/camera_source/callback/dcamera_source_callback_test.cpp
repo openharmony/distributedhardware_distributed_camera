@@ -27,6 +27,11 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace DistributedHardware {
+namespace {
+constexpr uint32_t DID_MAX_SIZE = 256;
+constexpr uint32_t ERR_IPC_CODE = 99999;
+constexpr uint32_t PARAM_MAX_SIZE = 50 * 1024 * 1024;
+}
 class DCameraSourceCallbackTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -157,5 +162,122 @@ HWTEST_F(DCameraSourceCallbackTest, dcamera_source_callback_test_004, TestSize.L
     EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
 }
 
+/**
+ * @tc.name: dcamera_source_callback_test_005
+ * @tc.desc: Verify the CheckParams function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraSourceCallbackTest, dcamera_source_callback_test_005, TestSize.Level1)
+{
+    std::string devId = "";
+    std::string dhId = "dhId";
+    std::string reqId = "reqId";
+    std::string result = "result";
+    int32_t ret = sourceCallback_->CheckParams(devId, dhId, reqId, result);
+    EXPECT_EQ(false, ret);
+    devId += std::string(DID_MAX_SIZE + 1, 'a');
+    ret = sourceCallback_->CheckParams(devId, dhId, reqId, result);
+    EXPECT_EQ(false, ret);
+    devId = "devId";
+    dhId = "";
+    ret = sourceCallback_->CheckParams(devId, dhId, reqId, result);
+    EXPECT_EQ(false, ret);
+    dhId += std::string(DID_MAX_SIZE + 1, 'a');
+    ret = sourceCallback_->CheckParams(devId, dhId, reqId, result);
+    EXPECT_EQ(false, ret);
+    dhId = "dhId";
+    reqId = "";
+    ret = sourceCallback_->CheckParams(devId, dhId, reqId, result);
+    EXPECT_EQ(false, ret);
+    reqId += std::string(DID_MAX_SIZE + 1, 'a');
+    ret = sourceCallback_->CheckParams(devId, dhId, reqId, result);
+    EXPECT_EQ(false, ret);
+    reqId ="reqId";
+    ret = sourceCallback_->CheckParams(devId, dhId, reqId, result);
+    EXPECT_EQ(true, ret);
+    result = std::string(PARAM_MAX_SIZE + 1, 'a');
+    ret = sourceCallback_->CheckParams(devId, dhId, reqId, result);
+    EXPECT_EQ(false, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_callback_test_006
+ * @tc.desc: Verify the OnRemoteRequest function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraSourceCallbackTest, dcamera_source_callback_test_006, TestSize.Level1)
+{
+    uint32_t code = ERR_IPC_CODE;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    std::string descriptor = "desc";
+    EXPECT_EQ(true, data.WriteInterfaceToken(std::utf16(descriptor)));
+    std::string devId = "devId";
+    std::string dhId = "dhId";
+    std::string reqId = "reqId";
+    data.WriteString(devId);
+    data.WriteString(dhId);
+    data.WriteString(reqId);
+    int32_t ret = sourceCallback_->OnRemoteRequest(code, data, reply, option);
+    EXPECT_NE(DCAMERA_OK, ret);
+    code = DCameraSourceCallback::NOTIFY_REG_RESULT;
+    ret = sourceCallback_->OnRemoteRequest(code, data, reply, option);
+    EXPECT_NE(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_callback_test_007
+ * @tc.desc: Verify the NotifyRegResultInner function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraSourceCallbackTest, dcamera_source_callback_test_007, TestSize.Level1)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    std::string descriptor = "desc";
+    EXPECT_EQ(true, data.WriteInterfaceToken(std::utf16(descriptor)));
+    std::string devId = "devId";
+    std::string dhId = "dhId";
+    std::string reqId = "reqId";
+    int32_t status = 1;
+    std::string result = "success";
+    data.WriteString(devId);
+    data.WriteString(dhId);
+    data.WriteString(reqId);
+    data.WriteInt32(status);
+    data.WriteString(result);
+    int32_t ret = sourceCallback_->NotifyRegResultInner(data, reply);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_callback_test_008
+ * @tc.desc: Verify the NotifyUnregResultInner function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraSourceCallbackTest, dcamera_source_callback_test_008, TestSize.Level1)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    std::string descriptor = "desc";
+    EXPECT_EQ(true, data.WriteInterfaceToken(std::utf16(descriptor)));
+    std::string devId = "devId";
+    std::string dhId = "dhId";
+    std::string reqId = "reqId";
+    int32_t status = 1;
+    std::string result = "success";
+    data.WriteString(devId);
+    data.WriteString(dhId);
+    data.WriteString(reqId);
+    data.WriteInt32(status);
+    data.WriteString(result);
+    int32_t ret = sourceCallback_->NotifyUnregResultInner(data, reply);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
 }
 }
