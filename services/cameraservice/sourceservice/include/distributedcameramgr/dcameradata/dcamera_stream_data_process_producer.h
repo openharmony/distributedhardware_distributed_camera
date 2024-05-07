@@ -24,12 +24,12 @@
 
 #include "data_buffer.h"
 #include "event_handler.h"
-#include "v1_0/id_camera_provider.h"
+#include "v1_1/id_camera_provider.h"
 #include "dcamera_feeding_smoother.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-using namespace OHOS::HDI::DistributedCamera::V1_0;
+using namespace OHOS::HDI::DistributedCamera::V1_1;
 class DCameraStreamDataProcessProducer : public IFeedableDataProducer,
     public std::enable_shared_from_this<DCameraStreamDataProcessProducer> {
 public:

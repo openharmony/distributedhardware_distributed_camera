@@ -16,11 +16,11 @@
 #ifndef OHOS_DCAMERA_METADATA_SETTING_H
 #define OHOS_DCAMERA_METADATA_SETTING_H
 
-#include "v1_0/dcamera_types.h"
+#include "v1_1/dcamera_types.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-using namespace OHOS::HDI::DistributedCamera::V1_0;
+using namespace OHOS::HDI::DistributedCamera::V1_1;
 class DCameraMetadataSettingCmd {
 public:
     std::string type_;

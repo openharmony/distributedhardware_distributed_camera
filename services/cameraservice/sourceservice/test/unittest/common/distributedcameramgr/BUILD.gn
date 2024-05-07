@@ -93,7 +93,7 @@ ohos_unittest("DCameraSourceMgrTest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "c_utils:utils",
-    "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
+    "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.1",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
     "graphic_surface:surface",

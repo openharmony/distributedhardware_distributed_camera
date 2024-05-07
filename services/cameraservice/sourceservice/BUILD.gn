@@ -122,7 +122,7 @@ ohos_shared_library("distributed_camera_source") {
     "distributed_hardware_fwk:distributed_av_receiver",
     "distributed_hardware_fwk:distributedhardwareutils",
     "distributed_hardware_fwk:libdhfwk_sdk",
-    "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
+    "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.1",
     "eventhandler:libeventhandler",
     "graphic_surface:surface",
     "hdf_core:libhdi",

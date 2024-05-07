@@ -25,12 +25,12 @@
 #include "camera_manager.h"
 #include "camera_output_capability.h"
 #include "single_instance.h"
-#include "v1_0/dcamera_types.h"
+#include "v1_1/dcamera_types.h"
 #include "cJSON.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-using namespace OHOS::HDI::DistributedCamera::V1_0;
+using namespace OHOS::HDI::DistributedCamera::V1_1;
 
 class DCameraHandler : public IHardwareHandler {
 DECLARE_SINGLE_INSTANCE_BASE(DCameraHandler);

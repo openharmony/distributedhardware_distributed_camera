@@ -63,7 +63,7 @@ ohos_moduletest_suite("SubDctsdisCameraClientTest") {
     "camera_framework:camera_framework",
     "distributed_hardware_fwk:libdhfwk_sdk",
     "drivers_interface_camera:metadata",
-    "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
+    "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.1",
     "graphic_surface:surface",
     "hilog:libhilog",
     "ipc:ipc_core",
