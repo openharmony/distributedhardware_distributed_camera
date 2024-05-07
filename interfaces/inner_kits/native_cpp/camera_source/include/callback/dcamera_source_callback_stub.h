@@ -36,6 +36,8 @@ public:
 private:
     int32_t NotifyRegResultInner(MessageParcel &data, MessageParcel &reply);
     int32_t NotifyUnregResultInner(MessageParcel &data, MessageParcel &reply);
+    int32_t OnHardwareStateChangedInner(MessageParcel &data, MessageParcel &reply);
+    int32_t OnDataSyncTriggerInner(MessageParcel &data, MessageParcel &reply);
     bool CheckParams(const std::string& devId, const std::string& dhId, const std::string& reqId,
         const std::string& result);
 
