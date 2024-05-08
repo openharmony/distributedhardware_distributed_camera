@@ -24,6 +24,8 @@
 #include "xcollie/watchdog.h"
 
 #include "anonymous_string.h"
+#include "avcodec_info.h"
+#include "avcodec_list.h"
 #include "dcamera_hdf_operate.h"
 #include "dcamera_hisysevent_adapter.h"
 #include "dcamera_hitrace_adapter.h"
@@ -32,6 +34,7 @@
 #include "dcamera_utils_tools.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
+#include "dcamera_handler.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -140,6 +143,50 @@ int32_t DistributedCameraSourceService::ReleaseSource()
     return DCAMERA_OK;
 }
 
+std::string DistributedCameraSourceService::GetCodecInfo()
+{
+    DHLOGI("Create avCodecList start");
+    std::string sourceAttrs = "";
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        return sourceAttrs;
+    }
+    std::shared_ptr<MediaAVCodec::AVCodecList> avCodecList = MediaAVCodec::AVCodecListFactory::CreateAVCodecList();
+    if (avCodecList == nullptr) {
+        DHLOGI("Create avCodecList failed");
+        cJSON_Delete(root);
+        return sourceAttrs;
+    }
+    const std::vector<std::string> encoderName = {std::string(MediaAVCodec::CodecMimeType::VIDEO_AVC),
+                                                  std::string(MediaAVCodec::CodecMimeType::VIDEO_HEVC)};
+    cJSON *array = cJSON_CreateArray();
+    if (array == nullptr) {
+        DHLOGI("Create arrray failed");
+        cJSON_Delete(root);
+        return sourceAttrs;
+    }
+    for (auto &coder : encoderName) {
+        MediaAVCodec::CapabilityData *capData = avCodecList->GetCapability(coder, true,
+            MediaAVCodec::AVCodecCategory::AVCODEC_HARDWARE);
+        if (capData == nullptr) {
+            continue;
+        }
+        std::string mimeType = capData->mimeType;
+        cJSON_AddItemToArray(array, cJSON_CreateString(mimeType.c_str()));
+        DHLOGI("codec name: %{public}s, mimeType: %{public}s", coder.c_str(), mimeType.c_str());
+    }
+    cJSON_AddItemToObject(root, CAMERA_CODEC_TYPE_KEY.c_str(), array);
+    char *jsonstr = cJSON_Print(root);
+    if (jsonstr == nullptr) {
+        cJSON_Delete(root);
+        return sourceAttrs;
+    }
+    sourceAttrs = jsonstr;
+    cJSON_free(jsonstr);
+    cJSON_Delete(root);
+    return sourceAttrs;
+}
+
 int32_t DistributedCameraSourceService::RegisterDistributedHardware(const std::string& devId, const std::string& dhId,
     const std::string& reqId, const EnableParam& param)
 {
@@ -149,12 +196,15 @@ int32_t DistributedCameraSourceService::RegisterDistributedHardware(const std::s
         DHLOGE("cameras exceed the upper limit");
         return DCAMERA_BAD_VALUE;
     }
+    EnableParam params = const_cast<EnableParam&>(param);
+    params.sourceAttrs = GetCodecInfo();
+    DHLOGI("RegisterDistributedHardware sourceAttrs: %{public}s.", params.sourceAttrs.c_str());
     DCameraIndex camIndex(devId, dhId);
     int32_t ret = DCAMERA_OK;
     std::shared_ptr<DCameraSourceDev> camDev = GetCamDevByIndex(camIndex);
     if (camDev == nullptr) {
         DHLOGI("new dev devId: %{public}s, dhId: %{public}s, sinkVersion: %{public}s",
-            GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), param.sinkVersion.c_str());
+            GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), params.sinkVersion.c_str());
         camDev = std::make_shared<DCameraSourceDev>(devId, dhId, listener_);
         ret = camDev->InitDCameraSourceDev();
         if (ret != DCAMERA_OK) {
@@ -163,17 +213,21 @@ int32_t DistributedCameraSourceService::RegisterDistributedHardware(const std::s
             return ret;
         }
         CamDevInsert(camIndex, camDev);
+    } else {
+        DHLOGE("RegisterDistributedHardware exist devId: %{public}s, dhId: %{public}s, sinkVersion: %{public}s",
+            GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), params.sinkVersion.c_str());
+        return DCAMERA_ALREADY_EXISTS;
     }
 
-    ret = camDev->RegisterDistributedHardware(devId, dhId, reqId, param);
+    ret = camDev->RegisterDistributedHardware(devId, dhId, reqId, params);
     if (ret != DCAMERA_OK) {
         DHLOGE("RegisterDistributedHardware failed, ret: %{public}d", ret);
-        ReportRegisterCameraFail(DCAMERA_REGISTER_FAIL, GetAnonyString(devId), dhId, param.sinkVersion,
+        ReportRegisterCameraFail(DCAMERA_REGISTER_FAIL, GetAnonyString(devId), dhId, params.sinkVersion,
             "dcamera source RegisterDistributedHardware fail.");
         CamDevErase(camIndex);
     }
     DHLOGI("RegisterDistributedHardware end devId: %{public}s, dhId: %{public}s, sinkVersion: %{public}s",
-        GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), param.sinkVersion.c_str());
+        GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), params.sinkVersion.c_str());
     return ret;
 }
 

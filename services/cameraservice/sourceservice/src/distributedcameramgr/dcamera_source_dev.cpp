@@ -373,7 +373,7 @@ int32_t DCameraSourceDev::ParseEnableParam(std::shared_ptr<DCameraRegistParam>& 
         return DCAMERA_BAD_VALUE;
     }
     cJSON_AddItemToObject(abilityRootValue, "SinkAbility", sinkRootValue);
-    cJSON_AddItemToObject(abilityRootValue, "SourceAbility", srcRootValue);
+    cJSON_AddItemToObject(abilityRootValue, "SourceCodec", srcRootValue);
     char *jsonstr = cJSON_Print(abilityRootValue);
     if (jsonstr == nullptr) {
         cJSON_Delete(abilityRootValue);

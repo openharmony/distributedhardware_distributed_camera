@@ -90,8 +90,7 @@ std::vector<DHItem> DCameraHandler::Query()
         return itemList;
     }
     for (auto& info : cameraList) {
-        if ((info->GetConnectionType() != CameraStandard::ConnectionType::CAMERA_CONNECTION_BUILT_IN) &&
-            (info->GetConnectionType() != CameraStandard::ConnectionType::CAMERA_CONNECTION_USB_PLUGIN)) {
+        if ((info->GetConnectionType() != CameraStandard::ConnectionType::CAMERA_CONNECTION_BUILT_IN)) {
             DHLOGI("connection type: %{public}d", info->GetConnectionType());
             continue;
         }
@@ -190,7 +189,7 @@ int32_t DCameraHandler::CreateAVCodecList(cJSON *root)
         }
         std::string mimeType = capData->mimeType;
         cJSON_AddItemToArray(array, cJSON_CreateString(mimeType.c_str()));
-        DHLOGI("codec name: %s, mimeType: %s", coder.c_str(), mimeType.c_str());
+        DHLOGI("codec name: %{public}s, mimeType: %{public}s", coder.c_str(), mimeType.c_str());
     }
     return DCAMERA_OK;
 }
@@ -313,7 +312,7 @@ void DCameraHandler::ProcessProfile(const DCStreamType type, std::map<std::strin
 void DCameraHandler::ConfigFormatphoto(const DCStreamType type, cJSON* root,
     std::vector<CameraStandard::Profile>& profileList)
 {
-    DHLOGI("type: %d, size: %{public}zu", type, profileList.size());
+    DHLOGI("type: %{public}d, size: %{public}zu", type, profileList.size());
     std::set<int32_t> formatSet;
     cJSON* formatphotoObj = cJSON_CreateObject();
     if (formatphotoObj == nullptr) {

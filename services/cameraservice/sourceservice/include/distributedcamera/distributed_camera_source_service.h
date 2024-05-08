@@ -66,6 +66,7 @@ private:
     bool Init();
     int32_t LoadDCameraHDF();
     int32_t UnLoadCameraHDF();
+    std::string GetCodecInfo();
 
     bool registerToService_ = false;
     DCameraServiceState state_ = DCameraServiceState::DCAMERA_SRV_STATE_NOT_START;
