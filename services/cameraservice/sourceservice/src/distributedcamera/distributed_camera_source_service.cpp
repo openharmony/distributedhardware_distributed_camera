@@ -173,7 +173,7 @@ std::string DistributedCameraSourceService::GetCodecInfo()
         }
         std::string mimeType = capData->mimeType;
         cJSON_AddItemToArray(array, cJSON_CreateString(mimeType.c_str()));
-        DHLOGI("codec name: %s, mimeType: %s", coder.c_str(), mimeType.c_str());
+        DHLOGI("codec name: %{public}s, mimeType: %{public}s", coder.c_str(), mimeType.c_str());
     }
     cJSON_AddItemToObject(root, CAMERA_CODEC_TYPE_KEY.c_str(), array);
     char *jsonstr = cJSON_Print(root);
