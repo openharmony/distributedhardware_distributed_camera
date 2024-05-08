@@ -69,6 +69,45 @@ int32_t DCameraSourceCallback::OnNotifyUnregResult(const std::string& devId, con
     return ret;
 }
 
+int32_t DCameraSourceCallback::OnHardwareStateChanged(const std::string &devId, const std::string &dhId,
+    int32_t status)
+{
+    DHLOGI("On hardware state changed, devId: %{public}s, dhId: %{public}s, status: %{public}d",
+        GetAnonyString(devId).c_str(), dhId.c_str(), status);
+    std::lock_guard<std::mutex> stateLck(stateListenerMtx_);
+    if (stateListener_ == nullptr) {
+        DHLOGE("State listener is null.");
+        return DCAMERA_BAD_VALUE;
+    }
+    if (devId.empty() || devId.size() > DID_MAX_SIZE || dhId.empty() || dhId.size() > DID_MAX_SIZE) {
+        DHLOGE("devId or dhId is invalid");
+        return DCAMERA_BAD_VALUE;
+    }
+    if (status < 0) {
+        DHLOGE("status in invalid.");
+        return DCAMERA_BAD_VALUE;
+    }
+    BusinessState currentState = static_cast<BusinessState>(status);
+    stateListener_->OnStateChanged(devId, dhId, currentState);
+    return DCAMERA_OK;
+}
+
+int32_t DCameraSourceCallback::OnDataSyncTrigger(const std::string &devId)
+{
+    DHLOGI("On data sync trigger, devId: %{public}s", GetAnonyString(devId).c_str());
+    std::lock_guard<std::mutex> triggerLck(triggerListenerMtx_);
+    if (devId.empty() || devId.size() > DID_MAX_SIZE) {
+        DHLOGE("devId is invalid");
+        return DCAMERA_BAD_VALUE;
+    }
+    if (triggerListener_ == nullptr) {
+        DHLOGE("Trigger listener is null.");
+        return DCAMERA_BAD_VALUE;
+    }
+    triggerListener_->OnDataSyncTrigger(devId);
+    return DCAMERA_OK;
+}
+
 void DCameraSourceCallback::PushRegCallback(std::string& reqId, std::shared_ptr<RegisterCallback>& callback)
 {
     std::lock_guard<std::mutex> lock(mapMutex_);
@@ -91,6 +130,34 @@ void DCameraSourceCallback::PopUnregCallback(std::string& reqId)
 {
     std::lock_guard<std::mutex> lock(mapMutex_);
     unregCallbacks_.erase(reqId);
+}
+
+void DCameraSourceCallback::RegisterStateListener(const std::shared_ptr<DistributedHardwareStateListener> listener)
+{
+    DHLOGD("Register state listener.");
+    std::lock_guard<std::mutex> stateLck(stateListenerMtx_);
+    stateListener_ = listener;
+}
+
+void DCameraSourceCallback::UnRegisterStateListener()
+{
+    DHLOGD("UnRegister state listener.");
+    std::lock_guard<std::mutex> stateLck(stateListenerMtx_);
+    stateListener_ = nullptr;
+}
+
+void DCameraSourceCallback::RegisterTriggerListener(const std::shared_ptr<DataSyncTriggerListener> listener)
+{
+    DHLOGD("Register trigger listener.");
+    std::lock_guard<std::mutex> triggerLck(triggerListenerMtx_);
+    triggerListener_ = listener;
+}
+
+void DCameraSourceCallback::UnRegisterTriggerListener()
+{
+    DHLOGD("UnRegister trigger listener.");
+    std::lock_guard<std::mutex> triggerLck(triggerListenerMtx_);
+    triggerListener_ = nullptr;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

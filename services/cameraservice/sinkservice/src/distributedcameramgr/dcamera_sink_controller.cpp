@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -72,11 +72,16 @@ int32_t DCameraSinkController::StartCapture(std::vector<std::shared_ptr<DCameraC
         }
         return ret;
     } else {
-        std::string param = "";
-        DCameraFrameTriggerEvent triggerEvent(*this, param);
-        DCameraPostAuthorizationEvent authEvent(*this, captureInfos);
-        eventBus_->PostEvent<DCameraFrameTriggerEvent>(triggerEvent, POSTMODE::POST_ASYNC);
-        eventBus_->PostEvent<DCameraPostAuthorizationEvent>(authEvent, POSTMODE::POST_ASYNC);
+        std::shared_ptr<std::string> param = std::make_shared<std::string>("");
+        std::shared_ptr<std::vector<std::shared_ptr<DCameraCaptureInfo>>> infos =
+            std::make_shared<std::vector<std::shared_ptr<DCameraCaptureInfo>>>(captureInfos);
+        CHECK_NULL_RETURN(sinkCotrEventHandler_, DCAMERA_BAD_VALUE);
+        AppExecFwk::InnerEvent::Pointer triggerEvent =
+                AppExecFwk::InnerEvent::Get(EVENT_FRAME_TRIGGER, param, 0);
+        AppExecFwk::InnerEvent::Pointer authorizationEvent =
+                AppExecFwk::InnerEvent::Get(EVENT_AUTHORIZATION, infos, 0);
+        sinkCotrEventHandler_->SendEvent(triggerEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE);
+        sinkCotrEventHandler_->SendEvent(authorizationEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE);
     }
     return DCAMERA_OK;
 }
@@ -320,12 +325,9 @@ int32_t DCameraSinkController::Init(std::vector<DCameraIndex>& indexs)
     }
 
     channel_ = std::make_shared<DCameraChannelSinkImpl>();
-    eventBus_ = std::make_shared<EventBus>("SinkCtlHandler");
-    DCameraFrameTriggerEvent triggerEvent(*this);
-    DCameraPostAuthorizationEvent authEvent(*this);
-    eventBus_->AddHandler<DCameraFrameTriggerEvent>(triggerEvent.GetType(), *this);
-    eventBus_->AddHandler<DCameraPostAuthorizationEvent>(authEvent.GetType(), *this);
-
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(true);
+    sinkCotrEventHandler_ =
+        std::make_shared<DCameraSinkController::DCameraSinkContrEventHandler>(runner, shared_from_this());
     isInit_ = true;
     initCallback_ = std::make_shared<DeviceInitCallback>();
     DHLOGI("DCameraSinkController Init %{public}s success", GetAnonyString(dhId_).c_str());
@@ -369,16 +371,48 @@ int32_t DCameraSinkController::UnInit()
     return DCAMERA_OK;
 }
 
-void DCameraSinkController::OnEvent(DCameraFrameTriggerEvent& event)
+DCameraSinkController::DCameraSinkContrEventHandler::DCameraSinkContrEventHandler(
+    const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<DCameraSinkController> sinkContrPtr)
+    : AppExecFwk::EventHandler(runner), sinkContrWPtr_(sinkContrPtr)
 {
-    std::string param = event.GetParam();
-    accessControl_->TriggerFrame(param);
+    DHLOGI("Ctor DCameraSinkContrEventHandler.");
 }
 
-void DCameraSinkController::OnEvent(DCameraPostAuthorizationEvent& event)
+void DCameraSinkController::DCameraSinkContrEventHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos = event.GetParam();
-    PostAuthorization(captureInfos);
+    CHECK_AND_RETURN_LOG(event, "event is nullptr.");
+    uint32_t eventId = event->GetInnerEventId();
+    auto sinkContr = sinkContrWPtr_.lock();
+    if (sinkContr == nullptr) {
+        DHLOGE("Can not get strong self ptr");
+        return;
+    }
+    switch (eventId) {
+        case EVENT_FRAME_TRIGGER:
+            sinkContr->ProcessFrameTrigger(event);
+            break;
+        case EVENT_AUTHORIZATION:
+            sinkContr->ProcessPostAuthorization(event);
+            break;
+        default:
+            DHLOGE("event is undefined, id is %d", eventId);
+            break;
+    }
+}
+
+void DCameraSinkController::ProcessFrameTrigger(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    DHLOGD("Receive frame trigger event then start process data in sink controller.");
+    std::shared_ptr<std::string> param = event->GetSharedObject<std::string>();
+    accessControl_->TriggerFrame(*param);
+}
+
+void DCameraSinkController::ProcessPostAuthorization(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    DHLOGD("Receive post authorization event then start process data in sink controller.");
+    std::shared_ptr<std::vector<std::shared_ptr<DCameraCaptureInfo>>> captureInfos =
+        event->GetSharedObject<std::vector<std::shared_ptr<DCameraCaptureInfo>>>();
+    PostAuthorization(*captureInfos);
 }
 
 void DCameraSinkController::OnStateChanged(std::shared_ptr<DCameraEvent>& event)

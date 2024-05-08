@@ -39,6 +39,16 @@ public:
         return DCAMERA_OK;
     }
 
+    int32_t OnHardwareStateChanged(const std::string &devId, const std::string &dhId, int32_t status)
+    {
+        return DCAMERA_OK;
+    }
+
+    int32_t OnDataSyncTrigger(const std::string &devId)
+    {
+        return DCAMERA_OK;
+    }
+
     void SetCallback(sptr<IDCameraSourceCallback> callback)
     {
     }

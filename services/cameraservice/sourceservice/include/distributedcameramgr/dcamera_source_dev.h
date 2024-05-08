@@ -16,10 +16,12 @@
 #ifndef OHOS_DCAMERA_SOURCE_DEV_H
 #define OHOS_DCAMERA_SOURCE_DEV_H
 
+#include <set>
+
 #include "dcamera_index.h"
 #include "dcamera_source_event.h"
 #include "dcamera_source_state_machine.h"
-#include "eventbus/event_bus.h"
+#include "event_handler.h"
 #include "icamera_controller.h"
 #include "icamera_state_listener.h"
 #include "icamera_input.h"
@@ -30,11 +32,12 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-class DCameraSourceDev : public EventSender, public DistributedHardware::EventBusHandler<DCameraSourceEvent>,
-    public std::enable_shared_from_this<DCameraSourceDev> {
+const uint32_t EVENT_SOURCE_DEV_PROCESS = 0;
+const uint32_t EVENT_HICOLLIE = 1;
+class DCameraSourceDev : public std::enable_shared_from_this<DCameraSourceDev> {
 public:
     explicit DCameraSourceDev(std::string devId, std::string dhId, std::shared_ptr<ICameraStateListener>& stateLisener);
-    ~DCameraSourceDev() override;
+    virtual ~DCameraSourceDev();
 
     int32_t InitDCameraSourceDev();
     int32_t RegisterDistributedHardware(const std::string& devId, const std::string& dhId, const std::string& reqId,
@@ -50,7 +53,6 @@ public:
     int32_t StopCameraCapture(const std::vector<int>& streamIds);
     int32_t UpdateCameraSettings(const std::vector<std::shared_ptr<DCameraSettings>>& settings);
 
-    void OnEvent(DCameraSourceEvent& event) override;
     int32_t GetStateInfo();
     std::string GetVersion();
     int32_t OnChannelConnectedEvent();
@@ -58,6 +60,16 @@ public:
     int32_t PostHicollieEvent();
     void SetHicollieFlag(bool flag);
     bool GetHicollieFlag();
+
+    class DCameraSourceDevEventHandler : public AppExecFwk::EventHandler {
+        public:
+            DCameraSourceDevEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
+                std::shared_ptr<DCameraSourceDev> srcDevPtr);
+            ~DCameraSourceDevEventHandler() override = default;
+            void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
+        private:
+            std::weak_ptr<DCameraSourceDev> srcDevPtrWPtr_;
+    };
 
 public:
     virtual int32_t Register(std::shared_ptr<DCameraRegistParam>& param);
@@ -82,6 +94,8 @@ private:
     void NotifyHalResult(DCAMERA_EVENT eventType, DCameraSourceEvent& event, int32_t result);
     void HitraceAndHisyseventImpl(std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos);
     int32_t ParseEnableParam(std::shared_ptr<DCameraRegistParam>& param, std::string& ability);
+    void DoProcessData(const AppExecFwk::InnerEvent::Pointer &event);
+    void DoHicollieProcess();
 
 private:
     std::string devId_;
@@ -89,7 +103,7 @@ private:
     std::string version_;
     std::set<DCameraIndex> actualDevInfo_;
     std::shared_ptr<ICameraStateListener> stateListener_;
-    std::shared_ptr<EventBus> eventBus_;
+    std::shared_ptr<DCameraSourceDevEventHandler> srcDevEventHandler_ = nullptr;
     std::shared_ptr<DCameraSourceStateMachine> stateMachine_;
     std::shared_ptr<ICameraController> controller_;
     std::shared_ptr<ICameraInput> input_;

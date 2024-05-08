@@ -22,12 +22,10 @@
 #include "icamera_source_data_process.h"
 
 #include "dcamera_source_dev.h"
-#include "eventbus/event_bus.h"
-#include "eventbus/event_sender.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class DCameraSourceInput : public ICameraInput, public EventSender,
+class DCameraSourceInput : public ICameraInput,
     public std::enable_shared_from_this<DCameraSourceInput> {
 public:
     DCameraSourceInput(std::string devId, std::string dhId, std::shared_ptr<DCameraSourceDev>& camDev);

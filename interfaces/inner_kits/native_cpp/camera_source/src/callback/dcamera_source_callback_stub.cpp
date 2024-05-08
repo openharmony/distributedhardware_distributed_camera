@@ -27,6 +27,8 @@ DCameraSourceCallbackStub::DCameraSourceCallbackStub() : IRemoteStub(true)
 {
     memberFuncMap_[NOTIFY_REG_RESULT] = &DCameraSourceCallbackStub::NotifyRegResultInner;
     memberFuncMap_[NOTIFY_UNREG_RESULT] = &DCameraSourceCallbackStub::NotifyUnregResultInner;
+    memberFuncMap_[NOTIFY_STATE_CHANGED] = &DCameraSourceCallbackStub::OnHardwareStateChangedInner;
+    memberFuncMap_[NOTIFY_DATASYNC_TRIGGER] = &DCameraSourceCallbackStub::OnDataSyncTriggerInner;
 }
 
 DCameraSourceCallbackStub::~DCameraSourceCallbackStub()
@@ -89,6 +91,26 @@ int32_t DCameraSourceCallbackStub::NotifyUnregResultInner(MessageParcel &data, M
         }
         ret = OnNotifyUnregResult(devId, dhId, reqId, status, result);
     } while (0);
+    reply.WriteInt32(ret);
+    return DCAMERA_OK;
+}
+
+int32_t DCameraSourceCallbackStub::OnHardwareStateChangedInner(MessageParcel &data, MessageParcel &reply)
+{
+    DHLOGI("DCameraSourceCallbackStub OnHardwareStateChangedInner");
+    std::string devId = data.ReadString();
+    std::string dhId = data.ReadString();
+    int32_t status = data.ReadInt32();
+    int32_t ret = OnHardwareStateChanged(devId, dhId, status);
+    reply.WriteInt32(ret);
+    return DCAMERA_OK;
+}
+
+int32_t DCameraSourceCallbackStub::OnDataSyncTriggerInner(MessageParcel &data, MessageParcel &reply)
+{
+    DHLOGI("DCameraSourceCallbackStub OnDataSyncTriggerInner");
+    std::string devId = data.ReadString();
+    int32_t ret = OnDataSyncTrigger(devId);
     reply.WriteInt32(ret);
     return DCAMERA_OK;
 }

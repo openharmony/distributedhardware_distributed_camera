@@ -26,11 +26,7 @@
 #include "avcodec_common.h"
 #include "avcodec_video_decoder.h"
 #include "buffer/avsharedmemory.h"
-#include "eventbus/event.h"
-#include "eventbus/event_bus.h"
-#include "eventbus/event_sender.h"
-#include "eventbus/event_registration.h"
-#include "eventbus/eventbus_handler.h"
+#include "event_handler.h"
 #include "meta/format.h"
 #include "ibuffer_consumer_listener.h"
 #include "iconsumer_surface.h"
@@ -49,20 +45,21 @@ namespace OHOS {
 namespace DistributedHardware {
 class DCameraPipelineSource;
 class DecodeVideoCallback;
+const uint32_t EVENT_NO_ACTION = 0;
+const uint32_t EVENT_ACTION_ONCE_AGAIN = 1;
+const uint32_t EVENT_ACTION_GET_DECODER_OUTPUT_BUFFER = 2;
 
-class DecodeDataProcess : public EventSender, public EventBusHandler<DCameraCodecEvent>, public AbstractDataProcess,
-    public std::enable_shared_from_this<DecodeDataProcess> {
+class DecodeDataProcess : public AbstractDataProcess, public std::enable_shared_from_this<DecodeDataProcess> {
 public:
-    DecodeDataProcess(const std::shared_ptr<EventBus>& eventBusPipeline,
+    DecodeDataProcess(const std::shared_ptr<DCameraPipelineSource::DCameraPipelineSrcEventHandler>& pipeEventHandler,
         const std::weak_ptr<DCameraPipelineSource>& callbackPipSource)
-        : eventBusPipeline_(eventBusPipeline), callbackPipelineSource_(callbackPipSource) {}
+        : pipeSrcEventHandler_(pipeEventHandler), callbackPipelineSource_(callbackPipSource) {}
     ~DecodeDataProcess() override;
 
     int32_t InitNode(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig,
         VideoConfigParams& processedConfig) override;
     int32_t ProcessData(std::vector<std::shared_ptr<DataBuffer>>& inputBuffers) override;
     void ReleaseProcessNode() override;
-    void OnEvent(DCameraCodecEvent& ev) override;
 
     void OnError();
     void OnInputBufferAvailable(uint32_t index, std::shared_ptr<Media::AVSharedMemory> buffer);
@@ -76,6 +73,16 @@ public:
     void AlignFirstFrameTime();
 
     int32_t GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier) override;
+
+    class DecodeDataProcessEventHandler : public AppExecFwk::EventHandler {
+        public:
+            DecodeDataProcessEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
+                std::shared_ptr<DecodeDataProcess> decPtr);
+            ~DecodeDataProcessEventHandler() override = default;
+            void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
+        private:
+            std::weak_ptr<DecodeDataProcess> decPtrWPtr_;
+    };
 
 private:
     bool IsInDecoderRange(const VideoConfigParams& curConfig);
@@ -99,6 +106,9 @@ private:
     bool IsCorrectSurfaceBuffer(const sptr<SurfaceBuffer>& surBuf, int32_t alignedWidth, int32_t alignedHeight);
     void PostOutputDataBuffers(std::shared_ptr<DataBuffer>& outputBuffer);
     int32_t DecodeDone(std::vector<std::shared_ptr<DataBuffer>>& outputBuffers);
+    void ProcessFeedDecoderInputBuffer();
+    void ProcessGetDecoderOutputBuffer(const AppExecFwk::InnerEvent::Pointer &event);
+    void ProcessDecodeDone(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
     constexpr static int32_t VIDEO_DECODER_QUEUE_MAX = 1000;
@@ -119,7 +129,7 @@ private:
     constexpr static int32_t ALIGNED_WIDTH_MAX_SIZE = 10000;
     constexpr static uint32_t MEMORY_RATIO_UV = 1;
 
-    std::shared_ptr<EventBus> eventBusPipeline_;
+    std::shared_ptr<DCameraPipelineSource::DCameraPipelineSrcEventHandler> pipeSrcEventHandler_;
     std::weak_ptr<DCameraPipelineSource> callbackPipelineSource_;
     std::mutex mtxDecoderLock_;
     std::mutex mtxDecoderState_;
@@ -128,9 +138,7 @@ private:
     VideoConfigParams sourceConfig_;
     VideoConfigParams targetConfig_;
     VideoConfigParams processedConfig_;
-    std::shared_ptr<EventBus> eventBusDecode_ = nullptr;
-    std::shared_ptr<EventRegistration> eventBusRegHandleDecode_ = nullptr;
-    std::shared_ptr<EventRegistration> eventBusRegHandlePipeline2Decode_ = nullptr;
+    std::shared_ptr<DecodeDataProcessEventHandler> decEventHandler_;
     std::shared_ptr<MediaAVCodec::AVCodecVideoDecoder> videoDecoder_ = nullptr;
     std::shared_ptr<MediaAVCodec::AVCodecCallback> decodeVideoCallback_ = nullptr;
     sptr<IConsumerSurface> decodeConsumerSurface_ = nullptr;

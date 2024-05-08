@@ -183,20 +183,26 @@ int32_t DCameraSourceHandler::ConfigDistributedHardware(const std::string& devId
 void DCameraSourceHandler::RegisterDistributedHardwareStateListener(
     std::shared_ptr<DistributedHardwareStateListener> listener)
 {
-    (void)listener;
+    CHECK_AND_RETURN_LOG(callback_ == nullptr, "%{public}s", "ipc callback is null.");
+    callback_->RegisterStateListener(listener);
 }
 
 void DCameraSourceHandler::UnregisterDistributedHardwareStateListener()
 {
+    CHECK_AND_RETURN_LOG(callback_ == nullptr, "%{public}s", "ipc callback is null.");
+    callback_->UnRegisterStateListener();
 }
 
 void DCameraSourceHandler::RegisterDataSyncTriggerListener(std::shared_ptr<DataSyncTriggerListener> listener)
 {
-    (void)listener;
+    CHECK_AND_RETURN_LOG(callback_ == nullptr, "%{public}s", "ipc callback is null.");
+    callback_->RegisterTriggerListener(listener);
 }
 
 void DCameraSourceHandler::UnregisterDataSyncTriggerListener()
 {
+    CHECK_AND_RETURN_LOG(callback_ == nullptr, "%{public}s", "ipc callback is null.");
+    callback_->UnRegisterTriggerListener();
 }
 
 void DCameraSourceHandler::SetSAState()

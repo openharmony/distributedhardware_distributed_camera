@@ -22,7 +22,6 @@
 #include "icamera_channel_listener.h"
 #include "dcamera_source_dev.h"
 #include "dcamera_source_state_machine.h"
-#include "eventbus/event_bus.h"
 #include "icamera_channel.h"
 #include "iremote_object.h"
 
@@ -30,7 +29,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-class DCameraSourceController : public ICameraController, public EventSender,
+class DCameraSourceController : public ICameraController,
     public std::enable_shared_from_this<DCameraSourceController> {
 public:
     DCameraSourceController(std::string devId, std::string dhId,

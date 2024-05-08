@@ -18,7 +18,6 @@
 
 #include <vector>
 
-#include "eventbus/event.h"
 #include "data_buffer.h"
 #include "image_common_type.h"
 #include "surface.h"
@@ -76,14 +75,13 @@ private:
     sptr<IConsumerSurface> surface_;
 };
 
-class DCameraCodecEvent : public Event {
-    TYPEINDENT(DCameraCodecEvent)
+class DCameraCodecEvent {
 public:
-    DCameraCodecEvent(EventSender& sender, const std::shared_ptr<CodecPacket>& codecPacket)
-        : Event(sender), codecPacket_(codecPacket), action_(VideoCodecAction::NO_ACTION) {}
-    DCameraCodecEvent(EventSender& sender, const std::shared_ptr<CodecPacket>& codecPacket,
+    DCameraCodecEvent(const std::shared_ptr<CodecPacket>& codecPacket)
+        : codecPacket_(codecPacket), action_(VideoCodecAction::NO_ACTION) {}
+    DCameraCodecEvent(const std::shared_ptr<CodecPacket>& codecPacket,
         VideoCodecAction otherAction)
-        : Event(sender), codecPacket_(codecPacket), action_(otherAction) {}
+        : codecPacket_(codecPacket), action_(otherAction) {}
     ~DCameraCodecEvent() {}
 
     std::shared_ptr<CodecPacket> GetCodecPacket() const

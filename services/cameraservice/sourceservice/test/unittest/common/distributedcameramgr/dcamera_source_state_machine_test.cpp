@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -174,8 +174,8 @@ void DCameraSourceStateMachineTest::TearDown(void)
  */
 HWTEST_F(DCameraSourceStateMachineTest, dcamera_source_state_machine_test_001, TestSize.Level1)
 {
-    DCameraSourceEvent event0(*camDev_, DCAMERA_EVENT_REGIST, g_registParam);
-    DCameraSourceEvent event1(*camDev_, DCAMERA_EVENT_UNREGIST, g_registParam);
+    DCameraSourceEvent event0(DCAMERA_EVENT_REGIST, g_registParam);
+    DCameraSourceEvent event1(DCAMERA_EVENT_UNREGIST, g_registParam);
     stateMachine_ ->UpdateState(DCAMERA_STATE_INIT);
     int32_t ret = stateMachine_ ->Execute(DCAMERA_EVENT_REGIST, event0);
     EXPECT_EQ(DCAMERA_OK, ret);
@@ -192,11 +192,11 @@ HWTEST_F(DCameraSourceStateMachineTest, dcamera_source_state_machine_test_001, T
  */
 HWTEST_F(DCameraSourceStateMachineTest, dcamera_source_state_machine_test_002, TestSize.Level1)
 {
-    DCameraSourceEvent event0(*camDev_, DCAMERA_EVENT_REGIST, g_registParam);
-    DCameraSourceEvent event1(*camDev_, DCAMERA_EVENT_UNREGIST, g_registParam);
-    DCameraSourceEvent event2(*camDev_, DCAMERA_EVENT_OPEN, g_camIndex);
-    DCameraSourceEvent event3(*camDev_, DCAMERA_EVENT_CLOSE, g_camIndex);
-    DCameraSourceEvent event9(*camDev_, DCAMERA_EVENT_NOFIFY, g_camEvent);
+    DCameraSourceEvent event0(DCAMERA_EVENT_REGIST, g_registParam);
+    DCameraSourceEvent event1(DCAMERA_EVENT_UNREGIST, g_registParam);
+    DCameraSourceEvent event2(DCAMERA_EVENT_OPEN, g_camIndex);
+    DCameraSourceEvent event3(DCAMERA_EVENT_CLOSE, g_camIndex);
+    DCameraSourceEvent event9(DCAMERA_EVENT_NOFIFY, g_camEvent);
     stateMachine_ ->UpdateState(DCAMERA_STATE_INIT);
     stateMachine_ ->UpdateState(DCAMERA_STATE_REGIST);
     int32_t ret = stateMachine_ ->Execute(DCAMERA_EVENT_REGIST, event0);
@@ -223,14 +223,14 @@ HWTEST_F(DCameraSourceStateMachineTest, dcamera_source_state_machine_test_002, T
  */
 HWTEST_F(DCameraSourceStateMachineTest, dcamera_source_state_machine_test_003, TestSize.Level1)
 {
-    DCameraSourceEvent event0(*camDev_, DCAMERA_EVENT_REGIST, g_registParam);
-    DCameraSourceEvent event1(*camDev_, DCAMERA_EVENT_UNREGIST, g_registParam);
-    DCameraSourceEvent event2(*camDev_, DCAMERA_EVENT_OPEN, g_camIndex);
-    DCameraSourceEvent event3(*camDev_, DCAMERA_EVENT_CLOSE, g_camIndex);
-    DCameraSourceEvent event4(*camDev_, DCAMERA_EVENT_CONFIG_STREAMS, g_streamInfosSnap);
-    DCameraSourceEvent event5(*camDev_, DCAMERA_EVENT_RELEASE_STREAMS, g_streamIdSnap);
-    DCameraSourceEvent event8(*camDev_, DCAMERA_EVENT_UPDATE_SETTINGS, g_cameraSettingSnap);
-    DCameraSourceEvent event9(*camDev_, DCAMERA_EVENT_NOFIFY, g_camEvent);
+    DCameraSourceEvent event0(DCAMERA_EVENT_REGIST, g_registParam);
+    DCameraSourceEvent event1(DCAMERA_EVENT_UNREGIST, g_registParam);
+    DCameraSourceEvent event2(DCAMERA_EVENT_OPEN, g_camIndex);
+    DCameraSourceEvent event3(DCAMERA_EVENT_CLOSE, g_camIndex);
+    DCameraSourceEvent event4(DCAMERA_EVENT_CONFIG_STREAMS, g_streamInfosSnap);
+    DCameraSourceEvent event5(DCAMERA_EVENT_RELEASE_STREAMS, g_streamIdSnap);
+    DCameraSourceEvent event8(DCAMERA_EVENT_UPDATE_SETTINGS, g_cameraSettingSnap);
+    DCameraSourceEvent event9(DCAMERA_EVENT_NOFIFY, g_camEvent);
     stateMachine_ ->UpdateState(DCAMERA_STATE_INIT);
     stateMachine_ ->UpdateState(DCAMERA_STATE_REGIST);
     stateMachine_ ->UpdateState(DCAMERA_STATE_OPENED);
@@ -267,16 +267,16 @@ HWTEST_F(DCameraSourceStateMachineTest, dcamera_source_state_machine_test_003, T
  */
 HWTEST_F(DCameraSourceStateMachineTest, dcamera_source_state_machine_test_004, TestSize.Level1)
 {
-    DCameraSourceEvent event0(*camDev_, DCAMERA_EVENT_REGIST, g_registParam);
-    DCameraSourceEvent event1(*camDev_, DCAMERA_EVENT_UNREGIST, g_registParam);
-    DCameraSourceEvent event2(*camDev_, DCAMERA_EVENT_OPEN, g_camIndex);
-    DCameraSourceEvent event3(*camDev_, DCAMERA_EVENT_CLOSE, g_camIndex);
-    DCameraSourceEvent event4(*camDev_, DCAMERA_EVENT_CONFIG_STREAMS, g_streamInfosSnap);
-    DCameraSourceEvent event5(*camDev_, DCAMERA_EVENT_RELEASE_STREAMS, g_streamIdSnap);
-    DCameraSourceEvent event6(*camDev_, DCAMERA_EVENT_START_CAPTURE, g_captureInfoSnap);
-    DCameraSourceEvent event7(*camDev_, DCAMERA_EVENT_STOP_CAPTURE, g_streamIdSnap);
-    DCameraSourceEvent event8(*camDev_, DCAMERA_EVENT_UPDATE_SETTINGS, g_cameraSettingSnap);
-    DCameraSourceEvent event9(*camDev_, DCAMERA_EVENT_NOFIFY, g_camEvent);
+    DCameraSourceEvent event0(DCAMERA_EVENT_REGIST, g_registParam);
+    DCameraSourceEvent event1(DCAMERA_EVENT_UNREGIST, g_registParam);
+    DCameraSourceEvent event2(DCAMERA_EVENT_OPEN, g_camIndex);
+    DCameraSourceEvent event3(DCAMERA_EVENT_CLOSE, g_camIndex);
+    DCameraSourceEvent event4(DCAMERA_EVENT_CONFIG_STREAMS, g_streamInfosSnap);
+    DCameraSourceEvent event5(DCAMERA_EVENT_RELEASE_STREAMS, g_streamIdSnap);
+    DCameraSourceEvent event6(DCAMERA_EVENT_START_CAPTURE, g_captureInfoSnap);
+    DCameraSourceEvent event7(DCAMERA_EVENT_STOP_CAPTURE, g_streamIdSnap);
+    DCameraSourceEvent event8(DCAMERA_EVENT_UPDATE_SETTINGS, g_cameraSettingSnap);
+    DCameraSourceEvent event9(DCAMERA_EVENT_NOFIFY, g_camEvent);
     stateMachine_ ->UpdateState(DCAMERA_STATE_INIT);
     stateMachine_ ->UpdateState(DCAMERA_STATE_REGIST);
     stateMachine_ ->UpdateState(DCAMERA_STATE_OPENED);
@@ -320,14 +320,14 @@ HWTEST_F(DCameraSourceStateMachineTest, dcamera_source_state_machine_test_004, T
  */
 HWTEST_F(DCameraSourceStateMachineTest, dcamera_source_state_machine_test_005, TestSize.Level1)
 {
-    DCameraSourceEvent event0(*camDev_, DCAMERA_EVENT_REGIST, g_registParam);
-    DCameraSourceEvent event1(*camDev_, DCAMERA_EVENT_UNREGIST, g_registParam);
-    DCameraSourceEvent event2(*camDev_, DCAMERA_EVENT_OPEN, g_camIndex);
-    DCameraSourceEvent event3(*camDev_, DCAMERA_EVENT_CLOSE, g_camIndex);
-    DCameraSourceEvent event6(*camDev_, DCAMERA_EVENT_START_CAPTURE, g_captureInfoSnap);
-    DCameraSourceEvent event7(*camDev_, DCAMERA_EVENT_STOP_CAPTURE, g_streamIdSnap);
-    DCameraSourceEvent event8(*camDev_, DCAMERA_EVENT_UPDATE_SETTINGS, g_cameraSettingSnap);
-    DCameraSourceEvent event9(*camDev_, DCAMERA_EVENT_NOFIFY, g_camEvent);
+    DCameraSourceEvent event0(DCAMERA_EVENT_REGIST, g_registParam);
+    DCameraSourceEvent event1(DCAMERA_EVENT_UNREGIST, g_registParam);
+    DCameraSourceEvent event2(DCAMERA_EVENT_OPEN, g_camIndex);
+    DCameraSourceEvent event3(DCAMERA_EVENT_CLOSE, g_camIndex);
+    DCameraSourceEvent event6(DCAMERA_EVENT_START_CAPTURE, g_captureInfoSnap);
+    DCameraSourceEvent event7(DCAMERA_EVENT_STOP_CAPTURE, g_streamIdSnap);
+    DCameraSourceEvent event8(DCAMERA_EVENT_UPDATE_SETTINGS, g_cameraSettingSnap);
+    DCameraSourceEvent event9(DCAMERA_EVENT_NOFIFY, g_camEvent);
     stateMachine_ ->UpdateState(DCAMERA_STATE_INIT);
     stateMachine_ ->UpdateState(DCAMERA_STATE_REGIST);
     stateMachine_ ->UpdateState(DCAMERA_STATE_OPENED);

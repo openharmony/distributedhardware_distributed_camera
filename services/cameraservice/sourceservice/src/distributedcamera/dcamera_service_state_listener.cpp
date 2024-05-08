@@ -113,5 +113,29 @@ int32_t DCameraServiceStateListener::OnUnregisterNotify(const std::string& devId
 
     return DCAMERA_OK;
 }
+
+int32_t DCameraServiceStateListener::OnHardwareStateChanged(const std::string &devId,
+    const std::string &dhId, int32_t status)
+{
+    DHLOGI("OnHardwareStateChanged devId: %{public}s, dhId: %{public}s, status: %{public}d",
+        GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), status);
+    std::lock_guard<std::mutex> autoLock(proxyMutex_);
+    if (callbackProxy_ == nullptr) {
+        DHLOGE("callbackProxy_ is nullptr");
+        return DCAMERA_BAD_VALUE;
+    }
+    return callbackProxy_->OnHardwareStateChanged(devId, dhId, status);
+}
+
+int32_t DCameraServiceStateListener::OnDataSyncTrigger(const std::string &devId)
+{
+    DHLOGI("OnDataSyncTrigger devId: %{public}s.", GetAnonyString(devId).c_str());
+    std::lock_guard<std::mutex> autoLock(proxyMutex_);
+    if (callbackProxy_ == nullptr) {
+        DHLOGE("callbackProxy_ is nullptr");
+        return DCAMERA_BAD_VALUE;
+    }
+    return callbackProxy_->OnDataSyncTrigger(devId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

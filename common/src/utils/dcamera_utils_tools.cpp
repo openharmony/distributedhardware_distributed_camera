@@ -196,7 +196,7 @@ bool IsBase64(unsigned char c)
     return (isalnum(c) || (c == '+') || (c == '/'));
 }
 
-void DumpBufferToFile(std::string fileName, uint8_t *buffer, size_t bufSize)
+void DumpBufferToFile(const std::string fileName, uint8_t *buffer, size_t bufSize)
 {
     if (fileName.empty() || buffer == nullptr) {
         DHLOGE("dumpsaving : input param err.");
@@ -217,7 +217,7 @@ void DumpBufferToFile(std::string fileName, uint8_t *buffer, size_t bufSize)
     return;
 }
 
-int32_t IsUnderDumpMaxSize(std::string fileName)
+int32_t IsUnderDumpMaxSize(const std::string fileName)
 {
     if (fileName.empty()) {
         DHLOGE("dumpsaving : input fileName empty.");

@@ -59,7 +59,7 @@ DCameraSourceDev::~DCameraSourceDev()
 {
     DHLOGI("DCameraSourceDev Delete devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
-    eventBus_ = nullptr;
+    srcDevEventHandler_ = nullptr;
     hdiCallback_ = nullptr;
     input_ = nullptr;
     controller_ = nullptr;
@@ -76,9 +76,9 @@ int32_t DCameraSourceDev::InitDCameraSourceDev()
 {
     DHLOGI("DCameraSourceDev InitDCameraSourceDev devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
-    eventBus_ = std::make_shared<EventBus>("SrcDevHandler");
-    DCameraSourceEvent event(*this);
-    eventBus_->AddHandler<DCameraSourceEvent>(event.GetType(), *this);
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(true);
+    srcDevEventHandler_ = std::make_shared<DCameraSourceDev::DCameraSourceDevEventHandler>(
+        runner, shared_from_this());
     auto cameraSourceDev = std::shared_ptr<DCameraSourceDev>(shared_from_this());
     stateMachine_ = std::make_shared<DCameraSourceStateMachine>(cameraSourceDev);
     stateMachine_->UpdateState(DCAMERA_STATE_INIT);
@@ -105,8 +105,12 @@ int32_t DCameraSourceDev::RegisterDistributedHardware(const std::string& devId, 
 
     std::shared_ptr<DCameraRegistParam> regParam = std::make_shared<DCameraRegistParam>(devId, dhId, reqId,
         param.sinkAttrs, param.sourceAttrs);
-    DCameraSourceEvent event(*this, DCAMERA_EVENT_REGIST, regParam);
-    eventBus_->PostEvent<DCameraSourceEvent>(event);
+    DCameraSourceEvent event(DCAMERA_EVENT_REGIST, regParam);
+    std::shared_ptr<DCameraSourceEvent> eventParam = std::make_shared<DCameraSourceEvent>(event);
+    CHECK_AND_RETURN_RET_LOG(srcDevEventHandler_ == nullptr, DCAMERA_BAD_VALUE, "srcDevEventHandler_ is nullptr.");
+    AppExecFwk::InnerEvent::Pointer msgEvent =
+        AppExecFwk::InnerEvent::Get(EVENT_SOURCE_DEV_PROCESS, eventParam, 0);
+    srcDevEventHandler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE);
     return DCAMERA_OK;
 }
 
@@ -119,8 +123,12 @@ int32_t DCameraSourceDev::UnRegisterDistributedHardware(const std::string devId,
     std::string sourceAttrs;
     std::shared_ptr<DCameraRegistParam> regParam = std::make_shared<DCameraRegistParam>(devId, dhId, reqId, sinkAttrs,
         sourceAttrs);
-    DCameraSourceEvent event(*this, DCAMERA_EVENT_UNREGIST, regParam);
-    eventBus_->PostEvent<DCameraSourceEvent>(event);
+    DCameraSourceEvent event(DCAMERA_EVENT_UNREGIST, regParam);
+    std::shared_ptr<DCameraSourceEvent> eventParam = std::make_shared<DCameraSourceEvent>(event);
+    CHECK_AND_RETURN_RET_LOG(srcDevEventHandler_ == nullptr, DCAMERA_BAD_VALUE, "srcDevEventHandler_ is nullptr.");
+    AppExecFwk::InnerEvent::Pointer msgEvent =
+        AppExecFwk::InnerEvent::Get(EVENT_SOURCE_DEV_PROCESS, eventParam, 0);
+    srcDevEventHandler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE);
     return DCAMERA_OK;
 }
 
@@ -136,8 +144,12 @@ int32_t DCameraSourceDev::DCameraNotify(std::string& eventStr)
         return ret;
     }
 
-    DCameraSourceEvent event(*this, DCAMERA_EVENT_NOFIFY, cmd.value_);
-    eventBus_->PostEvent<DCameraSourceEvent>(event);
+    DCameraSourceEvent event(DCAMERA_EVENT_NOFIFY, cmd.value_);
+    std::shared_ptr<DCameraSourceEvent> eventParam = std::make_shared<DCameraSourceEvent>(event);
+    CHECK_AND_RETURN_RET_LOG(srcDevEventHandler_ == nullptr, DCAMERA_BAD_VALUE, "srcDevEventHandler_ is nullptr.");
+    AppExecFwk::InnerEvent::Pointer msgEvent =
+        AppExecFwk::InnerEvent::Get(EVENT_SOURCE_DEV_PROCESS, eventParam, 0);
+    srcDevEventHandler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE);
     return DCAMERA_OK;
 }
 
@@ -145,8 +157,13 @@ int32_t DCameraSourceDev::OpenSession(DCameraIndex& camIndex)
 {
     DHLOGI("DCameraSourceDev PostTask OpenSession devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
-    DCameraSourceEvent event(*this, DCAMERA_EVENT_OPEN, camIndex);
-    eventBus_->PostEvent<DCameraSourceEvent>(event);
+    std::shared_ptr<DCameraIndex> dCamIndex = std::make_shared<DCameraIndex>(camIndex);
+    DCameraSourceEvent event(DCAMERA_EVENT_OPEN, camIndex);
+    std::shared_ptr<DCameraSourceEvent> eventParam = std::make_shared<DCameraSourceEvent>(event);
+    CHECK_AND_RETURN_RET_LOG(srcDevEventHandler_ == nullptr, DCAMERA_BAD_VALUE, "srcDevEventHandler_ is nullptr.");
+    AppExecFwk::InnerEvent::Pointer msgEvent =
+        AppExecFwk::InnerEvent::Get(EVENT_SOURCE_DEV_PROCESS, eventParam, 0);
+    srcDevEventHandler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE);
     return DCAMERA_OK;
 }
 
@@ -154,8 +171,13 @@ int32_t DCameraSourceDev::CloseSession(DCameraIndex& camIndex)
 {
     DHLOGI("DCameraSourceDev PostTask CloseSession devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
-    DCameraSourceEvent event(*this, DCAMERA_EVENT_CLOSE, camIndex);
-    eventBus_->PostEvent<DCameraSourceEvent>(event);
+    std::shared_ptr<DCameraIndex> dCamIndex = std::make_shared<DCameraIndex>(camIndex);
+    DCameraSourceEvent event(DCAMERA_EVENT_CLOSE, camIndex);
+    std::shared_ptr<DCameraSourceEvent> eventParam = std::make_shared<DCameraSourceEvent>(event);
+    CHECK_AND_RETURN_RET_LOG(srcDevEventHandler_ == nullptr, DCAMERA_BAD_VALUE, "srcDevEventHandler_ is nullptr.");
+    AppExecFwk::InnerEvent::Pointer msgEvent =
+        AppExecFwk::InnerEvent::Get(EVENT_SOURCE_DEV_PROCESS, eventParam, 0);
+    srcDevEventHandler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE);
     return DCAMERA_OK;
 }
 
@@ -163,8 +185,14 @@ int32_t DCameraSourceDev::ConfigCameraStreams(const std::vector<std::shared_ptr<
 {
     DHLOGI("DCameraSourceDev PostTask ConfigStreams devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
-    DCameraSourceEvent event(*this, DCAMERA_EVENT_CONFIG_STREAMS, streamInfos);
-    eventBus_->PostEvent<DCameraSourceEvent>(event);
+    std::shared_ptr<std::vector<std::shared_ptr<DCStreamInfo>>> streams =
+        std::make_shared<std::vector<std::shared_ptr<DCStreamInfo>>>(streamInfos);
+    DCameraSourceEvent event(DCAMERA_EVENT_CONFIG_STREAMS, streamInfos);
+    std::shared_ptr<DCameraSourceEvent> eventParam = std::make_shared<DCameraSourceEvent>(event);
+    CHECK_AND_RETURN_RET_LOG(srcDevEventHandler_ == nullptr, DCAMERA_BAD_VALUE, "srcDevEventHandler_ is nullptr.");
+    AppExecFwk::InnerEvent::Pointer msgEvent =
+        AppExecFwk::InnerEvent::Get(EVENT_SOURCE_DEV_PROCESS, eventParam, 0);
+    srcDevEventHandler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE);
     return DCAMERA_OK;
 }
 
@@ -172,8 +200,13 @@ int32_t DCameraSourceDev::ReleaseCameraStreams(const std::vector<int>& streamIds
 {
     DHLOGI("DCameraSourceDev PostTask ReleaseStreams devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
-    DCameraSourceEvent event(*this, DCAMERA_EVENT_RELEASE_STREAMS, streamIds);
-    eventBus_->PostEvent<DCameraSourceEvent>(event);
+    std::shared_ptr<std::vector<int>> ids = std::make_shared<std::vector<int>>(streamIds);
+    DCameraSourceEvent event(DCAMERA_EVENT_RELEASE_STREAMS, streamIds);
+    std::shared_ptr<DCameraSourceEvent> eventParam = std::make_shared<DCameraSourceEvent>(event);
+    CHECK_AND_RETURN_RET_LOG(srcDevEventHandler_ == nullptr, DCAMERA_BAD_VALUE, "srcDevEventHandler_ is nullptr.");
+    AppExecFwk::InnerEvent::Pointer msgEvent =
+        AppExecFwk::InnerEvent::Get(EVENT_SOURCE_DEV_PROCESS, eventParam, 0);
+    srcDevEventHandler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE);
     return DCAMERA_OK;
 }
 
@@ -181,8 +214,14 @@ int32_t DCameraSourceDev::StartCameraCapture(const std::vector<std::shared_ptr<D
 {
     DHLOGI("DCameraSourceDev PostTask StartCapture devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
-    DCameraSourceEvent event(*this, DCAMERA_EVENT_START_CAPTURE, captureInfos);
-    eventBus_->PostEvent<DCameraSourceEvent>(event);
+    std::shared_ptr<std::vector<std::shared_ptr<DCCaptureInfo>>> capInfos =
+        std::make_shared<std::vector<std::shared_ptr<DCCaptureInfo>>>(captureInfos);
+    DCameraSourceEvent event(DCAMERA_EVENT_START_CAPTURE, captureInfos);
+    std::shared_ptr<DCameraSourceEvent> eventParam = std::make_shared<DCameraSourceEvent>(event);
+    CHECK_AND_RETURN_RET_LOG(srcDevEventHandler_ == nullptr, DCAMERA_BAD_VALUE, "srcDevEventHandler_ is nullptr.");
+    AppExecFwk::InnerEvent::Pointer msgEvent =
+        AppExecFwk::InnerEvent::Get(EVENT_SOURCE_DEV_PROCESS, eventParam, 0);
+    srcDevEventHandler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE);
     return DCAMERA_OK;
 }
 
@@ -190,8 +229,13 @@ int32_t DCameraSourceDev::StopCameraCapture(const std::vector<int>& streamIds)
 {
     DHLOGI("DCameraSourceDev PostTask StopCapture devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
-    DCameraSourceEvent event(*this, DCAMERA_EVENT_STOP_CAPTURE, streamIds);
-    eventBus_->PostEvent<DCameraSourceEvent>(event);
+    std::shared_ptr<std::vector<int>> ids = std::make_shared<std::vector<int>>(streamIds);
+    DCameraSourceEvent event(DCAMERA_EVENT_STOP_CAPTURE, streamIds);
+    std::shared_ptr<DCameraSourceEvent> eventParam = std::make_shared<DCameraSourceEvent>(event);
+    CHECK_AND_RETURN_RET_LOG(srcDevEventHandler_ == nullptr, DCAMERA_BAD_VALUE, "srcDevEventHandler_ is nullptr.");
+    AppExecFwk::InnerEvent::Pointer msgEvent =
+        AppExecFwk::InnerEvent::Get(EVENT_SOURCE_DEV_PROCESS, eventParam, 0);
+    srcDevEventHandler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE);
     return DCAMERA_OK;
 }
 
@@ -199,25 +243,61 @@ int32_t DCameraSourceDev::UpdateCameraSettings(const std::vector<std::shared_ptr
 {
     DHLOGI("DCameraSourceDev PostTask UpdateCameraSettings devId %{public}s dhId %{public}s",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
-    DCameraSourceEvent event(*this, DCAMERA_EVENT_UPDATE_SETTINGS, settings);
-    eventBus_->PostEvent<DCameraSourceEvent>(event);
+    std::shared_ptr<std::vector<std::shared_ptr<DCameraSettings>>> dcamSettins =
+        std::make_shared<std::vector<std::shared_ptr<DCameraSettings>>>(settings);
+    DCameraSourceEvent event(DCAMERA_EVENT_UPDATE_SETTINGS, settings);
+    std::shared_ptr<DCameraSourceEvent> eventParam = std::make_shared<DCameraSourceEvent>(event);
+    CHECK_AND_RETURN_RET_LOG(srcDevEventHandler_ == nullptr, DCAMERA_BAD_VALUE, "srcDevEventHandler_ is nullptr.");
+    AppExecFwk::InnerEvent::Pointer msgEvent =
+        AppExecFwk::InnerEvent::Get(EVENT_SOURCE_DEV_PROCESS, eventParam, 0);
+    srcDevEventHandler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE);
     return DCAMERA_OK;
 }
 
-void DCameraSourceDev::OnEvent(DCameraSourceEvent& event)
+void DCameraSourceDev::DoHicollieProcess()
 {
-    DHLOGI("DCameraSourceDev OnEvent devId %{public}s dhId %{public}s eventType: %{public}d",
-        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), event.GetEventType());
-    if (event.GetEventType() == DCAMERA_EVENT_HICOLLIE) {
-        SetHicollieFlag(true);
-        return;
-    }
-    int32_t ret = stateMachine_->Execute(event.GetEventType(), event);
+    SetHicollieFlag(true);
+}
+
+void DCameraSourceDev::DoProcessData(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::shared_ptr<DCameraSourceEvent> eventParam = event->GetSharedObject<DCameraSourceEvent>();
+    CHECK_AND_RETURN_LOG(eventParam == nullptr, "eventParam is nullptr.");
+    int32_t ret = stateMachine_->Execute((*eventParam).GetEventType(), (*eventParam));
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceDev OnEvent failed, ret: %{public}d, devId: %{public}s dhId: %{public}s", ret,
+        DHLOGE("DCameraSourceDev Execute failed, ret: %{public}d, devId: %{public}s dhId: %{public}s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     }
-    NotifyResult(event.GetEventType(), event, ret);
+    NotifyResult((*eventParam).GetEventType(), (*eventParam), ret);
+}
+
+DCameraSourceDev::DCameraSourceDevEventHandler::DCameraSourceDevEventHandler(
+    const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<DCameraSourceDev> srcDevPtr)
+    : AppExecFwk::EventHandler(runner), srcDevPtrWPtr_(srcDevPtr)
+{
+    DHLOGI("Ctor DCameraSourceDevEventHandler.");
+}
+
+void DCameraSourceDev::DCameraSourceDevEventHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    CHECK_AND_RETURN_LOG(event == nullptr, "event is nullptr.");
+    uint32_t eventId = event->GetInnerEventId();
+    auto srcDevPtr = srcDevPtrWPtr_.lock();
+    if (srcDevPtr == nullptr) {
+        DHLOGE("Can not get strong self ptr");
+        return;
+    }
+    switch (eventId) {
+        case EVENT_HICOLLIE:
+            srcDevPtr->DoHicollieProcess();
+            break;
+        case EVENT_SOURCE_DEV_PROCESS:
+            srcDevPtr->DoProcessData(event);
+            break;
+        default:
+            DHLOGE("event is undefined, id is %d", eventId);
+            break;
+    }
 }
 
 int32_t DCameraSourceDev::Register(std::shared_ptr<DCameraRegistParam>& param)
@@ -658,29 +738,40 @@ int32_t DCameraSourceDev::OnChannelConnectedEvent()
     std::shared_ptr<DCameraEvent> camEvent = std::make_shared<DCameraEvent>();
     camEvent->eventType_ = DCAMERA_MESSAGE;
     camEvent->eventResult_ = DCAMERA_EVENT_CHANNEL_CONNECTED;
-    DCameraSourceEvent event(*this, DCAMERA_EVENT_NOFIFY, camEvent);
-    eventBus_->PostEvent<DCameraSourceEvent>(event);
+    DCameraSourceEvent event(DCAMERA_EVENT_NOFIFY, camEvent);
+    std::shared_ptr<DCameraSourceEvent> eventParam = std::make_shared<DCameraSourceEvent>(event);
+    CHECK_AND_RETURN_RET_LOG(srcDevEventHandler_ == nullptr, DCAMERA_BAD_VALUE, "srcDevEventHandler_ is nullptr.");
+    AppExecFwk::InnerEvent::Pointer msgEvent =
+        AppExecFwk::InnerEvent::Get(EVENT_SOURCE_DEV_PROCESS, eventParam, 0);
+    srcDevEventHandler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE);
     return DCAMERA_OK;
 }
 
 int32_t DCameraSourceDev::OnChannelDisconnectedEvent()
 {
     DCameraIndex camIndex(devId_, dhId_);
-    DCameraSourceEvent event(*this, DCAMERA_EVENT_CLOSE, camIndex);
-    eventBus_->PostEvent<DCameraSourceEvent>(event);
+    std::shared_ptr<DCameraIndex> index = std::make_shared<DCameraIndex>(camIndex);
+    DCameraSourceEvent event(DCAMERA_EVENT_CLOSE, camIndex);
+    std::shared_ptr<DCameraSourceEvent> eventParam = std::make_shared<DCameraSourceEvent>(event);
+    CHECK_AND_RETURN_RET_LOG(srcDevEventHandler_ == nullptr, DCAMERA_BAD_VALUE, "srcDevEventHandler_ is nullptr.");
+    AppExecFwk::InnerEvent::Pointer msgEvent =
+        AppExecFwk::InnerEvent::Get(EVENT_SOURCE_DEV_PROCESS, eventParam, 0);
+    srcDevEventHandler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE);
     std::shared_ptr<DCameraEvent> camEvent = std::make_shared<DCameraEvent>();
     camEvent->eventType_ = DCAMERA_MESSAGE;
     camEvent->eventResult_ = DCAMERA_EVENT_CHANNEL_DISCONNECTED;
-    DCameraSourceEvent eventNotify(*this, DCAMERA_EVENT_NOFIFY, camEvent);
-    eventBus_->PostEvent<DCameraSourceEvent>(eventNotify);
+    DCameraSourceEvent eventNotify(DCAMERA_EVENT_NOFIFY, camEvent);
+    eventParam = std::make_shared<DCameraSourceEvent>(eventNotify);
+    msgEvent = AppExecFwk::InnerEvent::Get(EVENT_SOURCE_DEV_PROCESS, eventParam, 0);
+    srcDevEventHandler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE);
     return DCAMERA_OK;
 }
 
 int32_t DCameraSourceDev::PostHicollieEvent()
 {
-    DCameraIndex camIndex(devId_, dhId_);
-    DCameraSourceEvent event(*this, DCAMERA_EVENT_HICOLLIE, camIndex);
-    eventBus_->PostEvent<DCameraSourceEvent>(event);
+    CHECK_AND_RETURN_RET_LOG(srcDevEventHandler_ == nullptr, DCAMERA_BAD_VALUE, "srcDevEventHandler_ is nullptr.");
+    AppExecFwk::InnerEvent::Pointer msgEvent = AppExecFwk::InnerEvent::Get(EVENT_HICOLLIE);
+    srcDevEventHandler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE);
     return DCAMERA_OK;
 }
 
