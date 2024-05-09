@@ -34,6 +34,9 @@ public:
 
     int32_t Init()
     {
+        if (g_operatorStr == "test026") {
+            return DCAMERA_BAD_VALUE;
+        }
         return DCAMERA_OK;
     }
 
@@ -76,6 +79,9 @@ public:
 
     int32_t StopCapture()
     {
+        if (g_operatorStr == "test027") {
+            return DCAMERA_BAD_VALUE;
+        }
         return DCAMERA_OK;
     }
 
@@ -91,11 +97,17 @@ public:
 
     int32_t PauseCapture()
     {
+        if (g_operatorStr == "test029") {
+            return DCAMERA_BAD_VALUE;
+        }
         return DCAMERA_OK;
     }
 
     int32_t ResumeCapture()
     {
+        if (g_operatorStr == "test030") {
+            return DCAMERA_BAD_VALUE;
+        }
         return DCAMERA_OK;
     }
 };

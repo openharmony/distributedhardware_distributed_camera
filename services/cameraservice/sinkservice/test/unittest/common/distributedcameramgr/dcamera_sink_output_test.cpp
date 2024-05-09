@@ -28,6 +28,7 @@
 #include "dcamera_sink_controller.h"
 #include "dcamera_sink_data_process.h"
 #include "dcamera_sink_dev.h"
+#include "dcamera_sink_output_result_callback.h"
 #include "dcamera_utils_tools.h"
 #include "distributed_camera_errno.h"
 
@@ -141,6 +142,11 @@ HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_001, TestSize.Level1)
 {
     int32_t ret = output_->Init();
     EXPECT_EQ(DCAMERA_OK, ret);
+    std::shared_ptr<DCameraSinkOutput> output = nullptr;
+    auto callback = std::make_shared<DCameraSinkOutputResultCallback>(output);
+    auto dataBuffer = std::make_shared<DataBuffer>(1);
+    callback->OnPhotoResult(dataBuffer);
+    callback->OnVideoResult(dataBuffer);
     EXPECT_EQ(true, output_->isInit_);
     usleep(TEST_TWENTY_MS);
     ret = output_->UnInit();
