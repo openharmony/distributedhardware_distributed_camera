@@ -150,7 +150,7 @@ HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_001, TestSize.Level1)
     EXPECT_EQ(true, output_->isInit_);
     usleep(TEST_TWENTY_MS);
     ret = output_->UnInit();
-    EXPECT_EQ(DCAMERA_OK, ret); 
+    EXPECT_EQ(DCAMERA_OK, ret);
     EXPECT_EQ(false, output_->isInit_);
 }
 

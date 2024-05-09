@@ -61,6 +61,9 @@ public:
 
     int32_t SendData(std::shared_ptr<DataBuffer>& buffer)
     {
+        if (g_channelStr == "test005") {
+            return DCAMERA_BAD_VALUE;
+        }
         return DCAMERA_OK;
     }
 };

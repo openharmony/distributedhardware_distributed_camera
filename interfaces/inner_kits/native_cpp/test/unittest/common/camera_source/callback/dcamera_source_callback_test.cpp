@@ -214,7 +214,7 @@ HWTEST_F(DCameraSourceCallbackTest, dcamera_source_callback_test_006, TestSize.L
     MessageParcel reply;
     MessageOption option;
     std::string descriptor = "desc";
-    EXPECT_EQ(true, data.WriteInterfaceToken(std::utf16(descriptor)));
+    EXPECT_EQ(true, data.WriteInterfaceToken(to_utf16(descriptor)));
     std::string devId = "devId";
     std::string dhId = "dhId";
     std::string reqId = "reqId";
@@ -239,7 +239,7 @@ HWTEST_F(DCameraSourceCallbackTest, dcamera_source_callback_test_007, TestSize.L
     MessageParcel data;
     MessageParcel reply;
     std::string descriptor = "desc";
-    EXPECT_EQ(true, data.WriteInterfaceToken(std::utf16(descriptor)));
+    EXPECT_EQ(true, data.WriteInterfaceToken(to_utf16(descriptor)));
     std::string devId = "devId";
     std::string dhId = "dhId";
     std::string reqId = "reqId";
@@ -265,7 +265,7 @@ HWTEST_F(DCameraSourceCallbackTest, dcamera_source_callback_test_008, TestSize.L
     MessageParcel data;
     MessageParcel reply;
     std::string descriptor = "desc";
-    EXPECT_EQ(true, data.WriteInterfaceToken(std::utf16(descriptor)));
+    EXPECT_EQ(true, data.WriteInterfaceToken(to_utf16(descriptor)));
     std::string devId = "devId";
     std::string dhId = "dhId";
     std::string reqId = "reqId";

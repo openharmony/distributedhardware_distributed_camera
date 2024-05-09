@@ -35,6 +35,9 @@ public:
 
     int32_t Init()
     {
+        if (g_outputStr == "test026") {
+            return DCAMERA_BAD_VALUE;
+        }
         return DCAMERA_OK;
     }
     int32_t UnInit()
@@ -46,7 +49,7 @@ public:
     }
     int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos)
     {
-        if (g_outputStr == "test021") {
+        if (g_outputStr == "test021" || g_outputStr == "test_025") {
             return DCAMERA_BAD_VALUE;
         }
         return DCAMERA_OK;
@@ -68,6 +71,9 @@ public:
     }
     int32_t GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier)
     {
+        if (g_outputStr == "test_025") {
+            return DCAMERA_BAD_VALUE;
+        }
         return DCAMERA_OK;
     }
 };
