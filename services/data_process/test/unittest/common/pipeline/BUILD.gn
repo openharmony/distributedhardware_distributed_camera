@@ -42,6 +42,15 @@ config("module_private_config") {
 ohos_unittest("DCameraDataProcessPipelineTest") {
   module_out_path = module_out_path
 
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
   sources = [
     "dcamera_pipeline_sink_test.cpp",
     "dcamera_pipeline_source_test.cpp",
