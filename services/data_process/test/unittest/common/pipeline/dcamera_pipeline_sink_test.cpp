@@ -206,7 +206,7 @@ HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_005, TestSize.Level
  */
 HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_006, TestSize.Level1)
 {
-    EXPECT_EQ(false, testSinkPipeline_ == nullptr);
+    EXPECT_EQ(false, testPipelineSink_ == nullptr);
 
     VideoConfigParams vcParams(VideoCodecType::NO_CODEC, Videoformat::NV21, DCAMERA_PRODUCER_FPS_DEFAULT,
         TEST_WIDTH, TEST_HEIGTH);
@@ -252,7 +252,7 @@ HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_006, TestSize.Level
  */
 HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_007, TestSize.Level1)
 {
-    EXPECT_EQ(false, testSinkPipeline_ == nullptr);
+    EXPECT_EQ(false, testPipelineSink_ == nullptr);
 
     std::string propertyName = "propertyName";
     PropertyCarrier propertyCarrier;
@@ -278,7 +278,7 @@ HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_007, TestSize.Level
  */
 HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_008, TestSize.Level1)
 {
-    EXPECT_EQ(false, testSinkPipeline_ == nullptr);
+    EXPECT_EQ(false, testPipelineSink_ == nullptr);
 
     size_t i = 1;
     std::shared_ptr<DataBuffer> videoResult = std::make_shared<DataBuffer>(i);
@@ -298,7 +298,7 @@ HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_008, TestSize.Level
  */
 HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_009, TestSize.Level1)
 {
-    EXPECT_EQ(false, testSinkPipeline_ == nullptr);
+    EXPECT_EQ(false, testPipelineSink_ == nullptr);
 
     DataProcessErrorType errorType = DataProcessErrorType::ERROR_PIPELINE_ENCODER;
     testPipelineSink_->OnError(errorType);
@@ -317,7 +317,7 @@ HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_009, TestSize.Level
  */
 HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_010, TestSize.Level1)
 {
-    EXPECT_EQ(false, testSinkPipeline_ == nullptr);
+    EXPECT_EQ(false, testPipelineSink_ == nullptr);
 
     std::shared_ptr<DCameraPipelineSource> sourcePipeline = std::make_shared<DCameraPipelineSource>();
     std::weak_ptr<DCameraPipelineSource> callbackPipelineSource(sourcePipeline);

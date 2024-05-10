@@ -32,6 +32,7 @@ public:
     void TearDown();
 
     std::shared_ptr<IDataProcessPipeline> testSourcePipeline_;
+    std::shared_ptr<DCameraPipelineSource> testPipelineSource_;
 };
 
 namespace {
@@ -40,6 +41,7 @@ const int32_t TEST_HEIGTH = 1080;
 const int32_t TEST_WIDTH2 = 640;
 const int32_t TEST_HEIGTH2 = 480;
 const int32_t SLEEP_TIME = 200000;
+constexpr uint32_t EVENT_FRAME_TRIGGER = 1;
 }
 
 void DCameraPipelineSourceTest::SetUpTestCase(void)
@@ -53,11 +55,13 @@ void DCameraPipelineSourceTest::TearDownTestCase(void)
 void DCameraPipelineSourceTest::SetUp(void)
 {
     testSourcePipeline_ = std::make_shared<DCameraPipelineSource>();
+    testPipelineSource_ = std::make_shared<DCameraPipelineSource>();
 }
 
 void DCameraPipelineSourceTest::TearDown(void)
 {
     testSourcePipeline_ = nullptr;
+    testPipelineSource_ = nullptr;
 }
 
 /**
@@ -189,6 +193,74 @@ HWTEST_F(DCameraPipelineSourceTest, dcamera_pipeline_source_test_005, TestSize.L
     buffers.push_back(db);
     int32_t rc = testSourcePipeline_->ProcessData(buffers);
     EXPECT_EQ(rc, DCAMERA_INIT_ERR);
+}
+
+/**
+ * @tc.name: dcamera_pipeline_source_test_006
+ * @tc.desc: Verify pipeline source OnError abnormal.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraPipelineSourceTest, dcamera_pipeline_source_test_006, TestSize.Level1)
+{
+    EXPECT_EQ(false, testPipelineSource_ == nullptr);
+
+    DataProcessErrorType errorType = DataProcessErrorType::ERROR_PIPELINE_ENCODER;
+    testPipelineSource_->OnError(errorType);
+    EXPECT_TRUE(true);
+
+    testPipelineSource_->processListener_ = std::make_shared<MockDCameraDataProcessListener>();
+    testPipelineSource_->OnError(errorType);
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: dcamera_pipeline_source_test_007
+ * @tc.desc: Verify pipeline source OnError abnormal.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraPipelineSourceTest, dcamera_pipeline_source_test_007, TestSize.Level1)
+{
+    EXPECT_EQ(false, testPipelineSource_ == nullptr);
+    std::string propertyName = "propertyName";
+    PropertyCarrier propertyCarrier;
+    int32_t rc1 = testPipelineSource_->GetProperty(propertyName, propertyCarrier);
+    EXPECT_EQ(DCAMERA_OK, rc1);
+}
+
+/**
+ * @tc.name: dcamera_pipeline_source_test_008
+ * @tc.desc: Verify pipeline source OnProcessedVideoBuffer abnormal.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraPipelineSourceTest, dcamera_pipeline_source_test_008, TestSize.Level1)
+{
+    EXPECT_EQ(false, testPipelineSource_ == nullptr);
+    
+    size_t i = 1;
+    std::shared_ptr<DataBuffer> videoResult = std::make_shared<DataBuffer>(i);
+    testPipelineSource_->processListener_ = nullptr;
+    testPipelineSource_->OnProcessedVideoBuffer(videoResult);
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: dcamera_pipeline_source_test_009
+ * @tc.desc: Verify pipeline source DoProcessData abnormal.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraPipelineSourceTest, dcamera_pipeline_source_test_009, TestSize.Level1)
+{
+    EXPECT_EQ(false, testPipelineSource_ == nullptr);
+
+    std::shared_ptr<std::string> param = std::make_shared<std::string>("");
+    AppExecFwk::InnerEvent::Pointer triggerEvent =
+                AppExecFwk::InnerEvent::Get(EVENT_FRAME_TRIGGER, param, 0);
+    testPipelineSource_->DoProcessData(triggerEvent);
+    EXPECT_TRUE(true);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
