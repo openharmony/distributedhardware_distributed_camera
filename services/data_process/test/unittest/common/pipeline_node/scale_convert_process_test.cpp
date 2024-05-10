@@ -20,6 +20,7 @@
 #undef private
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
+#include "distributed_hardware_log.h"
 
 using namespace testing::ext;
 
@@ -407,6 +408,8 @@ const int32_t TEST_WIDTH = 1920;
 const int32_t TEST_HEIGTH = 1080;
 const int32_t TEST_WIDTH2 = 640;
 const int32_t TEST_HEIGTH2 = 480;
+const int32_t TEST_ALIGNEDWIDTH = 1920;
+const int32_t TEST_ALIGNEDHEIGTH = 1088;
 
 VideoConfigParams SRC_PARAMS1(VideoCodecType::CODEC_H264,
                             Videoformat::NV12,
@@ -434,6 +437,7 @@ VideoConfigParams PROC_CONFIG;
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_018, TestSize.Level1)
 {
+    DHLOGI("ScaleConvertProcessTest scale_convert_process_test_018.");
     int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS1, PROC_CONFIG);
     EXPECT_EQ(rc, DCAMERA_OK);
 }
@@ -446,6 +450,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_018, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_019, TestSize.Level1)
 {
+    DHLOGI("ScaleConvertProcessTest scale_convert_process_test_019.");
     std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
     int32_t rc = testScaleConvertProcess_->ProcessData(inputBuffers);
     EXPECT_EQ(rc, DCAMERA_DISABLE_PROCESS);
@@ -459,6 +464,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_019, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_020, TestSize.Level1)
 {
+    DHLOGI("ScaleConvertProcessTest scale_convert_process_test_020.");
     ImageUnitInfo srcImgInfo {Videoformat::YUVI420, 0, 0, 0, 0, 0, 0, nullptr};
     std::shared_ptr<DataBuffer> imgBuf = nullptr;
     int32_t rc = testScaleConvertProcess_->GetImageUnitInfo(srcImgInfo, imgBuf);
@@ -482,6 +488,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_020, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_021, TestSize.Level1)
 {
+    DHLOGI("ScaleConvertProcessTest scale_convert_process_test_021.");
     ImageUnitInfo srcImgInfo {Videoformat::YUVI420, 0, 0, 0, 0, 0, 0, nullptr};
     size_t capacity = 100;
     std::shared_ptr<DataBuffer> imgBuf = std::make_shared<DataBuffer>(capacity);
@@ -505,6 +512,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_021, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_022, TestSize.Level1)
 {
+    DHLOGI("ScaleConvertProcessTest scale_convert_process_test_022.");
     ImageUnitInfo srcImgInfo {Videoformat::NV12, TEST_WIDTH, TEST_HEIGTH, 0, 0, 0, 0, nullptr};
     ImageUnitInfo dstImgInfo {Videoformat::NV12, TEST_WIDTH, TEST_HEIGTH, 0, 0, 0, 0, nullptr};
 
@@ -526,6 +534,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_022, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_023, TestSize.Level1)
 {
+    DHLOGI("ScaleConvertProcessTest scale_convert_process_test_023.");
     ImageUnitInfo srcImgInfo {Videoformat::YUVI420, 0, 0, 0, 0, 0, 0, nullptr};
     size_t capacity = 100;
     std::shared_ptr<DataBuffer> imgBuf = std::make_shared<DataBuffer>(capacity);
@@ -538,6 +547,97 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_023, TestSize.Level
 
     int32_t rc = testScaleConvertProcess_->GetImageUnitInfo(srcImgInfo, imgBuf);
     EXPECT_EQ(rc, DCAMERA_NOT_FOUND);
+}
+
+/**
+ * @tc.name: scale_convert_process_test_024
+ * @tc.desc: Verify scale convert process InitNode IsConvertible true.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_024, TestSize.Level1)
+{
+    DHLOGI("ScaleConvertProcessTest scale_convert_process_test_024.");
+    int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS1, PROC_CONFIG);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
+    rc = testScaleConvertProcess_->ProcessData(inputBuffers);
+    EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
+}
+
+/**
+ * @tc.name: scale_convert_process_test_025
+ * @tc.desc: Verify scale convert process InitNode IsConvertible true.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_025, TestSize.Level1)
+{
+    DHLOGI("ScaleConvertProcessTest scale_convert_process_test_025.");
+    int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS1, PROC_CONFIG);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    size_t capacity = 100;
+    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
+    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
+    inputBuffers.push_back(db);
+    rc = testScaleConvertProcess_->ProcessData(inputBuffers);
+    EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
+}
+
+/**
+ * @tc.name: scale_convert_process_test_026
+ * @tc.desc: Verify scale convert process InitNode IsConvertible true.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_026, TestSize.Level1)
+{
+    DHLOGI("ScaleConvertProcessTest scale_convert_process_test_026.");
+    int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS2, PROC_CONFIG);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    size_t capacity = 3200000;
+    int64_t timeStamp = 10;
+    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
+    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
+    db->SetInt64("timeUs", timeStamp);
+    db->SetInt32("Videoformat", static_cast<int32_t>(Videoformat::YUVI420));
+    db->SetInt32("alignedWidth", TEST_ALIGNEDWIDTH);
+    db->SetInt32("alignedHeight", TEST_ALIGNEDHEIGTH);
+    db->SetInt32("width", TEST_WIDTH);
+    db->SetInt32("height", TEST_HEIGTH);
+    inputBuffers.push_back(db);
+    std::shared_ptr<DCameraPipelineSource> sourcePipeline = std::make_shared<DCameraPipelineSource>();
+    testScaleConvertProcess_->callbackPipelineSource_ = sourcePipeline;
+    rc = testScaleConvertProcess_->ProcessData(inputBuffers);
+    EXPECT_EQ(rc, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: scale_convert_process_test_027
+ * @tc.desc: Verify scale convert process InitNode IsConvertible true.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_027, TestSize.Level1)
+{
+    DHLOGI("ScaleConvertProcessTest scale_convert_process_test_027.");
+    int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS2, PROC_CONFIG);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    size_t capacity = 3200000;
+    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
+    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
+    db->SetInt32("Videoformat", static_cast<int32_t>(Videoformat::YUVI420));
+    db->SetInt32("width", TEST_WIDTH);
+    db->SetInt32("height", TEST_HEIGTH);
+    inputBuffers.push_back(db);
+    std::shared_ptr<DCameraPipelineSource> sourcePipeline = std::make_shared<DCameraPipelineSource>();
+    testScaleConvertProcess_->callbackPipelineSource_ = sourcePipeline;
+    rc = testScaleConvertProcess_->ProcessData(inputBuffers);
+    EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
 }
 #endif
 } // namespace DistributedHardware

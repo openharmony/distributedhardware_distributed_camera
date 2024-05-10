@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -241,7 +241,7 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_007, TestSize.Level1)
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
                                 TEST_HEIGTH);
-    VideoConfigParams destParams(VideoCodecType::CODEC_H264,
+    VideoConfigParams destParams(VideoCodecType::CODEC_H265,
                                  Videoformat::NV21,
                                  DCAMERA_PRODUCER_FPS_DEFAULT,
                                  TEST_WIDTH,
@@ -250,11 +250,7 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_007, TestSize.Level1)
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
     EXPECT_EQ(rc, DCAMERA_OK);
 
-    size_t capacity = 100;
-    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
-    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
-    inputBuffers.push_back(db);
-    rc = testEncodeDataProcess_->ProcessData(inputBuffers);
+    rc = testEncodeDataProcess_->InitEncoderMetadataFormat();
     EXPECT_EQ(rc, DCAMERA_OK);
 }
 
@@ -333,41 +329,6 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_010, TestSize.Level1)
     EXPECT_EQ(false, testEncodeDataProcess_ == nullptr);
 
     VideoConfigParams srcParams(VideoCodecType::NO_CODEC,
-                                Videoformat::RGBA_8888,
-                                DCAMERA_PRODUCER_FPS_DEFAULT,
-                                TEST_WIDTH,
-                                TEST_HEIGTH);
-    VideoConfigParams destParams(VideoCodecType::CODEC_H264,
-                                 Videoformat::NV21,
-                                 DCAMERA_PRODUCER_FPS_DEFAULT,
-                                 TEST_WIDTH,
-                                 TEST_HEIGTH);
-    VideoConfigParams procConfig;
-    int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_OK);
-
-    size_t capacity = 100;
-    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
-    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
-    inputBuffers.push_back(db);
-    rc = testEncodeDataProcess_->ProcessData(inputBuffers);
-    EXPECT_EQ(rc, DCAMERA_OK);
-
-    rc = testEncodeDataProcess_->FeedEncoderInputBuffer(db);
-    EXPECT_EQ(rc, DCAMERA_OK);
-}
-
-/**
- * @tc.name: encode_data_process_test_011
- * @tc.desc: Verify encode data process ProcessData.
- * @tc.type: FUNC
- * @tc.require: Issue Number
- */
-HWTEST_F(EncodeDataProcessTest, encode_data_process_test_011, TestSize.Level1)
-{
-    EXPECT_EQ(false, testEncodeDataProcess_ == nullptr);
-
-    VideoConfigParams srcParams(VideoCodecType::NO_CODEC,
                                 Videoformat::YUVI420,
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
@@ -381,21 +342,17 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_011, TestSize.Level1)
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
     EXPECT_EQ(rc, DCAMERA_OK);
 
-    size_t capacity = 100;
-    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
-    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
-    inputBuffers.push_back(db);
-    rc = testEncodeDataProcess_->ProcessData(inputBuffers);
+    rc = testEncodeDataProcess_->InitEncoderMetadataFormat();
     EXPECT_EQ(rc, DCAMERA_OK);
 }
 
 /**
- * @tc.name: encode_data_process_test_012
+ * @tc.name: encode_data_process_test_011
  * @tc.desc: Verify encode data process ProcessData.
  * @tc.type: FUNC
  * @tc.require: Issue Number
  */
-HWTEST_F(EncodeDataProcessTest, encode_data_process_test_012, TestSize.Level1)
+HWTEST_F(EncodeDataProcessTest, encode_data_process_test_011, TestSize.Level1)
 {
     EXPECT_EQ(false, testEncodeDataProcess_ == nullptr);
 
@@ -413,21 +370,17 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_012, TestSize.Level1)
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
     EXPECT_EQ(rc, DCAMERA_OK);
 
-    size_t capacity = 100;
-    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
-    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
-    inputBuffers.push_back(db);
-    rc = testEncodeDataProcess_->ProcessData(inputBuffers);
+    rc = testEncodeDataProcess_->InitEncoderMetadataFormat();
     EXPECT_EQ(rc, DCAMERA_OK);
 }
 
 /**
- * @tc.name: encode_data_process_test_013
+ * @tc.name: encode_data_process_test_012
  * @tc.desc: Verify encode data process GetEncoderOutputBuffer.
  * @tc.type: FUNC
  * @tc.require: Issue Number
  */
-HWTEST_F(EncodeDataProcessTest, encode_data_process_test_013, TestSize.Level1)
+HWTEST_F(EncodeDataProcessTest, encode_data_process_test_012, TestSize.Level1)
 {
     EXPECT_EQ(false, testEncodeDataProcess_ == nullptr);
 
@@ -445,12 +398,12 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_013, TestSize.Level1)
 }
 
 /**
- * @tc.name: encode_data_process_test_014
+ * @tc.name: encode_data_process_test_013
  * @tc.desc: Verify encode data process EncodeDone.
  * @tc.type: FUNC
  * @tc.require: Issue Number
  */
-HWTEST_F(EncodeDataProcessTest, encode_data_process_test_014, TestSize.Level1)
+HWTEST_F(EncodeDataProcessTest, encode_data_process_test_013, TestSize.Level1)
 {
     EXPECT_EQ(false, testEncodeDataProcess_ == nullptr);
 
@@ -460,12 +413,12 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_014, TestSize.Level1)
 }
 
 /**
- * @tc.name: encode_data_process_test_015
+ * @tc.name: encode_data_process_test_014
  * @tc.desc: Verify encode data process ProcessData codetype equality.
  * @tc.type: FUNC
  * @tc.require: Issue Number
  */
-HWTEST_F(EncodeDataProcessTest, encode_data_process_test_015, TestSize.Level1)
+HWTEST_F(EncodeDataProcessTest, encode_data_process_test_014, TestSize.Level1)
 {
     EXPECT_EQ(false, testEncodeDataProcess_ == nullptr);
 
