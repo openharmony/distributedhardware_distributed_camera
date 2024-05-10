@@ -30,6 +30,7 @@ DCameraSourceRegistState::DCameraSourceRegistState(std::shared_ptr<DCameraSource
     memberFuncMap_[DCAMERA_EVENT_OPEN] = &DCameraSourceRegistState::DoOpenTask;
     memberFuncMap_[DCAMERA_EVENT_CLOSE] = &DCameraSourceRegistState::DoCloseTask;
     memberFuncMap_[DCAMERA_EVENT_NOFIFY] = &DCameraSourceRegistState::DoEventNofityTask;
+    memberFuncMap_[DCAMERA_EVENT_GET_FULLCAPS] = &DCameraSourceRegistState::DoGetFullCaps;
 }
 
 int32_t DCameraSourceRegistState::Execute(std::shared_ptr<DCameraSourceDev>& camDev, DCAMERA_EVENT eventType,
@@ -109,6 +110,24 @@ int32_t DCameraSourceRegistState::DoEventNofityTask(std::shared_ptr<DCameraSourc
     }
 
     ret = camDev->CameraEventNotify(camEvent);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("DCameraSourceRegistState DoEventNofityTask CameraEventNotify failed, ret: %{public}d", ret);
+        return ret;
+    }
+    return DCAMERA_OK;
+}
+
+int32_t DCameraSourceRegistState::DoGetFullCaps(std::shared_ptr<DCameraSourceDev>& camDev,
+    DCameraSourceEvent& event)
+{
+    DHLOGI("DCameraSourceRegistState DoGetFullCaps enter.");
+    std::shared_ptr<DCameraEvent> camEvent;
+    int32_t ret = event.GetCameraEvent(camEvent);
+    if (ret != DCAMERA_OK) {
+        return ret;
+    }
+
+    ret = camDev->GetFullCaps();
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceRegistState DoEventNofityTask CameraEventNotify failed, ret: %{public}d", ret);
         return ret;

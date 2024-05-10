@@ -34,6 +34,7 @@ public:
     int32_t StartCapture(const DHBase& dhBase, const std::vector<DCCaptureInfo>& captureInfos) override;
     int32_t StopCapture(const DHBase& dhBase, const std::vector<int>& streamIds) override;
     int32_t UpdateSettings(const DHBase& dhBase, const std::vector<DCameraSettings>& settings) override;
+    int32_t NotifyEvent(const DHBase& dhBase, const DCameraHDFEvent& event) override;
 
 private:
     bool CheckDHBase(const DHBase& dhBase);

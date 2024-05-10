@@ -44,6 +44,7 @@ typedef enum {
     DCAMERA_MESSAGE = 0,
     DCAMERA_OPERATION = 1,
     DCAMERA_SINK_STOP = 2,
+    DCAMERE_GETFULLCAP = 3,
 } DCameraEventType;
 
 typedef enum {

@@ -254,6 +254,35 @@ int32_t DCameraSourceDev::UpdateCameraSettings(const std::vector<std::shared_ptr
     return DCAMERA_OK;
 }
 
+int32_t DCameraSourceDev::ProcessHDFEvent(const DCameraHDFEvent& event)
+{
+    DHLOGI("DCameraSourceDev ProcessHDFEvent devId %{public}s dhId %{public}s",
+        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+    std::shared_ptr<DCameraSourceEvent> eventParam;
+    if (event.type_ == DCameraEventType::DCAMERE_GETFULLCAP) {
+        eventParam = std::make_shared<DCameraSourceEvent>(DCAMERA_EVENT_GET_FULLCAPS);
+    } else {
+        DHLOGE("DCameraSourceDev ProcessHDFEvent event type is Invaild.");
+        return DCAMERA_BAD_VALUE;
+    }
+    CHECK_AND_RETURN_RET_LOG(srcDevEventHandler_ == nullptr, DCAMERA_BAD_VALUE, "srcDevEventHandler_ is nullptr.");
+    AppExecFwk::InnerEvent::Pointer msgEvent =
+        AppExecFwk::InnerEvent::Get(EVENT_PROCESS_HDF_NOTIFY, eventParam, 0);
+    srcDevEventHandler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE);
+    return DCAMERA_OK;
+}
+
+int32_t DCameraSourceDev::GetFullCaps()
+{
+    DHLOGI("DCameraSourceDev GetFullCaps enter.");
+    if (stateListener_ == nullptr) {
+        DHLOGE("DCameraSourceDev DoSyncTrigger, stateListener_ is nullptr.");
+        return DCAMERA_BAD_VALUE;
+    }
+    stateListener_->OnDataSyncTrigger(devId_);
+    return DCAMERA_OK;
+}
+
 void DCameraSourceDev::DoHicollieProcess()
 {
     SetHicollieFlag(true);
@@ -269,6 +298,17 @@ void DCameraSourceDev::DoProcessData(const AppExecFwk::InnerEvent::Pointer &even
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     }
     NotifyResult((*eventParam).GetEventType(), (*eventParam), ret);
+}
+
+void DCameraSourceDev::DoProcesHDFEvent(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::shared_ptr<DCameraSourceEvent> eventParam = event->GetSharedObject<DCameraSourceEvent>();
+    CHECK_AND_RETURN_LOG(eventParam == nullptr, "eventParam is nullptr.");
+    int32_t ret = stateMachine_->Execute((*eventParam).GetEventType(), (*eventParam));
+    if (ret != DCAMERA_OK) {
+        DHLOGE("DCameraSourceDev Execute failed, ret: %{public}d, devId: %{public}s dhId: %{public}s", ret,
+            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+    }
 }
 
 DCameraSourceDev::DCameraSourceDevEventHandler::DCameraSourceDevEventHandler(
@@ -293,6 +333,9 @@ void DCameraSourceDev::DCameraSourceDevEventHandler::ProcessEvent(const AppExecF
             break;
         case EVENT_SOURCE_DEV_PROCESS:
             srcDevPtr->DoProcessData(event);
+            break;
+        case EVENT_PROCESS_HDF_NOTIFY:
+            srcDevPtr->DoProcesHDFEvent(event);
             break;
         default:
             DHLOGE("event is undefined, id is %d", eventId);
@@ -444,6 +487,7 @@ int32_t DCameraSourceDev::OpenCamera()
         DcameraFinishAsyncTrace(DCAMERA_OPEN_CHANNEL_CONTROL, DCAMERA_OPEN_CHANNEL_TASKID);
         return DCAMERA_OPEN_CONFLICT;
     }
+    stateListener_->OnHardwareStateChanged(devId_, dhId_, DcameraBusinessState::RUNNING);
     return DCAMERA_OK;
 }
 
@@ -462,6 +506,7 @@ int32_t DCameraSourceDev::CloseCamera()
         DHLOGE("DCameraSourceDev Execute CloseCamera controller CloseChannel failed, ret: %{public}d, devId: "
             "%{public}s dhId: %{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     }
+    stateListener_->OnHardwareStateChanged(devId_, dhId_, DcameraBusinessState::IDLE);
     return DCAMERA_OK;
 }
 
