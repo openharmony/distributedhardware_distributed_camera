@@ -60,6 +60,7 @@ ohos_unittest("DistributedCameraSinkServiceTest") {
   module_out_path = module_out_path
 
   sources = [
+    "dcamera_sink_callback_proxy_test.cpp",
     "dcamera_sink_hidumper_test.cpp",
     "distributed_camera_sink_service_test.cpp",
     "distributed_camera_sink_stub_test.cpp",
