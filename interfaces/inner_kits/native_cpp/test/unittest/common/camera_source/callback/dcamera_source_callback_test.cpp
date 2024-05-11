@@ -54,6 +54,28 @@ public:
     }
 };
 
+class MockDistributedHardwareStateListener : public DistributedHardwareStateListener {
+public:
+    MockDistributedHardwareStateListener() = default;
+    virtual ~MockDistributedHardwareStateListener() = default;
+
+    void OnStateChanged(const std::string &uuid, const std::string &dhId, const BusinessState state) override
+    {
+        DHLOGI("Handle state changed event");
+    }
+};
+
+class MockDataSyncTriggerListener : public DataSyncTriggerListener {
+public:
+    MockDataSyncTriggerListener() = default;
+    virtual ~MockDataSyncTriggerListener() = default;
+
+    void OnDataSyncTrigger(const std::string &uuid) override
+    {
+        DHLOGI("Handle data sync event");
+    }
+};
+
 class UnregisterCallbackTest : public UnregisterCallback {
 public:
     UnregisterCallbackTest() = default;
@@ -277,7 +299,70 @@ HWTEST_F(DCameraSourceCallbackTest, dcamera_source_callback_test_008, TestSize.L
     data.WriteInt32(status);
     data.WriteString(result);
     int32_t ret = sourceCallback_->NotifyUnregResultInner(data, reply);
+    sourceCallback_->RegisterStateListener(nullptr);
+    sourceCallback_->UnRegisterStateListener();
+    sourceCallback_->RegisterTriggerListener(nullptr);
+    sourceCallback_->UnRegisterTriggerListener();
     EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_callback_test_009
+ * @tc.desc: Verify the OnHardwareStateChanged function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraSourceCallbackTest, dcamera_source_callback_test_009, TestSize.Level1)
+{
+    std::string devId = "devId";
+    std::string dhId = "dhId";
+    int32_t status = 1;
+    int32_t ret = sourceCallback_->OnHardwareStateChanged(devId, dhId, status);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+    sourceCallback_->stateListener_ = std::make_shared<MockDistributedHardwareStateListener>();
+    devId = "";
+    ret = sourceCallback_->OnHardwareStateChanged(devId, dhId, status);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+    devId += std::string(DID_MAX_SIZE + 1, 'a');
+    ret = sourceCallback_->OnHardwareStateChanged(devId, dhId, status);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+    devId = "devId";
+    dhId = "";
+    ret = sourceCallback_->OnHardwareStateChanged(devId, dhId, status);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+    dhId += std::string(DID_MAX_SIZE + 1, 'a');
+    ret = sourceCallback_->OnHardwareStateChanged(devId, dhId, status);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+    dhId = "dhId";
+    status = -1;
+    ret = sourceCallback_->OnHardwareStateChanged(devId, dhId, status);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+    status = 1;
+    ret = sourceCallback_->OnHardwareStateChanged(devId, dhId, status);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_callback_test_010
+ * @tc.desc: Verify the OnDataSyncTrigger function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraSourceCallbackTest, dcamera_source_callback_test_010, TestSize.Level1)
+{
+    std::string devId = "";
+    int32_t ret = sourceCallback_->OnDataSyncTrigger(devId);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+    devId += std::string(DID_MAX_SIZE + 1, 'a');
+    ret = sourceCallback_->OnDataSyncTrigger(devId);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    sourceCallback_->triggerListener_ = nullptr;
+    ret = sourceCallback_->OnDataSyncTrigger(devId);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+    sourceCallback_->triggerListener_ = std::make_shared<MockDataSyncTriggerListener>();
+    ret = sourceCallback_->OnDataSyncTrigger(devId);
+    EXPECT_NE(DCAMERA_OK, ret);
 }
 }
 }

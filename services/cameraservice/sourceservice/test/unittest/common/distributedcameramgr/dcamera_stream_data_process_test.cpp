@@ -237,5 +237,24 @@ HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_007, Tes
     int32_t ret = streamProcess1->GetProducerSize();
     EXPECT_EQ(DCAMERA_OK, ret);
 }
+
+/**
+ * @tc.name: dcamera_stream_data_process_test_008
+ * @tc.desc: Verify GetPipelineFormat func.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_008, TestSize.Level1)
+{
+    DHLOGI("DCameraStreamDataProcessTest::dcamera_stream_data_process_test_008");
+    int32_t format = OHOS_CAMERA_FORMAT_RGBA_8888;
+    std::shared_ptr<DCameraStreamDataProcess> streamProcess1 =
+        std::make_shared<DCameraStreamDataProcess>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, DCStreamType::CONTINUOUS_FRAME);
+    Videoformat ret = streamProcess1->GetPipelineFormat(format);
+    EXPECT_EQ(Videoformat::RGBA_8888, ret);
+    format = -1;
+    ret = streamProcess1->GetPipelineFormat(format);
+    EXPECT_EQ(Videoformat::NV21, ret);
+}
 }
 }
