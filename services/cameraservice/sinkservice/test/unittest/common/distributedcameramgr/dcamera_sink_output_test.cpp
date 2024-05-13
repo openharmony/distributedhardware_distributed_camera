@@ -270,5 +270,24 @@ HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_007, TestSize.Level1)
     int32_t ret = output_->CloseChannel();
     EXPECT_EQ(DCAMERA_OK, ret);
 }
+
+/**
+ * @tc.name: dcamera_sink_output_test_008
+ * @tc.desc: Verify the CloseChannel function.
+ * @tc.type: FUNC
+ * @tc.require: I5N1JI
+ */
+HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_008, TestSize.Level1)
+{
+    std::string name = "name";
+    PropertyCarrier propertyCarrier;
+    int32_t ret = output_->GetProperty(name, propertyCarrier);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+    channel_ = std::make_shared<MockCameraChannel>();
+    dataProcess_ = std::make_shared<MockDCameraSinkDataProcess>(channel_);
+    output_->dataProcesses_.emplace(CONTINUOUS_FRAME, dataProcess_);
+    ret = output_->GetProperty(name, propertyCarrier);
+    EXPECT_NE(DCAMERA_OK, ret);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

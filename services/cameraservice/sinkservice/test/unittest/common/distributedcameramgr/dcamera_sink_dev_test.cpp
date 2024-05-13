@@ -67,6 +67,7 @@ std::string g_testOpenInfoDev = R"({
 
 std::string g_testChannelInfoDevEmpty = "";
 std::string g_testOpenInfoDevEmpty = "";
+std::string g_sinkCtrlStr = "";
 
 void DCameraSinkDevTest::SetUpTestCase(void)
 {
@@ -108,6 +109,16 @@ HWTEST_F(DCameraSinkDevTest, dcamera_sink_dev_test_001, TestSize.Level1)
     ret = dev_->UnInit();
     EXPECT_EQ(DCAMERA_OK, ret);
     EXPECT_EQ(false, dev_->isInit_);
+
+    g_sinkCtrlStr = "test_001";
+    ret = dev_->UnInit();
+    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(false, dev_->isInit_);
+
+    dev_->controller_ = nullptr;
+    ret = dev_->UnInit();
+    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(false, dev_->isInit_);
 }
 
 /**
@@ -145,6 +156,10 @@ HWTEST_F(DCameraSinkDevTest, dcamera_sink_dev_test_004, TestSize.Level1)
     int32_t ret = dev_->GetCameraInfo(g_testCameraInfo);
     EXPECT_EQ(DCAMERA_OK, ret);
     DHLOGI("DCameraSinkDevTest::GetCameraInfo cameraInfo is %{public}s", GetAnonyString(g_testCameraInfo).c_str());
+
+    g_sinkCtrlStr = "test_004";
+    ret = dev_->GetCameraInfo(g_testCameraInfo);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
 /**
@@ -169,6 +184,10 @@ HWTEST_F(DCameraSinkDevTest, dcamera_sink_dev_test_006, TestSize.Level1)
 {
     int32_t ret = dev_->ChannelNeg(g_testChannelInfoDevContinue);
     EXPECT_EQ(DCAMERA_OK, ret);
+    g_sinkCtrlStr = "test_006";
+    ret = dev_->ChannelNeg(g_testChannelInfoDevContinue);
+    EXPECT_NE(DCAMERA_OK, ret);
+    g_sinkCtrlStr = "";
 }
 
 /**
@@ -217,6 +236,82 @@ HWTEST_F(DCameraSinkDevTest, dcamera_sink_dev_test_010, TestSize.Level1)
 {
     int32_t ret = dev_->CloseChannel();
     EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_dev_test_011
+ * @tc.desc: Verify the GetDhid function.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6N1
+ */
+HWTEST_F(DCameraSinkDevTest, dcamera_sink_dev_test_011, TestSize.Level1)
+{
+    dev_->dhId_ = "1";
+    std::string ret = dev_->GetDhid();
+    EXPECT_NE("", ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_dev_test_012
+ * @tc.desc: Verify the PauseDistributedHardware function.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6N1
+ */
+HWTEST_F(DCameraSinkDevTest, dcamera_sink_dev_test_012, TestSize.Level1)
+{
+    std::string devId = "";
+    int32_t ret = dev_->PauseDistributedHardware(devId);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    devId = "devId";
+    ret = dev_->PauseDistributedHardware(devId);
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    dev_->controller_ = nullptr;
+    ret = dev_->PauseDistributedHardware(devId);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_dev_test_013
+ * @tc.desc: Verify the ResumeDistributedHardware function.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6N1
+ */
+HWTEST_F(DCameraSinkDevTest, dcamera_sink_dev_test_013, TestSize.Level1)
+{
+    std::string devId = "";
+    int32_t ret = dev_->ResumeDistributedHardware(devId);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    devId = "devId";
+    ret = dev_->ResumeDistributedHardware(devId);
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    dev_->controller_ = nullptr;
+    ret = dev_->ResumeDistributedHardware(devId);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_dev_test_014
+ * @tc.desc: Verify the StopDistributedHardware function.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6N1
+ */
+HWTEST_F(DCameraSinkDevTest, dcamera_sink_dev_test_014, TestSize.Level1)
+{
+    std::string devId = "";
+    int32_t ret = dev_->StopDistributedHardware(devId);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    devId = "devId";
+    ret = dev_->StopDistributedHardware(devId);
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    dev_->controller_ = nullptr;
+    ret = dev_->StopDistributedHardware(devId);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
