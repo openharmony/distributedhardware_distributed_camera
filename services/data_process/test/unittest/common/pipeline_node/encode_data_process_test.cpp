@@ -457,5 +457,67 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_014, TestSize.Level1)
     testEncodeDataProcess_->OnOutputBufferAvailable(index, info, flag, buffer);
     EXPECT_EQ(rc, DCAMERA_OK);
 }
+
+/**
+ * @tc.name: encode_data_process_test_015
+ * @tc.desc: Verify encode data process GetProperty.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(EncodeDataProcessTest, encode_data_process_test_015, TestSize.Level1)
+{
+    EXPECT_EQ(false, testEncodeDataProcess_ == nullptr);
+
+    std::string propertyName = "propertyName";
+    PropertyCarrier propertyCarrier;
+    int32_t rc = testEncodeDataProcess_->GetProperty(propertyName, propertyCarrier);
+    EXPECT_EQ(rc, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: encode_data_process_test_016
+ * @tc.desc: Verify encode data process GetProperty.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(EncodeDataProcessTest, encode_data_process_test_016, TestSize.Level1)
+{
+    EXPECT_EQ(false, testEncodeDataProcess_ == nullptr);
+
+    VideoConfigParams srcParams(VideoCodecType::NO_CODEC,
+                                Videoformat::NV12,
+                                DCAMERA_PRODUCER_FPS_DEFAULT,
+                                TEST_WIDTH,
+                                TEST_HEIGTH);
+    VideoConfigParams destParams(VideoCodecType::CODEC_H264,
+                                 Videoformat::NV21,
+                                 DCAMERA_PRODUCER_FPS_DEFAULT,
+                                 TEST_WIDTH,
+                                 TEST_HEIGTH);
+    VideoConfigParams procConfig;
+    int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    std::string propertyName = "surface";
+    PropertyCarrier propertyCarrier;
+    rc = testEncodeDataProcess_->GetProperty(propertyName, propertyCarrier);
+    EXPECT_EQ(rc, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: encode_data_process_test_017
+ * @tc.desc: Verify encode data process GetProperty.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(EncodeDataProcessTest, encode_data_process_test_017, TestSize.Level1)
+{
+    EXPECT_EQ(false, testEncodeDataProcess_ == nullptr);
+
+    std::string propertyName = "surface";
+    PropertyCarrier propertyCarrier;
+    int32_t rc = testEncodeDataProcess_->GetProperty(propertyName, propertyCarrier);
+    EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

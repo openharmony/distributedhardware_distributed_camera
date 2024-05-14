@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -226,6 +226,54 @@ HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_009, TestSize.Level1)
     DistributedCameraSinkProxy sinkProxy(sinkStubPtr);
     std::string dhId = "dhId000";
     int32_t ret = sinkProxy.CloseChannel(dhId);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_stub_test_010
+ * @tc.desc: Verify the PauseDistributedHardware function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_010, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_stub_test_010");
+    sptr<IRemoteObject> sinkStubPtr(new MockDistributedCameraSinkStub());
+    DistributedCameraSinkProxy sinkProxy(sinkStubPtr);
+    std::string networkId = "test10";
+    int32_t ret = sinkProxy.PauseDistributedHardware(networkId);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_stub_test_011
+ * @tc.desc: Verify the ResumeDistributedHardware function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_011, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_stub_test_011");
+    sptr<IRemoteObject> sinkStubPtr(new MockDistributedCameraSinkStub());
+    DistributedCameraSinkProxy sinkProxy(sinkStubPtr);
+    std::string networkId = "test11";
+    int32_t ret = sinkProxy.ResumeDistributedHardware(networkId);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_stub_test_012
+ * @tc.desc: Verify the StopDistributedHardware function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_012, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_stub_test_012");
+    sptr<IRemoteObject> sinkStubPtr(new MockDistributedCameraSinkStub());
+    DistributedCameraSinkProxy sinkProxy(sinkStubPtr);
+    std::string networkId = "test12";
+    int32_t ret = sinkProxy.StopDistributedHardware(networkId);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 } // namespace DistributedHardware
