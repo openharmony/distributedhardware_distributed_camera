@@ -76,7 +76,7 @@ ohos_unittest("DCameraClientTest") {
     "c_utils:utils",
     "drivers_interface_camera:libcamera_proxy_1.0",
     "drivers_interface_camera:metadata",
-    "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
+    "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.1",
     "drivers_peripheral_display:hdi_gralloc_client",
     "eventhandler:libeventhandler",
     "graphic_surface:surface",

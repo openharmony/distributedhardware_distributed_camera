@@ -298,5 +298,10 @@ int32_t DCameraProviderCallbackImpl::UpdateSettings(const DHBase& dhBase, const 
     }
     return SUCCESS;
 }
+
+int32_t DCameraProviderCallbackImpl::NotifyEvent(const DHBase& dhBase, const DCameraHDFEvent& event)
+{
+    return SUCCESS;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

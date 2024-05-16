@@ -19,11 +19,11 @@
 #include <memory>
 
 #include "icamera_channel_listener.h"
-#include "v1_0/dcamera_types.h"
+#include "v1_1/dcamera_types.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-using namespace OHOS::HDI::DistributedCamera::V1_0;
+using namespace OHOS::HDI::DistributedCamera::V1_1;
 class DCameraSourceInput;
 class DCameraSourceInputChannelListener : public ICameraChannelListener {
 public:

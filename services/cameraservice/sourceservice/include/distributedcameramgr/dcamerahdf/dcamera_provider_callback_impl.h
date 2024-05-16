@@ -16,11 +16,11 @@
 #ifndef OHOS_DCAMERA_PROVIDER_CALLBACK_IMPL_H
 #define OHOS_DCAMERA_PROVIDER_CALLBACK_IMPL_H
 
-#include "v1_0/id_camera_provider_callback.h"
+#include "v1_1/id_camera_provider_callback.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-using namespace OHOS::HDI::DistributedCamera::V1_0;
+using namespace OHOS::HDI::DistributedCamera::V1_1;
 class DCameraSourceDev;
 class DCameraProviderCallbackImpl : public IDCameraProviderCallback {
 public:
@@ -34,6 +34,7 @@ public:
     int32_t StartCapture(const DHBase& dhBase, const std::vector<DCCaptureInfo>& captureInfos) override;
     int32_t StopCapture(const DHBase& dhBase, const std::vector<int>& streamIds) override;
     int32_t UpdateSettings(const DHBase& dhBase, const std::vector<DCameraSettings>& settings) override;
+    int32_t NotifyEvent(const DHBase& dhBase, const DCameraHDFEvent& event) override;
 
 private:
     bool CheckDHBase(const DHBase& dhBase);
