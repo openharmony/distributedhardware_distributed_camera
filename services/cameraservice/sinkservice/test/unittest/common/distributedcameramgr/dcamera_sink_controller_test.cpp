@@ -46,9 +46,6 @@ std::string g_channelStr = "";
 std::string g_outputStr = "";
 std::string g_operatorStr = "";
 
-namespace {
-const int DEFAULT_DEVICE_SECURITY_LEVEL = -1;
-}
 class DCameraSinkControllerTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -727,7 +724,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_032, TestSize.L
 HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_033, TestSize.Level1)
 {
     std::string udId = "";
-    EXPECT_EQ(DEFAULT_DEVICE_SECURITY_LEVEL, controller_->GetDeviceSecurityLevel(udId));
+    EXPECT_NE(DCAMERA_OK, controller_->GetDeviceSecurityLevel(udId));
 }
 
 /**

@@ -212,25 +212,21 @@ int32_t DCameraSinkController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& ope
     srcDevId_ = openInfo->sourceDevId_;
     int32_t ret = sinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_QUERY_RESOURCE, PAGE_SUBTYPE,
         srcDevId_, isSensitive_, isSameAccount_);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("Query resource failed, ret: %{public}d", ret);
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "Query resource failed, ret: %{public}d", ret);
     DHLOGI("OpenChannel isSensitive: %{public}d, isSameAccout: %{public}d", isSensitive_, isSameAccount_);
     if (isSensitive_ && !isSameAccount_) {
         DHLOGE("Privacy resource must be logged in with the same account.");
         return DCAMERA_BAD_VALUE;
     }
 
-    std::string sinkDevId;
-    ret = GetLocalDeviceNetworkId(sinkDevId);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("GetLocalDeviceNetworkId failed, ret: %{public}d", ret);
-        return ret;
-    }
-    if (isSensitive_ && !CheckDeviceSecurityLevel(srcDevId_, sinkDevId)) {
-        DHLOGE("Check device security level failed!");
-        return DCAMERA_BAD_VALUE;
+    if (isCheckSecLevel_) {
+        std::string sinkDevId;
+        ret = GetLocalDeviceNetworkId(sinkDevId);
+        CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "GetLocalDeviceNetworkId failed, ret: %{public}d", ret);
+        if (isSensitive_ && !CheckDeviceSecurityLevel(srcDevId_, sinkDevId)) {
+            DHLOGE("Check device security level failed!");
+            return DCAMERA_BAD_VALUE;
+        }
     }
     DCameraLowLatency::GetInstance().EnableLowLatency();
     std::vector<DCameraIndex> indexs;
@@ -244,9 +240,7 @@ int32_t DCameraSinkController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& ope
         return ret;
     }
     ret = PullUpPage();
-    if (ret != DCAMERA_OK) {
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "PullUpPage failed");
     DHLOGI("DCameraSinkController OpenChannel %{public}s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
 }
