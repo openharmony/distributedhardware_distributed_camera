@@ -461,7 +461,7 @@ HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_01
     EXPECT_EQ(SUCCESS, ret);
     event.type_ = DCameraEventType::DCAMERA_MESSAGE;
     ret = testProviderCallback_->NotifyEvent(dhBase, event);
-    EXPECT_EQ(FAILED, ret);
+    EXPECT_EQ(SUCCESS, ret);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

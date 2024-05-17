@@ -314,6 +314,7 @@ int32_t DCameraProviderCallbackImpl::NotifyEvent(const DHBase& dhBase, const DCa
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return FAILED;
     }
+    DHLOGI("DCameraProviderCallbackImpl NotifyEvent end.");
     return SUCCESS;
 }
 } // namespace DistributedHardware

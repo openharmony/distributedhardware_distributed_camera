@@ -61,10 +61,12 @@ int32_t DCameraSourceRegistState::DoRegisterTask(std::shared_ptr<DCameraSourceDe
     std::shared_ptr<DCameraRegistParam> param;
     int32_t ret = event.GetDCameraRegistParam(param);
     if (ret != DCAMERA_OK) {
+        DHLOGE("DCameraSourceRegistState GetDCameraRegistParam failed");
         return ret;
     }
     ret = camDev->Register(param);
     if (ret != DCAMERA_OK) {
+        DHLOGE("DCameraSourceRegistState Register failed");
         return ret;
     }
     return DCAMERA_OK;
@@ -128,6 +130,10 @@ int32_t DCameraSourceRegistState::DoGetFullCaps(std::shared_ptr<DCameraSourceDev
     DCameraSourceEvent& event)
 {
     DHLOGI("DCameraSourceRegistState DoGetFullCaps enter.");
+    if (camDev == nullptr) {
+        DHLOGE("DCameraSourceRegistState camDev is null.");
+        return DCAMERA_BAD_VALUE;
+    }
     int32_t ret = camDev->GetFullCaps();
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceRegistState DoGetFullCaps GetFullCaps failed, ret: %{public}d", ret);

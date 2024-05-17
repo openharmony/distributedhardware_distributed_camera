@@ -53,7 +53,6 @@ DCameraStateType DCameraSourceInitState::GetStateType()
 
 int32_t DCameraSourceInitState::DoRegisterTask(std::shared_ptr<DCameraSourceDev>& camDev, DCameraSourceEvent& event)
 {
-    DHLOGI("DCameraSourceRegistState DoRegisterTask");
     std::shared_ptr<DCameraRegistParam> param;
     int32_t ret = event.GetDCameraRegistParam(param);
     if (ret != DCAMERA_OK) {
