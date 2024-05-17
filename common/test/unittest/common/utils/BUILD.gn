@@ -42,11 +42,17 @@ ohos_unittest("CommonUtilsTest") {
 
   configs = [ ":module_private_config" ]
 
-  deps = [ "${common_path}:distributed_camera_utils" ]
+  deps = [
+    "${common_path}:distributed_camera_utils",
+    "//third_party/googletest:gmock",
+    "//third_party/googletest:gtest_main",
+  ]
 
   cflags = [
     "-fPIC",
     "-Wall",
+    "-Dprivate=public",
+    "-Dprotected=public",
   ]
 
   external_deps = [
@@ -55,7 +61,7 @@ ohos_unittest("CommonUtilsTest") {
     "access_token:libtoken_setproc",
     "c_utils:utils",
     "distributed_hardware_fwk:distributedhardwareutils",
-    "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
+    "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.1",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "safwk:system_ability_fwk",
@@ -66,6 +72,7 @@ ohos_unittest("CommonUtilsTest") {
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"CommonUtilsTest\"",
     "LOG_DOMAIN=0xD004150",
+    "DCAMERA_MMAP_RESERVE",
   ]
   cflags_cc = cflags
 }

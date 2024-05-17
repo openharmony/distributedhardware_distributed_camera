@@ -21,6 +21,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+extern std::string g_sinkCtrlStr;
 class MockDCameraSinkController : public ICameraController {
 public:
     explicit MockDCameraSinkController(const std::shared_ptr<ICameraSinkAccessControl>& accessControl)
@@ -41,6 +42,9 @@ public:
     }
     int32_t ChannelNeg(std::shared_ptr<DCameraChannelInfo>& info)
     {
+        if (g_sinkCtrlStr == "test_006") {
+            return DCAMERA_BAD_VALUE;
+        }
         return DCAMERA_OK;
     }
     int32_t DCameraNotify(std::shared_ptr<DCameraEvent>& events)
@@ -53,6 +57,9 @@ public:
     }
     int32_t GetCameraInfo(std::shared_ptr<DCameraInfo>& camInfo)
     {
+        if (g_sinkCtrlStr == "test_004") {
+            return DCAMERA_BAD_VALUE;
+        }
         return DCAMERA_OK;
     }
     int32_t OpenChannel(std::shared_ptr<DCameraOpenInfo>& openInfo)
@@ -69,6 +76,9 @@ public:
     }
     int32_t UnInit()
     {
+        if (g_sinkCtrlStr == "test_001") {
+            return DCAMERA_BAD_VALUE;
+        }
         return DCAMERA_OK;
     }
     int32_t PauseDistributedHardware(const std::string &networkId)

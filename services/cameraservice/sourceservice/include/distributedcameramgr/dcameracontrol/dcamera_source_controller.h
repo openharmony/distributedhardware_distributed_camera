@@ -25,7 +25,7 @@
 #include "icamera_channel.h"
 #include "iremote_object.h"
 
-#include "v1_0/id_camera_provider.h"
+#include "v1_1/id_camera_provider.h"
 
 namespace OHOS {
 namespace DistributedHardware {

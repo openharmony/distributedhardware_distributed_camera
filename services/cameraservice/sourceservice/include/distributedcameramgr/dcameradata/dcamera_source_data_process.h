@@ -23,11 +23,11 @@
 #include "dcamera_stream_data_process.h"
 #include "icamera_source_data_process.h"
 
-#include "v1_0/dcamera_types.h"
+#include "v1_1/dcamera_types.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-using namespace OHOS::HDI::DistributedCamera::V1_0;
+using namespace OHOS::HDI::DistributedCamera::V1_1;
 class DCameraSourceDataProcess : public ICameraSourceDataProcess {
 public:
     DCameraSourceDataProcess(std::string devId, std::string dhId, DCStreamType streamType);

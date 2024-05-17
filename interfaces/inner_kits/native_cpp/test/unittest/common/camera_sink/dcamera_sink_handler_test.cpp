@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -197,6 +197,83 @@ HWTEST_F(DCameraSinkHandlerTest, dcamera_sink_handler_test_006, TestSize.Level1)
     loadCallback->OnLoadSystemAbilityFail(systemAbilityId);
     int32_t ret = DCameraSinkHandler::GetInstance().ReleaseSink();
     EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_handler_test_007
+ * @tc.desc: Verify the function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraSinkHandlerTest, dcamera_sink_handler_test_007, TestSize.Level1)
+{
+    int32_t ret = DCameraSinkHandler::GetInstance().ReleaseSink();
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_handler_test_008
+ * @tc.desc: Verify the function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraSinkHandlerTest, dcamera_sink_handler_test_008, TestSize.Level1)
+{
+    std::shared_ptr<PrivacyResourcesListener> listener;
+    int32_t ret = DCameraSinkHandler::GetInstance().RegisterPrivacyResources(listener);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_handler_test_009
+ * @tc.desc: Verify the function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraSinkHandlerTest, dcamera_sink_handler_test_009, TestSize.Level1)
+{
+    std::string networkId = "test009";
+    int32_t ret = DCameraSinkHandler::GetInstance().PauseDistributedHardware(networkId);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = DCameraSinkHandler::GetInstance().ResumeDistributedHardware(networkId);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = DCameraSinkHandler::GetInstance().StopDistributedHardware(networkId);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_handler_test_010
+ * @tc.desc: Verify the function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraSinkHandlerTest, dcamera_sink_handler_test_010, TestSize.Level1)
+{
+    std::string params = "test010";
+    int32_t systemAbilityId = 4804;
+    sptr<ISystemAbilityManager> samgr =
+            SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(systemAbilityId);
+    sptr<DCameraSinkLoadCallback> loadCallback(new DCameraSinkLoadCallback(params));
+    loadCallback->OnLoadSystemAbilitySuccess(systemAbilityId, remoteObject);
+
+    remoteObject = nullptr;
+    loadCallback->OnLoadSystemAbilitySuccess(systemAbilityId, remoteObject);
+    systemAbilityId = 1;
+    loadCallback->OnLoadSystemAbilitySuccess(systemAbilityId, remoteObject);
+    int32_t ret = DCameraSinkHandler::GetInstance().InitSink(params);
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    ret = DCameraSinkHandler::GetInstance().PauseDistributedHardware(params);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = DCameraSinkHandler::GetInstance().ResumeDistributedHardware(params);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = DCameraSinkHandler::GetInstance().StopDistributedHardware(params);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 }
 }

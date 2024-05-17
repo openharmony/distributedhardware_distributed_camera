@@ -370,6 +370,12 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_004, TestSize.Level1)
     ret = client_->StartCapture(captureInfos, pSurface);
     EXPECT_EQ(DCAMERA_OK, ret);
 
+    ret = client_->PauseCapture();
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    ret = client_->ResumeCapture();
+    EXPECT_EQ(DCAMERA_OK, ret);
+
     auto metaData = std::make_shared<Camera::CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
     std::string abilityString = Camera::MetadataUtils::EncodeToString(metaData);
     std::vector<std::shared_ptr<DCameraSettings>> settings;
@@ -665,6 +671,22 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_015, TestSize.Level1)
     auto info = std::make_shared<DCameraCaptureInfo>();
     info->streamType_ = static_cast<DCStreamType>(invalidParam);
     int32_t ret = client_->StartCaptureInner(info);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_client_test_016
+ * @tc.desc: Verify PauseCapture ResumeCapture
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6ML
+ */
+HWTEST_F(DCameraClientTest, dcamera_client_test_016, TestSize.Level1)
+{
+    DHLOGI("DCameraClientTest dcamera_client_test_016: test PauseCapture");
+    int32_t ret = client_->PauseCapture();
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = client_->ResumeCapture();
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 } // namespace DistributedHardware

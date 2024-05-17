@@ -24,13 +24,13 @@
 #include "data_buffer.h"
 #include "dcamera_capture_info_cmd.h"
 #include "dcamera_event_cmd.h"
-#include "v1_0/dcamera_types.h"
+#include "v1_1/dcamera_types.h"
 
 #include "surface.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-using namespace OHOS::HDI::DistributedCamera::V1_0;
+using namespace OHOS::HDI::DistributedCamera::V1_1;
 class StateCallback {
 public:
     StateCallback() = default;

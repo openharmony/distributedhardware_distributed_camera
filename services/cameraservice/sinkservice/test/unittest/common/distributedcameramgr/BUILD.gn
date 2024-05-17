@@ -85,6 +85,7 @@ ohos_unittest("DCameraSinkMgrTest") {
     "${services_path}/cameraservice/cameraoperator/handler:distributed_camera_handler",
     "${services_path}/cameraservice/sinkservice:distributed_camera_sink",
     "${services_path}/channel:distributed_camera_channel",
+    "${services_path}/data_process:distributed_camera_data_process",
   ]
 
   external_deps = [
@@ -97,7 +98,7 @@ ohos_unittest("DCameraSinkMgrTest") {
     "device_manager:devicemanagersdk",
     "distributed_hardware_fwk:distributedhardwareutils",
     "drivers_interface_camera:metadata",
-    "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
+    "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.1",
     "drivers_peripheral_display:hdi_gralloc_client",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",

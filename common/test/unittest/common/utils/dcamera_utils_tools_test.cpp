@@ -198,5 +198,28 @@ HWTEST_F(DcameraUtilsToolsTest, IsOverDumpSize_001, TestSize.Level1)
     DumpBufferToFile(fileName, str, size);
     IsUnderDumpMaxSize(fileName);
 }
+
+/**
+ * @tc.name: IsUnderDumpMaxSize_001
+ * @tc.desc: Verify the IsUnderDumpMaxSize.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DcameraUtilsToolsTest, IsUnderDumpMaxSize_001, TestSize.Level1)
+{
+    std::string longFileName(PATH_MAX + 1, 'a');
+    EXPECT_EQ(IsUnderDumpMaxSize(longFileName), DCAMERA_INIT_ERR);
+}
+
+/**
+ * @tc.name: IsUnderDumpMaxSize_002
+ * @tc.desc: Verify the IsUnderDumpMaxSize.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DcameraUtilsToolsTest, IsUnderDumpMaxSize_002, TestSize.Level1)
+{
+    EXPECT_EQ(IsUnderDumpMaxSize("/nonexistent/file"), DCAMERA_INIT_ERR);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
