@@ -445,5 +445,23 @@ HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_01
     ret = testProviderCallback->StopCapture(dhBase, streamIds);
     EXPECT_EQ(FAILED, ret);
 }
+
+/**
+ * @tc.name: dcamera_provider_callback_impl_test_014
+ * @tc.desc: Verify NotifyEvent func.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_014, TestSize.Level1)
+{
+    DHBase dhBase{TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0};
+    DCameraHDFEvent event;
+    event.type_ = DCameraEventType::DCAMERE_GETFULLCAP;
+    int32_t ret = testProviderCallback_->NotifyEvent(dhBase, event);
+    EXPECT_EQ(SUCCESS, ret);
+    event.type_ = DCameraEventType::DCAMERA_MESSAGE;
+    ret = testProviderCallback_->NotifyEvent(dhBase, event);
+    EXPECT_EQ(FAILED, ret);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

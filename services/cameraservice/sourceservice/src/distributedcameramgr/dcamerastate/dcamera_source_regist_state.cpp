@@ -57,9 +57,16 @@ DCameraStateType DCameraSourceRegistState::GetStateType()
 
 int32_t DCameraSourceRegistState::DoRegisterTask(std::shared_ptr<DCameraSourceDev>& camDev, DCameraSourceEvent& event)
 {
-    DHLOGI("DCameraSourceRegistState DoRegisterTask Idempotent");
-    (void)camDev;
-    (void)event;
+    DHLOGI("DCameraSourceRegistState DoRegisterTask");
+    std::shared_ptr<DCameraRegistParam> param;
+    int32_t ret = event.GetDCameraRegistParam(param);
+    if (ret != DCAMERA_OK) {
+        return ret;
+    }
+    ret = camDev->Register(param);
+    if (ret != DCAMERA_OK) {
+        return ret;
+    }
     return DCAMERA_OK;
 }
 
@@ -121,15 +128,9 @@ int32_t DCameraSourceRegistState::DoGetFullCaps(std::shared_ptr<DCameraSourceDev
     DCameraSourceEvent& event)
 {
     DHLOGI("DCameraSourceRegistState DoGetFullCaps enter.");
-    std::shared_ptr<DCameraEvent> camEvent;
-    int32_t ret = event.GetCameraEvent(camEvent);
+    int32_t ret = camDev->GetFullCaps();
     if (ret != DCAMERA_OK) {
-        return ret;
-    }
-
-    ret = camDev->GetFullCaps();
-    if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceRegistState DoEventNofityTask CameraEventNotify failed, ret: %{public}d", ret);
+        DHLOGE("DCameraSourceRegistState DoGetFullCaps GetFullCaps failed, ret: %{public}d", ret);
         return ret;
     }
     return DCAMERA_OK;
