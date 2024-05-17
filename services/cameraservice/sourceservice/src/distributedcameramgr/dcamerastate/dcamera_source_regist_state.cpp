@@ -30,6 +30,7 @@ DCameraSourceRegistState::DCameraSourceRegistState(std::shared_ptr<DCameraSource
     memberFuncMap_[DCAMERA_EVENT_OPEN] = &DCameraSourceRegistState::DoOpenTask;
     memberFuncMap_[DCAMERA_EVENT_CLOSE] = &DCameraSourceRegistState::DoCloseTask;
     memberFuncMap_[DCAMERA_EVENT_NOFIFY] = &DCameraSourceRegistState::DoEventNofityTask;
+    memberFuncMap_[DCAMERA_EVENT_GET_FULLCAPS] = &DCameraSourceRegistState::DoGetFullCaps;
 }
 
 int32_t DCameraSourceRegistState::Execute(std::shared_ptr<DCameraSourceDev>& camDev, DCAMERA_EVENT eventType,
@@ -56,9 +57,18 @@ DCameraStateType DCameraSourceRegistState::GetStateType()
 
 int32_t DCameraSourceRegistState::DoRegisterTask(std::shared_ptr<DCameraSourceDev>& camDev, DCameraSourceEvent& event)
 {
-    DHLOGI("DCameraSourceRegistState DoRegisterTask Idempotent");
-    (void)camDev;
-    (void)event;
+    DHLOGI("DCameraSourceRegistState DoRegisterTask");
+    std::shared_ptr<DCameraRegistParam> param;
+    int32_t ret = event.GetDCameraRegistParam(param);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("DCameraSourceRegistState GetDCameraRegistParam failed");
+        return ret;
+    }
+    ret = camDev->Register(param);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("DCameraSourceRegistState Register failed");
+        return ret;
+    }
     return DCAMERA_OK;
 }
 
@@ -111,6 +121,22 @@ int32_t DCameraSourceRegistState::DoEventNofityTask(std::shared_ptr<DCameraSourc
     ret = camDev->CameraEventNotify(camEvent);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceRegistState DoEventNofityTask CameraEventNotify failed, ret: %{public}d", ret);
+        return ret;
+    }
+    return DCAMERA_OK;
+}
+
+int32_t DCameraSourceRegistState::DoGetFullCaps(std::shared_ptr<DCameraSourceDev>& camDev,
+    DCameraSourceEvent& event)
+{
+    DHLOGI("DCameraSourceRegistState DoGetFullCaps enter.");
+    if (camDev == nullptr) {
+        DHLOGE("DCameraSourceRegistState camDev is null.");
+        return DCAMERA_BAD_VALUE;
+    }
+    int32_t ret = camDev->GetFullCaps();
+    if (ret != DCAMERA_OK) {
+        DHLOGE("DCameraSourceRegistState DoGetFullCaps GetFullCaps failed, ret: %{public}d", ret);
         return ret;
     }
     return DCAMERA_OK;

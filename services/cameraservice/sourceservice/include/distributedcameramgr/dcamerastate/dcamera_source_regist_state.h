@@ -36,6 +36,7 @@ private:
     int32_t DoOpenTask(std::shared_ptr<DCameraSourceDev>& camDev, DCameraSourceEvent& event);
     int32_t DoCloseTask(std::shared_ptr<DCameraSourceDev>& camDev, DCameraSourceEvent& event);
     int32_t DoEventNofityTask(std::shared_ptr<DCameraSourceDev>& camDev, DCameraSourceEvent& event);
+    int32_t DoGetFullCaps(std::shared_ptr<DCameraSourceDev>& camDev, DCameraSourceEvent& event);
 
     using DCameraFunc = int32_t (DCameraSourceRegistState::*)(std::shared_ptr<DCameraSourceDev>& camDev,
         DCameraSourceEvent& event);

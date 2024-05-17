@@ -32,8 +32,15 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+enum DcameraBusinessState : int32_t {
+    UNKNOWN,
+    IDLE,
+    RUNNING,
+    PAUSING
+};
 const uint32_t EVENT_SOURCE_DEV_PROCESS = 0;
 const uint32_t EVENT_HICOLLIE = 1;
+const uint32_t EVENT_PROCESS_HDF_NOTIFY = 2;
 class DCameraSourceDev : public std::enable_shared_from_this<DCameraSourceDev> {
 public:
     explicit DCameraSourceDev(std::string devId, std::string dhId, std::shared_ptr<ICameraStateListener>& stateLisener);
@@ -52,6 +59,7 @@ public:
     int32_t StartCameraCapture(const std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos);
     int32_t StopCameraCapture(const std::vector<int>& streamIds);
     int32_t UpdateCameraSettings(const std::vector<std::shared_ptr<DCameraSettings>>& settings);
+    int32_t ProcessHDFEvent(const DCameraHDFEvent& event);
 
     int32_t GetStateInfo();
     std::string GetVersion();
@@ -60,6 +68,7 @@ public:
     int32_t PostHicollieEvent();
     void SetHicollieFlag(bool flag);
     bool GetHicollieFlag();
+    int32_t GetFullCaps();
 
     class DCameraSourceDevEventHandler : public AppExecFwk::EventHandler {
         public:
@@ -95,6 +104,7 @@ private:
     void HitraceAndHisyseventImpl(std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos);
     int32_t ParseEnableParam(std::shared_ptr<DCameraRegistParam>& param, std::string& ability);
     void DoProcessData(const AppExecFwk::InnerEvent::Pointer &event);
+    void DoProcesHDFEvent(const AppExecFwk::InnerEvent::Pointer &event);
     void DoHicollieProcess();
 
 private:

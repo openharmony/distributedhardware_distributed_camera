@@ -301,6 +301,20 @@ int32_t DCameraProviderCallbackImpl::UpdateSettings(const DHBase& dhBase, const 
 
 int32_t DCameraProviderCallbackImpl::NotifyEvent(const DHBase& dhBase, const DCameraHDFEvent& event)
 {
+    DHLOGI("DCameraProviderCallbackImpl NotifyEvent enter.");
+    std::shared_ptr<DCameraSourceDev> sourceDev = sourceDev_.lock();
+    if (sourceDev == nullptr) {
+        DHLOGE("Process Event failed, can not get device, devId: %{public}s, dhId: %{public}s",
+            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        return FAILED;
+    }
+    int32_t ret = sourceDev->ProcessHDFEvent(event);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("Process Event failed, ret: %{public}d, devId: %{public}s, dhId: %{public}s", ret,
+            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        return FAILED;
+    }
+    DHLOGI("DCameraProviderCallbackImpl NotifyEvent end.");
     return SUCCESS;
 }
 } // namespace DistributedHardware
