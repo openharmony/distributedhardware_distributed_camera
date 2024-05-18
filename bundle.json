@@ -29,6 +29,7 @@
                 "access_token",
                 "accessibility",
                 "ipc",
+                "init",
                 "eventhandler",
                 "camera_framework",
                 "graphic_surface",

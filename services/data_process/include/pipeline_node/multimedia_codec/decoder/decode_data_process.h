@@ -40,6 +40,7 @@
 #include "dcamera_pipeline_source.h"
 #include "distributed_camera_errno.h"
 #include "image_common_type.h"
+#include "dcamera_utils_tools.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -158,6 +159,8 @@ private:
     std::queue<std::shared_ptr<Media::AVSharedMemory>> availableInputBufferQueue_;
     std::queue<uint32_t> availableInputIndexsQueue_;
     std::deque<DCameraFrameInfo> frameInfoDeque_;
+    FILE *dumpDecBeforeFile_ = nullptr;
+    FILE *dumpDecAfterFile_ = nullptr;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

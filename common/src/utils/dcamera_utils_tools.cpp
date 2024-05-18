@@ -18,10 +18,13 @@
 #include <chrono>
 #include <dlfcn.h>
 #include <string>
+#include <sstream>
+#include <ostream>
 
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
+#include "parameter.h"
 
 #include "softbus_bus_center.h"
 
@@ -286,5 +289,96 @@ const OHOS::OpenSourceLibyuv::ImageConverter& ConverterHandle::GetHandle()
     return converter_;
 }
 #endif
+
+template <typename T>
+bool GetSysPara(const char *key, T &value)
+{
+    CHECK_AND_RETURN_RET_LOG(key == nullptr, false, "key is nullptr");
+    char paraValue[30] = {0}; // 30 for system parameter
+    auto res = GetParameter(key, "-1", paraValue, sizeof(paraValue));
+
+    CHECK_AND_RETURN_RET_LOG(res <= 0, false, "GetParameter fail, key:%{public}s res:%{public}d", key, res);
+    DHLOGI("GetSysPara key:%{public}s value:%{public}s", key, paraValue);
+    std::stringstream valueStr;
+    valueStr << paraValue;
+    valueStr >> value;
+    return true;
+}
+
+template bool GetSysPara(const char *key, int32_t &value);
+template bool GetSysPara(const char *key, uint32_t &value);
+template bool GetSysPara(const char *key, int64_t &value);
+template bool GetSysPara(const char *key, std::string &value);
+
+std::map<std::string, std::string> DumpFileUtil::g_lastPara = {};
+
+FILE *DumpFileUtil::OpenDumpFileInner(std::string para, std::string fileName)
+{
+    std::string filePath = DUMP_SERVICE_DIR + fileName;
+    std::string dumpPara;
+    FILE *dumpFile = nullptr;
+    bool res = GetSysPara(para.c_str(), dumpPara);
+    if (!res || dumpPara.empty()) {
+        DHLOGI("%{public}s is not set, dump dcamera is not required", para.c_str());
+        g_lastPara[para] = dumpPara;
+        return dumpFile;
+    }
+    DHLOGI("%{public}s = %{public}s, filePath: %{public}s", para.c_str(), dumpPara.c_str(), filePath.c_str());
+    if (dumpPara == "w") {
+        dumpFile = fopen(filePath.c_str(), "wb+");
+        CHECK_AND_RETURN_RET_LOG(dumpFile == nullptr, dumpFile, "Error opening dump file!");
+    } else if (dumpPara == "a") {
+        dumpFile = fopen(filePath.c_str(), "ab+");
+        CHECK_AND_RETURN_RET_LOG(dumpFile == nullptr, dumpFile, "Error opening dump file!");
+    }
+    g_lastPara[para] = dumpPara;
+    return dumpFile;
+}
+
+void DumpFileUtil::WriteDumpFile(FILE *dumpFile, void *buffer, size_t bufferSize)
+{
+    if (dumpFile == nullptr) {
+        return;
+    }
+    CHECK_AND_RETURN_LOG(buffer == nullptr, "Invalid write param");
+    size_t writeResult = fwrite(buffer, 1, bufferSize, dumpFile);
+    CHECK_AND_RETURN_LOG(writeResult != bufferSize, "Failed to write the file.");
+}
+
+void DumpFileUtil::CloseDumpFile(FILE **dumpFile)
+{
+    if (*dumpFile) {
+        fclose(*dumpFile);
+        *dumpFile = nullptr;
+    }
+}
+
+void DumpFileUtil::ChangeDumpFileState(std::string para, FILE **dumpFile, std::string filePath)
+{
+    CHECK_AND_RETURN_LOG(*dumpFile == nullptr, "Invalid file para");
+    CHECK_AND_RETURN_LOG(g_lastPara[para] != "w" || g_lastPara[para] != "a", "Invalid input para");
+    std::string dumpPara;
+    bool res = GetSysPara(para.c_str(), dumpPara);
+    if (!res || dumpPara.empty()) {
+        DHLOGE("get %{public}s fail", para.c_str());
+    }
+    if (g_lastPara[para] == "w" && dumpPara == "w") {
+        return;
+    }
+    CloseDumpFile(dumpFile);
+    OpenDumpFile(para, filePath, dumpFile);
+}
+
+void DumpFileUtil::OpenDumpFile(std::string para, std::string fileName, FILE **file)
+{
+    if (*file != nullptr) {
+        DumpFileUtil::ChangeDumpFileState(para, file, fileName);
+        return;
+    }
+
+    if (para == DUMP_SERVER_PARA) {
+        *file = DumpFileUtil::OpenDumpFileInner(para, fileName);
+    }
+}
 } // namespace DistributedHardware
 } // namespace OHOS
