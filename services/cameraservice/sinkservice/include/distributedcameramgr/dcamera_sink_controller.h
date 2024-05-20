@@ -101,6 +101,7 @@ private:
     std::shared_ptr<DmInitCallback> initCallback_;
     bool isSensitive_ = false;
     bool isSameAccount_ = false;
+    bool isCheckSecLevel_ = false;
 
     const std::string SESSION_FLAG = "control";
     const std::string SRC_TYPE = "camera";
