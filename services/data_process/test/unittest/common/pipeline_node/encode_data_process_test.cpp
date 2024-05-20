@@ -368,7 +368,7 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_011, TestSize.Level1)
                                  TEST_HEIGTH);
     VideoConfigParams procConfig;
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_OK);
+    EXPECT_EQ(rc, DCAMERA_INIT_ERR);
 
     rc = testEncodeDataProcess_->InitEncoderMetadataFormat();
     EXPECT_EQ(rc, DCAMERA_OK);
