@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include "dcamera_utils_tools.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -24,6 +23,7 @@ namespace OHOS {
 namespace DistributedHardware {
 ScaleConvertProcess::~ScaleConvertProcess()
 {
+    DumpFileUtil::CloseDumpFile(&dumpFile_);
     if (isScaleConvert_.load()) {
         DHLOGI("~ScaleConvertProcess : ReleaseProcessNode");
         ReleaseProcessNode();
@@ -119,6 +119,7 @@ int ScaleConvertProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& i
         return DCAMERA_BAD_VALUE;
     }
     inputBuffers[0]->frameInfo_.timePonit.startScale = startScaleTime;
+    DumpFileUtil::OpenDumpFile(DUMP_SERVER_PARA, DUMP_DCAMERA_AFTER_SCALE_FILENAME, &dumpFile_);
 
     if (!IsConvertible(sourceConfig_, processedConfig_)) {
         DHLOGD("The target resolution: %{public}dx%{public}d format: %{public}d is the same as the source "
@@ -150,6 +151,7 @@ int ScaleConvertProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& i
     dstBuf->SetInt32("width", processedConfig_.GetWidth());
     dstBuf->SetInt32("height", processedConfig_.GetHeight());
 
+    DumpFileUtil::WriteDumpFile(dumpFile_, static_cast<void *>(dstBuf->Data()), dstBuf->Size());
     std::vector<std::shared_ptr<DataBuffer>> outputBuffers;
     outputBuffers.push_back(dstBuf);
     return ConvertDone(outputBuffers);

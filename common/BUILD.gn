@@ -68,6 +68,7 @@ ohos_shared_library("distributed_camera_utils") {
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
+    "init:libbegetutil",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]

@@ -20,6 +20,7 @@
 #include <cstdint>
 #include <string>
 #include <fstream>
+#include <map>
 
 #ifdef DCAMERA_MMAP_RESERVE
 #include "image_converter.h"
@@ -56,6 +57,24 @@ private:
     OHOS::OpenSourceLibyuv::ImageConverter converter_ = {0};
 };
 #endif
+
+const std::string DUMP_SERVER_PARA = "sys.dcamera.dump.write.enable";
+const std::string DUMP_SERVICE_DIR = "/data/local/tmp/";
+const std::string DUMP_DCAMERA_AFTER_ENC_FILENAME = "dump_after_enc_dcamsink.h265";
+const std::string DUMP_DCAMERA_BEFORE_DEC_FILENAME = "dump_before_dec_dcamsource.h265";
+const std::string DUMP_DCAMERA_AFTER_DEC_FILENAME = "dump_after_dec_dcamsource.yuv";
+const std::string DUMP_DCAMERA_AFTER_SCALE_FILENAME = "dump_after_scale_dcamsource.yuv";
+
+class DumpFileUtil {
+public:
+    static void WriteDumpFile(FILE *dumpFile, void *buffer, size_t bufferSize);
+    static void CloseDumpFile(FILE **dumpFile);
+    static std::map<std::string, std::string> g_lastPara;
+    static void OpenDumpFile(std::string para, std::string fileName, FILE **file);
+private:
+    static FILE *OpenDumpFileInner(std::string para, std::string fileName);
+    static void ChangeDumpFileState(std::string para, FILE **dumpFile, std::string fileName);
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DCAMERA_UTILS_TOOL_H

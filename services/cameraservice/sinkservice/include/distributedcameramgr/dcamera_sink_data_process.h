@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,6 +25,7 @@
 #include "icamera_sink_data_process.h"
 #include "idata_process_pipeline.h"
 #include "image_common_type.h"
+#include "dcamera_utils_tools.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -60,6 +61,7 @@ private:
     std::thread eventThread_;
     std::condition_variable eventCon_;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_;
+    FILE *dumpFile_ = nullptr;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

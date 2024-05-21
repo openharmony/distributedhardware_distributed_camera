@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,7 +20,6 @@
 #include "dcamera_pipeline_sink.h"
 #include "dcamera_sink_data_process_listener.h"
 #include "dcamera_hidumper.h"
-#include "dcamera_utils_tools.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -42,6 +41,7 @@ DCameraSinkDataProcess::~DCameraSinkDataProcess()
     }
     eventThread_.join();
     eventHandler_ = nullptr;
+    DumpFileUtil::CloseDumpFile(&dumpFile_);
 }
 
 void DCameraSinkDataProcess::Init()
@@ -71,6 +71,7 @@ int32_t DCameraSinkDataProcess::StartCapture(std::shared_ptr<DCameraCaptureInfo>
     DHLOGI("StartCapture dhId: %{public}s, width: %{public}d, height: %{public}d, format: %{public}d, stream: "
         "%{public}d, encode: %{public}d", GetAnonyString(dhId_).c_str(), captureInfo->width_, captureInfo->height_,
         captureInfo->format_, captureInfo->streamType_, captureInfo->encodeType_);
+    DumpFileUtil::OpenDumpFile(DUMP_SERVER_PARA, DUMP_DCAMERA_AFTER_ENC_FILENAME, &dumpFile_);
     captureInfo_ = captureInfo;
     if (pipeline_ != nullptr) {
         DHLOGI("StartCapture %{public}s pipeline already exits", GetAnonyString(dhId_).c_str());
@@ -164,6 +165,7 @@ void DCameraSinkDataProcess::OnProcessedVideoBuffer(const std::shared_ptr<DataBu
         DumpBufferToFile(DUMP_PATH + AFTER_ENCODE, videoResult->Data(), videoResult->Size());
     }
 #endif
+    DumpFileUtil::WriteDumpFile(dumpFile_, static_cast<void *>(videoResult->Data()), videoResult->Size());
     SendDataAsync(videoResult);
 }
 

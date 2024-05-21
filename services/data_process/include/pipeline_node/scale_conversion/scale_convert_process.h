@@ -36,6 +36,7 @@ extern "C" {
 
 #include "dcamera_pipeline_source.h"
 #include "image_common_type.h"
+#include "dcamera_utils_tools.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -100,6 +101,7 @@ private:
     VideoConfigParams processedConfig_;
     std::weak_ptr<DCameraPipelineSource> callbackPipelineSource_;
     std::atomic<bool> isScaleConvert_ = false;
+    FILE *dumpFile_ = nullptr;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

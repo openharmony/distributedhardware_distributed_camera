@@ -19,7 +19,6 @@
 #include "distributed_hardware_log.h"
 #include "dcamera_hisysevent_adapter.h"
 #include "dcamera_hidumper.h"
-#include "dcamera_utils_tools.h"
 #include "decode_surface_listener.h"
 #include "decode_video_callback.h"
 #include "graphic_common_c.h"
@@ -32,6 +31,8 @@ const std::string ENUM_VIDEOFORMAT_STRINGS[] = {
 
 DecodeDataProcess::~DecodeDataProcess()
 {
+    DumpFileUtil::CloseDumpFile(&dumpDecBeforeFile_);
+    DumpFileUtil::CloseDumpFile(&dumpDecAfterFile_);
     if (isDecoderProcess_.load()) {
         DHLOGD("~DecodeDataProcess : ReleaseProcessNode.");
         ReleaseProcessNode();
@@ -323,6 +324,8 @@ int32_t DecodeDataProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>&
         DHLOGE("The input data buffers is empty.");
         return DCAMERA_BAD_VALUE;
     }
+    DumpFileUtil::OpenDumpFile(DUMP_SERVER_PARA, DUMP_DCAMERA_BEFORE_DEC_FILENAME, &dumpDecBeforeFile_);
+    DumpFileUtil::OpenDumpFile(DUMP_SERVER_PARA, DUMP_DCAMERA_AFTER_DEC_FILENAME, &dumpDecAfterFile_);
     if (sourceConfig_.GetVideoCodecType() == processedConfig_.GetVideoCodecType()) {
         DHLOGD("The target VideoCodecType : %{public}d is the same as the source VideoCodecType : %{public}d.",
             sourceConfig_.GetVideoCodecType(), processedConfig_.GetVideoCodecType());
@@ -397,10 +400,8 @@ int32_t DecodeDataProcess::FeedDecoderInputBuffer()
         int64_t timeStamp = buffer->frameInfo_.pts;
         {
             std::lock_guard<std::mutex> inputLock(mtxDecoderLock_);
-            if (videoDecoder_ == nullptr) {
-                DHLOGE("The video decoder does not exist before GetInputBuffer.");
-                return DCAMERA_OK;
-            }
+            CHECK_AND_RETURN_RET_LOG(
+                videoDecoder_ == nullptr, DCAMERA_OK, "The video decoder does not exist before GetInputBuffer.");
             uint32_t index = availableInputIndexsQueue_.front();
             std::shared_ptr<Media::AVSharedMemory> sharedMemoryInput = availableInputBufferQueue_.front();
             if (sharedMemoryInput == nullptr) {
@@ -408,12 +409,10 @@ int32_t DecodeDataProcess::FeedDecoderInputBuffer()
                 return DCAMERA_BAD_VALUE;
             }
             BeforeDecodeDump(buffer->Data(), buffer->Size());
+            DumpFileUtil::WriteDumpFile(dumpDecBeforeFile_, static_cast<void *>(buffer->Data()), buffer->Size());
             size_t inputMemoDataSize = static_cast<size_t>(sharedMemoryInput->GetSize());
             errno_t err = memcpy_s(sharedMemoryInput->GetBase(), inputMemoDataSize, buffer->Data(), buffer->Size());
-            if (err != EOK) {
-                DHLOGE("memcpy_s buffer failed.");
-                return DCAMERA_MEMORY_OPT_ERROR;
-            }
+            CHECK_AND_RETURN_RET_LOG(err != EOK, DCAMERA_MEMORY_OPT_ERROR, "memcpy_s buffer failed.");
             DHLOGD("Decoder input buffer size %{public}zu, timeStamp %{public}" PRId64"us.", buffer->Size(), timeStamp);
             MediaAVCodec::AVCodecBufferInfo bufferInfo {timeStamp, static_cast<int32_t>(buffer->Size()), 0};
             int32_t ret = videoDecoder_->QueueInputBuffer(index, bufferInfo,
@@ -558,6 +557,7 @@ void DecodeDataProcess::CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int3
         DumpBufferToFile(DUMP_PATH + fileName, bufferOutput->Data(), bufferOutput->Size());
     }
 #endif
+    DumpFileUtil::WriteDumpFile(dumpDecAfterFile_, static_cast<void *>(bufferOutput->Data()), bufferOutput->Size());
     PostOutputDataBuffers(bufferOutput);
 }
 
