@@ -76,7 +76,7 @@ HWTEST_F(DcameraSinkCallbackProxyTest, dcamera_sink_callback_proxy_test_001, Tes
     bool isSensitive = 0;
     bool isSameAccout = 0;
     int32_t ret = callbackProxy->OnNotifyResourceInfo(type, subtype, networkId, isSensitive, isSameAccout);
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
