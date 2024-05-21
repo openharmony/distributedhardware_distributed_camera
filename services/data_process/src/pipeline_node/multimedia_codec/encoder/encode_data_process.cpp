@@ -567,6 +567,7 @@ int32_t EncodeDataProcess::GetProperty(const std::string& propertyName, Property
     }
     CHECK_AND_RETURN_RET_LOG(encodeProducerSurface_ == nullptr, DCAMERA_BAD_VALUE, "%{public}s",
         "EncodeDataProcess::GetProperty: encode dataProcess get property fail, encode surface is nullptr.");
+    encodeProducerSurface_->SetDefaultUsage(encodeProducerSurface_->GetDefaultUsage() & (~BUFFER_USAGE_VIDEO_ENCODER));
     return propertyCarrier.CarrySurfaceProperty(encodeProducerSurface_);
 }
 } // namespace DistributedHardware
