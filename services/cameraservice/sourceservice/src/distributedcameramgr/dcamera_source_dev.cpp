@@ -157,7 +157,6 @@ int32_t DCameraSourceDev::OpenSession(DCameraIndex& camIndex)
 {
     DHLOGI("DCameraSourceDev PostTask OpenSession devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
-    std::shared_ptr<DCameraIndex> dCamIndex = std::make_shared<DCameraIndex>(camIndex);
     DCameraSourceEvent event(DCAMERA_EVENT_OPEN, camIndex);
     std::shared_ptr<DCameraSourceEvent> eventParam = std::make_shared<DCameraSourceEvent>(event);
     CHECK_AND_RETURN_RET_LOG(srcDevEventHandler_ == nullptr, DCAMERA_BAD_VALUE, "srcDevEventHandler_ is nullptr.");
@@ -171,7 +170,6 @@ int32_t DCameraSourceDev::CloseSession(DCameraIndex& camIndex)
 {
     DHLOGI("DCameraSourceDev PostTask CloseSession devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
-    std::shared_ptr<DCameraIndex> dCamIndex = std::make_shared<DCameraIndex>(camIndex);
     DCameraSourceEvent event(DCAMERA_EVENT_CLOSE, camIndex);
     std::shared_ptr<DCameraSourceEvent> eventParam = std::make_shared<DCameraSourceEvent>(event);
     CHECK_AND_RETURN_RET_LOG(srcDevEventHandler_ == nullptr, DCAMERA_BAD_VALUE, "srcDevEventHandler_ is nullptr.");
@@ -185,8 +183,6 @@ int32_t DCameraSourceDev::ConfigCameraStreams(const std::vector<std::shared_ptr<
 {
     DHLOGI("DCameraSourceDev PostTask ConfigStreams devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
-    std::shared_ptr<std::vector<std::shared_ptr<DCStreamInfo>>> streams =
-        std::make_shared<std::vector<std::shared_ptr<DCStreamInfo>>>(streamInfos);
     DCameraSourceEvent event(DCAMERA_EVENT_CONFIG_STREAMS, streamInfos);
     std::shared_ptr<DCameraSourceEvent> eventParam = std::make_shared<DCameraSourceEvent>(event);
     CHECK_AND_RETURN_RET_LOG(srcDevEventHandler_ == nullptr, DCAMERA_BAD_VALUE, "srcDevEventHandler_ is nullptr.");
@@ -200,7 +196,6 @@ int32_t DCameraSourceDev::ReleaseCameraStreams(const std::vector<int>& streamIds
 {
     DHLOGI("DCameraSourceDev PostTask ReleaseStreams devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
-    std::shared_ptr<std::vector<int>> ids = std::make_shared<std::vector<int>>(streamIds);
     DCameraSourceEvent event(DCAMERA_EVENT_RELEASE_STREAMS, streamIds);
     std::shared_ptr<DCameraSourceEvent> eventParam = std::make_shared<DCameraSourceEvent>(event);
     CHECK_AND_RETURN_RET_LOG(srcDevEventHandler_ == nullptr, DCAMERA_BAD_VALUE, "srcDevEventHandler_ is nullptr.");
@@ -214,8 +209,6 @@ int32_t DCameraSourceDev::StartCameraCapture(const std::vector<std::shared_ptr<D
 {
     DHLOGI("DCameraSourceDev PostTask StartCapture devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
-    std::shared_ptr<std::vector<std::shared_ptr<DCCaptureInfo>>> capInfos =
-        std::make_shared<std::vector<std::shared_ptr<DCCaptureInfo>>>(captureInfos);
     DCameraSourceEvent event(DCAMERA_EVENT_START_CAPTURE, captureInfos);
     std::shared_ptr<DCameraSourceEvent> eventParam = std::make_shared<DCameraSourceEvent>(event);
     CHECK_AND_RETURN_RET_LOG(srcDevEventHandler_ == nullptr, DCAMERA_BAD_VALUE, "srcDevEventHandler_ is nullptr.");
@@ -229,7 +222,6 @@ int32_t DCameraSourceDev::StopCameraCapture(const std::vector<int>& streamIds)
 {
     DHLOGI("DCameraSourceDev PostTask StopCapture devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
-    std::shared_ptr<std::vector<int>> ids = std::make_shared<std::vector<int>>(streamIds);
     DCameraSourceEvent event(DCAMERA_EVENT_STOP_CAPTURE, streamIds);
     std::shared_ptr<DCameraSourceEvent> eventParam = std::make_shared<DCameraSourceEvent>(event);
     CHECK_AND_RETURN_RET_LOG(srcDevEventHandler_ == nullptr, DCAMERA_BAD_VALUE, "srcDevEventHandler_ is nullptr.");
@@ -243,8 +235,6 @@ int32_t DCameraSourceDev::UpdateCameraSettings(const std::vector<std::shared_ptr
 {
     DHLOGI("DCameraSourceDev PostTask UpdateCameraSettings devId %{public}s dhId %{public}s",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
-    std::shared_ptr<std::vector<std::shared_ptr<DCameraSettings>>> dcamSettins =
-        std::make_shared<std::vector<std::shared_ptr<DCameraSettings>>>(settings);
     DCameraSourceEvent event(DCAMERA_EVENT_UPDATE_SETTINGS, settings);
     std::shared_ptr<DCameraSourceEvent> eventParam = std::make_shared<DCameraSourceEvent>(event);
     CHECK_AND_RETURN_RET_LOG(srcDevEventHandler_ == nullptr, DCAMERA_BAD_VALUE, "srcDevEventHandler_ is nullptr.");
