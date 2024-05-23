@@ -132,5 +132,68 @@ HWTEST_F(DcameraSourceCallbackProxyTest, dcamera_source_callback_proxy_test_003,
     ret = callbackProxy->OnNotifyUnregResult(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, TEST_REQID, status, TEST_ATTRS);
     EXPECT_EQ(DCAMERA_OK, status);
 }
+
+/**
+ * @tc.name: CheckParams_001
+ * @tc.desc: Verify the CheckParams function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSourceCallbackProxyTest, CheckParams_001, TestSize.Level1)
+{
+    DHLOGI("DcameraSourceCallbackProxyTest::CheckParams_001");
+    sptr<ISystemAbilityManager> samgr =
+        SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID);
+    sptr<DCameraSourceCallbackProxy> callbackProxy(new DCameraSourceCallbackProxy(remoteObject));
+
+    EXPECT_EQ(false, callbackProxy->CheckParams("", "dhId", 0));
+    EXPECT_EQ(false, callbackProxy->CheckParams("devId", "", 0));
+
+    std::string devId(257, '1');
+    EXPECT_EQ(false, callbackProxy->CheckParams(devId, "dhId", 0));
+
+    std::string dhId(257, '1');
+    EXPECT_EQ(false, callbackProxy->CheckParams("devId", dhId, 0));
+
+    EXPECT_EQ(false, callbackProxy->CheckParams("devId", "dhId", -1));
+    EXPECT_EQ(true, callbackProxy->CheckParams("devId", "dhId", 0));
+}
+
+/**
+ * @tc.name: OnDataSyncTrigger_001
+ * @tc.desc: Verify the OnDataSyncTrigger function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSourceCallbackProxyTest, OnDataSyncTrigger_001, TestSize.Level1)
+{
+    DHLOGI("DcameraSourceCallbackProxyTest::OnDataSyncTrigger_001");
+    sptr<ISystemAbilityManager> samgr =
+        SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID);
+    sptr<DCameraSourceCallbackProxy> callbackProxy(new DCameraSourceCallbackProxy(remoteObject));
+
+    EXPECT_EQ(DCAMERA_BAD_VALUE, callbackProxy->OnDataSyncTrigger(""));
+    std::string devId(257, '1');
+    EXPECT_EQ(DCAMERA_BAD_VALUE, callbackProxy->OnDataSyncTrigger(devId));
+}
+
+/**
+ * @tc.name: OnHardwareStateChanged_001
+ * @tc.desc: Verify the OnHardwareStateChanged function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSourceCallbackProxyTest, OnHardwareStateChanged_001, TestSize.Level1)
+{
+    DHLOGI("DcameraSourceCallbackProxyTest::OnHardwareStateChanged_001");
+    sptr<ISystemAbilityManager> samgr =
+        SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID);
+    sptr<DCameraSourceCallbackProxy> callbackProxy(new DCameraSourceCallbackProxy(remoteObject));
+
+    EXPECT_EQ(DCAMERA_BAD_VALUE, callbackProxy->OnHardwareStateChanged("", "", -1));
+}
 } // namespace DistributedHardware
 } // namespace OHOS

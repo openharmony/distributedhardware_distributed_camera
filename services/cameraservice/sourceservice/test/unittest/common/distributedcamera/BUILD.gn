@@ -65,6 +65,11 @@ ohos_unittest("DCameraSourceTest") {
     "distributed_camera_source_stub_test.cpp",
   ]
 
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
   configs = [ ":module_private_config" ]
 
   deps = [
