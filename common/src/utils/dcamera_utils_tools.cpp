@@ -317,18 +317,23 @@ FILE *DumpFileUtil::OpenDumpFileInner(std::string para, std::string fileName)
     std::string filePath = DUMP_SERVICE_DIR + fileName;
     std::string dumpPara;
     FILE *dumpFile = nullptr;
+    char path[PATH_MAX + 1] = {0x00};
+    if (filePath.length() > PATH_MAX || realpath(filePath.c_str(), path) == nullptr) {
+        DHLOGE("The file path is invalid.");
+        return dumpFile;
+    }
     bool res = GetSysPara(para.c_str(), dumpPara);
     if (!res || dumpPara.empty()) {
         DHLOGI("%{public}s is not set, dump dcamera is not required", para.c_str());
         g_lastPara[para] = dumpPara;
         return dumpFile;
     }
-    DHLOGI("%{public}s = %{public}s, filePath: %{public}s", para.c_str(), dumpPara.c_str(), filePath.c_str());
+    DHLOGI("%{public}s = %{public}s, filePath: %{public}s", para.c_str(), dumpPara.c_str(), path);
     if (dumpPara == "w") {
-        dumpFile = fopen(filePath.c_str(), "wb+");
+        dumpFile = fopen(path, "wb+");
         CHECK_AND_RETURN_RET_LOG(dumpFile == nullptr, dumpFile, "Error opening dump file!");
     } else if (dumpPara == "a") {
-        dumpFile = fopen(filePath.c_str(), "ab+");
+        dumpFile = fopen(path, "ab+");
         CHECK_AND_RETURN_RET_LOG(dumpFile == nullptr, dumpFile, "Error opening dump file!");
     }
     g_lastPara[para] = dumpPara;
