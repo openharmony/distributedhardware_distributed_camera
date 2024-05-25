@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -99,7 +99,7 @@ HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_002, TestSize.Level
     EXPECT_EQ(false, testSinkPipeline_ == nullptr);
 
     std::shared_ptr<DataProcessListener> listener = std::make_shared<MockDCameraDataProcessListener>();
-    VideoConfigParams srcParams(VideoCodecType::NO_CODEC,
+    VideoConfigParams srcParams(VideoCodecType::CODEC_H264,
                                 Videoformat::NV21,
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,

@@ -426,6 +426,11 @@ VideoConfigParams DEST_PARAMS2(VideoCodecType::CODEC_H264,
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH2,
                                 TEST_HEIGTH2);
+VideoConfigParams DEST_PARAMS3(VideoCodecType::CODEC_H264,
+                                Videoformat::RGBA_8888,
+                                DCAMERA_PRODUCER_FPS_DEFAULT,
+                                TEST_WIDTH2,
+                                TEST_HEIGTH2);
 
 VideoConfigParams PROC_CONFIG;
 }
@@ -638,6 +643,35 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_027, TestSize.Level
     testScaleConvertProcess_->callbackPipelineSource_ = sourcePipeline;
     rc = testScaleConvertProcess_->ProcessData(inputBuffers);
     EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
+}
+
+/**
+ * @tc.name: scale_convert_process_test_028
+ * @tc.desc: Verify scale convert process InitNode IsConvertible true.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_028, TestSize.Level1)
+{
+    DHLOGI("ScaleConvertProcessTest scale_convert_process_test_028.");
+    int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS3, PROC_CONFIG);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    size_t capacity = 3200000;
+    int64_t timeStamp = 10;
+    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
+    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
+    db->SetInt64("timeUs", timeStamp);
+    db->SetInt32("Videoformat", static_cast<int32_t>(Videoformat::YUVI420));
+    db->SetInt32("alignedWidth", TEST_ALIGNEDWIDTH);
+    db->SetInt32("alignedHeight", TEST_ALIGNEDHEIGTH);
+    db->SetInt32("width", TEST_WIDTH);
+    db->SetInt32("height", TEST_HEIGTH);
+    inputBuffers.push_back(db);
+    std::shared_ptr<DCameraPipelineSource> sourcePipeline = std::make_shared<DCameraPipelineSource>();
+    testScaleConvertProcess_->callbackPipelineSource_ = sourcePipeline;
+    rc = testScaleConvertProcess_->ProcessData(inputBuffers);
+    EXPECT_EQ(rc, DCAMERA_OK);
 }
 #endif
 } // namespace DistributedHardware

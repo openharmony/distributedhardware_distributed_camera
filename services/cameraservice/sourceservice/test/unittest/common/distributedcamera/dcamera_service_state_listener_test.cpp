@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -105,6 +105,37 @@ HWTEST_F(DcameraServiceStateListenerTest, dcamera_service_state_listener_test_00
     EXPECT_EQ(DCAMERA_OK, ret);
 
     callback = nullptr;
+}
+
+/**
+ * @tc.name: dcamera_service_state_listener_test_003
+ * @tc.desc: Verify the OnHardwareStateChanged function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraServiceStateListenerTest, dcamera_service_state_listener_test_003, TestSize.Level1)
+{
+    DHLOGI("DcameraServiceStateListenerTest::dcamera_service_state_listener_test_003");
+    EXPECT_EQ(false, testListener_ == nullptr);
+
+    int32_t status = 0;
+    int32_t ret = testListener_->OnHardwareStateChanged(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, status);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_service_state_listener_test_004
+ * @tc.desc: Verify the OnDataSyncTrigger function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraServiceStateListenerTest, dcamera_service_state_listener_test_004, TestSize.Level1)
+{
+    DHLOGI("DcameraServiceStateListenerTest::dcamera_service_state_listener_test_004");
+    EXPECT_EQ(false, testListener_ == nullptr);
+
+    int32_t ret = testListener_->OnDataSyncTrigger(TEST_DEVICE_ID);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

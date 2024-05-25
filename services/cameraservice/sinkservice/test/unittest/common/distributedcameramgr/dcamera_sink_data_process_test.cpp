@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -206,6 +206,22 @@ HWTEST_F(DCameraSinkDataProcessTest, dcamera_sink_data_process_test_007, TestSiz
     int32_t ret = dataProcess_->FeedStream(g_testDataBuffer);
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_TIME_MS));
     EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_data_process_test_008
+ * @tc.desc: Verify the GetPipelineCodecType GetPipelineFormat function.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MV
+ */
+HWTEST_F(DCameraSinkDataProcessTest, dcamera_sink_data_process_test_008, TestSize.Level1)
+{
+    EXPECT_EQ(VideoCodecType::CODEC_H264, dataProcess_->GetPipelineCodecType(DCEncodeType::ENCODE_TYPE_H264));
+    EXPECT_EQ(VideoCodecType::CODEC_H265, dataProcess_->GetPipelineCodecType(DCEncodeType::ENCODE_TYPE_H265));
+    EXPECT_EQ(VideoCodecType::CODEC_MPEG4_ES, dataProcess_->GetPipelineCodecType(DCEncodeType::ENCODE_TYPE_MPEG4_ES));
+    EXPECT_EQ(VideoCodecType::NO_CODEC, dataProcess_->GetPipelineCodecType(DCEncodeType::ENCODE_TYPE_NULL));
+    EXPECT_EQ(Videoformat::RGBA_8888, dataProcess_->GetPipelineFormat(1));
+    EXPECT_EQ(Videoformat::NV21, dataProcess_->GetPipelineFormat(0));
 }
 } // namespace DistributedHardware
 } // namespace OHOS
