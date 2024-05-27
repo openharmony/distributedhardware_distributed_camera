@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -172,6 +172,103 @@ HWTEST_F(DcameraSourceStubTest, dcamera_source_stub_test_005, TestSize.Level1)
     std::string events = "events000";
     int32_t ret = sourceProxy.DCameraNotify(devId, dhId, events);
     EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_stub_test_006
+ * @tc.desc: Verify the DCameraNotify function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSourceStubTest, dcamera_source_stub_test_006, TestSize.Level1)
+{
+    DHLOGI("DcameraSourceStubTest::dcamera_source_stub_test_006");
+    sptr<IRemoteObject> sourceStubPtr(new MockDistributedCameraSourceStub());
+    DistributedCameraSourceProxy sourceProxy(sourceStubPtr);
+    std::string devId = "";
+    std::string dhId = "dhId000";
+    std::string events = "events000";
+    int32_t ret = sourceProxy.DCameraNotify(devId, dhId, events);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    devId = "devId000";
+    events = "";
+    ret = sourceProxy.DCameraNotify(devId, dhId, events);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    dhId = "";
+    ret = sourceProxy.DCameraNotify(devId, dhId, events);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_stub_test_007
+ * @tc.desc: Verify the UnregisterDistributedHardware function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSourceStubTest, dcamera_source_stub_test_007, TestSize.Level1)
+{
+    DHLOGI("DcameraSourceStubTest::dcamera_source_stub_test_007");
+    sptr<IRemoteObject> sourceStubPtr(new MockDistributedCameraSourceStub());
+    DistributedCameraSourceProxy sourceProxy(sourceStubPtr);
+    std::string devId = "";
+    std::string dhId = "dhId000";
+    std::string reqId = "reqId000";
+    int32_t ret = sourceProxy.UnregisterDistributedHardware(devId, dhId, reqId);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    devId = "devId000";
+    reqId = "";
+    ret = sourceProxy.UnregisterDistributedHardware(devId, dhId, reqId);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    dhId = "";
+    ret = sourceProxy.UnregisterDistributedHardware(devId, dhId, reqId);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_stub_test_008
+ * @tc.desc: Verify the RegisterDistributedHardware function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSourceStubTest, dcamera_source_stub_test_008, TestSize.Level1)
+{
+    DHLOGI("DcameraSourceStubTest::dcamera_source_stub_test_008");
+    sptr<IRemoteObject> sourceStubPtr(new MockDistributedCameraSourceStub());
+    DistributedCameraSourceProxy sourceProxy(sourceStubPtr);
+    std::string devId = "";
+    std::string dhId = "dhId000";
+    std::string reqId = "reqId000";
+    EnableParam param;
+    param.sourceVersion = "1";
+    param.sourceAttrs = "sourceattrs";
+    param.sinkVersion = "1";
+    param.sinkAttrs = "sinkattrs";
+    int32_t ret = sourceProxy.RegisterDistributedHardware(devId, dhId, reqId, param);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    devId = "devId000";
+    reqId = "";
+    ret = sourceProxy.RegisterDistributedHardware(devId, dhId, reqId, param);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    dhId = "";
+    ret = sourceProxy.RegisterDistributedHardware(devId, dhId, reqId, param);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    dhId = "dhId000";
+    reqId = "reqId000";
+    param.sinkVersion = "";
+    ret = sourceProxy.RegisterDistributedHardware(devId, dhId, reqId, param);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    param.sinkVersion = "1";
+    param.sinkAttrs = "";
+    ret = sourceProxy.RegisterDistributedHardware(devId, dhId, reqId, param);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

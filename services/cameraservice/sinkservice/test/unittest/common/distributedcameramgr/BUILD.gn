@@ -76,6 +76,11 @@ ohos_unittest("DCameraSinkMgrTest") {
     "eventbus/dcamera_video_output_event_test.cpp",
   ]
 
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
   configs = [ ":module_private_config" ]
 
   deps = [
