@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -220,6 +220,30 @@ HWTEST_F(DcameraUtilsToolsTest, IsUnderDumpMaxSize_001, TestSize.Level1)
 HWTEST_F(DcameraUtilsToolsTest, IsUnderDumpMaxSize_002, TestSize.Level1)
 {
     EXPECT_EQ(IsUnderDumpMaxSize("/nonexistent/file"), DCAMERA_INIT_ERR);
+}
+
+/**
+ * @tc.name: OpenDumpFile_001
+ * @tc.desc: Verify the IsUnderDumpMaxSize.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DcameraUtilsToolsTest, OpenDumpFile_001, TestSize.Level1)
+{
+    FILE *dumpFile = nullptr;
+    void *buffer = nullptr;
+    size_t bufferSize = 0;
+    DumpFileUtil::WriteDumpFile(dumpFile, buffer, bufferSize);
+    const std::string DUMP_SERVER_PARA_TEST = "sys.dcamera.dump.write.enable w";
+    const std::string DUMP_DCAMERA_TEST_FILENAME = "opendumpfile.txt";
+    DumpFileUtil::OpenDumpFile(DUMP_SERVER_PARA_TEST, DUMP_DCAMERA_TEST_FILENAME, &dumpFile);
+    DumpFileUtil::WriteDumpFile(dumpFile, buffer, bufferSize);
+    const std::string DUMP_SERVER_PARA_TEST_1 = "sys.dcamera.dump.write.enable a";
+    const std::string DUMP_DCAMERA_TEST_FILENAME_1 = "opendumpfile1.txt";
+    DumpFileUtil::OpenDumpFile(DUMP_SERVER_PARA_TEST_1, DUMP_DCAMERA_TEST_FILENAME_1, &dumpFile);
+    DumpFileUtil::WriteDumpFile(dumpFile, buffer, bufferSize);
+    DumpFileUtil::CloseDumpFile(&dumpFile);
+    EXPECT_EQ(true, dumpFile == nullptr);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
