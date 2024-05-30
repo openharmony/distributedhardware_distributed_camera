@@ -15,6 +15,7 @@
 
 #include "dcamera_softbus_latency.h"
 
+#include "anonymous_string.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -52,7 +53,8 @@ int32_t DCameraSoftbusLatency::StartSoftbusTimeSync(const std::string& devId)
     int32_t ret = StartTimeSync(DCAMERA_PKG_NAME.c_str(), devId.c_str(), LOW_ACCURACY, NORMAL_PERIOD,
         &timeSyncCb);
     if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSoftbusLatency:: StartSoftbusTimeSync failed networkId %{public}s", devId.c_str());
+        DHLOGE("DCameraSoftbusLatency:: StartSoftbusTimeSync failed networkId %{public}s",
+            GetAnonyString(devId).c_str());
     }
     {
         std::lock_guard<std::mutex> lock(micLock_);
