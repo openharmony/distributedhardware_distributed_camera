@@ -36,12 +36,12 @@ DCameraSinkDataProcess::DCameraSinkDataProcess(const std::string& dhId, std::sha
 DCameraSinkDataProcess::~DCameraSinkDataProcess()
 {
     DHLOGI("DCameraSinkDataProcess delete dhId: %{public}s", GetAnonyString(dhId_).c_str());
+    DumpFileUtil::CloseDumpFile(&dumpFile_);
     if ((eventHandler_ != nullptr) && (eventHandler_->GetEventRunner() != nullptr)) {
         eventHandler_->GetEventRunner()->Stop();
     }
     eventThread_.join();
     eventHandler_ = nullptr;
-    DumpFileUtil::CloseDumpFile(&dumpFile_);
 }
 
 void DCameraSinkDataProcess::Init()

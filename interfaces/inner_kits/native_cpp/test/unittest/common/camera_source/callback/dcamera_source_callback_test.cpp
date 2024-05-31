@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -160,11 +160,11 @@ HWTEST_F(DCameraSourceCallbackTest, dcamera_source_callback_test_003, TestSize.L
     std::string reqId = "reqId";
     int32_t status = 0;
     std::string data = "data";
-    std::shared_ptr<RegisterCallback> callback = nullptr;
-    sourceCallback_->PushRegCallback(reqId, callback);
+    std::shared_ptr<UnregisterCallback> callback = std::make_shared<UnregisterCallbackTest>();
+    sourceCallback_->PushUnregCallback(reqId, callback);
     int32_t ret = sourceCallback_->OnNotifyUnregResult(devId, dhId, reqId, status, data);
-    sourceCallback_->PopRegCallback(reqId);
-    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
+    sourceCallback_->PopUnregCallback(reqId);
+    EXPECT_EQ(DCAMERA_OK, ret);
 }
 
 /**
@@ -319,7 +319,9 @@ HWTEST_F(DCameraSourceCallbackTest, dcamera_source_callback_test_009, TestSize.L
     int32_t status = 1;
     int32_t ret = sourceCallback_->OnHardwareStateChanged(devId, dhId, status);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
-    sourceCallback_->stateListener_ = std::make_shared<MockDistributedHardwareStateListener>();
+    std::shared_ptr<DistributedHardwareStateListener> listener =
+        std::make_shared<MockDistributedHardwareStateListener>();
+    sourceCallback_->RegisterStateListener(listener);
     devId = "";
     ret = sourceCallback_->OnHardwareStateChanged(devId, dhId, status);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
@@ -339,6 +341,7 @@ HWTEST_F(DCameraSourceCallbackTest, dcamera_source_callback_test_009, TestSize.L
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
     status = 1;
     ret = sourceCallback_->OnHardwareStateChanged(devId, dhId, status);
+    sourceCallback_->UnRegisterStateListener();
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
@@ -357,11 +360,14 @@ HWTEST_F(DCameraSourceCallbackTest, dcamera_source_callback_test_010, TestSize.L
     ret = sourceCallback_->OnDataSyncTrigger(devId);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 
-    sourceCallback_->triggerListener_ = nullptr;
+    devId = "devId";
     ret = sourceCallback_->OnDataSyncTrigger(devId);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
-    sourceCallback_->triggerListener_ = std::make_shared<MockDataSyncTriggerListener>();
+
+    std::shared_ptr<DataSyncTriggerListener> listener = std::make_shared<MockDataSyncTriggerListener>();
+    sourceCallback_->RegisterTriggerListener(listener);
     ret = sourceCallback_->OnDataSyncTrigger(devId);
+    sourceCallback_->UnRegisterTriggerListener();
     EXPECT_NE(DCAMERA_OK, ret);
 }
 }
