@@ -34,8 +34,7 @@ void DecodeOnOutputBufferAvailableFuzzTest(const uint8_t* data, size_t size)
     MediaAVCodec::AVCodecBufferFlag flag = static_cast<MediaAVCodec::AVCodecBufferFlag>(bufferFlag);
     std::shared_ptr<DCameraPipelineSource> sourcePipeline = std::make_shared<DCameraPipelineSource>();
     std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(true);
-    std::shared_ptr<DCameraPipelineSource::DCameraPipelineSrcEventHandler> pipeEventHandler =
-        std::make_shared<DCameraPipelineSource::DCameraPipelineSrcEventHandler>(runner, sourcePipeline);
+    std::shared_ptr<AppExecFwk::EventHandler> pipeEventHandler = std::make_shared<AppExecFwk::EventHandler>(runner);
     std::shared_ptr<DecodeDataProcess> decodeDataProcess =
         std::make_shared<DecodeDataProcess>(pipeEventHandler, sourcePipeline);
     std::shared_ptr<DecodeVideoCallback> decodeVideoCallback = std::make_shared<DecodeVideoCallback>(decodeDataProcess);

@@ -298,7 +298,7 @@ bool GetSysPara(const char *key, T &value)
     auto res = GetParameter(key, "-1", paraValue, sizeof(paraValue));
 
     CHECK_AND_RETURN_RET_LOG(res <= 0, false, "GetParameter fail, key:%{public}s res:%{public}d", key, res);
-    DHLOGI("GetSysPara key:%{public}s value:%{public}s", key, paraValue);
+    DHLOGD("GetSysPara key:%{public}s value:%{public}s", key, paraValue);
     std::stringstream valueStr;
     valueStr << paraValue;
     valueStr >> value;
@@ -328,7 +328,7 @@ FILE *DumpFileUtil::OpenDumpFileInner(std::string para, std::string fileName)
         g_lastPara[para] = dumpPara;
         return dumpFile;
     }
-    DHLOGI("%{public}s = %{public}s, filePath: %{public}s", para.c_str(), dumpPara.c_str(), path);
+    DHLOGD("%{public}s = %{public}s, filePath: %{public}s", para.c_str(), dumpPara.c_str(), path);
     if (dumpPara == "w") {
         dumpFile = fopen(path, "wb+");
         CHECK_AND_RETURN_RET_LOG(dumpFile == nullptr, dumpFile, "Error opening dump file!");

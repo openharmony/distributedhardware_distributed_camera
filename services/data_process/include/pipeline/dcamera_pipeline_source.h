@@ -31,7 +31,6 @@
 namespace OHOS {
 namespace DistributedHardware {
 class DecodeDataProcess;
-const uint32_t EVENT_PIPELINE_PROCESS_DATA = 0;
 
 class DCameraPipelineSource : public IDataProcessPipeline, public std::enable_shared_from_this<DCameraPipelineSource> {
 public:
@@ -47,21 +46,11 @@ public:
 
     int32_t GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier) override;
 
-    class DCameraPipelineSrcEventHandler : public AppExecFwk::EventHandler {
-        public:
-            DCameraPipelineSrcEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-                std::shared_ptr<DCameraPipelineSource> pipeSourcePtr);
-            ~DCameraPipelineSrcEventHandler() override = default;
-            void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
-        private:
-            std::weak_ptr<DCameraPipelineSource> pipeSourceWPtr_;
-    };
-
 private:
     bool IsInRange(const VideoConfigParams& curConfig);
     void InitDCameraPipEvent();
     int32_t InitDCameraPipNodes(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig);
-    void DoProcessData(const AppExecFwk::InnerEvent::Pointer &event);
+    void StartEventHandler();
 
 private:
     const static std::string PIPELINE_OWNER;
@@ -74,11 +63,15 @@ private:
 
     std::shared_ptr<DataProcessListener> processListener_ = nullptr;
     std::shared_ptr<AbstractDataProcess> pipelineHead_ = nullptr;
-    std::shared_ptr<DCameraPipelineSrcEventHandler> pipeEventHandler_ = nullptr;
 
     bool isProcess_ = false;
     PipelineType piplineType_ = PipelineType::VIDEO;
     std::vector<std::shared_ptr<AbstractDataProcess>> pipNodeRanks_;
+
+    std::mutex eventMutex_;
+    std::thread eventThread_;
+    std::condition_variable eventCon_;
+    std::shared_ptr<AppExecFwk::EventHandler> pipeEventHandler_ = nullptr;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
