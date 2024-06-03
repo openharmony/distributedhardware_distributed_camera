@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,7 +41,6 @@ const int32_t TEST_HEIGTH = 1080;
 const int32_t TEST_WIDTH2 = 640;
 const int32_t TEST_HEIGTH2 = 480;
 const int32_t SLEEP_TIME = 200000;
-constexpr uint32_t EVENT_FRAME_TRIGGER = 1;
 }
 
 void DCameraPipelineSourceTest::SetUpTestCase(void)
@@ -243,23 +242,6 @@ HWTEST_F(DCameraPipelineSourceTest, dcamera_pipeline_source_test_008, TestSize.L
     std::shared_ptr<DataBuffer> videoResult = std::make_shared<DataBuffer>(i);
     testPipelineSource_->processListener_ = nullptr;
     testPipelineSource_->OnProcessedVideoBuffer(videoResult);
-    EXPECT_TRUE(true);
-}
-
-/**
- * @tc.name: dcamera_pipeline_source_test_009
- * @tc.desc: Verify pipeline source DoProcessData abnormal.
- * @tc.type: FUNC
- * @tc.require: Issue Number
- */
-HWTEST_F(DCameraPipelineSourceTest, dcamera_pipeline_source_test_009, TestSize.Level1)
-{
-    EXPECT_EQ(false, testPipelineSource_ == nullptr);
-
-    std::shared_ptr<std::string> param = std::make_shared<std::string>("");
-    AppExecFwk::InnerEvent::Pointer triggerEvent =
-                AppExecFwk::InnerEvent::Get(EVENT_FRAME_TRIGGER, param, 0);
-    testPipelineSource_->DoProcessData(triggerEvent);
     EXPECT_TRUE(true);
 }
 } // namespace DistributedHardware

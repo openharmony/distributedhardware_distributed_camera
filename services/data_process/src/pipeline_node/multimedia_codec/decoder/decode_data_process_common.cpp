@@ -14,14 +14,15 @@
  */
 
 #include "decode_data_process.h"
+
 #include "distributed_camera_constants.h"
 #include "distributed_hardware_log.h"
-#include "graphic_common_c.h"
-
 #include "dcamera_hisysevent_adapter.h"
 #include "dcamera_hidumper.h"
 #include "decode_surface_listener.h"
 #include "decode_video_callback.h"
+#include "graphic_common_c.h"
+#include <sys/prctl.h>
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -47,6 +48,7 @@ int32_t DecodeDataProcess::InitNode(const VideoConfigParams& sourceConfig, const
         DHLOGE("Source config or target config are invalid.");
         return DCAMERA_BAD_VALUE;
     }
+
     if (!IsConvertible(sourceConfig, targetConfig)) {
         DHLOGE("The DecodeNode can't convert %{public}d to %{public}d.", sourceConfig.GetVideoCodecType(),
             targetConfig_.GetVideoCodecType());
@@ -93,9 +95,23 @@ bool DecodeDataProcess::IsConvertible(const VideoConfigParams& sourceConfig, con
 void DecodeDataProcess::InitCodecEvent()
 {
     DHLOGD("Init DecodeNode eventBus, and add handler for it.");
-    std::shared_ptr<AppExecFwk::EventRunner> decRunner = AppExecFwk::EventRunner::Create(true);
-    decEventHandler_ = std::make_shared<DecodeDataProcess::DecodeDataProcessEventHandler>(
-        decRunner, shared_from_this());
+    eventThread_ = std::thread(&DecodeDataProcess::StartEventHandler, this);
+    std::unique_lock<std::mutex> lock(eventMutex_);
+    eventCon_.wait(lock, [this] {
+        return decEventHandler_ != nullptr;
+    });
+}
+
+void DecodeDataProcess::StartEventHandler()
+{
+    prctl(PR_SET_NAME, DECODE_DATA_EVENT.c_str());
+    auto runner = AppExecFwk::EventRunner::Create(false);
+    {
+        std::lock_guard<std::mutex> lock(eventMutex_);
+        decEventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
+    }
+    eventCon_.notify_one();
+    runner->Run();
 }
 
 int32_t DecodeDataProcess::InitDecoder()
@@ -333,6 +349,10 @@ void DecodeDataProcess::ReleaseDecoderSurface()
 
 void DecodeDataProcess::ReleaseCodecEvent()
 {
+    if ((decEventHandler_ != nullptr) && (decEventHandler_->GetEventRunner() != nullptr)) {
+        decEventHandler_->GetEventRunner()->Stop();
+        eventThread_.join();
+    }
     decEventHandler_ = nullptr;
     pipeSrcEventHandler_ = nullptr;
     DHLOGD("Release DecodeNode eventBusDecode and eventBusPipeline end.");
@@ -402,13 +422,13 @@ int32_t DecodeDataProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>&
         int32_t sleepTimeUs = 5000;
         std::this_thread::sleep_for(std::chrono::microseconds(sleepTimeUs));
         DHLOGD("Feed decoder input buffer failed. Try FeedDecoderInputBuffer again.");
-        std::shared_ptr<CodecPacket> reFeedInputPacket = std::make_shared<CodecPacket>();
-        reFeedInputPacket->SetVideoCodecType(sourceConfig_.GetVideoCodecType());
+        auto sendFunc = [this]() mutable {
+            int32_t ret = FeedDecoderInputBuffer();
+            DHLOGD("excute FeedDecoderInputBuffer ret %{public}d.", ret);
+        };
         CHECK_AND_RETURN_RET_LOG(pipeSrcEventHandler_ == nullptr, DCAMERA_BAD_VALUE,
             "%{public}s", "pipeSrcEventHandler_ is nullptr.");
-        AppExecFwk::InnerEvent::Pointer msgEvent =
-            AppExecFwk::InnerEvent::Get(EVENT_ACTION_ONCE_AGAIN, reFeedInputPacket, 0);
-        pipeSrcEventHandler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE);
+        pipeSrcEventHandler_->PostTask(sendFunc);
     }
     return DCAMERA_OK;
 }
@@ -515,11 +535,13 @@ void DecodeDataProcess::ReduceWaitDecodeCnt()
 
 void DecodeDataProcess::OnSurfaceOutputBufferAvailable(const sptr<IConsumerSurface>& surface)
 {
-    std::shared_ptr<CodecPacket> bufferPkt = std::make_shared<CodecPacket>(surface);
-    CHECK_AND_RETURN_LOG(decEventHandler_ == nullptr, "decEventHandler is nullptr.");
-    AppExecFwk::InnerEvent::Pointer msgEvent =
-        AppExecFwk::InnerEvent::Get(EVENT_ACTION_GET_DECODER_OUTPUT_BUFFER, bufferPkt, 0);
-    decEventHandler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE);
+    auto sendFunc = [this, surface]() mutable {
+        GetDecoderOutputBuffer(surface);
+        DHLOGD("excute GetDecoderOutputBuffer.");
+    };
+    if (decEventHandler_ != nullptr) {
+        decEventHandler_->PostTask(sendFunc);
+    }
 }
 
 void DecodeDataProcess::GetDecoderOutputBuffer(const sptr<IConsumerSurface>& surface)
@@ -634,13 +656,15 @@ void DecodeDataProcess::PostOutputDataBuffers(std::shared_ptr<DataBuffer>& outpu
         DHLOGE("decEventHandler_ or outputBuffer is null.");
         return;
     }
-    std::vector<std::shared_ptr<DataBuffer>> multiDataBuffers;
-    multiDataBuffers.push_back(outputBuffer);
-    std::shared_ptr<CodecPacket> transNextNodePacket = std::make_shared<CodecPacket>(VideoCodecType::NO_CODEC,
-        multiDataBuffers);
-    AppExecFwk::InnerEvent::Pointer msgEvent =
-        AppExecFwk::InnerEvent::Get(EVENT_NO_ACTION, transNextNodePacket, 0);
-    decEventHandler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE);
+    auto sendFunc = [this, outputBuffer]() mutable {
+        std::vector<std::shared_ptr<DataBuffer>> multiDataBuffers;
+        multiDataBuffers.push_back(outputBuffer);
+        int32_t ret = DecodeDone(multiDataBuffers);
+        DHLOGD("excute DecodeDone ret %{public}d.", ret);
+    };
+    if (decEventHandler_ != nullptr) {
+        decEventHandler_->PostTask(sendFunc);
+    }
     DHLOGD("Send video decoder output asynchronous DCameraCodecEvents success.");
 }
 
@@ -668,67 +692,6 @@ int32_t DecodeDataProcess::DecodeDone(std::vector<std::shared_ptr<DataBuffer>>& 
     }
     targetPipelineSource->OnProcessedVideoBuffer(outputBuffers[0]);
     return DCAMERA_OK;
-}
-
-DecodeDataProcess::DecodeDataProcessEventHandler::DecodeDataProcessEventHandler(
-    const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<DecodeDataProcess> decPtr)
-    : AppExecFwk::EventHandler(runner), decPtrWPtr_(decPtr)
-{
-    DHLOGI("Ctor DecodeDataProcessEventHandler.");
-}
-
-void DecodeDataProcess::DecodeDataProcessEventHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
-{
-    CHECK_AND_RETURN_LOG(event == nullptr, "event is nullptr.");
-    uint32_t eventId = event->GetInnerEventId();
-    auto decPtr = decPtrWPtr_.lock();
-    if (decPtr == nullptr) {
-        DHLOGE("Can not get strong self ptr");
-        return;
-    }
-    switch (eventId) {
-        case EVENT_NO_ACTION:
-            decPtr->ProcessDecodeDone(event);
-            break;
-        case EVENT_ACTION_ONCE_AGAIN:
-            DHLOGD("Try FeedDecoderInputBuffer again.");
-            decPtr->ProcessFeedDecoderInputBuffer();
-            return;
-        case EVENT_ACTION_GET_DECODER_OUTPUT_BUFFER:
-            decPtr->ProcessGetDecoderOutputBuffer(event);
-            break;
-        default:
-            DHLOGD("The action : %{public}d is not supported.", eventId);
-            return;
-    }
-}
-
-void DecodeDataProcess::ProcessFeedDecoderInputBuffer()
-{
-    FeedDecoderInputBuffer();
-}
-
-void DecodeDataProcess::ProcessGetDecoderOutputBuffer(const AppExecFwk::InnerEvent::Pointer &event)
-{
-    std::shared_ptr<CodecPacket> receivedCodecPacket = event->GetSharedObject<CodecPacket>();
-    if (receivedCodecPacket == nullptr) {
-        DHLOGE("the received codecPacket of eventId [%{public}d] is null.", EVENT_ACTION_GET_DECODER_OUTPUT_BUFFER);
-        OnError();
-        return;
-    }
-    GetDecoderOutputBuffer(receivedCodecPacket->GetSurface());
-}
-
-void DecodeDataProcess::ProcessDecodeDone(const AppExecFwk::InnerEvent::Pointer &event)
-{
-    std::shared_ptr<CodecPacket> receivedCodecPacket = event->GetSharedObject<CodecPacket>();
-    if (receivedCodecPacket == nullptr) {
-        DHLOGE("the received codecPacket of eventId [%{public}d] is null.", EVENT_NO_ACTION);
-        OnError();
-        return;
-    }
-    std::vector<std::shared_ptr<DataBuffer>> dataBuffers = receivedCodecPacket->GetDataBuffers();
-    DecodeDone(dataBuffers);
 }
 
 void DecodeDataProcess::OnError()

@@ -17,10 +17,11 @@
 
 #include "dcamera_hitrace_adapter.h"
 #include "distributed_hardware_log.h"
-
+#include "distributed_camera_constants.h"
 #include "decode_data_process.h"
 #include "fps_controller_process.h"
 #include "scale_convert_process.h"
+#include <sys/prctl.h>
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -83,9 +84,23 @@ bool DCameraPipelineSource::IsInRange(const VideoConfigParams& curConfig)
 void DCameraPipelineSource::InitDCameraPipEvent()
 {
     DHLOGD("Init source DCamera pipeline event to asynchronously process data.");
-    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(true);
-    pipeEventHandler_ = std::make_shared<DCameraPipelineSource::DCameraPipelineSrcEventHandler>(
-        runner, shared_from_this());
+    eventThread_ = std::thread(&DCameraPipelineSource::StartEventHandler, this);
+    std::unique_lock<std::mutex> lock(eventMutex_);
+    eventCon_.wait(lock, [this] {
+        return pipeEventHandler_ != nullptr;
+    });
+}
+
+void DCameraPipelineSource::StartEventHandler()
+{
+    prctl(PR_SET_NAME, PIPELINE_SRC_EVENT.c_str());
+    auto runner = AppExecFwk::EventRunner::Create(false);
+    {
+        std::lock_guard<std::mutex> lock(eventMutex_);
+        pipeEventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
+    }
+    eventCon_.notify_one();
+    runner->Run();
 }
 
 int32_t DCameraPipelineSource::InitDCameraPipNodes(const VideoConfigParams& sourceConfig,
@@ -166,10 +181,18 @@ int32_t DCameraPipelineSource::ProcessData(std::vector<std::shared_ptr<DataBuffe
     DHLOGD("Send asynchronous event to process data in source pipeline.");
     std::shared_ptr<PipelineConfig> pipConfigSource = std::make_shared<PipelineConfig>(piplineType_,
         PIPELINE_OWNER, dataBuffers);
+    std::vector<std::shared_ptr<DataBuffer>> inputBuffers = pipConfigSource->GetDataBuffers();
+    if (inputBuffers.empty()) {
+        DHLOGE("Receiving process data buffers is empty in source pipeline.");
+        OnError(ERROR_PIPELINE_EVENTBUS);
+        return DCAMERA_BAD_VALUE;
+    }
+    auto sendFunc = [this, inputBuffers]() mutable {
+        int32_t ret = pipelineHead_->ProcessData(inputBuffers);
+        DHLOGD("excute ProcessData ret %{public}d.", ret);
+    };
     CHECK_AND_RETURN_RET_LOG(pipeEventHandler_ == nullptr, DCAMERA_BAD_VALUE, "pipeEventHandler_ is nullptr.");
-    AppExecFwk::InnerEvent::Pointer msgEvent =
-        AppExecFwk::InnerEvent::Get(EVENT_PIPELINE_PROCESS_DATA, pipConfigSource, 0);
-    pipeEventHandler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE);
+    pipeEventHandler_->PostTask(sendFunc);
     return DCAMERA_OK;
 }
 
@@ -182,29 +205,15 @@ void DCameraPipelineSource::DestroyDataProcessPipeline()
         pipelineHead_->ReleaseProcessNode();
         pipelineHead_ = nullptr;
     }
+    if ((pipeEventHandler_ != nullptr) && (pipeEventHandler_->GetEventRunner() != nullptr)) {
+        pipeEventHandler_->GetEventRunner()->Stop();
+        eventThread_.join();
+    }
     pipeEventHandler_ = nullptr;
     processListener_ = nullptr;
     pipNodeRanks_.clear();
     piplineType_ = PipelineType::VIDEO;
     DHLOGD("Destroy source data process pipeline end.");
-}
-
-void DCameraPipelineSource::DoProcessData(const AppExecFwk::InnerEvent::Pointer &event)
-{
-    DHLOGD("Receive asynchronous event then start process data in source pipeline.");
-    std::shared_ptr<PipelineConfig> pipelineConfig = event->GetSharedObject<PipelineConfig>();
-    if (pipelineConfig == nullptr) {
-        DHLOGE("pipeline config is nullptr.");
-        OnError(ERROR_PIPELINE_EVENTBUS);
-        return;
-    }
-    std::vector<std::shared_ptr<DataBuffer>> inputBuffers = pipelineConfig->GetDataBuffers();
-    if (inputBuffers.empty()) {
-        DHLOGE("Receiving process data buffers is empty in source pipeline.");
-        OnError(ERROR_PIPELINE_EVENTBUS);
-        return;
-    }
-    pipelineHead_->ProcessData(inputBuffers);
 }
 
 void DCameraPipelineSource::OnError(DataProcessErrorType errorType)
@@ -231,32 +240,6 @@ void DCameraPipelineSource::OnProcessedVideoBuffer(const std::shared_ptr<DataBuf
 int32_t DCameraPipelineSource::GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier)
 {
     return DCAMERA_OK;
-}
-
-DCameraPipelineSource::DCameraPipelineSrcEventHandler::DCameraPipelineSrcEventHandler(
-    const std::shared_ptr<AppExecFwk::EventRunner> &runner, std::shared_ptr<DCameraPipelineSource> pipeSourcePtr)
-    : AppExecFwk::EventHandler(runner), pipeSourceWPtr_(pipeSourcePtr)
-{
-    DHLOGI("Ctor DCameraPipelineSrcEventHandler.");
-}
-
-void DCameraPipelineSource::DCameraPipelineSrcEventHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
-{
-    CHECK_AND_RETURN_LOG(event == nullptr, "event is nullptr.");
-    uint32_t eventId = event->GetInnerEventId();
-    auto pipeSrc = pipeSourceWPtr_.lock();
-    if (pipeSrc == nullptr) {
-        DHLOGE("Can not get strong self ptr");
-        return;
-    }
-    switch (eventId) {
-        case EVENT_PIPELINE_PROCESS_DATA:
-            pipeSrc->DoProcessData(event);
-            break;
-        default:
-            DHLOGE("event is undefined, id is %{public}d", eventId);
-            break;
-    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -34,7 +34,6 @@ public:
     void TearDown();
 
     std::shared_ptr<DecodeDataProcess> testDecodeDataProcess_;
-    std::shared_ptr<DCameraPipelineSource::DCameraPipelineSrcEventHandler> pipeEventHandler_;
     std::shared_ptr<DCameraPipelineSource> sourcePipeline_;
 };
 
@@ -61,9 +60,8 @@ void DecodeDataProcessTest::SetUp(void)
     DHLOGI("DecodeDataProcessTest SetUp");
     sourcePipeline_ = std::make_shared<DCameraPipelineSource>();
     std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(true);
-    pipeEventHandler_ = std::make_shared<DCameraPipelineSource::DCameraPipelineSrcEventHandler>(
-        runner, sourcePipeline_);
-    testDecodeDataProcess_ = std::make_shared<DecodeDataProcess>(pipeEventHandler_, sourcePipeline_);
+    std::shared_ptr<AppExecFwk::EventHandler> pipeEventHandler = std::make_shared<AppExecFwk::EventHandler>(runner);
+    testDecodeDataProcess_ = std::make_shared<DecodeDataProcess>(pipeEventHandler, sourcePipeline_);
 }
 
 void DecodeDataProcessTest::TearDown(void)
@@ -71,7 +69,6 @@ void DecodeDataProcessTest::TearDown(void)
     DHLOGI("DecodeDataProcessTest TearDown");
     usleep(SLEEP_TIME);
     sourcePipeline_ = nullptr;
-    pipeEventHandler_ = nullptr;
     testDecodeDataProcess_ = nullptr;
 }
 
@@ -405,6 +402,7 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_011, TestSize.Level1)
     std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
     inputBuffers.push_back(db);
     rc = testDecodeDataProcess_->ProcessData(inputBuffers);
+    testDecodeDataProcess_->isDecoderProcess_.store(true);
     EXPECT_EQ(rc, DCAMERA_DISABLE_PROCESS);
 }
 
@@ -596,6 +594,7 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_016, TestSize.Level1)
     MediaAVCodec::AVCodecBufferFlag flag = MediaAVCodec::AVCODEC_BUFFER_FLAG_CODEC_DATA;
     testDecodeDataProcess_->OnOutputBufferAvailable(index, info, flag, buffer);
     testDecodeDataProcess_->OnError();
+    testDecodeDataProcess_->isDecoderProcess_.store(true);
     EXPECT_EQ(rc, DCAMERA_OK);
 }
 } // namespace DistributedHardware

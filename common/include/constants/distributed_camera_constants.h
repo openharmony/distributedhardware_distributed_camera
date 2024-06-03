@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -149,6 +149,8 @@ const std::string PRODUCER = "producer";
 const std::string REGISTER_SERVICE_NOTIFY = "regSvcNotify";
 const std::string SINK_START_EVENT = "sinkStartEvent";
 const std::string SOURCE_START_EVENT = "srcStartEvent";
+const std::string DECODE_DATA_EVENT = "srcDecEvent";
+const std::string PIPELINE_SRC_EVENT = "srcPipeEvent";
 const std::string UNREGISTER_SERVICE_NOTIFY = "unregSvcNotify";
 const std::string LOOPER_SMOOTH = "looperSmooth";
 const std::string DUMP_PATH = "/data/data/dcamera/";
