@@ -618,7 +618,7 @@ void DCameraClient::SetPhotoCaptureLocation(const std::shared_ptr<Camera::Camera
         int32_t latitudeIndex = 0;
         int32_t longitudeIndex = 1;
         int32_t altitudeIndex = 2;
-        std::unique_ptr<CameraStandard::Location> location = std::make_unique<CameraStandard::Location>();
+        std::shared_ptr<CameraStandard::Location> location = std::make_shared<CameraStandard::Location>();
         location->latitude = item.data.d[latitudeIndex];
         location->longitude = item.data.d[longitudeIndex];
         location->altitude = item.data.d[altitudeIndex];

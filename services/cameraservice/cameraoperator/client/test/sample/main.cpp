@@ -264,7 +264,7 @@ static std::shared_ptr<PhotoCaptureSetting> ConfigPhotoCaptureSetting()
     PhotoCaptureSetting::QualityLevel quality = PhotoCaptureSetting::QualityLevel::QUALITY_LEVEL_HIGH;
     photoCaptureSettings->SetQuality(quality);
     // Location
-    std::unique_ptr<Location> location = std::make_unique<Location>();
+    auto location = std::make_shared<Location>();
     location->latitude = LATITUDE;
     location->longitude = LONGITUDE;
     location->altitude = ALTITUDE;
