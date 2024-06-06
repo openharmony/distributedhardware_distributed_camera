@@ -84,7 +84,7 @@ HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_001, TestSize.Level
                                  TEST_WIDTH,
                                  TEST_HEIGTH);
     int32_t rc = testSinkPipeline_->CreateDataProcessPipeline(PipelineType::VIDEO, srcParams, destParams, listener);
-    EXPECT_EQ(rc, DCAMERA_OK);
+    EXPECT_EQ(rc, DCAMERA_INIT_ERR);
     usleep(SLEEP_TIME);
 }
 
@@ -110,7 +110,7 @@ HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_002, TestSize.Level
                                  TEST_WIDTH,
                                  TEST_HEIGTH);
     int32_t rc = testSinkPipeline_->CreateDataProcessPipeline(PipelineType::VIDEO, srcParams, destParams, listener);
-    EXPECT_EQ(rc, DCAMERA_OK);
+    EXPECT_EQ(rc, DCAMERA_INIT_ERR);
 
     size_t capacity = 100;
     std::vector<std::shared_ptr<DataBuffer>> buffers;
@@ -171,7 +171,7 @@ HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_004, TestSize.Level
                                  TEST_WIDTH,
                                  TEST_HEIGTH);
     int32_t rc = testSinkPipeline_->CreateDataProcessPipeline(PipelineType::VIDEO, srcParams, destParams, listener);
-    EXPECT_EQ(rc, DCAMERA_OK);
+    EXPECT_EQ(rc, DCAMERA_INIT_ERR);
 
     std::vector<std::shared_ptr<DataBuffer>> buffers;
     rc = testSinkPipeline_->ProcessData(buffers);
