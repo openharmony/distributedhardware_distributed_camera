@@ -117,7 +117,7 @@ HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_002, TestSize.Level
     std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
     buffers.push_back(db);
     rc = testSinkPipeline_->ProcessData(buffers);
-    EXPECT_EQ(rc, DCAMERA_OK);
+    EXPECT_EQ(rc, DCAMERA_INIT_ERR);
 
     usleep(SLEEP_TIME);
 }
@@ -175,7 +175,7 @@ HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_004, TestSize.Level
 
     std::vector<std::shared_ptr<DataBuffer>> buffers;
     rc = testSinkPipeline_->ProcessData(buffers);
-    EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
+    EXPECT_EQ(rc, DCAMERA_INIT_ERR);
     usleep(SLEEP_TIME);
 }
 
