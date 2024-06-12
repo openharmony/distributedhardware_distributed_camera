@@ -15,13 +15,14 @@
 import("//build/config/features.gni")
 import("//build/test.gni")
 import(
-    "//foundation/distributedhardware/distributed_camera/distributedcamera.gni")
+    "$base_root/foundation/distributedhardware/distributed_camera/distributedcamera.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SoftbusAdapterFuzzTest") {
   module_out_path = "${fuzz_test_output_path}/softbusadapter"
 
-  fuzz_config_file = "${innerkits_path}/native_cpp/test/sourcefuzztest/softbusadapter_fuzzer"
+  fuzz_config_file =
+      "${innerkits_path}/native_cpp/test/sourcefuzztest/softbusadapter_fuzzer"
 
   include_dirs = [
     "${fwk_common_path}/utils/include",
