@@ -21,6 +21,7 @@ group("fuzztest") {
     "decodeoninputbufferavailable_fuzzer:fuzztest",
     "decodeonoutputbufferavailable_fuzzer:fuzztest",
     "onsourcelocalcamsrvdied_fuzzer:fuzztest",
+    "softbusadapter_fuzzer:fuzztest",
     "softbusonsourcebytesreceived_fuzzer:fuzztest",
     "softbusonsourcemessagereceived_fuzzer:fuzztest",
     "softbusonsourcesessionclosed_fuzzer:fuzztest",
