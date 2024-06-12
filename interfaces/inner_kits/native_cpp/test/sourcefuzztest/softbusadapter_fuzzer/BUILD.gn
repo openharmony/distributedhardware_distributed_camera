@@ -12,6 +12,7 @@
 # limitations under the License.
 
 #####################hydra-fuzz###################
+base_root = "../../../../../../../../../"
 import("//build/config/features.gni")
 import("//build/test.gni")
 import(
