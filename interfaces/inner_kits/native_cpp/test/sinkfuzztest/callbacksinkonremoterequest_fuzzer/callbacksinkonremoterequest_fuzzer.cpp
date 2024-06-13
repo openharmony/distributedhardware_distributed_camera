@@ -56,6 +56,28 @@ void CallbackSinkOnRemoteRequestFuzzTest(const uint8_t* data, size_t size)
     dcameraSinkCallback->memberFuncMap_[code] = &DCameraSinkCallbackStub::OnNotifyResourceInfoInner;
     dcameraSinkCallback->OnRemoteRequest(code, pdata, reply, option);
 }
+
+void CallbackSinkOnNotifyResourceInfoInnerFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
+        return;
+    }
+    MessageParcel pdata;
+    MessageParcel reply;
+    int32_t resType = static_cast<int32_t>(resourceEventType[data[0] % DC_RESOURCE_SIZE]);
+    std::string subtype(reinterpret_cast<const char*>(data), size);
+    std::string networkId(reinterpret_cast<const char*>(data), size);
+    bool isSensitive = data[0] % DC_RESOURCE_VALUE;
+    bool isSameAccout = data[0] % DC_RESOURCE_VALUE;
+    pdata.WriteInt32(resType);
+    pdata.WriteString(subtype);
+    pdata.WriteString(networkId);
+    pdata.ReadBool(isSensitive);
+    pdata.ReadBool(isSameAccout);
+
+    sptr<DCameraSinkCallback> dcameraSinkCallback(new (std::nothrow) DCameraSinkCallback());
+    dcameraSinkCallback->OnNotifyResourceInfoInner(pdata, reply);
+}
 }
 }
 
@@ -64,6 +86,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
     OHOS::DistributedHardware::CallbackSinkOnRemoteRequestFuzzTest(data, size);
+    OHOS::DistributedHardware::CallbackSinkOnNotifyResourceInfoInnerFuzzTest(data, size);
     return 0;
 }
-
