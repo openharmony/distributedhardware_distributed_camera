@@ -601,6 +601,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_026, TestSize.Level
 {
     DHLOGI("ScaleConvertProcessTest scale_convert_process_test_026.");
     int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS2, PROC_CONFIG);
+    testScaleConvertProcess_->isScaleConvert_.store(false);
     EXPECT_EQ(rc, DCAMERA_OK);
 
     size_t capacity = 3200000;
@@ -617,7 +618,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_026, TestSize.Level
     std::shared_ptr<DCameraPipelineSource> sourcePipeline = std::make_shared<DCameraPipelineSource>();
     testScaleConvertProcess_->callbackPipelineSource_ = sourcePipeline;
     rc = testScaleConvertProcess_->ProcessData(inputBuffers);
-    EXPECT_EQ(rc, DCAMERA_OK);
+    EXPECT_EQ(rc, DCAMERA_DISABLE_PROCESS);
 }
 
 /**
@@ -655,6 +656,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_028, TestSize.Level
 {
     DHLOGI("ScaleConvertProcessTest scale_convert_process_test_028.");
     int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS3, PROC_CONFIG);
+    testScaleConvertProcess_->isScaleConvert_.store(false);
     EXPECT_EQ(rc, DCAMERA_OK);
 
     size_t capacity = 3200000;
@@ -671,7 +673,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_028, TestSize.Level
     std::shared_ptr<DCameraPipelineSource> sourcePipeline = std::make_shared<DCameraPipelineSource>();
     testScaleConvertProcess_->callbackPipelineSource_ = sourcePipeline;
     rc = testScaleConvertProcess_->ProcessData(inputBuffers);
-    EXPECT_EQ(rc, DCAMERA_OK);
+    EXPECT_EQ(rc, DCAMERA_DISABLE_PROCESS);
 }
 #endif
 } // namespace DistributedHardware

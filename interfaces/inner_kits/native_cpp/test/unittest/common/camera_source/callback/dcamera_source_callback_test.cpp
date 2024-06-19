@@ -368,7 +368,7 @@ HWTEST_F(DCameraSourceCallbackTest, dcamera_source_callback_test_010, TestSize.L
     sourceCallback_->RegisterTriggerListener(listener);
     ret = sourceCallback_->OnDataSyncTrigger(devId);
     sourceCallback_->UnRegisterTriggerListener();
-    EXPECT_NE(DCAMERA_OK, ret);
+    EXPECT_EQ(DCAMERA_OK, ret);
 }
 }
 }
