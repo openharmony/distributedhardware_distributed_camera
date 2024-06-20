@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,6 +28,10 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+namespace {
+const int32_t SINK_FUZZ_TEST_SLEEP = 200000;
+}
+
 void SinkServiceInitSinkFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size == 0)) {
@@ -44,6 +48,7 @@ void SinkServiceInitSinkFuzzTest(const uint8_t* data, size_t size)
     sinkDevice->accessControl_ = std::make_shared<DCameraSinkAccessControl>();
     sinkDevice->controller_ = std::make_shared<DCameraSinkController>(sinkDevice->accessControl_, sinkCallback);
     sinkService->InitSink(param, sinkCallback);
+    usleep(SINK_FUZZ_TEST_SLEEP);
 }
 }
 }
