@@ -386,7 +386,7 @@ void DecodeDataProcess::ReleaseProcessNode()
 int32_t DecodeDataProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& inputBuffers)
 {
     DHLOGD("Process data in DecodeDataProcess.");
-    if (inputBuffers.empty()) {
+    if (inputBuffers.empty() || inputBuffers[0] == nullptr) {
         DHLOGE("The input data buffers is empty.");
         return DCAMERA_BAD_VALUE;
     }

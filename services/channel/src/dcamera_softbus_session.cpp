@@ -87,6 +87,7 @@ int32_t DCameraSoftbusSession::OnSessionOpened(int32_t socket)
     DHLOGI("open current session start, socket: %{public}d", socket);
     sessionId_ = socket;
     state_ = DCAMERA_SOFTBUS_STATE_OPENED;
+    CHECK_AND_RETURN_RET_LOG(listener_ == nullptr, DCAMERA_BAD_VALUE, "listener_ is null.");
     listener_->OnSessionState(DCAMERA_CHANNEL_STATE_CONNECTED);
     DHLOGI("open current session end, socket: %{public}d", socket);
     return DCAMERA_OK;
@@ -98,6 +99,7 @@ int32_t DCameraSoftbusSession::OnSessionClose(int32_t sessionId)
         GetAnonyString(peerDevId_).c_str(), GetAnonyString(peerSessionName_).c_str());
     sessionId_ = -1;
     state_ = DCAMERA_SOFTBUS_STATE_CLOSED;
+    CHECK_AND_RETURN_RET_LOG(listener_ == nullptr, DCAMERA_BAD_VALUE, "listener_ is null.");
     listener_->OnSessionState(DCAMERA_CHANNEL_STATE_DISCONNECTED);
     return DCAMERA_OK;
 }
@@ -265,6 +267,7 @@ void DCameraSoftbusSession::PostData(std::shared_ptr<DataBuffer>& buffer)
 {
     std::vector<std::shared_ptr<DataBuffer>> buffers;
     buffers.push_back(buffer);
+    CHECK_AND_RETURN_LOG(listener_ == nullptr, "listener_ is null.");
     listener_->OnDataReceived(buffers);
 }
 

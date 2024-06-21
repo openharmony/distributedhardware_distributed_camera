@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -157,6 +157,7 @@ int32_t DCameraSinkHandler::UnsubscribeLocalHardware(const std::string& dhId)
 int32_t DCameraSinkHandler::RegisterPrivacyResources(std::shared_ptr<PrivacyResourcesListener> listener)
 {
     DHLOGI("RegisterPrivacyResources start.");
+    CHECK_AND_RETURN_RET_LOG(dCameraSinkCallback_ == nullptr, DCAMERA_BAD_VALUE, "get sinkCallback failed");
     dCameraSinkCallback_->PushPrivacyResCallback(listener);
     return DCAMERA_OK;
 }

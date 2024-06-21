@@ -391,7 +391,7 @@ int32_t ScaleConvertProcess::ConvertDone(std::vector<std::shared_ptr<DataBuffer>
 {
     int64_t finishScaleTime = GetNowTimeStampUs();
     DHLOGD("ScaleConvertProcess : Convert Done.");
-    if (outputBuffers.empty()) {
+    if (outputBuffers.empty() || outputBuffers[0] == nullptr) {
         DHLOGE("The received data buffer is empty.");
         return DCAMERA_BAD_VALUE;
     }

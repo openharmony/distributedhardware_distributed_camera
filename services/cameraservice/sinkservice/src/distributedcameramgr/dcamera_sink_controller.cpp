@@ -64,6 +64,7 @@ int32_t DCameraSinkController::StartCapture(std::vector<std::shared_ptr<DCameraC
 {
     DHLOGI("StartCapture dhId: %{public}s", GetAnonyString(dhId_).c_str());
     std::string accessType = "";
+    CHECK_AND_RETURN_RET_LOG(accessControl_ == nullptr, DCAMERA_BAD_VALUE, "accessControl_ is null.");
     if ((accessControl_->IsSensitiveSrcAccess(SRC_TYPE)) &&
         (accessControl_->GetAccessControlType(accessType) == DCAMERA_SAME_ACCOUNT)) {
         int32_t ret = StartCaptureInner(captureInfos);
@@ -75,7 +76,7 @@ int32_t DCameraSinkController::StartCapture(std::vector<std::shared_ptr<DCameraC
         std::shared_ptr<std::string> param = std::make_shared<std::string>("");
         std::shared_ptr<std::vector<std::shared_ptr<DCameraCaptureInfo>>> infos =
             std::make_shared<std::vector<std::shared_ptr<DCameraCaptureInfo>>>(captureInfos);
-        CHECK_NULL_RETURN(sinkCotrEventHandler_, DCAMERA_BAD_VALUE);
+        CHECK_AND_RETURN_RET_LOG(sinkCotrEventHandler_ == nullptr, DCAMERA_BAD_VALUE, "sinkCotrEventHandler_ is null.");
         AppExecFwk::InnerEvent::Pointer triggerEvent =
                 AppExecFwk::InnerEvent::Get(EVENT_FRAME_TRIGGER, param, 0);
         AppExecFwk::InnerEvent::Pointer authorizationEvent =

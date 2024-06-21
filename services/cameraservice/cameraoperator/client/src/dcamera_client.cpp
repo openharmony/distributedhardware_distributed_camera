@@ -330,6 +330,7 @@ int32_t DCameraClient::SetResultCallback(std::shared_ptr<ResultCallback>& callba
 int32_t DCameraClient::ConfigCaptureSession(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos)
 {
     DHLOGI("ConfigCaptureSession cameraId: %{public}s", GetAnonyString(cameraId_).c_str());
+    CHECK_AND_RETURN_RET_LOG(cameraManager_ == nullptr, DCAMERA_BAD_VALUE, "cameraManager is null.");
     int rv = cameraManager_->CreateCameraInput(cameraInfo_, &((sptr<CameraStandard::CameraInput> &)cameraInput_));
     if (rv != DCAMERA_OK) {
         DHLOGE("ConfigCaptureSession %{public}s create cameraInput failed", GetAnonyString(cameraId_).c_str());

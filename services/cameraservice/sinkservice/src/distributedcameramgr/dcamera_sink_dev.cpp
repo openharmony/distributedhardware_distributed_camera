@@ -88,6 +88,7 @@ int32_t DCameraSinkDev::UnsubscribeLocalHardware()
 int32_t DCameraSinkDev::StopCapture()
 {
     DHLOGI("StopCapture dhId: %{public}s", GetAnonyString(dhId_).c_str());
+    CHECK_AND_RETURN_RET_LOG(controller_ == nullptr, DCAMERA_BAD_VALUE, "controller_ is null.");
     return controller_->StopCapture();
 }
 
@@ -106,6 +107,7 @@ int32_t DCameraSinkDev::ChannelNeg(std::string& channelInfo)
                GetAnonyString(dhId_).c_str(), ret);
         return ret;
     }
+    CHECK_AND_RETURN_RET_LOG(controller_ == nullptr, DCAMERA_BAD_VALUE, "controller_ is null.");
     return controller_->ChannelNeg(channelInfoCmd.value_);
 }
 
@@ -113,6 +115,7 @@ int32_t DCameraSinkDev::GetCameraInfo(std::string& cameraInfo)
 {
     DHLOGI("GetCameraInfo dhId: %{public}s", GetAnonyString(dhId_).c_str());
     std::shared_ptr<DCameraInfo> info = std::make_shared<DCameraInfo>();
+    CHECK_AND_RETURN_RET_LOG(controller_ == nullptr, DCAMERA_BAD_VALUE, "controller_ is null.");
     int32_t ret = controller_->GetCameraInfo(info);
     if (ret != DCAMERA_OK) {
         DHLOGE("get state failed, dhId: %{public}s, ret: %{public}d", GetAnonyString(dhId_).c_str(), ret);
@@ -147,12 +150,14 @@ int32_t DCameraSinkDev::OpenChannel(std::string& openInfo)
         DHLOGE("openInfo unmarshal failed, dhId: %{public}s, ret: %{public}d", GetAnonyString(dhId_).c_str(), ret);
         return ret;
     }
+    CHECK_AND_RETURN_RET_LOG(controller_ == nullptr, DCAMERA_BAD_VALUE, "controller_ is null.");
     return controller_->OpenChannel(cmd.value_);
 }
 
 int32_t DCameraSinkDev::CloseChannel()
 {
     DHLOGI("CloseChannel dhId: %{public}s", GetAnonyString(dhId_).c_str());
+    CHECK_AND_RETURN_RET_LOG(controller_ == nullptr, DCAMERA_BAD_VALUE, "controller_ is null.");
     return controller_->CloseChannel();
 }
 

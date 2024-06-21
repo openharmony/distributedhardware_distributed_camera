@@ -86,10 +86,14 @@ void DCameraStreamDataProcessProducer::Stop()
         state_ = DCAMERA_PRODUCER_STATE_STOP;
     }
     if (streamType_ == CONTINUOUS_FRAME) {
-        smoother_->StopSmooth();
-        smoother_ = nullptr;
+        if (smoother_ != nullptr) {
+            smoother_->StopSmooth();
+            smoother_ = nullptr;
+        }
         smootherListener_ = nullptr;
-        eventHandler_->GetEventRunner()->Stop();
+        if ((eventHandler_ != nullptr) && (eventHandler_->GetEventRunner() != nullptr)) {
+            eventHandler_->GetEventRunner()->Stop();
+        }
         eventThread_.join();
         eventHandler_ = nullptr;
     } else {
@@ -123,6 +127,7 @@ void DCameraStreamDataProcessProducer::FeedStream(const std::shared_ptr<DataBuff
             producerCon_.notify_one();
         }
     }
+    CHECK_AND_RETURN_LOG(smoother_ == nullptr, "smoother_ is null.");
     if (streamType_ == CONTINUOUS_FRAME) {
         smoother_->PushData(buffer);
     }
