@@ -710,9 +710,23 @@ void DCameraSourceDev::NotifyResult(DCAMERA_EVENT eventType, DCameraSourceEvent&
         return;
     }
 
-    auto memberFunc = itFunc->second;
-    (this->*memberFunc)(eventType, event, result);
-    return;
+    switch (eventType) {
+        case DCAMERA_EVENT_REGIST:
+        case DCAMERA_EVENT_UNREGIST:
+            NotifyRegisterResult(eventType, event, result);
+            break;
+        case DCAMERA_EVENT_OPEN:
+        case DCAMERA_EVENT_CLOSE:
+        case DCAMERA_EVENT_CONFIG_STREAMS:
+        case DCAMERA_EVENT_RELEASE_STREAMS:
+        case DCAMERA_EVENT_START_CAPTURE:
+        case DCAMERA_EVENT_STOP_CAPTURE:
+        case DCAMERA_EVENT_UPDATE_SETTINGS:
+            NotifyHalResult(eventType, event, result);
+            break;
+        default:
+            break;
+    }
 }
 
 void DCameraSourceDev::NotifyRegisterResult(DCAMERA_EVENT eventType, DCameraSourceEvent& event, int32_t result)

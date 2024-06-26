@@ -95,7 +95,7 @@ bool DecodeDataProcess::IsConvertible(const VideoConfigParams& sourceConfig, con
 void DecodeDataProcess::InitCodecEvent()
 {
     DHLOGD("Init DecodeNode eventBus, and add handler for it.");
-    eventThread_ = std::thread(&DecodeDataProcess::StartEventHandler, this);
+    eventThread_ = std::thread([this]() { this->StartEventHandler(); });
     std::unique_lock<std::mutex> lock(eventMutex_);
     eventCon_.wait(lock, [this] {
         return decEventHandler_ != nullptr;
@@ -238,7 +238,7 @@ int32_t DecodeDataProcess::SetDecoderOutputSurface()
     if (ret != GSERROR_OK || decodeConsumerSurface_ == nullptr) {
         DHLOGE("Set Usage failed.");
     }
-    
+
     decodeSurfaceListener_ = new DecodeSurfaceListener(decodeConsumerSurface_, shared_from_this());
     if (decodeConsumerSurface_->RegisterConsumerListener(decodeSurfaceListener_) !=
         SURFACE_ERROR_OK) {

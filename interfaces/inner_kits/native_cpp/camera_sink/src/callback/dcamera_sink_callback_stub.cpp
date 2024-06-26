@@ -46,8 +46,13 @@ int32_t DCameraSinkCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &d
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
 
-    auto memberFunc = itFunc->second;
-    return (this->*memberFunc)(data, reply);
+    switch (code) {
+        case NOTIFY_RESOURCEINFO:
+            return OnNotifyResourceInfoInner(data, reply);
+        default:
+            break;
+    }
+    return DCAMERA_NOT_FOUND;
 }
 
 int32_t DCameraSinkCallbackStub::OnNotifyResourceInfoInner(MessageParcel &data, MessageParcel &reply)

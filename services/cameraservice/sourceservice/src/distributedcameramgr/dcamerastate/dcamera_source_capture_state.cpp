@@ -44,8 +44,35 @@ int32_t DCameraSourceCaptureState::Execute(std::shared_ptr<DCameraSourceDev>& ca
         return DCAMERA_WRONG_STATE;
     }
 
-    auto memberFunc = itFunc->second;
-    int32_t ret = (this->*memberFunc)(camDev, event);
+    int32_t ret = DCAMERA_NOT_FOUND;
+    switch (eventType) {
+        case DCAMERA_EVENT_REGIST:
+            ret = DoRegisterTask(camDev, event);
+            break;
+        case DCAMERA_EVENT_UNREGIST:
+            ret = DoUnregisterTask(camDev, event);
+            break;
+        case DCAMERA_EVENT_OPEN:
+            ret = DoOpenTask(camDev, event);
+            break;
+        case DCAMERA_EVENT_CLOSE:
+            ret = DoCloseTask(camDev, event);
+            break;
+        case DCAMERA_EVENT_START_CAPTURE:
+            ret = DoStartCaptureTask(camDev, event);
+            break;
+        case DCAMERA_EVENT_STOP_CAPTURE:
+            ret = DoStopCaptureTask(camDev, event);
+            break;
+        case DCAMERA_EVENT_UPDATE_SETTINGS:
+            ret = DoUpdateSettingsTask(camDev, event);
+            break;
+        case DCAMERA_EVENT_NOFIFY:
+            ret = DoEventNofityTask(camDev, event);
+            break;
+        default:
+            break;
+    }
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceCaptureState execute %{public}d failed, ret: %{public}d", eventType, ret);
     }

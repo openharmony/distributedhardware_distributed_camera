@@ -49,8 +49,19 @@ int32_t DCameraSourceCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel 
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
 
-    auto memberFunc = itFunc->second;
-    return (this->*memberFunc)(data, reply);
+    switch (code) {
+        case NOTIFY_REG_RESULT:
+            return NotifyRegResultInner(data, reply);
+        case NOTIFY_UNREG_RESULT:
+            return NotifyUnregResultInner(data, reply);
+        case NOTIFY_STATE_CHANGED:
+            return OnHardwareStateChangedInner(data, reply);
+        case NOTIFY_DATASYNC_TRIGGER:
+            return OnDataSyncTriggerInner(data, reply);
+        default:
+            break;
+    }
+    return DCAMERA_NOT_FOUND;
 }
 
 int32_t DCameraSourceCallbackStub::NotifyRegResultInner(MessageParcel &data, MessageParcel &reply)

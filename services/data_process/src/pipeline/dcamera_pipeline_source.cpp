@@ -84,7 +84,7 @@ bool DCameraPipelineSource::IsInRange(const VideoConfigParams& curConfig)
 void DCameraPipelineSource::InitDCameraPipEvent()
 {
     DHLOGD("Init source DCamera pipeline event to asynchronously process data.");
-    eventThread_ = std::thread(&DCameraPipelineSource::StartEventHandler, this);
+    eventThread_ = std::thread([this]() { this->StartEventHandler(); });
     std::unique_lock<std::mutex> lock(eventMutex_);
     eventCon_.wait(lock, [this] {
         return pipeEventHandler_ != nullptr;

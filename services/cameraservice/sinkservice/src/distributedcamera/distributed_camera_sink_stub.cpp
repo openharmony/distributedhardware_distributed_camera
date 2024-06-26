@@ -78,8 +78,35 @@ int32_t DistributedCameraSinkStub::OnRemoteRequest(uint32_t code, MessageParcel 
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
 
-    auto memberFunc = itFunc->second;
-    return (this->*memberFunc)(data, reply);
+    switch (code) {
+        case static_cast<uint32_t>(IDCameraSinkInterfaceCode::INIT_SINK):
+            return InitSinkInner(data, reply);
+        case static_cast<uint32_t>(IDCameraSinkInterfaceCode::RELEASE_SINK):
+            return ReleaseSinkInner(data, reply);
+        case static_cast<uint32_t>(IDCameraSinkInterfaceCode::SUBSCRIBE_LOCAL_HARDWARE):
+            return SubscribeLocalHardwareInner(data, reply);
+        case static_cast<uint32_t>(IDCameraSinkInterfaceCode::UNSUBSCRIBE_LOCAL_HARDWARE):
+            return UnsubscribeLocalHardwareInner(data, reply);
+        case static_cast<uint32_t>(IDCameraSinkInterfaceCode::STOP_CAPTURE):
+            return StopCaptureInner(data, reply);
+        case static_cast<uint32_t>(IDCameraSinkInterfaceCode::CHANNEL_NEG):
+            return ChannelNegInner(data, reply);
+        case static_cast<uint32_t>(IDCameraSinkInterfaceCode::GET_CAMERA_INFO):
+            return GetCameraInfoInner(data, reply);
+        case static_cast<uint32_t>(IDCameraSinkInterfaceCode::OPEN_CHANNEL):
+            return OpenChannelInner(data, reply);
+        case static_cast<uint32_t>(IDCameraSinkInterfaceCode::CLOSE_CHANNEL):
+            return CloseChannelInner(data, reply);
+        case static_cast<uint32_t>(IDCameraSinkInterfaceCode::PAUSE_DISTRIBUTED_HARDWARE):
+            return PauseDistributedHardwareInner(data, reply);
+        case static_cast<uint32_t>(IDCameraSinkInterfaceCode::RESUME_DISTRIBUTED_HARDWARE):
+            return ResumeDistributedHardwareInner(data, reply);
+        case static_cast<uint32_t>(IDCameraSinkInterfaceCode::STOP_DISTRIBUTED_HARDWARE):
+            return StopDistributedHardwareInner(data, reply);
+        default:
+            break;
+    }
+    return DCAMERA_NOT_FOUND;
 }
 
 int32_t DistributedCameraSinkStub::InitSinkInner(MessageParcel &data, MessageParcel &reply)
