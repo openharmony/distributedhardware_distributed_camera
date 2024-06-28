@@ -58,10 +58,8 @@ ohos_executable("dcamera_client_demo") {
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
-    "access_token:libnativetoken",
-    "access_token:libnativetoken",
-    "access_token:libtoken_setproc",
-    "access_token:libtoken_setproc",
+    "access_token:libnativetoken_shared",
+    "access_token:libtokensetproc_shared",
     "av_codec:av_codec_client",
     "cJSON:cjson",
     "c_utils:utils",
