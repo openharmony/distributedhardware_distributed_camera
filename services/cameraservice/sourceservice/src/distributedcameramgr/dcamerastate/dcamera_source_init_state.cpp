@@ -32,12 +32,7 @@ DCameraSourceInitState::DCameraSourceInitState(std::shared_ptr<DCameraSourceStat
 int32_t DCameraSourceInitState::Execute(std::shared_ptr<DCameraSourceDev>& camDev, DCAMERA_EVENT eventType,
     DCameraSourceEvent& event)
 {
-    auto itFunc = memberFuncMap_.find(eventType);
-    if (itFunc == memberFuncMap_.end()) {
-        DHLOGE("DCameraSourceInitState execute %{public}d in wrong state", eventType);
-        return DCAMERA_WRONG_STATE;
-    }
-
+    DHLOGE("DCameraSourceInitState execute %{public}d", eventType);
     int32_t ret = DCAMERA_NOT_FOUND;
     switch (eventType) {
         case DCAMERA_EVENT_REGIST:
@@ -47,7 +42,8 @@ int32_t DCameraSourceInitState::Execute(std::shared_ptr<DCameraSourceDev>& camDe
             ret = DoUnregisterTask(camDev, event);
             break;
         default:
-            break;
+            DHLOGE("DCameraSourceInitState execute %{public}d in wrong state", eventType);
+            return DCAMERA_WRONG_STATE;
     }
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceInitState execute %{public}d failed, ret: %{public}d", eventType, ret);

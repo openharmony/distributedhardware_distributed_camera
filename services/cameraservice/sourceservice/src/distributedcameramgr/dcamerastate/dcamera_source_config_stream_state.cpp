@@ -40,12 +40,7 @@ DCameraSourceConfigStreamState::DCameraSourceConfigStreamState(std::shared_ptr<D
 int32_t DCameraSourceConfigStreamState::Execute(std::shared_ptr<DCameraSourceDev>& camDev, DCAMERA_EVENT eventType,
     DCameraSourceEvent& event)
 {
-    auto itFunc = memberFuncMap_.find(eventType);
-    if (itFunc == memberFuncMap_.end()) {
-        DHLOGE("DCameraSourceConfigStreamState execute %{public}d in wrong state", eventType);
-        return DCAMERA_WRONG_STATE;
-    }
-
+    DHLOGI("DCameraSourceConfigStreamState execute %{public}d", eventType);
     int32_t ret = DCAMERA_NOT_FOUND;
     switch (eventType) {
         case DCAMERA_EVENT_REGIST:
@@ -79,7 +74,8 @@ int32_t DCameraSourceConfigStreamState::Execute(std::shared_ptr<DCameraSourceDev
             ret = DoEventNofityTask(camDev, event);
             break;
         default:
-            break;
+            DHLOGE("DCameraSourceConfigStreamState execute %{public}d in wrong state", eventType);
+            return DCAMERA_WRONG_STATE;
     }
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceConfigStreamState execute %{public}d failed, ret: %{public}d", eventType, ret);

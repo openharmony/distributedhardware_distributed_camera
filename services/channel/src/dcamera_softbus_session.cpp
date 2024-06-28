@@ -303,7 +303,7 @@ int32_t DCameraSoftbusSession::SendData(DCameraSessionMode mode, std::shared_ptr
         case DCAMERA_SESSION_MODE_JPEG:
             return UnPackSendData(buffer, memberFunc);
         default:
-            break;
+            return UnPackSendData(buffer, memberFunc);
     }
     return DCAMERA_NOT_FOUND;
 }

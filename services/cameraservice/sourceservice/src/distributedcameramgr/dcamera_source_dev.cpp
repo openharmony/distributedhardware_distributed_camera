@@ -703,13 +703,7 @@ int32_t DCameraSourceDev::CameraEventNotify(std::shared_ptr<DCameraEvent>& event
 
 void DCameraSourceDev::NotifyResult(DCAMERA_EVENT eventType, DCameraSourceEvent& event, int32_t result)
 {
-    auto itFunc = memberFuncMap_.find(eventType);
-    if (itFunc == memberFuncMap_.end()) {
-        DHLOGE("Notify func map not find, execute %{public}d notify, devId: %{public}s dhId: %{public}s", eventType,
-            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
-        return;
-    }
-
+    DHLOGI("Notify func map, execute %{public}d notify", eventType);
     switch (eventType) {
         case DCAMERA_EVENT_REGIST:
         case DCAMERA_EVENT_UNREGIST:
@@ -725,6 +719,8 @@ void DCameraSourceDev::NotifyResult(DCAMERA_EVENT eventType, DCameraSourceEvent&
             NotifyHalResult(eventType, event, result);
             break;
         default:
+            DHLOGE("Notify func map not find, execute %{public}d notify, devId: %{public}s dhId: %{public}s", eventType,
+                GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
             break;
     }
 }
