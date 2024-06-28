@@ -32,7 +32,7 @@ DCameraSourceInitState::DCameraSourceInitState(std::shared_ptr<DCameraSourceStat
 int32_t DCameraSourceInitState::Execute(std::shared_ptr<DCameraSourceDev>& camDev, DCAMERA_EVENT eventType,
     DCameraSourceEvent& event)
 {
-    DHLOGE("DCameraSourceInitState execute %{public}d", eventType);
+    DHLOGI("DCameraSourceInitState execute %{public}d", eventType);
     int32_t ret = DCAMERA_NOT_FOUND;
     switch (eventType) {
         case DCAMERA_EVENT_REGIST:
