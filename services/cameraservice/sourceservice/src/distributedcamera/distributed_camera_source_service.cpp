@@ -82,7 +82,7 @@ bool DistributedCameraSourceService::Init()
     listener_ = std::make_shared<DCameraServiceStateListener>();
     if (!isHicollieRunning_.load()) {
         isHicollieRunning_.store(true);
-        hicollieThread_ = std::thread(&DistributedCameraSourceService::StartHicollieThread, this);
+        hicollieThread_ = std::thread([this]() { this->StartHicollieThread(); });
     }
     DHLOGI("DistributedCameraSourceService init success");
     return true;

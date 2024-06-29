@@ -61,7 +61,7 @@ int32_t IFeedingSmoother::StartSmooth()
     }
     InitTimeStatistician();
     PrepareSmooth();
-    smoothThread_ = std::thread(&IFeedingSmoother::LooperSmooth, this);
+    smoothThread_ = std::thread([this]() { this->LooperSmooth(); });
     return SMOOTH_SUCCESS;
 }
 

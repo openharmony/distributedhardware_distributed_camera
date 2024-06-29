@@ -299,11 +299,16 @@ int32_t DCameraSoftbusSession::SendData(DCameraSessionMode mode, std::shared_ptr
         return DCAMERA_NOT_FOUND;
     }
     auto memberFunc = itFunc->second;
-    if (mode == DCAMERA_SESSION_MODE_VIDEO) {
-        return (this->*memberFunc)(buffer);
+    switch (mode) {
+        case DCAMERA_SESSION_MODE_VIDEO:
+            return SendStream(buffer);
+        case DCAMERA_SESSION_MODE_CTRL:
+        case DCAMERA_SESSION_MODE_JPEG:
+            return UnPackSendData(buffer, memberFunc);
+        default:
+            return UnPackSendData(buffer, memberFunc);
     }
-
-    return UnPackSendData(buffer, memberFunc);
+    return DCAMERA_NOT_FOUND;
 }
 
 int32_t DCameraSoftbusSession::UnPackSendData(std::shared_ptr<DataBuffer>& buffer, DCameraSendFuc memberFunc)
@@ -324,7 +329,7 @@ int32_t DCameraSoftbusSession::UnPackSendData(std::shared_ptr<DataBuffer>& buffe
                 "peerSess: %{public}s", ret, mySessionName_.c_str(), peerSessionName_.c_str());
             return ret;
         }
-        return (this->*memberFunc)(unpackData);
+        return SendBytes(unpackData);
     }
     uint32_t offset = 0;
     while (totalLen > offset) {
@@ -342,7 +347,7 @@ int32_t DCameraSoftbusSession::UnPackSendData(std::shared_ptr<DataBuffer>& buffe
                 "%{public}s", ret, mySessionName_.c_str(), peerSessionName_.c_str());
             return ret;
         }
-        ret = (this->*memberFunc)(unpackData);
+        ret = SendBytes(unpackData);
         if (ret != DCAMERA_OK) {
             DHLOGE("DCameraSoftbusSession sendData failed, ret: %{public}d, sess: %{public}s peerSess: %{public}s",
                 ret, mySessionName_.c_str(), peerSessionName_.c_str());

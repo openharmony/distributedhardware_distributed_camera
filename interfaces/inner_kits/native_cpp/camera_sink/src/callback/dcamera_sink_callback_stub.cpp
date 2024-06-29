@@ -41,13 +41,15 @@ int32_t DCameraSinkCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &d
         DHLOGE("remoteDesc is invalid!");
         return ERR_INVALID_DATA;
     }
-    auto itFunc = memberFuncMap_.find(code);
-    if (itFunc == memberFuncMap_.end()) {
-        return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
-    }
 
-    auto memberFunc = itFunc->second;
-    return (this->*memberFunc)(data, reply);
+    switch (code) {
+        case NOTIFY_RESOURCEINFO:
+            return OnNotifyResourceInfoInner(data, reply);
+        default:
+            DHLOGE("Invalid OnRemoteRequest code=%{public}d", code);
+            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+    }
+    return DCAMERA_NOT_FOUND;
 }
 
 int32_t DCameraSinkCallbackStub::OnNotifyResourceInfoInner(MessageParcel &data, MessageParcel &reply)

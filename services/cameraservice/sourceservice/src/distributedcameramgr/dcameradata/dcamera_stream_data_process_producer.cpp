@@ -62,7 +62,7 @@ void DCameraStreamDataProcessProducer::Start()
     }
     state_ = DCAMERA_PRODUCER_STATE_START;
     if (streamType_ == CONTINUOUS_FRAME) {
-        eventThread_ = std::thread(&DCameraStreamDataProcessProducer::StartEvent, this);
+        eventThread_ = std::thread([this]() { this->StartEvent(); });
         std::unique_lock<std::mutex> lock(eventMutex_);
         eventCon_.wait(lock, [this] {
             return eventHandler_ != nullptr;
@@ -72,7 +72,7 @@ void DCameraStreamDataProcessProducer::Start()
         smoother_->RegisterListener(smootherListener_);
         smoother_->StartSmooth();
     } else {
-        producerThread_ = std::thread(&DCameraStreamDataProcessProducer::LooperSnapShot, this);
+        producerThread_ = std::thread([this]() { this->LooperSnapShot(); });
     }
 }
 

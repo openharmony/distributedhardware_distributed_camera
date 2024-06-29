@@ -49,7 +49,7 @@ DCameraSinkDataProcess::~DCameraSinkDataProcess()
 void DCameraSinkDataProcess::Init()
 {
     DHLOGI("DCameraSinkDataProcess Init dhId: %{public}s", GetAnonyString(dhId_).c_str());
-    eventThread_ = std::thread(&DCameraSinkDataProcess::StartEventHandler, this);
+    eventThread_ = std::thread([this]() { this->StartEventHandler(); });
     std::unique_lock<std::mutex> lock(eventMutex_);
     eventCon_.wait(lock, [this] {
         return eventHandler_ != nullptr;

@@ -95,7 +95,7 @@ bool DecodeDataProcess::IsConvertible(const VideoConfigParams& sourceConfig, con
 void DecodeDataProcess::InitCodecEvent()
 {
     DHLOGD("Init DecodeNode eventBus, and add handler for it.");
-    eventThread_ = std::thread(&DecodeDataProcess::StartEventHandler, this);
+    eventThread_ = std::thread([this]() { this->StartEventHandler(); });
     std::unique_lock<std::mutex> lock(eventMutex_);
     eventCon_.wait(lock, [this] {
         return decEventHandler_ != nullptr;

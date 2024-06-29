@@ -60,13 +60,23 @@ int32_t DistributedCameraSourceStub::OnRemoteRequest(uint32_t code, MessageParce
         DHLOGE("remoteDesc is invalid!");
         return ERR_INVALID_DATA;
     }
-    auto itFunc = memberFuncMap_.find(code);
-    if (itFunc == memberFuncMap_.end()) {
-        return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
-    }
 
-    auto memberFunc = itFunc->second;
-    return (this->*memberFunc)(data, reply);
+    switch (code) {
+        case static_cast<uint32_t>(IDCameraSourceInterfaceCode::INIT_SOURCE):
+            return InitSourceInner(data, reply);
+        case static_cast<uint32_t>(IDCameraSourceInterfaceCode::RELEASE_SOURCE):
+            return ReleaseSourceInner(data, reply);
+        case static_cast<uint32_t>(IDCameraSourceInterfaceCode::REGISTER_DISTRIBUTED_HARDWARE):
+            return RegisterDistributedHardwareInner(data, reply);
+        case static_cast<uint32_t>(IDCameraSourceInterfaceCode::UNREGISTER_DISTRIBUTED_HARDWARE):
+            return UnregisterDistributedHardwareInner(data, reply);
+        case static_cast<uint32_t>(IDCameraSourceInterfaceCode::CAMERA_NOTIFY):
+            return DCameraNotifyInner(data, reply);
+        default:
+            DHLOGE("Invalid OnRemoteRequest code=%{public}d", code);
+            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+    }
+    return DCAMERA_NOT_FOUND;
 }
 
 int32_t DistributedCameraSourceStub::InitSourceInner(MessageParcel &data, MessageParcel &reply)

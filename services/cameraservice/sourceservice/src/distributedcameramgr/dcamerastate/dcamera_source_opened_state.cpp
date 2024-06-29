@@ -38,14 +38,37 @@ DCameraSourceOpenedState::DCameraSourceOpenedState(std::shared_ptr<DCameraSource
 int32_t DCameraSourceOpenedState::Execute(std::shared_ptr<DCameraSourceDev>& camDev, DCAMERA_EVENT eventType,
     DCameraSourceEvent& event)
 {
-    auto itFunc = memberFuncMap_.find(eventType);
-    if (itFunc == memberFuncMap_.end()) {
-        DHLOGE("DCameraSourceOpenedState execute %{public}d in wrong state", eventType);
-        return DCAMERA_WRONG_STATE;
+    DHLOGI("DCameraSourceOpenedState execute %{public}d", eventType);
+    int32_t ret = DCAMERA_NOT_FOUND;
+    switch (eventType) {
+        case DCAMERA_EVENT_REGIST:
+            ret = DoRegisterTask(camDev, event);
+            break;
+        case DCAMERA_EVENT_UNREGIST:
+            ret = DoUnregisterTask(camDev, event);
+            break;
+        case DCAMERA_EVENT_OPEN:
+            ret = DoOpenTask(camDev, event);
+            break;
+        case DCAMERA_EVENT_CLOSE:
+            ret = DoCloseTask(camDev, event);
+            break;
+        case DCAMERA_EVENT_CONFIG_STREAMS:
+            ret = DoConfigStreamsTask(camDev, event);
+            break;
+        case DCAMERA_EVENT_RELEASE_STREAMS:
+            ret = DoReleaseStreamsTask(camDev, event);
+            break;
+        case DCAMERA_EVENT_UPDATE_SETTINGS:
+            ret = DoUpdateSettingsTask(camDev, event);
+            break;
+        case DCAMERA_EVENT_NOFIFY:
+            ret = DoEventNofityTask(camDev, event);
+            break;
+        default:
+            DHLOGE("DCameraSourceOpenedState execute %{public}d in wrong state", eventType);
+            return DCAMERA_WRONG_STATE;
     }
-
-    auto memberFunc = itFunc->second;
-    int32_t ret = (this->*memberFunc)(camDev, event);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceOpenedState execute %{public}d failed, ret: %{public}d", eventType, ret);
     }
