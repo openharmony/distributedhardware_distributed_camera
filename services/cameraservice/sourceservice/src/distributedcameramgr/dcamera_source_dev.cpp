@@ -276,6 +276,7 @@ void DCameraSourceDev::DoProcessData(const AppExecFwk::InnerEvent::Pointer &even
 {
     std::shared_ptr<DCameraSourceEvent> eventParam = event->GetSharedObject<DCameraSourceEvent>();
     CHECK_AND_RETURN_LOG(eventParam == nullptr, "eventParam is nullptr.");
+    CHECK_AND_RETURN_LOG(stateMachine_ == nullptr, "stateMachine_ is nullptr.");
     int32_t ret = stateMachine_->Execute((*eventParam).GetEventType(), (*eventParam));
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev Execute failed, ret: %{public}d, devId: %{public}s dhId: %{public}s", ret,

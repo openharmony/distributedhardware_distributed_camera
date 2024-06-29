@@ -181,6 +181,7 @@ int32_t DCameraSinkDataProcess::FeedStreamInner(std::shared_ptr<DataBuffer>& dat
 {
     std::vector<std::shared_ptr<DataBuffer>> buffers;
     buffers.push_back(dataBuffer);
+    CHECK_AND_RETURN_RET_LOG(pipeline_ == nullptr, DCAMERA_BAD_VALUE, "pipeline_ is null.");
     int32_t ret = pipeline_->ProcessData(buffers);
     if (ret != DCAMERA_OK) {
         DHLOGE("process data failed, dhId: %{public}s, ret: %{public}d", GetAnonyString(dhId_).c_str(), ret);

@@ -73,7 +73,7 @@ void FpsControllerProcess::ReleaseProcessNode()
 
 int32_t FpsControllerProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& inputBuffers)
 {
-    if (inputBuffers.empty()) {
+    if (inputBuffers.empty() || inputBuffers[0] == nullptr) {
         DHLOGE("Data buffers is null.");
         return DCAMERA_BAD_TYPE;
     }

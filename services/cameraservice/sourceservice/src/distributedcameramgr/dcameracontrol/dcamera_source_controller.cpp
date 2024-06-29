@@ -94,6 +94,7 @@ int32_t DCameraSourceController::StartCapture(std::vector<std::shared_ptr<DCamer
             GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
         return ret;
     }
+    CHECK_AND_RETURN_RET_LOG(channel_ == nullptr, DCAMERA_BAD_VALUE, "channel_ is null.");
     ret = channel_->SendData(buffer);
     if (ret != DCAMERA_OK) {
         DHLOGE("SendData failed %{public}d, devId: %{public}s, dhId: %{public}s", ret,
@@ -236,6 +237,7 @@ int32_t DCameraSourceController::UpdateSettings(std::vector<std::shared_ptr<DCam
             GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
         return ret;
     }
+    CHECK_AND_RETURN_RET_LOG(channel_ == nullptr, DCAMERA_BAD_VALUE, "channel_ is null.");
     ret = channel_->SendData(buffer);
     if (ret != DCAMERA_OK) {
         DHLOGE("SendData failed %{public}d, devId: %{public}s, dhId: %{public}s", ret,
@@ -316,6 +318,7 @@ int32_t DCameraSourceController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& o
 
     std::vector<DCameraIndex> indexs;
     indexs.push_back(DCameraIndex(devId, dhId));
+    CHECK_AND_RETURN_RET_LOG(channel_ == nullptr, DCAMERA_BAD_VALUE, "channel_ is null.");
     ret = channel_->CreateSession(indexs, SESSION_FLAG, DCAMERA_SESSION_MODE_CTRL, listener_);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceController Bind Socket failed, ret: %{public}d", ret);

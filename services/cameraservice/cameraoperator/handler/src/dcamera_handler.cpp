@@ -55,6 +55,7 @@ int32_t DCameraHandler::Initialize()
 std::vector<DHItem> DCameraHandler::QueryMeta()
 {
     std::vector<DHItem> itemList;
+    CHECK_AND_RETURN_RET_LOG(cameraManager_ == nullptr, itemList, "cameraManager is null.");
     std::vector<sptr<CameraStandard::CameraDevice>> cameraList = cameraManager_->GetSupportedCameras();
     uint64_t listSize = static_cast<uint64_t>(cameraList.size());
     DHLOGI("get %{public}" PRIu64" cameras", listSize);
@@ -82,6 +83,7 @@ std::vector<DHItem> DCameraHandler::QueryMeta()
 std::vector<DHItem> DCameraHandler::Query()
 {
     std::vector<DHItem> itemList;
+    CHECK_AND_RETURN_RET_LOG(cameraManager_ == nullptr, itemList, "cameraManager is null.");
     std::vector<sptr<CameraStandard::CameraDevice>> cameraList = cameraManager_->GetSupportedCameras();
     uint64_t listSize = static_cast<uint64_t>(cameraList.size());
     DHLOGI("get %{public}" PRIu64" cameras", listSize);

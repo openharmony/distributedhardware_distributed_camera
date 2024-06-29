@@ -314,6 +314,7 @@ void DistributedCameraSinkService::GetCamDumpInfo(CameraDumpInfo& camDump)
 bool DistributedCameraSinkService::IsCurSinkDev(std::shared_ptr<DCameraSinkDev> sinkDevice)
 {
     std::string camInfoJson;
+    CHECK_AND_RETURN_RET_LOG(sinkDevice == nullptr, false, "sinkDevice is null.");
     int32_t ret = sinkDevice->GetCameraInfo(camInfoJson);
     CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, false, "GetCameraInfo failed, ret: %{public}d", ret);
     DCameraInfoCmd cmd;

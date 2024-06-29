@@ -136,6 +136,7 @@ int32_t DCameraSourceHandler::RegisterDistributedHardware(const std::string& dev
     std::string reqId = GetRandomID();
     std::lock_guard<std::mutex> autoLock(optLock_);
 
+    CHECK_AND_RETURN_RET_LOG(callback_ == nullptr, DCAMERA_BAD_VALUE, "ipc callback is null.");
     callback_->PushRegCallback(reqId, callback);
     int32_t ret = dCameraSourceSrv->RegisterDistributedHardware(devId, dhId, reqId, param);
     if (ret != DCAMERA_OK) {
@@ -164,6 +165,7 @@ int32_t DCameraSourceHandler::UnregisterDistributedHardware(const std::string& d
     std::string reqId = GetRandomID();
     std::lock_guard<std::mutex> autoLock(optLock_);
 
+    CHECK_AND_RETURN_RET_LOG(callback_ == nullptr, DCAMERA_BAD_VALUE, "ipc callback is null.");
     callback_->PushUnregCallback(reqId, callback);
     int32_t ret = dCameraSourceSrv->UnregisterDistributedHardware(devId, dhId, reqId);
     if (ret != DCAMERA_OK) {

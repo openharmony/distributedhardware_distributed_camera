@@ -32,6 +32,7 @@ void DCameraFeedingSmoother::PrepareSmooth()
 
 void DCameraFeedingSmoother::InitBaseline(const int64_t timeStampBaseline, const int64_t clockBaseline)
 {
+    CHECK_AND_RETURN_LOG(dCameraStatistician_ == nullptr, "dCameraStatistician_ is null.");
     int64_t clock = dCameraStatistician_->GetRecvTime() + dCameraStatistician_->GetAverRecv2FeedTime()
         + GetBufferTime();
     SetTimeStampBaseline(timeStampBaseline);
@@ -52,6 +53,7 @@ int32_t DCameraFeedingSmoother::NotifySmoothFinished(const std::shared_ptr<IFeed
     int64_t finishSmoothT = GetNowTimeStampUs();
     std::shared_ptr<DataBuffer> buffer = std::reinterpret_pointer_cast<DataBuffer>(data);
     buffer->frameInfo_.timePonit.finishSmooth = finishSmoothT;
+    CHECK_AND_RETURN_RET_LOG(dCameraStatistician_ == nullptr, NOTIFY_FAILED, "dCameraStatistician_ is null.");
     dCameraStatistician_->CalWholeProcessTime(buffer);
     if (listener_ == nullptr) {
         DHLOGE("Smoother listener is nullptr.");
