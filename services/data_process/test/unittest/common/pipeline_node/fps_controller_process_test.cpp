@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -153,9 +153,21 @@ HWTEST_F(FpsControllerProcessTest, fps_controller_process_test_004, TestSize.Lev
     EXPECT_EQ(false, testFpsControllerProcess_ == nullptr);
 
     std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
+    int32_t rc = testFpsControllerProcess_->ProcessData(inputBuffers);
+    EXPECT_EQ(rc, DCAMERA_BAD_TYPE);
+
     std::shared_ptr<DataBuffer> db;
     inputBuffers.push_back(db);
-    int32_t rc = testFpsControllerProcess_->ProcessData(inputBuffers);
+    rc = testFpsControllerProcess_->ProcessData(inputBuffers);
+    EXPECT_EQ(rc, DCAMERA_BAD_TYPE);
+
+    inputBuffers.clear();
+    size_t capacity = 100;
+    int64_t timeStamp = 10;
+    std::shared_ptr<DataBuffer> dataBuf = std::make_shared<DataBuffer>(capacity);
+    dataBuf->SetInt64("timeUs", timeStamp);
+    inputBuffers.push_back(dataBuf);
+    rc = testFpsControllerProcess_->ProcessData(inputBuffers);
     EXPECT_EQ(rc, DCAMERA_DISABLE_PROCESS);
 }
 
