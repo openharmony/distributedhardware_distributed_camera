@@ -69,6 +69,7 @@ ohos_shared_library("distributed_camera_client") {
     "c_utils:utils",
     "camera_framework:camera_framework",
     "drivers_interface_camera:libbuffer_handle_sequenceable_1.0",
+    "drivers_interface_camera:libbuffer_producer_sequenceable_1.0",
     "drivers_interface_camera:libcamera_proxy_1.0",
     "drivers_interface_camera:libmap_data_sequenceable_1.0",
     "drivers_interface_camera:metadata",
