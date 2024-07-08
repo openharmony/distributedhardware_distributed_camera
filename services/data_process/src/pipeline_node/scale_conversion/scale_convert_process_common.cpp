@@ -303,6 +303,7 @@ int32_t ScaleConvertProcess::ScaleConvert(ImageUnitInfo& srcImgInfo, ImageUnitIn
 
 int32_t ScaleConvertProcess::CopyYUV420SrcData(const ImageUnitInfo& srcImgInfo)
 {
+    CHECK_AND_RETURN_RET_LOG((srcImgInfo.imgData == nullptr), DCAMERA_BAD_VALUE, "Data buffer exists null data");
     int32_t ret = memcpy_s(srcData_[0], srcImgInfo.width * srcImgInfo.height,
         srcImgInfo.imgData->Data(), srcImgInfo.width * srcImgInfo.height);
     if (ret != EOK) {
@@ -331,6 +332,7 @@ int32_t ScaleConvertProcess::CopyYUV420SrcData(const ImageUnitInfo& srcImgInfo)
 
 int32_t ScaleConvertProcess::CopyNV12SrcData(const ImageUnitInfo& srcImgInfo)
 {
+    CHECK_AND_RETURN_RET_LOG((srcImgInfo.imgData == nullptr), DCAMERA_BAD_VALUE, "Data buffer exists null data");
     int32_t ret = memcpy_s(srcData_[0], srcImgInfo.width * srcImgInfo.height,
         srcImgInfo.imgData->Data(), srcImgInfo.width * srcImgInfo.height);
     if (ret != EOK) {
@@ -350,6 +352,7 @@ int32_t ScaleConvertProcess::CopyNV12SrcData(const ImageUnitInfo& srcImgInfo)
 
 int32_t ScaleConvertProcess::CopyNV21SrcData(const ImageUnitInfo& srcImgInfo)
 {
+    CHECK_AND_RETURN_RET_LOG((srcImgInfo.imgData == nullptr), DCAMERA_BAD_VALUE, "Data buffer exists null data");
     int32_t ret = memcpy_s(srcData_[0], srcImgInfo.width * srcImgInfo.height,
         srcImgInfo.imgData->Data(), srcImgInfo.width * srcImgInfo.height);
     if (ret != EOK) {

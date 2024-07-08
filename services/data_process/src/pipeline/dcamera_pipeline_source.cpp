@@ -95,6 +95,10 @@ void DCameraPipelineSource::StartEventHandler()
 {
     prctl(PR_SET_NAME, PIPELINE_SRC_EVENT.c_str());
     auto runner = AppExecFwk::EventRunner::Create(false);
+    if (runner == nullptr) {
+        DHLOGE("Creat runner failed.");
+        return;
+    }
     {
         std::lock_guard<std::mutex> lock(eventMutex_);
         pipeEventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
@@ -126,6 +130,7 @@ int32_t DCameraPipelineSource::InitDCameraPipNodes(const VideoConfigParams& sour
 
     VideoConfigParams curNodeSourceCfg = sourceConfig;
     for (size_t i = 0; i < pipNodeRanks_.size(); i++) {
+        CHECK_AND_RETURN_RET_LOG((pipNodeRanks_[i] == nullptr), DCAMERA_BAD_VALUE, "Node is null.");
         pipNodeRanks_[i]->SetNodeRank(i);
         DHLOGI("DCameraPipelineSource::InitDCameraPipNodes Node %{public}zu Source Config: width %{public}d height "
             "%{public}d format %{public}d codecType %{public}d frameRate %{public}d", i, curNodeSourceCfg.GetWidth(),

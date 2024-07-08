@@ -81,6 +81,7 @@ void DCameraChannelSinkImplTest::TearDown(void)
  */
 HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_001, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, channel_);
     std::vector<DCameraIndex> camIndexs;
     DCameraIndex index;
     index.devId_ = TEST_DEVICE_ID;
@@ -104,6 +105,7 @@ HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_001, TestSiz
  */
 HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_002, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, channel_);
     std::vector<DCameraIndex> camIndexs;
     DCameraIndex index;
     index.devId_ = TEST_DEVICE_ID;
@@ -128,6 +130,7 @@ HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_002, TestSiz
  */
 HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_003, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, channel_);
     std::vector<DCameraIndex> camIndexs;
     DCameraIndex index;
     index.devId_ = TEST_DEVICE_ID;
@@ -153,6 +156,7 @@ HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_003, TestSiz
  */
 HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_004, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, channel_);
     std::vector<DCameraIndex> camIndexs;
     DCameraIndex index;
     index.devId_ = TEST_DEVICE_ID;
@@ -183,6 +187,7 @@ HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_004, TestSiz
  */
 HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_006, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, channel_);
     int32_t ret = channel_->CloseSession();
     EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
 }
@@ -195,6 +200,7 @@ HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_006, TestSiz
  */
 HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_007, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, channel_);
     int32_t ret = channel_->ReleaseSession();
     EXPECT_EQ(DCAMERA_OK, ret);
 }
@@ -207,6 +213,7 @@ HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_007, TestSiz
  */
 HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_008, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, channel_);
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);
     int32_t ret = channel_->SendData(dataBuffer);
@@ -222,6 +229,7 @@ HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_008, TestSiz
  */
 HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_009, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, channel_);
     std::vector<DCameraIndex> camIndexs;
     DCameraIndex index;
     index.devId_ = TEST_DEVICE_ID;
@@ -243,6 +251,7 @@ HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_009, TestSiz
  */
 HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_010, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, channel_);
     operator_ = std::make_shared<MockCameraOperator>();
     output_ = std::make_shared<DCameraSinkOutput>(TEST_CAMERA_DH_ID_0, operator_);
     listener_ = std::make_shared<DCameraSinkOutputChannelListener>(CONTINUOUS_FRAME, output_);
@@ -269,6 +278,7 @@ HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_010, TestSiz
  */
 HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_011, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, channel_);
     std::vector<DCameraIndex> camIndexs;
     DCameraIndex index;
     index.devId_ = TEST_DEVICE_ID;

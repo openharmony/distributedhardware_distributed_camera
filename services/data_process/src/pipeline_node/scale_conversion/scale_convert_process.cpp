@@ -267,7 +267,7 @@ int32_t ScaleConvertProcess::ConvertResolution(ImageUnitInfo& srcImgInfo, ImageU
         DHLOGD("Convert I420 Scale: srcImgInfo is the same as dstImgInfo");
         return DCAMERA_OK;
     }
-
+    CHECK_AND_RETURN_RET_LOG((srcImgInfo.imgData == nullptr), DCAMERA_BAD_VALUE, "Data buffer exists null data");
     DHLOGD("Convert I420 Scale: format=%{public}d, width=[%{public}d, %{public}d], height=[%{public}d, %{public}d]",
         srcImgInfo.colorFormat, srcImgInfo.width, srcImgInfo.alignedWidth, srcImgInfo.height, srcImgInfo.alignedHeight);
     int srcSizeY = srcImgInfo.width * srcImgInfo.height;
@@ -315,6 +315,8 @@ int32_t ScaleConvertProcess::ConvertResolution(ImageUnitInfo& srcImgInfo, ImageU
 int32_t ScaleConvertProcess::ConvertFormatToNV21(ImageUnitInfo& srcImgInfo, ImageUnitInfo& dstImgInfo,
     std::shared_ptr<DataBuffer>& dstBuf)
 {
+    CHECK_AND_RETURN_RET_LOG((dstBuf == nullptr), DCAMERA_BAD_VALUE, "Buffer is null.");
+    CHECK_AND_RETURN_RET_LOG((dstImgInfo.imgData == nullptr), DCAMERA_BAD_VALUE, "Image data is null.");
     if (srcImgInfo.colorFormat == dstImgInfo.colorFormat) {
         DHLOGD("Convert format to NV21 srcImgInfo format is the same as dstImgInfo format");
         return DCAMERA_OK;
@@ -355,6 +357,8 @@ int32_t ScaleConvertProcess::ConvertFormatToNV21(ImageUnitInfo& srcImgInfo, Imag
 int32_t ScaleConvertProcess::ConvertFormatToRGBA(ImageUnitInfo& srcImgInfo, ImageUnitInfo& dstImgInfo,
     std::shared_ptr<DataBuffer>& dstBuf)
 {
+    CHECK_AND_RETURN_RET_LOG((dstBuf == nullptr), DCAMERA_BAD_VALUE, "Buffer is null.");
+    CHECK_AND_RETURN_RET_LOG((dstImgInfo.imgData == nullptr), DCAMERA_BAD_VALUE, "Image data is null.");
     if (srcImgInfo.colorFormat == dstImgInfo.colorFormat) {
         DHLOGD("Convert format to RGBA srcImgInfo format is the same as dstImgInfo format");
         return DCAMERA_OK;

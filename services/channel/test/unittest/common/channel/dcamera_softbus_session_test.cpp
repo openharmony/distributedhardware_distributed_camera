@@ -94,6 +94,7 @@ void DCameraSoftbusSessionTest::TearDown(void)
  */
 HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_001, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, softbusSession_);
     softbusSession_->sessionId_ = 2;
     int32_t ret = softbusSession_->CloseSession();
     EXPECT_EQ(DCAMERA_OK, ret);
@@ -108,6 +109,7 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_001, TestSize.L
  */
 HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_002, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, softbusSession_);
     int32_t sessionId = 1;
     std::string sessionName = "dcamera_softbus_session_test_002";
     std::string pkgName = "ohos.dhardware.dcamera";
@@ -124,6 +126,7 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_002, TestSize.L
  */
 HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_003, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, softbusSession_);
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(capacity);
     std::string mySessionName = "testmysession";
@@ -142,6 +145,7 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_003, TestSize.L
  */
 HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_004, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, softbusSession_);
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(capacity);
     softbusSession_->mode_ = DCAMERA_SESSION_MODE_VIDEO;
@@ -161,6 +165,7 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_004, TestSize.L
  */
 HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_005, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, softbusSession_);
     size_t capacity = 1;
     size_t offset = 0;
     size_t size = 22;
@@ -182,6 +187,7 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_005, TestSize.L
  */
 HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_006, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, softbusSession_);
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(capacity);
     DCameraSoftbusSession::SessionDataHeader headerPara;
@@ -202,6 +208,7 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_006, TestSize.L
  */
 HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_007, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, softbusSession_);
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(capacity);
     DCameraSoftbusSession::SessionDataHeader headerPara;
@@ -232,6 +239,7 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_007, TestSize.L
  */
 HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_008, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, softbusSession_);
     DCameraSoftbusSession::SessionDataHeader headerPara;
     headerPara.dataLen = 1;
     headerPara.totalLen = 2;
@@ -262,6 +270,7 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_008, TestSize.L
  */
 HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_009, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, softbusSession_);
     DCameraSoftbusSession::SessionDataHeader headerPara;
     headerPara.dataLen = 1;
     headerPara.totalLen = 2;
@@ -283,6 +292,7 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_009, TestSize.L
  */
 HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_010, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, softbusSession_);
     DCameraSessionMode mode = DCAMERA_SESSION_MODE_VIDEO;
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(capacity);
@@ -304,6 +314,7 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_010, TestSize.L
  */
 HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_011, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, softbusSession_);
     size_t offset = 1;
     size_t size = DCameraSoftbusSession::BINARY_DATA_PACKET_MAX_LEN - 10;
     size_t capacity = size;
@@ -324,6 +335,7 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_011, TestSize.L
  */
 HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_012, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, softbusSession_);
     DCameraSoftbusSession::SessionDataHeader headerPara;
     headerPara.dataLen = 1;
     headerPara.totalLen = 2;
@@ -347,6 +359,7 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_012, TestSize.L
  */
 HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_013, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, softbusSession_);
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(capacity);
     softbusSession_->state_ = DCAMERA_SOFTBUS_STATE_OPENED;
@@ -364,6 +377,7 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_013, TestSize.L
  */
 HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_014, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, softbusSession_);
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(capacity);
     softbusSession_->state_ = DCAMERA_SOFTBUS_STATE_OPENED;
@@ -382,6 +396,7 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_014, TestSize.L
  */
 HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_015, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, softbusSession_);
     int32_t sessionId = 1;
     int32_t ret = softbusSession_->OnSessionClose(sessionId);
     EXPECT_EQ(DCAMERA_OK, ret);

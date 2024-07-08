@@ -106,6 +106,10 @@ void DecodeDataProcess::StartEventHandler()
 {
     prctl(PR_SET_NAME, DECODE_DATA_EVENT.c_str());
     auto runner = AppExecFwk::EventRunner::Create(false);
+    if (runner == nullptr) {
+        DHLOGE("Creat runner failed.");
+        return;
+    }
     {
         std::lock_guard<std::mutex> lock(eventMutex_);
         decEventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);

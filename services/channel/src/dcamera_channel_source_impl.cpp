@@ -41,6 +41,9 @@ int32_t DCameraChannelSourceImpl::CloseSession()
     }
     int32_t ret = DCAMERA_OK;
     for (auto iter = softbusSessions_.begin(); iter != softbusSessions_.end(); iter++) {
+        if ((*iter) == nullptr) {
+            continue;
+        }
         int32_t retOpen = (*iter)->CloseSession();
         if (retOpen != DCAMERA_OK) {
             DHLOGE("DCameraChannelSourceImpl CloseSession %{public}s failed, ret: %{public}d",
@@ -96,6 +99,9 @@ int32_t DCameraChannelSourceImpl::ReleaseSession()
 {
     DHLOGI("DCameraChannelSourceImpl ReleaseSession name: %{public}s", GetAnonyString(mySessionName_).c_str());
     for (auto iter = softbusSessions_.begin(); iter != softbusSessions_.end(); iter++) {
+        if ((*iter) == nullptr) {
+            continue;
+        }
         std::string sessKey = (*iter)->GetPeerDevId() + (*iter)->GetPeerSessionName();
         DCameraSoftbusAdapter::GetInstance().sourceSessions_.erase(sessKey);
     }
@@ -116,6 +122,9 @@ int32_t DCameraChannelSourceImpl::SendData(std::shared_ptr<DataBuffer>& buffer)
     }
     int32_t ret = DCAMERA_OK;
     for (auto iter = softbusSessions_.begin(); iter != softbusSessions_.end(); iter++) {
+        if ((*iter) == nullptr) {
+            continue;
+        }
         int32_t retSend = (*iter)->SendData(mode_, buffer);
         if (retSend != DCAMERA_OK) {
             DHLOGE("DCameraChannelSourceImpl SendData %{public}s failed, ret: %{public}d",

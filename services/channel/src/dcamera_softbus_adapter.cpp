@@ -239,11 +239,13 @@ int32_t DCameraSoftbusAdapter::CloseSoftbusSession(int32_t socket)
 
 int32_t DCameraSoftbusAdapter::SendSofbusBytes(int32_t socket, std::shared_ptr<DataBuffer>& buffer)
 {
+    CHECK_AND_RETURN_RET_LOG(buffer == nullptr, DCAMERA_BAD_VALUE, "Data buffer is null");
     return SendBytes(socket, buffer->Data(), buffer->Size());
 }
 
 int32_t DCameraSoftbusAdapter::SendSofbusStream(int32_t socket, std::shared_ptr<DataBuffer>& buffer)
 {
+    CHECK_AND_RETURN_RET_LOG(buffer == nullptr, DCAMERA_BAD_VALUE, "Data buffer is null");
     StreamData streamData = { reinterpret_cast<char *>(buffer->Data()), buffer->Size() };
     int64_t timeStamp;
     if (!buffer->FindInt64(TIME_STAMP_US, timeStamp)) {
@@ -317,11 +319,10 @@ int32_t DCameraSoftbusAdapter::SourceOnBind(int32_t socket, PeerSocketInfo info)
     DHLOGI("source bind socket begin, socket: %{public}d", socket);
     std::shared_ptr<DCameraSoftbusSession> session = nullptr;
     int32_t ret = DCameraSoftbusSourceGetSession(socket, session);
-    if (ret != DCAMERA_OK) {
+    if (ret != DCAMERA_OK || session == nullptr) {
         DHLOGE("source bind socket can not find socket %{public}d", socket);
         return DCAMERA_NOT_FOUND;
     }
-
     ret = session->OnSessionOpened(socket);
     if (ret != DCAMERA_OK) {
         DHLOGE("source bind socket failed, ret: %{public}d socket: %{public}d", ret, socket);
@@ -338,7 +339,7 @@ void DCameraSoftbusAdapter::SourceOnShutDown(int32_t socket, ShutdownReason reas
     DHLOGI("source on shutdown socket start, socket: %{public}d", socket);
     std::shared_ptr<DCameraSoftbusSession> session = nullptr;
     int32_t ret = DCameraSoftbusGetSessionById(socket, session);
-    if (ret != DCAMERA_OK) {
+    if (ret != DCAMERA_OK || session == nullptr) {
         DHLOGE("SourceOnShutDown can not find socket %{public}d", socket);
         return;
     }
@@ -360,7 +361,7 @@ void DCameraSoftbusAdapter::SourceOnBytes(int32_t socket, const void *data, uint
     DHLOGI("source callback send bytes start, socket: %{public}d", socket);
     std::shared_ptr<DCameraSoftbusSession> session = nullptr;
     int32_t ret = DCameraSoftbusSourceGetSession(socket, session);
-    if (ret != DCAMERA_OK) {
+    if (ret != DCAMERA_OK || session == nullptr) {
         DHLOGE("source callback send bytes not find session %{public}d", socket);
         return;
     }
@@ -399,7 +400,7 @@ void DCameraSoftbusAdapter::SourceOnStream(int32_t socket, const StreamData *dat
     }
     std::shared_ptr<DCameraSoftbusSession> session = nullptr;
     int32_t ret = DCameraSoftbusSourceGetSession(socket, session);
-    if (ret != DCAMERA_OK) {
+    if (ret != DCAMERA_OK || session == nullptr) {
         DHLOGE("SourceOnStream not find socket %{public}d", socket);
         return;
     }
@@ -438,6 +439,7 @@ int32_t DCameraSoftbusAdapter::HandleSourceStreamExt(std::shared_ptr<DataBuffer>
         return DCAMERA_BAD_VALUE;
     }
     int64_t recvT;
+    CHECK_AND_RETURN_RET_LOG(buffer == nullptr, DCAMERA_BAD_VALUE, "Data buffer is null");
     if (!buffer->FindInt64(RECV_TIME_US, recvT)) {
         DHLOGD("HandleSourceStreamExt find %{public}s failed.", RECV_TIME_US.c_str());
     }
@@ -483,6 +485,7 @@ int32_t DCameraSoftbusAdapter::DCameraSoftbusSinkGetSession(int32_t socket,
             return DCAMERA_NOT_FOUND;
         }
         session = iter->second;
+        CHECK_AND_RETURN_RET_LOG(session == nullptr, DCAMERA_BAD_VALUE, "Softbus session is null");
         if (session->GetSessionId() < 0) {
             DHLOGE("sink find session error, current sessionId is invalid");
             return DCAMERA_BAD_VALUE;
@@ -527,11 +530,10 @@ int32_t DCameraSoftbusAdapter::SinkOnBind(int32_t socket, PeerSocketInfo info)
     DHLOGI("sink bind socket start, socket: %{public}d", socket);
     std::shared_ptr<DCameraSoftbusSession> session = nullptr;
     int32_t ret = DCameraSoftBusGetSessionByPeerSocket(socket, session, info);
-    if (ret != DCAMERA_OK) {
+    if (ret != DCAMERA_OK || session == nullptr) {
         DHLOGE("sink bind socket error, can not find socket %{public}d", socket);
         return DCAMERA_NOT_FOUND;
     }
-
     ret = session->OnSessionOpened(socket);
     if (ret != DCAMERA_OK) {
         DHLOGE("sink bind socket error, not find socket %{public}d", socket);
@@ -548,7 +550,7 @@ void DCameraSoftbusAdapter::SinkOnShutDown(int32_t socket, ShutdownReason reason
     DHLOGI("sink on shutdown socket start, socket: %{public}d", socket);
     std::shared_ptr<DCameraSoftbusSession> session = nullptr;
     int32_t ret = DCameraSoftbusGetSessionById(socket, session);
-    if (ret != DCAMERA_OK) {
+    if (ret != DCAMERA_OK || session == nullptr) {
         DHLOGE("sink on shutdown socket can not find socket %{public}d", socket);
         return;
     }
@@ -570,7 +572,7 @@ void DCameraSoftbusAdapter::SinkOnBytes(int32_t socket, const void *data, uint32
     DHLOGI("sink on bytes start, socket: %{public}d", socket);
     std::shared_ptr<DCameraSoftbusSession> session = nullptr;
     int32_t ret = DCameraSoftbusSinkGetSession(socket, session);
-    if (ret != DCAMERA_OK) {
+    if (ret != DCAMERA_OK || session == nullptr) {
         DHLOGE("sink on bytes error, can not find session %{public}d", socket);
         return;
     }
@@ -604,7 +606,7 @@ void DCameraSoftbusAdapter::SinkOnStream(int32_t socket, const StreamData *data,
     }
     std::shared_ptr<DCameraSoftbusSession> session = nullptr;
     int32_t ret = DCameraSoftbusSinkGetSession(socket, session);
-    if (ret != DCAMERA_OK) {
+    if (ret != DCAMERA_OK || session == nullptr) {
         DHLOGE("SinkOnStream error, can not find socket %{public}d", socket);
         return;
     }

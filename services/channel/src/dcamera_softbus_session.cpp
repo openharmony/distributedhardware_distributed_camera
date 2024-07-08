@@ -127,6 +127,10 @@ void DCameraSoftbusSession::DealRecvData(std::shared_ptr<DataBuffer>& buffer)
 
 void DCameraSoftbusSession::PackRecvData(std::shared_ptr<DataBuffer>& buffer)
 {
+    if (buffer == nullptr) {
+        DHLOGE("Data buffer is null");
+        return;
+    }
     uint64_t bufferSize;
     if (buffer->Size() < BINARY_HEADER_FRAG_LEN) {
         bufferSize = static_cast<uint64_t>(buffer->Size());
@@ -166,6 +170,10 @@ void DCameraSoftbusSession::AssembleNoFrag(std::shared_ptr<DataBuffer>& buffer, 
             peerSessionName_.c_str());
         return;
     }
+    if (buffer == nullptr) {
+        DHLOGE("Data buffer is null");
+        return;
+    }
     std::shared_ptr<DataBuffer> postData = std::make_shared<DataBuffer>(headerPara.dataLen);
     int32_t ret = memcpy_s(postData->Data(), postData->Size(), buffer->Data() + BINARY_HEADER_FRAG_LEN,
         buffer->Size() - BINARY_HEADER_FRAG_LEN);
@@ -179,6 +187,10 @@ void DCameraSoftbusSession::AssembleNoFrag(std::shared_ptr<DataBuffer>& buffer, 
 
 void DCameraSoftbusSession::AssembleFrag(std::shared_ptr<DataBuffer>& buffer, SessionDataHeader& headerPara)
 {
+    if (buffer == nullptr) {
+        DHLOGE("Data buffer is null");
+        return;
+    }
     if (headerPara.fragFlag == FRAG_START) {
         isWaiting_ = true;
         nowSeq_ = headerPara.seqNum;
@@ -313,6 +325,7 @@ int32_t DCameraSoftbusSession::SendData(DCameraSessionMode mode, std::shared_ptr
 
 int32_t DCameraSoftbusSession::UnPackSendData(std::shared_ptr<DataBuffer>& buffer, DCameraSendFuc memberFunc)
 {
+    CHECK_AND_RETURN_RET_LOG(buffer == nullptr, DCAMERA_BAD_VALUE, "Data buffer is null");
     uint16_t subSeq = 0;
     uint32_t seq = 0;
     uint32_t totalLen = buffer->Size();

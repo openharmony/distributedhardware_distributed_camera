@@ -84,6 +84,7 @@ void DCameraChannelSourceImplTest::TearDown(void)
  */
 HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_001, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, channel_);
     std::vector<DCameraIndex> camIndexs;
     DCameraIndex index;
     index.devId_ = TEST_DEVICE_ID;
@@ -109,6 +110,7 @@ HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_001, Tes
  */
 HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_002, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, channel_);
     std::vector<DCameraIndex> camIndexs;
     DCameraIndex index;
     index.devId_ = TEST_DEVICE_ID;
@@ -135,6 +137,7 @@ HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_002, Tes
  */
 HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_003, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, channel_);
     std::vector<DCameraIndex> camIndexs;
     DCameraIndex index;
     index.devId_ = TEST_DEVICE_ID;
@@ -165,6 +168,7 @@ HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_003, Tes
  */
 HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_006, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, channel_);
     int32_t ret = channel_->CloseSession();
     EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
 }
@@ -177,6 +181,7 @@ HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_006, Tes
  */
 HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_007, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, channel_);
     int32_t ret = channel_->ReleaseSession();
     EXPECT_EQ(DCAMERA_OK, ret);
 }
@@ -189,6 +194,7 @@ HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_007, Tes
  */
 HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_008, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, channel_);
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);
     int32_t ret = channel_->SendData(dataBuffer);
@@ -204,6 +210,7 @@ HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_008, Tes
  */
 HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_009, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, channel_);
     std::vector<DCameraIndex> camIndexs;
     DCameraIndex index;
     index.devId_ = TEST_DEVICE_ID;

@@ -88,6 +88,7 @@ VideoConfigParams PROC_CONFIG;
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_001, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
     int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS1, PROC_CONFIG);
     EXPECT_EQ(rc, DCAMERA_OK);
 }
@@ -100,6 +101,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_001, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_002, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
     int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS2, PROC_CONFIG);
     EXPECT_EQ(rc, DCAMERA_OK);
 }
@@ -112,6 +114,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_002, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_003, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
     std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
     int32_t rc = testScaleConvertProcess_->ProcessData(inputBuffers);
     EXPECT_EQ(rc, DCAMERA_DISABLE_PROCESS);
@@ -125,6 +128,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_003, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_004, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
     int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS1, PROC_CONFIG);
     EXPECT_EQ(rc, DCAMERA_OK);
 
@@ -141,6 +145,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_004, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_005, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
     int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS1, PROC_CONFIG);
     EXPECT_EQ(rc, DCAMERA_OK);
 
@@ -160,6 +165,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_005, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_006, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
     int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS2, PROC_CONFIG);
     EXPECT_EQ(rc, DCAMERA_OK);
 
@@ -179,6 +185,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_006, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_007, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
     int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS2, PROC_CONFIG);
     EXPECT_EQ(rc, DCAMERA_OK);
 
@@ -207,6 +214,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_007, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_008, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
     int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS2, PROC_CONFIG);
     EXPECT_EQ(rc, DCAMERA_OK);
 
@@ -228,6 +236,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_008, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_009, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
     ImageUnitInfo srcImgInfo {Videoformat::YUVI420, 0, 0, 0, 0, 0, 0, nullptr};
     std::shared_ptr<DataBuffer> imgBuf = nullptr;
     int32_t rc = testScaleConvertProcess_->GetImageUnitInfo(srcImgInfo, imgBuf);
@@ -251,6 +260,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_009, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_010, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
     ImageUnitInfo srcImgInfo {Videoformat::YUVI420, 0, 0, 0, 0, 0, 0, nullptr};
     size_t capacity = 100;
     std::shared_ptr<DataBuffer> imgBuf = std::make_shared<DataBuffer>(capacity);
@@ -273,6 +283,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_010, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_011, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
     ImageUnitInfo srcImgInfo {Videoformat::YUVI420, 0, 0, 0, 0, 0, 0, nullptr};
     size_t capacity = 100;
     std::shared_ptr<DataBuffer> imgBuf = std::make_shared<DataBuffer>(capacity);
@@ -296,6 +307,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_011, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_012, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
     ImageUnitInfo srcImgInfo {Videoformat::NV12, TEST_WIDTH, TEST_HEIGTH, 0, 0, 0, 0, nullptr};
     ImageUnitInfo dstImgInfo {Videoformat::NV12, TEST_WIDTH, TEST_HEIGTH, 0, 0, 0, 0, nullptr};
 
@@ -317,6 +329,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_012, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_013, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
     std::shared_ptr<DataBuffer> imgData = std::make_shared<DataBuffer>(10);
     ImageUnitInfo srcImgInfo {Videoformat::NV12, TEST_WIDTH, TEST_HEIGTH, 0, 0, 0, 0, imgData};
     ImageUnitInfo dstImgInfo {Videoformat::NV12, TEST_WIDTH, TEST_HEIGTH, 0, 0, 0, 0, imgData};
@@ -333,6 +346,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_013, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_014, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
     ImageUnitInfo srcImgInfo {Videoformat::NV12, TEST_WIDTH, TEST_HEIGTH, 0, 0, 0, 0, nullptr};
     ImageUnitInfo dstImgInfo {Videoformat::NV12, TEST_WIDTH, TEST_HEIGTH, 0, 0, 0, 0, nullptr};
 
@@ -348,6 +362,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_014, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_015, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
     ImageUnitInfo srcImgInfo {};
     std::shared_ptr<DataBuffer> dtBuf = std::make_shared<DataBuffer>(10);
     srcImgInfo.alignedWidth = TEST_WIDTH2;
@@ -369,6 +384,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_015, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_016, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
     Videoformat colorFormat = Videoformat::NV21;
     AVPixelFormat f = testScaleConvertProcess_->GetAVPixelFormat(colorFormat);
     colorFormat = Videoformat::RGBA_8888;
@@ -386,6 +402,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_016, TestSize.Level
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_017, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
     Videoformat colorFormat = Videoformat::NV12;
     AVPixelFormat f = testScaleConvertProcess_->GetAVPixelFormat(colorFormat);
     EXPECT_EQ(f, AVPixelFormat::AV_PIX_FMT_NV12);
@@ -442,6 +459,7 @@ VideoConfigParams PROC_CONFIG;
  */
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_018, TestSize.Level1)
 {
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
     DHLOGI("ScaleConvertProcessTest scale_convert_process_test_018.");
     int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS1, PROC_CONFIG);
     EXPECT_EQ(rc, DCAMERA_OK);
@@ -456,6 +474,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_018, TestSize.Level
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_019, TestSize.Level1)
 {
     DHLOGI("ScaleConvertProcessTest scale_convert_process_test_019.");
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
     std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
     int32_t rc = testScaleConvertProcess_->ProcessData(inputBuffers);
     EXPECT_EQ(rc, DCAMERA_DISABLE_PROCESS);
@@ -470,6 +489,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_019, TestSize.Level
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_020, TestSize.Level1)
 {
     DHLOGI("ScaleConvertProcessTest scale_convert_process_test_020.");
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
     ImageUnitInfo srcImgInfo {Videoformat::YUVI420, 0, 0, 0, 0, 0, 0, nullptr};
     std::shared_ptr<DataBuffer> imgBuf = nullptr;
     int32_t rc = testScaleConvertProcess_->GetImageUnitInfo(srcImgInfo, imgBuf);
@@ -494,6 +514,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_020, TestSize.Level
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_021, TestSize.Level1)
 {
     DHLOGI("ScaleConvertProcessTest scale_convert_process_test_021.");
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
     ImageUnitInfo srcImgInfo {Videoformat::YUVI420, 0, 0, 0, 0, 0, 0, nullptr};
     size_t capacity = 100;
     std::shared_ptr<DataBuffer> imgBuf = std::make_shared<DataBuffer>(capacity);
@@ -518,6 +539,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_021, TestSize.Level
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_022, TestSize.Level1)
 {
     DHLOGI("ScaleConvertProcessTest scale_convert_process_test_022.");
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
     ImageUnitInfo srcImgInfo {Videoformat::NV12, TEST_WIDTH, TEST_HEIGTH, 0, 0, 0, 0, nullptr};
     ImageUnitInfo dstImgInfo {Videoformat::NV12, TEST_WIDTH, TEST_HEIGTH, 0, 0, 0, 0, nullptr};
 
@@ -540,6 +562,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_022, TestSize.Level
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_023, TestSize.Level1)
 {
     DHLOGI("ScaleConvertProcessTest scale_convert_process_test_023.");
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
     ImageUnitInfo srcImgInfo {Videoformat::YUVI420, 0, 0, 0, 0, 0, 0, nullptr};
     size_t capacity = 100;
     std::shared_ptr<DataBuffer> imgBuf = std::make_shared<DataBuffer>(capacity);
@@ -563,6 +586,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_023, TestSize.Level
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_024, TestSize.Level1)
 {
     DHLOGI("ScaleConvertProcessTest scale_convert_process_test_024.");
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
     int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS1, PROC_CONFIG);
     EXPECT_EQ(rc, DCAMERA_OK);
 
@@ -580,6 +604,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_024, TestSize.Level
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_025, TestSize.Level1)
 {
     DHLOGI("ScaleConvertProcessTest scale_convert_process_test_025.");
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
     int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS1, PROC_CONFIG);
     EXPECT_EQ(rc, DCAMERA_OK);
 
@@ -600,6 +625,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_025, TestSize.Level
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_026, TestSize.Level1)
 {
     DHLOGI("ScaleConvertProcessTest scale_convert_process_test_026.");
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
     int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS2, PROC_CONFIG);
     testScaleConvertProcess_->isScaleConvert_.store(false);
     EXPECT_EQ(rc, DCAMERA_OK);
@@ -630,6 +656,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_026, TestSize.Level
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_027, TestSize.Level1)
 {
     DHLOGI("ScaleConvertProcessTest scale_convert_process_test_027.");
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
     int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS2, PROC_CONFIG);
     EXPECT_EQ(rc, DCAMERA_OK);
 
@@ -655,6 +682,7 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_027, TestSize.Level
 HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_028, TestSize.Level1)
 {
     DHLOGI("ScaleConvertProcessTest scale_convert_process_test_028.");
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
     int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS3, PROC_CONFIG);
     testScaleConvertProcess_->isScaleConvert_.store(false);
     EXPECT_EQ(rc, DCAMERA_OK);

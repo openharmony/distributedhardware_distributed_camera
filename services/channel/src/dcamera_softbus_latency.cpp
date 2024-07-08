@@ -31,6 +31,10 @@ constexpr static int32_t MICROSECONDS = 1000;
 
 static void OnTimeSyncResult(const TimeSyncResultInfo *info, int32_t retCode)
 {
+    if (info == nullptr) {
+        DHLOGE("Camera info is null");
+        return;
+    }
     int32_t microsecond = info->result.millisecond * MICROSECONDS + info->result.microsecond;
     DHLOGD("DCameraSoftbusLatency OnTimeSyncResult retcode %{public}d, millisecond: %{public}d, microsecond %{public}d "
         "microsecond_ %{public}d", retCode, info->result.millisecond, info->result.microsecond, microsecond);
