@@ -15,6 +15,7 @@
 
 #include "dcamera_hdf_operate.h"
 
+#include <hdf_base.h>
 #include <hdf_device_class.h>
 
 #include "anonymous_string.h"
@@ -74,9 +75,9 @@ int32_t DCameraHdfOperate::LoadDcameraHDFImpl()
         return DCAMERA_BAD_OPERATE;
     }
 
-    DHLOGI("Load provider service.");
     ret = devmgr->LoadDevice(PROVIDER_SERVICE_NAME);
     if (ret != HDF_SUCCESS && ret != HDF_ERR_DEVICE_BUSY) {
+        DHLOGE("Load provider service failed!");
         return DCAMERA_BAD_OPERATE;
     }
     if (WaitLoadProviderService() != DCAMERA_OK) {
