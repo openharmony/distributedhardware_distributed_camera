@@ -16,6 +16,7 @@
 #ifndef OHOS_DCAMERA_HDF_OPERATE_H
 #define OHOS_DCAMERA_HDF_OPERATE_H
 
+#include <atomic>
 #include <condition_variable>
 #include <mutex>
 
@@ -48,8 +49,8 @@ private:
     int32_t WaitLoadProviderService();
 
 private:
-    uint16_t cameraServStatus_ = INVALID_VALUE;
-    uint16_t providerServStatus_ = INVALID_VALUE;
+    std::atomic<uint16_t> cameraServStatus_ = INVALID_VALUE;
+    std::atomic<uint16_t> providerServStatus_ = INVALID_VALUE;
     std::condition_variable hdfOperateCon_;
     std::mutex hdfOperateMutex_;
 };
