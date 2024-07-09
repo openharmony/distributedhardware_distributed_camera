@@ -27,10 +27,6 @@ int32_t DCameraChannelInfoCmd::Marshal(std::string& jsonStr)
     if (rootValue == nullptr) {
         return DCAMERA_BAD_VALUE;
     }
-    if (value_ == nullptr) {
-        cJSON_Delete(rootValue);
-        return DCAMERA_BAD_VALUE;
-    }
     cJSON_AddStringToObject(rootValue, "Type", type_.c_str());
     cJSON_AddStringToObject(rootValue, "dhId", dhId_.c_str());
     cJSON_AddStringToObject(rootValue, "Command", command_.c_str());
@@ -123,10 +119,6 @@ int32_t DCameraChannelInfoCmd::Unmarshal(const std::string& jsonStr)
        
 int32_t DCameraChannelInfoCmd::UnmarshalDetails(cJSON *details, std::shared_ptr<DCameraChannelInfo> channelInfo)
 {
-    if (channelInfo == nullptr ) {
-            return DCAMERA_BAD_VALUE;
-        }
-        DC
     cJSON *detail = nullptr;
     cJSON_ArrayForEach(detail, details) {
         cJSON *dataSessionFlag = cJSON_GetObjectItemCaseSensitive(detail, "DataSessionFlag");
