@@ -15,6 +15,7 @@
 
 #include "dcamera_hdf_operate.h"
 
+#include <hdf_base.h>
 #include <hdf_device_class.h>
 
 #include "anonymous_string.h"
@@ -35,8 +36,8 @@ void DCameraHdfServStatListener::OnReceive(const ServiceStatus& status)
 
 int32_t DCameraHdfOperate::LoadDcameraHDFImpl()
 {
-    if (cameraServStatus_ == OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START &&
-        providerServStatus_ == OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START) {
+    if (cameraServStatus_.load() == OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START &&
+        providerServStatus_.load() == OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START) {
         DHLOGI("service has already start");
         return DCAMERA_OK;
     }
@@ -53,10 +54,10 @@ int32_t DCameraHdfOperate::LoadDcameraHDFImpl()
                 status.serviceName.c_str(), status.status);
             std::unique_lock<std::mutex> lock(hdfOperateMutex_);
             if (status.serviceName == CAMERA_SERVICE_NAME) {
-                cameraServStatus_ = status.status;
+                cameraServStatus_.store(status.status);
                 hdfOperateCon_.notify_one();
             } else if (status.serviceName == PROVIDER_SERVICE_NAME) {
-                providerServStatus_ = status.status;
+                providerServStatus_.store(status.status);
                 hdfOperateCon_.notify_one();
             }
         })));
@@ -66,16 +67,16 @@ int32_t DCameraHdfOperate::LoadDcameraHDFImpl()
     }
 
     DHLOGI("Load camera service.");
-    if (devmgr->LoadDevice(CAMERA_SERVICE_NAME) != 0) {
-        DHLOGE("Load camera service failed!");
+    int32_t ret = devmgr->LoadDevice(CAMERA_SERVICE_NAME);
+    if (ret != HDF_SUCCESS && ret != HDF_ERR_DEVICE_BUSY) {
         return DCAMERA_BAD_OPERATE;
     }
     if (WaitLoadCameraService() != DCAMERA_OK) {
         return DCAMERA_BAD_OPERATE;
     }
 
-    DHLOGI("Load provider service.");
-    if (devmgr->LoadDevice(PROVIDER_SERVICE_NAME) != 0) {
+    ret = devmgr->LoadDevice(PROVIDER_SERVICE_NAME);
+    if (ret != HDF_SUCCESS && ret != HDF_ERR_DEVICE_BUSY) {
         DHLOGE("Load provider service failed!");
         return DCAMERA_BAD_OPERATE;
     }
@@ -94,11 +95,11 @@ int32_t DCameraHdfOperate::WaitLoadCameraService()
     DHLOGI("wait Load camera service.");
     std::unique_lock<std::mutex> lock(hdfOperateMutex_);
     hdfOperateCon_.wait_for(lock, std::chrono::milliseconds(WAIT_TIME), [this] {
-        return (this->cameraServStatus_ == OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START);
+        return (this->cameraServStatus_.load() == OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START);
     });
 
-    if (cameraServStatus_ != OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START) {
-        DHLOGE("wait load cameraService failed, status %{public}d", cameraServStatus_);
+    if (cameraServStatus_.load() != OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START) {
+        DHLOGE("wait load cameraService failed, status %{public}d", cameraServStatus_.load());
         return DCAMERA_BAD_OPERATE;
     }
 
@@ -110,11 +111,11 @@ int32_t DCameraHdfOperate::WaitLoadProviderService()
     DHLOGI("wait Load provider service.");
     std::unique_lock<std::mutex> lock(hdfOperateMutex_);
     hdfOperateCon_.wait_for(lock, std::chrono::milliseconds(WAIT_TIME), [this] {
-        return (this->providerServStatus_ == OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START);
+        return (this->providerServStatus_.load() == OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START);
     });
 
-    if (providerServStatus_ != OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START) {
-        DHLOGE("wait load providerService failed, status %{public}d", providerServStatus_);
+    if (providerServStatus_.load() != OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START) {
+        DHLOGE("wait load providerService failed, status %{public}d", providerServStatus_.load());
         return DCAMERA_BAD_OPERATE;
     }
 
@@ -138,8 +139,8 @@ int32_t DCameraHdfOperate::UnLoadDcameraHDFImpl()
     if (ret != 0) {
         DHLOGE("Unload provider service failed, ret: %d", ret);
     }
-    cameraServStatus_ = INVALID_VALUE;
-    providerServStatus_ = INVALID_VALUE;
+    cameraServStatus_.store(INVALID_VALUE);
+    providerServStatus_.store(INVALID_VALUE);
     DHLOGI("UnLoadCameraHDFImpl end!");
     return DCAMERA_OK;
 }
