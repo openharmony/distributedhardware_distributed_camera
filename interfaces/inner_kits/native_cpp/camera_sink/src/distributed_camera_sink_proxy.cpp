@@ -48,7 +48,7 @@ int32_t DistributedCameraSinkProxy::InitSink(const std::string& params, const sp
         DHLOGE("write params failed");
         return DCAMERA_BAD_VALUE;
     }
-    if (!data.WriteRemoteObject(sinkCallback->AsObject())) {
+    if (sinkCallback->AsObject() != nullptr && !data.WriteRemoteObject(sinkCallback->AsObject())) {
         DHLOGE("write sinkCallback failed");
         return DCAMERA_BAD_VALUE;
     }
