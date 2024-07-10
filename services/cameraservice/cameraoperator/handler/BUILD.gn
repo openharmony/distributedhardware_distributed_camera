@@ -58,8 +58,11 @@ ohos_shared_library("distributed_camera_handler") {
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.1",
     "drivers_peripheral_display:hdi_gralloc_client",
     "graphic_surface:surface",
+    "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "media_foundation:media_foundation",
+    "samgr:samgr_proxy",
   ]
 
   subsystem_name = "distributedhardware"
