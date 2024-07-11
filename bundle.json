@@ -28,7 +28,6 @@
         ],
         "deps": {
             "components": [
-                "access_token",
                 "accessibility",
                 "ipc",
                 "init",
@@ -56,9 +55,6 @@
                 "drivers_interface_camera",
                 "access_token",
                 "av_codec"
-            ],
-            "third_party": [
-                "ffmpeg"
             ]
         },
         "build": {
