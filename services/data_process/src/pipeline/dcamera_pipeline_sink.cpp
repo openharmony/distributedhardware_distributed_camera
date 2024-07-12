@@ -94,6 +94,7 @@ int32_t DCameraPipelineSink::InitDCameraPipNodes(const VideoConfigParams& source
 
     VideoConfigParams curNodeSourceCfg = sourceConfig;
     for (size_t i = 0; i < pipNodeRanks_.size(); i++) {
+        CHECK_AND_RETURN_RET_LOG((pipNodeRanks_[i] == nullptr), DCAMERA_BAD_VALUE, "Node is null.");
         pipNodeRanks_[i]->SetNodeRank(i);
 
         VideoConfigParams curNodeProcessedCfg;

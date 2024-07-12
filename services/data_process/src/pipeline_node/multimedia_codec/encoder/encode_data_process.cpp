@@ -365,6 +365,10 @@ int32_t EncodeDataProcess::FeedEncoderInputBuffer(std::shared_ptr<DataBuffer>& i
     inputTimeStampUs_ = GetEncoderTimeStamp();
     DHLOGD("Encoder input buffer size %{public}zu, timeStamp %{public}lld.", inputBuffer->Size(),
         (long long)inputTimeStampUs_);
+    if (surfacebuffer->GetExtraData() == nullptr) {
+        DHLOGE("Surface buffer exist null extra data.");
+        return DCAMERA_BAD_OPERATE;
+    }
     surfacebuffer->GetExtraData()->ExtraSet("timeStamp", inputTimeStampUs_);
 
     BufferFlushConfig flushConfig = { {0, 0, sourceConfig_.GetWidth(), sourceConfig_.GetHeight()}, 0};
@@ -401,6 +405,10 @@ sptr<SurfaceBuffer> EncodeDataProcess::GetEncoderInputSurfaceBuffer()
     }
     sptr<SurfaceBuffer> surfacebuffer = nullptr;
     int32_t flushFence = -1;
+    if (encodeProducerSurface_ == nullptr) {
+        DHLOGE("Encode producer surface is null.");
+        return nullptr;
+    }
     GSError err = encodeProducerSurface_->RequestBuffer(surfacebuffer, flushFence, requestConfig);
     if (err != GSERROR_OK || surfacebuffer == nullptr) {
         DHLOGE("Request encoder input producer surface buffer failed, error code: %d.", err);
