@@ -226,7 +226,7 @@ int32_t DistributedCameraSinkService::GetCameraInfo(const std::string& dhId, std
 
 int32_t DistributedCameraSinkService::OpenChannel(const std::string& dhId, std::string& openInfo)
 {
-    DHLOGI("DistributedCameraSinkService OpenChannel Begin,dhId: %{public}s", GetAnonyString(dhId).c_str());
+    DHLOGI("DistributedCameraSinkService OpenChannel Begin, dhId: %{public}s", GetAnonyString(dhId).c_str());
     std::shared_ptr<DCameraSinkDev> sinkDevice = nullptr;
     {
         std::lock_guard<std::mutex> lock(mapMutex_);
