@@ -34,7 +34,7 @@ void CallbackOnNotifyRegResultFuzzTest(const uint8_t* data, size_t size)
     std::shared_ptr<UnregisterCallback> uncallback = std::make_shared<MockComponentDisable>();
 
     sptr<DCameraSourceCallback> dcameraSourceCallback(new (std::nothrow) DCameraSourceCallback());
-     if (dcameraSourceCallback == nullptr){
+    if (dcameraSourceCallback == nullptr) {
         return;
     }
     dcameraSourceCallback->PushUnregCallback(reqId, uncallback);

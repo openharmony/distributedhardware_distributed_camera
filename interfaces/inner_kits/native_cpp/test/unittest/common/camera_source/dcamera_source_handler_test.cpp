@@ -156,8 +156,8 @@ HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_005, TestSize.Lev
             SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(systemAbilityId);
     sptr<DCameraSourceLoadCallback> loadCallback(new DCameraSourceLoadCallback(params));
-    if(loadCallback == nullptr) {
-        return DCAMERA_BAD_VALUE;
+    if (loadCallback == nullptr) {
+        return;
     }
     loadCallback->OnLoadSystemAbilitySuccess(systemAbilityId, remoteObject);
 
@@ -180,8 +180,8 @@ HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_006, TestSize.Lev
     std::string params = "test006";
     int32_t systemAbilityId = 4803;
     sptr<DCameraSourceLoadCallback> loadCallback(new DCameraSourceLoadCallback(params));
-    if(loadCallback == nullptr) {
-        return DCAMERA_BAD_VALUE;
+    if (loadCallback == nullptr) {
+        return;
     }
     loadCallback->OnLoadSystemAbilityFail(systemAbilityId);
 

@@ -36,11 +36,9 @@ int32_t DCameraSinkCallback::OnNotifyResourceInfo(const ResourceEventType &type,
     std::lock_guard<std::mutex> lock(privacyResMutex_);
     auto iter = privacyResCallback_.begin();
     if (iter != privacyResCallback_.end()) {
-    if (*iter == nullptr){
-        DHLOGE("GetSystemAbility failed");
-        return DCAMERA_BAD_VALUE;
+        if (*iter != nullptr) {
+            ret = (*iter)->OnPrivaceResourceMessage(type, subtype, networkId, isSensitive, isSameAccout);
         }
-        ret = (*iter)->OnPrivaceResourceMessage(type, subtype, networkId, isSensitive, isSameAccout);
     }
     return ret;
 }

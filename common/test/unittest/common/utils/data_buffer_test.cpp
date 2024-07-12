@@ -67,8 +67,8 @@ HWTEST_F(DataBufferTest, SetRange_001, TestSize.Level1)
 {
     size_t offset = 0;
     size_t size = 0;
-    if(dataBuffer_ == nullptr) {
-        return DCAMERA_BAD_VALUE;
+    if (dataBuffer_ == nullptr) {
+        return;
     }
     int32_t ret = dataBuffer_->SetRange(offset, size);
     EXPECT_EQ(DCAMERA_OK, ret);
@@ -88,8 +88,8 @@ HWTEST_F(DataBufferTest, FindInt32_001, TestSize.Level1)
 {
     string name = "test";
     int32_t value = 1;
-    if(dataBuffer_ == nullptr) {
-        return DCAMERA_BAD_VALUE;
+    if (dataBuffer_ == nullptr) {
+        return;
     }
     dataBuffer_->SetInt32(name, value);
     bool ret = dataBuffer_->FindInt32(name, value);
@@ -109,8 +109,8 @@ HWTEST_F(DataBufferTest, FindInt62_001, TestSize.Level1)
 {
     string name = "test";
     int64_t value = 1;
-    if(dataBuffer_ == nullptr) {
-        return DCAMERA_BAD_VALUE;
+    if (dataBuffer_ == nullptr) {
+        return;
     }
     dataBuffer_->SetInt64(name, value);
     bool ret = dataBuffer_->FindInt64(name, value);
@@ -130,8 +130,8 @@ HWTEST_F(DataBufferTest, FindString_001, TestSize.Level1)
 {
     string name = "test";
     string value = "test";
-    if(dataBuffer_ == nullptr) {
-        return DCAMERA_BAD_VALUE;
+    if (dataBuffer_ == nullptr) {
+        return;
     }
     dataBuffer_->SetString(name, value);
     bool ret = dataBuffer_->FindString(name, value);
