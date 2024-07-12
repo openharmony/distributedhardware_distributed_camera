@@ -28,7 +28,6 @@
         ],
         "deps": {
             "components": [
-                "access_token",
                 "accessibility",
                 "ipc",
                 "init",

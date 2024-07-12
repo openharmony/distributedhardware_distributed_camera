@@ -213,10 +213,6 @@ int32_t DistributedCameraSourceService::RegisterDistributedHardware(const std::s
             return ret;
         }
         CamDevInsert(camIndex, camDev);
-    } else {
-        DHLOGE("RegisterDistributedHardware exist devId: %{public}s, dhId: %{public}s, sinkVersion: %{public}s",
-            GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), params.sinkVersion.c_str());
-        return DCAMERA_ALREADY_EXISTS;
     }
 
     ret = camDev->RegisterDistributedHardware(devId, dhId, reqId, params);
