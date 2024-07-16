@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -378,11 +378,13 @@ int32_t DCameraSoftbusSession::UnPackSendData(std::shared_ptr<DataBuffer>& buffe
 void DCameraSoftbusSession::SetHeadParaDataLen(SessionDataHeader& headPara, const uint32_t totalLen,
     const uint32_t offset)
 {
-    if (totalLen - offset > BINARY_DATA_PACKET_MAX_LEN) {
-        headPara.dataLen = BINARY_DATA_PACKET_MAX_LEN - BINARY_DATA_PACKET_RESERVED_BUFFER;
-    } else {
-        headPara.fragFlag = FRAG_END;
-        headPara.dataLen = totalLen - offset;
+    if (totalLen >= offset) {
+        if (totalLen - offset > BINARY_DATA_PACKET_MAX_LEN) {
+            headPara.dataLen = BINARY_DATA_PACKET_MAX_LEN - BINARY_DATA_PACKET_RESERVED_BUFFER;
+        } else {
+            headPara.fragFlag = FRAG_END;
+            headPara.dataLen = totalLen - offset;
+        }
     }
 }
 
