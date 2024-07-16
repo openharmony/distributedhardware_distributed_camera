@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -224,7 +224,8 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_004, TestSize.L
 {
     DCameraCaptureInfoCmd cmd;
     cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON);
-    int32_t ret = controller_->StartCapture(cmd.value_);
+    int32_t mode = 0;
+    int32_t ret = controller_->StartCapture(cmd.value_, mode);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
@@ -239,7 +240,8 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_005, TestSize.L
     SetTokenID();
     DCameraCaptureInfoCmd cmd;
     cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON);
-    int32_t ret = controller_->StartCapture(cmd.value_);
+    int32_t mode = 0;
+    int32_t ret = controller_->StartCapture(cmd.value_, mode);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     DCameraMetadataSettingCmd cmdMetadata;
@@ -263,7 +265,8 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_006, TestSize.L
 {
     DCameraCaptureInfoCmd cmd;
     cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON);
-    int32_t ret = controller_->StartCapture(cmd.value_);
+    int32_t mode = 0;
+    int32_t ret = controller_->StartCapture(cmd.value_, mode);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     ret = controller_->StopCapture();
@@ -436,7 +439,8 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_015, TestSize.L
     SetTokenID();
     DCameraCaptureInfoCmd cmd;
     cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON);
-    int32_t ret = controller_->StartCapture(cmd.value_);
+    int32_t mode = 0;
+    int32_t ret = controller_->StartCapture(cmd.value_, mode);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     DCameraMetadataSettingCmd cmdMetadata;
@@ -525,7 +529,8 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_021, TestSize.L
     DCameraCaptureInfoCmd cmd;
     cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON);
     g_outputStr = "test021";
-    int32_t ret = controller_->StartCapture(cmd.value_);
+    int32_t mode = 0;
+    int32_t ret = controller_->StartCapture(cmd.value_, mode);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
@@ -541,7 +546,8 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_022, TestSize.L
     cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON);
     g_outputStr = "";
     g_operatorStr = "test022";
-    int32_t ret = controller_->StartCapture(cmd.value_);
+    int32_t mode = 0;
+    int32_t ret = controller_->StartCapture(cmd.value_, mode);
     EXPECT_EQ(DCAMERA_ALLOC_ERROR, ret);
 }
 
@@ -556,7 +562,8 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_023, TestSize.L
     DCameraCaptureInfoCmd cmd;
     cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON);
     g_operatorStr = "test023";
-    int32_t ret = controller_->StartCapture(cmd.value_);
+    int32_t mode = 0;
+    int32_t ret = controller_->StartCapture(cmd.value_, mode);
     EXPECT_EQ(DCAMERA_DEVICE_BUSY, ret);
 }
 

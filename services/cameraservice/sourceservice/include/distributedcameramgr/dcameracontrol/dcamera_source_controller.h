@@ -35,7 +35,7 @@ public:
     DCameraSourceController(std::string devId, std::string dhId,
         std::shared_ptr<DCameraSourceStateMachine>& stateMachine, std::shared_ptr<DCameraSourceDev>& camDev);
     ~DCameraSourceController() override;
-    int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos) override;
+    int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos, int32_t sceneMode) override;
     int32_t StopCapture() override;
     int32_t ChannelNeg(std::shared_ptr<DCameraChannelInfo>& info) override;
     int32_t DCameraNotify(std::shared_ptr<DCameraEvent>& events) override;

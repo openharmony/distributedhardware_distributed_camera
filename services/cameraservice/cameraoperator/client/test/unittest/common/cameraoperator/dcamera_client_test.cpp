@@ -367,7 +367,8 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_004, TestSize.Level1)
     captureInfos.push_back(videoInfo_true_);
     sptr<IBufferProducer> bp = videoSurface->GetProducer();
     sptr<Surface> pSurface = Surface::CreateSurfaceAsProducer(bp);
-    ret = client_->StartCapture(captureInfos, pSurface);
+    int32_t mode = 0;
+    ret = client_->StartCapture(captureInfos, pSurface, mode);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     ret = client_->PauseCapture();
@@ -431,7 +432,8 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_005, TestSize.Level1)
     captureInfos.push_back(photoInfo_false_);
     sptr<IBufferProducer> bp = videoSurface->GetProducer();
     sptr<Surface> pSurface = Surface::CreateSurfaceAsProducer(bp);
-    ret = client_->StartCapture(captureInfos, pSurface);
+    int32_t mode = 0;
+    ret = client_->StartCapture(captureInfos, pSurface, mode);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     sleep(TEST_SLEEP_SEC);
@@ -445,7 +447,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_005, TestSize.Level1)
     captureInfos.clear();
     captureInfos.push_back(videoInfo_false_);
     captureInfos.push_back(photoInfo_true_);
-    ret = client_->StartCapture(captureInfos, pSurface);
+    ret = client_->StartCapture(captureInfos, pSurface, mode);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     sleep(TEST_SLEEP_SEC);
@@ -625,7 +627,8 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_013, TestSize.Level1)
     captureInfos.push_back(photoInfo_false_);
     sptr<IBufferProducer> bp = videoSurface->GetProducer();
     sptr<Surface> pSurface = Surface::CreateSurfaceAsProducer(bp);
-    ret = client_->StartCapture(captureInfos, pSurface);
+    int32_t mode = 0;
+    ret = client_->StartCapture(captureInfos, pSurface, mode);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     sleep(TEST_SLEEP_SEC);
@@ -654,7 +657,8 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_014, TestSize.Level1)
     DHLOGI("DCameraClientTest dcamera_client_test_014: test startCapture");
     std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos;
     sptr<Surface> surface = nullptr;
-    int32_t ret = client_->StartCapture(captureInfos, surface);
+    int32_t mode = 0;
+    int32_t ret = client_->StartCapture(captureInfos, surface, mode);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 

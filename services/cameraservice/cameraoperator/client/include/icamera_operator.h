@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -58,7 +58,7 @@ public:
     virtual int32_t UnInit() = 0;
     virtual int32_t UpdateSettings(std::vector<std::shared_ptr<DCameraSettings>>& settings) = 0;
     virtual int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos,
-        sptr<Surface>& surface) = 0;
+        sptr<Surface>& surface, int32_t sceneMode) = 0;
     virtual int32_t StopCapture() = 0;
     virtual int32_t SetStateCallback(std::shared_ptr<StateCallback>& callback) = 0;
     virtual int32_t SetResultCallback(std::shared_ptr<ResultCallback>& callback) = 0;

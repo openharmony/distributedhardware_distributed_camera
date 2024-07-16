@@ -40,7 +40,7 @@ public:
         const sptr<IDCameraSinkCallback> &sinkCallback);
     ~DCameraSinkController() override;
 
-    int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos) override;
+    int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos, int32_t sceneMode) override;
     int32_t StopCapture() override;
     int32_t ChannelNeg(std::shared_ptr<DCameraChannelInfo>& info) override;
     int32_t DCameraNotify(std::shared_ptr<DCameraEvent>& events) override;
@@ -102,6 +102,7 @@ private:
     bool isSensitive_ = false;
     bool isSameAccount_ = false;
     bool isCheckSecLevel_ = false;
+    int32_t sceneMode_ = 0;
 
     const std::string SESSION_FLAG = "control";
     const std::string SRC_TYPE = "camera";

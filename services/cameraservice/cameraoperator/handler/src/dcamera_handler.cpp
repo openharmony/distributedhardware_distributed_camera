@@ -222,7 +222,6 @@ int32_t DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraDevice>& info, D
     std::string id = info->GetID();
     item.dhId = CAMERA_ID_PREFIX + id;
     item.subtype = "camera";
-    DHLOGI("camera id: %{public}s", GetAnonyString(id).c_str());
 
     cJSON *root = cJSON_CreateObject();
     CHECK_AND_RETURN_RET_LOG(root == nullptr, DCAMERA_BAD_VALUE, "Create cJSON object failed");
@@ -238,28 +237,42 @@ int32_t DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraDevice>& info, D
     std::vector<CameraStandard::Profile> previewProfiles = capability->GetPreviewProfiles();
     ConfigFormatvideo(CONTINUOUS_FRAME, root, previewProfiles);
 
+    std::vector<CameraStandard::SceneMode> supportedModes = cameraManager_->GetSupportedModes(info);
+    cJSON *modeArray = cJSON_CreateArray();
+    CHECK_AND_FREE_RETURN_RET_LOG(modeArray == nullptr, DCAMERA_BAD_VALUE, root, "Create modeArray object failed");
+    cJSON_AddItemToObject(root, CAMERA_SUPPORT_MODE.c_str(), modeArray);
+    for (auto &mode : supportedModes) {
+        DHLOGI("The camera id: %{public}s, The supportedModes is : %{public}d", GetAnonyString(id).c_str(), mode);
+        cJSON_AddItemToArray(modeArray, cJSON_CreateNumber(mode));
+        auto capability = cameraManager_->GetSupportedOutputCapability(info, mode);
+        CHECK_AND_FREE_RETURN_RET_LOG(capability == nullptr, DCAMERA_BAD_VALUE, root, "supported capability is null");
+        cJSON *modeData = cJSON_CreateObject();
+        CHECK_AND_FREE_RETURN_RET_LOG(modeData == nullptr, DCAMERA_BAD_VALUE, root, "Create cJSON object failed");
+        std::vector<CameraStandard::Profile> photoProfiles = capability->GetPhotoProfiles();
+        ConfigFormatphoto(SNAPSHOT_FRAME, modeData, photoProfiles);
+    
+        std::vector<CameraStandard::Profile> previewProfiles = capability->GetPreviewProfiles();
+        ConfigFormatvideo(CONTINUOUS_FRAME, modeData, previewProfiles);
+
+        cJSON_AddItemToObject(root, std::to_string(mode).c_str(), modeData);
+    }
+
     sptr<CameraStandard::CameraInput> cameraInput = nullptr;
     int rv = cameraManager_->CreateCameraInput(info, &cameraInput);
     CHECK_AND_FREE_RETURN_RET_LOG(rv != DCAMERA_OK, DCAMERA_BAD_VALUE, root, "create cameraInput failed");
 
     std::hash<std::string> h;
-    std::string abilityString = cameraInput->GetCameraSettings();
-    DHLOGI("abilityString hash: %{public}zu, length: %{public}zu", h(abilityString), abilityString.length());
+    std::string abilityStr = cameraInput->GetCameraSettings();
+    DHLOGI("abilityString hash: %{public}zu, length: %{public}zu", h(abilityStr), abilityStr.length());
 
-    std::string encodeString = Base64Encode(reinterpret_cast<const unsigned char *>(abilityString.c_str()),
-        abilityString.length());
-    DHLOGI("encodeString hash: %zu, length: %zu", h(encodeString), encodeString.length());
-    cJSON_AddStringToObject(root, CAMERA_METADATA_KEY.c_str(), encodeString.c_str());
+    std::string encStr = Base64Encode(reinterpret_cast<const unsigned char*>(abilityStr.c_str()), abilityStr.length());
+    DHLOGI("encodeString hash: %zu, length: %zu", h(encStr), encStr.length());
+    cJSON_AddStringToObject(root, CAMERA_METADATA_KEY.c_str(), encStr.c_str());
     char *jsonstr = cJSON_Print(root);
-    if (jsonstr == nullptr) {
-        cJSON_Delete(root);
-        return DCAMERA_BAD_VALUE;
-    }
+    CHECK_AND_FREE_RETURN_RET_LOG(jsonstr == nullptr, DCAMERA_BAD_VALUE, root, "jsonstr is null");
 
     item.attrs = jsonstr;
-    if (cameraInput->Release() != DCAMERA_OK) {
-        DHLOGE("cameraInput Release failed");
-    }
+    CHECK_AND_LOG(cameraInput->Release() != DCAMERA_OK, "cameraInput Release failed");
     cJSON_free(jsonstr);
     cJSON_Delete(root);
     return DCAMERA_OK;

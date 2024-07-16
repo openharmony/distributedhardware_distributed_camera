@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -172,9 +172,9 @@ void DCameraClient::FindCameraMetadata(const std::string& metadataStr)
 }
 
 int32_t DCameraClient::StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos,
-    sptr<Surface>& surface)
+    sptr<Surface>& surface, int32_t sceneMode)
 {
-    DHLOGI("StartCapture cameraId: %{public}s", GetAnonyString(cameraId_).c_str());
+    DHLOGI("StartCapture cameraId: %{public}s, mode: %{public}d", GetAnonyString(cameraId_).c_str(), sceneMode);
     if ((photoOutput_ == nullptr) && (previewOutput_ == nullptr)) {
         DHLOGI("StartCapture %{public}s config capture session", GetAnonyString(cameraId_).c_str());
         if (surface == nullptr) {
@@ -182,7 +182,7 @@ int32_t DCameraClient::StartCapture(std::vector<std::shared_ptr<DCameraCaptureIn
             return DCAMERA_BAD_VALUE;
         }
         previewSurface_ = surface;
-        int32_t ret = ConfigCaptureSession(captureInfos);
+        int32_t ret = ConfigCaptureSession(captureInfos, sceneMode);
         if (ret != DCAMERA_OK) {
             DHLOGE("StartCapture config capture session failed, cameraId: %{public}s, ret: %{public}d",
                    GetAnonyString(cameraId_).c_str(), ret);
@@ -327,7 +327,8 @@ int32_t DCameraClient::SetResultCallback(std::shared_ptr<ResultCallback>& callba
     return DCAMERA_OK;
 }
 
-int32_t DCameraClient::ConfigCaptureSession(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos)
+int32_t DCameraClient::ConfigCaptureSession(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos,
+    int32_t sceneMode)
 {
     DHLOGI("ConfigCaptureSession cameraId: %{public}s", GetAnonyString(cameraId_).c_str());
     CHECK_AND_RETURN_RET_LOG(cameraManager_ == nullptr, DCAMERA_BAD_VALUE, "cameraManager is null.");
@@ -357,8 +358,8 @@ int32_t DCameraClient::ConfigCaptureSession(std::vector<std::shared_ptr<DCameraC
         cameraMetadatas_.pop();
     }
 
-    rv = cameraManager_->CreateCaptureSession(&captureSession_);
-    if (rv != DCAMERA_OK) {
+    captureSession_ = cameraManager_->CreateCaptureSession(static_cast<CameraStandard::SceneMode>(sceneMode));
+    if (captureSession_ == nullptr) {
         DHLOGE("ConfigCaptureSession %{public}s create captureSession failed",
                GetAnonyString(cameraId_).c_str());
         return DCAMERA_BAD_VALUE;

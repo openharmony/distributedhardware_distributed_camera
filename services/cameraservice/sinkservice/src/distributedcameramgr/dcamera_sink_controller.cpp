@@ -60,9 +60,10 @@ DCameraSinkController::~DCameraSinkController()
     }
 }
 
-int32_t DCameraSinkController::StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos)
+int32_t DCameraSinkController::StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos,
+    int32_t sceneMode)
 {
-    DHLOGI("StartCapture dhId: %{public}s", GetAnonyString(dhId_).c_str());
+    DHLOGI("StartCapture dhId: %{public}s, mode: %{public}d", GetAnonyString(dhId_).c_str(), sceneMode);
     std::string accessType = "";
     CHECK_AND_RETURN_RET_LOG(accessControl_ == nullptr, DCAMERA_BAD_VALUE, "accessControl_ is null.");
     if ((accessControl_->IsSensitiveSrcAccess(SRC_TYPE)) &&
@@ -535,7 +536,7 @@ int32_t DCameraSinkController::StartCaptureInner(std::vector<std::shared_ptr<DCa
         DHLOGD("StartCaptureInner: get property fail.");
         return DCAMERA_BAD_VALUE;
     }
-    ret = operator_->StartCapture(captureInfos, carrier.surface_);
+    ret = operator_->StartCapture(captureInfos, carrier.surface_, sceneMode_);
     if (ret != DCAMERA_OK) {
         DHLOGE("camera client start capture failed, dhId: %{public}s, ret: %{public}d",
             GetAnonyString(dhId_).c_str(), ret);
@@ -588,7 +589,8 @@ int32_t DCameraSinkController::HandleReceivedData(std::shared_ptr<DataBuffer>& d
                 GetAnonyString(dhId_).c_str(), ret);
             return ret;
         }
-        return StartCapture(captureInfoCmd.value_);
+        sceneMode_ = captureInfoCmd.sceneMode_;
+        return StartCapture(captureInfoCmd.value_, sceneMode_);
     } else if ((!command.empty()) && (command.compare(DCAMERA_PROTOCOL_CMD_UPDATE_METADATA) == 0)) {
         DCameraMetadataSettingCmd metadataSettingCmd;
         int ret = metadataSettingCmd.Unmarshal(jsonStr);

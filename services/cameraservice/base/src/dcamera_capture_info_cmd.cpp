@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -61,6 +61,7 @@ int32_t DCameraCaptureInfoCmd::Marshal(std::string& jsonStr)
         }
         cJSON_AddItemToObject(captureInfo, "CaptureSettings", captureSettings);
     }
+    cJSON_AddNumberToObject(rootValue, "mode", sceneMode_);
 
     char *data = cJSON_Print(rootValue);
     if (data == nullptr) {
@@ -101,6 +102,13 @@ int32_t DCameraCaptureInfoCmd::Unmarshal(const std::string& jsonStr)
     command_ = command->valuestring;
 
     int32_t ret = UmarshalValue(rootValue);
+
+    cJSON *mode = cJSON_GetObjectItemCaseSensitive(rootValue, "mode");
+    if (mode == nullptr || !cJSON_IsNumber(mode)) {
+        sceneMode_ = 0;
+    } else {
+        sceneMode_ = mode->valueint;
+    }
     cJSON_Delete(rootValue);
     return ret;
 }

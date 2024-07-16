@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -127,6 +127,7 @@ int32_t DCameraProviderCallbackImpl::ConfigureStreams(const DHBase& dhBase,
         stream->dataspace_ = iter->dataspace_;
         stream->encodeType_ = iter->encodeType_;
         stream->type_ = iter->type_;
+        stream->mode_ = iter->mode_;
         streams.push_back(stream);
     }
     int32_t ret = sourceDev->ConfigCameraStreams(streams);
