@@ -84,7 +84,8 @@ int32_t DCameraSourceDev::InitDCameraSourceDev()
     stateMachine_->UpdateState(DCAMERA_STATE_INIT);
     controller_ = std::make_shared<DCameraSourceController>(devId_, dhId_, stateMachine_, cameraSourceDev);
     input_ = std::make_shared<DCameraSourceInput>(devId_, dhId_, cameraSourceDev);
-    hdiCallback_ = new (std::nothrow) DCameraProviderCallbackImpl(devId_, dhId_, cameraSourceDev);
+    hdiCallback_ = sptr<DCameraProviderCallbackImpl>(
+        new (std::nothrow) DCameraProviderCallbackImpl(devId_, dhId_, cameraSourceDev));
     if (hdiCallback_ == nullptr) {
         DHLOGE("DCameraSourceDev InitDCameraSourceDev failed, hdiCallback is null.");
         return DCAMERA_BAD_VALUE;

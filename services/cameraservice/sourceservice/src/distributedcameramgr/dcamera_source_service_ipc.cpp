@@ -46,7 +46,7 @@ void DCameraSourceServiceIpc::Init()
         DHLOGI("DCameraSourceServiceIpc has already init");
         return;
     }
-    sinkRemoteRecipient_ = new SinkRemoteRecipient();
+    sinkRemoteRecipient_ = sptr<SinkRemoteRecipient>(new SinkRemoteRecipient());
     isInit_ = true;
     DHLOGI("End");
 }

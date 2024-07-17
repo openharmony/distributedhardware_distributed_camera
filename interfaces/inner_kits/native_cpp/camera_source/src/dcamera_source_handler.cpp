@@ -33,7 +33,7 @@ IMPLEMENT_SINGLE_INSTANCE(DCameraSourceHandler);
 DCameraSourceHandler::DCameraSourceHandler()
 {
     DHLOGI("DCameraSourceHandler construct.");
-    callback_ = new DCameraSourceCallback();
+    callback_ = sptr<DCameraSourceCallback>(new DCameraSourceCallback());
 }
 
 DCameraSourceHandler::~DCameraSourceHandler()

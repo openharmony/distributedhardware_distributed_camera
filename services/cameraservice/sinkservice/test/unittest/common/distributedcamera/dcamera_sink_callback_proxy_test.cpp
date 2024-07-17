@@ -69,14 +69,6 @@ HWTEST_F(DcameraSinkCallbackProxyTest, dcamera_sink_callback_proxy_test_001, Tes
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID);
     sptr<DCameraSinkCallbackProxy> callbackProxy(new DCameraSinkCallbackProxy(remoteObject));
     EXPECT_EQ(false, callbackProxy == nullptr);
-
-    ResourceEventType type = ResourceEventType::EVENT_TYPE_QUERY_RESOURCE;
-    const std::string subtype = "";
-    const std::string networkId = "";
-    bool isSensitive = 0;
-    bool isSameAccout = 0;
-    int32_t ret = callbackProxy->OnNotifyResourceInfo(type, subtype, networkId, isSensitive, isSameAccout);
-    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

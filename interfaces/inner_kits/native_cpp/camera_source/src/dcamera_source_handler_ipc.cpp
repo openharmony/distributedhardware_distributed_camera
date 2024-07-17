@@ -48,7 +48,7 @@ void DCameraSourceHandlerIpc::Init()
         DHLOGI("DCameraSourceHandlerIpc has already init");
         return;
     }
-    sourceLocalRecipient_ = new SourceLocalRecipient();
+    sourceLocalRecipient_ = sptr<SourceLocalRecipient>(new SourceLocalRecipient());
     isInit_ = true;
     DHLOGI("End");
 }

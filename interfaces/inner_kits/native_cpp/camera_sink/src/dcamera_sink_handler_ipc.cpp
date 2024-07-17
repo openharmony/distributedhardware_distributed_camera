@@ -48,7 +48,7 @@ void DCameraSinkHandlerIpc::Init()
         DHLOGI("DCameraSinkHandlerIpc has already init");
         return;
     }
-    sinkLocalRecipient_ = new SinkLocalRecipient();
+    sinkLocalRecipient_ = sptr<SinkLocalRecipient>(new SinkLocalRecipient());
     isInit_ = true;
     DHLOGI("End");
 }
