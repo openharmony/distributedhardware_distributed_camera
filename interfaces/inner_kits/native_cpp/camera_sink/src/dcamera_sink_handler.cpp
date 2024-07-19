@@ -40,7 +40,7 @@ DCameraSinkHandler::DCameraSinkHandler()
 {
     DHLOGI("DCameraSinkHandler ctor.");
     if (!dCameraSinkCallback_) {
-        dCameraSinkCallback_ = new DCameraSinkCallback();
+        dCameraSinkCallback_ = sptr<DCameraSinkCallback>(new DCameraSinkCallback());
     }
 }
 

@@ -465,7 +465,8 @@ int32_t DCameraClient::CreatePhotoOutput(std::shared_ptr<DCameraCaptureInfo>& in
         "%{public}d, isCapture: %{public}d", GetAnonyString(cameraId_).c_str(), info->width_, info->height_,
         info->format_, info->streamType_, info->isCapture_);
     photoSurface_ = IConsumerSurface::Create();
-    photoListener_ = new DCameraPhotoSurfaceListener(photoSurface_, resultCallback_);
+    photoListener_ = sptr<DCameraPhotoSurfaceListener>(
+        new DCameraPhotoSurfaceListener(photoSurface_, resultCallback_));
     photoSurface_->RegisterConsumerListener((sptr<IBufferConsumerListener> &)photoListener_);
     CameraStandard::CameraFormat photoFormat = ConvertToCameraFormat(info->format_);
     CameraStandard::Size photoSize = {info->width_, info->height_};

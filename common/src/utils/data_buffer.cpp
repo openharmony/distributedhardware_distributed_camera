@@ -21,7 +21,7 @@ namespace OHOS {
 namespace DistributedHardware {
 DataBuffer::DataBuffer(size_t capacity)
 {
-    if (capacity != 0) {
+    if (capacity != 0 && capacity <= DCAMERA_MAX_RECV_DATA_LEN) {
         data_ = new uint8_t[capacity] {0};
         if (data_ != nullptr) {
             capacity_ = capacity;

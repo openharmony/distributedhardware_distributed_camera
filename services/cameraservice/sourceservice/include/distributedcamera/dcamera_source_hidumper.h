@@ -69,6 +69,7 @@ private:
 
 private:
     CameraDumpInfo camDumpInfo_;
+    const size_t DUMP_MAX_SIZE = 10 * 1024;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

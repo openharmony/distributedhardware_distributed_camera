@@ -46,7 +46,7 @@ void DCameraSinkServiceIpc::Init()
         DHLOGI("DCameraSinkServiceIpc has already init");
         return;
     }
-    sourceRemoteRecipient_ = new SourceRemoteRecipient();
+    sourceRemoteRecipient_ = sptr<SourceRemoteRecipient>(new SourceRemoteRecipient());
     isInit_ = true;
     DHLOGI("DCameraSinkServiceIpc Init End");
 }

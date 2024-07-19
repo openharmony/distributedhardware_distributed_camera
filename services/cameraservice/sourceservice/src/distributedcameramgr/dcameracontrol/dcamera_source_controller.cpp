@@ -48,7 +48,7 @@ DCameraSourceController::DCameraSourceController(std::string devId, std::string 
     DHLOGI("DCameraSourceController create devId: %{public}s dhId: %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     isInit = false;
-    cameraHdiRecipient_ = new DCameraHdiRecipient();
+    cameraHdiRecipient_ = sptr<DCameraHdiRecipient>(new DCameraHdiRecipient());
 }
 
 DCameraSourceController::~DCameraSourceController()

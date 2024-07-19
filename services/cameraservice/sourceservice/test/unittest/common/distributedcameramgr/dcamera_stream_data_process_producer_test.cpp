@@ -212,11 +212,11 @@ HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_produ
     sharedMemory.bufferHandle_ = nullptr;
     int32_t ret = streamProcess1->CheckSharedMemory(sharedMemory, buffer);
     ret = streamProcess2->CheckSharedMemory(sharedMemory, buffer);
-    sharedMemory.bufferHandle_ = new NativeBuffer();
+    sharedMemory.bufferHandle_ = sptr<NativeBuffer>(new NativeBuffer());
     ret = streamProcess1->CheckSharedMemory(sharedMemory, buffer);
     ret = streamProcess2->CheckSharedMemory(sharedMemory, buffer);
     BufferHandle *bufferHandle = new BufferHandle();
-    sharedMemory.bufferHandle_ = new NativeBuffer(bufferHandle);
+    sharedMemory.bufferHandle_ = sptr<NativeBuffer>(new NativeBuffer(bufferHandle));
     ret = streamProcess1->CheckSharedMemory(sharedMemory, buffer);
     ret = streamProcess2->CheckSharedMemory(sharedMemory, buffer);
     DHBase dhBase;

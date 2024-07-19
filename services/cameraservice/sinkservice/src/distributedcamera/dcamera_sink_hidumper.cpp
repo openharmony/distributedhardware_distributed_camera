@@ -51,6 +51,10 @@ bool DcameraSinkHidumper::Dump(const std::vector<std::string>& args, std::string
 {
     result.clear();
     int32_t argsSize = static_cast<int32_t>(args.size());
+    if (argsSize > DUMP_MAX_SIZE) {
+        DHLOGE("DcameraSinkHidumper Dump args.size() is invalid");
+        return false;
+    }
     DHLOGI("DcameraSinkHidumper Dump args.size():%{public}d.", argsSize);
     if (args.empty()) {
         ShowHelp(result);
