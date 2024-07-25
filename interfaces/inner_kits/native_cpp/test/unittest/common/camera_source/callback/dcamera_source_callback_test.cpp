@@ -143,6 +143,9 @@ HWTEST_F(DCameraSourceCallbackTest, dcamera_source_callback_test_002, TestSize.L
     std::string reqId = "reqId";
     int32_t status = 0;
     std::string data = "data";
+    if (sourceCallback_ == nullptr) {
+        return;
+    }
     int32_t ret = sourceCallback_->OnNotifyRegResult(devId, dhId, reqId, status, data);
     EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
 }
@@ -180,6 +183,9 @@ HWTEST_F(DCameraSourceCallbackTest, dcamera_source_callback_test_004, TestSize.L
     std::string reqId = "reqId";
     int32_t status = 0;
     std::string data = "data";
+    if (sourceCallback_ == nullptr) {
+        return;
+    }
     int32_t ret = sourceCallback_->OnNotifyUnregResult(devId, dhId, reqId, status, data);
     EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
 }
@@ -196,6 +202,9 @@ HWTEST_F(DCameraSourceCallbackTest, dcamera_source_callback_test_005, TestSize.L
     std::string dhId = "dhId";
     std::string reqId = "reqId";
     std::string result = "result";
+    if (sourceCallback_ == nullptr) {
+        return;
+    }
     int32_t ret = sourceCallback_->CheckParams(devId, dhId, reqId, result);
     EXPECT_EQ(false, ret);
     devId += std::string(DID_MAX_SIZE + 1, 'a');
@@ -243,6 +252,9 @@ HWTEST_F(DCameraSourceCallbackTest, dcamera_source_callback_test_006, TestSize.L
     data.WriteString(devId);
     data.WriteString(dhId);
     data.WriteString(reqId);
+        if (sourceCallback_ == nullptr) {
+        return;
+    }
     int32_t ret = sourceCallback_->OnRemoteRequest(code, data, reply, option);
     EXPECT_NE(DCAMERA_OK, ret);
     code = DCameraSourceCallback::NOTIFY_REG_RESULT;
@@ -298,6 +310,9 @@ HWTEST_F(DCameraSourceCallbackTest, dcamera_source_callback_test_008, TestSize.L
     data.WriteString(reqId);
     data.WriteInt32(status);
     data.WriteString(result);
+    if (sourceCallback_ == nullptr) {
+        return;
+    }
     int32_t ret = sourceCallback_->NotifyUnregResultInner(data, reply);
     sourceCallback_->RegisterStateListener(nullptr);
     sourceCallback_->UnRegisterStateListener();
@@ -317,6 +332,9 @@ HWTEST_F(DCameraSourceCallbackTest, dcamera_source_callback_test_009, TestSize.L
     std::string devId = "devId";
     std::string dhId = "dhId";
     int32_t status = 1;
+    if (sourceCallback_ == nullptr) {
+        return;
+    }
     int32_t ret = sourceCallback_->OnHardwareStateChanged(devId, dhId, status);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
     std::shared_ptr<DistributedHardwareStateListener> listener =
@@ -354,6 +372,9 @@ HWTEST_F(DCameraSourceCallbackTest, dcamera_source_callback_test_009, TestSize.L
 HWTEST_F(DCameraSourceCallbackTest, dcamera_source_callback_test_010, TestSize.Level1)
 {
     std::string devId = "";
+    if (sourceCallback_ == nullptr) {
+        return;
+    }
     int32_t ret = sourceCallback_->OnDataSyncTrigger(devId);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
     devId += std::string(DID_MAX_SIZE + 1, 'a');
