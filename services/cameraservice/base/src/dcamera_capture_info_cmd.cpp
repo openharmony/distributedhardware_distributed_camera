@@ -35,12 +35,13 @@ int32_t DCameraCaptureInfoCmd::Marshal(std::string& jsonStr)
     CHECK_NULL_FREE_RETURN(captureInfos, DCAMERA_BAD_VALUE, rootValue);
     cJSON_AddItemToObject(rootValue, "Value", captureInfos);
     for (auto iter = value_.begin(); iter != value_.end(); iter++) {
-        cJSON *captureInfo = cJSON_CreateObject();
         std::shared_ptr<DCameraCaptureInfo> capture = *iter;
-        if (captureInfo == nullptr || capture == nullptr) {
+        if (capture == nullptr) {
             cJSON_Delete(rootValue);
             return DCAMERA_BAD_VALUE;
         }
+        cJSON *captureInfo = cJSON_CreateObject();
+        CHECK_NULL_FREE_RETURN(captureInfo, DCAMERA_BAD_VALUE, rootValue);
         cJSON_AddItemToArray(captureInfos, captureInfo);
         cJSON_AddNumberToObject(captureInfo, "Width", capture->width_);
         cJSON_AddNumberToObject(captureInfo, "Height", capture->height_);
