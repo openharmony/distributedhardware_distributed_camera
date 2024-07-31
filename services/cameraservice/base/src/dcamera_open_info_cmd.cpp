@@ -33,8 +33,13 @@ int32_t DCameraOpenInfoCmd::Marshal(std::string& jsonStr)
     cJSON_AddStringToObject(rootValue, "Command", command_.c_str());
 
     cJSON *openInfo = cJSON_CreateObject();
-    if (openInfo == nullptr || value_ == nullptr) {
+    if (openInfo == nullptr) {
         cJSON_Delete(rootValue);
+        return DCAMERA_BAD_VALUE;
+    }
+    if (value_ == nullptr) {
+        cJSON_Delete(rootValue);
+        cJSON_Delete(openInfo);
         return DCAMERA_BAD_VALUE;
     }
     cJSON_AddStringToObject(openInfo, "SourceDevId", value_->sourceDevId_.c_str());
