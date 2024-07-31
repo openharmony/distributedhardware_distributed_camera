@@ -39,8 +39,12 @@ int32_t DCameraMetadataSettingCmd::Marshal(std::string& jsonStr)
     }
     cJSON_AddItemToObject(rootValue, "Value", settings);
     for (auto iter = value_.begin(); iter != value_.end(); iter++) {
+        if ((*iter) == nullptr) {
+            cJSON_Delete(rootValue);
+            return DCAMERA_BAD_VALUE;
+        }
         cJSON *setting = cJSON_CreateObject();
-        if (setting == nullptr || (*iter) == nullptr) {
+        if (setting == nullptr) {
             cJSON_Delete(rootValue);
             return DCAMERA_BAD_VALUE;
         }
