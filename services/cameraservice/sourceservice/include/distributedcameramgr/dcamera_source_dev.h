@@ -119,6 +119,7 @@ private:
     std::shared_ptr<ICameraInput> input_;
     std::atomic<bool> hicollieFlag_ = true;
     sptr<IDCameraProviderCallback> hdiCallback_;
+    int32_t sceneMode_ = 0;
 
     std::map<uint32_t, DCameraNotifyFunc> memberFuncMap_;
     std::map<uint32_t, DCameraEventResult> eventResultMap_;

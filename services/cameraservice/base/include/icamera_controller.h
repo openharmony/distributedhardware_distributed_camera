@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,7 +30,8 @@ public:
     ICameraController() = default;
     virtual ~ICameraController() = default;
 
-    virtual int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos) = 0;
+    virtual int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos,
+        int32_t sceneMode) = 0;
     virtual int32_t StopCapture() = 0;
     virtual int32_t ChannelNeg(std::shared_ptr<DCameraChannelInfo>& info) = 0;
     virtual int32_t DCameraNotify(std::shared_ptr<DCameraEvent>& events) = 0;

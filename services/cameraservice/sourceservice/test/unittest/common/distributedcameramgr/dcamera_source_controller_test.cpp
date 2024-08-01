@@ -138,7 +138,8 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_003, TestSi
     index1.devId_ = TEST_DEVICE_ID;
     index1.dhId_ = TEST_CAMERA_DH_ID_0;
     controller_->indexs_.push_back(index1);
-    ret = controller_->StartCapture(captureInfos);
+    int32_t mode = 0;
+    ret = controller_->StartCapture(captureInfos, mode);
     controller_->UnInit();
     EXPECT_EQ(ret, DCAMERA_OK);
 }
@@ -166,7 +167,8 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_004, TestSi
     index1.devId_ = TEST_DEVICE_ID;
     index1.dhId_ = TEST_CAMERA_DH_ID_0;
     controller_->indexs_.push_back(index1);
-    ret = controller_->StartCapture(captureInfos);
+    int32_t mode = 0;
+    ret = controller_->StartCapture(captureInfos, mode);
 
     ret = controller_->StopCapture();
     controller_->UnInit();
@@ -542,7 +544,8 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_020, TestSi
 
     int32_t ret = controller_->Init(indexs_);
     EXPECT_EQ(ret, DCAMERA_INIT_ERR);
-    ret = controller_->StartCapture(captureInfos);
+    int32_t mode = 0;
+    ret = controller_->StartCapture(captureInfos, mode);
     EXPECT_EQ(ret, DCAMERA_BAD_OPERATE);
     ret = controller_->StopCapture();
     EXPECT_EQ(ret, DCAMERA_BAD_OPERATE);

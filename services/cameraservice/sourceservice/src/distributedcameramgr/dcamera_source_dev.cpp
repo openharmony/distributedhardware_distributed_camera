@@ -503,6 +503,10 @@ int32_t DCameraSourceDev::ConfigStreams(std::vector<std::shared_ptr<DCStreamInfo
 {
     DHLOGI("DCameraSourceDev Execute ConfigStreams devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
+    for (auto info : streamInfos) {
+        sceneMode_ = info->mode_;
+        break;
+    }
     int32_t ret = input_->ConfigStreams(streamInfos);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev Execute ConfigStreams ConfigStreams failed, ret: %{public}d, devId: %{public}s dhId: "
@@ -604,7 +608,8 @@ int32_t DCameraSourceDev::StartCapture(std::vector<std::shared_ptr<DCCaptureInfo
         captures.push_back(capture);
     }
 
-    ret = controller_->StartCapture(captures);
+    DHLOGI("startcapture sceneMode_: %{public}d", sceneMode_);
+    ret = controller_->StartCapture(captures, sceneMode_);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev Execute StartCapture StartCapture failed, ret: %{public}d, devId: %{public}s dhId: "
             "%{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());

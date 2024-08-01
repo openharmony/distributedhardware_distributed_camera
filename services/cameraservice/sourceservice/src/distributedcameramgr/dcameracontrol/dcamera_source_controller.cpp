@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -61,7 +61,8 @@ DCameraSourceController::~DCameraSourceController()
     camHdiProvider_ = nullptr;
 }
 
-int32_t DCameraSourceController::StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos)
+int32_t DCameraSourceController::StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos,
+    int32_t sceneMode)
 {
     if (indexs_.size() > DCAMERA_MAX_NUM) {
         DHLOGE("StartCapture not support operate %{public}zu camera", indexs_.size());
@@ -77,6 +78,7 @@ int32_t DCameraSourceController::StartCapture(std::vector<std::shared_ptr<DCamer
     cmd.dhId_ = dhId;
     cmd.command_ = DCAMERA_PROTOCOL_CMD_CAPTURE;
     cmd.value_.assign(captureInfos.begin(), captureInfos.end());
+    cmd.sceneMode_ = sceneMode;
     std::string jsonStr;
     int32_t ret = cmd.Marshal(jsonStr);
     if (ret != DCAMERA_OK) {

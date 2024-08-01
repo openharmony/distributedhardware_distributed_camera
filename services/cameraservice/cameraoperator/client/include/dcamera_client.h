@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -43,7 +43,7 @@ public:
     int32_t UnInit() override;
     int32_t UpdateSettings(std::vector<std::shared_ptr<DCameraSettings>>& settings) override;
     int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos,
-        sptr<Surface>& surface) override;
+        sptr<Surface>& surface, int32_t sceneMode) override;
     int32_t StopCapture() override;
     int32_t SetStateCallback(std::shared_ptr<StateCallback>& callback) override;
     int32_t SetResultCallback(std::shared_ptr<ResultCallback>& callback) override;
@@ -51,7 +51,7 @@ public:
     int32_t ResumeCapture() override;
 
 private:
-    int32_t ConfigCaptureSession(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos);
+    int32_t ConfigCaptureSession(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos, int32_t sceneMode);
     int32_t ConfigCaptureSessionInner();
     int32_t CreateCaptureOutput(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos);
     int32_t CreatePhotoOutput(std::shared_ptr<DCameraCaptureInfo>& info);
