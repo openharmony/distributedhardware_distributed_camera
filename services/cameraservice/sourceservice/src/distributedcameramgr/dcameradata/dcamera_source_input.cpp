@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -118,7 +118,7 @@ int32_t DCameraSourceInput::ReleaseStreams(std::vector<int>& streamIds, bool& is
     std::vector<int32_t> continueStreamIds;
     dataProcess_[CONTINUOUS_FRAME]->GetAllStreamIds(continueStreamIds);
     std::vector<int32_t> snapStreamIds;
-    dataProcess_[CONTINUOUS_FRAME]->GetAllStreamIds(snapStreamIds);
+    dataProcess_[SNAPSHOT_FRAME]->GetAllStreamIds(snapStreamIds);
     if (continueStreamIds.empty() && snapStreamIds.empty()) {
         isAllRelease = true;
     }
