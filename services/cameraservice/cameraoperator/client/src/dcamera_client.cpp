@@ -143,6 +143,7 @@ void DCameraClient::UpdateSettingCache(const std::string& metadataStr)
 void DCameraClient::FindCameraMetadata(const std::string& metadataStr)
 {
     std::shared_ptr<Camera::CameraMetadata> cameraMetadata = Camera::MetadataUtils::DecodeFromString(metadataStr);
+    CHECK_AND_RETURN_LOG(cameraMetadata == nullptr, "FindCameraMetadata get cameraMetadata is null");
     camera_metadata_item_t focusItem;
     int32_t ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_CONTROL_FOCUS_MODE, &focusItem);
     if (ret == CAM_META_SUCCESS) {
@@ -584,6 +585,7 @@ int32_t DCameraClient::StartPhotoOutput(std::shared_ptr<DCameraCaptureInfo>& inf
 void DCameraClient::SetPhotoCaptureRotation(const std::shared_ptr<Camera::CameraMetadata>& cameraMetadata,
     std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSetting)
 {
+    CHECK_AND_RETURN_LOG(cameraMetadata == nullptr, "SetPhotoCaptureRotation param cameraMetadata is null");
     uint32_t rotationCount = 1;
     camera_metadata_item_t item;
     int32_t ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_JPEG_ORIENTATION, &item);
