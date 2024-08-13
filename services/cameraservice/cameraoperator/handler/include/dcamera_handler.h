@@ -63,6 +63,7 @@ private:
         std::vector<CameraStandard::Profile>& profileList);
     bool IsValid(const DCStreamType type, const CameraStandard::Size& size);
     int32_t CovertToDcameraFormat(CameraStandard::CameraFormat format);
+    int32_t CreateMeatdataStr(sptr<CameraStandard::CameraDevice>& info, cJSON *root);
 
     sptr<CameraStandard::CameraManager> cameraManager_;
     std::shared_ptr<PluginListener> pluginListener_;
