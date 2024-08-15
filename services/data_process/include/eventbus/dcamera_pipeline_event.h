@@ -18,7 +18,6 @@
 
 #include <vector>
 
-#include "eventbus/event.h"
 #include "data_buffer.h"
 #include "image_common_type.h"
 
@@ -70,31 +69,6 @@ private:
     PipelineType pipelineType_;
     std::string pipelineOwner_;
     std::vector<std::shared_ptr<DataBuffer>> multiDataBuffers_;
-};
-
-class DCameraPipelineEvent : public Event {
-    TYPEINDENT(DCameraPipelineEvent)
-public:
-    DCameraPipelineEvent(EventSender& sender, const std::shared_ptr<PipelineConfig>& pipelineConfig)
-        : Event(sender), pipelineConfig_(pipelineConfig), action_(PipelineAction::NO_ACTION) {}
-    DCameraPipelineEvent(EventSender& sender, const std::shared_ptr<PipelineConfig>& pipelineConfig,
-        PipelineAction otherAction)
-        : Event(sender), pipelineConfig_(pipelineConfig), action_(otherAction) {}
-    ~DCameraPipelineEvent() = default;
-
-    std::shared_ptr<PipelineConfig> GetPipelineConfig() const
-    {
-        return pipelineConfig_;
-    }
-
-    PipelineAction GetAction() const
-    {
-        return action_;
-    }
-
-private:
-    std::shared_ptr<PipelineConfig> pipelineConfig_ = nullptr;
-    PipelineAction action_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

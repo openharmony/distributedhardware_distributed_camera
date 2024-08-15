@@ -65,7 +65,6 @@ ohos_shared_library("distributed_camera_data_process") {
     "av_codec:av_codec_client",
     "cJSON:cjson",
     "c_utils:utils",
-    "distributed_hardware_fwk:distributedhardwareutils",
     "drivers_interface_display:libdisplay_composer_hdi_impl",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "eventhandler:libeventhandler",
