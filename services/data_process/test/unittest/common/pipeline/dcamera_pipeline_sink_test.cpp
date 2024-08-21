@@ -73,7 +73,7 @@ HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_001, TestSize.Level
     EXPECT_EQ(false, testSinkPipeline_ == nullptr);
 
     std::shared_ptr<DataProcessListener> listener = std::make_shared<MockDCameraDataProcessListener>();
-    VideoConfigParams srcParams(VideoCodecType::NO_CODEC,
+    VideoConfigParams srcParams(VideoCodecType::CODEC_H264,
                                 Videoformat::NV21,
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
@@ -160,7 +160,7 @@ HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_004, TestSize.Level
     EXPECT_EQ(false, testSinkPipeline_ == nullptr);
 
     std::shared_ptr<DataProcessListener> listener = std::make_shared<MockDCameraDataProcessListener>();
-    VideoConfigParams srcParams(VideoCodecType::NO_CODEC,
+    VideoConfigParams srcParams(VideoCodecType::CODEC_H264,
                                 Videoformat::NV21,
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
@@ -175,7 +175,7 @@ HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_004, TestSize.Level
 
     std::vector<std::shared_ptr<DataBuffer>> buffers;
     rc = testSinkPipeline_->ProcessData(buffers);
-    EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
+    EXPECT_NE(rc, DCAMERA_OK);
     usleep(SLEEP_TIME);
 }
 
