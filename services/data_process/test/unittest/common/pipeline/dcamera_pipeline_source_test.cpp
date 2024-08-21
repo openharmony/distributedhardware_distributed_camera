@@ -86,6 +86,7 @@ HWTEST_F(DCameraPipelineSourceTest, dcamera_pipeline_source_test_001, TestSize.L
                                  TEST_HEIGTH2);
     int32_t rc = testSourcePipeline_->CreateDataProcessPipeline(PipelineType::VIDEO, srcParams, destParams, listener);
     EXPECT_EQ(rc, DCAMERA_OK);
+    usleep(SLEEP_TIME);
 }
 
 /**
@@ -174,6 +175,7 @@ HWTEST_F(DCameraPipelineSourceTest, dcamera_pipeline_source_test_004, TestSize.L
     std::vector<std::shared_ptr<DataBuffer>> buffers;
     rc = testSourcePipeline_->ProcessData(buffers);
     EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
+    usleep(SLEEP_TIME);
 }
 
 /**
