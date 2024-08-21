@@ -31,7 +31,6 @@ config("module_private_config") {
     "${camerastandard_path}/services/camera_service/include",
     "${services_path}/cameraservice/sinkservice/include/distributedcameramgr",
     "${services_path}/cameraservice/sinkservice/include/distributedcameramgr/callback",
-    "${services_path}/cameraservice/sinkservice/include/distributedcameramgr/eventbus",
     "${services_path}/cameraservice/sinkservice/include/distributedcameramgr/interface",
     "${services_path}/cameraservice/sinkservice/include/distributedcameramgr/listener",
     "${services_path}/cameraservice/cameraoperator/client/include",
@@ -48,7 +47,6 @@ config("module_private_config") {
     "${innerkits_path}/native_cpp/camera_sink/include/callback",
 
     "${fwk_common_path}/utils/include",
-    "${fwk_utils_path}/include/eventbus",
     "${feeding_smoother_path}/base",
     "${feeding_smoother_path}/derived",
     "${feeding_smoother_path}/utils",
@@ -70,10 +68,6 @@ ohos_unittest("DCameraSinkMgrTest") {
     "dcamera_sink_dev_test.cpp",
     "dcamera_sink_output_test.cpp",
     "dcamera_sink_service_ipc_test.cpp",
-    "eventbus/dcamera_frame_trigger_event_test.cpp",
-    "eventbus/dcamera_photo_output_event_test.cpp",
-    "eventbus/dcamera_post_authorization_event_test.cpp",
-    "eventbus/dcamera_video_output_event_test.cpp",
   ]
 
   cflags = [
@@ -101,7 +95,6 @@ ohos_unittest("DCameraSinkMgrTest") {
     "cJSON:cjson",
     "c_utils:utils",
     "device_manager:devicemanagersdk",
-    "distributed_hardware_fwk:distributedhardwareutils",
     "drivers_interface_camera:metadata",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.1",
     "drivers_peripheral_display:hdi_gralloc_client",
