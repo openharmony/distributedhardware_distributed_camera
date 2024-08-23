@@ -32,8 +32,6 @@ config("module_private_config") {
     "${common_path}/include/constants",
     "${common_path}/include/utils",
     "${innerkits_path}/native_cpp/camera_source/include",
-    "${fwk_common_path}/utils/include",
-    "${fwk_utils_path}/include/eventbus",
     "${feeding_smoother_path}/base",
     "${services_path}/cameraservice/base/include",
   ]
@@ -68,6 +66,7 @@ ohos_unittest("DCameraDataProcessPipelineNodeTest") {
   external_deps = [
     "av_codec:av_codec_client",
     "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "eventhandler:libeventhandler",
     "ffmpeg:libohosffmpeg",

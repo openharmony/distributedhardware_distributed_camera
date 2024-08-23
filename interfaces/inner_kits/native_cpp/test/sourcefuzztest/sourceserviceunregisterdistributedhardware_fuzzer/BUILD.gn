@@ -24,10 +24,8 @@ ohos_fuzztest("SourceServiceUnregisterDistributedHardwareFuzzTest") {
 
   fuzz_config_file = "${innerkits_path}/native_cpp/test/sourcefuzztest/sourceserviceunregisterdistributedhardware_fuzzer"
 
-  include_dirs = [
-    "${innerkits_path}/native_cpp/camera_source/include/callback",
-    "${fwk_common_path}/utils/include",
-  ]
+  include_dirs =
+      [ "${innerkits_path}/native_cpp/camera_source/include/callback" ]
 
   include_dirs += [
     "include",
@@ -43,10 +41,6 @@ ohos_fuzztest("SourceServiceUnregisterDistributedHardwareFuzzTest") {
     "${services_path}/cameraservice/sourceservice/include/distributedcameramgr/dcamerahdf",
     "${services_path}/cameraservice/sourceservice/include/distributedcameramgr/dcamerainterface",
     "${services_path}/cameraservice/sourceservice/include/distributedcameramgr/dcamerastate",
-
-    "${fwk_utils_path}/include",
-    "${fwk_utils_path}/include/eventbus",
-    "${fwk_common_path}/utils/include",
   ]
 
   cflags = [
@@ -72,6 +66,7 @@ ohos_fuzztest("SourceServiceUnregisterDistributedHardwareFuzzTest") {
   external_deps = [
     "cJSON:cjson",
     "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.1",
     "hilog:libhilog",
     "ipc:ipc_core",

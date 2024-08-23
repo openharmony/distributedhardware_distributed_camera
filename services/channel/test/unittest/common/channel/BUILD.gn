@@ -23,9 +23,6 @@ config("module_private_config") {
     "include",
     "${common_path}/include/constants",
     "${common_path}/include/utils",
-    "${fwk_common_path}/utils/include",
-    "${fwk_utils_path}/include",
-    "${fwk_utils_path}/include/eventbus",
     "${services_path}/cameraservice/base/include",
     "${services_path}/channel/include",
     "${services_path}/channel/test/unittest/common/channel",
@@ -47,7 +44,6 @@ config("module_private_config") {
     "${services_path}/data_process/include/utils",
     "${innerkits_path}/native_cpp/camera_source/include",
     "${innerkits_path}/native_cpp/camera_source/include/callback",
-    "${graphicsurface_path}/surface/include",
     "${feeding_smoother_path}/base",
   ]
 }
@@ -83,6 +79,7 @@ ohos_unittest("DCameraChannelTest") {
   external_deps = [
     "cJSON:cjson",
     "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.1",
     "eventhandler:libeventhandler",
     "graphic_surface:surface",

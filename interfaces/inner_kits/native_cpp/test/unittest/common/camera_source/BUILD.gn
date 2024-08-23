@@ -28,7 +28,6 @@ config("module_private_config") {
     "${innerkits_path}/native_cpp/camera_source/include",
     "${innerkits_path}/native_cpp/camera_source/include/callback",
     "${innerkits_path}/native_cpp/test/include",
-    "${fwk_common_path}/utils/include",
   ]
 }
 
@@ -50,6 +49,7 @@ ohos_unittest("DCameraSourceHandlerTest") {
 
   external_deps = [
     "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "hilog:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",

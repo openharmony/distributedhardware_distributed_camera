@@ -23,17 +23,12 @@ ohos_fuzztest("SoftbusOnSinkSessionClosedFuzzTest") {
 
   fuzz_config_file = "${innerkits_path}/native_cpp/test/sinkfuzztest/softbusonsinksessionclosed_fuzzer"
 
-  include_dirs = [
-    "${fwk_common_path}/utils/include",
-    "${services_path}/cameraservice/base/include",
-  ]
+  include_dirs = [ "${services_path}/cameraservice/base/include" ]
 
   include_dirs += [
     "${services_path}/channel/include",
     "${common_path}/include/constants",
     "${common_path}/include/utils",
-    "//foundation//communication//dsoftbus//core//common//include",
-    "${fwk_innerkits_path}/include",
     "${feeding_smoother_path}/base",
     "${feeding_smoother_path}/derived",
     "${feeding_smoother_path}/utils",
@@ -61,6 +56,7 @@ ohos_fuzztest("SoftbusOnSinkSessionClosedFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "distributed_hardware_fwk:libdhfwk_sdk",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
