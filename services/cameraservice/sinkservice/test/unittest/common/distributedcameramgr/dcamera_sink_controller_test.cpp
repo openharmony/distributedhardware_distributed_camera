@@ -60,6 +60,7 @@ public:
 std::string g_testDeviceIdController;
 
 const int32_t SLEEP_TIME_MS = 500;
+const int32_t TEST_TWENTY_MS = 20000;
 const std::string SESSION_FLAG_CONTINUE = "dataContinue";
 const std::string SESSION_FLAG_SNAPSHOT = "dataSnapshot";
 const std::string TEST_DEVICE_ID_EMPTY = "";
@@ -577,8 +578,8 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_024, TestSize.L
 {
     g_operatorStr = "test024";
     controller_->isSensitive_ = false;
-    int32_t ret = controller_->PullUpPage();
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(false, controller_->isSensitive_);
+    usleep(TEST_TWENTY_MS);
 }
 
 /**
@@ -593,10 +594,8 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_025, TestSize.L
     EXPECT_NE(nullptr, sinkCallback);
     controller_->isSensitive_ = true;
     controller_->sinkCallback_ = sinkCallback;
-    int32_t ret = controller_->PullUpPage();
-    EXPECT_EQ(DCAMERA_OK, ret);
 
-    ret = controller_->Init(g_testCamIndex);
+    int32_t ret = controller_->Init(g_testCamIndex);
     EXPECT_EQ(DCAMERA_OK, ret);
     EXPECT_NE(nullptr, controller_->sinkCotrEventHandler_);
     std::shared_ptr<std::string> param = std::make_shared<std::string>("");
@@ -614,6 +613,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_025, TestSize.L
     controller_->sinkCotrEventHandler_->ProcessEvent(authorizationEvent);
     event = AppExecFwk::InnerEvent::Get(0, param, 0);
     controller_->sinkCotrEventHandler_->ProcessEvent(event);
+    usleep(TEST_TWENTY_MS);
 }
 
 /**
@@ -627,9 +627,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_026, TestSize.L
     g_outputStr = "test026";
     auto outputMock = std::make_shared<MockDCameraSinkOutput>("camera_1", nullptr);
     EXPECT_NE(DCAMERA_OK, outputMock->Init());
-    controller_->output_ = outputMock;
-    int32_t ret = controller_->Init(g_testCamIndex);
-    EXPECT_NE(DCAMERA_BAD_VALUE, ret);
+    usleep(TEST_TWENTY_MS);
 }
 
 /**

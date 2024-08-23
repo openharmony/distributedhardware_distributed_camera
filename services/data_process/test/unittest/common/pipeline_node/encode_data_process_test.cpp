@@ -357,7 +357,7 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_011, TestSize.Level1)
     EXPECT_EQ(false, testEncodeDataProcess_ == nullptr);
 
     VideoConfigParams srcParams(VideoCodecType::NO_CODEC,
-                                Videoformat::NV21,
+                                Videoformat::YUVI420,
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
                                 TEST_HEIGTH);
