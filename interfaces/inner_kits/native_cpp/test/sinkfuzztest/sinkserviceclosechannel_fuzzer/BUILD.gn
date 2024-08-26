@@ -23,13 +23,10 @@ ohos_fuzztest("SinkServiceCloseChannelFuzzTest") {
 
   fuzz_config_file = "${innerkits_path}/native_cpp/test/sinkfuzztest/sinkserviceclosechannel_fuzzer"
 
-  include_dirs = [ "${fwk_common_path}/utils/include" ]
-
-  include_dirs += [
+  include_dirs = [
     "include",
     "${common_path}/include/constants",
     "${common_path}/include/utils",
-    "${graphicsurface_path}/surface/include",
     "${innerkits_path}/native_cpp/camera_sink/include",
     "${innerkits_path}/native_cpp/camera_sink/include/callback",
     "${innerkits_path}/native_cpp/test/include",
@@ -41,7 +38,6 @@ ohos_fuzztest("SinkServiceCloseChannelFuzzTest") {
     "${services_path}/cameraservice/sinkservice/include/distributedcameramgr/eventbus",
     "${services_path}/data_process/include/utils",
     "${services_path}/channel/include",
-    "${fwk_utils_path}/include/eventbus",
     "${feeding_smoother_path}/base",
   ]
 

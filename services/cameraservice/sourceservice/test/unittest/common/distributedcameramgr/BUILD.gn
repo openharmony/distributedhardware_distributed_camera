@@ -42,11 +42,6 @@ config("module_private_config") {
     "${innerkits_path}/native_cpp/camera_sink/include",
     "${innerkits_path}/native_cpp/camera_sink/include/callback",
 
-    "${fwk_utils_path}/include",
-    "${fwk_utils_path}/include/eventbus",
-    "${fwk_common_path}/utils/include",
-    "//drivers/peripheral/base/",
-    "${graphicsurface_path}/surface/include",
     "${feeding_smoother_path}",
     "${feeding_smoother_path}/base",
     "${feeding_smoother_path}/derived",
@@ -84,7 +79,6 @@ ohos_unittest("DCameraSourceMgrTest") {
     "${services_path}/cameraservice/sourceservice:distributed_camera_source",
     "${services_path}/channel:distributed_camera_channel",
     "${services_path}/data_process:distributed_camera_data_process",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -93,6 +87,7 @@ ohos_unittest("DCameraSourceMgrTest") {
     "access_token:libtokensetproc_shared",
     "cJSON:cjson",
     "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.1",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
