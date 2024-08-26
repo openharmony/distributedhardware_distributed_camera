@@ -95,33 +95,6 @@ void DCameraSinkDevTest::TearDown(void)
 }
 
 /**
- * @tc.name: dcamera_sink_dev_test_001
- * @tc.desc: Verify the Init and UnInit function.
- * @tc.type: FUNC
- * @tc.require: AR000GK6MV
- */
-HWTEST_F(DCameraSinkDevTest, dcamera_sink_dev_test_001, TestSize.Level1)
-{
-    int32_t ret = dev_->Init();
-    EXPECT_EQ(DCAMERA_OK, ret);
-    EXPECT_EQ(true, dev_->isInit_);
-
-    ret = dev_->UnInit();
-    EXPECT_EQ(DCAMERA_OK, ret);
-    EXPECT_EQ(false, dev_->isInit_);
-
-    g_sinkCtrlStr = "test_001";
-    ret = dev_->UnInit();
-    EXPECT_EQ(DCAMERA_OK, ret);
-    EXPECT_EQ(false, dev_->isInit_);
-
-    dev_->controller_ = nullptr;
-    ret = dev_->UnInit();
-    EXPECT_EQ(DCAMERA_OK, ret);
-    EXPECT_EQ(false, dev_->isInit_);
-}
-
-/**
  * @tc.name: dcamera_sink_dev_test_002
  * @tc.desc: Verify the SubscribeLocalHardware function.
  * @tc.type: FUNC

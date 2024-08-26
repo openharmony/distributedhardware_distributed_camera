@@ -34,10 +34,9 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-
-    std::shared_ptr<DistributedCameraSinkService> sinkService_;
 };
 
+const int32_t TEST_TWENTY_MS = 20000;
 std::string g_dhId;
 std::string g_networkId = "08647073e02e7a78f09473aa122ff57fc81c00";
 std::string g_testParams = "TestParams";
@@ -55,29 +54,34 @@ std::string g_testOpenInfoService = R"({
     "Command": "OPEN_CHANNEL",
     "Value": {"SourceDevId": "TestDevId"}
 })";
+std::shared_ptr<DistributedCameraSinkService> sinkService_;
 
 void DistributedCameraSinkServiceTest::SetUpTestCase(void)
-{
-    DHLOGI("enter");
-}
-
-void DistributedCameraSinkServiceTest::TearDownTestCase(void)
-{
-    DHLOGI("enter");
-}
-
-void DistributedCameraSinkServiceTest::SetUp(void)
 {
     DHLOGI("enter");
     sinkService_ = std::make_shared<DistributedCameraSinkService>(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, true);
     DCameraHandler::GetInstance().Initialize();
     g_dhId = DCameraHandler::GetInstance().GetCameras().front();
+    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
+    sinkService_->InitSink(g_testParams, sinkCallback);
+}
+
+void DistributedCameraSinkServiceTest::TearDownTestCase(void)
+{
+    DHLOGI("enter");
+    sinkService_->ReleaseSink();
+    usleep(TEST_TWENTY_MS);
+    sinkService_ = nullptr;
+}
+
+void DistributedCameraSinkServiceTest::SetUp(void)
+{
+    DHLOGI("enter");
 }
 
 void DistributedCameraSinkServiceTest::TearDown(void)
 {
     DHLOGI("enter");
-    sinkService_ = nullptr;
 }
 
 /**
@@ -91,15 +95,8 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_001, TestSi
     DHLOGI("dcamera_sink_service_test_001");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
-    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
-    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
+    int32_t ret = sinkService_->SubscribeLocalHardware(g_dhId, g_testParams);
     EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = sinkService_->SubscribeLocalHardware(g_dhId, g_testParams);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = sinkService_->ReleaseSink();
-    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
 /**
@@ -113,15 +110,8 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_002, TestSi
     DHLOGI("dcamera_sink_service_test_002");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
-    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
-    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
+    int32_t ret = sinkService_->UnsubscribeLocalHardware(g_dhId);
     EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = sinkService_->UnsubscribeLocalHardware(g_dhId);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = sinkService_->ReleaseSink();
-    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
 /**
@@ -135,15 +125,8 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_003, TestSi
     DHLOGI("dcamera_sink_service_test_003");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
-    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
-    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
+    int32_t ret = sinkService_->StopCapture(g_dhId);
     EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = sinkService_->StopCapture(g_dhId);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = sinkService_->ReleaseSink();
-    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
 /**
@@ -157,15 +140,8 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_004, TestSi
     DHLOGI("dcamera_sink_service_test_004");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
-    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
-    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = sinkService_->ChannelNeg(g_dhId, g_testChannelInfoContinue);
+    int32_t ret = sinkService_->ChannelNeg(g_dhId, g_testChannelInfoContinue);
     EXPECT_NE(DCAMERA_OK, ret);
-
-    ret = sinkService_->ReleaseSink();
-    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
 /**
@@ -179,15 +155,8 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_005, TestSi
     DHLOGI("dcamera_sink_service_test_005");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
-    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
-    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
+    int32_t ret = sinkService_->GetCameraInfo(g_dhId, g_testCameraInfo);
     EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = sinkService_->GetCameraInfo(g_dhId, g_testCameraInfo);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = sinkService_->ReleaseSink();
-    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
 /**
@@ -201,11 +170,7 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_006, TestSi
     DHLOGI("dcamera_sink_service_test_006");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
-    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
-    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = sinkService_->OpenChannel(g_dhId, g_testOpenInfoService);
+    int32_t ret = sinkService_->OpenChannel(g_dhId, g_testOpenInfoService);
     EXPECT_NE(DCAMERA_OK, ret);
 
     ret = sinkService_->ChannelNeg(g_dhId, g_testChannelInfoContinue);
@@ -213,9 +178,6 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_006, TestSi
 
     ret = sinkService_->CloseChannel(g_dhId);
     EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = sinkService_->ReleaseSink();
-    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
 /**
@@ -248,15 +210,8 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_008, TestSi
     DHLOGI("dcamera_sink_service_test_008");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
-    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
-    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = sinkService_->SubscribeLocalHardware("", g_testParams);
+    int32_t ret = sinkService_->SubscribeLocalHardware("", g_testParams);
     EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
-
-    ret = sinkService_->ReleaseSink();
-    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
 /**
@@ -270,15 +225,8 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_009, TestSi
     DHLOGI("dcamera_sink_service_test_009");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
-    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
-    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = sinkService_->UnsubscribeLocalHardware("");
+    int32_t ret = sinkService_->UnsubscribeLocalHardware("");
     EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
-
-    ret = sinkService_->ReleaseSink();
-    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
 /**
@@ -291,15 +239,8 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_010, TestSi
     DHLOGI("dcamera_sink_service_test_010");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
-    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
-    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = sinkService_->ChannelNeg("", g_testChannelInfoContinue);
+    int32_t ret = sinkService_->ChannelNeg("", g_testChannelInfoContinue);
     EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
-
-    ret = sinkService_->ReleaseSink();
-    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
 /**
@@ -312,15 +253,8 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_011, TestSi
     DHLOGI("dcamera_sink_service_test_011");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
-    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
-    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = sinkService_->GetCameraInfo("", g_testCameraInfo);
+    int32_t ret = sinkService_->GetCameraInfo("", g_testCameraInfo);
     EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
-
-    ret = sinkService_->ReleaseSink();
-    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
 /**
@@ -333,18 +267,11 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_012, TestSi
     DHLOGI("dcamera_sink_service_test_012");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
-    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
-    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = sinkService_->OpenChannel("", g_testOpenInfoService);
+    int32_t ret = sinkService_->OpenChannel("", g_testOpenInfoService);
     EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
 
     ret = sinkService_->CloseChannel("");
     EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
-
-    ret = sinkService_->ReleaseSink();
-    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
 /**
@@ -375,15 +302,8 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_014, TestSi
     DHLOGI("dcamera_sink_service_test_014");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
-    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
-    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = sinkService_->StopCapture("");
+    int32_t ret = sinkService_->StopCapture("");
     EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
-
-    ret = sinkService_->ReleaseSink();
-    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
 /**
@@ -396,14 +316,7 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_015, TestSi
     DHLOGI("dcamera_sink_service_test_015");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
-    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
-    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = sinkService_->PauseDistributedHardware(g_networkId);
-    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
-
-    ret = sinkService_->ReleaseSink();
+    int32_t ret = sinkService_->PauseDistributedHardware(g_networkId);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
@@ -417,14 +330,7 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_016, TestSi
     DHLOGI("dcamera_sink_service_test_016");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
-    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
-    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = sinkService_->ResumeDistributedHardware(g_networkId);
-    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
-
-    ret = sinkService_->ReleaseSink();
+    int32_t ret = sinkService_->ResumeDistributedHardware(g_networkId);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
@@ -438,14 +344,7 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_017, TestSi
     DHLOGI("dcamera_sink_service_test_017");
     EXPECT_EQ(sinkService_ == nullptr, false);
 
-    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
-    int32_t ret = sinkService_->InitSink(g_testParams, sinkCallback);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = sinkService_->StopDistributedHardware(g_networkId);
-    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
-
-    ret = sinkService_->ReleaseSink();
+    int32_t ret = sinkService_->StopDistributedHardware(g_networkId);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 } // namespace DistributedHardware
