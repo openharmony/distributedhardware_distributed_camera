@@ -26,6 +26,8 @@ namespace OHOS {
 namespace DistributedHardware {
 namespace {
 constexpr int32_t MSG_MAX_LEN = 2048;
+constexpr int32_t ENUM_STREAMTYPE_LEN = 2;
+constexpr int32_t ENUM_ENCODETYPE_LEN = 4;
 using HiSysEventNameSpace = OHOS::HiviewDFX::HiSysEvent;
 const std::string ENUM_STREAMTYPE_STRINGS[] = {
     "CONTINUOUS_FRAME", "SNAPSHOT_FRAME"
@@ -118,10 +120,8 @@ void ReportCameraOperaterEvent(const std::string& eventName, const std::string& 
 
 void ReportStartCaptureEvent(const std::string& eventName, EventCaptureInfo& capture, const std::string& errMsg)
 {
-    if (capture.encodeType_ < 0 ||
-        capture.encodeType_ >= sizeof(ENUM_ENCODETYPE_STRINGS) / sizeof(ENUM_ENCODETYPE_STRINGS[0]) ||
-        capture.type_ < 0 ||
-        capture.type_ >= sizeof(ENUM_STREAMTYPE_STRINGS) / sizeof(ENUM_STREAMTYPE_STRINGS[0])) {
+    if (capture.encodeType_ < 0 || capture.encodeType_ >= ENUM_ENCODETYPE_LEN ||
+        capture.type_ < 0 || capture.type_ >= ENUM_STREAMTYPE_LEN) {
         DHLOGE("Invalid capture parameters.");
         return;
     }
