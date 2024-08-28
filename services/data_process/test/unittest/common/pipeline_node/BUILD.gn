@@ -41,9 +41,11 @@ ohos_unittest("DCameraDataProcessPipelineNodeTest") {
   module_out_path = module_out_path
 
   sources = [
+    "abstract_data_process_test.cpp",
     "decode_data_process_test.cpp",
     "encode_data_process_test.cpp",
     "fps_controller_process_test.cpp",
+    "property_carrier_test.cpp",
     "scale_convert_process_test.cpp",
   ]
 
