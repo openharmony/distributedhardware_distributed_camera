@@ -82,6 +82,7 @@ ohos_unittest("DCameraChannelTest") {
     "distributed_hardware_fwk:distributedhardwareutils",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.1",
     "eventhandler:libeventhandler",
+    "dsoftbus:softbus_client",
     "graphic_surface:surface",
     "hdf_core:libhdi",
     "hilog:libhilog",
