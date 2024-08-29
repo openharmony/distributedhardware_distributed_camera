@@ -94,6 +94,7 @@ ohos_unittest("DCameraSinkMgrTest") {
     "graphic_surface:surface",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "samgr:samgr_proxy",
   ]
 
   defines = [
