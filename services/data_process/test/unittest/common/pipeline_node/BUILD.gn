@@ -68,6 +68,7 @@ ohos_unittest("DCameraDataProcessPipelineNodeTest") {
     "c_utils:utils",
     "distributed_hardware_fwk:distributedhardwareutils",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
+    "drivers_interface_display:libdisplay_composer_hdi_impl_1.1",
     "eventhandler:libeventhandler",
     "ffmpeg:libohosffmpeg",
     "graphic_surface:surface",
