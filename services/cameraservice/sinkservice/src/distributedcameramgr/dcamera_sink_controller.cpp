@@ -400,6 +400,7 @@ void DCameraSinkController::ProcessFrameTrigger(const AppExecFwk::InnerEvent::Po
 {
     DHLOGD("Receive frame trigger event then start process data in sink controller.");
     std::shared_ptr<std::string> param = event->GetSharedObject<std::string>();
+    CHECK_AND_RETURN_LOG(param == nullptr, "ProcessFrameTrigger get param is null");
     accessControl_->TriggerFrame(*param);
 }
 
@@ -408,6 +409,7 @@ void DCameraSinkController::ProcessPostAuthorization(const AppExecFwk::InnerEven
     DHLOGD("Receive post authorization event then start process data in sink controller.");
     std::shared_ptr<std::vector<std::shared_ptr<DCameraCaptureInfo>>> captureInfos =
         event->GetSharedObject<std::vector<std::shared_ptr<DCameraCaptureInfo>>>();
+    CHECK_AND_RETURN_LOG(captureInfos == nullptr, "ProcessPostAuthorization get captureInfos is null");
     PostAuthorization(*captureInfos);
 }
 
