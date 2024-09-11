@@ -196,7 +196,7 @@ int32_t DCameraSoftbusAdapter::CreateSoftBusSourceSocketClient(std::string myDev
     sourceSocketId_ = socketId;
     DHLOGI("create socket client end, myDevId: %{public}s, peerSessionName: %{public}s",
         GetAnonyString(myDevId).c_str(), GetAnonyString(peerSessionName).c_str());
-    return DCAMERA_OK;
+    return socketId;
 }
 
 int32_t DCameraSoftbusAdapter::DestroySoftbusSessionServer(std::string sessionName)
@@ -221,10 +221,6 @@ int32_t DCameraSoftbusAdapter::CloseSoftbusSession(int32_t socket)
 {
     DHLOGI("Shutdown softbus socket start: %{public}d", socket);
     Shutdown(socket); // shutdown socket
-    {
-        std::lock_guard<std::mutex> autoLock(idMapLock_);
-        sessionIdMap_.erase(socket);
-    }
     {
         std::lock_guard<std::mutex> autoLock(sinkSocketLock_);
         sinkSocketSessionMap_.erase(socket);
@@ -286,20 +282,6 @@ int32_t DCameraSoftbusAdapter::SendSofbusStream(int32_t socket, std::shared_ptr<
     return DCAMERA_OK;
 }
 
-int32_t DCameraSoftbusAdapter::DCameraSoftbusGetSessionById(int32_t sessionId,
-    std::shared_ptr<DCameraSoftbusSession>& session)
-{
-    DHLOGI("get softbus session by sessionId: %{public}d", sessionId);
-    std::lock_guard<std::mutex> autoLock(idMapLock_);
-    auto iter = sessionIdMap_.find(sessionId);
-    if (iter == sessionIdMap_.end()) {
-        DHLOGE("get softbus session by id not find session %{public}d", sessionId);
-        return DCAMERA_NOT_FOUND;
-    }
-    session = iter->second;
-    return DCAMERA_OK;
-}
-
 int32_t DCameraSoftbusAdapter::DCameraSoftbusSourceGetSession(int32_t socket,
     std::shared_ptr<DCameraSoftbusSession>& session)
 {
@@ -326,9 +308,6 @@ int32_t DCameraSoftbusAdapter::SourceOnBind(int32_t socket, PeerSocketInfo info)
     ret = session->OnSessionOpened(socket);
     if (ret != DCAMERA_OK) {
         DHLOGE("source bind socket failed, ret: %{public}d socket: %{public}d", ret, socket);
-    } else {
-        std::lock_guard<std::mutex> autoLock(idMapLock_);
-        sessionIdMap_.emplace(socket, session);
     }
     DHLOGI("source bind socket end, socket: %{public}d end", socket);
     return ret;
@@ -338,14 +317,10 @@ void DCameraSoftbusAdapter::SourceOnShutDown(int32_t socket, ShutdownReason reas
 {
     DHLOGI("source on shutdown socket start, socket: %{public}d", socket);
     std::shared_ptr<DCameraSoftbusSession> session = nullptr;
-    int32_t ret = DCameraSoftbusGetSessionById(socket, session);
+    int32_t ret = DCameraSoftbusSourceGetSession(socket, session);
     if (ret != DCAMERA_OK || session == nullptr) {
         DHLOGE("SourceOnShutDown can not find socket %{public}d", socket);
         return;
-    }
-    {
-        std::lock_guard<std::mutex> autoLock(idMapLock_);
-        sessionIdMap_.erase(socket);
     }
     session->OnSessionClose(socket);
     DHLOGI("source on shutdown socket end socket: %{public}d end", socket);
@@ -456,11 +431,6 @@ int32_t DCameraSoftbusAdapter::HandleSourceStreamExt(std::shared_ptr<DataBuffer>
     return DCAMERA_OK;
 }
 
-int32_t DCameraSoftbusAdapter::GetSourceSocketId()
-{
-    return sourceSocketId_;
-}
-
 void DCameraSoftbusAdapter::RecordSourceSocketSession(int32_t socket, std::shared_ptr<DCameraSoftbusSession> session)
 {
     if (session == nullptr) {
@@ -537,9 +507,6 @@ int32_t DCameraSoftbusAdapter::SinkOnBind(int32_t socket, PeerSocketInfo info)
     ret = session->OnSessionOpened(socket);
     if (ret != DCAMERA_OK) {
         DHLOGE("sink bind socket error, not find socket %{public}d", socket);
-    } else {
-        std::lock_guard<std::mutex> autoLock(idMapLock_);
-        sessionIdMap_.emplace(socket, session);
     }
     DHLOGI("sink bind socket end, socket: %{public}d", socket);
     return ret;
@@ -549,14 +516,10 @@ void DCameraSoftbusAdapter::SinkOnShutDown(int32_t socket, ShutdownReason reason
 {
     DHLOGI("sink on shutdown socket start, socket: %{public}d", socket);
     std::shared_ptr<DCameraSoftbusSession> session = nullptr;
-    int32_t ret = DCameraSoftbusGetSessionById(socket, session);
+    int32_t ret = DCameraSoftbusSinkGetSession(socket, session);
     if (ret != DCAMERA_OK || session == nullptr) {
         DHLOGE("sink on shutdown socket can not find socket %{public}d", socket);
         return;
-    }
-    {
-        std::lock_guard<std::mutex> autoLock(idMapLock_);
-        sessionIdMap_.erase(socket);
     }
     session->OnSessionClose(socket);
     DHLOGI("sink on shutdown socket end, socket: %{public}d", socket);
