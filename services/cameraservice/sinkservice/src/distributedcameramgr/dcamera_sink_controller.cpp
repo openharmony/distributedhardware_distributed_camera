@@ -34,8 +34,10 @@
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
+#ifdef DEVICE_SECURITY_LEVEL_ENABLE
 #include "device_security_defines.h"
 #include "device_security_info.h"
+#endif
 #include "idistributed_camera_source.h"
 #include "ipc_skeleton.h"
 #include "json/json.h"
@@ -643,6 +645,7 @@ bool DCameraSinkController::CheckDeviceSecurityLevel(const std::string &srcDevic
 
 int32_t DCameraSinkController::GetDeviceSecurityLevel(const std::string &udid)
 {
+    #ifdef DEVICE_SECURITY_LEVEL_ENABLE
     DeviceIdentify devIdentify;
     devIdentify.length = DEVICE_ID_MAX_LEN;
     int32_t ret = memcpy_s(devIdentify.identity, DEVICE_ID_MAX_LEN, udid.c_str(), DEVICE_ID_MAX_LEN);
@@ -658,7 +661,9 @@ int32_t DCameraSinkController::GetDeviceSecurityLevel(const std::string &udid)
         info = nullptr;
         return DEFAULT_DEVICE_SECURITY_LEVEL;
     }
+    #endif
     int32_t level = 0;
+    #ifdef DEVICE_SECURITY_LEVEL_ENABLE
     ret = GetDeviceSecurityLevelValue(info, &level);
     DHLOGD("Get device security level, level is %d", level);
     FreeDeviceSecurityInfo(info);
@@ -667,6 +672,7 @@ int32_t DCameraSinkController::GetDeviceSecurityLevel(const std::string &udid)
         DHLOGE("Get device security level failed %d", ret);
         return DEFAULT_DEVICE_SECURITY_LEVEL;
     }
+    #endif
     return level;
 }
 
