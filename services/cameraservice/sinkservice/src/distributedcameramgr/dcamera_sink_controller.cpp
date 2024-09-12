@@ -200,18 +200,12 @@ int32_t DCameraSinkController::GetCameraInfo(std::shared_ptr<DCameraInfo>& camIn
     return DCAMERA_OK;
 }
 
-int32_t DCameraSinkController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& openInfo)
+int32_t DCameraSinkController::CheckSensitive()
 {
-    DHLOGI("DCameraSinkController OpenChannel Start, dhId: %{public}s", GetAnonyString(dhId_).c_str());
-    if (!CheckPermission()) {
-        DHLOGE("DCameraSinkController OpenChannel fail, CheckPermission fail");
-        return DCAMERA_WRONG_STATE;
+    if (sinkCallback_ == nullptr) {
+        DHLOGE("check sensitive callback is nullptr.");
+        return DCAMERA_BAD_VALUE;
     }
-    if (sessionState_ != DCAMERA_CHANNEL_STATE_DISCONNECTED) {
-        DHLOGE("wrong state, dhId: %{public}s, sessionState: %{public}d", GetAnonyString(dhId_).c_str(), sessionState_);
-        return DCAMERA_WRONG_STATE;
-    }
-    srcDevId_ = openInfo->sourceDevId_;
     int32_t ret = sinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_QUERY_RESOURCE, PAGE_SUBTYPE,
         srcDevId_, isSensitive_, isSameAccount_);
     CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "Query resource failed, ret: %{public}d", ret);
@@ -229,6 +223,26 @@ int32_t DCameraSinkController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& ope
             DHLOGE("Check device security level failed!");
             return DCAMERA_BAD_VALUE;
         }
+    }
+    return DCAMERA_OK;
+}
+
+int32_t DCameraSinkController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& openInfo)
+{
+    DHLOGI("DCameraSinkController OpenChannel Start, dhId: %{public}s", GetAnonyString(dhId_).c_str());
+    if (!CheckPermission()) {
+        DHLOGE("DCameraSinkController OpenChannel fail, CheckPermission fail");
+        return DCAMERA_WRONG_STATE;
+    }
+    if (sessionState_ != DCAMERA_CHANNEL_STATE_DISCONNECTED) {
+        DHLOGE("wrong state, dhId: %{public}s, sessionState: %{public}d", GetAnonyString(dhId_).c_str(), sessionState_);
+        return DCAMERA_WRONG_STATE;
+    }
+    srcDevId_ = openInfo->sourceDevId_;
+    int32_t ret = CheckSensitive();
+    if (ret != DCAMERA_OK) {
+        DHLOGE("Check sensitive error. ret %{public}d.", ret);
+        return ret;
     }
     DCameraLowLatency::GetInstance().EnableLowLatency();
     std::vector<DCameraIndex> indexs;

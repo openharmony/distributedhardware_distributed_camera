@@ -83,6 +83,7 @@ private:
     bool CheckPermission();
     void ProcessFrameTrigger(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessPostAuthorization(const AppExecFwk::InnerEvent::Pointer &event);
+    int32_t CheckSensitive();
 
     bool isInit_;
     int32_t sessionState_;

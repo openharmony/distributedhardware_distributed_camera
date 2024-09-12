@@ -64,11 +64,9 @@ public:
         const StreamFrameInfo *param);
 
     int32_t HandleSourceStreamExt(std::shared_ptr<DataBuffer>& buffer, const StreamData *ext);
-    int32_t GetSourceSocketId();
     void RecordSourceSocketSession(int32_t socket, std::shared_ptr<DCameraSoftbusSession> session);
 
 public:
-    std::map<std::string, std::shared_ptr<DCameraSoftbusSession>> sourceSessions_;
     std::map<std::string, std::shared_ptr<DCameraSoftbusSession>> sinkSessions_;
 
 private:
@@ -79,7 +77,6 @@ private:
         PeerSocketInfo info);
     int32_t DCameraSoftbusSourceGetSession(int32_t socket, std::shared_ptr<DCameraSoftbusSession>& session);
     int32_t DCameraSoftbusSinkGetSession(int32_t socket, std::shared_ptr<DCameraSoftbusSession>& session);
-    int32_t DCameraSoftbusGetSessionById(int32_t socket, std::shared_ptr<DCameraSoftbusSession>& session);
 
 private:
     std::mutex optLock_;
@@ -89,8 +86,6 @@ private:
     std::map<std::string, uint32_t> sessionTotal_;
     static const uint32_t DCAMERA_LINK_TYPE_MAX = 4;
     static const uint32_t DCAMERA_LINK_TYPE_INDEX_2 = 2;
-    std::mutex idMapLock_;
-    std::map<int32_t, std::shared_ptr<DCameraSoftbusSession>> sessionIdMap_;
 
     int32_t sourceSocketId_ = -1;
     std::map<DCameraSessionMode, TransDataType> sessionModeAndDataTypeMap_;

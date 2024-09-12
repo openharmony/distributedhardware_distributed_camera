@@ -323,6 +323,34 @@ int32_t DCameraSoftbusSession::SendData(DCameraSessionMode mode, std::shared_ptr
     return DCAMERA_NOT_FOUND;
 }
 
+int32_t DCameraSoftbusSession::CreateSocketServer()
+{
+    int32_t ret = DCameraSoftbusAdapter::GetInstance().CreatSoftBusSinkSocketServer(mySessionName_,
+        DCAMERA_CHANNLE_ROLE_SINK, mode_, peerDevId_, peerSessionName_);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("DCameraSoftbusSession CreateSocketServer Error, ret %{public}d", ret);
+        return ret;
+    }
+    return DCAMERA_OK;
+}
+
+int32_t DCameraSoftbusSession::BindSocketServer()
+{
+    int32_t socketId = DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDevId_, peerSessionName_,
+        peerDevId_, mode_, DCAMERA_CHANNLE_ROLE_SOURCE);
+    if (socketId <= 0) {
+        DHLOGE("DCameraSoftbusSession BindSocketServer Error, socketId %{public}d", socketId);
+        return socketId;
+    }
+    OnSessionOpened(socketId);
+    return socketId;
+}
+
+void DCameraSoftbusSession::ReleaseSession()
+{
+    DCameraSoftbusAdapter::GetInstance().DestroySoftbusSessionServer(mySessionName_);
+}
+
 int32_t DCameraSoftbusSession::UnPackSendData(std::shared_ptr<DataBuffer>& buffer, DCameraSendFuc memberFunc)
 {
     CHECK_AND_RETURN_RET_LOG(buffer == nullptr, DCAMERA_BAD_VALUE, "Data buffer is null");

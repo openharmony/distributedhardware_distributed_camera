@@ -230,7 +230,6 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_008, TestSize.L
         .dataType = TransDataType::DATA_TYPE_VIDEO_STREAM,
     };
     std::shared_ptr<DCameraSoftbusSession> session = std::make_shared<DCameraSoftbusSession>();
-    DCameraSoftbusAdapter::GetInstance().sourceSessions_.emplace(peerDevId + mySessName, session);
     ret = DCameraSoftbusAdapter::GetInstance().SourceOnBind(sessionId, info);
     DCameraSoftbusAdapter::GetInstance().DestroySoftbusSessionServer(sessionName);
     EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
@@ -643,7 +642,6 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_020, TestSize.L
     };
     std::shared_ptr<DCameraSoftbusSession> session = std::make_shared<DCameraSoftbusSession>();
     ret = DCameraSoftbusAdapter::GetInstance().SinkOnBind(sessionId, info);
-    ret = DCameraSoftbusAdapter::GetInstance().DCameraSoftbusGetSessionById(sessionId, session);
 
     DCameraSoftbusAdapter::GetInstance().DestroySoftbusSessionServer(sessionName);
     EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
@@ -675,7 +673,6 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_023, TestSize.L
     };
     std::shared_ptr<DCameraSoftbusSession> session = std::make_shared<DCameraSoftbusSession>();
     ret = DCameraSoftbusAdapter::GetInstance().SinkOnBind(sessionId, info);
-    ret = DCameraSoftbusAdapter::GetInstance().DCameraSoftbusGetSessionById(sessionId, session);
 
     DCameraSoftbusAdapter::GetInstance().DestroySoftbusSessionServer(sessionName);
     EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
@@ -713,7 +710,6 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_027, TestSize.L
     ret = DCameraSoftbusAdapter::GetInstance().DCameraSoftbusSourceGetSession(sessionId, session);
     EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
     sessionId = 2;
-    DCameraSoftbusAdapter::GetInstance().sourceSessions_.clear();
     DCameraSoftbusAdapter::GetInstance().DestroySoftbusSessionServer(sessionName);
     EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
 }
