@@ -129,7 +129,6 @@ ohos_shared_library("distributed_camera_sink") {
     "c_utils:utils",
     "camera_framework:camera_framework",
     "device_manager:devicemanagersdk",
-    "device_security_level:dslm_sdk",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "drivers_peripheral_display:hdi_gralloc_client",
     "eventhandler:libeventhandler",
@@ -138,6 +137,11 @@ ohos_shared_library("distributed_camera_sink") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
+
+  if (device_security_level_camera) {
+    external_deps += [ "device_security_level:dslm_sdk" ]
+    defines += [ "DEVICE_SECURITY_LEVEL_ENABLE" ]
+  }
 
   subsystem_name = "distributedhardware"
 
