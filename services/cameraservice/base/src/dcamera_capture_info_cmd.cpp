@@ -166,7 +166,7 @@ int32_t DCameraCaptureInfoCmd::UmarshalSettings(cJSON *valueJson,
     std::shared_ptr<DCameraCaptureInfo>& captureInfo)
 {
     if (captureInfo == nullptr) {
-            return DCAMERA_BAD_VALUE;
+        return DCAMERA_BAD_VALUE;
     }
     cJSON *captureSetting = nullptr;
     cJSON_ArrayForEach(captureSetting, valueJson) {
