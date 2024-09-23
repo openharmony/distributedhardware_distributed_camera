@@ -23,12 +23,7 @@ ohos_fuzztest("DecodeOnOutputBufferAvailableFuzzTest") {
 
   fuzz_config_file = "${innerkits_path}/native_cpp/test/sourcefuzztest/decodeonoutputbufferavailable_fuzzer"
 
-  include_dirs = [
-    "${fwk_common_path}/utils/include",
-    "${fwk_utils_path}/include/eventbus",
-    "${graphicsurface_path}/surface/include",
-    "${services_path}/cameraservice/base/include",
-  ]
+  include_dirs = [ "${services_path}/cameraservice/base/include" ]
 
   include_dirs += [
     "${services_path}/data_process/include/interfaces",
@@ -73,6 +68,7 @@ ohos_fuzztest("DecodeOnOutputBufferAvailableFuzzTest") {
     "distributed_hardware_fwk:distributedhardwareutils",
     "eventhandler:libeventhandler",
     "graphic_surface:surface",
+    "hilog:libhilog",
     "hitrace:hitrace_meter",
     "media_foundation:media_foundation",
   ]

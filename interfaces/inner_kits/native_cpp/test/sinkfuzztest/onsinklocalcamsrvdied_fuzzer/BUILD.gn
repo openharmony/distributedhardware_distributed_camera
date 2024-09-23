@@ -24,11 +24,6 @@ ohos_fuzztest("OnSinkLocalCamSrvDiedFuzzTest") {
   fuzz_config_file = "${innerkits_path}/native_cpp/test/sinkfuzztest/onsinklocalcamsrvdied_fuzzer"
 
   include_dirs = [
-    "${fwk_utils_path}/include",
-    "${fwk_common_path}/utils/include",
-  ]
-
-  include_dirs += [
     "include",
     "${common_path}/include",
     "${common_path}/include/constants",
@@ -58,6 +53,7 @@ ohos_fuzztest("OnSinkLocalCamSrvDiedFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
     "ipc:ipc_core",

@@ -99,7 +99,7 @@ HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_001, Tes
 
     listener_ = std::make_shared<DCameraSourceInputChannelListener>(input_, CONTINUOUS_FRAME);
     int32_t ret = channel_->CreateSession(camIndexs, sessionFlag, sessionMode, listener_);
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
 /**
@@ -126,7 +126,7 @@ HWTEST_F(DCameraChannelSourceImplTest, dcamera_channel_source_impl_test_002, Tes
     listener_ = std::make_shared<DCameraSourceInputChannelListener>(input_, CONTINUOUS_FRAME);
     int32_t ret = channel_->CreateSession(camIndexs, sessionFlag, sessionMode, listener_);
     ret = channel_->CloseSession();
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
 }
 
 /**

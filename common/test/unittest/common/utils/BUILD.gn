@@ -42,11 +42,7 @@ ohos_unittest("CommonUtilsTest") {
 
   configs = [ ":module_private_config" ]
 
-  deps = [
-    "${common_path}:distributed_camera_utils",
-    "//third_party/googletest:gmock",
-    "//third_party/googletest:gtest_main",
-  ]
+  deps = [ "${common_path}:distributed_camera_utils" ]
 
   cflags = [
     "-fPIC",
@@ -64,6 +60,7 @@ ohos_unittest("CommonUtilsTest") {
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.1",
     "hdf_core:libhdi",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]

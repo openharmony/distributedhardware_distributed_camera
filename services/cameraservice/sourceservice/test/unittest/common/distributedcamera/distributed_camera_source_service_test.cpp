@@ -46,6 +46,7 @@ namespace {
 const std::string TEST_DEVICE_ID = "bb536a637105409e904d4da83790a4a7";
 const std::string TEST_CAMERA_DH_ID_0 = "camera_0";
 const std::string TEST_REQID = "bb536a637105409e904d4da83790a4a7";
+const int32_t TEST_SOURCE_SERVICE = 200000;
 }
 
 void DistributedCameraSourceServiceTest::SetUpTestCase(void)
@@ -178,6 +179,7 @@ HWTEST_F(DistributedCameraSourceServiceTest, dcamera_source_service_test_006, Te
     testSrcService_->listener_ = std::make_shared<DCameraServiceStateListener>();
     int32_t ret = testSrcService_->InitSource(params, callbackProxy);
     EXPECT_EQ(DCAMERA_OK, ret);
+    usleep(TEST_SOURCE_SERVICE);
 }
 
 /**
@@ -193,6 +195,7 @@ HWTEST_F(DistributedCameraSourceServiceTest, dcamera_source_service_test_007, Te
 
     int32_t ret = testSrcService_->ReleaseSource();
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+    usleep(TEST_SOURCE_SERVICE);
 }
 
 /**
@@ -208,6 +211,7 @@ HWTEST_F(DistributedCameraSourceServiceTest, dcamera_source_service_test_008, Te
 
     int32_t ret = testSrcService_->LoadDCameraHDF();
     EXPECT_EQ(DCAMERA_OK, ret);
+    usleep(TEST_SOURCE_SERVICE);
 }
 
 /**
@@ -225,6 +229,7 @@ HWTEST_F(DistributedCameraSourceServiceTest, dcamera_source_service_test_009, Te
     EXPECT_EQ(DCAMERA_OK, ret);
     ret = testSrcService_->UnLoadCameraHDF();
     EXPECT_EQ(DCAMERA_OK, ret);
+    usleep(TEST_SOURCE_SERVICE);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

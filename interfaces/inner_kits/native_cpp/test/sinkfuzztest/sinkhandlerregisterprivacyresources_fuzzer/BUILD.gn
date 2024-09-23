@@ -25,10 +25,7 @@ ohos_fuzztest("SinkHandlerRegisterPrivacyResourcesFuzzTest") {
 
   fuzz_config_file = "${innerkits_path}/native_cpp/test/sinkfuzztest/sinkhandlerregisterprivacyresources_fuzzer"
 
-  include_dirs = [
-    "${innerkits_path}/native_cpp",
-    "${fwk_common_path}/utils/include",
-  ]
+  include_dirs = [ "${innerkits_path}/native_cpp" ]
 
   include_dirs += [
     "include",
@@ -61,6 +58,7 @@ ohos_fuzztest("SinkHandlerRegisterPrivacyResourcesFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "hilog:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",

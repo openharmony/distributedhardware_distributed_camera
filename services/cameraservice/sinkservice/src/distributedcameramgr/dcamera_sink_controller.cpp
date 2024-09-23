@@ -34,8 +34,10 @@
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
+#ifdef DEVICE_SECURITY_LEVEL_ENABLE
 #include "device_security_defines.h"
 #include "device_security_info.h"
+#endif
 #include "ffrt_inner.h"
 #include "idistributed_camera_source.h"
 #include "ipc_skeleton.h"
@@ -201,18 +203,12 @@ int32_t DCameraSinkController::GetCameraInfo(std::shared_ptr<DCameraInfo>& camIn
     return DCAMERA_OK;
 }
 
-int32_t DCameraSinkController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& openInfo)
+int32_t DCameraSinkController::CheckSensitive()
 {
-    DHLOGI("DCameraSinkController OpenChannel Start, dhId: %{public}s", GetAnonyString(dhId_).c_str());
-    if (!CheckPermission()) {
-        DHLOGE("DCameraSinkController OpenChannel fail, CheckPermission fail");
-        return DCAMERA_WRONG_STATE;
+    if (sinkCallback_ == nullptr) {
+        DHLOGE("check sensitive callback is nullptr.");
+        return DCAMERA_BAD_VALUE;
     }
-    if (sessionState_ != DCAMERA_CHANNEL_STATE_DISCONNECTED) {
-        DHLOGE("wrong state, dhId: %{public}s, sessionState: %{public}d", GetAnonyString(dhId_).c_str(), sessionState_);
-        return DCAMERA_WRONG_STATE;
-    }
-    srcDevId_ = openInfo->sourceDevId_;
     int32_t ret = sinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_QUERY_RESOURCE, PAGE_SUBTYPE,
         srcDevId_, isSensitive_, isSameAccount_);
     CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "Query resource failed, ret: %{public}d", ret);
@@ -230,6 +226,26 @@ int32_t DCameraSinkController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& ope
             DHLOGE("Check device security level failed!");
             return DCAMERA_BAD_VALUE;
         }
+    }
+    return DCAMERA_OK;
+}
+
+int32_t DCameraSinkController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& openInfo)
+{
+    DHLOGI("DCameraSinkController OpenChannel Start, dhId: %{public}s", GetAnonyString(dhId_).c_str());
+    if (!CheckPermission()) {
+        DHLOGE("DCameraSinkController OpenChannel fail, CheckPermission fail");
+        return DCAMERA_WRONG_STATE;
+    }
+    if (sessionState_ != DCAMERA_CHANNEL_STATE_DISCONNECTED) {
+        DHLOGE("wrong state, dhId: %{public}s, sessionState: %{public}d", GetAnonyString(dhId_).c_str(), sessionState_);
+        return DCAMERA_WRONG_STATE;
+    }
+    srcDevId_ = openInfo->sourceDevId_;
+    int32_t ret = CheckSensitive();
+    if (ret != DCAMERA_OK) {
+        DHLOGE("Check sensitive error. ret %{public}d.", ret);
+        return ret;
     }
     DCameraLowLatency::GetInstance().EnableLowLatency();
     std::vector<DCameraIndex> indexs;
@@ -687,6 +703,7 @@ bool DCameraSinkController::CheckDeviceSecurityLevel(const std::string &srcDevic
 
 int32_t DCameraSinkController::GetDeviceSecurityLevel(const std::string &udid)
 {
+    #ifdef DEVICE_SECURITY_LEVEL_ENABLE
     DeviceIdentify devIdentify;
     devIdentify.length = DEVICE_ID_MAX_LEN;
     int32_t ret = memcpy_s(devIdentify.identity, DEVICE_ID_MAX_LEN, udid.c_str(), DEVICE_ID_MAX_LEN);
@@ -702,7 +719,9 @@ int32_t DCameraSinkController::GetDeviceSecurityLevel(const std::string &udid)
         info = nullptr;
         return DEFAULT_DEVICE_SECURITY_LEVEL;
     }
+    #endif
     int32_t level = 0;
+    #ifdef DEVICE_SECURITY_LEVEL_ENABLE
     ret = GetDeviceSecurityLevelValue(info, &level);
     DHLOGD("Get device security level, level is %{public}d", level);
     FreeDeviceSecurityInfo(info);
@@ -711,6 +730,7 @@ int32_t DCameraSinkController::GetDeviceSecurityLevel(const std::string &udid)
         DHLOGE("Get device security level failed %{public}d", ret);
         return DEFAULT_DEVICE_SECURITY_LEVEL;
     }
+    #endif
     return level;
 }
 

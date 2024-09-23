@@ -45,6 +45,9 @@ public:
     std::string GetPeerSessionName();
     std::string GetMySessionName();
     int32_t GetSessionId();
+    int32_t CreateSocketServer();
+    int32_t BindSocketServer();
+    void ReleaseSession();
 
 private:
     struct SessionDataHeader {

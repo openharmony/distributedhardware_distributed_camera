@@ -23,12 +23,7 @@ ohos_fuzztest("EncodeOnOutputBufferAvailableFuzzTest") {
 
   fuzz_config_file = "${innerkits_path}/native_cpp/test/sinkfuzztest/encodeonoutputbufferavailable_fuzzer"
 
-  include_dirs = [
-    "${fwk_common_path}/utils/include",
-    "${fwk_utils_path}/include/eventbus",
-    "${graphicsurface_path}/surface/include",
-    "${services_path}/cameraservice/base/include",
-  ]
+  include_dirs = [ "${services_path}/cameraservice/base/include" ]
 
   include_dirs += [
     "${services_path}/data_process/include/interfaces",
@@ -71,9 +66,11 @@ ohos_fuzztest("EncodeOnOutputBufferAvailableFuzzTest") {
     "av_codec:av_codec_client",
     "c_utils:utils",
     "distributed_hardware_fwk:distributedhardwareutils",
+    "drivers_interface_display:libdisplay_composer_hdi_impl_1.1",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "eventhandler:libeventhandler",
     "graphic_surface:surface",
+    "hilog:libhilog",
     "hitrace:hitrace_meter",
     "media_foundation:media_foundation",
   ]

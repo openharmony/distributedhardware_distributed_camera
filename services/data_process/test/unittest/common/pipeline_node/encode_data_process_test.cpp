@@ -316,6 +316,14 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_009, TestSize.Level1)
     inputBuffers.push_back(db);
     rc = testEncodeDataProcess_->ProcessData(inputBuffers);
     EXPECT_EQ(rc, DCAMERA_MEMORY_OPT_ERROR);
+
+    inputBuffers.clear();
+    std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);
+    size_t len = NORM_YUV420_BUFFER_SIZE - 1;
+    db->SetRange(offset, len);
+    inputBuffers.push_back(db);
+    rc = testEncodeDataProcess_->ProcessData(inputBuffers);
+    EXPECT_EQ(rc, DCAMERA_OK);
 }
 
 /**
@@ -357,7 +365,7 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_011, TestSize.Level1)
     EXPECT_EQ(false, testEncodeDataProcess_ == nullptr);
 
     VideoConfigParams srcParams(VideoCodecType::NO_CODEC,
-                                Videoformat::NV21,
+                                Videoformat::YUVI420,
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
                                 TEST_HEIGTH);
@@ -372,6 +380,13 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_011, TestSize.Level1)
 
     rc = testEncodeDataProcess_->InitEncoderMetadataFormat();
     EXPECT_EQ(rc, DCAMERA_OK);
+
+    uint32_t index = 0;
+    MediaAVCodec::AVCodecBufferInfo info;
+    std::shared_ptr<Media::AVSharedMemory> buffer = nullptr;
+    MediaAVCodec::AVCodecBufferFlag flag = MediaAVCodec::AVCODEC_BUFFER_FLAG_CODEC_DATA;
+    rc = testEncodeDataProcess_->GetEncoderOutputBuffer(index, info, flag, buffer);
+    EXPECT_EQ(rc, DCAMERA_BAD_OPERATE);
 }
 
 /**
@@ -517,6 +532,36 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_017, TestSize.Level1)
     std::string propertyName = "surface";
     PropertyCarrier propertyCarrier;
     int32_t rc = testEncodeDataProcess_->GetProperty(propertyName, propertyCarrier);
+    EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
+}
+
+/**
+ * @tc.name: encode_data_process_test_018
+ * @tc.desc: Verify encode data process func.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(EncodeDataProcessTest, encode_data_process_test_018, TestSize.Level1)
+{
+    EXPECT_EQ(false, testEncodeDataProcess_ == nullptr);
+
+    testEncodeDataProcess_->targetConfig_.SetVideoCodecType(VideoCodecType::NO_CODEC);
+    int32_t rc = testEncodeDataProcess_->InitEncoderMetadataFormat();
+    EXPECT_EQ(rc, DCAMERA_NOT_FOUND);
+
+    testEncodeDataProcess_->targetConfig_.SetVideoCodecType(VideoCodecType::CODEC_MPEG4_ES);
+    testEncodeDataProcess_->sourceConfig_.SetVideoformat(Videoformat::NV21);
+    rc = testEncodeDataProcess_->InitEncoderMetadataFormat();
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    testEncodeDataProcess_->sourceConfig_.SetVideoformat(static_cast<Videoformat>(-1));
+    rc = testEncodeDataProcess_->InitEncoderMetadataFormat();
+    EXPECT_EQ(rc, DCAMERA_NOT_FOUND);
+
+    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
+    std::shared_ptr<DataBuffer> db = nullptr;
+    inputBuffers.push_back(db);
+    rc = testEncodeDataProcess_->ProcessData(inputBuffers);
     EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
 }
 } // namespace DistributedHardware
