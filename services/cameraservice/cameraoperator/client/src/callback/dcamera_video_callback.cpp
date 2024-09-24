@@ -47,5 +47,10 @@ void DCameraVideoCallback::OnError(const int32_t errorCode) const
     event->eventResult_ = DCAMERA_EVENT_DEVICE_ERROR;
     callback_->OnStateChanged(event);
 }
+
+void DCameraVideoCallback::OnDeferredVideoEnhancementInfo(const CameraStandard::CaptureEndedInfoExt info) const
+{
+    DHLOGI("enter");
+}
 } // namespace DistributedHardware
 } // namespace OHOS
