@@ -41,10 +41,11 @@ int32_t DCameraSourceStateMachine::Execute(DCAMERA_EVENT eventType, DCameraSourc
         DHLOGE("DCameraSourceStateMachine execute failed, camDev is nullptr");
         return DCAMERA_BAD_VALUE;
     }
-    int32_t ret = currentState_->Execute(camDev, event.GetEventType(), event);
+    auto tempState = currentState_;
+    int32_t ret = tempState->Execute(camDev, event.GetEventType(), event);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceStateMachine currentState_: %{public}d execute event: %{public}d failed",
-            currentState_->GetStateType(), event.GetEventType());
+            tempState->GetStateType(), event.GetEventType());
     }
     return ret;
 }
