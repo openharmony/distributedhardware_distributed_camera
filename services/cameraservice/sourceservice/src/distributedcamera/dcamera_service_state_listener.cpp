@@ -22,6 +22,7 @@
 #include "distributed_camera_errno.h"
 #include "distributed_camera_source_service.h"
 #include "distributed_hardware_log.h"
+#include "ffrt_inner.h"
 #include <sys/prctl.h>
 
 namespace OHOS {
@@ -52,7 +53,7 @@ int32_t DCameraServiceStateListener::OnRegisterNotify(const std::string& devId, 
     std::lock_guard<std::mutex> autoLock(proxyMutex_);
 
     if (status != DCAMERA_OK) {
-        std::thread([=]() mutable {
+        ffrt::submit([=]() mutable {
             DHLOGI("thread delete devId: %{public}s dhId: %{public}s", GetAnonyString(devId).c_str(),
                 GetAnonyString(dhId).c_str());
             prctl(PR_SET_NAME, REGISTER_SERVICE_NOTIFY.c_str());
@@ -66,7 +67,7 @@ int32_t DCameraServiceStateListener::OnRegisterNotify(const std::string& devId, 
             if (ret != DCAMERA_OK) {
                 DHLOGE("OnNotifyRegResult failed: %{public}d", ret);
             }
-        }).detach();
+        });
     } else {
         if (callbackProxy_ == nullptr) {
             DHLOGE("callbackProxy_ is nullptr");
@@ -92,7 +93,7 @@ int32_t DCameraServiceStateListener::OnUnregisterNotify(const std::string& devId
     }
 
     if (status == DCAMERA_OK) {
-        std::thread([=]() mutable {
+        ffrt::submit([=]() mutable {
             DHLOGI("thread delete devId: %{public}s dhId: %{public}s", GetAnonyString(devId).c_str(),
                 GetAnonyString(dhId).c_str());
             prctl(PR_SET_NAME, UNREGISTER_SERVICE_NOTIFY.c_str());
@@ -103,7 +104,7 @@ int32_t DCameraServiceStateListener::OnUnregisterNotify(const std::string& devId
             if (ret != DCAMERA_OK) {
                 DHLOGE("OnNotifyUnregResult failed, ret: %{public}d", ret);
             }
-        }).detach();
+        });
     } else {
         int32_t ret = callbackProxy_->OnNotifyUnregResult(devId, dhId, reqId, status, data);
         if (ret != DCAMERA_OK) {

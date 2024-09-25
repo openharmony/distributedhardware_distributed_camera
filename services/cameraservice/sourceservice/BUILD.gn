@@ -130,6 +130,7 @@ ohos_shared_library("distributed_camera_source") {
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.1",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
+    "ffrt:libffrt",
     "graphic_surface:surface",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdi",

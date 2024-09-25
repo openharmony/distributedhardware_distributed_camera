@@ -44,6 +44,7 @@
                 "c_utils",
                 "cJSON",
                 "dsoftbus",
+                "ffrt",
                 "ffmpeg",
                 "hicollie",
                 "media_foundation",

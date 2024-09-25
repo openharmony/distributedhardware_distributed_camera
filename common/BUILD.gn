@@ -64,6 +64,7 @@ ohos_shared_library("distributed_camera_utils") {
     "c_utils:utils",
     "distributed_hardware_fwk:distributedhardwareutils",
     "dsoftbus:softbus_client",
+    "ffrt:libffrt",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "hisysevent:libhisysevent",

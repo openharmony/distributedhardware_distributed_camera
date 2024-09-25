@@ -38,6 +38,7 @@
 #include "device_security_defines.h"
 #include "device_security_info.h"
 #endif
+#include "ffrt_inner.h"
 #include "idistributed_camera_source.h"
 #include "ipc_skeleton.h"
 #include "dcamera_low_latency.h"
@@ -488,7 +489,7 @@ void DCameraSinkController::OnSessionState(int32_t state)
             break;
         case DCAMERA_CHANNEL_STATE_DISCONNECTED:
             DHLOGI("channel is disconnected");
-            std::thread([this]() {
+            ffrt::submit([this]() {
                 DHLOGI("DCameraSinkController::OnSessionState %{public}s new thread session state: %{public}d",
                     GetAnonyString(dhId_).c_str(), sessionState_);
                 prctl(PR_SET_NAME, CHANNEL_DISCONNECTED.c_str());
@@ -503,7 +504,7 @@ void DCameraSinkController::OnSessionState(int32_t state)
                     DHLOGE("session state: %{public}d, %{public}s stop capture failed, ret: %{public}d",
                         sessionState_, GetAnonyString(dhId_).c_str(), ret);
                 }
-            }).detach();
+            });
             break;
         default:
             DHLOGE("unknown session state");
