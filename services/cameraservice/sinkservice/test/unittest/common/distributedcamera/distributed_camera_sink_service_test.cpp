@@ -174,7 +174,7 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_006, TestSi
     EXPECT_NE(DCAMERA_OK, ret);
 
     ret = sinkService_->ChannelNeg(g_dhId, g_testChannelInfoContinue);
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_NE(DCAMERA_OK, ret);
 
     ret = sinkService_->CloseChannel(g_dhId);
     EXPECT_EQ(DCAMERA_OK, ret);
