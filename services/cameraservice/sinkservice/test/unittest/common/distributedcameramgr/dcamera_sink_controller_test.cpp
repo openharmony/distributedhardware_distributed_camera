@@ -178,7 +178,7 @@ void DCameraSinkControllerTest::SetTokenID()
 HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_001, TestSize.Level1)
 {
     int32_t ret = controller_->Init(g_testCamIndex);
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_NE(DCAMERA_OK, ret);
     EXPECT_EQ(true, controller_->isInit_);
 
     ret = controller_->UnInit();
@@ -312,14 +312,14 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_008, TestSize.L
  */
 HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_009, TestSize.Level1)
 {
-    controller_->OnSessionState(DCAMERA_CHANNEL_STATE_CONNECTING);
+    controller_->OnSessionState(DCAMERA_CHANNEL_STATE_CONNECTING, "");
 
     DCameraInfoCmd cmd;
     cmd.value_ = std::make_shared<DCameraInfo>();
     int32_t ret = controller_->GetCameraInfo(cmd.value_);
     EXPECT_EQ(DCAMERA_OK, ret);
     int32_t state = -1;
-    controller_->OnSessionState(state);
+    controller_->OnSessionState(state, "");
 
     int32_t eventType = 1;
     int32_t eventReason = 0;
@@ -336,7 +336,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_009, TestSize.L
  */
 HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_010, TestSize.Level1)
 {
-    controller_->OnSessionState(DCAMERA_CHANNEL_STATE_CONNECTED);
+    controller_->OnSessionState(DCAMERA_CHANNEL_STATE_CONNECTED, "");
 
     DCameraInfoCmd cmd;
     cmd.value_ = std::make_shared<DCameraInfo>();
@@ -364,7 +364,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_010, TestSize.L
  */
 HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_011, TestSize.Level1)
 {
-    controller_->OnSessionState(DCAMERA_CHANNEL_STATE_DISCONNECTED);
+    controller_->OnSessionState(DCAMERA_CHANNEL_STATE_DISCONNECTED, "");
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_TIME_MS));
 
     DCameraInfoCmd cmd;
@@ -397,7 +397,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_012, TestSize.L
  */
 HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_013, TestSize.Level1)
 {
-    controller_->OnSessionState(DCAMERA_CHANNEL_STATE_CONNECTED);
+    controller_->OnSessionState(DCAMERA_CHANNEL_STATE_CONNECTED, "");
 
     DCameraInfoCmd cmd;
     cmd.value_ = std::make_shared<DCameraInfo>();

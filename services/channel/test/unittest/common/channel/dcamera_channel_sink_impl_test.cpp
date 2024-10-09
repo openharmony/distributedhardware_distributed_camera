@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -259,7 +259,7 @@ HWTEST_F(DCameraChannelSinkImplTest, dcamera_channel_sink_impl_test_010, TestSiz
     int32_t eventType = 1;
     int32_t eventReason = 1;
     std::string detail = "test010";
-    listener_->OnSessionState(state);
+    listener_->OnSessionState(state, "");
     listener_->OnSessionError(eventType, eventReason, detail);
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);

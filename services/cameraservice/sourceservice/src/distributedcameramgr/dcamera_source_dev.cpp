@@ -101,6 +101,9 @@ int32_t DCameraSourceDev::RegisterDistributedHardware(const std::string& devId, 
     DHLOGI("DCameraSourceDev PostTask RegisterDistributedHardware devId %{public}s dhId %{public}s",
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
     version_ = param.sinkVersion;
+    if (version_ >= SEPARATE_SINK_VERSION) {
+        ManageSelectChannel::GetInstance().SetSrcConnect(true);
+    }
     DCameraIndex index(devId, dhId);
     actualDevInfo_.insert(index);
 

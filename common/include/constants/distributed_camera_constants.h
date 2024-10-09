@@ -83,6 +83,15 @@ const uint32_t DCAMERA_MAX_RECV_DATA_LEN = 104857600;
 const uint16_t DCAMERA_MAX_RECV_EXT_LEN = 65535;
 const uint32_t DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID = 4803;
 const uint32_t DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID = 4804;
+const std::string SESSION_HEAD = "ohos.dhardware.dcamera_";
+const std::string DEVICE_ID_0 = "device/0";
+const std::string DEVICE_ID_1 = "device/1";
+const std::string SENDER_SESSION_NAME_CONTROL = "_control_sender";
+const std::string SENDER_SESSION_NAME_DATA_SNAPSHOT = "_dataSnapshot_sender";
+const std::string SENDER_SESSION_NAME_DATA_CONTINUE = "_dataContinue_sender";
+const std::string RECEIVER_SESSION_NAME_CONTROL = "_control_receiver";
+const std::string RECEIVER_SESSION_NAME_DATA_SNAPSHOT = "_dataSnapshot_receiver";
+const std::string RECEIVER_SESSION_NAME_DATA_CONTINUE = "_dataContinue_receiver";
 const std::string DCAMERA_PKG_NAME = "ohos.dhardware.dcamera";
 const std::string SNAP_SHOT_SESSION_FLAG = "dataSnapshot";
 const std::string CONTINUE_SESSION_FLAG = "dataContinue";
@@ -161,6 +170,7 @@ const std::string SINK_PHOTO = "_SinkPhoto.jpg";
 const std::string AFTER_ENCODE = "SinkAfterEncode.h265";
 const std::string BEFORE_DECODE = "SourceBeforeDecode.h265";
 const std::string CAMERA_HICOLLIE = "CameraHicollie";
+const std::string SEPARATE_SINK_VERSION = "2.0";
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DISTRIBUTED_CAMERA_CONSTANTS_H

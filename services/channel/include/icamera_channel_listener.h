@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,7 +34,7 @@ class ICameraChannelListener {
 public:
     virtual ~ICameraChannelListener() = default;
 
-    virtual void OnSessionState(int32_t state) = 0;
+    virtual void OnSessionState(int32_t state, std::string networkId) = 0;
     virtual void OnSessionError(int32_t eventType, int32_t eventReason, std::string detail) = 0;
     virtual void OnDataReceived(std::vector<std::shared_ptr<DataBuffer>>& buffers) = 0;
 };

@@ -64,6 +64,7 @@ ohos_executable("dcamera_client_demo") {
     "cJSON:cjson",
     "c_utils:utils",
     "camera_framework:camera_framework",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "drivers_interface_camera:metadata",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.1",
     "drivers_peripheral_display:hdi_gralloc_client",

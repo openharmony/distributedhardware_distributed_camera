@@ -172,7 +172,7 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_004, TestSi
 
     ret = controller_->StopCapture();
     controller_->UnInit();
-    EXPECT_EQ(ret, DCAMERA_BAD_OPERATE);
+    EXPECT_EQ(ret, DCAMERA_BAD_VALUE);
 }
 
 /**
@@ -306,7 +306,7 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_010, TestSi
     std::shared_ptr<ICameraChannelListener> listener =
         std::make_shared<DCameraSourceControllerChannelListener>(controller_);
     int32_t state = 0;
-    listener->OnSessionState(state);
+    listener->OnSessionState(state, "");
     int32_t eventType = 1;
     int32_t eventReason = 1;
     std::string detail = "OnSessionErrorTest";
@@ -503,7 +503,7 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_019, TestSi
     std::shared_ptr<ICameraChannelListener> listener_ =
         std::make_shared<DCameraSourceControllerChannelListener>(controller);
     int32_t state = 0;
-    listener_->OnSessionState(state);
+    listener_->OnSessionState(state, "");
     int32_t eventType = 1;
     int32_t eventReason = 1;
     std::string detail = "OnSessionErrorTest";

@@ -381,5 +381,26 @@ void DumpFileUtil::OpenDumpFile(std::string para, std::string fileName, FILE **f
         *file = DumpFileUtil::OpenDumpFileInner(para, fileName);
     }
 }
+
+IMPLEMENT_SINGLE_INSTANCE(ManageSelectChannel);
+void ManageSelectChannel::SetSrcConnect(bool isSoftbusConnect)
+{
+    isSoftbusConnectSource_ = isSoftbusConnect;
+}
+
+void ManageSelectChannel::SetSinkConnect(bool isSoftbusConnect)
+{
+    isSoftbusConnectSink_ = isSoftbusConnect;
+}
+
+bool ManageSelectChannel::GetSrcConnect()
+{
+    return isSoftbusConnectSource_;
+}
+
+bool ManageSelectChannel::GetSinkConnect()
+{
+    return isSoftbusConnectSink_;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
