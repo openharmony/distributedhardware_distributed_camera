@@ -21,6 +21,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+
+const int32_t MAX_IMG_SIZE = 46340;
 ScaleConvertProcess::~ScaleConvertProcess()
 {
     DumpFileUtil::CloseDumpFile(&dumpFile_);
@@ -161,6 +163,11 @@ int32_t ScaleConvertProcess::GetImageUnitInfo(ImageUnitInfo& imgInfo, const std:
 {
     if (imgBuf == nullptr) {
         DHLOGE("GetImageUnitInfo failed, imgBuf is nullptr.");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    if (imgInfo.alignedWidth > MAX_IMG_SIZE && imgInfo.alignedHeight > MAX_IMG_SIZE) {
+        DHLOGE("imgInfo aligned width and height out of range");
         return DCAMERA_BAD_VALUE;
     }
 

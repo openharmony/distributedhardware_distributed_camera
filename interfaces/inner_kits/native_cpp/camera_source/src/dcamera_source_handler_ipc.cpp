@@ -97,7 +97,7 @@ sptr<IDistributedCameraSource> DCameraSourceHandlerIpc::GetSourceLocalCamSrv()
     }
     {
         std::lock_guard<std::mutex> autoLock(sourceLocalCamSrvLock_);
-        if (localSource_ != nullptr && localSource_->AsObject() != nullptr) {
+        if (localSource_ != nullptr) {
             localSource_->AsObject()->RemoveDeathRecipient(sourceLocalRecipient_);
         }
         localSource_ = localSource;
@@ -110,7 +110,7 @@ void DCameraSourceHandlerIpc::DeleteSourceLocalCamSrv()
 {
     DHLOGI("start");
     std::lock_guard<std::mutex> autoLock(sourceLocalCamSrvLock_);
-    if (localSource_ != nullptr && localSource_->AsObject() != nullptr) {
+    if (localSource_ != nullptr) {
         localSource_->AsObject()->RemoveDeathRecipient(sourceLocalRecipient_);
     }
     localSource_ = nullptr;

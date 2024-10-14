@@ -97,7 +97,7 @@ sptr<IDistributedCameraSink> DCameraSinkHandlerIpc::GetSinkLocalCamSrv()
     }
     {
         std::lock_guard<std::mutex> autoLock(sinkLocalCamSrvLock_);
-        if (localSink_ != nullptr && localSink_->AsObject() != nullptr) {
+        if (localSink_ != nullptr) {
             localSink_->AsObject()->RemoveDeathRecipient(sinkLocalRecipient_);
         }
         localSink_ = localSink;
@@ -110,7 +110,7 @@ void DCameraSinkHandlerIpc::DeleteSinkLocalCamSrv()
 {
     DHLOGI("start");
     std::lock_guard<std::mutex> autoLock(sinkLocalCamSrvLock_);
-    if (localSink_ != nullptr && localSink_->AsObject()) {
+    if (localSink_ != nullptr) {
         localSink_->AsObject()->RemoveDeathRecipient(sinkLocalRecipient_);
     }
     localSink_ = nullptr;

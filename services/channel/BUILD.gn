@@ -65,7 +65,6 @@ ohos_shared_library("distributed_camera_channel") {
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
-    "ipc:ipc_core",
   ]
 
   subsystem_name = "distributedhardware"

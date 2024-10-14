@@ -23,13 +23,10 @@ ohos_fuzztest("SinkServiceResumeDistributedHardwareFuzzTest") {
 
   fuzz_config_file = "${innerkits_path}/native_cpp/test/sinkfuzztest/sinkserviceresumedistributedhardware_fuzzer"
 
-  include_dirs = [ "${fwk_common_path}/utils/include" ]
-
-  include_dirs += [
+  include_dirs = [
     "include",
     "${common_path}/include/constants",
     "${common_path}/include/utils",
-    "${graphicsurface_path}/surface/include",
     "${innerkits_path}/native_cpp/camera_sink/include",
     "${innerkits_path}/native_cpp/camera_sink/include/callback",
     "${services_path}/cameraservice/base/include",
@@ -40,7 +37,6 @@ ohos_fuzztest("SinkServiceResumeDistributedHardwareFuzzTest") {
     "${services_path}/cameraservice/sinkservice/include/distributedcameramgr/eventbus",
     "${services_path}/data_process/include/utils",
     "${services_path}/channel/include",
-    "${fwk_utils_path}/include/eventbus",
     "${feeding_smoother_path}/base",
   ]
 
@@ -70,6 +66,7 @@ ohos_fuzztest("SinkServiceResumeDistributedHardwareFuzzTest") {
     "cJSON:cjson",
     "c_utils:utils",
     "device_manager:devicemanagersdk",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.1",
     "graphic_surface:surface",
     "hilog:libhilog",

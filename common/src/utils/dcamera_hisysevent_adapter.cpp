@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,6 +26,8 @@ namespace OHOS {
 namespace DistributedHardware {
 namespace {
 constexpr int32_t MSG_MAX_LEN = 2048;
+constexpr int32_t ENUM_STREAMTYPE_LEN = 2;
+constexpr int32_t ENUM_ENCODETYPE_LEN = 4;
 using HiSysEventNameSpace = OHOS::HiviewDFX::HiSysEvent;
 const std::string ENUM_STREAMTYPE_STRINGS[] = {
     "CONTINUOUS_FRAME", "SNAPSHOT_FRAME"
@@ -118,6 +120,11 @@ void ReportCameraOperaterEvent(const std::string& eventName, const std::string& 
 
 void ReportStartCaptureEvent(const std::string& eventName, EventCaptureInfo& capture, const std::string& errMsg)
 {
+    if (capture.encodeType_ < 0 || capture.encodeType_ >= ENUM_ENCODETYPE_LEN ||
+        capture.type_ < 0 || capture.type_ >= ENUM_STREAMTYPE_LEN) {
+        DHLOGE("Invalid capture parameters.");
+        return;
+    }
     int32_t ret = HiSysEventWrite(HiSysEventNameSpace::Domain::DISTRIBUTED_CAMERA,
         eventName,
         HiSysEventNameSpace::EventType::BEHAVIOR,
@@ -136,7 +143,6 @@ void ReportStartCaptureEvent(const std::string& eventName, EventCaptureInfo& cap
 std::string CreateMsg(const char *format, ...)
 {
     va_list args;
-    (void)memset_s(&args, sizeof(va_list), 0, sizeof(va_list));
     va_start(args, format);
     char msg[MSG_MAX_LEN] = {0};
     if (vsnprintf_s(msg, sizeof(msg), sizeof(msg) - 1, format, args) < 0) {

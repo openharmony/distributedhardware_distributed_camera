@@ -35,14 +35,13 @@ int32_t DCameraCaptureInfoCmd::Marshal(std::string& jsonStr)
     CHECK_NULL_FREE_RETURN(captureInfos, DCAMERA_BAD_VALUE, rootValue);
     cJSON_AddItemToObject(rootValue, "Value", captureInfos);
     for (auto iter = value_.begin(); iter != value_.end(); iter++) {
-        std::shared_ptr<DCameraCaptureInfo> capture = *iter;
-        if (capture == nullptr) {
+        cJSON *captureInfo = cJSON_CreateObject();
+        if (captureInfo == nullptr) {
             cJSON_Delete(rootValue);
             return DCAMERA_BAD_VALUE;
         }
-        cJSON *captureInfo = cJSON_CreateObject();
-        CHECK_NULL_FREE_RETURN(captureInfo, DCAMERA_BAD_VALUE, rootValue);
         cJSON_AddItemToArray(captureInfos, captureInfo);
+        std::shared_ptr<DCameraCaptureInfo> capture = *iter;
         cJSON_AddNumberToObject(captureInfo, "Width", capture->width_);
         cJSON_AddNumberToObject(captureInfo, "Height", capture->height_);
         cJSON_AddNumberToObject(captureInfo, "Format", capture->format_);
@@ -165,9 +164,6 @@ int32_t DCameraCaptureInfoCmd::UmarshalValue(cJSON *rootValue)
 int32_t DCameraCaptureInfoCmd::UmarshalSettings(cJSON *valueJson,
     std::shared_ptr<DCameraCaptureInfo>& captureInfo)
 {
-    if (captureInfo == nullptr) {
-            return DCAMERA_BAD_VALUE;
-    }
     cJSON *captureSetting = nullptr;
     cJSON_ArrayForEach(captureSetting, valueJson) {
         cJSON *settingType = cJSON_GetObjectItemCaseSensitive(captureSetting, "SettingType");

@@ -46,9 +46,6 @@ void CallbackOnRemoteRequestFuzzTest(const uint8_t* data, size_t size)
     pdata.WriteString(dataStr);
 
     sptr<DCameraSourceCallback> dcameraSourceCallback(new (std::nothrow) DCameraSourceCallback());
-    if (dcameraSourceCallback == nullptr) {
-        return;
-    }
     dcameraSourceCallback->OnRemoteRequest(code, pdata, reply, option);
 }
 }
