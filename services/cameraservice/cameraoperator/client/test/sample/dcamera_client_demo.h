@@ -280,6 +280,11 @@ public:
     {
         DHLOGI("DemoDCameraVideoCallback::OnError errorCode: %{public}d", errorCode);
     }
+
+    void OnDeferredVideoEnhancementInfo(const CameraStandard::CaptureEndedInfoExt info) const
+    {
+        DHLOGI("DemoDCameraVideoCallback::OnDeferredVideoEnhancementInfo videoId: %{public}s", info.videoId.c_str());
+    }
 };
 
 class DemoDCameraInputCallback : public CameraStandard::ErrorCallback {
