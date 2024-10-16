@@ -28,7 +28,6 @@ ohos_fuzztest("SourceHandlerConfigDistributedHardwareFuzzTest") {
     "include",
     "${common_path}/include",
     "${common_path}/include/constants",
-    "${fwk_common_path}/utils/include",
     "${innerkits_path}/native_cpp/camera_source/include",
     "${innerkits_path}/native_cpp/camera_source/include/callback",
   ]
@@ -54,6 +53,7 @@ ohos_fuzztest("SourceHandlerConfigDistributedHardwareFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "hilog:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",

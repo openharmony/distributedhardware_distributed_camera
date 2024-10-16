@@ -26,7 +26,6 @@ config("module_private_config") {
     "${common_path}/include/utils",
     "${innerkits_path}/native_cpp/camera_sink/include",
     "${innerkits_path}/native_cpp/camera_sink/include/callback",
-    "${fwk_common_path}/utils/include",
   ]
 }
 
@@ -51,6 +50,7 @@ ohos_unittest("DCameraSinkHandlerTest") {
     "access_token:libnativetoken_shared",
     "access_token:libtokensetproc_shared",
     "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "dsoftbus:softbus_client",
     "hilog:libhilog",
     "ipc:ipc_core",

@@ -32,8 +32,6 @@ config("module_private_config") {
     "${common_path}/include/constants",
     "${common_path}/include/utils",
     "${innerkits_path}/native_cpp/camera_source/include",
-    "${fwk_common_path}/utils/include",
-    "${fwk_utils_path}/include/eventbus",
     "${feeding_smoother_path}/base",
     "${services_path}/cameraservice/base/include",
   ]

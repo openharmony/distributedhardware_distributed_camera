@@ -25,8 +25,6 @@
 #include "data_process_listener.h"
 #include "dcamera_capture_info_cmd.h"
 #include "dcamera_index.h"
-#include "dcamera_photo_output_event.h"
-#include "dcamera_video_output_event.h"
 #include "icamera_channel.h"
 #include "icamera_channel_listener.h"
 #include "icamera_sink_data_process.h"
@@ -57,12 +55,6 @@ public:
         return DCAMERA_OK;
     }
     void Init()
-    {
-    }
-    void OnEvent(DCameraPhotoOutputEvent& event)
-    {
-    }
-    void OnEvent(DCameraVideoOutputEvent& event)
     {
     }
     void OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult)

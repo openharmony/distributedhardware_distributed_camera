@@ -23,10 +23,8 @@ ohos_fuzztest("SourceOnLoadSystemAbilitySuccessFuzzTest") {
 
   fuzz_config_file = "${innerkits_path}/native_cpp/test/sourcefuzztest/sourceonloadsystemabilitysuccess_fuzzer"
 
-  include_dirs = [
-    "${innerkits_path}/native_cpp/camera_source/include/callback",
-    "${fwk_common_path}/utils/include",
-  ]
+  include_dirs =
+      [ "${innerkits_path}/native_cpp/camera_source/include/callback" ]
 
   include_dirs += [
     "include",
@@ -56,6 +54,7 @@ ohos_fuzztest("SourceOnLoadSystemAbilitySuccessFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "hilog:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",

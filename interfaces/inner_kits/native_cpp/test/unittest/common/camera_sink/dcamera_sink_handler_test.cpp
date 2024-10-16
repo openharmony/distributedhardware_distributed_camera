@@ -170,9 +170,6 @@ HWTEST_F(DCameraSinkHandlerTest, dcamera_sink_handler_test_005, TestSize.Level1)
             SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(systemAbilityId);
     sptr<DCameraSinkLoadCallback> loadCallback(new DCameraSinkLoadCallback(params));
-    if (loadCallback == nullptr) {
-        return;
-    }
     loadCallback->OnLoadSystemAbilitySuccess(systemAbilityId, remoteObject);
 
     remoteObject = nullptr;
@@ -194,9 +191,6 @@ HWTEST_F(DCameraSinkHandlerTest, dcamera_sink_handler_test_006, TestSize.Level1)
     std::string params = "test006";
     int32_t systemAbilityId = 4804;
     sptr<DCameraSinkLoadCallback> loadCallback(new DCameraSinkLoadCallback(params));
-    if (loadCallback == nullptr) {
-        return;
-    }
     loadCallback->OnLoadSystemAbilityFail(systemAbilityId);
 
     systemAbilityId = 1;
@@ -263,9 +257,6 @@ HWTEST_F(DCameraSinkHandlerTest, dcamera_sink_handler_test_010, TestSize.Level1)
             SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(systemAbilityId);
     sptr<DCameraSinkLoadCallback> loadCallback(new DCameraSinkLoadCallback(params));
-    if (loadCallback == nullptr) {
-        return;
-    }
     loadCallback->OnLoadSystemAbilitySuccess(systemAbilityId, remoteObject);
 
     remoteObject = nullptr;

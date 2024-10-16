@@ -42,9 +42,6 @@ void CallbackOnNotifyResourceInfoFuzzTest(const uint8_t* data, size_t size)
     std::shared_ptr<PrivacyResourcesListener> callback = std::make_shared<MockComponentResourceInfo>();
 
     sptr<DCameraSinkCallback> dcameraSinkCallback(new (std::nothrow) DCameraSinkCallback());
-    if (dcameraSinkCallback == nullptr) {
-        return;
-    }
     dcameraSinkCallback->PushPrivacyResCallback(callback);
     dcameraSinkCallback->OnNotifyResourceInfo(type, subtype, networkId, isSensitive, isSameAccout);
 }

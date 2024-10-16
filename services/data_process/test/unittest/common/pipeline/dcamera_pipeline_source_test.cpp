@@ -175,7 +175,6 @@ HWTEST_F(DCameraPipelineSourceTest, dcamera_pipeline_source_test_004, TestSize.L
     std::vector<std::shared_ptr<DataBuffer>> buffers;
     rc = testSourcePipeline_->ProcessData(buffers);
     EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
-    usleep(SLEEP_TIME);
 }
 
 /**

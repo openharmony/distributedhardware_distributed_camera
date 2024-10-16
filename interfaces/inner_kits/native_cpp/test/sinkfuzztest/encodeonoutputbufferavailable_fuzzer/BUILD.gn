@@ -23,12 +23,7 @@ ohos_fuzztest("EncodeOnOutputBufferAvailableFuzzTest") {
 
   fuzz_config_file = "${innerkits_path}/native_cpp/test/sinkfuzztest/encodeonoutputbufferavailable_fuzzer"
 
-  include_dirs = [
-    "${fwk_common_path}/utils/include",
-    "${fwk_utils_path}/include/eventbus",
-    "${graphicsurface_path}/surface/include",
-    "${services_path}/cameraservice/base/include",
-  ]
+  include_dirs = [ "${services_path}/cameraservice/base/include" ]
 
   include_dirs += [
     "${services_path}/data_process/include/interfaces",

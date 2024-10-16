@@ -24,9 +24,6 @@ namespace OHOS {
 namespace DistributedHardware {
 int32_t DCameraInfoCmd::Marshal(std::string& jsonStr)
 {
-    if (value_ == nullptr) {
-        return DCAMERA_BAD_VALUE;
-    }
     cJSON *rootValue = cJSON_CreateObject();
     if (rootValue == nullptr) {
         return DCAMERA_BAD_VALUE;
