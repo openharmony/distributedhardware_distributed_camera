@@ -52,6 +52,7 @@ int32_t DCameraCaptureInfoCmd::Marshal(std::string& jsonStr)
         cJSON_AddNumberToObject(captureInfo, "StreamType", capture->streamType_);
         cJSON *captureSettings = cJSON_CreateArray();
         CHECK_NULL_FREE_RETURN(captureSettings, DCAMERA_BAD_VALUE, rootValue);
+        cJSON_AddItemToObject(captureInfo, "CaptureSettings", captureSettings);
         for (auto settingIter = capture->captureSettings_.begin();
             settingIter != capture->captureSettings_.end(); settingIter++) {
             cJSON *captureSetting = cJSON_CreateObject();
@@ -60,7 +61,6 @@ int32_t DCameraCaptureInfoCmd::Marshal(std::string& jsonStr)
             cJSON_AddStringToObject(captureSetting, "SettingValue", (*settingIter)->value_.c_str());
             cJSON_AddItemToArray(captureSettings, captureSetting);
         }
-        cJSON_AddItemToObject(captureInfo, "CaptureSettings", captureSettings);
     }
     cJSON_AddNumberToObject(rootValue, "mode", sceneMode_);
 
