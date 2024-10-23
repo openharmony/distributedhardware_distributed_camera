@@ -135,16 +135,7 @@ int32_t DCameraSinkController::ChannelNeg(std::shared_ptr<DCameraChannelInfo>& i
 int32_t DCameraSinkController::DCameraNotify(std::shared_ptr<DCameraEvent>& events)
 {
     DHLOGI("DCameraNotify dhId: %{public}s", GetAnonyString(dhId_).c_str());
-    if (srcDevId_.empty()) {
-        DHLOGE("source deviceId is empty");
-        return DCAMERA_BAD_VALUE;
-    }
-
-    sptr<IDistributedCameraSource> sourceSA = DCameraSinkServiceIpc::GetInstance().GetSourceRemoteCamSrv(srcDevId_);
-    if (sourceSA == nullptr) {
-        DHLOGE("sourceSA is null");
-        return DCAMERA_BAD_VALUE;
-    }
+    CHECK_AND_RETURN_RET_LOG(srcDevId_.empty(), DCAMERA_BAD_VALUE, "source deviceId is empty");
 
     DCameraEventCmd eventCmd;
     std::string jsonStr = "";
@@ -159,20 +150,35 @@ int32_t DCameraSinkController::DCameraNotify(std::shared_ptr<DCameraEvent>& even
         return ret;
     }
 
-    std::string sinkDevId;
-    ret = GetLocalDeviceNetworkId(sinkDevId);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("GetLocalDeviceNetworkId failed, devId: %{public}s, dhId: %{public}s, ret: %{public}d",
-               GetAnonyString(sinkDevId).c_str(), GetAnonyString(dhId_).c_str(), ret);
-        return ret;
-    }
+    if (ManageSelectChannel::GetInstance().GetSinkConnect()) {
+        std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(jsonStr.length() + 1);
+        ret = memcpy_s(buffer->Data(), buffer->Capacity(),
+            reinterpret_cast<uint8_t *>(const_cast<char *>(jsonStr.c_str())), jsonStr.length());
+        CHECK_AND_RETURN_RET_LOG(ret != EOK, DCAMERA_BAD_VALUE, "DCameraNotify memcpy_s failed, ret: %{public}d", ret);
+        ret = channel_->SendData(buffer);
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCameraNotify channel send data failed, dhId: %{public}s ret: %{public}d",
+                GetAnonyString(dhId_).c_str(), ret);
+            return DCAMERA_BAD_VALUE;
+        }
+    } else {
+        std::string sinkDevId;
+        ret = GetLocalDeviceNetworkId(sinkDevId);
+        if (ret != DCAMERA_OK) {
+            DHLOGE("GetLocalDeviceNetworkId failed, devId: %{public}s, dhId: %{public}s, ret: %{public}d",
+                GetAnonyString(sinkDevId).c_str(), GetAnonyString(dhId_).c_str(), ret);
+            return ret;
+        }
 
-    ret = sourceSA->DCameraNotify(sinkDevId, dhId_, jsonStr);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("SourceSA notify failed, srcId: %{public}s, sinkId: %{public}s, dhId: %{public}s, ret: %{public}d",
-               GetAnonyString(srcDevId_).c_str(), GetAnonyString(sinkDevId).c_str(),
-               GetAnonyString(dhId_).c_str(), ret);
-        return ret;
+        sptr<IDistributedCameraSource> sourceSA = DCameraSinkServiceIpc::GetInstance().GetSourceRemoteCamSrv(srcDevId_);
+        CHECK_AND_RETURN_RET_LOG(sourceSA == nullptr, DCAMERA_BAD_VALUE, "sourceSA is null");
+        ret = sourceSA->DCameraNotify(sinkDevId, dhId_, jsonStr);
+        if (ret != DCAMERA_OK) {
+            DHLOGE("SourceSA notify failed, srcId: %{public}s, sinkId: %{public}s, dhId: %{public}s, ret: %{public}d",
+                GetAnonyString(srcDevId_).c_str(), GetAnonyString(sinkDevId).c_str(),
+                GetAnonyString(dhId_).c_str(), ret);
+            return ret;
+        }
     }
 
     DHLOGI("DCameraNotify %{public}s success", GetAnonyString(dhId_).c_str());
@@ -233,6 +239,7 @@ int32_t DCameraSinkController::CheckSensitive()
 int32_t DCameraSinkController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& openInfo)
 {
     DHLOGI("DCameraSinkController OpenChannel Start, dhId: %{public}s", GetAnonyString(dhId_).c_str());
+    ManageSelectChannel::GetInstance().SetSinkConnect(false);
     if (!CheckPermission()) {
         DHLOGE("DCameraSinkController OpenChannel fail, CheckPermission fail");
         return DCAMERA_WRONG_STATE;
@@ -244,10 +251,9 @@ int32_t DCameraSinkController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& ope
     srcDevId_ = openInfo->sourceDevId_;
     int32_t ret = CheckSensitive();
     if (ret != DCAMERA_OK) {
-        DHLOGE("Check sensitive error. ret %{public}d.", ret);
+        DHLOGE("check sensitive error, ret %{public}d", ret);
         return ret;
     }
-    DCameraLowLatency::GetInstance().EnableLowLatency();
     std::vector<DCameraIndex> indexs;
     indexs.push_back(DCameraIndex(srcDevId_, dhId_));
     auto controller = std::shared_ptr<DCameraSinkController>(shared_from_this());
@@ -284,34 +290,37 @@ int32_t DCameraSinkController::CloseChannel()
 {
     DHLOGI("DCameraSinkController CloseChannel Start, dhId: %{public}s", GetAnonyString(dhId_).c_str());
     std::lock_guard<std::mutex> autoLock(channelLock_);
-    DCameraLowLatency::GetInstance().DisableLowLatency();
-    DCameraSinkServiceIpc::GetInstance().DeleteSourceRemoteCamSrv(srcDevId_);
-    srcDevId_.clear();
-    if (channel_ == nullptr) {
-        return DCAMERA_BAD_VALUE;
-    }
-    int32_t ret = channel_->ReleaseSession();
-    if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSinkController release channel failed, dhId: %{public}s, ret: %{public}d",
-               GetAnonyString(dhId_).c_str(), ret);
-    }
+    if (!ManageSelectChannel::GetInstance().GetSinkConnect()) {
+        DCameraSinkServiceIpc::GetInstance().DeleteSourceRemoteCamSrv(srcDevId_);
+        if (channel_ == nullptr) {
+            DHLOGE("DCameraSinkController CloseChannel channel_ is nullptr");
+            return DCAMERA_BAD_VALUE;
+        }
+        int32_t ret = channel_->ReleaseSession();
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCameraSinkController release channel failed, dhId: %{public}s, ret: %{public}d",
+                GetAnonyString(dhId_).c_str(), ret);
+        }
 
-    ret = output_->CloseChannel();
-    if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSinkController CloseChannel failed, dhId: %{public}s, ret: %{public}d",
-               GetAnonyString(dhId_).c_str(), ret);
+        ret = output_->CloseChannel();
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCameraSinkController CloseChannel failed, dhId: %{public}s, ret: %{public}d",
+                GetAnonyString(dhId_).c_str(), ret);
+        }
     }
+    srcDevId_.clear();
     sessionState_ = DCAMERA_CHANNEL_STATE_DISCONNECTED;
     if (isPageStatus_.load()) {
         bool isSensitive = false;
         bool isSameAccout = false;
-        ret = sinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_CLOSE_PAGE, PAGE_SUBTYPE, srcDevId_,
-            isSensitive, isSameAccout);
+        int32_t ret = sinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_CLOSE_PAGE, PAGE_SUBTYPE,
+            srcDevId_, isSensitive, isSameAccout);
         if (ret != DCAMERA_OK) {
             DHLOGE("close page failed, ret: %{public}d", ret);
         }
     }
     isPageStatus_.store(false);
+    ManageSelectChannel::GetInstance().SetSinkConnect(false);
     DHLOGI("DCameraSinkController CloseChannel %{public}s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
 }
@@ -343,7 +352,46 @@ int32_t DCameraSinkController::Init(std::vector<DCameraIndex>& indexs)
         std::make_shared<DCameraSinkController::DCameraSinkContrEventHandler>(runner, shared_from_this());
     isInit_ = true;
     initCallback_ = std::make_shared<DeviceInitCallback>();
+    ManageSelectChannel::GetInstance().SetSinkConnect(true);
+    ret = CreateCtrlSession();
+    if (ret != DCAMERA_OK) {
+        DHLOGE("CreateCtrlSessiion init failed, dhId: %{public}s, ret: %{public}d", GetAnonyString(dhId_).c_str(), ret);
+        return ret;
+    }
+    std::shared_ptr<DCameraChannelInfo> info = std::make_shared<DCameraChannelInfo>();
+    info->sourceDevId_ = "";
+    DCameraChannelDetail continueChInfo(CONTINUE_SESSION_FLAG, CONTINUOUS_FRAME);
+    DCameraChannelDetail snapShotChInfo(SNAP_SHOT_SESSION_FLAG, SNAPSHOT_FRAME);
+    info->detail_.push_back(continueChInfo);
+    info->detail_.push_back(snapShotChInfo);
+    ret = ChannelNeg(info);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("ChannelNeg init failed, dhId: %{public}s, ret: %{public}d", GetAnonyString(dhId_).c_str(), ret);
+        return ret;
+    }
     DHLOGI("DCameraSinkController Init %{public}s success", GetAnonyString(dhId_).c_str());
+    return DCAMERA_OK;
+}
+
+int32_t DCameraSinkController::CreateCtrlSession()
+{
+    DHLOGI("DCameraSinkController CreateCtrlSessiion Start, dhId: %{public}s", GetAnonyString(dhId_).c_str());
+    if (sessionState_ != DCAMERA_CHANNEL_STATE_DISCONNECTED) {
+        DHLOGE("wrong state, dhId: %{public}s, sessionState: %{public}d", GetAnonyString(dhId_).c_str(), sessionState_);
+        return DCAMERA_WRONG_STATE;
+    }
+    DCameraLowLatency::GetInstance().EnableLowLatency();
+    std::vector<DCameraIndex> indexs;
+    indexs.push_back(DCameraIndex("", dhId_));
+    auto controller = std::shared_ptr<DCameraSinkController>(shared_from_this());
+    std::shared_ptr<ICameraChannelListener> listener =
+        std::make_shared<DCameraSinkControllerChannelListener>(controller);
+    int32_t ret = channel_->CreateSession(indexs, SESSION_FLAG, DCAMERA_SESSION_MODE_CTRL, listener);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("channel create session failed, dhId: %{public}s, ret: %{public}d", GetAnonyString(dhId_).c_str(), ret);
+        return ret;
+    }
+    DHLOGI("DCameraSinkController CreateCtrlSessiion %{public}s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
 }
 
@@ -361,6 +409,24 @@ int32_t DCameraSinkController::UnInit()
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSinkController UnInit %{public}s close channel failed, ret: %{public}d",
             GetAnonyString(dhId_).c_str(), ret);
+    }
+
+    DCameraLowLatency::GetInstance().DisableLowLatency();
+    if (ManageSelectChannel::GetInstance().GetSinkConnect()) {
+        if (channel_ != nullptr) {
+            ret = channel_->ReleaseSession();
+            if (ret != DCAMERA_OK) {
+                DHLOGE("DCameraSinkController release channel failed, dhId: %{public}s, ret: %{public}d",
+                    GetAnonyString(dhId_).c_str(), ret);
+            }
+        }
+        if (output_ != nullptr) {
+            ret = output_->CloseChannel();
+            if (ret != DCAMERA_OK) {
+                DHLOGE("DCameraSinkController output CloseChannel failed, dhId: %{public}s, ret: %{public}d",
+                    GetAnonyString(dhId_).c_str(), ret);
+            }
+        }
     }
 
     if (output_ != nullptr) {
@@ -475,7 +541,7 @@ void DCameraSinkController::OnMetadataResult(std::vector<std::shared_ptr<DCamera
     DHLOGI("DCameraSinkController::OnMetadataResult dhId: %{public}s success", GetAnonyString(dhId_).c_str());
 }
 
-void DCameraSinkController::OnSessionState(int32_t state)
+void DCameraSinkController::OnSessionState(int32_t state, std::string networkId)
 {
     DHLOGI("DCameraSinkController::OnSessionState dhId: %{public}s, state: %{public}d",
         GetAnonyString(dhId_).c_str(), state);
@@ -484,9 +550,21 @@ void DCameraSinkController::OnSessionState(int32_t state)
         case DCAMERA_CHANNEL_STATE_CONNECTING:
             DHLOGI("channel is connecting");
             break;
-        case DCAMERA_CHANNEL_STATE_CONNECTED:
+        case DCAMERA_CHANNEL_STATE_CONNECTED: {
             DHLOGI("channel is connected");
+            if (!ManageSelectChannel::GetInstance().GetSinkConnect()) {
+                break;
+            }
+            srcDevId_ = networkId;
+            int32_t ret = CheckSensitive();
+            if (ret != DCAMERA_OK) {
+                DHLOGE("Check sensitive error. ret %{public}d.", ret);
+                return;
+            }
+            ret = PullUpPage();
+            CHECK_AND_RETURN_LOG(ret != DCAMERA_OK, "PullUpPage failed");
             break;
+        }
         case DCAMERA_CHANNEL_STATE_DISCONNECTED:
             DHLOGI("channel is disconnected");
             ffrt::submit([this]() {
@@ -602,7 +680,7 @@ int32_t DCameraSinkController::HandleReceivedData(std::shared_ptr<DataBuffer>& d
     cJSON_Delete(rootValue);
     if ((!command.empty()) && (command.compare(DCAMERA_PROTOCOL_CMD_CAPTURE) == 0)) {
         DCameraCaptureInfoCmd captureInfoCmd;
-        int ret = captureInfoCmd.Unmarshal(jsonStr);
+        int32_t ret = captureInfoCmd.Unmarshal(jsonStr);
         if (ret != DCAMERA_OK) {
             DHLOGE("Capture Info Unmarshal failed, dhId: %{public}s ret: %{public}d",
                 GetAnonyString(dhId_).c_str(), ret);
@@ -612,13 +690,15 @@ int32_t DCameraSinkController::HandleReceivedData(std::shared_ptr<DataBuffer>& d
         return StartCapture(captureInfoCmd.value_, sceneMode_);
     } else if ((!command.empty()) && (command.compare(DCAMERA_PROTOCOL_CMD_UPDATE_METADATA) == 0)) {
         DCameraMetadataSettingCmd metadataSettingCmd;
-        int ret = metadataSettingCmd.Unmarshal(jsonStr);
+        int32_t ret = metadataSettingCmd.Unmarshal(jsonStr);
         if (ret != DCAMERA_OK) {
             DHLOGE("Metadata Setting Unmarshal failed, dhId: %{public}s ret: %{public}d",
                    GetAnonyString(dhId_).c_str(), ret);
             return ret;
         }
         return UpdateSettings(metadataSettingCmd.value_);
+    } else if ((!command.empty()) && (command.compare(DCAMERA_PROTOCOL_CMD_STOP_CAPTURE) == 0)) {
+        return StopCapture();
     }
     return DCAMERA_BAD_VALUE;
 }

@@ -96,7 +96,7 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_001, TestSi
     EXPECT_EQ(sinkService_ == nullptr, false);
 
     int32_t ret = sinkService_->SubscribeLocalHardware(g_dhId, g_testParams);
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
 }
 
 /**
@@ -111,7 +111,7 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_002, TestSi
     EXPECT_EQ(sinkService_ == nullptr, false);
 
     int32_t ret = sinkService_->UnsubscribeLocalHardware(g_dhId);
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
 }
 
 /**
@@ -126,7 +126,7 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_003, TestSi
     EXPECT_EQ(sinkService_ == nullptr, false);
 
     int32_t ret = sinkService_->StopCapture(g_dhId);
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
 }
 
 /**
@@ -141,7 +141,7 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_004, TestSi
     EXPECT_EQ(sinkService_ == nullptr, false);
 
     int32_t ret = sinkService_->ChannelNeg(g_dhId, g_testChannelInfoContinue);
-    EXPECT_NE(DCAMERA_OK, ret);
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
 }
 
 /**
@@ -156,7 +156,7 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_005, TestSi
     EXPECT_EQ(sinkService_ == nullptr, false);
 
     int32_t ret = sinkService_->GetCameraInfo(g_dhId, g_testCameraInfo);
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
 }
 
 /**
@@ -171,13 +171,13 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_006, TestSi
     EXPECT_EQ(sinkService_ == nullptr, false);
 
     int32_t ret = sinkService_->OpenChannel(g_dhId, g_testOpenInfoService);
-    EXPECT_NE(DCAMERA_OK, ret);
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
 
     ret = sinkService_->ChannelNeg(g_dhId, g_testChannelInfoContinue);
-    EXPECT_NE(DCAMERA_OK, ret);
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
 
     ret = sinkService_->CloseChannel(g_dhId);
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
 }
 
 /**

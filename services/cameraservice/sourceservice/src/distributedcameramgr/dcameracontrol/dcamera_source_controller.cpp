@@ -119,16 +119,40 @@ int32_t DCameraSourceController::StopCapture()
     std::string devId = indexs_.begin()->devId_;
     DHLOGI("StopCapture devId: %{public}s, dhId: %{public}s", GetAnonyString(devId).c_str(),
         GetAnonyString(dhId).c_str());
-    sptr<IDistributedCameraSink> camSinkSrv = DCameraSourceServiceIpc::GetInstance().GetSinkRemoteCamSrv(devId);
-    if (camSinkSrv == nullptr) {
-        DHLOGE("can not get service, devId: %{public}s", GetAnonyString(devId).c_str());
-        return DCAMERA_BAD_OPERATE;
-    }
-    int32_t ret = camSinkSrv->StopCapture(dhId);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("StopCapture failed: %{public}d, devId: %{public}s, dhId: %{public}s", ret,
-            GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
-        return DCAMERA_BAD_OPERATE;
+    if (!ManageSelectChannel::GetInstance().GetSrcConnect()) {
+        sptr<IDistributedCameraSink> camSinkSrv = DCameraSourceServiceIpc::GetInstance().GetSinkRemoteCamSrv(devId);
+        CHECK_AND_RETURN_RET_LOG(camSinkSrv == nullptr, DCAMERA_BAD_VALUE, "stopCapture can not get sink service");
+        int32_t ret = camSinkSrv->StopCapture(dhId);
+        if (ret != DCAMERA_OK) {
+            DHLOGE("StopCapture failed: %{public}d, devId: %{public}s, dhId: %{public}s", ret,
+                GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
+            return DCAMERA_BAD_OPERATE;
+        }
+    } else {
+        cJSON *rootValue = cJSON_CreateObject();
+        if (rootValue == nullptr) {
+            return DCAMERA_BAD_VALUE;
+        }
+        cJSON_AddStringToObject(rootValue, "Command", DCAMERA_PROTOCOL_CMD_STOP_CAPTURE.c_str());
+        char *data = cJSON_Print(rootValue);
+        if (data == nullptr) {
+            cJSON_Delete(rootValue);
+            return DCAMERA_BAD_VALUE;
+        }
+        std::string jsonStr = std::string(data);
+        cJSON_Delete(rootValue);
+        cJSON_free(data);
+        std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(jsonStr.length() + 1);
+        int32_t ret = memcpy_s(buffer->Data(), buffer->Capacity(),
+            reinterpret_cast<uint8_t *>(const_cast<char *>(jsonStr.c_str())), jsonStr.length());
+        CHECK_AND_RETURN_RET_LOG(ret != EOK, ret, "StopCapture memcpy_s failed ret: %{public}d", ret);
+        CHECK_AND_RETURN_RET_LOG(channel_ == nullptr, DCAMERA_BAD_VALUE, "channel_ is null.");
+        ret = channel_->SendData(buffer);
+        if (ret != DCAMERA_OK) {
+            DHLOGE("StopCapture SendData failed %{public}d, devId: %{public}s, dhId: %{public}s", ret,
+                GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
+            return ret;
+        }
     }
     DHLOGI("StopCapture devId: %{public}s, dhId: %{public}s success", GetAnonyString(devId).c_str(),
         GetAnonyString(dhId).c_str());
@@ -137,42 +161,44 @@ int32_t DCameraSourceController::StopCapture()
 
 int32_t DCameraSourceController::ChannelNeg(std::shared_ptr<DCameraChannelInfo>& info)
 {
-    if (indexs_.size() > DCAMERA_MAX_NUM) {
-        DHLOGE("ChannelNeg not support operate %{public}zu camera", indexs_.size());
-        return DCAMERA_BAD_OPERATE;
-    }
+    if (!ManageSelectChannel::GetInstance().GetSrcConnect()) {
+        if (indexs_.size() > DCAMERA_MAX_NUM) {
+            DHLOGE("ChannelNeg not support operate %{public}zu camera", indexs_.size());
+            return DCAMERA_BAD_OPERATE;
+        }
 
-    std::string dhId = indexs_.begin()->dhId_;
-    std::string devId = indexs_.begin()->devId_;
-    DHLOGI("ChannelNeg devId: %{public}s, dhId: %{public}s", GetAnonyString(devId).c_str(),
-        GetAnonyString(dhId).c_str());
-    sptr<IDistributedCameraSink> camSinkSrv = DCameraSourceServiceIpc::GetInstance().GetSinkRemoteCamSrv(devId);
-    if (camSinkSrv == nullptr) {
-        DHLOGE("can not get service, devId: %{public}s", GetAnonyString(devId).c_str());
-        return DCAMERA_BAD_OPERATE;
-    }
-    DCameraChannelInfoCmd cmd;
-    cmd.type_ = DCAMERA_PROTOCOL_TYPE_MESSAGE;
-    cmd.dhId_ = dhId;
-    cmd.command_ = DCAMERA_PROTOCOL_CMD_CHAN_NEG;
-    cmd.value_ = info;
-    std::string jsonStr;
-    int32_t ret = cmd.Marshal(jsonStr);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("Marshal failed ret: %{public}d, devId: %{public}s, dhId: %{public}s", ret,
+        std::string dhId = indexs_.begin()->dhId_;
+        std::string devId = indexs_.begin()->devId_;
+        DHLOGI("ChannelNeg devId: %{public}s, dhId: %{public}s", GetAnonyString(devId).c_str(),
+            GetAnonyString(dhId).c_str());
+        sptr<IDistributedCameraSink> camSinkSrv = DCameraSourceServiceIpc::GetInstance().GetSinkRemoteCamSrv(devId);
+        if (camSinkSrv == nullptr) {
+            DHLOGE("can not get service, devId: %{public}s", GetAnonyString(devId).c_str());
+            return DCAMERA_BAD_OPERATE;
+        }
+        DCameraChannelInfoCmd cmd;
+        cmd.type_ = DCAMERA_PROTOCOL_TYPE_MESSAGE;
+        cmd.dhId_ = dhId;
+        cmd.command_ = DCAMERA_PROTOCOL_CMD_CHAN_NEG;
+        cmd.value_ = info;
+        std::string jsonStr;
+        int32_t ret = cmd.Marshal(jsonStr);
+        if (ret != DCAMERA_OK) {
+            DHLOGE("Marshal failed ret: %{public}d, devId: %{public}s, dhId: %{public}s", ret,
+                GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
+            return ret;
+        }
+        DHLOGD("devId: %{public}s, dhId: %{public}s channelNegCommand: %{public}s",
+            GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), cmd.command_.c_str());
+        ret = camSinkSrv->ChannelNeg(dhId, jsonStr);
+        if (ret != DCAMERA_OK) {
+            DHLOGE("ChannelNeg rpc failed ret: %{public}d, devId: %{public}s, dhId: %{public}s", ret,
+                GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
+            return ret;
+        }
+        DHLOGD("DCameraSourceController ChannelNeg devId: %{public}s, dhId: %{public}s success",
             GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
-        return ret;
     }
-    DHLOGD("devId: %{public}s, dhId: %{public}s channelNegCommand: %{public}s",
-        GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), cmd.command_.c_str());
-    ret = camSinkSrv->ChannelNeg(dhId, jsonStr);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("ChannelNeg rpc failed ret: %{public}d, devId: %{public}s, dhId: %{public}s", ret,
-            GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
-        return ret;
-    }
-    DHLOGD("DCameraSourceController ChannelNeg devId: %{public}s, dhId: %{public}s success",
-        GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
     return DCAMERA_OK;
 }
 
@@ -253,34 +279,36 @@ int32_t DCameraSourceController::UpdateSettings(std::vector<std::shared_ptr<DCam
 
 int32_t DCameraSourceController::GetCameraInfo(std::shared_ptr<DCameraInfo>& camInfo)
 {
-    if (indexs_.size() > DCAMERA_MAX_NUM) {
-        DHLOGE("GetCameraInfo not support operate %{public}zu camera", indexs_.size());
-        return DCAMERA_BAD_OPERATE;
-    }
+    if (!ManageSelectChannel::GetInstance().GetSrcConnect()) {
+        if (indexs_.size() > DCAMERA_MAX_NUM) {
+            DHLOGE("GetCameraInfo not support operate %{public}zu camera", indexs_.size());
+            return DCAMERA_BAD_OPERATE;
+        }
 
-    std::string dhId = indexs_.begin()->dhId_;
-    std::string devId = indexs_.begin()->devId_;
-    DHLOGI("GetCameraInfo devId: %{public}s, dhId: %{public}s", GetAnonyString(devId).c_str(),
-        GetAnonyString(dhId).c_str());
-    sptr<IDistributedCameraSink> camSinkSrv = DCameraSourceServiceIpc::GetInstance().GetSinkRemoteCamSrv(devId);
-    if (camSinkSrv == nullptr) {
-        DHLOGE("can not get service, devId: %{public}s", GetAnonyString(devId).c_str());
-        return DCAMERA_BAD_OPERATE;
+        std::string dhId = indexs_.begin()->dhId_;
+        std::string devId = indexs_.begin()->devId_;
+        DHLOGI("GetCameraInfo devId: %{public}s, dhId: %{public}s", GetAnonyString(devId).c_str(),
+            GetAnonyString(dhId).c_str());
+        sptr<IDistributedCameraSink> camSinkSrv = DCameraSourceServiceIpc::GetInstance().GetSinkRemoteCamSrv(devId);
+        if (camSinkSrv == nullptr) {
+            DHLOGE("can not get service, devId: %{public}s", GetAnonyString(devId).c_str());
+            return DCAMERA_BAD_OPERATE;
+        }
+        std::string camInfoJson;
+        int32_t ret = camSinkSrv->GetCameraInfo(dhId, camInfoJson);
+        if (ret != DCAMERA_OK) {
+            DHLOGE("GetCameraInfo failed: %{public}d, devId: %{public}s, dhId: %{public}s", ret,
+                GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
+            return ret;
+        }
+        DCameraInfoCmd cmd;
+        ret = cmd.Unmarshal(camInfoJson);
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCameraInfoCmd Unmarshal failed: %{public}d", ret);
+            return ret;
+        }
+        camInfo = cmd.value_;
     }
-    std::string camInfoJson;
-    int32_t ret = camSinkSrv->GetCameraInfo(dhId, camInfoJson);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("GetCameraInfo failed: %{public}d, devId: %{public}s, dhId: %{public}s", ret,
-            GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
-        return ret;
-    }
-    DCameraInfoCmd cmd;
-    ret = cmd.Unmarshal(camInfoJson);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraInfoCmd Unmarshal failed: %{public}d", ret);
-        return ret;
-    }
-    camInfo = cmd.value_;
     return DCAMERA_OK;
 }
 
@@ -294,34 +322,36 @@ int32_t DCameraSourceController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& o
     std::string devId = indexs_.begin()->devId_;
     DHLOGI("DCameraSourceController OpenChannel Start, devId: %{public}s, dhId: %{public}s",
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
-    sptr<IDistributedCameraSink> camSinkSrv = DCameraSourceServiceIpc::GetInstance().GetSinkRemoteCamSrv(devId);
-    if (camSinkSrv == nullptr) {
-        DHLOGE("DCameraSourceController can not get service, devId: %{public}s", GetAnonyString(devId).c_str());
-        return DCAMERA_BAD_OPERATE;
+    if (!ManageSelectChannel::GetInstance().GetSrcConnect()) {
+        sptr<IDistributedCameraSink> camSinkSrv = DCameraSourceServiceIpc::GetInstance().GetSinkRemoteCamSrv(devId);
+        if (camSinkSrv == nullptr) {
+            DHLOGE("DCameraSourceController can not get service, devId: %{public}s", GetAnonyString(devId).c_str());
+            return DCAMERA_BAD_OPERATE;
+        }
+        std::string jsonStr;
+        DCameraOpenInfoCmd cmd;
+        cmd.type_ = DCAMERA_PROTOCOL_TYPE_MESSAGE;
+        cmd.dhId_ = dhId;
+        cmd.command_ = DCAMERA_PROTOCOL_CMD_OPEN_CHANNEL;
+        cmd.value_ = openInfo;
+        int32_t ret = cmd.Marshal(jsonStr);
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCameraSourceController Marshal OpenInfo failed %{public}d", ret);
+            return ret;
+        }
+        ret = camSinkSrv->OpenChannel(dhId, jsonStr);
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCameraSourceController SA OpenChannel failed %{public}d", ret);
+            return ret;
+        }
+        DHLOGD("DCameraSourceController OpenChannel devId: %{public}s, dhId: %{public}s success",
+            GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
     }
-    std::string jsonStr;
-    DCameraOpenInfoCmd cmd;
-    cmd.type_ = DCAMERA_PROTOCOL_TYPE_MESSAGE;
-    cmd.dhId_ = dhId;
-    cmd.command_ = DCAMERA_PROTOCOL_CMD_OPEN_CHANNEL;
-    cmd.value_ = openInfo;
-    int32_t ret = cmd.Marshal(jsonStr);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceController Marshal OpenInfo failed %{public}d", ret);
-        return ret;
-    }
-    ret = camSinkSrv->OpenChannel(dhId, jsonStr);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraSourceController SA OpenChannel failed %{public}d", ret);
-        return ret;
-    }
-    DHLOGD("DCameraSourceController OpenChannel devId: %{public}s, dhId: %{public}s success",
-        GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
 
     std::vector<DCameraIndex> indexs;
     indexs.push_back(DCameraIndex(devId, dhId));
-    CHECK_AND_RETURN_RET_LOG(channel_ == nullptr, DCAMERA_BAD_VALUE, "channel_ is null.");
-    ret = channel_->CreateSession(indexs, SESSION_FLAG, DCAMERA_SESSION_MODE_CTRL, listener_);
+    CHECK_AND_RETURN_RET_LOG(channel_ == nullptr, DCAMERA_BAD_VALUE, "OpenChannel channel_ is null.");
+    int32_t ret = channel_->CreateSession(indexs, SESSION_FLAG, DCAMERA_SESSION_MODE_CTRL, listener_);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceController Bind Socket failed, ret: %{public}d", ret);
         PostChannelDisconnectedEvent();
@@ -342,6 +372,7 @@ int32_t DCameraSourceController::CloseChannel()
     std::string devId = indexs_.begin()->devId_;
     DHLOGI("DCameraSourceController CloseChannel Start, devId: %{public}s, dhId: %{public}s",
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
+    CHECK_AND_RETURN_RET_LOG(channel_ == nullptr, DCAMERA_BAD_VALUE, "CloseChannel channel_ is null.");
     int32_t ret = channel_->CloseSession();
     if (ret != DCAMERA_OK) {
         DHLOGE("CloseSession failed %{public}d", ret);
@@ -353,14 +384,17 @@ int32_t DCameraSourceController::CloseChannel()
     if (ret != DCAMERA_OK) {
         DHLOGE("ReleaseSession failed %{public}d", ret);
     }
-    sptr<IDistributedCameraSink> camSinkSrv = DCameraSourceServiceIpc::GetInstance().GetSinkRemoteCamSrv(devId);
-    if (camSinkSrv != nullptr) {
-        ret = camSinkSrv->CloseChannel(dhId);
-        if (ret != DCAMERA_OK) {
-            DHLOGE("DCameraSourceController SA CloseChannel failed %{public}d", ret);
+    if (!ManageSelectChannel::GetInstance().GetSrcConnect()) {
+        sptr<IDistributedCameraSink> camSinkSrv = DCameraSourceServiceIpc::GetInstance().GetSinkRemoteCamSrv(devId);
+        if (camSinkSrv != nullptr) {
+            ret = camSinkSrv->CloseChannel(dhId);
+            if (ret != DCAMERA_OK) {
+                DHLOGE("DCameraSourceController SA CloseChannel failed %{public}d", ret);
+            }
+            DCameraSourceServiceIpc::GetInstance().DeleteSinkRemoteCamSrv(devId);
         }
-        DCameraSourceServiceIpc::GetInstance().DeleteSinkRemoteCamSrv(devId);
     }
+    ManageSelectChannel::GetInstance().SetSrcConnect(false);
     return ret;
 }
 
@@ -405,7 +439,7 @@ int32_t DCameraSourceController::UnInit()
     return DCAMERA_OK;
 }
 
-void DCameraSourceController::OnSessionState(int32_t state)
+void DCameraSourceController::OnSessionState(int32_t state, std::string networkId)
 {
     DHLOGI("DCameraSourceController OnSessionState state %{public}d", state);
     channelState_ = state;
@@ -446,13 +480,20 @@ void DCameraSourceController::OnSessionError(int32_t eventType, int32_t eventRea
 
 void DCameraSourceController::OnDataReceived(std::vector<std::shared_ptr<DataBuffer>>& buffers)
 {
-    if (buffers.empty()) {
-        DHLOGI("DCameraSourceController OnDataReceived empty, devId: %{public}s, dhId: %{public}s",
-            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
-        return;
+    for (auto& buffer : buffers) {
+        if (buffer->Size() <= 0 || buffer->Size() > DATABUFF_MAX_SIZE) {
+            DHLOGI("buffer is invalid");
+            return;
+        }
+        HandleReceivedData(buffer);
     }
-    std::shared_ptr<DataBuffer> buffer = *(buffers.begin());
-    std::string jsonStr(reinterpret_cast<char *>(buffer->Data()));
+}
+
+void DCameraSourceController::HandleReceivedData(std::shared_ptr<DataBuffer>& dataBuffer)
+{
+    DHLOGI("DCameraSourceController::HandleReceivedData dhId: %{public}s", GetAnonyString(dhId_).c_str());
+    uint8_t *data = dataBuffer->Data();
+    std::string jsonStr(reinterpret_cast<const char *>(data), dataBuffer->Capacity());
     cJSON *rootValue = cJSON_Parse(jsonStr.c_str());
     if (rootValue == nullptr) {
         return;
@@ -460,14 +501,23 @@ void DCameraSourceController::OnDataReceived(std::vector<std::shared_ptr<DataBuf
     cJSON *comvalue = cJSON_GetObjectItemCaseSensitive(rootValue, "Command");
     if (comvalue == nullptr || !cJSON_IsString(comvalue) || (comvalue->valuestring == nullptr)) {
         cJSON_Delete(rootValue);
+        DHLOGE("parse command failed");
         return;
     }
     std::string command = std::string(comvalue->valuestring);
-    if (command == DCAMERA_PROTOCOL_CMD_METADATA_RESULT) {
-        HandleMetaDataResult(jsonStr);
-    }
     cJSON_Delete(rootValue);
-    return;
+    if ((!command.empty()) && (command.compare(DCAMERA_PROTOCOL_CMD_METADATA_RESULT) == 0)) {
+        HandleMetaDataResult(jsonStr);
+    } else if ((!command.empty()) && (command.compare(DCAMERA_PROTOCOL_CMD_STATE_NOTIFY) == 0)) {
+        DCameraEventCmd cmd;
+        int32_t ret = cmd.Unmarshal(jsonStr);
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCameraSourceController Unmarshal failed, ret: %{public}d, devId: %{public}s, "
+                "dhId: %{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+            return;
+        }
+        DCameraNotify(cmd.value_);
+    }
 }
 
 void DCameraSourceController::HandleMetaDataResult(std::string& jsonStr)

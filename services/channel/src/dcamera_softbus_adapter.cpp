@@ -36,6 +36,20 @@ static QosTV g_qosInfo[] = {
     { .qos = QOS_TYPE_MIN_LATENCY, .value = DCAMERA_QOS_TYPE_MIN_LATENCY}
 };
 static uint32_t g_QosTV_Param_Index = static_cast<uint32_t>(sizeof(g_qosInfo) / sizeof(QosTV));
+const static std::pair<std::string, std::string> LOCAL_TO_PEER_SESS_NAME_MAP[] = {
+    {SESSION_HEAD + CAMERA_ID_PREFIX + DEVICE_ID_0 + RECEIVER_SESSION_NAME_CONTROL,
+     SESSION_HEAD + CAMERA_ID_PREFIX + DEVICE_ID_0 + SENDER_SESSION_NAME_CONTROL},
+    {SESSION_HEAD + CAMERA_ID_PREFIX + DEVICE_ID_0 + RECEIVER_SESSION_NAME_DATA_SNAPSHOT,
+     SESSION_HEAD + CAMERA_ID_PREFIX + DEVICE_ID_0 + SENDER_SESSION_NAME_DATA_SNAPSHOT},
+    {SESSION_HEAD + CAMERA_ID_PREFIX + DEVICE_ID_0 + RECEIVER_SESSION_NAME_DATA_CONTINUE,
+     SESSION_HEAD + CAMERA_ID_PREFIX + DEVICE_ID_0 + SENDER_SESSION_NAME_DATA_CONTINUE},
+    {SESSION_HEAD + CAMERA_ID_PREFIX + DEVICE_ID_1 + RECEIVER_SESSION_NAME_CONTROL,
+     SESSION_HEAD + CAMERA_ID_PREFIX + DEVICE_ID_1 + SENDER_SESSION_NAME_CONTROL},
+    {SESSION_HEAD + CAMERA_ID_PREFIX + DEVICE_ID_1 + RECEIVER_SESSION_NAME_DATA_SNAPSHOT,
+     SESSION_HEAD + CAMERA_ID_PREFIX + DEVICE_ID_1 + SENDER_SESSION_NAME_DATA_SNAPSHOT},
+    {SESSION_HEAD + CAMERA_ID_PREFIX + DEVICE_ID_1 + RECEIVER_SESSION_NAME_DATA_CONTINUE,
+     SESSION_HEAD + CAMERA_ID_PREFIX + DEVICE_ID_1 + SENDER_SESSION_NAME_DATA_CONTINUE},
+};
 }
 IMPLEMENT_SINGLE_INSTANCE(DCameraSoftbusAdapter);
 
@@ -133,33 +147,42 @@ int32_t DCameraSoftbusAdapter::CreatSoftBusSinkSocketServer(std::string mySessio
 {
     DHLOGI("create socket server start, mySessionName: %{public}s,peerSessionName: %{public}s",
         GetAnonyString(mySessionName).c_str(), GetAnonyString(peerSessionName).c_str());
-    {
-        std::lock_guard<std::mutex> autoLock(mySessionNameLock_);
-        if (mySessionNameSet_.find(mySessionName) != mySessionNameSet_.end()) {
-            DHLOGI("current mySessionName had Listened");
-            return DCAMERA_OK;
-        }
-        mySessionNameSet_.insert(mySessionName);
+    SocketInfo serverSocketInfo {};
+    if (!ManageSelectChannel::GetInstance().GetSinkConnect()) {
+        serverSocketInfo = {
+            .name =  const_cast<char*>(mySessionName.c_str()),
+            .peerName = const_cast<char*>(peerSessionName.c_str()),
+            .peerNetworkId = const_cast<char*>(peerDevId.c_str()),
+            .pkgName = const_cast<char*>(PKG_NAME.c_str()),
+            .dataType = sessionModeAndDataTypeMap_[sessionMode],
+        };
+    } else {
+        serverSocketInfo = {
+            .name =  const_cast<char*>(mySessionName.c_str()),
+            .pkgName = const_cast<char*>(PKG_NAME.c_str()),
+            .dataType = sessionModeAndDataTypeMap_[sessionMode],
+        };
     }
-    SocketInfo serverSocketInfo = {
-        .name =  const_cast<char*>(mySessionName.c_str()),
-        .peerName = const_cast<char*>(peerSessionName.c_str()),
-        .peerNetworkId = const_cast<char*>(peerDevId.c_str()),
-        .pkgName = const_cast<char*>(PKG_NAME.c_str()),
-        .dataType = sessionModeAndDataTypeMap_[sessionMode],
-    };
-    int socketId = Socket(serverSocketInfo);
+    int32_t socketId = Socket(serverSocketInfo);
     if (socketId < 0) {
-        DHLOGE("create socket server error, socket is invalid");
+        DHLOGE("create socket server error, socket is invalid, socketId: %{public}d", socketId);
         return DCAMERA_BAD_VALUE;
     }
-    int ret = Listen(socketId, g_qosInfo, g_QosTV_Param_Index, &sessListeners_[role]);
+    {
+        std::lock_guard<std::mutex> autoLock(mySocketSetLock_);
+        if (mySocketSet_.find(socketId) != mySocketSet_.end()) {
+            DHLOGI("current socketId had Listened");
+            return DCAMERA_OK;
+        }
+        mySocketSet_.insert(socketId);
+    }
+    int32_t ret = Listen(socketId, g_qosInfo, g_QosTV_Param_Index, &sessListeners_[role]);
     if (ret != DCAMERA_OK) {
-        DHLOGE("create socket server error");
+        DHLOGE("create socket server error, ret: %{public}d", ret);
         Shutdown(socketId);
         return DCAMERA_BAD_VALUE;
     }
-    {
+    if (!ManageSelectChannel::GetInstance().GetSinkConnect()) {
         std::lock_guard<std::mutex> autoLock(mySessionNamePeerDevIdLock_);
         std::string peerDevIdMySessionName = peerDevId + std::string("_") + mySessionName;
         peerDevIdMySessionNameMap_[peerDevIdMySessionName] = mySessionName;
@@ -174,14 +197,29 @@ int32_t DCameraSoftbusAdapter::CreateSoftBusSourceSocketClient(std::string myDev
 {
     DHLOGI("create socket client start, myDevId: %{public}s, peerSessionName: %{public}s",
         GetAnonyString(myDevId).c_str(), GetAnonyString(peerSessionName).c_str());
-    std::string myDevIdPeerSessionName = myDevId + std::string("_") + peerSessionName;
-    SocketInfo clientSocketInfo = {
-        .name = const_cast<char*>(myDevIdPeerSessionName.c_str()),
-        .peerName = const_cast<char*>(peerSessionName.c_str()),
-        .peerNetworkId = const_cast<char*>(peerDevId.c_str()),
-        .pkgName = const_cast<char*>(PKG_NAME.c_str()),
-        .dataType = sessionModeAndDataTypeMap_[sessionMode],
-    };
+    SocketInfo clientSocketInfo {};
+    std::string myDevIdPeerSessionName = "";
+    std::string srcSessionName = "";
+    if (!ManageSelectChannel::GetInstance().GetSrcConnect()) {
+        myDevIdPeerSessionName = myDevId + std::string("_") + peerSessionName;
+        clientSocketInfo = {
+            .name = const_cast<char*>(myDevIdPeerSessionName.c_str()),
+            .peerName = const_cast<char*>(peerSessionName.c_str()),
+            .peerNetworkId = const_cast<char*>(peerDevId.c_str()),
+            .pkgName = const_cast<char*>(PKG_NAME.c_str()),
+            .dataType = sessionModeAndDataTypeMap_[sessionMode],
+        };
+    } else {
+        srcSessionName = peerSessionName + "_receiver";
+        peerSessionName = peerSessionName + "_sender";
+        clientSocketInfo = {
+            .name = const_cast<char*>(srcSessionName.c_str()),
+            .peerName = const_cast<char*>(peerSessionName.c_str()),
+            .peerNetworkId = const_cast<char*>(peerDevId.c_str()),
+            .pkgName = const_cast<char*>(PKG_NAME.c_str()),
+            .dataType = sessionModeAndDataTypeMap_[sessionMode],
+        };
+    }
     int socketId = Socket(clientSocketInfo);
     if (socketId < 0) {
         DHLOGE("create socket client error, socket is invalid");
@@ -305,7 +343,7 @@ int32_t DCameraSoftbusAdapter::SourceOnBind(int32_t socket, PeerSocketInfo info)
         DHLOGE("source bind socket can not find socket %{public}d", socket);
         return DCAMERA_NOT_FOUND;
     }
-    ret = session->OnSessionOpened(socket);
+    ret = session->OnSessionOpened(socket, info.networkId);
     if (ret != DCAMERA_OK) {
         DHLOGE("source bind socket failed, ret: %{public}d socket: %{public}d", ret, socket);
     }
@@ -465,12 +503,22 @@ int32_t DCameraSoftbusAdapter::DCameraSoftbusSinkGetSession(int32_t socket,
     return DCAMERA_OK;
 }
 
+std::string DCameraSoftbusAdapter::FindSessNameByPeerSessName(const std::string peerSessionName)
+{
+    auto foundItem = std::find_if(std::begin(LOCAL_TO_PEER_SESS_NAME_MAP), std::end(LOCAL_TO_PEER_SESS_NAME_MAP),
+        [&](const auto& item) { return item.first == peerSessionName; });
+    if (foundItem != std::end(LOCAL_TO_PEER_SESS_NAME_MAP)) {
+        return foundItem->second;
+    }
+    return "";
+}
+
 int32_t DCameraSoftbusAdapter::DCameraSoftBusGetSessionByPeerSocket(int32_t socket,
     std::shared_ptr<DCameraSoftbusSession> &session, PeerSocketInfo info)
 {
     DHLOGI("find session by peer socket start, socket %{public}d", socket);
     std::string mySessionName = "";
-    {
+    if (!ManageSelectChannel::GetInstance().GetSinkConnect()) {
         std::lock_guard<std::mutex> autoLock(mySessionNamePeerDevIdLock_);
         auto sessionNameIter = peerDevIdMySessionNameMap_.find(info.name);
         if (sessionNameIter == peerDevIdMySessionNameMap_.end()) {
@@ -478,6 +526,12 @@ int32_t DCameraSoftbusAdapter::DCameraSoftBusGetSessionByPeerSocket(int32_t sock
             return DCAMERA_NOT_FOUND;
         }
         mySessionName = sessionNameIter->second;
+    } else {
+        mySessionName = FindSessNameByPeerSessName(info.name);
+    }
+    if (mySessionName.empty()) {
+        DHLOGE("find mySessionName is empty");
+        return DCAMERA_BAD_VALUE;
     }
     auto iter = sinkSessions_.find(std::string(mySessionName));
     if (iter == sinkSessions_.end()) {
@@ -504,7 +558,7 @@ int32_t DCameraSoftbusAdapter::SinkOnBind(int32_t socket, PeerSocketInfo info)
         DHLOGE("sink bind socket error, can not find socket %{public}d", socket);
         return DCAMERA_NOT_FOUND;
     }
-    ret = session->OnSessionOpened(socket);
+    ret = session->OnSessionOpened(socket, info.networkId);
     if (ret != DCAMERA_OK) {
         DHLOGE("sink bind socket error, not find socket %{public}d", socket);
     }

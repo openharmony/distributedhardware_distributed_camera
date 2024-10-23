@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -56,10 +56,6 @@ int32_t DCameraChannelSinkImpl::CreateSession(std::vector<DCameraIndex>& camInde
     if (camIndexs.size() > DCAMERA_MAX_NUM || listener == nullptr) {
         return DCAMERA_BAD_VALUE;
     }
-    if (softbusSession_ != nullptr) {
-        DHLOGI("DCameraChannelSinkImpl session has already create %{public}s", sessionFlag.c_str());
-        return DCAMERA_OK;
-    }
     std::string myDevId;
     int32_t ret = GetLocalDeviceNetworkId(myDevId);
     if (ret != DCAMERA_OK) {
@@ -68,7 +64,11 @@ int32_t DCameraChannelSinkImpl::CreateSession(std::vector<DCameraIndex>& camInde
     }
     camIndexs_.assign(camIndexs.begin(), camIndexs.end());
     listener_ = listener;
-    mySessionName_ = SESSION_HEAD + camIndexs[0].dhId_ + std::string("_") + sessionFlag;
+    if (!ManageSelectChannel::GetInstance().GetSinkConnect()) {
+        mySessionName_ = SESSION_HEAD + camIndexs[0].dhId_ + std::string("_") + sessionFlag;
+    } else {
+        mySessionName_ = SESSION_HEAD + camIndexs[0].dhId_ + std::string("_") + sessionFlag + "_sender";
+    }
     mode_ = sessionMode;
     std::string peerDevId = camIndexs[0].devId_;
     std::string peerSessionName = SESSION_HEAD + sessionFlag;

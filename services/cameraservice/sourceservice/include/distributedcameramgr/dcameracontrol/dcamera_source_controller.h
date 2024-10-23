@@ -49,7 +49,7 @@ public:
     int32_t ResumeDistributedHardware(const std::string &networkId) override;
     int32_t StopDistributedHardware(const std::string &networkId) override;
 
-    void OnSessionState(int32_t state);
+    void OnSessionState(int32_t state, std::string networkId);
     void OnSessionError(int32_t eventType, int32_t eventReason, std::string detail);
     void OnDataReceived(std::vector<std::shared_ptr<DataBuffer>>& buffers);
 
@@ -57,6 +57,7 @@ private:
     void HandleMetaDataResult(std::string& jsonStr);
     void PostChannelDisconnectedEvent();
     int32_t PublishEnableLatencyMsg(const std::string& devId);
+    void HandleReceivedData(std::shared_ptr<DataBuffer> &dataBuffer);
     class DCameraHdiRecipient : public IRemoteObject::DeathRecipient {
     public:
         void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
@@ -79,6 +80,7 @@ private:
     const std::string SESSION_FLAG = "control";
 
     static constexpr uint8_t CHANNEL_REL_SECONDS = 5;
+    const size_t DATABUFF_MAX_SIZE = 100 * 1024 * 1024;
     std::atomic<bool> isChannelConnected_ = false;
     std::mutex channelMtx_;
     std::condition_variable channelCond_;

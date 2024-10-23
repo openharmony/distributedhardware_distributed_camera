@@ -21,10 +21,10 @@
 #include <string>
 #include <fstream>
 #include <map>
+#include "single_instance.h"
 
 #ifdef DCAMERA_MMAP_RESERVE
 #include "image_converter.h"
-#include "single_instance.h"
 #endif
 
 namespace OHOS {
@@ -74,6 +74,19 @@ public:
 private:
     static FILE *OpenDumpFileInner(std::string para, std::string fileName);
     static void ChangeDumpFileState(std::string para, FILE **dumpFile, std::string fileName);
+};
+
+class ManageSelectChannel {
+DECLARE_SINGLE_INSTANCE(ManageSelectChannel);
+
+public:
+    void SetSrcConnect(bool isSoftbusConnect);
+    void SetSinkConnect(bool isSoftbusConnect);
+    bool GetSrcConnect();
+    bool GetSinkConnect();
+private:
+    bool isSoftbusConnectSource_ = false;
+    bool isSoftbusConnectSink_ = false;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

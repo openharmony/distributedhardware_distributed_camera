@@ -57,7 +57,7 @@ public:
     void OnStateChanged(std::shared_ptr<DCameraEvent>& event);
     void OnMetadataResult(std::vector<std::shared_ptr<DCameraSettings>>& settings);
 
-    void OnSessionState(int32_t state);
+    void OnSessionState(int32_t state, std::string networkId);
     void OnSessionError(int32_t eventType, int32_t eventReason, std::string detail);
     void OnDataReceived(std::vector<std::shared_ptr<DataBuffer>>& buffers);
 
@@ -83,6 +83,7 @@ private:
     bool CheckPermission();
     void ProcessFrameTrigger(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessPostAuthorization(const AppExecFwk::InnerEvent::Pointer &event);
+    int32_t CreateCtrlSession();
     int32_t CheckSensitive();
 
     bool isInit_;

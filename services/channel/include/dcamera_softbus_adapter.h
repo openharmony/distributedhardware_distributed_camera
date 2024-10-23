@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -77,6 +77,7 @@ private:
         PeerSocketInfo info);
     int32_t DCameraSoftbusSourceGetSession(int32_t socket, std::shared_ptr<DCameraSoftbusSession>& session);
     int32_t DCameraSoftbusSinkGetSession(int32_t socket, std::shared_ptr<DCameraSoftbusSession>& session);
+    std::string FindSessNameByPeerSessName(const std::string peerSessionName);
 
 private:
     std::mutex optLock_;
@@ -91,8 +92,8 @@ private:
     std::map<DCameraSessionMode, TransDataType> sessionModeAndDataTypeMap_;
     std::mutex mySessionNamePeerDevIdLock_;
     std::map<std::string, std::string> peerDevIdMySessionNameMap_;
-    std::mutex mySessionNameLock_;
-    std::set<std::string> mySessionNameSet_;
+    std::mutex mySocketSetLock_;
+    std::set<int32_t> mySocketSet_;
 
     std::mutex sinkSocketLock_;
     std::map<int32_t, std::shared_ptr<DCameraSoftbusSession>> sinkSocketSessionMap_;
