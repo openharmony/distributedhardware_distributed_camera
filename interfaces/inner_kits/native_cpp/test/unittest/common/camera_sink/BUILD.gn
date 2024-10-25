@@ -33,8 +33,8 @@ ohos_unittest("DCameraSinkHandlerTest") {
   module_out_path = module_out_path
 
   sources = [
-    "callback/dcamera_sink_callback_test.cpp",
     "callback/dcamera_sink_callback_stub_test.cpp",
+    "callback/dcamera_sink_callback_test.cpp",
     "dcamera_sink_handler_ipc_test.cpp",
     "dcamera_sink_handler_test.cpp",
   ]

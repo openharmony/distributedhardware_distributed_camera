@@ -222,9 +222,9 @@ HWTEST_F(DcameraSourceCallbackProxyTest, OnDataSyncTrigger_002, TestSize.Level1)
     DHLOGI("DcameraSourceCallbackProxyTest::OnDataSyncTrigger_002");
 
     sptr<DCameraSourceCallback> remoteObject = sptr<DCameraSourceCallback>(new DCameraSourceCallback());
-    auto instance = new DCameraSourceCallbackProxy(remoteObject);        
+    sptr<DCameraSourceCallbackProxy> callbackProxy(new DCameraSourceCallbackProxy(remoteObject));
 
-    EXPECT_EQ(DCAMERA_BAD_VALUE, instance->OnDataSyncTrigger(TEST_DEVICE_ID));
+    EXPECT_EQ(DCAMERA_BAD_VALUE, callbackProxy->OnDataSyncTrigger(TEST_DEVICE_ID));
 }
 
 /**
@@ -255,9 +255,9 @@ HWTEST_F(DcameraSourceCallbackProxyTest, OnHardwareStateChanged_002, TestSize.Le
     DHLOGI("DcameraSourceCallbackProxyTest::OnHardwareStateChanged_002");
 
     sptr<DCameraSourceCallback> remoteObject = sptr<DCameraSourceCallback>(new DCameraSourceCallback());
-    auto instance = new DCameraSourceCallbackProxy(remoteObject);        
+    sptr<DCameraSourceCallbackProxy> callbackProxy(new DCameraSourceCallbackProxy(remoteObject));
 
-    EXPECT_EQ(DCAMERA_BAD_VALUE, instance->OnHardwareStateChanged(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, 0));
+    EXPECT_EQ(DCAMERA_BAD_VALUE, callbackProxy->OnHardwareStateChanged(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, 0));
 }
 } // namespace DistributedHardware
 } // namespace OHOS
