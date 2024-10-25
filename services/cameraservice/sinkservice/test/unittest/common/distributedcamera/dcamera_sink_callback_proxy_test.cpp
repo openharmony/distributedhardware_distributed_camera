@@ -86,7 +86,7 @@ HWTEST_F(DcameraSinkCallbackProxyTest, dcamera_sink_callback_proxy_test_002, Tes
     EXPECT_EQ(false, callbackProxy == nullptr);
 
     int32_t ret = DCAMERA_BAD_VALUE;
-    ResourceEventType type;
+    ResourceEventType type = ResourceEventType::EVENT_TYPE_QUERY_RESOURCE;
     std::string subtype("");
     std::string newworkId("");
     bool isSensitive = false;

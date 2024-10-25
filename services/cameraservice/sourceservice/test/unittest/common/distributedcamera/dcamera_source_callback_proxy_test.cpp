@@ -150,10 +150,10 @@ HWTEST_F(DcameraSourceCallbackProxyTest, dcamera_source_callback_proxy_test_004,
     EXPECT_EQ(false, callbackProxy == nullptr);
 
     int32_t status = 0;
-    const std::string maxdirstr(257, "1");
+    const std::string maxdirstr(257, '1');
     const std::string testemptystr = "";
     const std::string teststr = "TESTSTR";
-    std::string maxdirstr1(50 * 1024 * 1024 + 1, "1");
+    std::string maxdirstr1(50 * 1024 * 1024 + 1, '1');
     std::string emptystr = "";
 
     EXPECT_EQ(DCAMERA_OK, callbackProxy->OnNotifyRegResult(testemptystr, testemptystr, testemptystr, status, emptystr));
