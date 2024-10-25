@@ -34,6 +34,7 @@ ohos_unittest("DCameraSinkHandlerTest") {
 
   sources = [
     "callback/dcamera_sink_callback_test.cpp",
+    "callback/dcamera_sink_callback_stub_test.cpp",
     "dcamera_sink_handler_ipc_test.cpp",
     "dcamera_sink_handler_test.cpp",
   ]

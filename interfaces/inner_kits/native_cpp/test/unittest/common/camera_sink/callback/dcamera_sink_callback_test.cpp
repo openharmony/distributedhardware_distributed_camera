@@ -104,6 +104,11 @@ HWTEST_F(DCameraSinkCallbackTest, dcamera_sink_callback_test_002, TestSize.Level
     bool isSameAccout = false;
     int32_t ret = sinkCallback_->OnNotifyResourceInfo(type, subType, networkId, isSensitive, isSameAccout);
     EXPECT_EQ(DCAMERA_OK, ret);
+
+    std::shared_ptr<PrivacyResourcesListenerTest> callback = std::make_shared<PrivacyResourcesListenerTest>();
+    sinkCallback_->PushPrivacyResCallback(callback);
+    ret = sinkCallback_->OnNotifyResourceInfo(type, subType, networkId, isSensitive, isSameAccout);
+    EXPECT_EQ(DCAMERA_OK, ret);
 }
 }
 }

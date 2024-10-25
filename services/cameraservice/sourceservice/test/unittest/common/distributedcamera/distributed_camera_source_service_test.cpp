@@ -123,6 +123,12 @@ HWTEST_F(DistributedCameraSourceServiceTest, dcamera_source_service_test_003, Te
     args.push_back(str);
     int ret = testSrcService_->Dump(fd, args);
     EXPECT_EQ(DCAMERA_OK, ret);
+
+    for (int i=0; i<10242; i++) {
+        args.push_back(u"");
+    }
+    ret = testSrcService_->Dump(fd, args);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
 /**
@@ -225,7 +231,10 @@ HWTEST_F(DistributedCameraSourceServiceTest, dcamera_source_service_test_009, Te
     DHLOGI("DistributedCameraSourceServiceTest::dcamera_source_service_test_009");
     EXPECT_EQ(false, testSrcService_ == nullptr);
 
-    int32_t ret = testSrcService_->LoadDCameraHDF();
+    int32_t ret = testSrcService_->UnLoadCameraHDF();
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    ret = testSrcService_->LoadDCameraHDF();
     EXPECT_EQ(DCAMERA_OK, ret);
     ret = testSrcService_->UnLoadCameraHDF();
     EXPECT_EQ(DCAMERA_OK, ret);

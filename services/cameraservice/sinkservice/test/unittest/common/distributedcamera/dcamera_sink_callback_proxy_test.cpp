@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "dcamera_sink_callback_proxy.h"
+#include "dcamera_sink_callback.h"
 #include "distributed_camera_errno.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_sink_proxy.h"
@@ -69,6 +70,29 @@ HWTEST_F(DcameraSinkCallbackProxyTest, dcamera_sink_callback_proxy_test_001, Tes
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID);
     sptr<DCameraSinkCallbackProxy> callbackProxy(new DCameraSinkCallbackProxy(remoteObject));
     EXPECT_EQ(false, callbackProxy == nullptr);
+}
+
+/**
+ * @tc.name: dcamera_sink_callback_proxy_test_002
+ * @tc.desc: Verify the OnNotifyResourceInfo function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSinkCallbackProxyTest, dcamera_sink_callback_proxy_test_002, TestSize.Level1)
+{
+    DHLOGI("DcameraSinkCallbackProxyTest::dcamera_sink_callback_proxy_test_002");
+    sptr<IRemoteObject> remoteObject = sptr<IRemoteObject>(new DCameraSinkCallback());
+    sptr<DCameraSinkCallbackProxy> callbackProxy(new DCameraSinkCallbackProxy(remoteObject));
+    EXPECT_EQ(false, callbackProxy == nullptr);
+
+    int32_t ret = DCAMERA_BAD_VALUE;
+    ResourceEventType type;
+    std::string subtype("");
+    std::string newworkId("");
+    bool isSensitive = false;
+    bool isSameAccout = false;
+    ret = callbackProxy->OnNotifyResourceInfo(type, subtype, newworkId, isSensitive, isSameAccout);
+    EXPECT_EQ(DCAMERA_OK, ret);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
