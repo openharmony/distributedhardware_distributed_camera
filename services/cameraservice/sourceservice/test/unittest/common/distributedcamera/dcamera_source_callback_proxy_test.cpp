@@ -156,13 +156,20 @@ HWTEST_F(DcameraSourceCallbackProxyTest, dcamera_source_callback_proxy_test_004,
     std::string maxdirstr1(50 * 1024 * 1024 + 1, '1');
     std::string emptystr = "";
 
-    EXPECT_EQ(DCAMERA_BAD_VALUE, callbackProxy->OnNotifyRegResult(testemptystr, testemptystr, testemptystr, status, emptystr));
-    EXPECT_EQ(DCAMERA_BAD_VALUE, callbackProxy->OnNotifyRegResult(maxdirstr, testemptystr, testemptystr, status, emptystr));
-    EXPECT_EQ(DCAMERA_BAD_VALUE, callbackProxy->OnNotifyRegResult(teststr, testemptystr, testemptystr, status, emptystr));
-    EXPECT_EQ(DCAMERA_BAD_VALUE, callbackProxy->OnNotifyRegResult(teststr, maxdirstr, testemptystr, status, emptystr));
-    EXPECT_EQ(DCAMERA_BAD_VALUE, callbackProxy->OnNotifyRegResult(teststr, teststr, testemptystr, status, emptystr));
-    EXPECT_EQ(DCAMERA_BAD_VALUE, callbackProxy->OnNotifyRegResult(teststr, teststr, maxdirstr, status, emptystr));
-    EXPECT_EQ(DCAMERA_BAD_VALUE, callbackProxy->OnNotifyRegResult(teststr, teststr, teststr, status, maxdirstr1));
+    EXPECT_EQ(DCAMERA_BAD_VALUE, callbackProxy->OnNotifyRegResult(
+        testemptystr, testemptystr, testemptystr, status, emptystr));
+    EXPECT_EQ(DCAMERA_BAD_VALUE, callbackProxy->OnNotifyRegResult(
+        maxdirstr, testemptystr, testemptystr, status, emptystr));
+    EXPECT_EQ(DCAMERA_BAD_VALUE, callbackProxy->OnNotifyRegResult(
+        teststr, testemptystr, testemptystr, status, emptystr));
+    EXPECT_EQ(DCAMERA_BAD_VALUE, callbackProxy->OnNotifyRegResult(
+        teststr, maxdirstr, testemptystr, status, emptystr));
+    EXPECT_EQ(DCAMERA_BAD_VALUE, callbackProxy->OnNotifyRegResult(
+        teststr, teststr, testemptystr, status, emptystr));
+    EXPECT_EQ(DCAMERA_BAD_VALUE, callbackProxy->OnNotifyRegResult(
+        teststr, teststr, maxdirstr, status, emptystr));
+    EXPECT_EQ(DCAMERA_BAD_VALUE, callbackProxy->OnNotifyRegResult(
+        teststr, teststr, teststr, status, maxdirstr1));
 }
 
 /**
