@@ -210,7 +210,7 @@ HWTEST_F(DcameraUtilsToolsTest, IsOverDumpSize_001, TestSize.Level1)
     EXPECT_EQ(DCAMERA_INIT_ERR, IsUnderDumpMaxSize(fileName));
 
     DumpBufferToFile(DUMP_FILE_NAME, str, size);
-    EXPECT_EQ(DCAMERA_OK, IsUnderDumpMaxSize(fileName));
+    EXPECT_EQ(DCAMERA_OK, IsUnderDumpMaxSize(DUMP_FILE_NAME));
 }
 
 /**

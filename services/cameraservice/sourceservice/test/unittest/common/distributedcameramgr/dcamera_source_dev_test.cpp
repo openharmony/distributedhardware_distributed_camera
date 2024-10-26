@@ -676,7 +676,7 @@ HWTEST_F(DCameraSourceDevTest, GetFullCaps_001, TestSize.Level1)
     std::shared_ptr<DCameraSourceDev> camDev1_;
     std::shared_ptr<ICameraStateListener> stateListener1_;
     camDev1_ = std::make_shared<DCameraSourceDev>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, stateListener1_);
-    EXPECT_EQ(DCAMERA_BAD_VALUE, camDev_->GetFullCaps());
+    EXPECT_EQ(DCAMERA_BAD_VALUE, camDev1_->GetFullCaps());
 }
 } // namespace DistributedHardware
 } // namespace OHOS

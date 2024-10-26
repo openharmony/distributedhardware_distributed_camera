@@ -86,7 +86,7 @@ HWTEST_F(DCameraSinkCallbackStubTest, OnRemoteRequest_001, TestSize.Level1)
 
     data.WriteInterfaceToken(u"");
     ret = sinkCallbackStub_->OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(ERR_INVALID_DATA, ret);
 }
 }
 }
