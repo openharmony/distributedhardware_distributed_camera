@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "dcamera_source_callback_proxy.h"
+#include "dcamera_source_callback.h"
 #include "distributed_camera_errno.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_source_proxy.h"
@@ -134,6 +135,44 @@ HWTEST_F(DcameraSourceCallbackProxyTest, dcamera_source_callback_proxy_test_003,
 }
 
 /**
+ * @tc.name: dcamera_source_callback_proxy_test_004
+ * @tc.desc: Verify the OnNotifyRegResult function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSourceCallbackProxyTest, dcamera_source_callback_proxy_test_004, TestSize.Level1)
+{
+    DHLOGI("DcameraSourceCallbackProxyTest::dcamera_source_callback_proxy_test_004");
+    sptr<ISystemAbilityManager> samgr =
+        SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID);
+    sptr<DCameraSourceCallbackProxy> callbackProxy(new DCameraSourceCallbackProxy(remoteObject));
+    EXPECT_EQ(false, callbackProxy == nullptr);
+
+    int32_t status = 0;
+    const std::string maxdirstr(257, '1');
+    const std::string testemptystr = "";
+    const std::string teststr = "TESTSTR";
+    std::string maxdirstr1(50 * 1024 * 1024 + 1, '1');
+    std::string emptystr = "";
+
+    EXPECT_EQ(DCAMERA_BAD_VALUE, callbackProxy->OnNotifyRegResult(
+        testemptystr, testemptystr, testemptystr, status, emptystr));
+    EXPECT_EQ(DCAMERA_BAD_VALUE, callbackProxy->OnNotifyRegResult(
+        maxdirstr, testemptystr, testemptystr, status, emptystr));
+    EXPECT_EQ(DCAMERA_BAD_VALUE, callbackProxy->OnNotifyRegResult(
+        teststr, testemptystr, testemptystr, status, emptystr));
+    EXPECT_EQ(DCAMERA_BAD_VALUE, callbackProxy->OnNotifyRegResult(
+        teststr, maxdirstr, testemptystr, status, emptystr));
+    EXPECT_EQ(DCAMERA_BAD_VALUE, callbackProxy->OnNotifyRegResult(
+        teststr, teststr, testemptystr, status, emptystr));
+    EXPECT_EQ(DCAMERA_BAD_VALUE, callbackProxy->OnNotifyRegResult(
+        teststr, teststr, maxdirstr, status, emptystr));
+    EXPECT_EQ(DCAMERA_BAD_VALUE, callbackProxy->OnNotifyRegResult(
+        teststr, teststr, teststr, status, maxdirstr1));
+}
+
+/**
  * @tc.name: CheckParams_001
  * @tc.desc: Verify the CheckParams function.
  * @tc.type: FUNC
@@ -180,6 +219,22 @@ HWTEST_F(DcameraSourceCallbackProxyTest, OnDataSyncTrigger_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: OnDataSyncTrigger_002
+ * @tc.desc: Verify the OnDataSyncTrigger function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSourceCallbackProxyTest, OnDataSyncTrigger_002, TestSize.Level1)
+{
+    DHLOGI("DcameraSourceCallbackProxyTest::OnDataSyncTrigger_002");
+
+    sptr<DCameraSourceCallback> remoteObject = sptr<DCameraSourceCallback>(new DCameraSourceCallback());
+    sptr<DCameraSourceCallbackProxy> callbackProxy(new DCameraSourceCallbackProxy(remoteObject));
+
+    EXPECT_EQ(DCAMERA_BAD_VALUE, callbackProxy->OnDataSyncTrigger(TEST_DEVICE_ID));
+}
+
+/**
  * @tc.name: OnHardwareStateChanged_001
  * @tc.desc: Verify the OnHardwareStateChanged function.
  * @tc.type: FUNC
@@ -194,6 +249,22 @@ HWTEST_F(DcameraSourceCallbackProxyTest, OnHardwareStateChanged_001, TestSize.Le
     sptr<DCameraSourceCallbackProxy> callbackProxy(new DCameraSourceCallbackProxy(remoteObject));
 
     EXPECT_EQ(DCAMERA_BAD_VALUE, callbackProxy->OnHardwareStateChanged("", "", -1));
+}
+
+/**
+ * @tc.name: OnHardwareStateChanged_002
+ * @tc.desc: Verify the OnHardwareStateChanged function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSourceCallbackProxyTest, OnHardwareStateChanged_002, TestSize.Level1)
+{
+    DHLOGI("DcameraSourceCallbackProxyTest::OnHardwareStateChanged_002");
+
+    sptr<DCameraSourceCallback> remoteObject = sptr<DCameraSourceCallback>(new DCameraSourceCallback());
+    sptr<DCameraSourceCallbackProxy> callbackProxy(new DCameraSourceCallbackProxy(remoteObject));
+
+    EXPECT_EQ(DCAMERA_BAD_VALUE, callbackProxy->OnHardwareStateChanged(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, 0));
 }
 } // namespace DistributedHardware
 } // namespace OHOS

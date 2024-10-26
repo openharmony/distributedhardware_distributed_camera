@@ -16,6 +16,8 @@
 #include <gtest/gtest.h>
 
 #include <cstring>
+#include <fstream>
+#include <iostream>
 
 #include "accesstoken_kit.h"
 #include "anonymous_string.h"
@@ -187,16 +189,28 @@ HWTEST_F(DcameraUtilsToolsTest, GetAnonyInt32_001, TestSize.Level1)
  */
 HWTEST_F(DcameraUtilsToolsTest, IsOverDumpSize_001, TestSize.Level1)
 {
+    std::string DUMP_FILE_NAME = "/data/dump.txt";
+    std::ofstream ofs(DUMP_FILE_NAME, std::ios::out);
+    if (!ofs) {
+        DHLOGI("open file failed");
+    } else {
+        ofs.close();
+    }
+
     std::string fileName = "";
     uint8_t *buf = nullptr;
     size_t size = 0;
     DumpBufferToFile(fileName, buf, size);
     EXPECT_EQ(DCAMERA_INIT_ERR, IsUnderDumpMaxSize(fileName));
+
     fileName = "test";
     uint8_t str[] = "test";
     size = strlen(reinterpret_cast<const char*>(str));
     DumpBufferToFile(fileName, str, size);
-    IsUnderDumpMaxSize(fileName);
+    EXPECT_EQ(DCAMERA_INIT_ERR, IsUnderDumpMaxSize(fileName));
+
+    DumpBufferToFile(DUMP_FILE_NAME, str, size);
+    EXPECT_EQ(DCAMERA_OK, IsUnderDumpMaxSize(DUMP_FILE_NAME));
 }
 
 /**

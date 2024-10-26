@@ -661,5 +661,22 @@ HWTEST_F(DCameraSourceDevTest, SetHicollieFlag_001, TestSize.Level1)
     camDev_->SetHicollieFlag(false);
     EXPECT_EQ(false, camDev_->GetHicollieFlag());
 }
+
+/**
+ * @tc.name: SetHicollieFlag_001
+ * @tc.desc: Verify source dev SetHicollieFlag.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceDevTest, GetFullCaps_001, TestSize.Level1)
+{
+    DHLOGI("DCameraSourceDevTest GetFullCaps_001");
+    EXPECT_EQ(DCAMERA_OK, camDev_->GetFullCaps());
+
+    std::shared_ptr<DCameraSourceDev> camDev1_;
+    std::shared_ptr<ICameraStateListener> stateListener1_;
+    camDev1_ = std::make_shared<DCameraSourceDev>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, stateListener1_);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, camDev1_->GetFullCaps());
+}
 } // namespace DistributedHardware
 } // namespace OHOS
