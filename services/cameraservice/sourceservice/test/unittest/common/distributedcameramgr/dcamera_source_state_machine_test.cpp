@@ -38,6 +38,9 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace DistributedHardware {
+std::string g_regisStateStr = "";
+std::string g_openStateStr = "";
+std::string g_captureStateStr = "";
 class DCameraSourceStateMachineTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -356,6 +359,390 @@ HWTEST_F(DCameraSourceStateMachineTest, dcamera_source_state_machine_test_005, T
 
     ret = stateMachine_ ->Execute(DCAMERA_EVENT_UNREGIST, event1);
     EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_state_machine_test_006
+ * @tc.desc: Verify source state machine.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MC
+ */
+HWTEST_F(DCameraSourceStateMachineTest, dcamera_source_state_machine_test_006, TestSize.Level1)
+{
+    int32_t ret = DCAMERA_OK;
+    stateMachine_ ->UpdateState(DCAMERA_STATE_INIT);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_REGIST);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_OPENED);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_CONFIG_STREAM);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_CAPTURE);
+    stateMachine_ ->UpdateState(static_cast<DCameraStateType>(-1));
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_state_machine_test_007
+ * @tc.desc: Verify source regist state machine.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MC
+ */
+HWTEST_F(DCameraSourceStateMachineTest, dcamera_source_state_machine_test_007, TestSize.Level1)
+{
+    DCameraSourceEvent event0(DCAMERA_EVENT_REGIST, g_camIndex);
+    DCameraSourceEvent event1(DCAMERA_EVENT_UNREGIST, g_camIndex);
+    DCameraSourceEvent event2(DCAMERA_EVENT_NOFIFY, g_camIndex);
+    DCameraSourceEvent event3(DCAMERA_EVENT_GET_FULLCAPS, g_camIndex);
+    DCameraSourceEvent event4(static_cast<DCAMERA_EVENT>(-1), g_camIndex);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_INIT);
+    int32_t ret = stateMachine_ ->Execute(DCAMERA_EVENT_REGIST, event0);
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
+
+    stateMachine_ ->UpdateState(DCAMERA_STATE_REGIST);
+    ret = stateMachine_ ->Execute(DCAMERA_EVENT_REGIST, event0);
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
+
+    ret = stateMachine_ ->Execute(DCAMERA_EVENT_UNREGIST, event1);
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
+
+    ret = stateMachine_ ->Execute(DCAMERA_EVENT_NOFIFY, event2);
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
+
+    ret = stateMachine_ ->Execute(DCAMERA_EVENT_GET_FULLCAPS, event3);
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    ret = stateMachine_ ->Execute(static_cast<DCAMERA_EVENT>(-1), event4);
+    EXPECT_EQ(DCAMERA_WRONG_STATE, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_state_machine_test_008
+ * @tc.desc: Verify source regist state machine.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MC
+ */
+HWTEST_F(DCameraSourceStateMachineTest, dcamera_source_state_machine_test_008, TestSize.Level1)
+{
+    DCameraSourceEvent event0(DCAMERA_EVENT_REGIST, g_registParam);
+    DCameraSourceEvent event1(DCAMERA_EVENT_UNREGIST, g_registParam);
+    DCameraSourceEvent event2(DCAMERA_EVENT_NOFIFY, g_camEvent);
+    DCameraSourceEvent event3(DCAMERA_EVENT_OPEN, g_camIndex);
+
+    g_regisStateStr = "test008";
+    stateMachine_ ->UpdateState(DCAMERA_STATE_INIT);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_REGIST);
+    int32_t ret = stateMachine_ ->Execute(DCAMERA_EVENT_REGIST, event0);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = stateMachine_ ->Execute(DCAMERA_EVENT_UNREGIST, event1);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = stateMachine_ ->Execute(DCAMERA_EVENT_NOFIFY, event2);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = stateMachine_ ->Execute(DCAMERA_EVENT_OPEN, event3);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_state_machine_test_009
+ * @tc.desc: Verify source open state machine.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MC
+ */
+HWTEST_F(DCameraSourceStateMachineTest, dcamera_source_state_machine_test_009, TestSize.Level1)
+{
+    DCameraSourceEvent event0(DCAMERA_EVENT_REGIST, g_camIndex);
+    DCameraSourceEvent event1(DCAMERA_EVENT_UNREGIST, g_camIndex);
+    DCameraSourceEvent event2(DCAMERA_EVENT_CONFIG_STREAMS, g_camIndex);
+    DCameraSourceEvent event3(DCAMERA_EVENT_RELEASE_STREAMS, g_streamIdSnap);
+    DCameraSourceEvent event4(static_cast<DCAMERA_EVENT>(-1), g_camIndex);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_INIT);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_REGIST);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_OPENED);
+    int32_t ret = stateMachine_ ->Execute(DCAMERA_EVENT_REGIST, event0);
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    ret = stateMachine_ ->Execute(DCAMERA_EVENT_CONFIG_STREAMS, event2);
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
+
+    ret = stateMachine_ ->Execute(DCAMERA_EVENT_RELEASE_STREAMS, event3);
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    ret = stateMachine_ ->Execute(DCAMERA_EVENT_UNREGIST, event1);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = stateMachine_ ->Execute(static_cast<DCAMERA_EVENT>(-1), event4);
+    EXPECT_EQ(DCAMERA_WRONG_STATE, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_state_machine_test_010
+ * @tc.desc: Verify source open state machine.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MC
+ */
+HWTEST_F(DCameraSourceStateMachineTest, dcamera_source_state_machine_test_010, TestSize.Level1)
+{
+    DCameraSourceEvent event1(DCAMERA_EVENT_UNREGIST, g_registParam);
+    DCameraSourceEvent event2(DCAMERA_EVENT_CONFIG_STREAMS, g_streamInfosSnap);
+    DCameraSourceEvent event3(DCAMERA_EVENT_UPDATE_SETTINGS, g_cameraSettingSnap);
+    DCameraSourceEvent event4(DCAMERA_EVENT_CLOSE, g_camIndex);
+    DCameraSourceEvent event5(DCAMERA_EVENT_NOFIFY, g_camEvent);
+
+    g_openStateStr = "test010";
+    stateMachine_ ->UpdateState(DCAMERA_STATE_INIT);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_REGIST);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_OPENED);
+
+    int32_t ret = stateMachine_ ->Execute(DCAMERA_EVENT_UNREGIST, event1);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = stateMachine_ ->Execute(DCAMERA_EVENT_CONFIG_STREAMS, event2);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = stateMachine_ ->Execute(DCAMERA_EVENT_UPDATE_SETTINGS, event3);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = stateMachine_ ->Execute(DCAMERA_EVENT_CLOSE, event4);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = stateMachine_ ->Execute(DCAMERA_EVENT_NOFIFY, event4);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_state_machine_test_011
+ * @tc.desc: Verify source open state machine.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MC
+ */
+HWTEST_F(DCameraSourceStateMachineTest, dcamera_source_state_machine_test_011, TestSize.Level1)
+{
+    DCameraSourceEvent event1(DCAMERA_EVENT_UNREGIST, g_registParam);
+
+    g_openStateStr = "test011";
+    stateMachine_ ->UpdateState(DCAMERA_STATE_INIT);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_REGIST);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_OPENED);
+
+    int32_t ret = stateMachine_ ->Execute(DCAMERA_EVENT_UNREGIST, event1);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_state_machine_test_012
+ * @tc.desc: Verify source open state machine.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MC
+ */
+HWTEST_F(DCameraSourceStateMachineTest, dcamera_source_state_machine_test_012, TestSize.Level1)
+{
+    DCameraSourceEvent event1(DCAMERA_EVENT_UNREGIST, g_registParam);
+
+    g_openStateStr = "test012";
+    stateMachine_ ->UpdateState(DCAMERA_STATE_INIT);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_REGIST);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_OPENED);
+
+    int32_t ret = stateMachine_ ->Execute(DCAMERA_EVENT_UNREGIST, event1);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_state_machine_test_013
+ * @tc.desc: Verify source capture state machine.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MC
+ */
+HWTEST_F(DCameraSourceStateMachineTest, dcamera_source_state_machine_test_013, TestSize.Level1)
+{
+    DCameraSourceEvent event0(DCAMERA_EVENT_REGIST, g_registParam);
+    DCameraSourceEvent event1(DCAMERA_EVENT_UNREGIST, g_camIndex);
+    DCameraSourceEvent event3(DCAMERA_EVENT_CLOSE, g_camIndex);
+    DCameraSourceEvent event4(static_cast<DCAMERA_EVENT>(-1), g_camIndex);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_INIT);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_REGIST);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_OPENED);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_CONFIG_STREAM);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_CAPTURE);
+    int32_t ret = stateMachine_ ->Execute(DCAMERA_EVENT_REGIST, event0);
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    ret = stateMachine_ ->Execute(DCAMERA_EVENT_CLOSE, event3);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = stateMachine_ ->Execute(DCAMERA_EVENT_UNREGIST, event1);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = stateMachine_ ->Execute(static_cast<DCAMERA_EVENT>(-1), event4);
+    EXPECT_EQ(DCAMERA_WRONG_STATE, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_state_machine_test_014
+ * @tc.desc: Verify source capture state machine.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MC
+ */
+HWTEST_F(DCameraSourceStateMachineTest, dcamera_source_state_machine_test_014, TestSize.Level1)
+{
+    DCameraSourceEvent event1(DCAMERA_EVENT_UNREGIST, g_registParam);
+    DCameraSourceEvent event2(DCAMERA_EVENT_OPEN, g_camIndex);
+    DCameraSourceEvent event3(DCAMERA_EVENT_CLOSE, g_camIndex);
+    DCameraSourceEvent event4(DCAMERA_EVENT_START_CAPTURE, g_captureInfoSnap);
+    DCameraSourceEvent event5(DCAMERA_EVENT_STOP_CAPTURE, g_streamIdSnap);
+    DCameraSourceEvent event8(DCAMERA_EVENT_UPDATE_SETTINGS, g_cameraSettingSnap);
+    DCameraSourceEvent event9(DCAMERA_EVENT_NOFIFY, g_camEvent);
+
+    g_captureStateStr = "test014";
+    stateMachine_ ->UpdateState(DCAMERA_STATE_INIT);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_REGIST);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_OPENED);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_CONFIG_STREAM);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_CAPTURE);
+
+    int32_t ret = stateMachine_ ->Execute(DCAMERA_EVENT_UNREGIST, event1);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = stateMachine_ ->Execute(DCAMERA_EVENT_CLOSE, event3);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = stateMachine_ ->Execute(DCAMERA_EVENT_START_CAPTURE, event4);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = stateMachine_ ->Execute(DCAMERA_EVENT_STOP_CAPTURE, event5);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = stateMachine_ ->Execute(DCAMERA_EVENT_UPDATE_SETTINGS, event8);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = stateMachine_ ->Execute(DCAMERA_EVENT_NOFIFY, event9);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_state_machine_test_015
+ * @tc.desc: Verify source capture state machine.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MC
+ */
+HWTEST_F(DCameraSourceStateMachineTest, dcamera_source_state_machine_test_015, TestSize.Level1)
+{
+    DCameraSourceEvent event1(DCAMERA_EVENT_UNREGIST, g_registParam);
+
+    g_captureStateStr = "test015";
+    stateMachine_ ->UpdateState(DCAMERA_STATE_INIT);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_REGIST);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_OPENED);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_CONFIG_STREAM);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_CAPTURE);
+
+    int32_t ret = stateMachine_ ->Execute(DCAMERA_EVENT_UNREGIST, event1);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_state_machine_test_016
+ * @tc.desc: Verify source capture state machine.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MC
+ */
+HWTEST_F(DCameraSourceStateMachineTest, dcamera_source_state_machine_test_016, TestSize.Level1)
+{
+    DCameraSourceEvent event1(DCAMERA_EVENT_UNREGIST, g_registParam);
+
+    g_captureStateStr = "test016";
+    stateMachine_ ->UpdateState(DCAMERA_STATE_INIT);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_REGIST);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_OPENED);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_CONFIG_STREAM);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_CAPTURE);
+
+    int32_t ret = stateMachine_ ->Execute(DCAMERA_EVENT_UNREGIST, event1);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_state_machine_test_017
+ * @tc.desc: Verify source capture state machine.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MC
+ */
+HWTEST_F(DCameraSourceStateMachineTest, dcamera_source_state_machine_test_017, TestSize.Level1)
+{
+    DCameraSourceEvent event1(DCAMERA_EVENT_UNREGIST, g_registParam);
+
+    g_captureStateStr = "test017";
+    stateMachine_ ->UpdateState(DCAMERA_STATE_INIT);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_REGIST);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_OPENED);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_CONFIG_STREAM);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_CAPTURE);
+
+    int32_t ret = stateMachine_ ->Execute(DCAMERA_EVENT_UNREGIST, event1);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_state_machine_test_018
+ * @tc.desc: Verify source capture state machine.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MC
+ */
+HWTEST_F(DCameraSourceStateMachineTest, dcamera_source_state_machine_test_018, TestSize.Level1)
+{
+    DCameraSourceEvent event1(DCAMERA_EVENT_UNREGIST, g_registParam);
+
+    g_captureStateStr = "test018";
+    stateMachine_ ->UpdateState(DCAMERA_STATE_INIT);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_REGIST);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_OPENED);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_CONFIG_STREAM);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_CAPTURE);
+
+    int32_t ret = stateMachine_ ->Execute(DCAMERA_EVENT_UNREGIST, event1);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_state_machine_test_019
+ * @tc.desc: Verify source capture state machine.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MC
+ */
+HWTEST_F(DCameraSourceStateMachineTest, dcamera_source_state_machine_test_019, TestSize.Level1)
+{
+    DCameraSourceEvent event1(DCAMERA_EVENT_CLOSE, g_camIndex);
+
+    g_captureStateStr = "test019";
+    stateMachine_ ->UpdateState(DCAMERA_STATE_INIT);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_REGIST);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_OPENED);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_CONFIG_STREAM);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_CAPTURE);
+
+    int32_t ret = stateMachine_ ->Execute(DCAMERA_EVENT_CLOSE, event1);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_state_machine_test_020
+ * @tc.desc: Verify source capture state machine.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MC
+ */
+HWTEST_F(DCameraSourceStateMachineTest, dcamera_source_state_machine_test_020, TestSize.Level1)
+{
+    DCameraSourceEvent event1(DCAMERA_EVENT_CLOSE, g_camIndex);
+
+    g_captureStateStr = "test020";
+    stateMachine_ ->UpdateState(DCAMERA_STATE_INIT);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_REGIST);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_OPENED);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_CONFIG_STREAM);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_CAPTURE);
+
+    int32_t ret = stateMachine_ ->Execute(DCAMERA_EVENT_CLOSE, event1);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
