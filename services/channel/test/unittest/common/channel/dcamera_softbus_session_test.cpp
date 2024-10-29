@@ -175,6 +175,8 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_005, TestSize.L
     size = 2;
     softbusSession_->PackRecvData(buffer);
     usleep(TEST_SLEEP_SEC);
+    buffer = nullptr;
+    softbusSession_->PackRecvData(buffer);
     int32_t ret = softbusSession_->CloseSession();
     EXPECT_EQ(DCAMERA_OK, ret);
 }
@@ -195,6 +197,8 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_006, TestSize.L
     headerPara.totalLen = 2;
     softbusSession_->AssembleNoFrag(buffer, headerPara);
     headerPara.totalLen = 1;
+    softbusSession_->AssembleNoFrag(buffer, headerPara);
+    buffer = nullptr;
     softbusSession_->AssembleNoFrag(buffer, headerPara);
     int32_t ret = softbusSession_->CloseSession();
     EXPECT_EQ(DCAMERA_OK, ret);
@@ -226,6 +230,8 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_007, TestSize.L
     headerPara.subSeq = 1;
     softbusSession_->nowSubSeq_ = 1;
     headerPara.totalLen = 10;
+    softbusSession_->AssembleFrag(buffer, headerPara);
+    buffer = nullptr;
     softbusSession_->AssembleFrag(buffer, headerPara);
     int32_t ret = softbusSession_->CloseSession();
     EXPECT_EQ(DCAMERA_OK, ret);
@@ -301,6 +307,9 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_010, TestSize.L
     mode = DCAMERA_SESSION_MODE_JPEG;
     ret = softbusSession_->SendData(mode, buffer);
     EXPECT_EQ(DCAMERA_WRONG_STATE, ret);
+    mode = static_cast<DCameraSessionMode>(-1);
+    ret = softbusSession_->SendData(mode, buffer);
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
     softbusSession_->sendFuncMap_.clear();
     ret = softbusSession_->SendData(mode, buffer);
     EXPECT_EQ(DCAMERA_NOT_FOUND, ret);

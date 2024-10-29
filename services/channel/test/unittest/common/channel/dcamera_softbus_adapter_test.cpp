@@ -23,6 +23,7 @@
 #include "data_buffer.h"
 #include "dcamera_softbus_session.h"
 #include "dcamera_hisysevent_adapter.h"
+#include "dcamera_utils_tools.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "session_bus_center.h"
@@ -427,6 +428,7 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_014, TestSize.L
     DCameraSessionMode sessionMode = DCameraSessionMode::DCAMERA_SESSION_MODE_VIDEO;
     std::string peerDevId = TEST_DEVICE_ID;
     std::string myDevId = "abcde";
+    ManageSelectChannel::GetInstance().SetSinkConnect(true);
     int32_t ret = DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDevId, peerSessName, peerDevId,
         sessionMode, role);
     int32_t sessionId = 2;
@@ -819,6 +821,83 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_032, TestSize.L
     test01.bufLen = DCAMERA_MAX_RECV_EXT_LEN + 1;
     ret = DCameraSoftbusAdapter::GetInstance().HandleSourceStreamExt(dataBuffer, data);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_033
+ * @tc.desc: Verify the DCameraSoftbusSourceGetSession function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_033, TestSize.Level1)
+{
+    std::string sessionName = "sourcetest033";
+    DCAMERA_CHANNEL_ROLE role = DCAMERA_CHANNLE_ROLE_SOURCE;
+    std::string mySessName = "sourcetest033";
+    std::string peerSessName = "sourcetest033";
+    DCameraSessionMode sessionMode = DCameraSessionMode::DCAMERA_SESSION_MODE_CTRL;
+    std::string peerDevId = TEST_DEVICE_ID;
+    std::string myDevId = "abcde";
+    ManageSelectChannel::GetInstance().SetSrcConnect(true);
+    int32_t ret = DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDevId, peerSessName, peerDevId,
+        sessionMode, role);
+    int32_t sessionId = 27;
+    std::shared_ptr<DCameraSoftbusSession> session = std::make_shared<DCameraSoftbusSession>();
+    PeerSocketInfo info = {
+        .name = const_cast<char*>(peerSessName.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
+        .networkId = const_cast<char*>(peerDevId.c_str()),
+        .dataType = TransDataType::DATA_TYPE_BYTES,
+    };
+    ret = DCameraSoftbusAdapter::GetInstance().SourceOnBind(sessionId, info);
+    ret = DCameraSoftbusAdapter::GetInstance().DCameraSoftbusSourceGetSession(sessionId, session);
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
+    mySessName = "sourcetest0027";
+    ret = DCameraSoftbusAdapter::GetInstance().DCameraSoftbusSourceGetSession(sessionId, session);
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
+    sessionId = 2;
+    DCameraSoftbusAdapter::GetInstance().DestroySoftbusSessionServer(sessionName);
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
+
+    int32_t socket = 0;
+    DCameraSoftbusAdapter::GetInstance().RecordSourceSocketSession(socket, session);
+
+    session = nullptr;
+    DCameraSoftbusAdapter::GetInstance().RecordSourceSocketSession(socket, session);
+    std::shared_ptr<DataBuffer> buffer = nullptr;
+    StreamData *ext = nullptr;
+    ret = DCameraSoftbusAdapter::GetInstance().HandleSourceStreamExt(buffer, ext);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_034
+ * @tc.desc: Verify the SendSofbusStream function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_034, TestSize.Level1)
+{
+    std::string sessionName = "sourcetest034";
+    DCAMERA_CHANNEL_ROLE role = DCAMERA_CHANNLE_ROLE_SOURCE;
+    std::string mySessName = "sourcetest034";
+    std::string peerSessName = "sinktest02";
+    DCameraSessionMode sessionMode = DCameraSessionMode::DCAMERA_SESSION_MODE_VIDEO;
+    std::string peerDevId = TEST_DEVICE_ID;
+    std::string myDevId = "abcde";
+    int32_t ret = DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDevId, peerSessName, peerDevId,
+        sessionMode, role);
+    size_t capacity = 1;
+    std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);
+    int32_t sessionId = 1;
+    dataBuffer->SetInt64(TIME_STAMP_US, 1);
+    dataBuffer->SetInt64(FRAME_TYPE, 1);
+    dataBuffer->SetInt64(INDEX, 1);
+    dataBuffer->SetInt64(START_ENCODE_TIME_US, 0);
+    dataBuffer->SetInt64(FINISH_ENCODE_TIME_US, 1);
+    ret = DCameraSoftbusAdapter::GetInstance().SendSofbusStream(sessionId, dataBuffer);
+    DCameraSoftbusAdapter::GetInstance().DestroySoftbusSessionServer(sessionName);
+    EXPECT_EQ(DCAMERA_OK, ret);
 }
 }
 }
