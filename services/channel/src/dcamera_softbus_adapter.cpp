@@ -220,6 +220,8 @@ int32_t DCameraSoftbusAdapter::CreateSoftBusSourceSocketClient(std::string myDev
             .dataType = sessionModeAndDataTypeMap_[sessionMode],
         };
     }
+    DHLOGD("create socket client myDevIdPeerSessionName: %{public}s, srcSessionName: %{public}s",
+        GetAnonyString(myDevIdPeerSessionName).c_str(), GetAnonyString(srcSessionName).c_str());
     int socketId = Socket(clientSocketInfo);
     if (socketId < 0) {
         DHLOGE("create socket client error, socket is invalid");
