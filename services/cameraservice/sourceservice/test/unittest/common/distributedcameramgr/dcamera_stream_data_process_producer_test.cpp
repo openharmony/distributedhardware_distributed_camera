@@ -155,7 +155,6 @@ HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_produ
     streamProcess2->Start();
     streamProcess2->FeedStream(buffer);
     streamProcess2->FeedStream(buffer);
-    streamProcess2->Stop();
     DHBase dhBase;
     dhBase.deviceId_ = TEST_DEVICE_ID;
     dhBase.dhId_ = TEST_CAMERA_DH_ID_0;
@@ -163,6 +162,7 @@ HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_produ
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
     ret = streamProcess2->FeedStreamToDriver(dhBase, buffer);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+    streamProcess2->Stop();
 }
 
 /**

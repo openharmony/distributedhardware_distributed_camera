@@ -56,6 +56,7 @@ const int32_t TEST_FORMAT = 4;
 const int32_t TEST_DATASPACE = 8;
 const int32_t TEST_ISCAPTURE = 0;
 const int32_t TEST_SLEEP_SEC = 200000;
+const size_t DATABUFF_MAX_SIZE = 100 * 1024 * 1024;
 }
 
 void DCameraSourceControllerTest::SetUpTestCase(void)
@@ -100,6 +101,7 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_001, TestSi
     int32_t ret = controller_->Init(indexs_);
     EXPECT_EQ(ret, DCAMERA_INIT_ERR);
 }
+
 /**
  * @tc.name: dcamera_source_controller_test_002
  * @tc.desc: Verify source controller UnInit.
@@ -113,6 +115,7 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_002, TestSi
     ret = controller_->UnInit();
     EXPECT_EQ(ret, DCAMERA_OK);
 }
+
 /**
  * @tc.name: dcamera_source_controller_test_003
  * @tc.desc: Verify source controller StartCapture.
@@ -143,6 +146,7 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_003, TestSi
     controller_->UnInit();
     EXPECT_EQ(ret, DCAMERA_OK);
 }
+
 /**
  * @tc.name: dcamera_source_controller_test_004
  * @tc.desc: Verify source controller StartCapture and StopCapture.
@@ -307,11 +311,27 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_010, TestSi
         std::make_shared<DCameraSourceControllerChannelListener>(controller_);
     int32_t state = 0;
     listener->OnSessionState(state, "");
+    state = 1;
+    listener->OnSessionState(state, "");
     int32_t eventType = 1;
     int32_t eventReason = 1;
     std::string detail = "OnSessionErrorTest";
     listener->OnSessionError(eventType, eventReason, detail);
     std::vector<std::shared_ptr<DataBuffer>> buffers;
+    listener->OnDataReceived(buffers);
+    size_t capacity = 0;
+    std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);
+    buffers.push_back(dataBuffer);
+    listener->OnDataReceived(buffers);
+    buffers.clear();
+    capacity = DATABUFF_MAX_SIZE + 1;
+    dataBuffer = std::make_shared<DataBuffer>(capacity);
+    buffers.push_back(dataBuffer);
+    listener->OnDataReceived(buffers);
+    buffers.clear();
+    capacity = 1;
+    dataBuffer = std::make_shared<DataBuffer>(capacity);
+    buffers.push_back(dataBuffer);
     listener->OnDataReceived(buffers);
     ret = controller_->UnInit();
     EXPECT_EQ(ret, DCAMERA_OK);

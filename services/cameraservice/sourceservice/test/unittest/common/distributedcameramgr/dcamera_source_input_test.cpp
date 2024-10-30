@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -81,7 +81,7 @@ void DCameraSourceInputTest::SetStreamInfos()
     streamInfo2->format_ = 1;
     streamInfo2->dataspace_ = 1;
     streamInfo2->encodeType_ = ENCODE_TYPE_JPEG;
-    streamInfo2->type_ = SNAPSHOT_FRAME;
+    streamInfo2->type_ = CONTINUOUS_FRAME;
     g_streamInfos.push_back(streamInfo1);
     g_streamInfos.push_back(streamInfo2);
 }
@@ -188,6 +188,10 @@ HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_003, TestSize.Level1)
     EXPECT_EQ(rc, DCAMERA_OK);
 
     rc = testInput_->ConfigStreams(g_streamInfos);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    std::vector<std::shared_ptr<DCStreamInfo>> streamInfos;
+    rc = testInput_->ConfigStreams(streamInfos);
     EXPECT_EQ(rc, DCAMERA_OK);
 
     rc = testInput_->UnInit();
@@ -422,6 +426,12 @@ HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_015, TestSize.Level1)
 
     testInput_->FinshFrameAsyncTrace(DCStreamType::CONTINUOUS_FRAME);
     testInput_->FinshFrameAsyncTrace(DCStreamType::SNAPSHOT_FRAME);
+    int32_t state = 0;
+    testInput_->OnSessionState(DCStreamType::CONTINUOUS_FRAME, state);
+    state = 1;
+    testInput_->OnSessionState(DCStreamType::CONTINUOUS_FRAME, state);
+    state = 2;
+    testInput_->OnSessionState(DCStreamType::CONTINUOUS_FRAME, state);
     rc = testInput_->EstablishSnapshotFrameSession(g_camIndexs);
     EXPECT_NE(rc, DCAMERA_OK);
 }
