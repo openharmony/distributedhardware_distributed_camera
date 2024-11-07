@@ -23,7 +23,7 @@ namespace OHOS {
 namespace DistributedHardware {
 void SinkHandlerRegisterPrivacyResourcesFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
+    if (data == nullptr) {
         return;
     }
     std::shared_ptr<PrivacyResourcesListener> callback = std::make_shared<MockComponentResourceInfo>();
