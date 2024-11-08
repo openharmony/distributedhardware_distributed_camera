@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,7 @@ namespace OHOS {
 namespace DistributedHardware {
 void SoftbusCreatSoftBusSinkSocketServerFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int64_t))) {
+    if (data == nullptr) {
         return;
     }
 
@@ -36,7 +36,7 @@ void SoftbusCreatSoftBusSinkSocketServerFuzzTest(const uint8_t* data, size_t siz
 
 void SoftbusCreateSoftBusSourceSocketClientFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int64_t))) {
+    if (data == nullptr) {
         return;
     }
 
@@ -53,7 +53,7 @@ void SoftbusCreateSoftBusSourceSocketClientFuzzTest(const uint8_t* data, size_t 
 
 void SoftbusDestroySoftbusSessionServerFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int64_t))) {
+    if (data == nullptr) {
         return;
     }
 
@@ -69,7 +69,7 @@ void SoftbusDestroySoftbusSessionServerFuzzTest(const uint8_t* data, size_t size
 
 void SoftbusCloseSoftbusSessionFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int64_t))) {
+    if (data == nullptr) {
         return;
     }
 
@@ -87,7 +87,7 @@ void SoftbusCloseSoftbusSessionFuzzTest(const uint8_t* data, size_t size)
 
 void SoftbusSendSofbusStreamFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int64_t))) {
+    if (data == nullptr) {
         return;
     }
 
@@ -108,7 +108,7 @@ void SoftbusSendSofbusStreamFuzzTest(const uint8_t* data, size_t size)
 
 void SoftbusGetLocalNetworkIdFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int64_t))) {
+    if (data == nullptr) {
         return;
     }
 
