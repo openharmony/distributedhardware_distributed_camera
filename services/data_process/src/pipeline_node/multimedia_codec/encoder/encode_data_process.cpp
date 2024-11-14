@@ -171,7 +171,7 @@ int32_t EncodeDataProcess::InitEncoderMetadataFormat()
         case VideoCodecType::CODEC_MPEG4_ES:
             processType_ = "video/mp4v-es";
             metadataFormat_.PutIntValue("codec_profile",
-                    MediaAVCodec::MPEG4Profile::MPEG4_PROFILE_ADVANCED_CODING_EFFICIENCY);
+                MediaAVCodec::MPEG4Profile::MPEG4_PROFILE_ADVANCED_CODING_EFFICIENCY);
             processedConfig_.SetVideoCodecType(VideoCodecType::CODEC_MPEG4_ES);
             break;
         default:
