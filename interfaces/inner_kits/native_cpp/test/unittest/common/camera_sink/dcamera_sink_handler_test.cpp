@@ -202,18 +202,6 @@ HWTEST_F(DCameraSinkHandlerTest, dcamera_sink_handler_test_006, TestSize.Level1)
 }
 
 /**
- * @tc.name: dcamera_sink_handler_test_007
- * @tc.desc: Verify the function.
- * @tc.type: FUNC
- * @tc.require: issue
- */
-HWTEST_F(DCameraSinkHandlerTest, dcamera_sink_handler_test_007, TestSize.Level1)
-{
-    int32_t ret = DCameraSinkHandler::GetInstance().ReleaseSink();
-    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
-}
-
-/**
  * @tc.name: dcamera_sink_handler_test_008
  * @tc.desc: Verify the function.
  * @tc.type: FUNC

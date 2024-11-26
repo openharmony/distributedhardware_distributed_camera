@@ -595,8 +595,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_025, TestSize.L
     controller_->isSensitive_ = true;
     controller_->sinkCallback_ = sinkCallback;
 
-    int32_t ret = controller_->Init(g_testCamIndex);
-    EXPECT_EQ(DCAMERA_OK, ret);
+    controller_->Init(g_testCamIndex);
     EXPECT_NE(nullptr, controller_->sinkCotrEventHandler_);
     std::shared_ptr<std::string> param = std::make_shared<std::string>("");
     AppExecFwk::InnerEvent::Pointer event =

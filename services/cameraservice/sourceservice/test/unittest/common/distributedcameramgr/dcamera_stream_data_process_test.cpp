@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -90,6 +90,12 @@ HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_001, Tes
 
     streamProcess2->FeedStream(buffer);
     EXPECT_EQ(DCAMERA_OK, ret);
+
+    std::shared_ptr<DCameraStreamDataProcess> streamProcess3 =
+        std::make_shared<DCameraStreamDataProcess>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, static_cast<DCStreamType>(-1));
+
+    streamProcess3->FeedStream(buffer);
+    EXPECT_EQ(DCAMERA_OK, ret);
 }
 
 /**
@@ -111,8 +117,16 @@ HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_002, Tes
     streamIds.insert(1);
     streamProcess->ConfigStreams(srcConfig, streamIds);
     streamProcess->StartCapture(srcConfig, streamIds);
+    streamProcess->StopCapture(streamIds);
+
+    std::shared_ptr<DCameraStreamDataProcess> streamProcess1 =
+        std::make_shared<DCameraStreamDataProcess>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, DCStreamType::SNAPSHOT_FRAME);
+    streamIds.clear();
+    streamProcess->ConfigStreams(srcConfig, streamIds);
+    streamProcess->StartCapture(srcConfig, streamIds);
+    streamProcess->StopCapture(streamIds);
     int32_t ret = streamProcess->GetProducerSize();
-    EXPECT_NE(DCAMERA_OK, ret);
+    EXPECT_EQ(DCAMERA_OK, ret);
 }
 
 /**
@@ -205,6 +219,7 @@ HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_006, Tes
     streamProcess->GetPipelineCodecType(DCEncodeType::ENCODE_TYPE_H264);
     streamProcess->GetPipelineCodecType(DCEncodeType::ENCODE_TYPE_H265);
     streamProcess->GetPipelineCodecType(DCEncodeType::ENCODE_TYPE_NULL);
+    streamProcess->GetPipelineCodecType(DCEncodeType::ENCODE_TYPE_MPEG4_ES);
     int32_t ret = streamProcess->GetProducerSize();
     EXPECT_EQ(DCAMERA_OK, ret);
 }
