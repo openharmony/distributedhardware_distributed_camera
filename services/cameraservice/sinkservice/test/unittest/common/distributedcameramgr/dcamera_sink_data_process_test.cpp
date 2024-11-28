@@ -126,6 +126,7 @@ void DCameraSinkDataProcessTest::TearDown(void)
  */
 HWTEST_F(DCameraSinkDataProcessTest, dcamera_sink_data_process_test_001, TestSize.Level1)
 {
+    dataProcess_->pipeline_ = nullptr;
     int32_t ret = dataProcess_->StartCapture(g_testCaptureInfoContinuousNotEncode);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
@@ -138,6 +139,7 @@ HWTEST_F(DCameraSinkDataProcessTest, dcamera_sink_data_process_test_001, TestSiz
  */
 HWTEST_F(DCameraSinkDataProcessTest, dcamera_sink_data_process_test_002, TestSize.Level1)
 {
+    dataProcess_->pipeline_ = nullptr;
     int32_t ret = dataProcess_->StartCapture(g_testCaptureInfoContinuousNeedEncode);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
@@ -150,6 +152,7 @@ HWTEST_F(DCameraSinkDataProcessTest, dcamera_sink_data_process_test_002, TestSiz
  */
 HWTEST_F(DCameraSinkDataProcessTest, dcamera_sink_data_process_test_003, TestSize.Level1)
 {
+    dataProcess_->pipeline_ = nullptr;
     int32_t ret = dataProcess_->StartCapture(g_testCaptureInfoSnapshot);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
@@ -222,6 +225,32 @@ HWTEST_F(DCameraSinkDataProcessTest, dcamera_sink_data_process_test_008, TestSiz
     EXPECT_EQ(VideoCodecType::NO_CODEC, dataProcess_->GetPipelineCodecType(DCEncodeType::ENCODE_TYPE_NULL));
     EXPECT_EQ(Videoformat::RGBA_8888, dataProcess_->GetPipelineFormat(1));
     EXPECT_EQ(Videoformat::NV21, dataProcess_->GetPipelineFormat(0));
+}
+
+/**
+ * @tc.name: dcamera_sink_data_process_test_009
+ * @tc.desc: Verify the StartCapture function.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MU
+ */
+HWTEST_F(DCameraSinkDataProcessTest, dcamera_sink_data_process_test_009, TestSize.Level1)
+{
+    int32_t ret = dataProcess_->StartCapture(g_testCaptureInfoSnapshot);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_data_process_test_010
+ * @tc.desc: Verify the StartCapture function.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MU
+ */
+HWTEST_F(DCameraSinkDataProcessTest, dcamera_sink_data_process_test_010, TestSize.Level1)
+{
+    std::string propertyName = "test010";
+    PropertyCarrier propertyCarrier;
+    int32_t ret = dataProcess_->GetProperty(propertyName, propertyCarrier);
+    EXPECT_EQ(DCAMERA_OK, ret);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

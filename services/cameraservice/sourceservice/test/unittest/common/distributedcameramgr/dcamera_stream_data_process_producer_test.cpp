@@ -153,6 +153,7 @@ HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_produ
     streamProcess1->FeedStream(buffer);
     streamProcess1->FeedStream(buffer);
     streamProcess2->Start();
+    sleep(SLEEP_TIME);
     streamProcess2->FeedStream(buffer);
     streamProcess2->FeedStream(buffer);
     DHBase dhBase;

@@ -522,7 +522,7 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_019, TestSi
     std::shared_ptr<DCameraSourceController> controller = nullptr;
     std::shared_ptr<ICameraChannelListener> listener_ =
         std::make_shared<DCameraSourceControllerChannelListener>(controller);
-    int32_t state = 0;
+    int32_t state = DCAMERA_CHANNEL_STATE_CONNECTED;
     listener_->OnSessionState(state, "");
     int32_t eventType = 1;
     int32_t eventReason = 1;
