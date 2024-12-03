@@ -197,6 +197,10 @@ HWTEST_F(DCameraPipelineSourceTest, dcamera_pipeline_source_test_005, TestSize.L
     buffers.push_back(db);
     int32_t rc = testSourcePipeline_->ProcessData(buffers);
     EXPECT_EQ(rc, DCAMERA_INIT_ERR);
+
+    testPipelineSource_->piplineType_ = PipelineType::PHOTO_JPEG;
+    rc = testPipelineSource_->ProcessData(buffers);
+    EXPECT_EQ(rc, DCAMERA_NOT_FOUND);
 }
 
 /**
