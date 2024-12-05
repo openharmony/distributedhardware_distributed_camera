@@ -227,7 +227,10 @@ float FpsControllerProcess::CalculateFrameRate(int64_t nowMs)
     const int32_t minValidCalculatedFrameRatesNum = 2;
     int32_t minIncomingFrameNum = targetFrameRate_ / MIN_INCOME_FRAME_NUM_COEFFICIENT;
     if (validFramesNumber > minIncomingFrameNum && validFramesNumber > minValidCalculatedFrameRatesNum) {
-        int64_t validTotalTimeInterval = (nowMs - incomingFrameTimesMs_[num - 1]);
+        int64_t validTotalTimeInterval = 0;
+        if (num > 0) {
+            validTotalTimeInterval = (nowMs - incomingFrameTimesMs_[num - 1]);
+        }
         if (validTotalTimeInterval < 0) {
             validTotalTimeInterval = -validTotalTimeInterval;
         }
