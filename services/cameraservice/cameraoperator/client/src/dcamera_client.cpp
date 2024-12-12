@@ -35,7 +35,9 @@ namespace DistributedHardware {
 DCameraClient::DCameraClient(const std::string& dhId)
 {
     DHLOGI("DCameraClient Constructor dhId: %{public}s", GetAnonyString(dhId).c_str());
-    cameraId_ = dhId.substr(CAMERA_ID_PREFIX.size());
+    if (dhId.size() >= CAMERA_ID_PREFIX.size()) {
+        cameraId_ = dhId.substr(CAMERA_ID_PREFIX.size());
+    }
     isInit_ = false;
 }
 

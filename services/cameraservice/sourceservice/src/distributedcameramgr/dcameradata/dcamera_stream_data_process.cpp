@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -186,6 +186,7 @@ int32_t DCameraStreamDataProcess::GetProducerSize()
 
 void DCameraStreamDataProcess::FeedStreamToSnapShot(const std::shared_ptr<DataBuffer>& buffer)
 {
+    CHECK_AND_RETURN_LOG(buffer == nullptr, "buffer is nullptr.");
     uint64_t buffersSize = static_cast<uint64_t>(buffer->Size());
     DHLOGD("DCameraStreamDataProcess FeedStreamToSnapShot devId %{public}s dhId %{public}s streamType %{public}d "
         "streamSize: %{public}" PRIu64, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(),
@@ -198,6 +199,7 @@ void DCameraStreamDataProcess::FeedStreamToSnapShot(const std::shared_ptr<DataBu
 
 void DCameraStreamDataProcess::FeedStreamToContinue(const std::shared_ptr<DataBuffer>& buffer)
 {
+    CHECK_AND_RETURN_LOG(buffer == nullptr, "buffer is nullptr.");
     uint64_t buffersSize = static_cast<uint64_t>(buffer->Size());
     DHLOGD("DCameraStreamDataProcess FeedStreamToContinue devId %{public}s dhId %{public}s streamType %{public}d "
         "streamSize: %{public}" PRIu64, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(),
