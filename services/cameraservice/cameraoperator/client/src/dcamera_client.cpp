@@ -208,9 +208,9 @@ int32_t DCameraClient::StartCapture(std::vector<std::shared_ptr<DCameraCaptureIn
 
 int32_t DCameraClient::CameraServiceErrorType(const int32_t errorType)
 {
-    if (errorType == CameraStandard::CamServiceError::CAMERA_ALLOC_ERROR) {
+    if (errorType == CameraStandard::CameraErrorCode::SERVICE_FATL_ERROR) {
         return DCAMERA_ALLOC_ERROR;
-    } else if (errorType == CameraStandard::CamServiceError::CAMERA_DEVICE_BUSY) {
+    } else if (errorType == CameraStandard::CameraErrorCode::CONFLICT_CAMERA) {
         return DCAMERA_DEVICE_BUSY;
     }
     return errorType;

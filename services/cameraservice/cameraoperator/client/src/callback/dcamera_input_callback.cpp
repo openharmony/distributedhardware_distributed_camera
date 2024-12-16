@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,7 +35,7 @@ void DCameraInputCallback::OnError(const int32_t errorType, const int32_t errorM
 
     std::shared_ptr<DCameraEvent> event = std::make_shared<DCameraEvent>();
     event->eventType_ = DCAMERA_MESSAGE;
-    if (errorType == CameraStandard::CamServiceError::CAMERA_DEVICE_PREEMPTED) {
+    if (errorType == CameraStandard::CameraErrorCode::DEVICE_PREEMPTED) {
         event->eventResult_ = DCAMERA_EVENT_DEVICE_PREEMPT;
     } else {
         event->eventResult_ = DCAMERA_EVENT_DEVICE_ERROR;
