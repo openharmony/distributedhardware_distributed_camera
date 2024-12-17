@@ -236,7 +236,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_001, TestSize.Level1)
     managerCallback->OnFlashlightStatusChanged("", CameraStandard::FlashStatus::FLASH_STATUS_OFF);
 
     auto inputCallback = std::make_shared<DCameraInputCallback>(nullptr);
-    inputCallback->OnError(CameraStandard::CamServiceError::CAMERA_DEVICE_BUSY, 0);
+    inputCallback->OnError(CameraStandard::CameraErrorCode::CONFLICT_CAMERA, 0);
 
     auto sessionCallback = std::make_shared<DCameraSessionCallback>(nullptr);
     sessionCallback->OnError(0);
@@ -260,8 +260,8 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_001, TestSize.Level1)
 
     std::shared_ptr<StateCallback> stateCallback = std::make_shared<DCameraClientTestStateCallback>();
     inputCallback = std::make_shared<DCameraInputCallback>(stateCallback);
-    inputCallback->OnError(CameraStandard::CamServiceError::CAMERA_DEVICE_BUSY, 0);
-    inputCallback->OnError(CameraStandard::CamServiceError::CAMERA_DEVICE_PREEMPTED, 0);
+    inputCallback->OnError(CameraStandard::CameraErrorCode::CONFLICT_CAMERA, 0);
+    inputCallback->OnError(CameraStandard::CameraErrorCode::DEVICE_PREEMPTED, 0);
 
     sessionCallback = std::make_shared<DCameraSessionCallback>(stateCallback);
     sessionCallback->OnError(0);
@@ -536,13 +536,13 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_008, TestSize.Level1)
 HWTEST_F(DCameraClientTest, dcamera_client_test_009, TestSize.Level1)
 {
     DHLOGI("DCameraClientTest dcamera_client_test_009: test cameraServiceErrorType");
-    int32_t ret = client_->CameraServiceErrorType(CameraStandard::CamServiceError::CAMERA_OK);
+    int32_t ret = client_->CameraServiceErrorType(CameraStandard::CameraErrorCode::SUCCESS);
     EXPECT_EQ(DCAMERA_OK, ret);
 
-    ret = client_->CameraServiceErrorType(CameraStandard::CamServiceError::CAMERA_ALLOC_ERROR);
+    ret = client_->CameraServiceErrorType(CameraStandard::CameraErrorCode::SERVICE_FATL_ERROR);
     EXPECT_EQ(DCAMERA_ALLOC_ERROR, ret);
 
-    ret = client_->CameraServiceErrorType(CameraStandard::CamServiceError::CAMERA_DEVICE_BUSY);
+    ret = client_->CameraServiceErrorType(CameraStandard::CameraErrorCode::CONFLICT_CAMERA);
     EXPECT_EQ(DCAMERA_DEVICE_BUSY, ret);
 }
 
