@@ -15,6 +15,7 @@
 
 #include "decodeonoutputbufferavailable_fuzzer.h"
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "decode_video_callback.h"
 
 namespace OHOS {
@@ -25,11 +26,12 @@ void DecodeOnOutputBufferAvailableFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-    uint32_t index = *(reinterpret_cast<const uint32_t*>(data));
-    int64_t presentTimeUs = *(reinterpret_cast<const int64_t*>(data));
-    int32_t infoSize = *(reinterpret_cast<const int32_t*>(data));
-    int32_t offset = *(reinterpret_cast<const int32_t*>(data));
-    int32_t bufferFlag = *(reinterpret_cast<const int32_t*>(data));
+    FuzzedDataProvider fdp(data, size);
+    uint32_t index = fdp.ConsumeIntegral<uint32_t>();
+    int64_t presentTimeUs = fdp.ConsumeIntegral<int64_t>();
+    int32_t infoSize = fdp.ConsumeIntegral<int32_t>();
+    int32_t offset = fdp.ConsumeIntegral<int32_t>();
+    int32_t bufferFlag = fdp.ConsumeIntegral<int32_t>();
     MediaAVCodec::AVCodecBufferInfo info = { presentTimeUs, infoSize, offset};
     MediaAVCodec::AVCodecBufferFlag flag = static_cast<MediaAVCodec::AVCodecBufferFlag>(bufferFlag);
     std::shared_ptr<DCameraPipelineSource> sourcePipeline = std::make_shared<DCameraPipelineSource>();
