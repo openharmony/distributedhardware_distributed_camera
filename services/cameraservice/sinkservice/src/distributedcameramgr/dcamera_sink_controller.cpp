@@ -459,7 +459,7 @@ DCameraSinkController::DCameraSinkContrEventHandler::DCameraSinkContrEventHandle
 
 void DCameraSinkController::DCameraSinkContrEventHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    CHECK_AND_RETURN_LOG(event, "event is nullptr.");
+    CHECK_AND_RETURN_LOG(event == nullptr, "event is nullptr.");
     uint32_t eventId = event->GetInnerEventId();
     auto sinkContr = sinkContrWPtr_.lock();
     if (sinkContr == nullptr) {
