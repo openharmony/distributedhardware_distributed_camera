@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -70,6 +70,10 @@ void DCameraTimeStatistician::SetFrameIndex(const int32_t index)
 int64_t DCameraTimeStatistician::CalAverValue(int64_t& value, int64_t& valueSum)
 {
     if (frameIndex_ == FRAME_HEAD) {
+        return 0;
+    }
+    if (INT64_MAX - valueSum < value) {
+        DHLOGD("CalAverValue addition overflow.");
         return 0;
     }
     valueSum += value;
