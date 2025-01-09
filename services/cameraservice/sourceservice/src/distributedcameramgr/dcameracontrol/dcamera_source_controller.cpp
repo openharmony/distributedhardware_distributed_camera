@@ -394,7 +394,6 @@ int32_t DCameraSourceController::CloseChannel()
             DCameraSourceServiceIpc::GetInstance().DeleteSinkRemoteCamSrv(devId);
         }
     }
-    ManageSelectChannel::GetInstance().SetSrcConnect(false);
     return ret;
 }
 

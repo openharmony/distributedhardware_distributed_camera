@@ -320,7 +320,6 @@ int32_t DCameraSinkController::CloseChannel()
         }
     }
     isPageStatus_.store(false);
-    ManageSelectChannel::GetInstance().SetSinkConnect(false);
     DHLOGI("DCameraSinkController CloseChannel %{public}s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
 }
@@ -446,6 +445,7 @@ int32_t DCameraSinkController::UnInit()
     }
 
     isInit_ = false;
+    ManageSelectChannel::GetInstance().SetSinkConnect(false);
     DHLOGI("DCameraSinkController UnInit %{public}s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
 }
