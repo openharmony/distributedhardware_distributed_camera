@@ -43,6 +43,12 @@ ohos_shared_library("distributed_camera_source_sdk") {
     "src/distributed_camera_source_proxy.cpp",
   ]
 
+  ldflags = [
+    "-fpie",
+    "-Wl,-z,relro",
+    "-Wl,-z,now",
+  ]
+
   deps = [ "${common_path}:distributed_camera_utils" ]
 
   defines = [

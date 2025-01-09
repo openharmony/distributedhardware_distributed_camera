@@ -60,6 +60,12 @@ ohos_shared_library("distributed_camera_utils") {
     "LOG_DOMAIN=0xD004150",
   ]
 
+  ldflags = [
+    "-fpie",
+    "-Wl,-z,relro",
+    "-Wl,-z,now",
+  ]
+
   external_deps = [
     "c_utils:utils",
     "distributed_hardware_fwk:distributedhardwareutils",

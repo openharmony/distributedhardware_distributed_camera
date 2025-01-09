@@ -94,6 +94,12 @@ ohos_shared_library("distributed_camera_source") {
     "src/distributedcameramgr/dcamerastate/dcamera_source_state_machine.cpp",
   ]
 
+  ldflags = [
+    "-fpie",
+    "-Wl,-z,relro",
+    "-Wl,-z,now",
+  ]
+
   deps = [
     "${common_path}:distributed_camera_utils",
     "${innerkits_path}/native_cpp/camera_sink:distributed_camera_sink_sdk",
