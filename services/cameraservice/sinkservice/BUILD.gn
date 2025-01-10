@@ -81,6 +81,12 @@ ohos_shared_library("distributed_camera_sink") {
     "src/distributedcameramgr/listener/dcamera_sink_output_channel_listener.cpp",
   ]
 
+  ldflags = [
+    "-fpie",
+    "-Wl,-z,relro",
+    "-Wl,-z,now",
+  ]
+
   deps = [
     "${common_path}:distributed_camera_utils",
     "${services_path}/cameraservice/cameraoperator/client:distributed_camera_client",

@@ -48,6 +48,12 @@ ohos_shared_library("distributed_camera_channel") {
     "src/dcamera_softbus_session.cpp",
   ]
 
+  ldflags = [
+    "-fpie",
+    "-Wl,-z,relro",
+    "-Wl,-z,now",
+  ]
+
   deps = [ "${common_path}:distributed_camera_utils" ]
 
   defines = [

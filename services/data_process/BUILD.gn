@@ -59,6 +59,12 @@ ohos_shared_library("distributed_camera_data_process") {
     "src/utils/property_carrier.cpp",
   ]
 
+  ldflags = [
+    "-fpie",
+    "-Wl,-z,relro",
+    "-Wl,-z,now",
+  ]
+
   deps = [ "${common_path}:distributed_camera_utils" ]
 
   external_deps = [

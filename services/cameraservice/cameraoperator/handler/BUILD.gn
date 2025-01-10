@@ -40,6 +40,12 @@ ohos_shared_library("distributed_camera_handler") {
     "src/dcamera_handler.cpp",
   ]
 
+  ldflags = [
+    "-fpie",
+    "-Wl,-z,relro",
+    "-Wl,-z,now",
+  ]
+
   deps = [ "${common_path}:distributed_camera_utils" ]
 
   defines = [
