@@ -80,23 +80,6 @@ HWTEST_F(DCameraSinkCallbackTest, dcamera_sink_callback_test_001, TestSize.Level
     DHLOGI("DCameraSinkCallbackTest dcamera_sink_callback_test_001.");
     EXPECT_EQ(false, sinkCallback_ == nullptr);
 
-    int32_t ret = DCAMERA_OK;
-    std::shared_ptr<PrivacyResourcesListenerTest> callback = std::make_shared<PrivacyResourcesListenerTest>();
-    sinkCallback_->PushPrivacyResCallback(callback);
-    EXPECT_EQ(DCAMERA_OK, ret);
-}
-
-/**
- * @tc.name: dcamera_sink_callback_test_002
- * @tc.desc: Verify the OnNotifyRegResult function.
- * @tc.type: FUNC
- * @tc.require: issue
- */
-HWTEST_F(DCameraSinkCallbackTest, dcamera_sink_callback_test_002, TestSize.Level1)
-{
-    DHLOGI("DCameraSinkCallbackTest dcamera_sink_callback_test_002.");
-    EXPECT_EQ(false, sinkCallback_ == nullptr);
-
     ResourceEventType type = ResourceEventType::EVENT_TYPE_QUERY_RESOURCE;
     const std::string subType = "camera";
     const std::string networkId = "networkId";

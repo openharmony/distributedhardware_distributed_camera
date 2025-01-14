@@ -376,7 +376,10 @@ HWTEST_F(DCameraSourceStateMachineTest, dcamera_source_state_machine_test_006, T
     stateMachine_ ->UpdateState(DCAMERA_STATE_CONFIG_STREAM);
     stateMachine_ ->UpdateState(DCAMERA_STATE_CAPTURE);
     stateMachine_ ->UpdateState(static_cast<DCameraStateType>(-1));
-    EXPECT_EQ(DCAMERA_OK, ret);
+    stateMachine_ ->UpdateState(DCAMERA_STATE_INIT);
+    DCameraSourceEvent event0(DCAMERA_EVENT_REGIST, g_camIndex);
+    ret = stateMachine_ ->Execute(DCAMERA_EVENT_REGIST, event0);
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
 }
 
 /**

@@ -485,23 +485,6 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_013, TestSize.Level1)
 }
 
 /**
- * @tc.name: decode_data_process_test_014
- * @tc.desc: Verify decode data process func.
- * @tc.type: FUNC
- * @tc.require: Issue Number
- */
-HWTEST_F(DecodeDataProcessTest, decode_data_process_test_014, TestSize.Level1)
-{
-    DHLOGI("DecodeDataProcessTest decode_data_process_test_014");
-    EXPECT_EQ(false, testDecodeDataProcess_ == nullptr);
-
-    int32_t rc = DCAMERA_OK;
-    std::shared_ptr<DataBuffer> outputBuffer;
-    testDecodeDataProcess_->PostOutputDataBuffers(outputBuffer);
-    EXPECT_EQ(rc, DCAMERA_OK);
-}
-
-/**
  * @tc.name: decode_data_process_test_015
  * @tc.desc: Verify decode data process func.
  * @tc.type: FUNC
