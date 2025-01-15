@@ -19,6 +19,7 @@
 #include "distributed_hardware_log.h"
 #include "dcamera_hisysevent_adapter.h"
 #include "dcamera_hidumper.h"
+#include "dcamera_radar.h"
 #include "decode_surface_listener.h"
 #include "decode_video_callback.h"
 #include "graphic_common_c.h"
@@ -68,6 +69,7 @@ int32_t DecodeDataProcess::InitNode(const VideoConfigParams& sourceConfig, const
 
     InitCodecEvent();
     int32_t err = InitDecoder();
+    DcameraRadar::GetInstance().ReportDcameraOpenProgress("InitDecoder", CameraOpen::INIT_DECODE, err);
     if (err != DCAMERA_OK) {
         DHLOGE("Init video decoder failed.");
         ReleaseProcessNode();

@@ -17,6 +17,7 @@
 #include "distributed_camera_source_stub.h"
 
 #include "dcamera_ipc_interface_code.h"
+#include "dcamera_radar.h"
 #include "dcamera_source_callback_proxy.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -110,6 +111,7 @@ int32_t DistributedCameraSourceStub::InitSourceInner(MessageParcel &data, Messag
         }
 
         ret = InitSource(params, callbackProxy);
+        DcameraRadar::GetInstance().ReportDcameraInitProgress("InitSource", CameraInit::SOURCE_CAMERA_INIT, ret);
     } while (0);
     reply.WriteInt32(ret);
     return DCAMERA_OK;

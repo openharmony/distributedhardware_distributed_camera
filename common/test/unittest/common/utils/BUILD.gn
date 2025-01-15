@@ -37,6 +37,7 @@ ohos_unittest("CommonUtilsTest") {
     "dcamera_buffer_handle_test.cpp",
     "dcamera_hidumper_test.cpp",
     "dcamera_hisysevent_adapter_test.cpp",
+    "dcamera_radar_test.cpp",
     "dcamera_utils_tools_test.cpp",
   ]
 

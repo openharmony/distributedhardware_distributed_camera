@@ -50,6 +50,7 @@ ohos_shared_library("distributed_camera_utils") {
     "src/utils/dcamera_hidumper.cpp",
     "src/utils/dcamera_hisysevent_adapter.cpp",
     "src/utils/dcamera_hitrace_adapter.cpp",
+    "src/utils/dcamera_radar.cpp",
     "src/utils/dcamera_utils_tools.cpp",
     "src/utils/dh_log.cpp",
   ]
