@@ -26,6 +26,9 @@
 #include "softbus_error_code.h"
 #include "dcamera_utils_tools.h"
 #include "dcamera_frame_info.h"
+#include "distributed_camera_allconnect_manager.h"
+#include "dcamera_event_cmd.h"
+#include "dcamera_protocol.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -236,6 +239,10 @@ int32_t DCameraSoftbusAdapter::CreateSoftBusSourceSocketClient(std::string myDev
         return DCAMERA_BAD_VALUE;
     }
     sourceSocketId_ = socketId;
+    if (peerSessionName.find("_control") != std::string::npos && DCameraAllConnectManager::IsInited()) {
+        DCameraAllConnectManager::GetInstance().PublishServiceState(peerDevId, SCM_CONNECTED);
+        DCameraAllConnectManager::SetSourceNetworkId(peerDevId, sourceSocketId_);
+    }
     DHLOGI("create socket client end, myDevId: %{public}s, peerSessionName: %{public}s",
         GetAnonyString(myDevId).c_str(), GetAnonyString(peerSessionName).c_str());
     return socketId;
@@ -351,6 +358,13 @@ int32_t DCameraSoftbusAdapter::SourceOnBind(int32_t socket, PeerSocketInfo info)
     if (ret != DCAMERA_OK) {
         DHLOGE("source bind socket failed, ret: %{public}d socket: %{public}d", ret, socket);
     }
+    if (session->GetPeerSessionName().find("_control") != std::string::npos && DCameraAllConnectManager::IsInited()) {
+        ret = DCameraAllConnectManager::GetInstance().PublishServiceState(info.networkId, SCM_CONNECTED);
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCamera allconnect sourceonBind publish scm connected failed, ret: %{public}d", ret);
+        }
+        DCameraAllConnectManager::SetSourceNetworkId(info.networkId, socket);
+    }
     DHLOGI("source bind socket end, socket: %{public}d end", socket);
     return ret;
 }
@@ -365,6 +379,9 @@ void DCameraSoftbusAdapter::SourceOnShutDown(int32_t socket, ShutdownReason reas
         return;
     }
     session->OnSessionClose(socket);
+    if (session->GetPeerSessionName().find("_control") != std::string::npos && DCameraAllConnectManager::IsInited()) {
+        DCameraAllConnectManager::RemoveSourceNetworkId(socket);
+    }
     DHLOGI("source on shutdown socket end socket: %{public}d end", socket);
     return;
 }
@@ -564,6 +581,19 @@ int32_t DCameraSoftbusAdapter::SinkOnBind(int32_t socket, PeerSocketInfo info)
     if (ret != DCAMERA_OK) {
         DHLOGE("sink bind socket error, not find socket %{public}d", socket);
     }
+    if (session->GetPeerSessionName().find("_control") != std::string::npos && DCameraAllConnectManager::IsInited()) {
+        ret =  DCameraAllConnectManager::GetInstance().RegisterLifecycleCallback();
+        if (ret == DCAMERA_OK) {
+            ret = DCameraAllConnectManager::GetInstance().PublishServiceState(info.networkId, SCM_CONNECTED);
+            if (ret != DCAMERA_OK) {
+                DHLOGE("DCamera allconnect sink on bind, publish service state failed %{public}d", ret);
+            }
+        } else {
+            DHLOGE("DCamera allconnect sink on bind, InitDCameraAllConnectManager failed %{public}d", ret);
+        }
+
+        DCameraAllConnectManager::SetSinkNetWorkId(info.networkId, socket);
+    }
     DHLOGI("sink bind socket end, socket: %{public}d", socket);
     return ret;
 }
@@ -578,6 +608,24 @@ void DCameraSoftbusAdapter::SinkOnShutDown(int32_t socket, ShutdownReason reason
         return;
     }
     session->OnSessionClose(socket);
+    if (session->GetPeerSessionName().find("_control") != std::string::npos && DCameraAllConnectManager::IsInited()) {
+        std::string devId = DCameraAllConnectManager::GetSinkDevIdBySocket(socket);
+        if (!devId.empty()) {
+            ret = DCameraAllConnectManager::GetInstance().PublishServiceState(devId, SCM_IDLE);
+            if (ret != DCAMERA_OK) {
+                DHLOGE("DCamera allconnect sinkDown PublishServiceState failed, ret: %{public}d, devId: %{public}s ",
+                    ret, GetAnonyString(devId).c_str());
+            }
+
+            ret = DCameraAllConnectManager::GetInstance().UnRegisterLifecycleCallback();
+            if (ret != DCAMERA_OK) {
+                DHLOGE("DCamera allconnect sinkdown UnInitDCameraAllConn failed, ret: %{public}d, devId: %{public}s",
+                    ret, GetAnonyString(devId).c_str());
+            }
+        }
+        DCameraAllConnectManager::RemoveSinkNetworkId(socket);
+    }
+
     DHLOGI("sink on shutdown socket end, socket: %{public}d", socket);
     return;
 }
@@ -652,5 +700,46 @@ int32_t DCameraSoftbusAdapter::GetLocalNetworkId(std::string& myDevId)
     myDevId = std::string(basicInfo.networkId);
     return DCAMERA_OK;
 }
+void DCameraSoftbusAdapter::CloseSessionWithNetWorkId(const std::string &networkId)
+{
+    DHLOGI("DCamera allconnect CloseSessionWithNetworkId begin");
+    if (networkId.empty()) {
+        DHLOGE("DCamera allconnect peerNetworkId is empty");
+        return;
+    }
+    int32_t  sessionId = DCameraAllConnectManager::GetSinkSocketByNetWorkId(networkId);
+    std::shared_ptr<DCameraSoftbusSession> session = nullptr;
+    int32_t ret = DCAMERA_OK;
+    bool bSinkConflict = false;
+    if (sessionId != -1) {
+        ret = DCameraSoftbusSinkGetSession(sessionId, session);
+        bSinkConflict = true;
+    } else {
+        sessionId = DCameraAllConnectManager::GetSourceSocketByNetworkId(networkId);
+        if (sessionId != -1) {
+            ret = DCameraSoftbusSourceGetSession(sessionId, session);
+        } else {
+            DHLOGE("DCamera allconnect CloseSessionWithNetWorkId can not find socket");
+            return;
+        }
+    }
+    if (ret != DCAMERA_OK || session == nullptr) {
+        DHLOGE("DCamera allconnect CloseSessionWithNetWorkId can not find session %{public}d", sessionId);
+        return;
+    }
+    session->OnSessionClose(sessionId);
+    Shutdown(sessionId);
+    if (bSinkConflict) {
+        ret = DCameraAllConnectManager::GetInstance().PublishServiceState(networkId, SCM_IDLE);
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCamera allconnect CloseSessionWithNetworkId publish service state failed");
+        }
+        ret = DCameraAllConnectManager::GetInstance().UnRegisterLifecycleCallback();
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCamera allconnect CloseSessionWithNetworkId UnInitDCameraAllConnectManager failed");
+        }
+    }
+}
+
 } // namespace DistributedHardware
 } // namespace OHOS

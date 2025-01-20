@@ -66,6 +66,7 @@ public:
     int32_t HandleSourceStreamExt(std::shared_ptr<DataBuffer>& buffer, const StreamData *ext);
     void RecordSourceSocketSession(int32_t socket, std::shared_ptr<DCameraSoftbusSession> session);
 
+    void CloseSessionWithNetWorkId(const std::string &networkId);
 public:
     std::map<std::string, std::shared_ptr<DCameraSoftbusSession>> sinkSessions_;
 

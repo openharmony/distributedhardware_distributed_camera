@@ -32,6 +32,7 @@
 #include "dcamera_service_state_listener.h"
 #include "dcamera_source_service_ipc.h"
 #include "dcamera_utils_tools.h"
+#include "distributed_camera_allconnect_manager.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
 #include "dcamera_handler.h"
@@ -63,6 +64,9 @@ void DistributedCameraSourceService::OnStart()
 #ifdef DCAMERA_MMAP_RESERVE
     ConverterHandle::GetInstance().InitConverter();
 #endif
+    if (!DCameraAllConnectManager::IsInited()) {
+        DCameraAllConnectManager::GetInstance().InitDCameraAllConnectManager();
+    }
     state_ = DCameraServiceState::DCAMERA_SRV_STATE_RUNNING;
     DHLOGI("start service success.");
 }
@@ -98,6 +102,9 @@ void DistributedCameraSourceService::OnStop()
     isHicollieRunning_.store(false);
     if (hicollieThread_.joinable()) {
         hicollieThread_.join();
+    }
+    if (DCameraAllConnectManager::IsInited()) {
+        DCameraAllConnectManager::GetInstance().UnInitDCameraAllConnectManager();
     }
 #ifdef DCAMERA_MMAP_RESERVE
     ConverterHandle::GetInstance().DeInitConverter();

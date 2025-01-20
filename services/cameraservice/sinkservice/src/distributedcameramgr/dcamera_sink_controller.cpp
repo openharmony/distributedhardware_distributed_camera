@@ -553,9 +553,14 @@ void DCameraSinkController::OnSessionState(int32_t state, std::string networkId)
         case DCAMERA_CHANNEL_STATE_CONNECTED:
             HandleConnected(networkId);
             break;
-        case DCAMERA_CHANNEL_STATE_DISCONNECTED:
+        case DCAMERA_CHANNEL_STATE_DISCONNECTED: {
+            std::shared_ptr<DCameraEvent> events = std::make_shared<DCameraEvent>();
+            events->eventType_ = DCAMERA_SINK_STOP;
+            events->eventResult_ = DCAMERA_EVENT_SINK_STOP;
+            DCameraNotify(events);
             HandleDisconnected();
             break;
+        }
         default:
             DHLOGE("unknown session state");
             break;

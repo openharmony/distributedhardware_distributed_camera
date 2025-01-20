@@ -27,6 +27,7 @@
 #include "dcamera_handler.h"
 #include "dcamera_hisysevent_adapter.h"
 #include "dcamera_sink_service_ipc.h"
+#include "distributed_camera_allconnect_manager.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
 
@@ -53,6 +54,9 @@ void DistributedCameraSinkService::OnStart()
         return;
     }
     state_ = DCameraServiceState::DCAMERA_SRV_STATE_RUNNING;
+    if (!DCameraAllConnectManager::IsInited()) {
+        DCameraAllConnectManager::GetInstance().InitDCameraAllConnectManager();
+    }
     DHLOGI("DCameraServiceState OnStart service success.");
 }
 
@@ -74,6 +78,9 @@ void DistributedCameraSinkService::OnStop()
     DHLOGI("DistributedCameraSinkService OnStop service");
     state_ = DCameraServiceState::DCAMERA_SRV_STATE_NOT_START;
     registerToService_ = false;
+    if (DCameraAllConnectManager::IsInited()) {
+        DCameraAllConnectManager::GetInstance().UnInitDCameraAllConnectManager();
+    }
     DCameraSinkServiceIpc::GetInstance().UnInit();
 }
 

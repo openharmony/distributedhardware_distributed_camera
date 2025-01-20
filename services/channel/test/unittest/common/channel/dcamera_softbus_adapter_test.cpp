@@ -899,5 +899,20 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_034, TestSize.L
     DCameraSoftbusAdapter::GetInstance().DestroySoftbusSessionServer(sessionName);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
+
+HWTEST_F(DCameraSoftbusAdapterTest, DCameraSoftbusAdapterTest_035, TestSize.Level1)
+{
+    DCameraSoftbusAdapter::GetInstance().CloseSessionWithNetWorkId("");
+    std::string sessionName = "sourcetest035";
+    DCAMERA_CHANNEL_ROLE role = DCAMERA_CHANNLE_ROLE_SOURCE;
+    std::string mySessName = "sourcetest035";
+    std::string peerSessName = "sinktest02";
+    DCameraSessionMode sessionMode = DCameraSessionMode::DCAMERA_SESSION_MODE_VIDEO;
+    std::string peerDevId = TEST_DEVICE_ID;
+    std::string myDevId = "abcde";
+    DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDevId, peerSessName, peerDevId,
+        sessionMode, role);
+    DCameraSoftbusAdapter::GetInstance().CloseSessionWithNetWorkId("testNetworkId");
+}
 }
 }
