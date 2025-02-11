@@ -60,7 +60,7 @@ private:
     std::shared_ptr<DataProcessListener> processListener_ = nullptr;
     std::shared_ptr<AbstractDataProcess> pipelineHead_ = nullptr;
 
-    bool isProcess_ = false;
+    std::atomic<bool> isProcess_ = false;
     PipelineType piplineType_ = PipelineType::VIDEO;
     std::vector<std::shared_ptr<AbstractDataProcess>> pipNodeRanks_;
 };
