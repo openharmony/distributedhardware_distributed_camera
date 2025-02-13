@@ -26,7 +26,7 @@ const std::string DCameraPipelineSink::PIPELINE_OWNER = "Sink";
 
 DCameraPipelineSink::~DCameraPipelineSink()
 {
-    if (isProcess_) {
+    if (isProcess_.load() == true) {
         DHLOGD("~DCameraPipelineSink : Destroy sink data process pipeline.");
         DestroyDataProcessPipeline();
     }
@@ -65,7 +65,7 @@ int32_t DCameraPipelineSink::CreateDataProcessPipeline(PipelineType piplineType,
     }
     piplineType_ = piplineType;
     processListener_ = listener;
-    isProcess_ = true;
+    isProcess_.store(true);
     return DCAMERA_OK;
 }
 
@@ -135,7 +135,7 @@ int32_t DCameraPipelineSink::ProcessData(std::vector<std::shared_ptr<DataBuffer>
         DHLOGE("Sink Pipeline Input Data buffers is null.");
         return DCAMERA_BAD_VALUE;
     }
-    if (!isProcess_) {
+    if (isProcess_.load() == false) {
         DHLOGE("Sink pipeline node occurred error or start destroy.");
         return DCAMERA_DISABLE_PROCESS;
     }
@@ -151,7 +151,7 @@ void DCameraPipelineSink::DestroyDataProcessPipeline()
 {
     DCAMERA_SYNC_TRACE(DCAMERA_SINK_DESTORY_PIPELINE);
     DHLOGD("Destroy sink data process pipeline start.");
-    isProcess_ = false;
+    isProcess_.store(false);
     if (pipelineHead_ != nullptr) {
         pipelineHead_->ReleaseProcessNode();
         pipelineHead_ = nullptr;
@@ -166,7 +166,7 @@ void DCameraPipelineSink::DestroyDataProcessPipeline()
 void DCameraPipelineSink::OnError(DataProcessErrorType errorType)
 {
     DHLOGE("A runtime error occurred in sink pipeline.");
-    isProcess_ = false;
+    isProcess_.store(false);
     if (processListener_ == nullptr) {
         DHLOGE("The process listener of sink pipeline is empty.");
         return;
