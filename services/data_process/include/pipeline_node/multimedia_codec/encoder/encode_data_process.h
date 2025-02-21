@@ -120,6 +120,7 @@ private:
     const static std::map<std::int64_t, int32_t> ENCODER_BITRATE_TABLE;
     constexpr static uint64_t S2NS = 1000000000;
     constexpr static uint32_t US2NS = 1000;
+    constexpr static std::chrono::seconds TIMEOUT_1_SEC = std::chrono::seconds(1);
 
     std::weak_ptr<DCameraPipelineSink> callbackPipelineSink_;
     std::mutex mtxEncoderState_;
@@ -132,6 +133,9 @@ private:
     sptr<Surface> encodeProducerSurface_ = nullptr;
 
     std::atomic<bool> isEncoderProcess_ = false;
+    std::mutex isEncoderProcessMtx_;
+    std::condition_variable isEncoderProcessCond_;
+
     int32_t waitEncoderOutputCount_ = 0;
     int64_t lastFeedEncoderInputBufferTimeUs_ = 0;
     int64_t inputTimeStampUs_ = 0;

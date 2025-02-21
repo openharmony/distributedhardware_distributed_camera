@@ -74,6 +74,7 @@ int32_t EncodeDataProcess::InitNode(const VideoConfigParams& sourceConfig, const
         processedConfig_ = sourceConfig;
         processedConfig = processedConfig_;
         isEncoderProcess_.store(true);
+        isEncoderProcessCond_.notify_one();
         return DCAMERA_OK;
     }
 
@@ -85,6 +86,7 @@ int32_t EncodeDataProcess::InitNode(const VideoConfigParams& sourceConfig, const
     }
     processedConfig = processedConfig_;
     isEncoderProcess_.store(true);
+    isEncoderProcessCond_.notify_one();
     return DCAMERA_OK;
 }
 
@@ -460,7 +462,7 @@ int32_t EncodeDataProcess::GetEncoderOutputBuffer(uint32_t index, MediaAVCodec::
         DHLOGE("Failed to get the output shared memory, index : %{public}u", index);
         return DCAMERA_BAD_OPERATE;
     }
-    
+
     CHECK_AND_RETURN_RET_LOG(info.size <= 0 || info.size > DATABUFF_MAX_SIZE, DCAMERA_BAD_VALUE,
         "AVCodecBufferInfo error, buffer size : %{public}d", info.size);
     size_t outputMemoDataSize = static_cast<size_t>(info.size);
@@ -541,9 +543,9 @@ void EncodeDataProcess::OnOutputFormatChanged(const Media::Format &format)
 void EncodeDataProcess::OnOutputBufferAvailable(uint32_t index, MediaAVCodec::AVCodecBufferInfo info,
     MediaAVCodec::AVCodecBufferFlag flag, std::shared_ptr<Media::AVSharedMemory> buffer)
 {
-    if (!isEncoderProcess_.load()) {
-        DHLOGE("EncodeNode occurred error or start release.");
-        return;
+    std::unique_lock<std::mutex> lock(isEncoderProcessMtx_);
+    while (!isEncoderProcess_.load()) {
+        isEncoderProcessCond_.wait_for(lock, TIMEOUT_1_SEC, [this] { return isEncoderProcess_.load(); });
     }
     DHLOGD("Video encode buffer info: presentation TimeUs %{public}" PRId64", size %{public}d, offset %{public}d, "
         "flag %{public}d", info.presentationTimeUs, info.size, info.offset, flag);

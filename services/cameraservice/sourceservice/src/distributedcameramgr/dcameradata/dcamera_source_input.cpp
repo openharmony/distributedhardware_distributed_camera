@@ -180,13 +180,21 @@ int32_t DCameraSourceInput::OpenChannel(std::vector<DCameraIndex>& indexs)
     DHLOGI("DCameraSourceInput OpenChannel devId %{public}s dhId %{public}s continue state: %{public}d, snapshot "
         "state: %{public}d", GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(),
         channelState_[CONTINUOUS_FRAME], channelState_[SNAPSHOT_FRAME]);
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(true);
+    auto handler = std::make_shared<AppExecFwk::EventHandler>(runner);
+    std::vector<DCameraIndex> &localIndexs = indexs;
     if (channelState_[CONTINUOUS_FRAME] == DCAMERA_CHANNEL_STATE_DISCONNECTED) {
-        int32_t ret = EstablishContinuousFrameSession(indexs);
-        if (ret != DCAMERA_OK) {
-            DHLOGE("esdablish continuous frame failed ret: %{public}d, devId: %{public}s, dhId: %{public}s", ret,
-                GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
-            return ret;
-        }
+        auto task = [&]() {
+            int32_t ret = EstablishContinuousFrameSession(localIndexs);
+            if (ret != DCAMERA_OK) {
+                DHLOGE("esdablish continuous frame failed ret: %{public}d, devId: %{public}s, dhId: %{public}s", ret,
+                    GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+            }
+            std::unique_lock<std::mutex> lock(isOpenChannelMtx_);
+            isOpenChannel_.store(true);
+            isOpenChannelCond_.notify_one();
+        };
+        handler->PostTask(task, "DCameraSourceInput:OpenChannel", 0, AppExecFwk::EventQueue::Priority::HIGH);
     }
     if (channelState_[SNAPSHOT_FRAME] == DCAMERA_CHANNEL_STATE_DISCONNECTED) {
         int32_t ret = EstablishSnapshotFrameSession(indexs);
@@ -194,7 +202,12 @@ int32_t DCameraSourceInput::OpenChannel(std::vector<DCameraIndex>& indexs)
             DHLOGE("esdablish snapshot frame failed ret: %{public}d,"
                 "devId: %{public}s, dhId: %{public}s", ret, GetAnonyString(devId_).c_str(),
                 GetAnonyString(dhId_).c_str());
-            return ret;
+        }
+        {
+            std::unique_lock<std::mutex> lock(isOpenChannelMtx_);
+            while (!isOpenChannel_.load()) {
+                isOpenChannelCond_.wait_for(lock, TIMEOUT_1_SEC, [this] { return isOpenChannel_.load(); });
+            }
         }
     }
     return DCAMERA_OK;
