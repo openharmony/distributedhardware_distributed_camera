@@ -17,6 +17,7 @@
 
 #include "anonymous_string.h"
 #include "dcamera_hisysevent_adapter.h"
+#include "dcamera_radar.h"
 #include "dcamera_source_callback.h"
 #include "dcamera_source_handler_ipc.h"
 #include "dcamera_source_load_callback.h"
@@ -58,6 +59,8 @@ int32_t DCameraSourceHandler::InitSource(const std::string& params)
     ReportSaEvent(INIT_SA_EVENT, DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, "init source sa event.");
     sptr<DCameraSourceLoadCallback> loadCallback(new DCameraSourceLoadCallback(params));
     int32_t ret = sm->LoadSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, loadCallback);
+    DcameraRadar::GetInstance().ReportDcameraInit("LoadSystemAbility", CameraInit::SERVICE_INIT,
+        BizState::BIZ_STATE_START, ret);
     if (ret != ERR_OK) {
         DHLOGE("systemAbilityId: %{public}d load failed, result code: %{public}d.",
             DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, ret);

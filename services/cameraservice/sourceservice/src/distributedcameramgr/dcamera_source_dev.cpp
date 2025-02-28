@@ -18,6 +18,7 @@
 #include "anonymous_string.h"
 #include "dcamera_hisysevent_adapter.h"
 #include "dcamera_hitrace_adapter.h"
+#include "dcamera_radar.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -464,6 +465,8 @@ int32_t DCameraSourceDev::OpenCamera()
     ReportCameraOperaterEvent(OPEN_CAMERA_EVENT, GetAnonyString(devId_), dhId_, "execute open camera event.");
     std::shared_ptr<DCameraOpenInfo> openInfo = std::make_shared<DCameraOpenInfo>();
     int32_t ret = GetLocalDeviceNetworkId(openInfo->sourceDevId_);
+    DcameraRadar::GetInstance().ReportDcameraOpen("GetLocalDeviceNetworkId", CameraOpen::OPEN_CAMERA,
+        BizState::BIZ_STATE_START, ret);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev getMyId failed ret: %{public}d, devId: %{public}s, dhId: %{public}s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
@@ -472,6 +475,7 @@ int32_t DCameraSourceDev::OpenCamera()
 
     DcameraStartAsyncTrace(DCAMERA_OPEN_CHANNEL_CONTROL, DCAMERA_OPEN_CHANNEL_TASKID);
     ret = controller_->OpenChannel(openInfo);
+    DcameraRadar::GetInstance().ReportDcameraOpenProgress("OpenChannel", CameraOpen::OPEN_CHANNEL, ret);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev Execute OpenCamera OpenChannel failed, ret: %{public}d, devId: %{public}s dhId: "
             "%{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
@@ -494,6 +498,8 @@ int32_t DCameraSourceDev::CloseCamera()
             "dhId: %{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     }
     ret = controller_->CloseChannel();
+    DcameraRadar::GetInstance().ReportDcameraClose("CloseChannel", CameraClose::CLOSE_CAMERA,
+        BizState::BIZ_STATE_END, ret);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev Execute CloseCamera controller CloseChannel failed, ret: %{public}d, devId: "
             "%{public}s dhId: %{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
@@ -553,6 +559,7 @@ int32_t DCameraSourceDev::ReleaseStreams(std::vector<int>& streamIds, bool& isAl
     DHLOGI("DCameraSourceDev Execute ReleaseStreams devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     int32_t ret = input_->ReleaseStreams(streamIds, isAllRelease);
+    DcameraRadar::GetInstance().ReportDcameraCloseProgress("ReleaseStreams", CameraClose::RELEASE_STREAM, ret);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev Execute ReleaseStreams failed ret: %{public}d, devId: %{public}s, dhId: %{public}s",
             ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
@@ -580,6 +587,7 @@ int32_t DCameraSourceDev::StartCapture(std::vector<std::shared_ptr<DCCaptureInfo
     DHLOGI("DCameraSourceDev Execute StartCapture devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     int32_t ret = input_->StartCapture(captureInfos);
+    DcameraRadar::GetInstance().ReportDcameraOpenProgress("StartCapture", CameraOpen::START_CAPTURE, ret);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev input StartCapture failed ret: %{public}d, devId: %{public}s, dhId: %{public}s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
@@ -649,6 +657,8 @@ int32_t DCameraSourceDev::StopCapture(std::vector<int>& streamIds, bool& isAllSt
     DHLOGI("DCameraSourceDev Execute StopCapture devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     int32_t ret = input_->StopCapture(streamIds, isAllStop);
+    DcameraRadar::GetInstance().ReportDcameraClose("StopCapture", CameraClose::STOP_CAPTURE,
+        BizState::BIZ_STATE_START, ret);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev Execute StopCapture input StopCapture failed, ret: %{public}d, devId: %{public}s "
             "dhId: %{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
