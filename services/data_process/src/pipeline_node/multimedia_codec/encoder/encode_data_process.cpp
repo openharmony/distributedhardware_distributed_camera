@@ -15,6 +15,7 @@
 
 #include <cmath>
 #include "dcamera_hisysevent_adapter.h"
+#include "dcamera_radar.h"
 #include "dcamera_utils_tools.h"
 #include "distributed_hardware_log.h"
 #include "encode_data_process.h"
@@ -79,6 +80,8 @@ int32_t EncodeDataProcess::InitNode(const VideoConfigParams& sourceConfig, const
     }
 
     int32_t err = InitEncoder();
+    DcameraRadar::GetInstance().ReportDcameraOpen("InitEncoder", CameraOpen::INIT_ENCODE,
+        BizState::BIZ_STATE_END, err);
     if (err != DCAMERA_OK) {
         DHLOGE("Init video encoder failed.");
         ReleaseProcessNode();

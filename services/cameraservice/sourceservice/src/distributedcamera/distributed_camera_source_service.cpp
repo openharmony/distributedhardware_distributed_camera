@@ -29,6 +29,7 @@
 #include "dcamera_hdf_operate.h"
 #include "dcamera_hisysevent_adapter.h"
 #include "dcamera_hitrace_adapter.h"
+#include "dcamera_radar.h"
 #include "dcamera_service_state_listener.h"
 #include "dcamera_source_service_ipc.h"
 #include "dcamera_utils_tools.h"
@@ -116,6 +117,8 @@ int32_t DistributedCameraSourceService::InitSource(const std::string& params,
 {
     DHLOGI("DistributedCameraSourceService InitSource param: %{public}s", params.c_str());
     int32_t ret = LoadDCameraHDF();
+    DcameraRadar::GetInstance().ReportDcameraInit("LoadDCameraHDF", CameraInit::LOAD_HDF_DRIVER,
+        BizState::BIZ_STATE_END, ret);
     if (ret != DCAMERA_OK) {
         DHLOGE("DistributedCameraSourceService InitSource LoadHDF failed, ret: %{public}d", ret);
         return ret;
@@ -131,6 +134,8 @@ int32_t DistributedCameraSourceService::ReleaseSource()
 {
     DHLOGI("enter");
     int32_t ret = UnLoadCameraHDF();
+    DcameraRadar::GetInstance().ReportDcameraUnInit("UnLoadCameraHDF", CameraUnInit::UNLOAD_HDF_DRIVER,
+        BizState::BIZ_STATE_START, ret);
     if (ret != DCAMERA_OK) {
         DHLOGE("DistributedCameraSourceService ReleaseSource UnLoadHDF failed, ret: %{public}d", ret);
         return ret;
@@ -142,6 +147,8 @@ int32_t DistributedCameraSourceService::ReleaseSource()
         return DCAMERA_BAD_VALUE;
     }
     ret = systemAbilityMgr->UnloadSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID);
+    DcameraRadar::GetInstance().ReportDcameraUnInit("UnloadSystemAbility", CameraUnInit::SERVICE_RELEASE,
+        BizState::BIZ_STATE_END, ret);
     if (ret != DCAMERA_OK) {
         DHLOGE("source systemAbilityMgr UnLoadSystemAbility failed, ret: %{public}d", ret);
         return DCAMERA_BAD_VALUE;
