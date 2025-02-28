@@ -25,6 +25,7 @@ config("module_private_config") {
     "${common_path}/include/utils",
     "${services_path}/cameraservice/base/include",
     "${services_path}/channel/include",
+    "${services_path}/channel/include/allconnect",
     "${services_path}/channel/test/unittest/common/channel",
     "${services_path}/cameraservice/cameraoperator/client/include",
     "${services_path}/cameraservice/cameraoperator/client/include/callback",
@@ -53,6 +54,7 @@ ohos_unittest("DCameraChannelTest") {
 
   sources = [
     "${services_path}/cameraservice/base/src/dcamera_sink_frame_info.cpp",
+    "${services_path}/channel/src/allconnect/distributed_camera_allconnect_manager.cpp",
     "${services_path}/channel/src/dcamera_channel_sink_impl.cpp",
     "${services_path}/channel/src/dcamera_channel_source_impl.cpp",
     "${services_path}/channel/src/dcamera_softbus_adapter.cpp",

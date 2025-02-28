@@ -29,6 +29,7 @@
 #include "dcamera_source_controller.h"
 #include "dcamera_source_input.h"
 #include "dcamera_utils_tools.h"
+#include "distributed_camera_allconnect_manager.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -473,6 +474,30 @@ int32_t DCameraSourceDev::OpenCamera()
         return ret;
     }
 
+    if (DCameraAllConnectManager::IsInited()) {
+        ret = DCameraAllConnectManager::GetInstance().RegisterLifecycleCallback();
+        if (ret == DCAMERA_OK) {
+            auto resourceReq = DCameraAllConnectManager::GetInstance().BuildResourceRequest();
+            ret = DCameraAllConnectManager::GetInstance().ApplyAdvancedResource(devId_, resourceReq.get());
+            if (ret != DCAMERA_OK) {
+                DHLOGE("DCamera allconnect apply advanced resource failed, ret: %{public}d, devId: %{public}s",
+                    ret, GetAnonyString(devId_).c_str());
+                return ret;
+            }
+            ret = DCameraAllConnectManager::GetInstance().PublishServiceState(devId_, SCM_PREPARE);
+            if (ret != DCAMERA_OK) {
+                DHLOGE("DCamera allconnect publish scm prepare failed, ret: %{public}d, devId: %{public}s",
+                    ret, GetAnonyString(devId_).c_str());
+                return ret;
+            }
+        } else {
+            DHLOGE("DCamera allconnect init and register lifecycle callback failed, ret: %{public}d, devId: %{public}s",
+                ret, GetAnonyString(devId_).c_str());
+            return ret;
+        }
+        DHLOGI("DCamera allconnect register lifecyle and apply advanced resource scm prepare success");
+    }
+
     DcameraStartAsyncTrace(DCAMERA_OPEN_CHANNEL_CONTROL, DCAMERA_OPEN_CHANNEL_TASKID);
     ret = controller_->OpenChannel(openInfo);
     DcameraRadar::GetInstance().ReportDcameraOpenProgress("OpenChannel", CameraOpen::OPEN_CHANNEL, ret);
@@ -482,6 +507,7 @@ int32_t DCameraSourceDev::OpenCamera()
         DcameraFinishAsyncTrace(DCAMERA_OPEN_CHANNEL_CONTROL, DCAMERA_OPEN_CHANNEL_TASKID);
         return DCAMERA_OPEN_CONFLICT;
     }
+
     CHECK_AND_RETURN_RET_LOG(stateListener_ == nullptr, DCAMERA_BAD_VALUE, "stateListener_ is nullptr.");
     stateListener_->OnHardwareStateChanged(devId_, dhId_, DcameraBusinessState::RUNNING);
     return DCAMERA_OK;
@@ -503,6 +529,19 @@ int32_t DCameraSourceDev::CloseCamera()
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev Execute CloseCamera controller CloseChannel failed, ret: %{public}d, devId: "
             "%{public}s dhId: %{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+    }
+    if (DCameraAllConnectManager::IsInited()) {
+        ret = DCameraAllConnectManager::GetInstance().PublishServiceState(devId_, SCM_IDLE);
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCamera allconnect CloseCamera PublishServiceState failed, ret: %{public}d, devId: %{public}s ",
+                ret, GetAnonyString(devId_).c_str());
+        }
+
+        ret = DCameraAllConnectManager::GetInstance().UnRegisterLifecycleCallback();
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCamera allconnect source CloseCamera UnInitDCamera failed, ret: %{public}d, devId: %{public}s",
+                ret, GetAnonyString(devId_).c_str());
+        }
     }
     CHECK_AND_RETURN_RET_LOG(stateListener_ == nullptr, DCAMERA_BAD_VALUE, "stateListener_ is nullptr.");
     stateListener_->OnHardwareStateChanged(devId_, dhId_, DcameraBusinessState::IDLE);
