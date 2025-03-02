@@ -239,6 +239,11 @@ public:
         DHLOGI("DemoDCameraPhotoCallback::OnCaptureError captureID: %{public}d errorCode: %{public}d",
             captureId, errorCode);
     }
+
+    void OnOfflineDeliveryFinished(const int32_t captureId)  const
+    {
+        DHLOGI("DemoDCameraPhotoCallback::OnOfflineDeliveryFinished duration: %{public}d", captureId);
+    }
 };
 
 class DemoDCameraPreviewCallback : public CameraStandard::PreviewStateCallback {
