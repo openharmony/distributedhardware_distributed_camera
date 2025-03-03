@@ -234,11 +234,6 @@ public:
         DHLOGI("DemoDCameraPhotoCallback::OnEstimatedCaptureDuration duration: %{public}d", duration);
     }
 
-    void OnOfflineDeliveryFinished(const int32_t captureId)  const
-    {
-        DHLOGI("DemoDCameraPhotoCallback::OnOfflineDeliveryFinished duration: %{public}d", captureId);
-    }
-
     void OnCaptureError(const int32_t captureId, const int32_t errorCode) const
     {
         DHLOGI("DemoDCameraPhotoCallback::OnCaptureError captureID: %{public}d errorCode: %{public}d",
