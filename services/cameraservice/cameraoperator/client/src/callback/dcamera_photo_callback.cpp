@@ -59,6 +59,11 @@ void DCameraPhotoCallback::OnEstimatedCaptureDuration(const int32_t duration) co
     DHLOGI("enter, duration: %{public}d", duration);
 }
 
+void DCameraPhotoCallback::OnOfflineDeliveryFinished(const int32_t captureId) const
+{
+    DHLOGI("enter, captureId: %{public}d", captureId);
+}
+
 void DCameraPhotoCallback::OnCaptureError(const int32_t captureId, const int32_t errorCode) const
 {
     DHLOGE("enter, captureId: %{public}d, errorCode: %{public}d", captureId, errorCode);
