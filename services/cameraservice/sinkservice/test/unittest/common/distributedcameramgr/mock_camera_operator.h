@@ -110,11 +110,6 @@ public:
         }
         return DCAMERA_OK;
     }
-
-    int32_t PrelaunchCamera()
-    {
-        return DCAMERA_OK;
-    }
 };
 } // namespace DistributedHardware
 } // namespace OHOS
