@@ -68,11 +68,6 @@ private:
     std::atomic<bool> isChannelConnected_ = false;
     std::mutex channelMtx_;
     std::condition_variable channelCond_;
-
-    static constexpr std::chrono::seconds TIMEOUT_1_SEC = std::chrono::seconds(1);
-    std::atomic<bool> isOpenChannel_ = false;
-    std::mutex isOpenChannelMtx_;
-    std::condition_variable isOpenChannelCond_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

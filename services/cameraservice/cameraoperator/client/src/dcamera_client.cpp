@@ -665,19 +665,5 @@ int32_t DCameraClient::ResumeCapture()
     }
     return ret;
 }
-
-int32_t DCameraClient::PrelaunchCamera()
-{
-    if (cameraManager_ == nullptr) {
-        DHLOGE("DCameraClient cameraManager_ is nullptr.");
-        return DCAMERA_BAD_VALUE;
-    }
-    int32_t ret = cameraManager_->PrelaunchCamera();
-    if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraClient PrelaunchCamera Start failed, cameraId: %{public}s, ret: %{public}d",
-            GetAnonyString(cameraId_).c_str(), ret);
-    }
-    return ret;
-}
 } // namespace DistributedHardware
 } // namespace OHOS
