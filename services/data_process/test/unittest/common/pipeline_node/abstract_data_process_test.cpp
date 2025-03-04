@@ -49,7 +49,6 @@ void AbstractDataProcessTest::SetUp(void)
 
 void AbstractDataProcessTest::TearDown(void)
 {
-    testAbstractDataProcess_ = nullptr;
 }
 
 /**

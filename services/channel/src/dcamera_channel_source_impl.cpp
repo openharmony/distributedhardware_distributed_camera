@@ -85,7 +85,7 @@ int32_t DCameraChannelSourceImpl::CreateSession(std::vector<DCameraIndex>& camIn
         std::shared_ptr<DCameraSoftbusSession> softbusSess = std::make_shared<DCameraSoftbusSession>(myDevId,
             mySessionName_, peerDevId, peerSessionName, listener, sessionMode);
         int32_t socketId = softbusSess->BindSocketServer();
-        if (socketId <= 0) {
+        if (socketId == 0 || socketId == DCAMERA_BAD_VALUE) {
             DHLOGE("DCameraChannelSourceImpl Create Session failed. socketId: %{public}d.", socketId);
             return DCAMERA_BAD_VALUE;
         }
