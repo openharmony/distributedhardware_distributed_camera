@@ -81,6 +81,34 @@ HWTEST_F(DcameraRadarTest, ReportDcameraInit_002, TestSize.Level1)
 }
 
 /**
+ * @tc.name: ReportDcameraInitProgress_001
+ * @tc.desc: check ReportDcameraInitProgress
+ * @tc.type: FUNC
+ */
+HWTEST_F(DcameraRadarTest, ReportDcameraInitProgress_001, TestSize.Level1)
+{
+    DHLOGI("DcameraRadarTest ReportDcameraInitProgress_001 begin");
+    bool ret = DcameraRadar::GetInstance().ReportDcameraInitProgress(FUNC, CameraInit::SERVICE_INIT,
+        DCAMERA_OK);
+    EXPECT_EQ(ret, true);
+    DHLOGI("DcameraRadarTest ReportDcameraInitProgress_001 end");
+}
+
+/**
+ * @tc.name: ReportDcameraInitProgress_002
+ * @tc.desc: check ReportDcameraInitProgress
+ * @tc.type: FUNC
+ */
+HWTEST_F(DcameraRadarTest, ReportDcameraInitProgress_002, TestSize.Level1)
+{
+    DHLOGI("DcameraRadarTest ReportDcameraInitProgress_002 begin");
+    bool ret = DcameraRadar::GetInstance().ReportDcameraInitProgress(FUNC, CameraInit::SERVICE_INIT,
+        DCAMERA_MEMORY_OPT_ERROR);
+    EXPECT_EQ(ret, true);
+    DHLOGI("DcameraRadarTest ReportDcameraInitProgress_002 end");
+}
+
+/**
  * @tc.name: ReportDcameraOpen_001
  * @tc.desc: check ReportDcameraOpen
  * @tc.type: FUNC
@@ -108,6 +136,34 @@ HWTEST_F(DcameraRadarTest, ReportDcameraOpen_002, TestSize.Level1)
 }
 
 /**
+ * @tc.name: ReportDcameraOpenProgress_001
+ * @tc.desc: check ReportDcameraOpenProgress
+ * @tc.type: FUNC
+ */
+HWTEST_F(DcameraRadarTest, ReportDcameraOpenProgress_001, TestSize.Level1)
+{
+    DHLOGI("DcameraRadarTest ReportDcameraOpenProgress_001 begin");
+    bool ret = DcameraRadar::GetInstance().ReportDcameraOpenProgress(FUNC, CameraOpen::OPEN_CHANNEL,
+        DCAMERA_OK);
+    EXPECT_EQ(ret, true);
+    DHLOGI("DcameraRadarTest ReportDcameraOpenProgress_001 end");
+}
+
+/**
+ * @tc.name: ReportDcameraOpenProgress_002
+ * @tc.desc: check ReportDcameraOpenProgress
+ * @tc.type: FUNC
+ */
+HWTEST_F(DcameraRadarTest, ReportDcameraOpenProgress_002, TestSize.Level1)
+{
+    DHLOGI("DcameraRadarTest ReportDcameraOpenProgress_002 begin");
+    bool ret = DcameraRadar::GetInstance().ReportDcameraOpenProgress(FUNC, CameraOpen::OPEN_CHANNEL,
+        DCAMERA_MEMORY_OPT_ERROR);
+    EXPECT_EQ(ret, true);
+    DHLOGI("DcameraRadarTest ReportDcameraOpenProgress_002 end");
+}
+
+/**
  * @tc.name: ReportDcameraClose_001
  * @tc.desc: check ReportDcameraClose
  * @tc.type: FUNC
@@ -132,6 +188,34 @@ HWTEST_F(DcameraRadarTest, ReportDcameraClose_002, TestSize.Level1)
         BizState::BIZ_STATE_START, DCAMERA_MEMORY_OPT_ERROR);
     EXPECT_EQ(ret, true);
     DHLOGI("DcameraRadarTest ReportDcameraClose_002 end");
+}
+
+/**
+ * @tc.name: ReportDcameraCloseProgress_001
+ * @tc.desc: check ReportDcameraCloseProgress
+ * @tc.type: FUNC
+ */
+HWTEST_F(DcameraRadarTest, ReportDcameraCloseProgress_001, TestSize.Level1)
+{
+    DHLOGI("DcameraRadarTest ReportDcameraCloseProgress_001 begin");
+    bool ret = DcameraRadar::GetInstance().ReportDcameraCloseProgress(FUNC, CameraClose::RELEASE_STREAM,
+        DCAMERA_OK);
+    EXPECT_EQ(ret, true);
+    DHLOGI("DcameraRadarTest ReportDcameraCloseProgress_001 end");
+}
+
+/**
+ * @tc.name: ReportDcameraCloseProgress_002
+ * @tc.desc: check ReportDcameraCloseProgress
+ * @tc.type: FUNC
+ */
+HWTEST_F(DcameraRadarTest, ReportDcameraCloseProgress_002, TestSize.Level1)
+{
+    DHLOGI("DcameraRadarTest ReportDcameraCloseProgress_002 begin");
+    bool ret = DcameraRadar::GetInstance().ReportDcameraCloseProgress(FUNC, CameraClose::RELEASE_STREAM,
+        DCAMERA_MEMORY_OPT_ERROR);
+    EXPECT_EQ(ret, true);
+    DHLOGI("DcameraRadarTest ReportDcameraCloseProgress_002 end");
 }
 
 /**

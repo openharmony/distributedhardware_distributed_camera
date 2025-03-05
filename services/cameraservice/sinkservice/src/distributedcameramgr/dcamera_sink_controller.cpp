@@ -648,7 +648,7 @@ int32_t DCameraSinkController::StartCaptureInner(std::vector<std::shared_ptr<DCa
         return ret;
     }
 
-    DCameraNotifyInner(DCAMERA_MESSAGE, DCAMERA_EVENT_CAMERA_SUCCESS, std::string("operator start capture success"));
+    DCameraNotifyInner(DCAMERA_MESSAGE, DCAMERA_EVENT_CAMERA_SUCCESS, START_CAPTURE_SUCC);
     DHLOGI("DCameraSinkController::StartCaptureInner %{public}s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
 }

@@ -171,6 +171,7 @@ const std::string AFTER_ENCODE = "SinkAfterEncode.h265";
 const std::string BEFORE_DECODE = "SourceBeforeDecode.h265";
 const std::string CAMERA_HICOLLIE = "CameraHicollie";
 const std::string SEPARATE_SINK_VERSION = "2.0";
+const std::string START_CAPTURE_SUCC = "operator start capture success";
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DISTRIBUTED_CAMERA_CONSTANTS_H

@@ -90,6 +90,7 @@ void DCameraSourceHandler::FinishStartSA(const std::string &params)
         return;
     }
 
+    DcameraRadar::GetInstance().ReportDcameraInitProgress("InitSource", CameraInit::SOURCE_CAMERA_INIT, DCAMERA_OK);
     dCameraSourceSrv->InitSource(params, callback_);
     std::lock_guard<std::mutex> lock(producerMutex_);
     state_ = DCAMERA_SA_STATE_START;
