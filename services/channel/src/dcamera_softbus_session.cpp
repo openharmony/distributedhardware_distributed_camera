@@ -338,7 +338,7 @@ int32_t DCameraSoftbusSession::BindSocketServer()
 {
     int32_t socketId = DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDevId_, peerSessionName_,
         peerDevId_, mode_, DCAMERA_CHANNLE_ROLE_SOURCE);
-    if (socketId <= 0) {
+    if (socketId == 0 || socketId == DCAMERA_BAD_VALUE) {
         DHLOGE("DCameraSoftbusSession BindSocketServer Error, socketId %{public}d", socketId);
         return socketId;
     }
