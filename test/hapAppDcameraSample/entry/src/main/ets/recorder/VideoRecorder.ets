@@ -1,0 +1,972 @@
+/*
+ * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import { camera } from '@kit.CameraKit';
+import { media } from '@kit.MediaKit';
+import { BusinessError } from '@kit.BasicServicesKit';
+import { dateTime } from '../utils/DateTimeUtils';
+import Logger from '../utils/Logger';
+import SaveCameraAsset from '../utils/SaveCameraAsset';
+import { RemoteDeviceModel } from './RemoteDeviceModel';
+import { TitleBarComponent } from '../common/TitleBarComponent'
+import json from '@ohos.util.json';
+import image from '@ohos.multimedia.image';
+import fileio from '@ohos.fileio';
+
+const TAG: string = 'Sample_VideoRecorder';
+
+@Entry
+@Component
+struct VideoRecording {
+  @State isLand: boolean = false
+  @State isShow: boolean = false
+  @State result: string = ''
+  private surfaceId: string = '';
+  xcomponentController: XComponentController = new XComponentController();
+  private videoRecorder?: media.AVRecorder;
+  private cameraManager?: camera.CameraManager;
+  private cameras?: Array<camera.CameraDevice>;
+  private cameraInput?: camera.CameraInput;
+  private captureSession?: camera.CaptureSession;
+  private previewOutput?: camera.PreviewOutput;
+  private videoOutput?: camera.VideoOutput;
+  private videoOutSurfaceId: string = '';
+  private photoReceiver?: image.ImageReceiver;
+  private photoOutput?: camera.PhotoOutput;
+  private fdPath?: string = '';
+  @State videoRecorderTimeText: string = '00:00';
+  private seconds: number = 0;
+  private timer: number = 0;
+  private cameraIndex: number = 0;
+  @State videoResolution: Resolution = { frameWidth: 640, frameHeight: 480 };
+  @State framerate: number = 30; // set default video framerate 30
+  @State videoCodecType: string = 'video/avc';
+  private recorderState: string = 'free';
+  @State isStartRecording: boolean = false;
+  @State isPauseRecording: boolean = false;
+  private mSaveCameraAsset: SaveCameraAsset = new SaveCameraAsset(TAG);
+  private mFileAssetId?: number = 0;
+  private cameraOutputCapability?: camera.CameraOutputCapability;
+  private curVideoProfiles?: Array<camera.VideoProfile>;
+  private previewProfiles?: Array<camera.Profile>;
+  private remoteDeviceModel: RemoteDeviceModel = new RemoteDeviceModel();
+
+  private avProfile: media.AVRecorderProfile = {
+    fileFormat: media.ContainerFormatType.CFT_MPEG_4, // set fileFormat, for video is mp4
+    videoBitrate: 3000000, // set videoBitrate according to device ability
+    videoCodec: media.CodecMimeType.VIDEO_AVC, // set videoCodec, avc or mpeg4 can be selected
+    videoFrameWidth: 640, // set videoFrameWidth according to device ability
+    videoFrameHeight: 480, // set videoFrameHeight according to device ability
+    videoFrameRate: 30 // set videoFrameRate according to device ability
+  }
+  private avConfig: media.AVRecorderConfig = {
+    videoSourceType: media.VideoSourceType.VIDEO_SOURCE_TYPE_SURFACE_YUV,
+    profile: this.avProfile,
+    url: 'fd://',
+  }
+
+  aboutToAppear(): void {
+    Logger.info(TAG, 'aboutToAppear');
+  }
+
+  aboutToDisappear(): void {
+    Logger.info(TAG, 'aboutToDisappear called');
+    this.releaseCamera();
+  }
+
+  onPageShow(): void {
+    console.info(TAG, 'onPageShow called');
+  }
+
+  onPageHide(): void {
+    console.info(TAG, 'onPageHide called');
+    this.stopRecordingProcess();
+  }
+
+  async failureCallback(error: BusinessError): Promise<void> {
+    Logger.info(TAG, 'case failureCallback called,errMessage is ', json.stringify(error));
+  }
+
+  async catchCallback(error: BusinessError): Promise<void> {
+    Logger.info(TAG, 'case catchCallback called,errMessage is ', json.stringify(error));
+  }
+
+  // show recording time
+  getRecordTime(): void {
+    this.timer = setInterval(() => {
+      this.seconds += 1;
+      this.videoRecorderTimeText = dateTime(this.seconds);
+    }, 1000)
+  }
+
+  // get recording file fd
+  async getFileFd(): Promise<void> {
+    Logger.info(TAG, 'getFileFd called');
+    this.mFileAssetId = await this.mSaveCameraAsset.createVideoFd();
+    this.fdPath = 'fd://' + this.mFileAssetId.toString();
+    this.avConfig.url = this.fdPath;
+    Logger.info(TAG, 'fdPath is: ' + this.fdPath);
+    Logger.info(TAG, 'getFileFd done');
+  }
+
+  async getRecordingFileFd(): Promise<void> {
+    Logger.info(TAG, 'getRecordingFileFd called');
+    this.mFileAssetId = await this.mSaveCameraAsset.createVideoFd();
+    this.fdPath = 'fd://' + this.mFileAssetId.toString();
+    this.avConfig.url = this.fdPath;
+    Logger.info(TAG, 'fdPath is: ' + this.fdPath);
+    Logger.info(TAG, 'getFileFd done');
+  }
+
+  async getImageFileFd(): Promise<void> {
+    Logger.info(TAG, 'getImageFileFd called');
+    this.mFileAssetId = await this.mSaveCameraAsset.createImageFd();
+    this.fdPath = 'fd://' + this.mFileAssetId.toString();
+    this.avConfig.url = this.fdPath;
+    Logger.info(TAG, 'ImageFileFd is: ' + this.fdPath);
+    Logger.info(TAG, 'getImageFileFd done');
+  }
+
+  // get camera ability
+  async initCamera(): Promise<void> {
+    Logger.info(TAG, 'init camera called');
+    if (this.cameraManager) {
+      Logger.info(TAG, 'cameraManager already exits');
+      return;
+    }
+
+    Logger.info(TAG, '[camera] case to get cameraManager');
+    this.cameraManager = camera.getCameraManager(globalThis.abilityContext);
+    if (this.cameraManager) {
+      Logger.info(TAG, '[camera] case getCameraManager success');
+    } else {
+      Logger.info(TAG, '[camera] case getCameraManager failed');
+      return;
+    }
+
+    this.cameras = this.cameraManager.getSupportedCameras();
+    if (this.cameras) {
+      console.log(TAG, '[camera] case getCameras success, size ', this.cameras.length);
+      for (let i = 0; i < this.cameras.length; i++) {
+        let came: camera.CameraDevice = this.cameras[i];
+        console.log(TAG, '[came] camera json:', JSON.stringify(came));
+        if (came.connectionType == camera.ConnectionType.CAMERA_CONNECTION_REMOTE) {
+          this.cameraIndex = i;
+          this.cameraOutputCapability = this.cameraManager.getSupportedOutputCapability(came);
+          this.curVideoProfiles = this.cameraOutputCapability.videoProfiles;
+          Logger.info(TAG, 'init camera done');
+          break;
+        }
+      }
+    } else {
+      Logger.info(TAG, '[camera] case getCameras failed');
+    }
+  }
+
+  // create camera input
+  async createCameraInput(): Promise<void> {
+    Logger.info(TAG, 'createCameraInput called');
+    if (this.cameras && this.cameras.length > 0) {
+      let came: camera.CameraDevice = this.cameras[this.cameraIndex];
+      console.log(TAG, '[came]createCameraInput camera json:', JSON.stringify(came));
+      this.cameraInput = this.cameraManager?.createCameraInput(came);
+      if (this.cameraInput) {
+        Logger.info(TAG, '[camera] case createCameraInput success');
+        await this.cameraInput.open().then(() => {
+          Logger.info(TAG, '[camera] case cameraInput.open() success');
+        }).catch((err: Error) => {
+          Logger.info(TAG, '[camera] cameraInput.open then.error:', json.stringify(err));
+        });
+      } else {
+        Logger.info(TAG, '[camera] case createCameraInput failed');
+        return;
+      }
+    }
+  }
+
+  // create camera preview
+  async createPreviewOutput(): Promise<void> {
+    Logger.info(TAG, 'createPreviewOutput called');
+    if (this.cameraOutputCapability && this.cameraManager) {
+      this.previewProfiles = this.cameraOutputCapability.previewProfiles;
+      Logger.info(TAG, '[camera] this.previewProfiles json ', json.stringify(this.previewProfiles));
+      if (this.previewProfiles[0].format === camera.CameraFormat.CAMERA_FORMAT_YUV_420_SP) {
+        Logger.info(TAG, '[camera] case format is VIDEO_SOURCE_TYPE_SURFACE_YUV');
+        this.avConfig.videoSourceType = media.VideoSourceType.VIDEO_SOURCE_TYPE_SURFACE_YUV;
+      } else {
+        Logger.info(TAG, '[camera] case format is VIDEO_SOURCE_TYPE_SURFACE_ES');
+        this.avConfig.videoSourceType = media.VideoSourceType.VIDEO_SOURCE_TYPE_SURFACE_ES;
+      }
+      this.previewOutput = this.cameraManager.createPreviewOutput(this.previewProfiles[0], this.surfaceId);
+      if (!this.previewOutput) {
+        Logger.info(TAG, 'create previewOutput failed!');
+      }
+      Logger.info(TAG, 'createPreviewOutput done');
+    }
+  }
+
+  async createPhotoOutput() {
+    const photoProfile: camera.Profile = {
+      format: camera.CameraFormat.CAMERA_FORMAT_JPEG,
+      size: {
+        "width": 1280,
+        "height": 720
+      }
+    }
+    if (!this.cameraManager) {
+      Logger.error(TAG, 'createPhotoOutput cameraManager is null')
+    }
+    if (!this.photoReceiver) {
+      this.photoReceiver = image.createImageReceiver(photoProfile.size.width, photoProfile.size.height, photoProfile.format, 8)
+      this.photoReceiver.on("imageArrival",()=>{
+        this.photoReceiver?.readNextImage((err,image)=>{
+          if (err || image === undefined) {
+            Logger.error(TAG, 'photoReceiver imageArrival on error')
+            return
+          }
+          image.getComponent(4, async (err, img) => {
+            if (err || img === undefined) {
+              Logger.error(TAG, 'image getComponent on error')
+              return
+            }
+            await this.getImageFileFd()
+            fileio.write(this.mFileAssetId, img.byteBuffer)
+            await this.closeFd()
+            await image.release()
+            Logger.info(TAG, 'photoReceiver image.getComponent save success')
+          })
+        })
+      })
+      await this.photoReceiver.getReceivingSurfaceId().then((surfaceId: string) => {
+        this.photoOutput = this.cameraManager?.createPhotoOutput(photoProfile, surfaceId)
+        if (!this.photoOutput) {
+          Logger.error(TAG, 'cameraManager.createPhotoOutput on error')
+        }
+        Logger.info(TAG, 'cameraManager.createPhotoOutput success')
+        this.photoOutput?.on("captureStart", (err, captureId) => {
+          Logger.info(TAG, 'photoOutput.on captureStart')
+        })
+      }).catch((err: Error) => {
+        Logger.error(TAG, 'photoReceiver.getReceivingSurfaceId on error:' + err)
+      })
+    }
+  }
+
+  // create camera capture session
+  async createCaptureSession(): Promise<void> {
+    Logger.info(TAG, 'createCaptureSession called');
+    if (this.cameraManager) {
+      this.captureSession = this.cameraManager.createCaptureSession();
+      if (!this.captureSession) {
+        Logger.info(TAG, 'createCaptureSession failed!');
+        return
+      }
+      try {
+        this.captureSession.beginConfig();
+        this.captureSession.addInput(this.cameraInput);
+      } catch (e) {
+        Logger.error(TAG, 'case addInput error:' + json.stringify(e));
+      }
+      try {
+        this.captureSession.addOutput(this.previewOutput);
+      } catch (e) {
+        Logger.error(TAG, 'case addOutput error:' + json.stringify(e));
+      }
+      await this.captureSession.commitConfig().then(() => {
+        Logger.info(TAG, 'captureSession commitConfig success');
+      }, this.failureCallback).catch(this.catchCallback);
+    }
+  }
+
+  // start captureSession
+  async startCaptureSession(): Promise<void> {
+    Logger.info(TAG, 'startCaptureSession called');
+    if (!this.captureSession) {
+      Logger.info(TAG, 'CaptureSession does not exists!');
+      return
+    }
+    await this.captureSession.start().then(() => {
+      Logger.info(TAG, 'case start captureSession success');
+    }, this.failureCallback).catch(this.catchCallback);
+  }
+
+  // remove previous videoOutput
+  async removeVideoOutput(): Promise<void> {
+    Logger.info(TAG, 'removeVideoOutput called');
+    if (this.videoOutput) {
+      Logger.info(TAG, 'videoOutput already exits, remove it');
+      if (this.captureSession) {
+        this.captureSession.removeOutput(this.videoOutput);
+        Logger.info(TAG, 'remove videoOutput done');
+      }
+    }
+    Logger.info(TAG, 'removeVideoOutput done');
+  }
+
+  // create video output
+  async createVideoOutput(): Promise<void> {
+    Logger.info(TAG, 'createVideoOutput called');
+    if (this.videoRecorder && this.curVideoProfiles && this.cameraManager) {
+      this.curVideoProfiles[this.cameraIndex].size.height = this.videoResolution.frameHeight;
+      this.curVideoProfiles[this.cameraIndex].size.width = this.videoResolution.frameWidth;
+
+      Logger.info(TAG, '[createVideoOutput]' + this.curVideoProfiles[this.cameraIndex] + ":" + this.videoOutSurfaceId);
+
+      this.videoOutput = this.cameraManager.createVideoOutput(this.curVideoProfiles[this.cameraIndex], this.videoOutSurfaceId);
+      if (!this.videoOutput) {
+        Logger.info(TAG, '[camera] case create videoOutPut fail!!!');
+        return;
+      }
+    } else {
+      Logger.info(TAG, 'videoRecorder is null, createVideoOutput failed');
+      return;
+    }
+  }
+
+  // add video output into CaptureSession
+  async restartVideoOutput(): Promise<void> {
+    Logger.info(TAG, 'restartVideoOutput called');
+    if (this.captureSession) {
+      await this.captureSession.stop().then(() => {
+        Logger.info(TAG, 'case stop captureSession success');
+      }, this.failureCallback).catch(this.catchCallback);
+      this.captureSession.beginConfig();
+      await this.removeVideoOutput();
+      await this.createVideoOutput();
+      this.captureSession.addOutput(this.videoOutput);
+      await this.captureSession.commitConfig().then(() => {
+        Logger.info(TAG, 'case commitConfig success');
+      }, this.failureCallback).catch(this.catchCallback);
+      await this.startCaptureSession();
+      if (this.videoOutput) {
+        await this.videoOutput.start().then(() => {
+          Logger.info(TAG, '[camera] case videoOutput start success');
+        }, this.failureCallback).catch(this.catchCallback);
+      } else {
+        Logger.info(TAG, 'videoOutput is null!!!');
+        return;
+      }
+    }
+  }
+
+  // start videoOutput
+  async startVideoOutput(): Promise<void> {
+    Logger.info(TAG, 'startVideoOutput called');
+    if (this.videoOutput) {
+      await this.videoOutput.start().then(() => {
+        Logger.info(TAG, '[camera] case videoOutput start success');
+      }, this.failureCallback).catch(this.catchCallback);
+    } else {
+      Logger.info(TAG, 'videoOutput is null!!!');
+      return;
+    }
+  }
+
+  // stop videoOutput
+  async stopVideoOutput(): Promise<void> {
+    Logger.info(TAG, 'stopVideoOutput called');
+    if (this.videoOutput) {
+      await this.videoOutput.stop().then(() => {
+        Logger.info(TAG, '[camera] case videoOutput stop success');
+      }, this.failureCallback).catch(this.catchCallback);
+    } else {
+      Logger.info(TAG, 'videoOutput is null!!!');
+      return;
+    }
+  }
+
+  // release camera
+  async releaseCameraInput(): Promise<void> {
+    Logger.info(TAG, 'releaseCameraInput called');
+    if (this.cameraInput) {
+      this.cameraInput = undefined;
+    }
+    Logger.info(TAG, 'releaseCameraInput done');
+  }
+
+  // release preview
+  async releasePreviewOutput(): Promise<void> {
+    Logger.info(TAG, 'releasePreviewOutput called');
+    if (this.previewOutput) {
+      await this.previewOutput.release().then(() => {
+        Logger.info('[camera] case main previewOutput release called');
+      }, this.failureCallback).catch(this.catchCallback);
+      this.previewOutput = undefined;
+    }
+    Logger.info(TAG, 'releasePreviewOutput done');
+  }
+
+  // release video output
+  async releaseVideoOutput(): Promise<void> {
+    Logger.info(TAG, 'releaseVideoOutput called');
+    if (this.videoOutput) {
+      await this.videoOutput.release().then(() => {
+        Logger.info('[camera] case main videoOutput release called');
+      }, this.failureCallback).catch(this.catchCallback);
+      this.videoOutput = undefined;
+    }
+    Logger.info(TAG, 'releaseVideoOutput done');
+  }
+
+  // stop captureSession
+  async stopCaptureSession(): Promise<void> {
+    Logger.info(TAG, 'stopCaptureSession called');
+    if (this.captureSession) {
+      await this.captureSession.stop().then(() => {
+        Logger.info('[camera] case main captureSession stop success');
+      }, this.failureCallback).catch(this.catchCallback);
+    }
+    Logger.info(TAG, 'stopCaptureSession done');
+  }
+
+  // release captureSession
+  async releaseCaptureSession(): Promise<void> {
+    Logger.info(TAG, 'releaseCaptureSession called');
+    if (this.captureSession) {
+      await this.captureSession.release().then(() => {
+        Logger.info('[camera] case main captureSession release success');
+      }, this.failureCallback).catch(this.catchCallback);
+      this.captureSession = undefined;
+    }
+    Logger.info(TAG, 'releaseCaptureSession done');
+  }
+
+  // clear camera environment
+  async releaseCamera(): Promise<void> {
+    Logger.info(TAG, 'releaseCamera called');
+    await this.stopCaptureSession();
+    await this.releaseCameraInput();
+    await this.releasePreviewOutput();
+    await this.releaseVideoOutput();
+    await this.releaseCaptureSession();
+    Logger.info(TAG, 'releaseCamera done');
+  }
+
+  // set callback on
+  setCallback(): void {
+    Logger.info('case callback');
+    if (this.videoRecorder) {
+      this.videoRecorder.on('stateChange', (state, reason) => {
+        Logger.info('case state has changed, new state is' + state);
+        switch (state) {
+          case 'idle':
+            this.recorderState = 'idle';
+            break;
+          case 'prepared':
+            this.recorderState = 'prepared';
+            break;
+          case 'started':
+            this.recorderState = 'started';
+            this.getRecordTime();
+            this.isStartRecording = true;
+            this.isPauseRecording = false;
+            break;
+          case 'paused':
+            this.recorderState = 'paused';
+            clearInterval(this.timer);
+            this.isPauseRecording = true;
+            break;
+          case 'stopped':
+            this.recorderState = 'stopped';
+            this.isStartRecording = false;
+            break;
+          case 'released':
+            this.recorderState = 'released';
+            break;
+          case 'error':
+            Logger.info('case error state!!!');
+            this.recorderState = 'error';
+            break;
+          default:
+            Logger.info('case start is unknown');
+            break;
+        }
+      });
+      this.videoRecorder.on('error', (err) => {
+        Logger.info(TAG, 'case avRecorder.on(error) called, errMessage is ' + err.message);
+      });
+    }
+  }
+
+  async createVideoRecorder(): Promise<void> {
+    await media.createAVRecorder().then((recorder) => {
+      Logger.info(TAG, 'case createAVRecorder called');
+      if (typeof (recorder) !== 'undefined') {
+        this.videoRecorder = recorder;
+      } else {
+        Logger.info(TAG, 'case create avRecorder failed!!!');
+        return
+      }
+    }, this.failureCallback).catch(this.catchCallback);
+    this.setCallback();
+  }
+
+  async prepareVideoRecorder(): Promise<void> {
+    Logger.info(TAG, 'case prepareVideoRecorder in');
+    if (this.videoCodecType === 'video/mpeg4') {
+      Logger.info(TAG, 'VIDEO_MPEG4');
+      this.avConfig.profile.videoCodec = media.CodecMimeType.VIDEO_MPEG4;
+    } else {
+      Logger.info(TAG, 'VIDEO_AVC');
+      this.avConfig.profile.videoCodec = media.CodecMimeType.VIDEO_AVC;
+    }
+    this.avConfig.profile.videoCodec = media.CodecMimeType.VIDEO_AVC;
+    console.log(TAG, this.videoResolution.frameWidth, " ", this.videoResolution.frameHeight, " ", this.framerate);
+    this.avConfig.profile.videoFrameHeight = 480; //this.videoResolution.frameHeight;
+    this.avConfig.profile.videoFrameWidth = 640; //this.videoResolution.frameWidth;
+    this.avConfig.profile.videoFrameRate = this.framerate;
+    if (this.videoRecorder) {
+      await this.videoRecorder.prepare(this.avConfig).then(() => {
+        Logger.info(TAG, 'case prepare AVRecorder called');
+      }, this.failureCallback).catch(this.catchCallback);
+      Logger.info(TAG, 'case prepareVideoRecorder out');
+    }
+  }
+
+  async getInputSurface(): Promise<void> {
+    Logger.info(TAG, 'case getInputSurface in');
+    if (this.videoRecorder) {
+      await this.videoRecorder.getInputSurface().then((outPutSurface) => {
+        Logger.info('case getInputSurface called');
+        if (!outPutSurface) {
+          Logger.error(TAG, 'case getInputSurface ID is none');
+          return
+        }
+        this.videoOutSurfaceId = outPutSurface;
+        Logger.info(TAG, 'case outPutSurface surfaceID is: ' + this.videoOutSurfaceId);
+      }, this.failureCallback).catch(this.catchCallback);
+    }
+    Logger.info(TAG, 'case getInputSurface out');
+  }
+
+  async startVideoRecording(): Promise<void> {
+    Logger.info(TAG, 'case startVideoRecording called');
+    if (this.videoRecorder) {
+      await this.videoRecorder.start().then(() => {
+        Logger.info(TAG, 'case start VideoRecorder called');
+      }, this.failureCallback).catch(this.catchCallback);
+    }
+  }
+
+  async pauseVideoRecording(): Promise<void> {
+    Logger.info(TAG, 'case pauseVideoRecording called');
+    if (this.videoRecorder) {
+      await this.videoRecorder.pause().then(() => {
+        Logger.info(TAG, 'case pause VideoRecorder called');
+      }, this.failureCallback).catch(this.catchCallback);
+    }
+  }
+
+  async resumeVideoRecording(): Promise<void> {
+    Logger.info(TAG, 'case resumeVideoRecording called');
+    if (this.videoRecorder) {
+      await this.videoRecorder.resume().then(() => {
+        Logger.info(TAG, 'case resume VideoRecorder called');
+      }, this.failureCallback).catch(this.catchCallback);
+    }
+  }
+
+  async stopVideoRecording(): Promise<void> {
+    Logger.info(TAG, 'case stopVideoRecording called');
+    if (this.videoRecorder) {
+      await this.videoRecorder.stop().then(() => {
+        Logger.info(TAG, 'case stop VideoRecorder called');
+      }, this.failureCallback).catch(this.catchCallback);
+    }
+  }
+
+  async resetVideoRecording(): Promise<void> {
+    if (this.videoRecorder) {
+      await this.videoRecorder.reset().then(() => {
+        Logger.info(TAG, 'case resetVideoRecording called');
+      }, this.failureCallback).catch(this.catchCallback);
+    }
+  }
+
+  async releaseVideoRecorder(): Promise<void> {
+    if (this.videoRecorder) {
+      this.videoRecorder.off('stateChange');
+      this.videoRecorder.off('error');
+      await this.videoRecorder.release().then(() => {
+        Logger.info(TAG, 'case releaseVideoRecorder called');
+      }, this.failureCallback).catch(this.catchCallback);
+      this.videoRecorder = undefined;
+    }
+  }
+
+  // close file fd
+  async closeFd(): Promise<void> {
+    Logger.info(TAG, 'case closeFd called');
+    if (this.mSaveCameraAsset) {
+      await this.mSaveCameraAsset.closeVideoFile();
+      this.mFileAssetId = undefined;
+      this.fdPath = undefined;
+      Logger.info(TAG, 'case closeFd done');
+    }
+  }
+
+  // init camera
+  async enterInit(): Promise<void> {
+    Logger.info(TAG, 'enterInit called');
+    await this.initCamera(); // 获取设备相机信息
+    await this.createCameraInput(); // 打开相机
+    Logger.info(TAG, 'enterInit createPreviewOutput');
+    await this.createPreviewOutput(); // 预览流
+    // await this.createPhotoOutput(); // 拍照流
+    await this.createCaptureSession(); // 会话，保存一次相机运行需要的所有资源，并向相机设备申请完成相机功能
+    await this.startCaptureSession(); // 开启会话
+    Logger.info(TAG, 'end enterInit');
+  }
+
+  // start button process
+  async startRecordingProcess(): Promise<void> {
+    Logger.info(TAG, 'startRecording called');
+    await this.createVideoRecorder();
+    await this.getFileFd();
+    await this.prepareVideoRecorder();
+    await this.getInputSurface();
+    await this.restartVideoOutput();
+    await this.startVideoRecording();
+    Logger.info(TAG, 'startRecording done');
+  }
+
+  // pause button process
+  async pauseRecordingProcess(): Promise<void> {
+    Logger.info(TAG, 'pauseRecording called');
+    if (this.recorderState === 'started') {
+      Logger.info(TAG, 'current state is started, to pause');
+      await this.pauseVideoRecording();
+      await this.stopVideoOutput();
+    }
+    Logger.info(TAG, 'pauseRecording done');
+  }
+
+  // resume button process
+  async resumeRecordingProcess(): Promise<void> {
+    Logger.info(TAG, 'resumeRecording called');
+    if (this.recorderState === 'paused') {
+      Logger.info(TAG, 'current state is paused, to resume');
+      await this.startVideoOutput();
+      await this.resumeVideoRecording();
+    }
+    Logger.info(TAG, 'resumeRecording done');
+  }
+
+  // stop button process
+  async stopRecordingProcess(): Promise<void> {
+    Logger.info(TAG, 'stopRecording called');
+    if (this.recorderState === 'started' || this.recorderState === 'paused') {
+      await this.stopVideoRecording();
+    }
+    await this.resetVideoRecording();
+    await this.releaseVideoRecorder();
+    await this.stopVideoOutput();
+    this.videoOutput = undefined;
+    await this.closeFd();
+    clearInterval(this.timer);
+    this.isStartRecording = false;
+    this.isPauseRecording = false;
+    this.seconds = 0;
+    this.videoRecorderTimeText = '00:00';
+    Logger.info(TAG, 'stopRecording done');
+  }
+
+  startAbilityCallBack = (key: string) => {
+    Logger.info(TAG, `startAbilityCallBack ${key}`)
+  }
+  onInputValue = (value: string) => {
+  }
+
+  build() {
+    Column() {
+      Row() {
+        Flex({ direction: FlexDirection.Row, justifyContent: FlexAlign.SpaceBetween }) {
+          TitleBarComponent({
+            isLand: this.isLand,
+            startAbilityCallBack: this.startAbilityCallBack,
+            remoteDeviceModel: this.remoteDeviceModel,
+            isShow: this.isShow
+          })
+          Button("connect remote")
+            .onClick(() => {
+              this.enterInit();
+            })
+        }
+      }
+
+      Column() {
+        Row() {
+          Stack({ alignContent: Alignment.Center }) {
+            XComponent({
+              id: 'xcomponent1',
+              type: 'surface',
+              controller: this.xcomponentController
+            })
+              .onLoad(() => {
+                this.xcomponentController.setXComponentSurfaceSize({ surfaceWidth: 640, surfaceHeight: 480 })
+                this.surfaceId = this.xcomponentController.getXComponentSurfaceId()
+                Logger.info(TAG, '[VideoRecorder] surfaceId: ' + this.surfaceId)
+                Logger.info(TAG, 'XComponent1 loaded');
+              })
+              .width('100%').height('100%')
+            Text(this.videoRecorderTimeText)
+              .fontFamily('HarmonyHeiTi-Light')
+              .width(70)
+              .height(40)
+              .fontSize(27)
+              .fontColor(Color.Red)
+              .margin({
+                left: 155,
+                top: 18,
+                right: 135,
+                bottom: 707
+              })
+              .visibility(this.isStartRecording ? Visibility.Visible : Visibility.Hidden)
+            Image($r('app.media.take_video_normal'))
+              .width(86)
+              .height(86)
+              .margin({
+                left: 132,
+                top: 612,
+                right: 132,
+                bottom: 72
+              })
+              .onClick(() => this.startRecordingProcess())
+              .id('videoStart')
+              .visibility(this.isStartRecording ? Visibility.Hidden : Visibility.Visible)
+            Image($r('app.media.ic_circle_open'))
+              .width(120)
+              .height(56)
+              .margin({
+                left: 120,
+                top: 632,
+                right: 120,
+                bottom: 92
+              })
+              .visibility(this.isStartRecording ? Visibility.Visible : Visibility.Hidden)
+            Image($r('app.media.ic_stop'))
+              .width(16)
+              .height(16)
+              .margin({
+                left: 146,
+                top: 652,
+                right: 198,
+                bottom: 112
+              })
+              .onClick(() => this.stopRecordingProcess())
+              .id('videoStop')
+              .visibility(this.isStartRecording ? Visibility.Visible : Visibility.Hidden)
+            Image($r('app.media.ic_pause'))
+              .width(14)
+              .height(15)
+              .margin({
+                left: 200,
+                top: 652,
+                right: 146,
+                bottom: 113
+              })
+              .onClick(() => this.pauseRecordingProcess())
+              .id('videoPause')
+              .visibility(this.isStartRecording && !this.isPauseRecording ? Visibility.Visible : Visibility.Hidden)
+            Image($r('app.media.ic_continue'))
+              .width(16)
+              .height(16)
+              .margin({
+                left: 198,
+                top: 651,
+                right: 144,
+                bottom: 111
+              })
+              .onClick(() => this.resumeRecordingProcess())
+              .id('videoResume')
+              .visibility(this.isStartRecording && this.isPauseRecording ? Visibility.Visible : Visibility.Hidden)
+          }.width('100%').height('100%')
+        }.width('100%').height('88%')
+      }
+    }
+  }
+
+  onCancel() {
+    Logger.info(TAG, 'Callback when the cancel button is clicked')
+  }
+
+  onAccept() {
+    Logger.info(TAG, 'Callback when the confirm button is clicked')
+  }
+
+  existApp() {
+    Logger.info(TAG, 'Click the callback in the blank area')
+  }
+
+  settingDialog: CustomDialogController = new CustomDialogController({
+    builder: CustomDialogSetting({
+      cancel: this.onCancel,
+      confirm: this.onAccept,
+      videoResolution: $videoResolution,
+      videoFrameRate: $framerate,
+      videoCodec: $videoCodecType,
+    }),
+    cancel: this.existApp,
+    autoCancel: false,
+    alignment: DialogAlignment.Bottom,
+    customStyle: true
+  })
+}
+
+class Resolution {
+  public frameWidth: number = 0
+  public frameHeight: number = 0
+}
+
+class VideoResolution {
+  public itemValue: string = ''
+  public value: Resolution = { frameWidth: 0, frameHeight: 0 }
+}
+
+class VideoFrameRate {
+  public itemValue: string = ''
+  public value: number = 0
+}
+
+class VideoCodec {
+  public itemValue: string = ''
+  public value: string = ''
+}
+
+@CustomDialog
+struct CustomDialogSetting {
+  @Link videoResolution: Resolution;
+  @Link videoFrameRate: number;
+  @Link videoCodec: string;
+  controller: CustomDialogController;
+  cancel?: () => void;
+  confirm?: () => void;
+  @State currentVideoResolution: Resolution = { frameWidth: 640, frameHeight: 480 };
+  @State currentVideoResolutionText: string = '[16:9]1080p';
+  @State currentVideoFramerate: number = 30;
+  @State currentVideoCodec: string = 'video/avc';
+  private initVideoResolution: Resolution = this.videoResolution;
+  private initVideoFramerate: number = this.videoFrameRate;
+  private initVideoCodec: string = 'video/avc';
+  @State videoResolutionList: Array<VideoResolution> = [
+    { itemValue: '16:9 (720p)', value: { frameWidth: 1280, frameHeight: 720 } },
+    { itemValue: '16:9 (1080p)', value: { frameWidth: 640, frameHeight: 480 } },
+  ];
+  @State videoFrameRateList: Array<VideoFrameRate> = [
+    { itemValue: '30fps', value: 30 },
+  ];
+  @State videoCodecList: Array<VideoCodec> = [
+    { itemValue: 'video/avc', value: 'video/avc' },
+    { itemValue: 'video/mpeg4', value: 'video/mpeg4' },
+  ];
+
+  build() {
+    Column() {
+      Column() {
+        Text($r('app.string.video_parameter'))
+          .fontFamily('HarmonyHeiTi-Medium')
+          .fontSize(20)
+          .width(288)
+          .height(26)
+          .margin({ left: 24, top: 16, right: 24 })
+        Column() {
+          List({ space: 10 }) {
+            ForEach(this.videoResolutionList, (item: VideoResolution, index) => {
+              ListItem() {
+                Row() {
+                  Text($r('app.string.video_resolution'))
+                    .fontSize(16)
+                  Text(item.itemValue.toString())
+                    .fontSize(16)
+                    .width(160)
+                    .fontFamily('HarmonyHeiTi-Medium')
+                  Radio({ value: item.value.toString(), group: 'radioGroup' })
+                    .checked(item.value.frameWidth == this.initVideoResolution.frameWidth)
+                    .height(24)
+                    .onChange((isChecked: boolean) => {
+                      if (isChecked) {
+                        Logger.info(TAG, item.itemValue + ' resolution is clicked')
+                        this.currentVideoResolution = item.value;
+                        this.currentVideoResolutionText = item.itemValue;
+                      }
+                    })
+                }.margin({ left: 0, right: 39 })
+              }
+            })
+          }.listDirection(Axis.Vertical)
+          .divider({
+            strokeWidth: 0.5,
+            color: '#EEEEEE',
+            startMargin: 0,
+            endMargin: 0
+          })
+        }.margin({ left: 24, right: 24, top: 16 })
+      }.alignItems(HorizontalAlign.Start)
+
+      Row() {
+        Button($r('app.string.button_cancel'))
+          .onClick(() => {
+            this.videoResolution = this.initVideoResolution
+            this.videoFrameRate = this.initVideoFramerate
+            this.videoCodec = this.initVideoCodec
+            this.controller.close()
+            if (this.cancel) {
+              this.cancel()
+            }
+          })
+          .backgroundColor($r('app.color.button_background'))
+          .fontColor($r('app.color.button_color'))
+          .fontFamily('HarmonyHeiTi-Medium')
+          .fontSize(16)
+          .id('videoCancel')
+          .layoutWeight(1)
+        Divider()
+          .vertical(true)
+          .height(24)
+          .color($r('app.color.divider_color'))
+          .opacity(0.6)
+          .margin({ left: 8, right: 8 })
+        Button($r('app.string.button_confirm'))
+          .onClick(() => {
+            this.videoResolution = this.currentVideoResolution
+            this.videoFrameRate = this.currentVideoFramerate
+            this.videoCodec = this.currentVideoCodec
+            this.controller.close()
+            if (this.confirm) {
+              this.confirm()
+            }
+          })
+          .backgroundColor($r('app.color.button_background'))
+          .fontColor($r('app.color.button_color'))
+          .fontFamily('HarmonyHeiTi-Medium')
+          .fontSize(16)
+          .id('videoConfirm')
+          .layoutWeight(1)
+      }
+      .width(300)
+      .height(40)
+      .margin({
+        left: 24,
+        right: 24,
+        top: 12,
+        bottom: 16
+      })
+    }
+    .margin({ left: 12, right: 12, bottom: 12 })
+    .backgroundColor($r('app.color.button_background'))
+    .borderRadius(32)
+    .alignItems(HorizontalAlign.Center)
+  }
+}
