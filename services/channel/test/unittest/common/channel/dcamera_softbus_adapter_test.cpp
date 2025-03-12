@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,8 @@
 #undef private
 
 #include "data_buffer.h"
+#include "dcamera_allconnect_manager_test.h"
+#include "dcamera_channel_listener_mock.h"
 #include "dcamera_softbus_session.h"
 #include "dcamera_hisysevent_adapter.h"
 #include "dcamera_utils_tools.h"
@@ -29,6 +31,13 @@
 #include "session_bus_center.h"
 
 using namespace testing::ext;
+using ::testing::_;
+using ::testing::An;
+using ::testing::Return;
+using ::testing::DoAll;
+using ::testing::AtLeast;
+using ::testing::InSequence;
+using ::testing::SetArgReferee;
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -43,14 +52,17 @@ public:
 namespace {
 const std::string TEST_DEVICE_ID = "bb536a637105409e904d4da83790a4a7";
 const std::string TEST_CAMERA_DH_ID_0 = "camera_0";
+constexpr int32_t UNIQUE_SOCKED_ID = 0;
 }
 
 void DCameraSoftbusAdapterTest::SetUpTestCase(void)
 {
+    DCameraAllConnectManagerTest::InitAllConnectManagerMockEnv();
 }
 
 void DCameraSoftbusAdapterTest::TearDownTestCase(void)
 {
+    DCameraAllConnectManagerTest::UnInitAllConnectManagerMockEnv();
 }
 
 void DCameraSoftbusAdapterTest::SetUp(void)
@@ -913,6 +925,78 @@ HWTEST_F(DCameraSoftbusAdapterTest, DCameraSoftbusAdapterTest_035, TestSize.Leve
     DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDevId, peerSessName, peerDevId,
         sessionMode, role);
     DCameraSoftbusAdapter::GetInstance().CloseSessionWithNetWorkId("testNetworkId");
+}
+
+HWTEST_F(DCameraSoftbusAdapterTest, DCameraSoftbusAdapterTest_036, TestSize.Level1)
+{
+    std::string myDevId = "abcde";
+    std::string peerSessName = "sink_control";
+    std::string peerDevId = TEST_DEVICE_ID;
+    DCameraSessionMode sessionMode = DCameraSessionMode::DCAMERA_SESSION_MODE_VIDEO;
+    DCAMERA_CHANNEL_ROLE role = DCAMERA_CHANNLE_ROLE_SOURCE;
+    auto ret = DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDevId, peerSessName, peerDevId,
+        sessionMode, role);
+
+    DCameraSoftbusAdapter::GetInstance().CloseSessionWithNetWorkId(peerDevId);
+    EXPECT_EQ(ret, UNIQUE_SOCKED_ID);
+}
+
+HWTEST_F(DCameraSoftbusAdapterTest, DCameraSoftbusAdapterTest_037, TestSize.Level1)
+{
+    std::string myDevId = "abcde";
+    std::string sessionName = "sourcetest037";
+    std::string peerDevId = TEST_DEVICE_ID;
+    std::string peerSessName = "sink_control";
+
+    auto listener = std::make_shared<DCameraChannelListenerMock>();
+    auto session = std::make_shared<DCameraSoftbusSession>(
+        myDevId, sessionName, peerDevId, peerSessName, listener, DCameraSessionMode::DCAMERA_SESSION_MODE_CTRL);
+    EXPECT_CALL(*listener, OnSessionState(_, _)).Times(AtLeast(1));
+
+    DCameraSoftbusAdapter::GetInstance().RecordSourceSocketSession(UNIQUE_SOCKED_ID, session);
+    PeerSocketInfo info = {
+        .name = const_cast<char*>(peerSessName.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
+        .networkId = const_cast<char*>(peerDevId.c_str()),
+        .dataType = TransDataType::DATA_TYPE_BYTES,
+    };
+    auto ret = DCameraSoftbusAdapter::GetInstance().SourceOnBind(UNIQUE_SOCKED_ID, info);
+
+    DCameraSoftbusAdapter::GetInstance().CloseSoftbusSession(UNIQUE_SOCKED_ID);
+    DCameraAllConnectManager::RemoveSourceNetworkId(UNIQUE_SOCKED_ID);
+    EXPECT_EQ(ret, DCAMERA_OK);
+}
+
+HWTEST_F(DCameraSoftbusAdapterTest, DCameraSoftbusAdapterTest_038, TestSize.Level1)
+{
+    std::string mySessionName = "control";
+    DCAMERA_CHANNEL_ROLE role = DCAMERA_CHANNEL_ROLE::DCAMERA_CHANNLE_ROLE_SINK;
+    DCameraSessionMode sessionMode = DCameraSessionMode::DCAMERA_SESSION_MODE_CTRL;
+    std::string myDevId = "abcde";
+    std::string peerDevId = TEST_DEVICE_ID;
+    std::string peerSessionName = peerDevId + "_control";
+    DCameraSoftbusAdapter::GetInstance().mySocketSet_.clear();
+    ManageSelectChannel::GetInstance().SetSinkConnect(false);
+    DCameraSoftbusAdapter::GetInstance().CreatSoftBusSinkSocketServer(
+        mySessionName, role, sessionMode, peerDevId, peerSessionName);
+    auto listener = std::make_shared<DCameraChannelListenerMock>();
+    EXPECT_CALL(*listener, OnSessionState(_, _)).Times(AtLeast(1));
+    auto session = std::make_shared<DCameraSoftbusSession>(
+        myDevId, mySessionName, peerDevId, peerSessionName, listener, DCameraSessionMode::DCAMERA_SESSION_MODE_CTRL);
+    DCameraSoftbusAdapter::GetInstance().sinkSessions_[mySessionName] = session;
+    PeerSocketInfo info = {
+        .name = const_cast<char*>(peerSessionName.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
+        .networkId = const_cast<char*>(peerDevId.c_str()),
+        .dataType = TransDataType::DATA_TYPE_BYTES,
+    };
+    auto ret = DCameraSoftbusAdapter::GetInstance().SinkOnBind(UNIQUE_SOCKED_ID, info);
+
+    DCameraSoftbusAdapter::GetInstance().SinkOnShutDown(UNIQUE_SOCKED_ID, SHUTDOWN_REASON_UNEXPECTED);
+    DCameraSoftbusAdapter::GetInstance().CloseSoftbusSession(UNIQUE_SOCKED_ID);
+    DCameraSoftbusAdapter::GetInstance().mySocketSet_.erase(UNIQUE_SOCKED_ID);
+    DCameraSoftbusAdapter::GetInstance().sinkSessions_.erase(mySessionName);
+    EXPECT_EQ(ret, DCAMERA_OK);
 }
 }
 }

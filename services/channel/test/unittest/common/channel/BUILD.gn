@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -27,6 +27,7 @@ config("module_private_config") {
     "${services_path}/channel/include",
     "${services_path}/channel/include/allconnect",
     "${services_path}/channel/test/unittest/common/channel",
+    "${services_path}/channel/test/unittest/common/channel/mock",
     "${services_path}/cameraservice/cameraoperator/client/include",
     "${services_path}/cameraservice/cameraoperator/client/include/callback",
     "${services_path}/cameraservice/cameraoperator/client/include/listener",
@@ -60,11 +61,14 @@ ohos_unittest("DCameraChannelTest") {
     "${services_path}/channel/src/dcamera_softbus_adapter.cpp",
     "${services_path}/channel/src/dcamera_softbus_latency.cpp",
     "${services_path}/channel/src/dcamera_softbus_session.cpp",
+    "dcamera_allconnect_manager_test.cpp",
     "dcamera_channel_sink_impl_test.cpp",
     "dcamera_channel_source_impl_test.cpp",
     "dcamera_softbus_adapter_test.cpp",
     "dcamera_softbus_latency_test.cpp",
     "dcamera_softbus_session_test.cpp",
+    "mock/dcamera_collaboration_mock.cpp",
+    "mock/lib_function_mock.cpp",
     "session_bus_center.cpp",
     "session_mock.cpp",
   ]
@@ -85,6 +89,8 @@ ohos_unittest("DCameraChannelTest") {
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.1",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
+    "googletest:gmock",
+    "googletest:gmock_main",
     "graphic_surface:surface",
     "hdf_core:libhdi",
     "hilog:libhilog",
