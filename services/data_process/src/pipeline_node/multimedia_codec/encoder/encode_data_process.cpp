@@ -79,8 +79,6 @@ int32_t EncodeDataProcess::InitNode(const VideoConfigParams& sourceConfig, const
     }
 
     int32_t err = InitEncoder();
-    DcameraRadar::GetInstance().ReportDcameraOpen("InitEncoder", CameraOpen::INIT_ENCODE,
-        BizState::BIZ_STATE_END, err);
     if (err != DCAMERA_OK) {
         DHLOGE("Init video encoder failed.");
         ReleaseProcessNode();

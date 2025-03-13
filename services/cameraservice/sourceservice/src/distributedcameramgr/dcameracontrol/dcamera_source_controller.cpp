@@ -27,6 +27,7 @@
 #include "dcamera_hitrace_adapter.h"
 #include "dcamera_metadata_setting_cmd.h"
 #include "dcamera_protocol.h"
+#include "dcamera_radar.h"
 #include "dcamera_softbus_latency.h"
 #include "dcamera_source_controller_channel_listener.h"
 #include "dcamera_source_service_ipc.h"
@@ -204,6 +205,12 @@ int32_t DCameraSourceController::ChannelNeg(std::shared_ptr<DCameraChannelInfo>&
 
 int32_t DCameraSourceController::DCameraNotify(std::shared_ptr<DCameraEvent>& events)
 {
+    if (events->eventResult_ == DCAMERA_EVENT_CAMERA_SUCCESS &&
+        events->eventContent_ == START_CAPTURE_SUCC) {
+        DcameraRadar::GetInstance().ReportDcameraOpen("StartCapture", CameraOpen::START_CAPTURE,
+            BizState::BIZ_STATE_END, DCAMERA_OK);
+    }
+
     if (events->eventResult_ == DCAMERA_EVENT_CAMERA_ERROR) {
         DcameraFinishAsyncTrace(DCAMERA_CONTINUE_FIRST_FRAME, DCAMERA_CONTINUE_FIRST_FRAME_TASKID);
         DcameraFinishAsyncTrace(DCAMERA_SNAPSHOT_FIRST_FRAME, DCAMERA_SNAPSHOT_FIRST_FRAME_TASKID);

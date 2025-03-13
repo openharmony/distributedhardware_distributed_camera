@@ -132,7 +132,6 @@ int32_t DistributedCameraSinkStub::InitSinkInner(MessageParcel &data, MessagePar
 
         sptr<DCameraSinkCallbackProxy> dCameraSinkCallbackProxy(new DCameraSinkCallbackProxy(remoteObject));
         ret = InitSink(params, dCameraSinkCallbackProxy);
-        DcameraRadar::GetInstance().ReportDcameraInitProgress("InitSink", CameraInit::SINK_CAMERA_INIT, ret);
     } while (0);
     reply.WriteInt32(ret);
     return DCAMERA_OK;

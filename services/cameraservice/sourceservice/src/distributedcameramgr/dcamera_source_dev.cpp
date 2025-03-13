@@ -557,6 +557,7 @@ int32_t DCameraSourceDev::ConfigStreams(std::vector<std::shared_ptr<DCStreamInfo
         break;
     }
     int32_t ret = input_->ConfigStreams(streamInfos);
+    DcameraRadar::GetInstance().ReportDcameraOpenProgress("ConfigStreams", CameraOpen::CONFIG_STREAMS, ret);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev Execute ConfigStreams ConfigStreams failed, ret: %{public}d, devId: %{public}s dhId: "
             "%{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
@@ -585,6 +586,7 @@ int32_t DCameraSourceDev::ConfigStreams(std::vector<std::shared_ptr<DCStreamInfo
     std::vector<DCameraIndex> actualDevInfo;
     actualDevInfo.assign(actualDevInfo_.begin(), actualDevInfo_.end());
     ret = input_->OpenChannel(actualDevInfo);
+    DcameraRadar::GetInstance().ReportDcameraOpenProgress("intput->OpenChannel", CameraOpen::OPEN_DATA_CHANNEL, ret);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev ChannelNeg OpenChannel failed ret: %{public}d, devId: %{public}s, dhId: %{public}s",
             ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
@@ -626,7 +628,6 @@ int32_t DCameraSourceDev::StartCapture(std::vector<std::shared_ptr<DCCaptureInfo
     DHLOGI("DCameraSourceDev Execute StartCapture devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     int32_t ret = input_->StartCapture(captureInfos);
-    DcameraRadar::GetInstance().ReportDcameraOpenProgress("StartCapture", CameraOpen::START_CAPTURE, ret);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev input StartCapture failed ret: %{public}d, devId: %{public}s, dhId: %{public}s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());

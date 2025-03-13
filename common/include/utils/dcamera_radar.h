@@ -62,16 +62,16 @@ enum class BizState : int32_t {
 enum class CameraInit : int32_t {
     SERVICE_INIT = 1,
     SOURCE_CAMERA_INIT = 2,
-    SINK_CAMERA_INIT = 3,
-    LOAD_HDF_DRIVER = 4,
+    LOAD_HDF_DRIVER = 3,
 };
 
 enum class CameraOpen : int32_t {
     OPEN_CAMERA = 1,
     OPEN_CHANNEL = 2,
-    START_CAPTURE = 3,
-    INIT_DECODE = 4,
-    INIT_ENCODE = 5,
+    CONFIG_STREAMS = 3,
+    OPEN_DATA_CHANNEL = 4,
+    INIT_DECODE = 5,
+    START_CAPTURE = 6,
 };
 
 enum class CameraClose : int32_t {

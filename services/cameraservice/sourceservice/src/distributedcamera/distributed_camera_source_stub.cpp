@@ -111,7 +111,6 @@ int32_t DistributedCameraSourceStub::InitSourceInner(MessageParcel &data, Messag
         }
 
         ret = InitSource(params, callbackProxy);
-        DcameraRadar::GetInstance().ReportDcameraInitProgress("InitSource", CameraInit::SOURCE_CAMERA_INIT, ret);
     } while (0);
     reply.WriteInt32(ret);
     return DCAMERA_OK;
