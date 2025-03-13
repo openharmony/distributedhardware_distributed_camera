@@ -1,0 +1,93 @@
+/*
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import deviceManager from '@ohos.distributedDeviceManager';
+import Logger from '../utils/Logger'
+
+const TAG: string = 'Sample_DeviceDialog'
+
+@CustomDialog
+export struct DeviceDialog {
+  controller?: CustomDialogController;
+  @StorageLink('deviceList') deviceList: Array<deviceManager.DeviceBasicInfo> = AppStorage.get('deviceList')!;
+  private selectedIndex: number | undefined = 0;
+  private onSelectedIndexChange: (selectedIndex: number | undefined) => void = () => {
+  }
+  @State deviceDialogWidth: number = 0
+
+  build() {
+    Column() {
+      Text($r('app.string.choiceDevice'))
+        .fontSize(px2vp(30))
+        .width('100%')
+        .height('20%')
+        .fontColor(Color.Black)
+        .textAlign(TextAlign.Start)
+      List() {
+        ForEach(this.deviceList, (item: deviceManager.DeviceBasicInfo, index: number | undefined) => {
+          ListItem() {
+            Flex({ direction: FlexDirection.Row, justifyContent: FlexAlign.SpaceBetween }) {
+              Text(item.deviceName)
+                .fontSize(px2vp(30))
+                .width('100%')
+                .fontColor(Color.Black)
+            }
+            .margin({ top: 17 })
+            .enabled(true)
+            .backgroundColor(Color.Gray)
+            .onClick(() => {
+              Logger.info(TAG, `select device: ${item.deviceId}`)
+              if (this.selectedIndex !== undefined) {
+                Logger.info(TAG, `onSelectedIndexChange: ${index}`)
+                console.log(TAG, this.onSelectedIndexChange);
+                this.selectedIndex = index
+                this.onSelectedIndexChange(this.selectedIndex)
+              }
+            })
+          }
+          .width('100%')
+          .height('50%')
+        }, (item: deviceManager.DeviceBasicInfo) => item.deviceName)
+      }
+      .height('60%')
+      .width('100%')
+      .layoutWeight(1)
+
+      Button() {
+        Text($r('app.string.cancel'))
+          .width('90%')
+          .fontSize(21)
+          .fontColor('#ff0d64fb')
+          .textAlign(TextAlign.Center)
+      }
+      .type(ButtonType.Capsule)
+      .backgroundColor(Color.White)
+      .onClick(() => {
+        if (this.controller !== undefined) {
+          this.controller.close()
+        }
+      })
+    }
+    .margin({ bottom: 15 })
+    .onAreaChange((oldArea: Area, newArea: Area) => {
+      this.deviceDialogWidth =
+        (newArea.width > newArea.height ? newArea.height : newArea.width) as number * 0.1 //percentage
+    })
+    .width('80%')
+    .height(px2vp(240))
+    .padding({ left: 18, right: 32 })
+    .backgroundColor(Color.White)
+    .border({ color: Color.White, radius: 20 })
+  }
+}
