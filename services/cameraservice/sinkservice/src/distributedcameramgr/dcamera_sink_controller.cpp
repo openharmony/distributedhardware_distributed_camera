@@ -567,28 +567,37 @@ void DCameraSinkController::OnSessionState(int32_t state, std::string networkId)
         }
         case DCAMERA_CHANNEL_STATE_DISCONNECTED: {
             DHLOGI("channel is disconnected");
-            ffrt::submit([this]() {
-                DHLOGI("DCameraSinkController::OnSessionState %{public}s new thread session state: %{public}d",
-                    GetAnonyString(dhId_).c_str(), sessionState_);
-                prctl(PR_SET_NAME, CHANNEL_DISCONNECTED.c_str());
-                std::lock_guard<std::mutex> autoLock(autoLock_);
-                int32_t ret = CloseChannel();
-                if (ret != DCAMERA_OK) {
-                    DHLOGE("session state: %{public}d, %{public}s close channel failed, ret: %{public}d",
-                        sessionState_, GetAnonyString(dhId_).c_str(), ret);
-                }
-                ret = StopCapture();
-                if (ret != DCAMERA_OK) {
-                    DHLOGE("session state: %{public}d, %{public}s stop capture failed, ret: %{public}d",
-                        sessionState_, GetAnonyString(dhId_).c_str(), ret);
-                }
-            });
+            std::shared_ptr<DCameraEvent> events = std::make_shared<DCameraEvent>();
+            events->eventType_ = DCAMERA_SINK_STOP;
+            events->eventResult_ = DCAMERA_EVENT_SINK_STOP;
+            DCameraNotify(events);
+            HandleDisconnected();
             break;
         }
         default:
             DHLOGE("unknown session state");
             break;
     }
+}
+
+void DCameraSinkController::HandleDisconnected()
+{
+    ffrt::submit([this]() {
+        DHLOGI("DCameraSinkController::OnSessionState %{public}s new thread session state: %{public}d",
+               GetAnonyString(dhId_).c_str(), sessionState_);
+        prctl(PR_SET_NAME, CHANNEL_DISCONNECTED.c_str());
+        std::lock_guard<std::mutex> autoLock(autoLock_);
+        int32_t ret = CloseChannel();
+        if (ret != DCAMERA_OK) {
+            DHLOGE("session state: %{public}d, %{public}s close channel failed, ret: %{public}d",
+                   sessionState_, GetAnonyString(dhId_).c_str(), ret);
+        }
+        ret = StopCapture();
+        if (ret != DCAMERA_OK) {
+            DHLOGE("session state: %{public}d, %{public}s stop capture failed, ret: %{public}d",
+                   sessionState_, GetAnonyString(dhId_).c_str(), ret);
+        }
+    });
 }
 
 void DCameraSinkController::OnSessionError(int32_t eventType, int32_t eventReason, std::string detail)
