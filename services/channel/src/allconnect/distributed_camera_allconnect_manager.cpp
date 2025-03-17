@@ -232,7 +232,8 @@ int32_t DCameraAllConnectManager::ApplyResult(int32_t errorcode, int32_t result,
 {
     DHLOGI("DCamera allconnect ApplyResult begin");
     if (result != PASS) {
-        DHLOGE("DCamera allconnect Apply Result is Reject, errorcode is %{}d, reason is %{public}s", errorcode, reason);
+        DHLOGE("DCamera allconnect Apply Result is Reject, errorcode is %{public}d, reason is %{public}s",
+            errorcode, reason);
         applyResultBlock_->SetValue(false);
         return DistributedCameraErrno::DCAMERA_ERR_APPLY_RESULT;
     }
