@@ -85,7 +85,6 @@ private:
     void ProcessPostAuthorization(const AppExecFwk::InnerEvent::Pointer &event);
     int32_t CreateCtrlSession();
     int32_t CheckSensitive();
-    void HandleDisconnected();
 
     bool isInit_;
     int32_t sessionState_;
