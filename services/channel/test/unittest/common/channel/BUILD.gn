@@ -15,7 +15,7 @@ import("//build/test.gni")
 import(
     "//foundation/distributedhardware/distributed_camera/distributedcamera.gni")
 
-module_out_path = "distributed_camera/dcamera_channel_test"
+module_out_path = "${unittest_output_path}/dcamera_channel_test"
 
 config("module_private_config") {
   visibility = [ ":*" ]
