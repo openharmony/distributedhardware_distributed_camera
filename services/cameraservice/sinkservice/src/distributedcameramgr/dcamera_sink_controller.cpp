@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -249,23 +249,16 @@ int32_t DCameraSinkController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& ope
         return DCAMERA_WRONG_STATE;
     }
     srcDevId_ = openInfo->sourceDevId_;
-    int32_t ret = CheckSensitive();
-    if (ret != DCAMERA_OK) {
-        DHLOGE("check sensitive error, ret %{public}d", ret);
-        return ret;
-    }
     std::vector<DCameraIndex> indexs;
     indexs.push_back(DCameraIndex(srcDevId_, dhId_));
     auto controller = std::shared_ptr<DCameraSinkController>(shared_from_this());
     std::shared_ptr<ICameraChannelListener> listener =
         std::make_shared<DCameraSinkControllerChannelListener>(controller);
-    ret = channel_->CreateSession(indexs, SESSION_FLAG, DCAMERA_SESSION_MODE_CTRL, listener);
+    int32_t ret = channel_->CreateSession(indexs, SESSION_FLAG, DCAMERA_SESSION_MODE_CTRL, listener);
     if (ret != DCAMERA_OK) {
         DHLOGE("channel create session failed, dhId: %{public}s, ret: %{public}d", GetAnonyString(dhId_).c_str(), ret);
         return ret;
     }
-    ret = PullUpPage();
-    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "PullUpPage failed");
     DHLOGI("DCameraSinkController OpenChannel %{public}s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
 }
@@ -310,15 +303,6 @@ int32_t DCameraSinkController::CloseChannel()
     }
     srcDevId_.clear();
     sessionState_ = DCAMERA_CHANNEL_STATE_DISCONNECTED;
-    if (isPageStatus_.load()) {
-        bool isSensitive = false;
-        bool isSameAccout = false;
-        int32_t ret = sinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_CLOSE_PAGE, PAGE_SUBTYPE,
-            srcDevId_, isSensitive, isSameAccout);
-        if (ret != DCAMERA_OK) {
-            DHLOGE("close page failed, ret: %{public}d", ret);
-        }
-    }
     isPageStatus_.store(false);
     DHLOGI("DCameraSinkController CloseChannel %{public}s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
@@ -556,13 +540,6 @@ void DCameraSinkController::OnSessionState(int32_t state, std::string networkId)
                 break;
             }
             srcDevId_ = networkId;
-            int32_t ret = CheckSensitive();
-            if (ret != DCAMERA_OK) {
-                DHLOGE("Check sensitive error. ret %{public}d.", ret);
-                return;
-            }
-            ret = PullUpPage();
-            CHECK_AND_RETURN_LOG(ret != DCAMERA_OK, "PullUpPage failed");
             break;
         }
         case DCAMERA_CHANNEL_STATE_DISCONNECTED:
