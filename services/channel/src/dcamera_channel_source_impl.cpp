@@ -80,10 +80,11 @@ int32_t DCameraChannelSourceImpl::CreateSession(std::vector<DCameraIndex>& camIn
         GetAnonyString(mySessionName_).c_str(), GetAnonyString(myDevId).c_str());
     for (auto iter = camIndexs.begin(); iter != camIndexs.end(); iter++) {
         std::string peerDevId = (*iter).devId_;
+        std::string dhId = (*iter).dhId_;
         std::string peerSessionName = SESSION_HEAD + (*iter).dhId_ + std::string("_") + sessionFlag;
         // source_bind
-        std::shared_ptr<DCameraSoftbusSession> softbusSess = std::make_shared<DCameraSoftbusSession>(myDevId,
-            mySessionName_, peerDevId, peerSessionName, listener, sessionMode);
+        std::shared_ptr<DCameraSoftbusSession> softbusSess = std::make_shared<DCameraSoftbusSession>(
+            dhId, myDevId, mySessionName_, peerDevId, peerSessionName, listener, sessionMode);
         int32_t socketId = softbusSess->BindSocketServer();
         if (socketId == 0 || socketId == DCAMERA_BAD_VALUE) {
             DHLOGE("DCameraChannelSourceImpl Create Session failed. socketId: %{public}d.", socketId);

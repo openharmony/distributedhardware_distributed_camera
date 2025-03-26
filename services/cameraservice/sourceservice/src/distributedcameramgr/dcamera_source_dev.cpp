@@ -475,27 +475,20 @@ int32_t DCameraSourceDev::OpenCamera()
     }
 
     if (DCameraAllConnectManager::IsInited()) {
-        ret = DCameraAllConnectManager::GetInstance().RegisterLifecycleCallback();
-        if (ret == DCAMERA_OK) {
-            auto resourceReq = DCameraAllConnectManager::GetInstance().BuildResourceRequest();
-            ret = DCameraAllConnectManager::GetInstance().ApplyAdvancedResource(devId_, resourceReq.get());
-            if (ret != DCAMERA_OK) {
-                DHLOGE("DCamera allconnect apply advanced resource failed, ret: %{public}d, devId: %{public}s",
-                    ret, GetAnonyString(devId_).c_str());
-                return ret;
-            }
-            ret = DCameraAllConnectManager::GetInstance().PublishServiceState(devId_, SCM_PREPARE);
-            if (ret != DCAMERA_OK) {
-                DHLOGE("DCamera allconnect publish scm prepare failed, ret: %{public}d, devId: %{public}s",
-                    ret, GetAnonyString(devId_).c_str());
-                return ret;
-            }
-        } else {
-            DHLOGE("DCamera allconnect init and register lifecycle callback failed, ret: %{public}d, devId: %{public}s",
+        auto resourceReq = DCameraAllConnectManager::GetInstance().BuildResourceRequest();
+        ret = DCameraAllConnectManager::GetInstance().ApplyAdvancedResource(devId_, resourceReq.get());
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCamera allconnect apply advanced resource failed, ret: %{public}d, devId: %{public}s",
                 ret, GetAnonyString(devId_).c_str());
             return ret;
         }
-        DHLOGI("DCamera allconnect register lifecyle and apply advanced resource scm prepare success");
+        ret = DCameraAllConnectManager::GetInstance().PublishServiceState(devId_, dhId_, SCM_PREPARE);
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCamera allconnect publish scm prepare failed, ret: %{public}d, devId: %{public}s",
+                ret, GetAnonyString(devId_).c_str());
+            return ret;
+        }
+        DHLOGI("DCamera allconnect apply advanced resource and publish scm prepare success");
     }
 
     DcameraStartAsyncTrace(DCAMERA_OPEN_CHANNEL_CONTROL, DCAMERA_OPEN_CHANNEL_TASKID);
@@ -531,15 +524,9 @@ int32_t DCameraSourceDev::CloseCamera()
             "%{public}s dhId: %{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     }
     if (DCameraAllConnectManager::IsInited()) {
-        ret = DCameraAllConnectManager::GetInstance().PublishServiceState(devId_, SCM_IDLE);
+        ret = DCameraAllConnectManager::GetInstance().PublishServiceState(devId_, dhId_, SCM_IDLE);
         if (ret != DCAMERA_OK) {
             DHLOGE("DCamera allconnect CloseCamera PublishServiceState failed, ret: %{public}d, devId: %{public}s ",
-                ret, GetAnonyString(devId_).c_str());
-        }
-
-        ret = DCameraAllConnectManager::GetInstance().UnRegisterLifecycleCallback();
-        if (ret != DCAMERA_OK) {
-            DHLOGE("DCamera allconnect source CloseCamera UnInitDCamera failed, ret: %{public}d, devId: %{public}s",
                 ret, GetAnonyString(devId_).c_str());
         }
     }

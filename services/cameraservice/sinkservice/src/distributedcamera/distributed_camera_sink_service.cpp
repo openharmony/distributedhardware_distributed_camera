@@ -56,6 +56,12 @@ void DistributedCameraSinkService::OnStart()
     state_ = DCameraServiceState::DCAMERA_SRV_STATE_RUNNING;
     if (!DCameraAllConnectManager::IsInited()) {
         DCameraAllConnectManager::GetInstance().InitDCameraAllConnectManager();
+        int32_t ret = DCameraAllConnectManager::GetInstance().RegisterLifecycleCallback();
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCamera allconnect sink init and register lifecycle callback failed");
+        } else {
+            DHLOGI("DCamera allconnect sink init and register lifecycle callback success");
+        }
     }
     DHLOGI("DCameraServiceState OnStart service success.");
 }
@@ -79,8 +85,15 @@ void DistributedCameraSinkService::OnStop()
     state_ = DCameraServiceState::DCAMERA_SRV_STATE_NOT_START;
     registerToService_ = false;
     if (DCameraAllConnectManager::IsInited()) {
+        int32_t ret = DCameraAllConnectManager::GetInstance().UnRegisterLifecycleCallback();
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCamera allconnect sink UnRegisterLifecycle failed");
+        } else {
+            DHLOGI("DCamera allconnect sink UnRegisterLifecycle success");
+        }
         DCameraAllConnectManager::GetInstance().UnInitDCameraAllConnectManager();
     }
+
     DCameraSinkServiceIpc::GetInstance().UnInit();
 }
 

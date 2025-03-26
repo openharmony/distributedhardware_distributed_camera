@@ -67,7 +67,14 @@ void DistributedCameraSourceService::OnStart()
 #endif
     if (!DCameraAllConnectManager::IsInited()) {
         DCameraAllConnectManager::GetInstance().InitDCameraAllConnectManager();
+        int32_t ret = DCameraAllConnectManager::GetInstance().RegisterLifecycleCallback();
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCamera allconnect source init and RegisterLifecycle failed");
+        } else {
+            DHLOGI("DCamera allconnect source init and RegisterLifecycle success");
+        }
     }
+
     state_ = DCameraServiceState::DCAMERA_SRV_STATE_RUNNING;
     DHLOGI("start service success.");
 }
@@ -105,8 +112,15 @@ void DistributedCameraSourceService::OnStop()
         hicollieThread_.join();
     }
     if (DCameraAllConnectManager::IsInited()) {
+        int32_t ret = DCameraAllConnectManager::GetInstance().UnRegisterLifecycleCallback();
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCamera allconnect source UnRegisterLifecycle failed");
+        } else {
+            DHLOGI("DCamera allconnect source UnRegisterLifecycle success");
+        }
         DCameraAllConnectManager::GetInstance().UnInitDCameraAllConnectManager();
     }
+
 #ifdef DCAMERA_MMAP_RESERVE
     ConverterHandle::GetInstance().DeInitConverter();
 #endif

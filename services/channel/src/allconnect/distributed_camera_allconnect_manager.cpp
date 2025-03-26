@@ -89,10 +89,21 @@ bool DCameraAllConnectManager::IsInited()
 }
 
 int32_t DCameraAllConnectManager::PublishServiceState(const std::string &peerNetworkId,
-    DCameraCollaborationBussinessStatus state)
+    const std::string &dhId, DCameraCollaborationBussinessStatus state)
 {
     DHLOGI("DCamera allconnect PublishServiceState begin");
     std::lock_guard<std::mutex> lock(allConnectLock_);
+    dhIdStateMap_[dhId] = state;
+    DHLOGI("DCamera allconnect PublishServiceState dhId:%{public}s, state:%{public}d",
+        dhId.c_str(), state);
+    DCameraCollaborationBussinessStatus maxState = SCM_IDLE;
+    std::string dhIdOfmaxState;
+    for (const auto& statePair : dhIdStateMap_) {
+        if (statePair.second > maxState) {
+            maxState = statePair.second;
+            dhIdOfmaxState = statePair.first;
+        }
+    }
     if (dllHandle_ == nullptr) {
         DHLOGE("DCamera allconnect dllHandle_ is nullptr, all connect not support.");
         return DistributedCameraErrno::DCAMERA_OK;
@@ -102,9 +113,11 @@ int32_t DCameraAllConnectManager::PublishServiceState(const std::string &peerNet
         return DistributedCameraErrno::DCAMERA_ERR_DLOPEN;
     }
 
+    DHLOGI("DCamera allconnect PublishDhId:%{public}s, pulishState:%{public}d",
+        dhIdOfmaxState.c_str(), maxState);
     int32_t ret = allConnect_.dCameraCollaborationPublishServiceState(peerNetworkId.c_str(),
         SERVICE_NAME.c_str(),
-        "", state);
+        "", maxState);
     if (ret != DistributedCameraErrno::DCAMERA_OK) {
         DHLOGE("DCamera allconnect PublishServiceState %{public}d fail, ret %{public}d", state, ret);
         return DistributedCameraErrno::DCAMERA_ERR_PUBLISH_STATE;

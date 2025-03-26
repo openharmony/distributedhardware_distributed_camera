@@ -64,6 +64,7 @@ void DCameraSoftbusSessionTest::TearDownTestCase(void)
 
 void DCameraSoftbusSessionTest::SetUp(void)
 {
+    std::string myDhId = "dhId";
     std::string myDevId = TEST_MYDEVICE_ID;
     std::string mySessionName = "testmysession";
     std::string peerSessionName = "testpeersession";
@@ -74,7 +75,7 @@ void DCameraSoftbusSessionTest::SetUp(void)
 
     listener_ = std::make_shared<DCameraSinkOutputChannelListener>(CONTINUOUS_FRAME, output_);
 
-    softbusSession_ = std::make_shared<DCameraSoftbusSession>(myDevId, mySessionName, peerDevId,
+    softbusSession_ = std::make_shared<DCameraSoftbusSession>(myDhId, myDevId, mySessionName, peerDevId,
         peerSessionName, listener_, sessionMode);
 }
 

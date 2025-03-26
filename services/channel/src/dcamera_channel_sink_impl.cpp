@@ -71,11 +71,12 @@ int32_t DCameraChannelSinkImpl::CreateSession(std::vector<DCameraIndex>& camInde
     }
     mode_ = sessionMode;
     std::string peerDevId = camIndexs[0].devId_;
+    std::string dhId = camIndexs[0].dhId_;
     std::string peerSessionName = SESSION_HEAD + sessionFlag;
     DHLOGI("DCameraChannelSinkImpl CreateSession Listen Start, devId: %{public}s", GetAnonyString(myDevId).c_str());
     // sink_server_listen
-    softbusSession_ = std::make_shared<DCameraSoftbusSession>(myDevId, mySessionName_, peerDevId, peerSessionName,
-        listener, sessionMode);
+    softbusSession_ = std::make_shared<DCameraSoftbusSession>(dhId, myDevId, mySessionName_, peerDevId,
+        peerSessionName, listener, sessionMode);
     ret = softbusSession_->CreateSocketServer();
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraChannelSinkImpl CreateSession Error, ret %{public}d", ret);

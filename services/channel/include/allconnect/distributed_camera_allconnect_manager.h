@@ -32,7 +32,7 @@ public:
     static DCameraAllConnectManager &GetInstance();
     int32_t InitDCameraAllConnectManager();
     int32_t UnInitDCameraAllConnectManager();
-    int32_t PublishServiceState(const std::string &peerNetworkId,
+    int32_t PublishServiceState(const std::string &peerNetworkId, const std::string &dhId,
                                 DCameraCollaborationBussinessStatus state);
     int32_t ApplyAdvancedResource(const std::string &peerNetworkId,
                                   DCameraCollaborationResourceRequestInfoSets *resourceRequest);
@@ -57,6 +57,7 @@ private:
     static int32_t ApplyResult(int32_t errorcode, int32_t result, const char *reason);
 
     std::mutex allConnectLock_;
+    std::map<std::string, DCameraCollaborationBussinessStatus> dhIdStateMap_;
     void *dllHandle_ = nullptr;
 
     DCameraCollaborationApi allConnect_ = {
@@ -72,7 +73,7 @@ private:
 
     static std::shared_ptr<DCameraBlockObject<bool>> applyResultBlock_;
     static constexpr uint32_t BLOCK_INTERVAL_ALLCONNECT = 60 * 1000;
-    static inline const std::string SERVICE_NAME {"DistributedCamera"};  // to be discussed
+    static inline const std::string SERVICE_NAME {"DistributedCamera"};
 
     static std::map<std::string, int32_t> netwkIdSourceSessionIdMap_;
     static std::mutex netwkIdSourceSessionIdMapLock_;

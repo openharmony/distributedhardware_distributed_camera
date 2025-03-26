@@ -47,7 +47,8 @@ void SoftbusCreateSoftBusSourceSocketClientFuzzTest(const uint8_t* data, size_t 
     DCameraSessionMode sessionMode = DCameraSessionMode::DCAMERA_SESSION_MODE_CTRL;
     std::string peerDevId = "bb536a637105409e904d4da83790a4a7";
     std::string myDevId = "abcde";
-    DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDevId, peerSessName, peerDevId,
+    std::string myDhId = "mydhid";
+    DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDhId, myDevId, peerSessName, peerDevId,
         sessionMode, role);
 }
 
@@ -98,7 +99,8 @@ void SoftbusSendSofbusStreamFuzzTest(const uint8_t* data, size_t size)
     DCameraSessionMode sessionMode = DCameraSessionMode::DCAMERA_SESSION_MODE_VIDEO;
     std::string peerDevId = "bb536a637105409e904d4da83790a4a7";
     std::string myDevId = "abcde";
-    DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDevId, peerSessName, peerDevId,
+    std::string myDhId = "mydhid";
+    DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDhId, myDevId, peerSessName, peerDevId,
         sessionMode, role);
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);
