@@ -64,6 +64,7 @@ public:
     virtual int32_t SetResultCallback(std::shared_ptr<ResultCallback>& callback) = 0;
     virtual int32_t PauseCapture() = 0;
     virtual int32_t ResumeCapture() = 0;
+    virtual int32_t PrelaunchCamera() = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

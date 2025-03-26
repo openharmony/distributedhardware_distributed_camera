@@ -22,6 +22,7 @@
 #include "icamera_source_data_process.h"
 
 #include "dcamera_source_dev.h"
+#include "distributed_camera_errno.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -52,6 +53,7 @@ private:
     void PostChannelDisconnectedEvent();
     int32_t EstablishContinuousFrameSession(std::vector<DCameraIndex>& indexs);
     int32_t EstablishSnapshotFrameSession(std::vector<DCameraIndex>& indexs);
+    int32_t WaitForOpenChannelCompletion(bool needWait);
 
 private:
     std::map<DCStreamType, std::shared_ptr<ICameraChannel>> channels_;
@@ -68,6 +70,15 @@ private:
     std::atomic<bool> isChannelConnected_ = false;
     std::mutex channelMtx_;
     std::condition_variable channelCond_;
+
+    static constexpr std::chrono::seconds TIMEOUT_3_SEC = std::chrono::seconds(3);
+    std::atomic<bool> isOpenChannelFinished_ = false;
+    std::mutex isOpenChannelMtx_;
+    std::condition_variable isOpenChannelCond_;
+    std::atomic<int32_t> continuousFrameResult_ = DCAMERA_OK;
+    std::atomic<int32_t> snapshotFrameResult_ = DCAMERA_OK;
+    std::shared_ptr<AppExecFwk::EventRunner> runner_ = AppExecFwk::EventRunner::Create(true);
+    std::shared_ptr<AppExecFwk::EventHandler> handler_ = std::make_shared<AppExecFwk::EventHandler>(runner_);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

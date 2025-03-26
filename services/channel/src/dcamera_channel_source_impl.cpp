@@ -78,7 +78,7 @@ int32_t DCameraChannelSourceImpl::CreateSession(std::vector<DCameraIndex>& camIn
     mode_ = sessionMode;
     DHLOGI("DCameraChannelSourceImpl CreateSession Start, name: %{public}s devId: %{public}s",
         GetAnonyString(mySessionName_).c_str(), GetAnonyString(myDevId).c_str());
-    for (auto iter = camIndexs.begin(); iter != camIndexs.end(); iter++) {
+    for (auto iter = camIndexs_.begin(); iter != camIndexs_.end(); iter++) {
         std::string peerDevId = (*iter).devId_;
         std::string peerSessionName = SESSION_HEAD + (*iter).dhId_ + std::string("_") + sessionFlag;
         // source_bind
