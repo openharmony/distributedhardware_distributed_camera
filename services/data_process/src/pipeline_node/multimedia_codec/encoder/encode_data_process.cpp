@@ -74,7 +74,11 @@ int32_t EncodeDataProcess::InitNode(const VideoConfigParams& sourceConfig, const
             "%{public}d.", sourceConfig_.GetVideoCodecType(), targetConfig_.GetVideoCodecType());
         processedConfig_ = sourceConfig;
         processedConfig = processedConfig_;
-        isEncoderProcess_.store(true);
+        {
+            std::unique_lock<std::mutex> lock(isEncoderProcessMtx_);
+            isEncoderProcess_.store(true);
+        }
+        isEncoderProcessCond_.notify_one();
         return DCAMERA_OK;
     }
 
@@ -85,7 +89,11 @@ int32_t EncodeDataProcess::InitNode(const VideoConfigParams& sourceConfig, const
         return err;
     }
     processedConfig = processedConfig_;
-    isEncoderProcess_.store(true);
+    {
+        std::unique_lock<std::mutex> lock(isEncoderProcessMtx_);
+        isEncoderProcess_.store(true);
+    }
+    isEncoderProcessCond_.notify_one();
     return DCAMERA_OK;
 }
 
@@ -542,8 +550,13 @@ void EncodeDataProcess::OnOutputFormatChanged(const Media::Format &format)
 void EncodeDataProcess::OnOutputBufferAvailable(uint32_t index, MediaAVCodec::AVCodecBufferInfo info,
     MediaAVCodec::AVCodecBufferFlag flag, std::shared_ptr<Media::AVSharedMemory> buffer)
 {
-    if (!isEncoderProcess_.load()) {
-        DHLOGE("EncodeNode occurred error or start release.");
+    DHLOGI("Waiting for encoder process to become available...");
+    std::unique_lock<std::mutex> lock(isEncoderProcessMtx_);
+    bool timeOut = !isEncoderProcessCond_.wait_for(lock, TIMEOUT_3_SEC, [this] {
+        return isEncoderProcess_.load();
+    });
+    if (timeOut) {
+        DHLOGE("Timed out waiting for encoder process after 3 second.");
         return;
     }
     DHLOGD("Video encode buffer info: presentation TimeUs %{public}" PRId64", size %{public}d, offset %{public}d, "

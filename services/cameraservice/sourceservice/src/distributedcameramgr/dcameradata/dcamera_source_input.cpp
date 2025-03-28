@@ -23,7 +23,6 @@
 #include "dcamera_source_input_channel_listener.h"
 #include "dcamera_softbus_latency.h"
 #include "distributed_camera_constants.h"
-#include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
 
 namespace OHOS {
@@ -175,29 +174,75 @@ int32_t DCameraSourceInput::StopCapture(std::vector<int>& streamIds, bool& isAll
     return DCAMERA_OK;
 }
 
+int32_t DCameraSourceInput::WaitForOpenChannelCompletion(bool needWait)
+{
+    DHLOGI("openChannel needWait: %{public}s", needWait ? "true" : "false");
+    if (needWait) {
+        std::unique_lock<std::mutex> lock(isOpenChannelMtx_);
+        bool timeOut = !isOpenChannelCond_.wait_for(lock, TIMEOUT_3_SEC, [this] {
+            return isOpenChannelFinished_.load();
+        });
+        if (timeOut) {
+            DHLOGE("openChannel timed out after 3 seconds.");
+            continuousFrameResult_.store(DCAMERA_BAD_VALUE);
+        }
+    }
+    DHLOGI("DCameraSourceInput OpenChannel finish devId %{public}s dhId %{public}s continue "
+        "state: %{public}d, snapshot state: %{public}d", GetAnonyString(devId_).c_str(),
+        GetAnonyString(dhId_).c_str(), channelState_[CONTINUOUS_FRAME], channelState_[SNAPSHOT_FRAME]);
+    const int32_t contRet = continuousFrameResult_.load();
+    if (contRet != DCAMERA_OK) {
+        return contRet;
+    }
+    const int32_t snapRet = snapshotFrameResult_.load();
+    if (snapRet != DCAMERA_OK) {
+        return snapRet;
+    }
+    return DCAMERA_OK;
+}
+
 int32_t DCameraSourceInput::OpenChannel(std::vector<DCameraIndex>& indexs)
 {
     DHLOGI("DCameraSourceInput OpenChannel devId %{public}s dhId %{public}s continue state: %{public}d, snapshot "
         "state: %{public}d", GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(),
         channelState_[CONTINUOUS_FRAME], channelState_[SNAPSHOT_FRAME]);
-    if (channelState_[CONTINUOUS_FRAME] == DCAMERA_CHANNEL_STATE_DISCONNECTED) {
-        int32_t ret = EstablishContinuousFrameSession(indexs);
-        if (ret != DCAMERA_OK) {
-            DHLOGE("esdablish continuous frame failed ret: %{public}d, devId: %{public}s, dhId: %{public}s", ret,
-                GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
-            return ret;
-        }
+    bool needWait = false;
+    isOpenChannelFinished_.store(false);
+    const bool continuousNeeded = (channelState_[CONTINUOUS_FRAME] == DCAMERA_CHANNEL_STATE_DISCONNECTED);
+    const bool snapshotNeeded = (channelState_[SNAPSHOT_FRAME] == DCAMERA_CHANNEL_STATE_DISCONNECTED);
+    continuousFrameResult_.store(DCAMERA_OK);
+    snapshotFrameResult_.store(DCAMERA_OK);
+    if (continuousNeeded) {
+        needWait = true;
+        DHLOGI("openChannel starting continuous frame session establishment");
+        auto task = [&]() {
+            DHLOGI("openChannel continuous frame task started");
+            int32_t ret = EstablishContinuousFrameSession(indexs);
+            continuousFrameResult_.store(ret);
+            if (ret != DCAMERA_OK) {
+                DHLOGE("esdablish continuous frame failed ret: %{public}d, devId: %{public}s, dhId: %{public}s", ret,
+                    GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+            }
+            {
+                std::unique_lock<std::mutex> lock(isOpenChannelMtx_);
+                isOpenChannelFinished_.store(true);
+            }
+            isOpenChannelCond_.notify_one();
+            DHLOGI("openChannel continuous frame task completed");
+        };
+        handler_->PostTask(task, "DCameraSourceInput:OpenChannel", 0, AppExecFwk::EventQueue::Priority::HIGH);
     }
-    if (channelState_[SNAPSHOT_FRAME] == DCAMERA_CHANNEL_STATE_DISCONNECTED) {
+    if (snapshotNeeded) {
+        DHLOGI("openChannel starting snapshot frame session establishment");
         int32_t ret = EstablishSnapshotFrameSession(indexs);
+        snapshotFrameResult_.store(ret);
         if (ret != DCAMERA_OK) {
             DHLOGE("esdablish snapshot frame failed ret: %{public}d,"
                 "devId: %{public}s, dhId: %{public}s", ret, GetAnonyString(devId_).c_str(),
                 GetAnonyString(dhId_).c_str());
-            return ret;
         }
     }
-    return DCAMERA_OK;
+    return WaitForOpenChannelCompletion(needWait);
 }
 
 int32_t DCameraSourceInput::CloseChannel()

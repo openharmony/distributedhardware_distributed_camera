@@ -65,7 +65,7 @@ DCameraSourceController::~DCameraSourceController()
 int32_t DCameraSourceController::StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos,
     int32_t sceneMode)
 {
-    if (indexs_.size() > DCAMERA_MAX_NUM) {
+    if (indexs_.empty() || indexs_.size() > DCAMERA_MAX_NUM) {
         DHLOGE("StartCapture not support operate %{public}zu camera", indexs_.size());
         return DCAMERA_BAD_OPERATE;
     }
@@ -111,7 +111,7 @@ int32_t DCameraSourceController::StartCapture(std::vector<std::shared_ptr<DCamer
 
 int32_t DCameraSourceController::StopCapture()
 {
-    if (indexs_.size() > DCAMERA_MAX_NUM) {
+    if (indexs_.empty() || indexs_.size() > DCAMERA_MAX_NUM) {
         DHLOGE("StopCapture not support operate %{public}zu camera", indexs_.size());
         return DCAMERA_BAD_OPERATE;
     }
@@ -163,7 +163,7 @@ int32_t DCameraSourceController::StopCapture()
 int32_t DCameraSourceController::ChannelNeg(std::shared_ptr<DCameraChannelInfo>& info)
 {
     if (!ManageSelectChannel::GetInstance().GetSrcConnect()) {
-        if (indexs_.size() > DCAMERA_MAX_NUM) {
+        if (indexs_.empty() || indexs_.size() > DCAMERA_MAX_NUM) {
             DHLOGE("ChannelNeg not support operate %{public}zu camera", indexs_.size());
             return DCAMERA_BAD_OPERATE;
         }
@@ -243,7 +243,7 @@ int32_t DCameraSourceController::DCameraNotify(std::shared_ptr<DCameraEvent>& ev
 
 int32_t DCameraSourceController::UpdateSettings(std::vector<std::shared_ptr<DCameraSettings>>& settings)
 {
-    if (indexs_.size() > DCAMERA_MAX_NUM) {
+    if (indexs_.empty() || indexs_.size() > DCAMERA_MAX_NUM) {
         DHLOGE("UpdateSettings not support operate %{public}zu camera", indexs_.size());
         return DCAMERA_BAD_OPERATE;
     }
@@ -287,7 +287,7 @@ int32_t DCameraSourceController::UpdateSettings(std::vector<std::shared_ptr<DCam
 int32_t DCameraSourceController::GetCameraInfo(std::shared_ptr<DCameraInfo>& camInfo)
 {
     if (!ManageSelectChannel::GetInstance().GetSrcConnect()) {
-        if (indexs_.size() > DCAMERA_MAX_NUM) {
+        if (indexs_.empty() || indexs_.size() > DCAMERA_MAX_NUM) {
             DHLOGE("GetCameraInfo not support operate %{public}zu camera", indexs_.size());
             return DCAMERA_BAD_OPERATE;
         }
@@ -321,7 +321,7 @@ int32_t DCameraSourceController::GetCameraInfo(std::shared_ptr<DCameraInfo>& cam
 
 int32_t DCameraSourceController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& openInfo)
 {
-    if (indexs_.size() > DCAMERA_MAX_NUM) {
+    if (indexs_.empty() || indexs_.size() > DCAMERA_MAX_NUM) {
         DHLOGE("OpenChannel not support operate %{public}zu camera", indexs_.size());
         return DCAMERA_BAD_OPERATE;
     }
@@ -369,7 +369,7 @@ int32_t DCameraSourceController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& o
 
 int32_t DCameraSourceController::CloseChannel()
 {
-    if (indexs_.size() > DCAMERA_MAX_NUM) {
+    if (indexs_.empty() || indexs_.size() > DCAMERA_MAX_NUM) {
         DHLOGE("CloseChannel not support operate %{public}zu camera", indexs_.size());
         return DCAMERA_BAD_OPERATE;
     }
