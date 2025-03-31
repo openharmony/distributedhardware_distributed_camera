@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -154,7 +154,7 @@ void DCameraProviderCallbackImplTest::TearDown(void)
  * @tc.type: FUNC
  * @tc.require: issue
  */
-HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_001, TestSize.Level1)
+HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_001, TestSize.Level0)
 {
     EXPECT_EQ(false, testProviderCallback_ == nullptr);
 
@@ -172,7 +172,7 @@ HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_00
  * @tc.type: FUNC
  * @tc.require: issue
  */
-HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_002, TestSize.Level1)
+HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_002, TestSize.Level0)
 {
     EXPECT_EQ(false, testProviderCallback_ == nullptr);
     DHBase dhBase{TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0};
@@ -189,7 +189,7 @@ HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_00
  * @tc.type: FUNC
  * @tc.require: issue
  */
-HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_003, TestSize.Level1)
+HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_003, TestSize.Level0)
 {
     EXPECT_EQ(false, testProviderCallback_ == nullptr);
 
@@ -209,7 +209,7 @@ HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_00
  * @tc.type: FUNC
  * @tc.require: issue
  */
-HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_004, TestSize.Level1)
+HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_004, TestSize.Level0)
 {
     EXPECT_EQ(false, testProviderCallback_ == nullptr);
 
@@ -227,7 +227,7 @@ HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_00
  * @tc.type: FUNC
  * @tc.require: issue
  */
-HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_005, TestSize.Level1)
+HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_005, TestSize.Level0)
 {
     EXPECT_EQ(false, testProviderCallback_ == nullptr);
 
@@ -247,7 +247,7 @@ HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_00
  * @tc.type: FUNC
  * @tc.require: issue
  */
-HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_006, TestSize.Level1)
+HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_006, TestSize.Level0)
 {
     EXPECT_EQ(false, testProviderCallback_ == nullptr);
 
@@ -265,7 +265,7 @@ HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_00
  * @tc.type: FUNC
  * @tc.require: issue
  */
-HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_007, TestSize.Level1)
+HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_007, TestSize.Level0)
 {
     EXPECT_EQ(false, testProviderCallback_ == nullptr);
 
@@ -280,7 +280,7 @@ HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_00
  * @tc.type: FUNC
  * @tc.require: issue
  */
-HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_008, TestSize.Level1)
+HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_008, TestSize.Level0)
 {
     EXPECT_EQ(false, testProviderCallback_ == nullptr);
 
@@ -301,7 +301,7 @@ HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_00
  * @tc.type: FUNC
  * @tc.require: issue
  */
-HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_009, TestSize.Level1)
+HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_009, TestSize.Level0)
 {
     DHBase dhBase{TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0};
     std::shared_ptr<DCameraSourceDev> camDev = nullptr;
@@ -320,7 +320,7 @@ HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_00
  * @tc.type: FUNC
  * @tc.require: issue
  */
-HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_010, TestSize.Level1)
+HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_010, TestSize.Level0)
 {
     DHBase dhBase{TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0};
     std::shared_ptr<DCameraSourceDev> camDev = nullptr;
@@ -337,7 +337,7 @@ HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_01
  * @tc.type: FUNC
  * @tc.require: issue
  */
-HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_011, TestSize.Level1)
+HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_011, TestSize.Level0)
 {
     EXPECT_EQ(false, testProviderCallback_ == nullptr);
 
@@ -422,7 +422,7 @@ HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_01
  * @tc.type: FUNC
  * @tc.require: issue
  */
-HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_013, TestSize.Level1)
+HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_013, TestSize.Level0)
 {
     DHBase dhBase{TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0};
     std::vector<DCCaptureInfo> captureInfos;
@@ -452,7 +452,7 @@ HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_01
  * @tc.type: FUNC
  * @tc.require: issue
  */
-HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_014, TestSize.Level1)
+HWTEST_F(DCameraProviderCallbackImplTest, dcamera_provider_callback_impl_test_014, TestSize.Level0)
 {
     DHBase dhBase{TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0};
     DCameraHDFEvent event;

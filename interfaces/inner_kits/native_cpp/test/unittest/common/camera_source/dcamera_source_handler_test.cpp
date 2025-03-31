@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -75,7 +75,7 @@ void DCameraSourceHandlerTest::TearDown(void)
  * @tc.type: FUNC
  * @tc.require: issue
  */
-HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_001, TestSize.Level1)
+HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_001, TestSize.Level0)
 {
     std::string params = "test001";
     int32_t ret = DCameraSourceHandler::GetInstance().InitSource(params);
@@ -88,7 +88,7 @@ HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_001, TestSize.Lev
  * @tc.type: FUNC
  * @tc.require: issue
  */
-HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_002, TestSize.Level1)
+HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_002, TestSize.Level0)
 {
     std::string params = "test002";
     int32_t ret = DCameraSourceHandler::GetInstance().InitSource(params);
@@ -107,7 +107,7 @@ HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_002, TestSize.Lev
  * @tc.type: FUNC
  * @tc.require: issue
  */
-HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_003, TestSize.Level1)
+HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_003, TestSize.Level0)
 {
     std::string devId = TEST_DEVICE_ID;
     std::string dhId = TEST_CAMERA_DH_ID_0;
@@ -130,7 +130,7 @@ HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_003, TestSize.Lev
  * @tc.type: FUNC
  * @tc.require: issue
  */
-HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_004, TestSize.Level1)
+HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_004, TestSize.Level0)
 {
     std::string devId = TEST_DEVICE_ID;
     std::string dhId = TEST_CAMERA_DH_ID_0;
@@ -148,7 +148,7 @@ HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_004, TestSize.Lev
  * @tc.type: FUNC
  * @tc.require: issue
  */
-HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_005, TestSize.Level1)
+HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_005, TestSize.Level0)
 {
     std::string params = "test005";
     int32_t systemAbilityId = 4803;
@@ -173,7 +173,7 @@ HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_005, TestSize.Lev
  * @tc.type: FUNC
  * @tc.require: issue
  */
-HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_006, TestSize.Level1)
+HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_006, TestSize.Level0)
 {
     std::string params = "test006";
     int32_t systemAbilityId = 4803;

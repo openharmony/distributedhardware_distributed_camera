@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -328,7 +328,7 @@ void DCameraHandler::ProcessProfile(const DCStreamType type, std::map<std::strin
             continue;
         }
         formatSet.insert(dformat);
-        DHLOGI("width: %{public}d, height: %{public}d, format: %{public}d", picSize.width, picSize.height, dformat);
+        DHLOGD("width: %{public}d, height: %{public}d, format: %{public}d", picSize.width, picSize.height, dformat);
         std::string formatName = std::to_string(dformat);
         if (IsValid(type, picSize)) {
             std::string resolutionValue = std::to_string(picSize.width) + "*" + std::to_string(picSize.height);
@@ -409,7 +409,7 @@ void DCameraHandler::ConfigFormatvideo(const DCStreamType type, cJSON* root,
 
 int32_t DCameraHandler::CovertToDcameraFormat(CameraStandard::CameraFormat format)
 {
-    DHLOGI("format: %{public}d", format);
+    DHLOGD("format: %{public}d", format);
     int32_t ret = INVALID_FORMAT;
     switch (format) {
         case CameraStandard::CameraFormat::CAMERA_FORMAT_RGBA_8888:
