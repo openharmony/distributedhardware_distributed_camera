@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -189,8 +189,8 @@ HWTEST_F(DcameraUtilsToolsTest, GetAnonyInt32_001, TestSize.Level1)
  */
 HWTEST_F(DcameraUtilsToolsTest, IsOverDumpSize_001, TestSize.Level1)
 {
-    std::string DUMP_FILE_NAME = "/data/dump.txt";
-    std::ofstream ofs(DUMP_FILE_NAME, std::ios::out);
+    std::string dumpFileName = "/data/dump.txt";
+    std::ofstream ofs(dumpFileName, std::ios::out);
     if (!ofs) {
         DHLOGI("open file failed");
     } else {
@@ -209,8 +209,8 @@ HWTEST_F(DcameraUtilsToolsTest, IsOverDumpSize_001, TestSize.Level1)
     DumpBufferToFile(fileName, str, size);
     EXPECT_EQ(DCAMERA_INIT_ERR, IsUnderDumpMaxSize(fileName));
 
-    DumpBufferToFile(DUMP_FILE_NAME, str, size);
-    EXPECT_EQ(DCAMERA_OK, IsUnderDumpMaxSize(DUMP_FILE_NAME));
+    DumpBufferToFile(dumpFileName, str, size);
+    EXPECT_EQ(DCAMERA_OK, IsUnderDumpMaxSize(dumpFileName));
 }
 
 /**
@@ -248,13 +248,13 @@ HWTEST_F(DcameraUtilsToolsTest, OpenDumpFile_001, TestSize.Level1)
     void *buffer = nullptr;
     size_t bufferSize = 0;
     DumpFileUtil::WriteDumpFile(dumpFile, buffer, bufferSize);
-    const std::string DUMP_SERVER_PARA_TEST = "sys.dcamera.dump.write.enable w";
-    const std::string DUMP_DCAMERA_TEST_FILENAME = "opendumpfile.txt";
-    DumpFileUtil::OpenDumpFile(DUMP_SERVER_PARA_TEST, DUMP_DCAMERA_TEST_FILENAME, &dumpFile);
+    const std::string dumpServerParaTest = "sys.dcamera.dump.write.enable w";
+    const std::string dumpDcameraTestFilename = "opendumpfile.txt";
+    DumpFileUtil::OpenDumpFile(dumpServerParaTest, dumpDcameraTestFilename, &dumpFile);
     DumpFileUtil::WriteDumpFile(dumpFile, buffer, bufferSize);
-    const std::string DUMP_SERVER_PARA_TEST_1 = "sys.dcamera.dump.write.enable a";
-    const std::string DUMP_DCAMERA_TEST_FILENAME_1 = "opendumpfile1.txt";
-    DumpFileUtil::OpenDumpFile(DUMP_SERVER_PARA_TEST_1, DUMP_DCAMERA_TEST_FILENAME_1, &dumpFile);
+    const std::string dumpServerParaTest1 = "sys.dcamera.dump.write.enable a";
+    const std::string dumpDcameraTestFilename1 = "opendumpfile1.txt";
+    DumpFileUtil::OpenDumpFile(dumpServerParaTest1, dumpDcameraTestFilename1, &dumpFile);
     DumpFileUtil::WriteDumpFile(dumpFile, buffer, bufferSize);
     DumpFileUtil::CloseDumpFile(&dumpFile);
     EXPECT_EQ(true, dumpFile == nullptr);
