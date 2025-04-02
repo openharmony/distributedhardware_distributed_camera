@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +14,7 @@
  */
 
 #include "softbusonsinkbytesreceived_fuzzer.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "dcamera_softbus_adapter.h"
 
@@ -25,10 +26,11 @@ void SoftbusOnSinkBytesReceivedFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-    int32_t sessionId = *(reinterpret_cast<const int32_t*>(data));
+    FuzzedDataProvider fdp(data, size);
+    int32_t sessionId = fdp.ConsumeIntegral<int32_t>();
     int32_t socket = 1;
     const void *receivedData = reinterpret_cast<const void*>(data);
-    uint32_t dataLen = *(reinterpret_cast<const uint32_t*>(data));
+    uint32_t dataLen = fdp.ConsumeIntegral<uint32_t>();
     auto session = std::make_shared<DCameraSoftbusSession>();
     DCameraSoftbusAdapter::GetInstance().sinkSocketSessionMap_[socket] = session;
     DCameraSoftbusAdapter::GetInstance().SinkOnBytes(sessionId, receivedData, dataLen);
