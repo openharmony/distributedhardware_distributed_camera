@@ -197,8 +197,8 @@ int32_t DCameraSoftbusAdapter::CreatSoftBusSinkSocketServer(std::string mySessio
     return DCAMERA_OK;
 }
 
-int32_t DCameraSoftbusAdapter::CreateSoftBusSourceSocketClient(std::string myDevId, std::string peerSessionName,
-    std::string peerDevId, DCameraSessionMode sessionMode, DCAMERA_CHANNEL_ROLE role)
+int32_t DCameraSoftbusAdapter::CreateSoftBusSourceSocketClient(std::string myDhId, std::string myDevId,
+    std::string peerSessionName, std::string peerDevId, DCameraSessionMode sessionMode, DCAMERA_CHANNEL_ROLE role)
 {
     DHLOGI("create socket client start, myDevId: %{public}s, peerSessionName: %{public}s",
         GetAnonyString(myDevId).c_str(), GetAnonyString(peerSessionName).c_str());
@@ -240,9 +240,11 @@ int32_t DCameraSoftbusAdapter::CreateSoftBusSourceSocketClient(std::string myDev
     }
     sourceSocketId_ = socketId;
     if (peerSessionName.find("_control") != std::string::npos && DCameraAllConnectManager::IsInited()) {
-        DCameraAllConnectManager::GetInstance().PublishServiceState(peerDevId, SCM_CONNECTED);
+        DCameraAllConnectManager::GetInstance().PublishServiceState(peerDevId, myDhId, SCM_CONNECTED);
         DCameraAllConnectManager::SetSourceNetworkId(peerDevId, sourceSocketId_);
     }
+    DHLOGI("DCamera allconnect create socket client publish scm connected success, dhId: %{public}s",
+        myDhId.c_str());
     DHLOGI("create socket client end, myDevId: %{public}s, peerSessionName: %{public}s",
         GetAnonyString(myDevId).c_str(), GetAnonyString(peerSessionName).c_str());
     return socketId;
@@ -359,10 +361,13 @@ int32_t DCameraSoftbusAdapter::SourceOnBind(int32_t socket, PeerSocketInfo info)
         DHLOGE("source bind socket failed, ret: %{public}d socket: %{public}d", ret, socket);
     }
     if (session->GetPeerSessionName().find("_control") != std::string::npos && DCameraAllConnectManager::IsInited()) {
-        ret = DCameraAllConnectManager::GetInstance().PublishServiceState(info.networkId, SCM_CONNECTED);
+        ret = DCameraAllConnectManager::GetInstance().PublishServiceState(info.networkId,
+            session->GetMyDhId(), SCM_CONNECTED);
         if (ret != DCAMERA_OK) {
             DHLOGE("DCamera allconnect sourceonBind publish scm connected failed, ret: %{public}d", ret);
         }
+        DHLOGI("DCamera allconnect sourceonBind publish scm connected success, dhId: %{public}s",
+            session->GetMyDhId().c_str());
         DCameraAllConnectManager::SetSourceNetworkId(info.networkId, socket);
     }
     DHLOGI("source bind socket end, socket: %{public}d end", socket);
@@ -582,16 +587,13 @@ int32_t DCameraSoftbusAdapter::SinkOnBind(int32_t socket, PeerSocketInfo info)
         DHLOGE("sink bind socket error, not find socket %{public}d", socket);
     }
     if (session->GetPeerSessionName().find("_control") != std::string::npos && DCameraAllConnectManager::IsInited()) {
-        ret =  DCameraAllConnectManager::GetInstance().RegisterLifecycleCallback();
-        if (ret == DCAMERA_OK) {
-            ret = DCameraAllConnectManager::GetInstance().PublishServiceState(info.networkId, SCM_CONNECTED);
-            if (ret != DCAMERA_OK) {
-                DHLOGE("DCamera allconnect sink on bind, publish service state failed %{public}d", ret);
-            }
-        } else {
-            DHLOGE("DCamera allconnect sink on bind, InitDCameraAllConnectManager failed %{public}d", ret);
+        ret = DCameraAllConnectManager::GetInstance().PublishServiceState(info.networkId,
+            session->GetMyDhId(), SCM_CONNECTED);
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCamera allconnect sink on bind, publish service state failed %{public}d", ret);
         }
-
+        DHLOGI("DCamera allconnect sink on bind publish scm connected success, dhId: %{public}s",
+            session->GetMyDhId().c_str());
         DCameraAllConnectManager::SetSinkNetWorkId(info.networkId, socket);
     }
     DHLOGI("sink bind socket end, socket: %{public}d", socket);
@@ -611,18 +613,14 @@ void DCameraSoftbusAdapter::SinkOnShutDown(int32_t socket, ShutdownReason reason
     if (session->GetPeerSessionName().find("_control") != std::string::npos && DCameraAllConnectManager::IsInited()) {
         std::string devId = DCameraAllConnectManager::GetSinkDevIdBySocket(socket);
         if (!devId.empty()) {
-            ret = DCameraAllConnectManager::GetInstance().PublishServiceState(devId, SCM_IDLE);
+            ret = DCameraAllConnectManager::GetInstance().PublishServiceState(devId, session->GetMyDhId(), SCM_IDLE);
             if (ret != DCAMERA_OK) {
                 DHLOGE("DCamera allconnect sinkDown PublishServiceState failed, ret: %{public}d, devId: %{public}s ",
                     ret, GetAnonyString(devId).c_str());
             }
-
-            ret = DCameraAllConnectManager::GetInstance().UnRegisterLifecycleCallback();
-            if (ret != DCAMERA_OK) {
-                DHLOGE("DCamera allconnect sinkdown UnInitDCameraAllConn failed, ret: %{public}d, devId: %{public}s",
-                    ret, GetAnonyString(devId).c_str());
-            }
         }
+        DHLOGI("DCamera allconnect sinkdown publish scm idle success, dhId: %{public}s",
+            session->GetMyDhId().c_str());
         DCameraAllConnectManager::RemoveSinkNetworkId(socket);
     }
 
@@ -730,14 +728,12 @@ void DCameraSoftbusAdapter::CloseSessionWithNetWorkId(const std::string &network
     session->OnSessionClose(sessionId);
     Shutdown(sessionId);
     if (bSinkConflict) {
-        ret = DCameraAllConnectManager::GetInstance().PublishServiceState(networkId, SCM_IDLE);
+        ret = DCameraAllConnectManager::GetInstance().PublishServiceState(networkId, session->GetMyDhId(), SCM_IDLE);
         if (ret != DCAMERA_OK) {
             DHLOGE("DCamera allconnect CloseSessionWithNetworkId publish service state failed");
         }
-        ret = DCameraAllConnectManager::GetInstance().UnRegisterLifecycleCallback();
-        if (ret != DCAMERA_OK) {
-            DHLOGE("DCamera allconnect CloseSessionWithNetworkId UnInitDCameraAllConnectManager failed");
-        }
+        DHLOGI("DCamera allconnect close session publish scm idle success, dhId: %{public}s",
+            session->GetMyDhId().c_str());
     }
 }
 

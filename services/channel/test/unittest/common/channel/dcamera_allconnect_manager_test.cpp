@@ -29,6 +29,7 @@ constexpr int32_t VALUABLE_SESSION_ID = 10;
 constexpr int32_t UNVALUABLE_SESSION_ID = -1;
 constexpr const char* DL_HANDLE = "dlhandle success";
 const std::string PEER_NETWORK_ID = "peerNetworkId";
+const std::string DH_ID = "dhId";
 } // namespace
 
 bool DCameraAllConnectManagerTest::InitAllConnectManagerMockEnv()
@@ -80,7 +81,7 @@ void DCameraAllConnectManagerTest::TearDownTestCase(void)
 HWTEST_F(DCameraAllConnectManagerTest, PublishServiceState_001, testing::ext::TestSize.Level1)
 {
     auto ret = DCameraAllConnectManager::GetInstance().PublishServiceState(PEER_NETWORK_ID,
-        DCameraCollaborationBussinessStatus::SCM_CONNECTING);
+        DH_ID, DCameraCollaborationBussinessStatus::SCM_CONNECTING);
     EXPECT_EQ(ret, DistributedCameraErrno::DCAMERA_OK);
 }
 
@@ -88,7 +89,7 @@ HWTEST_F(DCameraAllConnectManagerTest, PublishServiceState_002, testing::ext::Te
 {
     std::string emptyPeerNetworkId;
     auto ret = DCameraAllConnectManager::GetInstance().PublishServiceState(emptyPeerNetworkId,
-        DCameraCollaborationBussinessStatus::SCM_CONNECTING);
+        DH_ID, DCameraCollaborationBussinessStatus::SCM_CONNECTING);
     EXPECT_EQ(ret, DistributedCameraErrno::DCAMERA_ERR_PUBLISH_STATE);
 }
 

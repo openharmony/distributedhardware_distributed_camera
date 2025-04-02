@@ -34,10 +34,12 @@ DCameraSoftbusSession::DCameraSoftbusSession()
     ResetAssembleFrag();
 }
 
-DCameraSoftbusSession::DCameraSoftbusSession(std::string myDevId, std::string mySessionName, std::string peerDevId,
-    std::string peerSessionName, std::shared_ptr<ICameraChannelListener> listener, DCameraSessionMode mode)
-    : myDevId_(myDevId), mySessionName_(mySessionName), peerDevId_(peerDevId), peerSessionName_(peerSessionName),
-    listener_(listener), sessionId_(-1), state_(DCAMERA_SOFTBUS_STATE_CLOSED), mode_(mode)
+DCameraSoftbusSession::DCameraSoftbusSession(std::string myDhId, std::string myDevId, std::string mySessionName,
+    std::string peerDevId, std::string peerSessionName, std::shared_ptr<ICameraChannelListener> listener,
+    DCameraSessionMode mode)
+    : myDhId_(myDhId), myDevId_(myDevId), mySessionName_(mySessionName), peerDevId_(peerDevId),
+    peerSessionName_(peerSessionName), listener_(listener), sessionId_(-1), state_(DCAMERA_SOFTBUS_STATE_CLOSED),
+    mode_(mode)
 {
     sendFuncMap_[DCAMERA_SESSION_MODE_CTRL] = &DCameraSoftbusSession::SendBytes;
     sendFuncMap_[DCAMERA_SESSION_MODE_VIDEO] = &DCameraSoftbusSession::SendStream;
@@ -336,8 +338,8 @@ int32_t DCameraSoftbusSession::CreateSocketServer()
 
 int32_t DCameraSoftbusSession::BindSocketServer()
 {
-    int32_t socketId = DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDevId_, peerSessionName_,
-        peerDevId_, mode_, DCAMERA_CHANNLE_ROLE_SOURCE);
+    int32_t socketId = DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDhId_, myDevId_,
+        peerSessionName_, peerDevId_, mode_, DCAMERA_CHANNLE_ROLE_SOURCE);
     if (socketId == 0 || socketId == DCAMERA_BAD_VALUE) {
         DHLOGE("DCameraSoftbusSession BindSocketServer Error, socketId %{public}d", socketId);
         return socketId;
@@ -503,5 +505,11 @@ int32_t DCameraSoftbusSession::GetSessionId()
 {
     return sessionId_;
 }
+
+std::string DCameraSoftbusSession::GetMyDhId()
+{
+    return myDhId_;
+}
+
 } // namespace DistributedHardware
 } // namespace OHOS

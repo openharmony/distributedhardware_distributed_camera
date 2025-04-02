@@ -33,7 +33,7 @@ typedef enum {
 class DCameraSoftbusSession {
 public:
     DCameraSoftbusSession();
-    DCameraSoftbusSession(std::string myDevId, std::string mySessionName, std::string peerDevId,
+    DCameraSoftbusSession(std::string myDhId, std::string myDevId, std::string mySessionName, std::string peerDevId,
         std::string peerSessionName, std::shared_ptr<ICameraChannelListener> listener, DCameraSessionMode mode);
     ~DCameraSoftbusSession();
     int32_t CloseSession();
@@ -44,6 +44,7 @@ public:
     std::string GetPeerDevId();
     std::string GetPeerSessionName();
     std::string GetMySessionName();
+    std::string GetMyDhId();
     int32_t GetSessionId();
     int32_t CreateSocketServer();
     int32_t BindSocketServer();
@@ -110,6 +111,7 @@ private:
     uint32_t totalLen_;
 
 private:
+    std::string myDhId_;
     std::string myDevId_;
     std::string mySessionName_;
     std::string peerDevId_;

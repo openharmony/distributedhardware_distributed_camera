@@ -40,7 +40,7 @@ DECLARE_SINGLE_INSTANCE_BASE(DCameraSoftbusAdapter);
 public:
     int32_t CreatSoftBusSinkSocketServer(std::string mySessionName, DCAMERA_CHANNEL_ROLE role,
         DCameraSessionMode sessionMode, std::string peerDevId, std::string peerSessionName);
-    int32_t CreateSoftBusSourceSocketClient(std::string myDevId, std::string peerSessionName,
+    int32_t CreateSoftBusSourceSocketClient(std::string myDhId, std::string myDevId, std::string peerSessionName,
         std::string peerDevId, DCameraSessionMode sessionMode, DCAMERA_CHANNEL_ROLE role);
 
     int32_t DestroySoftbusSessionServer(std::string sessionName);
