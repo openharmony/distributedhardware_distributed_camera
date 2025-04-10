@@ -40,7 +40,6 @@
                 "hdf_core",
                 "drivers_interface_display",
                 "drivers_interface_distributed_camera",
-                "drivers_peripheral_display",
                 "c_utils",
                 "cJSON",
                 "dsoftbus",
