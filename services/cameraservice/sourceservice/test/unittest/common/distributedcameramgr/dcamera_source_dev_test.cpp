@@ -26,6 +26,7 @@
 #include "dcamera_source_dev.h"
 #include "mock_dcamera_source_dev.h"
 #include "mock_dcamera_source_controller.h"
+#include "mock_dcamera_source_input.h"
 #include "mock_dcamera_source_state_listener.h"
 #include "nativetoken_kit.h"
 #include "token_setproc.h"
@@ -421,6 +422,24 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_015, TestSize.Level1)
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
+HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_015_1, TestSize.Level1)
+{
+    SetTokenID();
+    std::vector<DCameraIndex> indexs;
+    camDev_->InitDCameraSourceDev();
+    camDev_->controller_ = std::make_shared<MockDCameraSourceControllerRetErr>();
+    int32_t ret = camDev_->controller_->Init(indexs);
+    camDev_->input_->Init();
+    DCameraIndex index;
+    index.devId_ = TEST_DEVICE_ID;
+    index.dhId_ = TEST_CAMERA_DH_ID_0;
+    indexs.push_back(index);
+    ret = camDev_->OpenCamera();
+    EXPECT_EQ(DCAMERA_OPEN_CONFLICT, ret);
+    ret = camDev_->CloseCamera();
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
 /**
  * @tc.name: dcamera_source_dev_test_016
  * @tc.desc: Verify source dev ConfigStreams.
@@ -590,6 +609,36 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_020, TestSize.Level1)
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
+HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_020_1, TestSize.Level1)
+{
+    std::vector<std::shared_ptr<DCCaptureInfo>> captureInfos;
+    std::shared_ptr<DCCaptureInfo> captureInfo = std::make_shared<DCCaptureInfo>();
+    captureInfo->streamIds_.push_back(1);
+    captureInfo->width_ = TEST_WIDTH;
+    captureInfo->height_ = TEST_HEIGTH;
+    captureInfo->stride_ = 1;
+    captureInfo->format_ = 1;
+    captureInfo->dataspace_ = 1;
+    captureInfo->encodeType_ = ENCODE_TYPE_H265;
+    captureInfo->type_ = CONTINUOUS_FRAME;
+    captureInfos.push_back(captureInfo);
+    camDev_->controller_ = std::make_shared<MockDCameraSourceController>();
+    auto savedInput = camDev_->input_;
+    camDev_->input_ = std::make_shared<MockDCameraSourceInput>();
+    camDev_->input_->Init();
+    int32_t ret = camDev_->StartCapture(captureInfos);
+    EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
+    std::vector<int> streamIds;
+    int32_t streamId = 1;
+    streamIds.push_back(streamId);
+    bool isAllStop = true;
+    ret = camDev_->StopCapture(streamIds, isAllStop);
+    EXPECT_EQ(DCAMERA_OK, ret);
+    ret = camDev_->StopAllCapture();
+    EXPECT_EQ(DCAMERA_OK, ret);
+    camDev_->input_ = savedInput;
+}
+
 /**
  * @tc.name: dcamera_source_dev_test_021
  * @tc.desc: Verify source dev UpdateSettings.
@@ -627,6 +676,12 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_021, TestSize.Level1)
     settings.push_back(setting);
     int32_t ret = camDev_->UpdateSettings(settings);
     EXPECT_EQ(DCAMERA_OK, ret);
+
+    auto savedInput = camDev_->input_;
+    camDev_->input_ = std::make_shared<MockDCameraSourceInput>();
+    ret = camDev_->UpdateSettings(settings);
+    EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
+    camDev_->input_ = savedInput;
 }
 
 /**
@@ -677,6 +732,28 @@ HWTEST_F(DCameraSourceDevTest, GetFullCaps_001, TestSize.Level1)
     std::shared_ptr<ICameraStateListener> stateListener1_;
     camDev1_ = std::make_shared<DCameraSourceDev>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, stateListener1_);
     EXPECT_EQ(DCAMERA_BAD_VALUE, camDev1_->GetFullCaps());
+}
+
+HWTEST_F(DCameraSourceDevTest, OnChannelConnectedEvent_001, TestSize.Level1)
+{
+    std::shared_ptr<DCameraSourceDev> camDev1_;
+    std::shared_ptr<ICameraStateListener> stateListener1_;
+    camDev1_ = std::make_shared<DCameraSourceDev>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, stateListener1_);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, camDev1_->OnChannelConnectedEvent());
+
+    camDev1_->InitDCameraSourceDev();
+    EXPECT_EQ(DCAMERA_OK, camDev1_->OnChannelConnectedEvent());
+}
+
+HWTEST_F(DCameraSourceDevTest, PostHicollieEvent_001, TestSize.Level1)
+{
+    std::shared_ptr<DCameraSourceDev> camDev1_;
+    std::shared_ptr<ICameraStateListener> stateListener1_;
+    camDev1_ = std::make_shared<DCameraSourceDev>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, stateListener1_);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, camDev1_->PostHicollieEvent());
+
+    camDev1_->InitDCameraSourceDev();
+    EXPECT_EQ(DCAMERA_OK, camDev1_->PostHicollieEvent());
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -464,5 +464,17 @@ HWTEST_F(DCameraCaptureInfoCmdlTest, Unmarshal_003, TestSize.Level1)
     ret = cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON_VALUE_ARRAY);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
+
+HWTEST_F(DCameraCaptureInfoCmdlTest, Unmarshal_004, TestSize.Level1)
+{
+    DCameraCaptureInfoCmd cmd;
+    int32_t ret = cmd.UmarshalValue(nullptr);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    std::shared_ptr<DCameraCaptureInfo> captureInfo;
+    ret = cmd.UmarshalSettings(nullptr, captureInfo);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -91,6 +91,26 @@ static const std::string TEST_SINK_FRAME_INFO_JSON_SENDT = R"({
     "ver": "v1"
 })";
 
+static const std::string TEST_SINK_FRAME_INFO_JSON_SENDT2 = R"({
+    "type": 0,
+    "index": 1,
+    "pts": 1,
+    "startEncodeT": 1,
+    "finishEncodeT": 1,
+    "sendT": 1,
+    "ver": "v1"
+})";
+
+static const std::string TEST_SINK_FRAME_INFO_JSON_SENDT3 = R"({
+    "type": 0,
+    "index": 1,
+    "pts": 1,
+    "startEncodeT": 1,
+    "finishEncodeT": 1,
+    "sendT": 1,
+    "ver": 1
+})";
+
 static const std::string TEST_SINK_FRAME_INFO_JSON_VER = R"({
     "type": 0,
     "index": 1,
@@ -156,6 +176,12 @@ HWTEST_F(DCameraSinkFrameInfoTest, dcamera_sink_frame_info_test_001, TestSize.Le
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 
     ret = frame.Unmarshal(TEST_SINK_FRAME_INFO_JSON_SENDT);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = frame.Unmarshal(TEST_SINK_FRAME_INFO_JSON_SENDT2);
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    ret = frame.Unmarshal(TEST_SINK_FRAME_INFO_JSON_SENDT3);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 
     ret = frame.Unmarshal(TEST_SINK_FRAME_INFO_JSON_VER);

@@ -86,6 +86,17 @@ public:
         return DCAMERA_OK;
     }
 };
+class MockDCameraSourceControllerRetErr : public MockDCameraSourceController {
+public:
+    int32_t OpenChannel(std::shared_ptr<DCameraOpenInfo>& openInfo)
+    {
+        return DCAMERA_BAD_OPERATE;
+    }
+    int32_t CloseChannel()
+    {
+        return DCAMERA_BAD_OPERATE;
+    }
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_MOCK_DCAMERA_SINK_CONTROLLER_H
