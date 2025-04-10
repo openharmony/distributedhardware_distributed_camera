@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -80,7 +80,6 @@ ohos_shared_library("distributed_camera_client") {
     "drivers_interface_camera:libmap_data_sequenceable_1.0",
     "drivers_interface_camera:metadata",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.1",
-    "drivers_peripheral_display:hdi_gralloc_client",
     "graphic_surface:surface",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
