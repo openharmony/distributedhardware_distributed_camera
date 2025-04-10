@@ -32,6 +32,54 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace DistributedHardware {
+
+class DCameraSourceStateImpl : public DCameraSourceState {
+public:
+    int32_t Execute(std::shared_ptr<DCameraSourceDev> &camDev, DCAMERA_EVENT eventType,
+        DCameraSourceEvent &event) override
+    {
+        return 0;
+    }
+
+    DCameraStateType GetStateType() override
+    {
+        return DCameraStateType::DCAMERA_STATE_INIT;
+    }
+};
+
+class CameraStateListenerImpl : public ICameraStateListener {
+public:
+    int32_t OnRegisterNotify(const std::string &devId, const std::string &dhId, const std::string &reqId,
+        int32_t status, std::string &data) override
+    {
+        return 0;
+    }
+
+    int32_t OnUnregisterNotify(const std::string &devId, const std::string &dhId, const std::string &reqId,
+        int32_t status, std::string &data) override
+    {
+        return 0;
+    }
+
+    int32_t OnHardwareStateChanged(const std::string &devId, const std::string &dhId, int32_t status) override
+    {
+        return 0;
+    }
+
+    int32_t OnDataSyncTrigger(const std::string &devId) override
+    {
+        return 0;
+    }
+
+    void SetCallback(sptr<IDCameraSourceCallback> callback) override
+    {
+        callback_ = callback;
+    }
+
+private:
+    sptr<IDCameraSourceCallback> callback_;
+};
+
 std::string g_channelStr = "";
 class DCameraSourceControllerTest : public testing::Test {
 public:
@@ -568,6 +616,38 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_020, TestSi
     ret = controller_->StartCapture(captureInfos, mode);
     EXPECT_EQ(ret, DCAMERA_BAD_OPERATE);
     ret = controller_->StopCapture();
+    EXPECT_EQ(ret, DCAMERA_BAD_OPERATE);
+}
+
+/**
+ * @tc.name: dcamera_source_controller_test_021
+ * @tc.desc: Verify source controller DCameraNotify.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_021, TestSize.Level1)
+{
+    std::shared_ptr<DCameraEvent> events = std::make_shared<DCameraEvent>();
+    events->eventType_ = 1;
+    events->eventResult_ = DCAMERA_EVENT_CAMERA_SUCCESS;
+    events->eventContent_ = START_CAPTURE_SUCC;
+    controller_->camHdiProvider_ = IDCameraProvider::Get(HDF_DCAMERA_EXT_SERVICE);
+    int32_t ret = controller_->DCameraNotify(events);
+    int32_t state = 2;
+    std::shared_ptr<ICameraStateListener> stateLisener = std::make_shared<CameraStateListenerImpl>();
+    std::shared_ptr<DCameraSourceDev> camDev = std::make_shared<DCameraSourceDev>("devId", "dhId",
+        stateLisener);
+    std::shared_ptr<DCameraSourceStateMachine> stMachine = std::make_shared<DCameraSourceStateMachine>(camDev);
+    controller_->stateMachine_ = stMachine;
+    std::shared_ptr<DCameraSourceState> currentState = std::make_shared<DCameraSourceStateImpl>();
+    controller_->stateMachine_->currentState_ = currentState;
+    controller_->OnSessionState(state, "networkId");
+    controller_->camDev_ = std::make_shared<DCameraSourceDev>("devId", "dhId", stateLisener);
+    controller_->PostChannelDisconnectedEvent();
+    controller_->PauseDistributedHardware("networkId");
+    controller_->ResumeDistributedHardware("networkId");
+    controller_->StopDistributedHardware("networkId");
+    controller_->UnInit();
     EXPECT_EQ(ret, DCAMERA_BAD_OPERATE);
 }
 }

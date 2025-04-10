@@ -580,5 +580,70 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_016, TestSize.Level1)
     testDecodeDataProcess_->isDecoderProcess_.store(true);
     EXPECT_EQ(rc, DCAMERA_OK);
 }
+
+/**
+ * @tc.name: decode_data_process_test_017
+ * @tc.desc: Verify decode data process func.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DecodeDataProcessTest, decode_data_process_test_017, TestSize.Level1)
+{
+    DHLOGI("DecodeDataProcessTest decode_data_process_test_017");
+    EXPECT_EQ(false, testDecodeDataProcess_ == nullptr);
+    VideoConfigParams srcParams2(VideoCodecType::CODEC_H264,
+        Videoformat::NV12, DCAMERA_PRODUCER_FPS_DEFAULT, 2000, 2000);
+    VideoConfigParams destParams2(VideoCodecType::NO_CODEC,
+        Videoformat::NV21, DCAMERA_PRODUCER_FPS_DEFAULT, 2000, 2000);
+    VideoConfigParams procConfig2;
+    int32_t rc = testDecodeDataProcess_->InitNode(srcParams2, destParams2, procConfig2);
+    testDecodeDataProcess_->OnError();
+    testDecodeDataProcess_->isDecoderProcess_.store(true);
+    EXPECT_EQ(rc, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: decode_data_process_test_018
+ * @tc.desc: Verify decode data process func.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DecodeDataProcessTest, decode_data_process_test_018, TestSize.Level1)
+{
+    DHLOGI("DecodeDataProcessTest decode_data_process_test_018");
+    EXPECT_EQ(false, testDecodeDataProcess_ == nullptr);
+    VideoConfigParams srcParams3(VideoCodecType::CODEC_H265,
+        Videoformat::NV12, DCAMERA_PRODUCER_FPS_DEFAULT, TEST_WIDTH, TEST_HEIGTH);
+    VideoConfigParams destParams3(VideoCodecType::NO_CODEC,
+        Videoformat::NV21, DCAMERA_PRODUCER_FPS_DEFAULT, TEST_WIDTH, TEST_HEIGTH);
+    VideoConfigParams procConfig3;
+    int32_t rc = testDecodeDataProcess_->InitNode(srcParams3, destParams3, procConfig3);
+    testDecodeDataProcess_->OnError();
+    testDecodeDataProcess_->isDecoderProcess_.store(true);
+    DHLOGI("DecodeDataProcessTest 14");
+    EXPECT_EQ(rc, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: decode_data_process_test_019
+ * @tc.desc: Verify decode data process func.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DecodeDataProcessTest, decode_data_process_test_019, TestSize.Level1)
+{
+    DHLOGI("DecodeDataProcessTest decode_data_process_test_019");
+    EXPECT_EQ(false, testDecodeDataProcess_ == nullptr);
+    VideoConfigParams srcParams4(VideoCodecType::NO_CODEC,
+        Videoformat::NV12, DCAMERA_PRODUCER_FPS_DEFAULT, TEST_WIDTH, TEST_HEIGTH);
+    VideoConfigParams destParams4(VideoCodecType::NO_CODEC,
+        Videoformat::NV21, DCAMERA_PRODUCER_FPS_DEFAULT, TEST_WIDTH, TEST_HEIGTH);
+    VideoConfigParams procConfig4;
+    int32_t rc = testDecodeDataProcess_->InitNode(srcParams4, destParams4, procConfig4);
+    testDecodeDataProcess_->OnError();
+    testDecodeDataProcess_->isDecoderProcess_.store(true);
+    EXPECT_EQ(rc, DCAMERA_OK);
+}
+
 } // namespace DistributedHardware
 } // namespace OHOS
