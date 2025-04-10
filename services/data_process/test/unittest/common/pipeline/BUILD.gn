@@ -52,6 +52,7 @@ ohos_unittest("DCameraDataProcessPipelineTest") {
   sources = [
     "dcamera_pipeline_sink_test.cpp",
     "dcamera_pipeline_source_test.cpp",
+    "decode_surface_listener_test.cpp",
   ]
 
   configs = [ ":module_private_config" ]
