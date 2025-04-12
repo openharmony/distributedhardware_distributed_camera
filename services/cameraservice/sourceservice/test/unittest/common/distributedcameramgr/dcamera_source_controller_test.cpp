@@ -18,6 +18,8 @@
 #include "dcamera_source_controller.h"
 #undef private
 
+#include <securec.h>
+
 #include "dcamera_source_state.h"
 #include "dcamera_utils_tools.h"
 #include "mock_camera_channel.h"
@@ -105,6 +107,8 @@ const int32_t TEST_DATASPACE = 8;
 const int32_t TEST_ISCAPTURE = 0;
 const int32_t TEST_SLEEP_SEC = 200000;
 const size_t DATABUFF_MAX_SIZE = 100 * 1024 * 1024;
+static const char* DCAMERA_PROTOCOL_CMD_METADATA_RESULT = "METADATA_RESULT";
+static const char* DCAMERA_PROTOCOL_CMD_STATE_NOTIFY = "STATE_NOTIFY";
 }
 
 void DCameraSourceControllerTest::SetUpTestCase(void)
@@ -431,6 +435,17 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_012, TestSi
     EXPECT_EQ(ret, DCAMERA_BAD_OPERATE);
 }
 
+HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_012_1, TestSize.Level1)
+{
+    std::shared_ptr<DCameraEvent> events = std::make_shared<DCameraEvent>();
+    events->eventType_ = 1;
+    events->eventResult_ = DCAMERA_EVENT_CAMERA_SUCCESS;
+    events->eventContent_ = START_CAPTURE_SUCC;
+    int32_t ret = controller_->DCameraNotify(events);
+    controller_->UnInit();
+    EXPECT_EQ(ret, DCAMERA_BAD_OPERATE);
+}
+
 /**
  * @tc.name: dcamera_source_controller_test_013
  * @tc.desc: Verify source controller UpdateSettings.
@@ -508,6 +523,24 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_015, TestSi
     EXPECT_EQ(ret, DCAMERA_BAD_OPERATE);
 }
 
+HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_015_1, TestSize.Level1)
+{
+    DCameraIndex index1;
+    index1.devId_ = TEST_DEVICE_ID;
+    index1.dhId_ = TEST_CAMERA_DH_ID_0;
+    controller_->indexs_.push_back(index1);
+    indexs_.push_back(index1);
+
+    bool saved = ManageSelectChannel::GetInstance().GetSrcConnect();
+    ManageSelectChannel::GetInstance().SetSrcConnect(true);
+    std::shared_ptr<DCameraOpenInfo> openInfo = std::make_shared<DCameraOpenInfo>();
+    int32_t ret = GetLocalDeviceNetworkId(openInfo->sourceDevId_);
+    ret = controller_->OpenChannel(openInfo);
+    controller_->UnInit();
+    ManageSelectChannel::GetInstance().SetSrcConnect(saved);
+    EXPECT_EQ(ret, DCAMERA_OK);
+}
+
 /**
  * @tc.name: dcamera_source_controller_test_016
  * @tc.desc: Verify source controller OpenChannel and CloseChannel.
@@ -570,6 +603,24 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_019, TestSi
     std::shared_ptr<DCameraSourceController> controller = nullptr;
     std::shared_ptr<ICameraChannelListener> listener_ =
         std::make_shared<DCameraSourceControllerChannelListener>(controller);
+    int32_t state = DCAMERA_CHANNEL_STATE_CONNECTED;
+    listener_->OnSessionState(state, "");
+    int32_t eventType = 1;
+    int32_t eventReason = 1;
+    std::string detail = "OnSessionErrorTest";
+    listener_->OnSessionError(eventType, eventReason, detail);
+    std::vector<std::shared_ptr<DataBuffer>> buffers;
+    listener_->OnDataReceived(buffers);
+    ret = controller_->UnInit();
+    EXPECT_EQ(ret, DCAMERA_OK);
+}
+
+HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_019_1, TestSize.Level1)
+{
+    int32_t ret = controller_->Init(indexs_);
+    std::shared_ptr<ICameraChannelListener> listener_ =
+        std::make_shared<DCameraSourceControllerChannelListener>(controller_);
+    stateMachine_->UpdateState(DCAMERA_STATE_INIT);
     int32_t state = DCAMERA_CHANNEL_STATE_CONNECTED;
     listener_->OnSessionState(state, "");
     int32_t eventType = 1;
@@ -650,5 +701,70 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_021, TestSi
     controller_->UnInit();
     EXPECT_EQ(ret, DCAMERA_BAD_OPERATE);
 }
+
+HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_022, TestSize.Level1)
+{
+    std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos;
+    std::shared_ptr<DCameraCaptureInfo> capture = std::make_shared<DCameraCaptureInfo>();
+    capture->width_ = TEST_WIDTH;
+    capture->height_ = TEST_HEIGTH;
+    capture->format_ = TEST_FORMAT;
+    capture->dataspace_ = TEST_DATASPACE;
+    capture->isCapture_ = TEST_ISCAPTURE;
+    capture->encodeType_ = DCEncodeType::ENCODE_TYPE_H264;
+    capture->streamType_ = DCStreamType::SNAPSHOT_FRAME;
+    captureInfos.push_back(capture);
+    int32_t ret = controller_->Init(indexs_);
+    EXPECT_EQ(ret, DCAMERA_INIT_ERR);
+    DCameraIndex index1;
+    index1.devId_ = TEST_DEVICE_ID;
+    index1.dhId_ = TEST_CAMERA_DH_ID_0;
+    controller_->indexs_.push_back(index1);
+    int32_t mode = 0;
+    ret = controller_->StartCapture(captureInfos, mode);
+    bool saved = ManageSelectChannel::GetInstance().GetSrcConnect();
+    ManageSelectChannel::GetInstance().SetSrcConnect(true);
+    ret = controller_->StopCapture();
+    controller_->UnInit();
+    ManageSelectChannel::GetInstance().SetSrcConnect(saved);
+    EXPECT_EQ(ret, DCAMERA_OK);
+}
+
+HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_023, TestSize.Level1)
+{
+    cJSON *metaJson1 = cJSON_CreateObject();
+    cJSON_AddStringToObject(metaJson1, "Command", "skip");
+    std::string cjson1 = cJSON_PrintUnformatted(metaJson1);
+    size_t capacity = cjson1.length() + 1;
+    std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);
+    if (memcpy_s(dataBuffer->Data(), capacity, cjson1.c_str(), capacity) != EOK) {
+        EXPECT_TRUE(false);
+    }
+    controller_->HandleReceivedData(dataBuffer);
+    cJSON_Delete(metaJson1);
+
+    metaJson1 = cJSON_CreateObject();
+    cJSON_AddStringToObject(metaJson1, "Command", DCAMERA_PROTOCOL_CMD_METADATA_RESULT);
+    cjson1 = cJSON_PrintUnformatted(metaJson1);
+    capacity = cjson1.length() + 1;
+    dataBuffer = std::make_shared<DataBuffer>(capacity);
+    if (memcpy_s(dataBuffer->Data(), capacity, cjson1.c_str(), capacity) != EOK) {
+        EXPECT_TRUE(false);
+    }
+    controller_->HandleReceivedData(dataBuffer);
+    cJSON_Delete(metaJson1);
+
+    metaJson1 = cJSON_CreateObject();
+    cJSON_AddStringToObject(metaJson1, "Command", DCAMERA_PROTOCOL_CMD_STATE_NOTIFY);
+    cjson1 = cJSON_PrintUnformatted(metaJson1);
+    capacity = cjson1.length() + 1;
+    dataBuffer = std::make_shared<DataBuffer>(capacity);
+    if (memcpy_s(dataBuffer->Data(), capacity, cjson1.c_str(), capacity) != EOK) {
+        EXPECT_TRUE(false);
+    }
+    controller_->HandleReceivedData(dataBuffer);
+    cJSON_Delete(metaJson1);
+}
+
 }
 }

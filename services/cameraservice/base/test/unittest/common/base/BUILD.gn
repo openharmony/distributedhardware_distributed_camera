@@ -46,6 +46,7 @@ ohos_unittest("DCameraServicesBaseTest") {
 
   configs = [ ":module_private_config" ]
 
+  cflags = [ "-Dprivate = public" ]
   deps = [
     "${common_path}:distributed_camera_utils",
     "${services_path}/cameraservice/sourceservice:distributed_camera_source",

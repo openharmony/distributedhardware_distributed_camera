@@ -46,6 +46,9 @@ std::string g_channelStr = "";
 std::string g_outputStr = "";
 std::string g_operatorStr = "";
 
+static const char* DCAMERA_PROTOCOL_CMD_METADATA_RESULT = "METADATA_RESULT";
+static const char* DCAMERA_PROTOCOL_CMD_CAPTURE = "CAPTURE";
+
 class DCameraSinkControllerTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -717,6 +720,18 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_032, TestSize.L
     std::string srcNetId = "";
     std::string dstNetId = "";
     EXPECT_NE(true, controller_->CheckDeviceSecurityLevel(srcNetId, dstNetId));
+
+    srcNetId = "abc";
+    dstNetId = "";
+    EXPECT_NE(true, controller_->CheckDeviceSecurityLevel(srcNetId, dstNetId));
+
+    srcNetId = "";
+    dstNetId = "abc";
+    EXPECT_NE(true, controller_->CheckDeviceSecurityLevel(srcNetId, dstNetId));
+
+    srcNetId = "abc";
+    dstNetId = "abc";
+    EXPECT_NE(true, controller_->CheckDeviceSecurityLevel(srcNetId, dstNetId));
 }
 
 /**
@@ -744,5 +759,44 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_034, TestSize.L
     netId = "netId";
     EXPECT_EQ("", controller_->GetUdidByNetworkId(netId));
 }
+
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_035, TestSize.Level1)
+{
+    cJSON *metaJson1 = cJSON_CreateObject();
+    cJSON_AddStringToObject(metaJson1, "Command", "skip");
+    std::string cjson1 = cJSON_PrintUnformatted(metaJson1);
+    size_t capacity = cjson1.length() + 1;
+    std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);
+    if (memcpy_s(dataBuffer->Data(), capacity, cjson1.c_str(), capacity) != EOK) {
+        EXPECT_TRUE(false);
+    }
+    controller_->HandleReceivedData(dataBuffer);
+    cJSON_Delete(metaJson1);
+
+    metaJson1 = cJSON_CreateObject();
+    cJSON_AddStringToObject(metaJson1, "Command", DCAMERA_PROTOCOL_CMD_METADATA_RESULT);
+    cjson1 = cJSON_PrintUnformatted(metaJson1);
+    capacity = cjson1.length() + 1;
+    dataBuffer = std::make_shared<DataBuffer>(capacity);
+    if (memcpy_s(dataBuffer->Data(), capacity, cjson1.c_str(), capacity) != EOK) {
+        EXPECT_TRUE(false);
+    }
+    int32_t result = controller_->HandleReceivedData(dataBuffer);
+    cJSON_Delete(metaJson1);
+    EXPECT_EQ(result, DCAMERA_BAD_VALUE);
+
+    metaJson1 = cJSON_CreateObject();
+    cJSON_AddStringToObject(metaJson1, "Command", DCAMERA_PROTOCOL_CMD_CAPTURE);
+    cjson1 = cJSON_PrintUnformatted(metaJson1);
+    capacity = cjson1.length() + 1;
+    dataBuffer = std::make_shared<DataBuffer>(capacity);
+    if (memcpy_s(dataBuffer->Data(), capacity, cjson1.c_str(), capacity) != EOK) {
+        EXPECT_TRUE(false);
+    }
+    result = controller_->HandleReceivedData(dataBuffer);
+    cJSON_Delete(metaJson1);
+    EXPECT_EQ(result, DCAMERA_BAD_VALUE);
+}
+
 } // namespace DistributedHardware
 } // namespace OHOS
