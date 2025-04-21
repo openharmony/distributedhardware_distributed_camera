@@ -301,5 +301,19 @@ HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_009, TestSize.Level1)
     int32_t ret = operator_->PrelaunchCamera();
     EXPECT_EQ(DCAMERA_OK, ret);
 }
+
+/**
+ * @tc.name: dcamera_sink_output_test_010
+ * @tc.desc: Verify the UnInit function.
+ * @tc.type: FUNC
+ * @tc.require: I5N1JI
+ */
+HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_010, TestSize.Level1)
+{
+    auto callback = std::make_shared<DCameraSinkOutputResultCallback>(output_);
+    auto dataBuffer = std::make_shared<DataBuffer>(1);
+    EXPECT_NO_FATAL_FAILURE(callback->OnPhotoResult(dataBuffer));
+    EXPECT_NO_FATAL_FAILURE(callback->OnVideoResult(dataBuffer));
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -380,6 +380,8 @@ void DCameraSourceInput::OnSessionError(DCStreamType streamType, int32_t eventTy
 
 void DCameraSourceInput::OnDataReceived(DCStreamType streamType, std::vector<std::shared_ptr<DataBuffer>>& buffers)
 {
+    CHECK_AND_RETURN_LOG(buffers[0] == nullptr, "the first buffer is nullptr.");
+    CHECK_AND_RETURN_LOG(dataProcess_[streamType] == nullptr, "dataProcess_ is nullptr.");
     buffers[0]->frameInfo_.offset = DCameraSoftbusLatency::GetInstance().GetTimeSyncInfo(devId_);
     int32_t ret = dataProcess_[streamType]->FeedStream(buffers);
     if (ret != DCAMERA_OK) {
