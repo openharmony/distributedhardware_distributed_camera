@@ -19,6 +19,7 @@
 #undef private
 #include "distributed_camera_errno.h"
 #include "mock_dcamera_source_state_listener.h"
+#include "dcamera_source_input_channel_listener.h"
 
 using namespace testing::ext;
 
@@ -434,6 +435,30 @@ HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_015, TestSize.Level1)
     testInput_->OnSessionState(DCStreamType::CONTINUOUS_FRAME, state);
     rc = testInput_->EstablishSnapshotFrameSession(g_camIndexs);
     EXPECT_NE(rc, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: dcamera_source_input_test_016
+ * @tc.desc: Verify source inptut EstablishSnapshotFrameSession.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_016, TestSize.Level1)
+{
+    auto testInputListener =
+        std::make_shared<DCameraSourceInputChannelListener>(testInput_, DCStreamType::CONTINUOUS_FRAME);
+    int32_t state = 0;
+    std::string networkId = "networkId";
+    EXPECT_NO_FATAL_FAILURE(testInputListener->OnSessionState(state, networkId));
+    int32_t eventType = 0;
+    int32_t eventReason = 1;
+    std::string detail = "detail";
+    EXPECT_NO_FATAL_FAILURE(testInputListener->OnSessionError(eventType, eventReason, detail));
+    std::vector<std::shared_ptr<DataBuffer>> buffers;
+    size_t capacity = 0;
+    std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);
+    buffers.push_back(dataBuffer);
+    EXPECT_NO_FATAL_FAILURE(testInputListener->OnDataReceived(buffers));
 }
 } // namespace DistributedHardware
 } // namespace OHOS

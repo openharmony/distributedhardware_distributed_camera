@@ -53,7 +53,10 @@ ohos_unittest("DCameraSinkMgrTest") {
 
   sources = [
     "dcamera_sink_access_control_test.cpp",
+    "dcamera_sink_controller_channel_listener_test.cpp",
+    "dcamera_sink_controller_state_callback_test.cpp",
     "dcamera_sink_controller_test.cpp",
+    "dcamera_sink_data_process_listener_test.cpp",
     "dcamera_sink_data_process_test.cpp",
     "dcamera_sink_dev_test.cpp",
     "dcamera_sink_output_test.cpp",
