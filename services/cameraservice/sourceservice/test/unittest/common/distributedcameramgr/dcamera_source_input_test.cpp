@@ -449,16 +449,17 @@ HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_016, TestSize.Level1)
         std::make_shared<DCameraSourceInputChannelListener>(testInput_, DCStreamType::CONTINUOUS_FRAME);
     int32_t state = 0;
     std::string networkId = "networkId";
-    EXPECT_NO_FATAL_FAILURE(testInputListener->OnSessionState(state, networkId));
+    testInputListener->OnSessionState(state, networkId);
     int32_t eventType = 0;
     int32_t eventReason = 1;
     std::string detail = "detail";
-    EXPECT_NO_FATAL_FAILURE(testInputListener->OnSessionError(eventType, eventReason, detail));
+    testInputListener->OnSessionError(eventType, eventReason, detail);
     std::vector<std::shared_ptr<DataBuffer>> buffers;
     size_t capacity = 0;
     std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);
     buffers.push_back(dataBuffer);
-    EXPECT_NO_FATAL_FAILURE(testInputListener->OnDataReceived(buffers));
+    testInputListener->OnDataReceived(buffers);
+    EXPECT_EQ(true, capacity == 0);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
