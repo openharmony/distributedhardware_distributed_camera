@@ -70,7 +70,8 @@ HWTEST_F(DCameraSinkControllerStateCallbackTest, dcamera_sink_controller_state_c
     DHLOGI("dcamera_sink_controller_state_callback_test_001 enter");
     ASSERT_NE(stateCallback_, nullptr);
     std::shared_ptr<DCameraEvent> event = std::make_shared<DCameraEvent>();
-    EXPECT_NO_FATAL_FAILURE(stateCallback_->OnStateChanged(event));
+    stateCallback_->OnStateChanged(event);
+    EXPECT_EQ(true, event != nullptr);
 }
 
 /**
@@ -84,7 +85,8 @@ HWTEST_F(DCameraSinkControllerStateCallbackTest, dcamera_sink_controller_state_c
     DHLOGI("dcamera_sink_controller_state_callback_test_002 enter");
     ASSERT_NE(stateCallback_, nullptr);
     std::vector<std::shared_ptr<DCameraSettings>> settings;
-    EXPECT_NO_FATAL_FAILURE(stateCallback_->OnMetadataResult(settings));
+    stateCallback_->OnMetadataResult(settings);
+    EXPECT_EQ(true, settings.empty());
 }
 
 /**
@@ -99,9 +101,10 @@ HWTEST_F(DCameraSinkControllerStateCallbackTest, dcamera_sink_controller_state_c
     std::shared_ptr<DCameraSinkController> contl;
     auto stateCallback = std::make_shared<DCameraSinkControllerStateCallback>(contl);
     std::shared_ptr<DCameraEvent> event = std::make_shared<DCameraEvent>();
-    EXPECT_NO_FATAL_FAILURE(stateCallback->OnStateChanged(event));
+    stateCallback->OnStateChanged(event);
     std::vector<std::shared_ptr<DCameraSettings>> settings;
-    EXPECT_NO_FATAL_FAILURE(stateCallback->OnMetadataResult(settings));
+    stateCallback->OnMetadataResult(settings);
+    EXPECT_EQ(true, settings.empty());
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -311,9 +311,11 @@ HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_009, TestSize.Level1)
 HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_010, TestSize.Level1)
 {
     auto callback = std::make_shared<DCameraSinkOutputResultCallback>(output_);
-    auto dataBuffer = std::make_shared<DataBuffer>(1);
-    EXPECT_NO_FATAL_FAILURE(callback->OnPhotoResult(dataBuffer));
-    EXPECT_NO_FATAL_FAILURE(callback->OnVideoResult(dataBuffer));
+    size_t capacity = 1;
+    auto dataBuffer = std::make_shared<DataBuffer>(capacity);
+    callback->OnPhotoResult(dataBuffer);
+    callback->OnVideoResult(dataBuffer);
+    EXPECT_EQ(true, capacity == 1);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

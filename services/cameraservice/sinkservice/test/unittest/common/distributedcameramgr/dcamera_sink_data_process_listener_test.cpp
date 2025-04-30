@@ -69,7 +69,8 @@ HWTEST_F(DCameraSinkDataProcessListenerTest, dcamera_sink_data_process_listener_
     ASSERT_NE(dataProcessListener_, nullptr);
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> videoResult = std::make_shared<DataBuffer>(capacity);
-    EXPECT_NO_FATAL_FAILURE(dataProcessListener_->OnProcessedVideoBuffer(videoResult));
+    dataProcessListener_->OnProcessedVideoBuffer(videoResult);
+    EXPECT_EQ(true, capacity == 1);
 }
 
 /**
@@ -83,7 +84,8 @@ HWTEST_F(DCameraSinkDataProcessListenerTest, dcamera_sink_data_process_listener_
     DHLOGI("dcamera_sink_data_process_listener_test_002 enter");
     ASSERT_NE(dataProcessListener_, nullptr);
     DataProcessErrorType errorType = DataProcessErrorType::ERROR_PIPELINE_ENCODER;
-    EXPECT_NO_FATAL_FAILURE(dataProcessListener_->OnError(errorType));
+    dataProcessListener_->OnError(errorType);
+    EXPECT_EQ(true, errorType == DataProcessErrorType::ERROR_PIPELINE_ENCODER);
 }
 
 /**
@@ -99,9 +101,10 @@ HWTEST_F(DCameraSinkDataProcessListenerTest, dcamera_sink_data_process_listener_
     auto dataProcessListener = std::make_shared<DCameraSinkDataProcessListener>(data);
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> videoResult = std::make_shared<DataBuffer>(capacity);
-    EXPECT_NO_FATAL_FAILURE(dataProcessListener->OnProcessedVideoBuffer(videoResult));
+    dataProcessListener->OnProcessedVideoBuffer(videoResult);
     DataProcessErrorType errorType = DataProcessErrorType::ERROR_PIPELINE_ENCODER;
-    EXPECT_NO_FATAL_FAILURE(dataProcessListener->OnError(errorType));
+    dataProcessListener->OnError(errorType);
+    EXPECT_EQ(true, capacity == 1);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

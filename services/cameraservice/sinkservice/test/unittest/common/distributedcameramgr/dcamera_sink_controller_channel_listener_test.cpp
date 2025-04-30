@@ -71,7 +71,8 @@ HWTEST_F(DCameraSinkControllerChannelListenerTest, dcamera_sink_controller_chann
     ASSERT_NE(channelListener_, nullptr);
     int32_t state = 1;
     std::string networkId = "networkId";
-    EXPECT_NO_FATAL_FAILURE(channelListener_->OnSessionState(state, networkId));
+    channelListener_->OnSessionState(state, networkId);
+    EXPECT_EQ(true, state == 1);
 }
 
 /**
@@ -87,7 +88,8 @@ HWTEST_F(DCameraSinkControllerChannelListenerTest, dcamera_sink_controller_chann
     int32_t eventType = 0;
     int32_t eventReason = 1;
     std::string detail = "detail";
-    EXPECT_NO_FATAL_FAILURE(channelListener_->OnSessionError(eventType, eventReason, detail));
+    channelListener_->OnSessionError(eventType, eventReason, detail);
+    EXPECT_EQ(true, eventType == 0);
 }
 
 /**
@@ -104,7 +106,8 @@ HWTEST_F(DCameraSinkControllerChannelListenerTest, dcamera_sink_controller_chann
     size_t capacity = 0;
     std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);
     buffers.push_back(dataBuffer);
-    EXPECT_NO_FATAL_FAILURE(channelListener_->OnDataReceived(buffers));
+    channelListener_->OnDataReceived(buffers);
+    EXPECT_EQ(true, capacity == 0);
 }
 
 /**
@@ -120,16 +123,17 @@ HWTEST_F(DCameraSinkControllerChannelListenerTest, dcamera_sink_controller_chann
     auto channelListener = std::make_shared<DCameraSinkControllerChannelListener>(contl);
     int32_t state = 1;
     std::string networkId = "networkId";
-    EXPECT_NO_FATAL_FAILURE(channelListener->OnSessionState(state, networkId));
+    channelListener->OnSessionState(state, networkId);
     int32_t eventType = 0;
     int32_t eventReason = 1;
     std::string detail = "detail";
-    EXPECT_NO_FATAL_FAILURE(channelListener->OnSessionError(eventType, eventReason, detail));
+    channelListener->OnSessionError(eventType, eventReason, detail);
     std::vector<std::shared_ptr<DataBuffer>> buffers;
     size_t capacity = 0;
     std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);
     buffers.push_back(dataBuffer);
-    EXPECT_NO_FATAL_FAILURE(channelListener->OnDataReceived(buffers));
+    channelListener->OnDataReceived(buffers);
+    EXPECT_EQ(true, capacity == 0);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

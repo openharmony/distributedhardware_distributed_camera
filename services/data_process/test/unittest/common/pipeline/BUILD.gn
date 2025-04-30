@@ -71,6 +71,7 @@ ohos_unittest("DCameraDataProcessPipelineTest") {
     "graphic_surface:surface",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
+    "ipc:ipc_single",
   ]
 
   defines = [
