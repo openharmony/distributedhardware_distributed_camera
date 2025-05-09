@@ -96,6 +96,13 @@ std::vector<DHItem> DCameraHandler::Query()
             DHLOGI("connection type: %{public}d", info->GetConnectionType());
             continue;
         }
+#ifdef DCAMERA_FRONT
+        std::string position = GetCameraPosition(info->GetPosition());
+        if (position != CAMERA_POSITION_FRONT) {
+            DHLOGI("filter camera position is: %{public}s", position.c_str());
+            continue;
+        }
+#endif
         DHLOGI("get %{public}s, position: %{public}d, cameraType: %{public}d",
             GetAnonyString(info->GetID()).c_str(), info->GetPosition(), info->GetCameraType());
         DHItem item;
