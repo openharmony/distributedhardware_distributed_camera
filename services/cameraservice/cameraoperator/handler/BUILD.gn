@@ -54,6 +54,10 @@ ohos_shared_library("distributed_camera_handler") {
     "LOG_DOMAIN=0xD004150",
   ]
 
+  if (distributed_camera_filter_front) {
+    cflags = [ "-DDCAMERA_FRONT" ]
+  }
+
   external_deps = [
     "av_codec:av_codec_client",
     "cJSON:cjson",

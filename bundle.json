@@ -16,7 +16,8 @@
         "subsystem": "distributedhardware",
         "syscap": [],
         "features": [
-            "distributed_camera_common"
+            "distributed_camera_common",
+            "distributed_camera_filter_front"
         ],
         "adapted_system_type": [
             "standard"
