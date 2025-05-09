@@ -81,8 +81,7 @@ HWTEST_F(DecodeSurfaceListenerTest, decode_surface_listener_test_001, TestSize.L
     MediaAVCodec::AVCodecBufferInfo info;
     MediaAVCodec::AVCodecBufferFlag flag = MediaAVCodec::AVCODEC_BUFFER_FLAG_CODEC_DATA;
     dCallBack->OnOutputBufferAvailable(0, info, flag, buffer2);
-    int32_t rc = DCAMERA_OK;
-    EXPECT_EQ(rc, DCAMERA_OK);
+    EXPECT_TRUE(buffer2 == nullptr);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
