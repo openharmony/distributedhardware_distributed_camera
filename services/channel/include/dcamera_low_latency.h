@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,6 +35,8 @@ private:
 private:
     constexpr static int32_t REF_INITIAL = 0;
     constexpr static int32_t REF_NORMAL = 1;
+    const std::string DH_TYPE = "dh_type";
+    const std::string LOW_LATENCY_ENABLE = "low_latency_enable";
     std::shared_ptr<DistributedHardwareFwkKit> dHFwkKit_;
     std::mutex dHFwkKitMutex_;
     std::atomic<int> refCount_ = 0;
