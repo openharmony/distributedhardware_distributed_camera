@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,6 +31,7 @@
 #include "dcamera_source_dev.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_source_stub.h"
+#include "distributed_hardware_fwk_kit.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -67,6 +68,7 @@ private:
     int32_t LoadDCameraHDF();
     int32_t UnLoadCameraHDF();
     std::string GetCodecInfo();
+    std::shared_ptr<DistributedHardwareFwkKit> GetDHFwkKit();
 
     bool registerToService_ = false;
     DCameraServiceState state_ = DCameraServiceState::DCAMERA_SRV_STATE_NOT_START;
@@ -80,6 +82,8 @@ private:
     static std::mutex camDevMutex_;
     std::thread hicollieThread_;
     std::atomic<bool> isHicollieRunning_ = false;
+    std::shared_ptr<DistributedHardwareFwkKit> dHFwkKit_;
+    std::mutex dHFwkKitMutex_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

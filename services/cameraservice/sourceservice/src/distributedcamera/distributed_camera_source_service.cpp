@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,7 +26,6 @@
 #include "anonymous_string.h"
 #include "avcodec_info.h"
 #include "avcodec_list.h"
-#include "dcamera_hdf_operate.h"
 #include "dcamera_hisysevent_adapter.h"
 #include "dcamera_hitrace_adapter.h"
 #include "dcamera_radar.h"
@@ -215,6 +214,17 @@ std::string DistributedCameraSourceService::GetCodecInfo()
     return sourceAttrs;
 }
 
+std::shared_ptr<DistributedHardwareFwkKit> DistributedCameraSourceService::GetDHFwkKit()
+{
+    if (dHFwkKit_ == nullptr) {
+        std::lock_guard<std::mutex> lock(dHFwkKitMutex_);
+        if (dHFwkKit_ == nullptr) {
+            dHFwkKit_ = std::make_shared<DistributedHardwareFwkKit>();
+        }
+    }
+    return dHFwkKit_;
+}
+
 int32_t DistributedCameraSourceService::RegisterDistributedHardware(const std::string& devId, const std::string& dhId,
     const std::string& reqId, const EnableParam& param)
 {
@@ -297,7 +307,12 @@ int32_t DistributedCameraSourceService::LoadDCameraHDF()
 {
     DCAMERA_SYNC_TRACE(DCAMERA_LOAD_HDF);
     DHLOGI("load hdf driver start");
-    int32_t ret = DCameraHdfOperate::GetInstance().LoadDcameraHDFImpl();
+    auto dHFwkKit = GetDHFwkKit();
+    if (dHFwkKit == nullptr) {
+        DHLOGE("Get dHFwkKit is null when load hdf driver.");
+        return DCAMERA_BAD_VALUE;
+    }
+    int32_t ret = dHFwkKit->LoadDistributedHDF(DHType::CAMERA);
     if (ret != DCAMERA_OK) {
         DHLOGE("load hdf driver failed, ret %{public}d", ret);
         ReportDcamerInitFail(DCAMERA_INIT_FAIL, DCAMERA_HDF_ERROR, CreateMsg("dcamera load hdf driver fail."));
@@ -310,7 +325,12 @@ int32_t DistributedCameraSourceService::LoadDCameraHDF()
 int32_t DistributedCameraSourceService::UnLoadCameraHDF()
 {
     DHLOGI("unload hdf driver start");
-    int32_t ret = DCameraHdfOperate::GetInstance().UnLoadDcameraHDFImpl();
+    auto dHFwkKit = GetDHFwkKit();
+    if (dHFwkKit == nullptr) {
+        DHLOGE("Get dHFwkKit is null when unload hdf driver.");
+        return DCAMERA_BAD_VALUE;
+    }
+    int32_t ret = dHFwkKit->UnLoadDistributedHDF(DHType::CAMERA);
     if (ret != DCAMERA_OK) {
         DHLOGE("unload hdf driver failed, ret %{public}d", ret);
         return ret;
