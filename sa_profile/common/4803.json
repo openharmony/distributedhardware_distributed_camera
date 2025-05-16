@@ -2,10 +2,10 @@
     "process": "dcamera",
     "systemability": [
         {
-            "name": 4804,
-            "libpath": "libdistributed_camera_sink.z.so",
+            "name": 4803,
+            "libpath": "libdistributed_camera_source.z.so",
             "run-on-create": false,
-            "distributed": false,
+            "distributed": true,
             "dump_level": 1
         }
     ]

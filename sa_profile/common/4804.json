@@ -5,7 +5,7 @@
             "name": 4804,
             "libpath": "libdistributed_camera_sink.z.so",
             "run-on-create": false,
-            "distributed": false,
+            "distributed": true,
             "dump_level": 1
         }
     ]
