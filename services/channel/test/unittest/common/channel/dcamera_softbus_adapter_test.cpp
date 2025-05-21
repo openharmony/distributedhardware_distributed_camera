@@ -942,9 +942,10 @@ HWTEST_F(DCameraSoftbusAdapterTest, DCameraSoftbusAdapterTest_035, TestSize.Leve
     std::string peerDevId = TEST_DEVICE_ID;
     std::string myDevId = "abcde";
     std::string myDhId = "mydhid";
-    DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDhId, myDevId,
+    int32_t ret = DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDhId, myDevId,
         peerSessName, peerDevId, sessionMode, role);
     DCameraSoftbusAdapter::GetInstance().CloseSessionWithNetWorkId("testNetworkId");
+    EXPECT_NE(ret, DCAMERA_BAD_VALUE);
 }
 
 HWTEST_F(DCameraSoftbusAdapterTest, DCameraSoftbusAdapterTest_036, TestSize.Level1)
