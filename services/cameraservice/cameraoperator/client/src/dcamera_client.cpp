@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -661,20 +661,6 @@ int32_t DCameraClient::ResumeCapture()
     int32_t ret = captureSession_->Start();
     if (ret != DCAMERA_OK) {
         DHLOGE("ResumeCapture captureSession Start failed, cameraId: %{public}s, ret: %{public}d",
-            GetAnonyString(cameraId_).c_str(), ret);
-    }
-    return ret;
-}
-
-int32_t DCameraClient::PrelaunchCamera()
-{
-    if (cameraManager_ == nullptr) {
-        DHLOGE("DCameraClient cameraManager_ is nullptr.");
-        return DCAMERA_BAD_VALUE;
-    }
-    int32_t ret = cameraManager_->PrelaunchCamera();
-    if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraClient PrelaunchCamera Start failed, cameraId: %{public}s, ret: %{public}d",
             GetAnonyString(cameraId_).c_str(), ret);
     }
     return ret;

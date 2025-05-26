@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -49,7 +49,6 @@ public:
     int32_t SetResultCallback(std::shared_ptr<ResultCallback>& callback) override;
     int32_t PauseCapture() override;
     int32_t ResumeCapture() override;
-    int32_t PrelaunchCamera() override;
 
 private:
     int32_t ConfigCaptureSession(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos, int32_t sceneMode);

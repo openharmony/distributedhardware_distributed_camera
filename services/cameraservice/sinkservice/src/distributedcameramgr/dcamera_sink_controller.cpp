@@ -544,10 +544,6 @@ void DCameraSinkController::OnSessionState(int32_t state, std::string networkId)
                 DHLOGE("operator_ is nullptr");
                 break;
             }
-            int32_t ret = operator_->PrelaunchCamera();
-            if (ret != DCAMERA_OK) {
-                DHLOGE("operator_ PrelaunchCamera error. ret %{public}d.", ret);
-            }
             break;
         }
         case DCAMERA_CHANNEL_STATE_DISCONNECTED:
