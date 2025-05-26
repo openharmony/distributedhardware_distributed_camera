@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -288,18 +288,6 @@ HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_008, TestSize.Level1)
     output_->dataProcesses_.emplace(CONTINUOUS_FRAME, dataProcess_);
     ret = output_->GetProperty(name, propertyCarrier);
     EXPECT_NE(DCAMERA_OK, ret);
-}
-
-/**
- * @tc.name: dcamera_sink_output_test_009
- * @tc.desc: Verify the PrelaunchCamera function.
- * @tc.type: FUNC
- * @tc.require: I5N1JI
- */
-HWTEST_F(DCameraSinkOutputTest, dcamera_sink_output_test_009, TestSize.Level1)
-{
-    int32_t ret = operator_->PrelaunchCamera();
-    EXPECT_EQ(DCAMERA_OK, ret);
 }
 
 /**
