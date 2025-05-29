@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -292,7 +292,7 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_006, TestSi
  */
 HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_007, TestSize.Level1)
 {
-    DHLOGI("start execute dcamera_source_controller_test_006");
+    DHLOGI("start execute dcamera_source_controller_test_007");
     int32_t ret = controller_->Init(indexs_);
     EXPECT_EQ(ret, DCAMERA_INIT_ERR);
     DCameraIndex index1;
@@ -536,7 +536,7 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_015_1, Test
     std::shared_ptr<DCameraOpenInfo> openInfo = std::make_shared<DCameraOpenInfo>();
     int32_t ret = GetLocalDeviceNetworkId(openInfo->sourceDevId_);
     ret = controller_->OpenChannel(openInfo);
-    controller_->UnInit();
+    ret = controller_->UnInit();
     ManageSelectChannel::GetInstance().SetSrcConnect(saved);
     EXPECT_EQ(ret, DCAMERA_OK);
 }
@@ -764,6 +764,7 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_023, TestSi
     }
     controller_->HandleReceivedData(dataBuffer);
     cJSON_Delete(metaJson1);
+    EXPECT_FALSE(controller_->CheckAclRight());
 }
 
 }

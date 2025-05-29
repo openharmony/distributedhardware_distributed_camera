@@ -50,4 +50,11 @@ declare_args() {
       !defined(global_parts_info.security_device_security_level)) {
     device_security_level_camera = false
   }
+
+  if (!defined(global_parts_info) ||
+      defined(global_parts_info.account_os_account)) {
+    os_account_camera = true
+  } else {
+    os_account_camera = false
+  }
 }

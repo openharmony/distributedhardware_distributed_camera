@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -69,6 +69,7 @@ public:
     void SetHicollieFlag(bool flag);
     bool GetHicollieFlag();
     int32_t GetFullCaps();
+    void SetTokenId(uint64_t token);
 
     class DCameraSourceDevEventHandler : public AppExecFwk::EventHandler {
         public:
@@ -120,6 +121,7 @@ private:
     std::atomic<bool> hicollieFlag_ = true;
     sptr<IDCameraProviderCallback> hdiCallback_;
     int32_t sceneMode_ = 0;
+    uint64_t tokenId_ = 0;
 
     std::map<uint32_t, DCameraNotifyFunc> memberFuncMap_;
     std::map<uint32_t, DCameraEventResult> eventResultMap_;

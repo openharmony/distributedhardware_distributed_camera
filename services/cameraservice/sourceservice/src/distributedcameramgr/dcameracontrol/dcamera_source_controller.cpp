@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,6 +38,10 @@
 #include "distributed_hardware_log.h"
 #include "idistributed_camera_sink.h"
 #include "dcamera_low_latency.h"
+#ifdef OS_ACCOUNT_ENABLE
+#include "ohos_account_kits.h"
+#include "os_account_manager.h"
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -80,6 +84,9 @@ int32_t DCameraSourceController::StartCapture(std::vector<std::shared_ptr<DCamer
     cmd.command_ = DCAMERA_PROTOCOL_CMD_CAPTURE;
     cmd.value_.assign(captureInfos.begin(), captureInfos.end());
     cmd.sceneMode_ = sceneMode;
+    cmd.userId_ = userId_;
+    cmd.tokenId_ = tokenId_;
+    cmd.accountId_ = accountId_;
     std::string jsonStr;
     int32_t ret = cmd.Marshal(jsonStr);
     if (ret != DCAMERA_OK) {
@@ -329,6 +336,11 @@ int32_t DCameraSourceController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& o
     std::string devId = indexs_.begin()->devId_;
     DHLOGI("DCameraSourceController OpenChannel Start, devId: %{public}s, dhId: %{public}s",
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
+    srcDevId_ = openInfo->sourceDevId_;
+    if (!CheckAclRight()) {
+        DHLOGE("ACL check failed.");
+        return DCAMERA_BAD_OPERATE;
+    }
     if (!ManageSelectChannel::GetInstance().GetSrcConnect()) {
         sptr<IDistributedCameraSink> camSinkSrv = DCameraSourceServiceIpc::GetInstance().GetSinkRemoteCamSrv(devId);
         if (camSinkSrv == nullptr) {
@@ -365,6 +377,53 @@ int32_t DCameraSourceController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& o
         return ret;
     }
     return PublishEnableLatencyMsg(devId);
+}
+
+bool DCameraSourceController::CheckAclRight()
+{
+    if (!GetOsAccountInfo()) {
+        return false;
+    }
+    std::shared_ptr<DmInitCallback> initCallback = std::make_shared<DeviceInitCallback>();
+    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(DCAMERA_PKG_NAME, initCallback);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("InitDeviceManager failed ret = %{public}d", ret);
+        return false;
+    }
+    DmAccessCaller dmSrcCaller = {
+        .accountId = accountId_,
+        .pkgName = DCAMERA_PKG_NAME,
+        .networkId = srcDevId_,
+        .userId = userId_,
+        .tokenId = tokenId_,
+    };
+    DmAccessCallee dmDstCallee = {
+        .networkId = devId_,
+    };
+    DHLOGI("CheckAclRight dmSrcCaller networkId: %{public}s, accountId: %{public}s, devId: %{public}s",
+        GetAnonyString(srcDevId_).c_str(), GetAnonyString(accountId_).c_str(), GetAnonyString(devId_).c_str());
+    if (DeviceManager::GetInstance().CheckSrcAccessControl(dmSrcCaller, dmDstCallee)) {
+        return true;
+    }
+    return false;
+}
+
+bool DCameraSourceController::GetOsAccountInfo()
+{
+#ifdef OS_ACCOUNT_ENABLE
+    std::vector<int32_t> ids;
+    int32_t ret = AccountSA::OsAccountManager::QueryActiveOsAccountIds(ids);
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK || ids.empty(), false,
+        "Get userId from active os accountIds fail, ret: %{public}d", ret);
+    userId_ = ids[0];
+
+    AccountSA::OhosAccountInfo osAccountInfo;
+    ret = AccountSA::OhosAccountKits::GetInstance().GetOhosAccountInfo(osAccountInfo);
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, false,
+        "Get accountId from ohos account info fail, ret: %{public}d", ret);
+    accountId_ = osAccountInfo.uid_;
+#endif
+    return true;
 }
 
 int32_t DCameraSourceController::CloseChannel()
@@ -592,6 +651,16 @@ void DCameraSourceController::DCameraHdiRecipient::OnRemoteDied(const wptr<IRemo
 {
     DHLOGE("Exit the current process.");
     _Exit(0);
+}
+
+void DCameraSourceController::SetTokenId(uint64_t token)
+{
+    tokenId_ = token;
+}
+
+void DeviceInitCallback::OnRemoteDied()
+{
+    DHLOGI("DeviceInitCallback OnRemoteDied");
 }
 } // namespace DistributedHardware
 } // namespace OHOS

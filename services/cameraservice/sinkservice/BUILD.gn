@@ -106,9 +106,14 @@ ohos_shared_library("distributed_camera_sink") {
     defines += [ "DUMP_DCAMERA_FILE" ]
   }
 
+  if (os_account_camera) {
+    defines += [ "OS_ACCOUNT_ENABLE" ]
+  }
+
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
+    "access_token:libtokensetproc_shared",
     "cJSON:cjson",
     "c_utils:utils",
     "camera_framework:camera_framework",
@@ -127,6 +132,13 @@ ohos_shared_library("distributed_camera_sink") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
+
+  if (os_account_camera) {
+    external_deps += [
+      "os_account:libaccountkits",
+      "os_account:os_account_innerkits",
+    ]
+  }
 
   if (device_security_level_camera) {
     external_deps += [ "device_security_level:dslm_sdk" ]

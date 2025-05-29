@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -798,5 +798,17 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_035, TestSize.L
     EXPECT_EQ(result, DCAMERA_BAD_VALUE);
 }
 
+/**
+ * @tc.name: dcamera_sink_controller_test_036
+ * @tc.desc: Verify function.
+ * @tc.type: FUNC
+ * @tc.require: DTS
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_036, TestSize.Level1)
+{
+    EXPECT_TRUE(controller_->CheckAclRight());
+    controller_->userId_ = 100;
+    EXPECT_FALSE(controller_->CheckAclRight());
+}
 } // namespace DistributedHardware
 } // namespace OHOS

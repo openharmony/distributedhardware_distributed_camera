@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,6 +24,7 @@
 #include "dcamera_source_state_machine.h"
 #include "icamera_channel.h"
 #include "iremote_object.h"
+#include "device_manager.h"
 
 #include "v1_1/id_camera_provider.h"
 
@@ -48,6 +49,7 @@ public:
     int32_t PauseDistributedHardware(const std::string &networkId) override;
     int32_t ResumeDistributedHardware(const std::string &networkId) override;
     int32_t StopDistributedHardware(const std::string &networkId) override;
+    void SetTokenId(uint64_t token) override;
 
     void OnSessionState(int32_t state, std::string networkId);
     void OnSessionError(int32_t eventType, int32_t eventReason, std::string detail);
@@ -58,6 +60,8 @@ private:
     void PostChannelDisconnectedEvent();
     int32_t PublishEnableLatencyMsg(const std::string& devId);
     void HandleReceivedData(std::shared_ptr<DataBuffer> &dataBuffer);
+    bool CheckAclRight();
+    bool GetOsAccountInfo();
     class DCameraHdiRecipient : public IRemoteObject::DeathRecipient {
     public:
         void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
@@ -84,6 +88,14 @@ private:
     std::atomic<bool> isChannelConnected_ = false;
     std::mutex channelMtx_;
     std::condition_variable channelCond_;
+    std::string accountId_ = "";
+    int32_t userId_ = -1;
+    std::string srcDevId_ = "";
+    uint64_t tokenId_ = 0;
+};
+
+class DeviceInitCallback : public DmInitCallback {
+    void OnRemoteDied() override;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

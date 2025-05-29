@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -53,6 +53,7 @@ public:
     int32_t PauseDistributedHardware(const std::string &networkId) override;
     int32_t ResumeDistributedHardware(const std::string &networkId) override;
     int32_t StopDistributedHardware(const std::string &networkId) override;
+    void SetTokenId(uint64_t token) override;
 
     void OnStateChanged(std::shared_ptr<DCameraEvent>& event);
     void OnMetadataResult(std::vector<std::shared_ptr<DCameraSettings>>& settings);
@@ -85,6 +86,7 @@ private:
     void ProcessPostAuthorization(const AppExecFwk::InnerEvent::Pointer &event);
     int32_t CreateCtrlSession();
     int32_t CheckSensitive();
+    bool CheckAclRight();
 
     bool isInit_;
     int32_t sessionState_;
@@ -105,6 +107,10 @@ private:
     bool isSameAccount_ = false;
     bool isCheckSecLevel_ = false;
     int32_t sceneMode_ = 0;
+    int32_t userId_ = -1;
+    uint64_t tokenId_ = 0;
+    uint64_t sinkTokenId_ = 0;
+    std::string accountId_ = "";
 
     const std::string SESSION_FLAG = "control";
     const std::string SRC_TYPE = "camera";

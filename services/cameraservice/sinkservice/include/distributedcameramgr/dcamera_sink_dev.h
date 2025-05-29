@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -44,6 +44,7 @@ public:
     int32_t PauseDistributedHardware(const std::string &networkId);
     int32_t ResumeDistributedHardware(const std::string &networkId);
     int32_t StopDistributedHardware(const std::string &networkId);
+    void SetTokenId(uint64_t token);
 
 private:
     bool isInit_;
@@ -51,6 +52,7 @@ private:
     std::shared_ptr<ICameraController> controller_;
     std::shared_ptr<ICameraSinkAccessControl> accessControl_;
     sptr<IDCameraSinkCallback> sinkCallback_;
+    uint64_t tokenId_ = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,6 +30,7 @@
 #include "distributed_camera_allconnect_manager.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
+#include "token_setproc.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -111,6 +112,7 @@ int32_t DistributedCameraSinkService::InitSink(const std::string& params,
     g_camDump.camNumber = static_cast<int32_t>(cameras.size());
     for (auto& dhId : cameras) {
         std::shared_ptr<DCameraSinkDev> sinkDevice = std::make_shared<DCameraSinkDev>(dhId, sinkCallback);
+        sinkDevice->SetTokenId(GetFirstCallerTokenID());
         ret = sinkDevice->Init();
         CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "sink device init failed, ret: %{public}d", ret);
         {

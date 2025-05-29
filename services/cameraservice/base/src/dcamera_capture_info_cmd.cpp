@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,9 +24,8 @@ namespace DistributedHardware {
 int32_t DCameraCaptureInfoCmd::Marshal(std::string& jsonStr)
 {
     cJSON *rootValue = cJSON_CreateObject();
-    if (rootValue == nullptr) {
-        return DCAMERA_BAD_VALUE;
-    }
+    CHECK_NULL_RETURN((rootValue == nullptr), DCAMERA_BAD_VALUE);
+
     cJSON_AddStringToObject(rootValue, "Type", type_.c_str());
     cJSON_AddStringToObject(rootValue, "dhId", dhId_.c_str());
     cJSON_AddStringToObject(rootValue, "Command", command_.c_str());
@@ -36,10 +35,7 @@ int32_t DCameraCaptureInfoCmd::Marshal(std::string& jsonStr)
     cJSON_AddItemToObject(rootValue, "Value", captureInfos);
     for (auto iter = value_.begin(); iter != value_.end(); iter++) {
         std::shared_ptr<DCameraCaptureInfo> capture = *iter;
-        if (capture == nullptr) {
-            cJSON_Delete(rootValue);
-            return DCAMERA_BAD_VALUE;
-        }
+        CHECK_NULL_FREE_RETURN(capture, DCAMERA_BAD_VALUE, rootValue);
         cJSON *captureInfo = cJSON_CreateObject();
         CHECK_NULL_FREE_RETURN(captureInfo, DCAMERA_BAD_VALUE, rootValue);
         cJSON_AddItemToArray(captureInfos, captureInfo);
@@ -63,6 +59,9 @@ int32_t DCameraCaptureInfoCmd::Marshal(std::string& jsonStr)
         }
     }
     cJSON_AddNumberToObject(rootValue, "mode", sceneMode_);
+    cJSON_AddNumberToObject(rootValue, "userId", userId_);
+    cJSON_AddNumberToObject(rootValue, "tokenId", tokenId_);
+    cJSON_AddStringToObject(rootValue, "accountId", accountId_.c_str());
 
     char *data = cJSON_Print(rootValue);
     if (data == nullptr) {
@@ -78,21 +77,16 @@ int32_t DCameraCaptureInfoCmd::Marshal(std::string& jsonStr)
 int32_t DCameraCaptureInfoCmd::Unmarshal(const std::string& jsonStr)
 {
     cJSON *rootValue = cJSON_Parse(jsonStr.c_str());
-    if (rootValue == nullptr) {
-        return DCAMERA_BAD_VALUE;
-    }
+    CHECK_NULL_RETURN((rootValue == nullptr), DCAMERA_BAD_VALUE);
+
     cJSON *type = cJSON_GetObjectItemCaseSensitive(rootValue, "Type");
-    if (type == nullptr || !cJSON_IsString(type) || (type->valuestring == nullptr)) {
-        cJSON_Delete(rootValue);
-        return DCAMERA_BAD_VALUE;
-    }
+    CHECK_AND_FREE_RETURN_RET_LOG((type == nullptr || !cJSON_IsString(type) || (type->valuestring == nullptr)),
+        DCAMERA_BAD_VALUE, rootValue, "type parse fail.");
     type_ = type->valuestring;
 
     cJSON *dhId = cJSON_GetObjectItemCaseSensitive(rootValue, "dhId");
-    if (dhId == nullptr || !cJSON_IsString(dhId) || (dhId->valuestring == nullptr)) {
-        cJSON_Delete(rootValue);
-        return DCAMERA_BAD_VALUE;
-    }
+    CHECK_AND_FREE_RETURN_RET_LOG((dhId == nullptr || !cJSON_IsString(dhId) || (dhId->valuestring == nullptr)),
+        DCAMERA_BAD_VALUE, rootValue, "dhId parse fail.");
     dhId_ = dhId->valuestring;
 
     cJSON *command = cJSON_GetObjectItemCaseSensitive(rootValue, "Command");
@@ -109,6 +103,24 @@ int32_t DCameraCaptureInfoCmd::Unmarshal(const std::string& jsonStr)
         sceneMode_ = 0;
     } else {
         sceneMode_ = mode->valueint;
+    }
+    cJSON *userId = cJSON_GetObjectItemCaseSensitive(rootValue, "userId");
+    if (userId == nullptr || !cJSON_IsNumber(userId)) {
+        userId_ = -1;
+    } else {
+        userId_ = userId->valueint;
+    }
+    cJSON *tokenId = cJSON_GetObjectItemCaseSensitive(rootValue, "tokenId");
+    if (tokenId == nullptr || !cJSON_IsNumber(tokenId)) {
+        tokenId_ = 0;
+    } else {
+        tokenId_ = tokenId->valueint;
+    }
+    cJSON *accountId = cJSON_GetObjectItemCaseSensitive(rootValue, "accountId");
+    if (accountId == nullptr || !cJSON_IsString(accountId) || (accountId->valuestring == nullptr)) {
+        accountId_ = "";
+    } else {
+        accountId_ = accountId->valuestring;
     }
     cJSON_Delete(rootValue);
     return ret;
