@@ -55,7 +55,8 @@
                 "safwk",
                 "drivers_interface_camera",
                 "access_token",
-                "av_codec"
+                "av_codec",
+                "os_account"
             ]
         },
         "build": {

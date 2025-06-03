@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -330,6 +330,21 @@ static const std::string TEST_CAPTURE_INFO_CMD_JSON_CAPTURESETTINGS_BODY_VALUE_E
     ]
 })";
 
+static const std::string TEST_CAPTURE_INFO_CMD_JSON_CAPTURESETTINGS_CHECK = R"({
+    "Type": "OPERATION",
+    "dhId": "camrea_0",
+    "Command": "CAPTURE",
+    "Value": [
+        {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": 1,
+        "IsCapture":true, "EncodeType": 1, "StreamType": 1,
+        "CaptureSettings": [{"SettingType": 1, "SettingValue": 0}]}
+    ],
+    "mode": 1,
+    "userId": 100,
+    "tokenId": 0,
+    "accountId": "accountId"
+})";
+
 
 void DCameraCaptureInfoCmdlTest::SetUpTestCase(void)
 {
@@ -462,6 +477,9 @@ HWTEST_F(DCameraCaptureInfoCmdlTest, Unmarshal_003, TestSize.Level1)
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 
     ret = cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON_VALUE_ARRAY);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON_CAPTURESETTINGS_CHECK);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 

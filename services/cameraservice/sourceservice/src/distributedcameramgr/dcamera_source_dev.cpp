@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -464,6 +464,7 @@ int32_t DCameraSourceDev::OpenCamera()
     DHLOGI("DCameraSourceDev Execute OpenCamera devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     ReportCameraOperaterEvent(OPEN_CAMERA_EVENT, GetAnonyString(devId_), dhId_, "execute open camera event.");
+    controller_->SetTokenId(tokenId_);
     std::shared_ptr<DCameraOpenInfo> openInfo = std::make_shared<DCameraOpenInfo>();
     int32_t ret = GetLocalDeviceNetworkId(openInfo->sourceDevId_);
     DcameraRadar::GetInstance().ReportDcameraOpen("GetLocalDeviceNetworkId", CameraOpen::OPEN_CAMERA,
@@ -873,6 +874,11 @@ void DCameraSourceDev::SetHicollieFlag(bool flag)
 bool DCameraSourceDev::GetHicollieFlag()
 {
     return hicollieFlag_.load();
+}
+
+void DCameraSourceDev::SetTokenId(uint64_t token)
+{
+    tokenId_ = token;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

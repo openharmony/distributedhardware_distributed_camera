@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,6 +37,7 @@
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
 #include "dcamera_handler.h"
+#include "token_setproc.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -250,6 +251,7 @@ int32_t DistributedCameraSourceService::RegisterDistributedHardware(const std::s
             "dcamera source RegisterDistributedHardware fail.");
         CamDevErase(camIndex);
     }
+    camDev->SetTokenId(GetFirstCallerTokenID());
     DHLOGI("RegisterDistributedHardware end devId: %{public}s, dhId: %{public}s, sinkVersion: %{public}s",
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), params.sinkVersion.c_str());
     return ret;

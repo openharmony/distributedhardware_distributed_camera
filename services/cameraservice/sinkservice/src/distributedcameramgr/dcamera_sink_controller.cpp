@@ -42,6 +42,10 @@
 #include "idistributed_camera_source.h"
 #include "ipc_skeleton.h"
 #include "dcamera_low_latency.h"
+#ifdef OS_ACCOUNT_ENABLE
+#include "ohos_account_kits.h"
+#include "os_account_manager.h"
+#endif
 #include <sys/prctl.h>
 
 namespace OHOS {
@@ -550,18 +554,18 @@ void DCameraSinkController::OnSessionState(int32_t state, std::string networkId)
             DHLOGI("channel is disconnected");
             ffrt::submit([this]() {
                 DHLOGI("DCameraSinkController::OnSessionState %{public}s new thread session state: %{public}d",
-                       GetAnonyString(dhId_).c_str(), sessionState_);
+                    GetAnonyString(dhId_).c_str(), sessionState_);
                 prctl(PR_SET_NAME, CHANNEL_DISCONNECTED.c_str());
                 std::lock_guard<std::mutex> autoLock(autoLock_);
                 int32_t ret = CloseChannel();
                 if (ret != DCAMERA_OK) {
                     DHLOGE("session state: %{public}d, %{public}s close channel failed, ret: %{public}d",
-                           sessionState_, GetAnonyString(dhId_).c_str(), ret);
+                        sessionState_, GetAnonyString(dhId_).c_str(), ret);
                 }
                 ret = StopCapture();
                 if (ret != DCAMERA_OK) {
                     DHLOGE("session state: %{public}d, %{public}s stop capture failed, ret: %{public}d",
-                           sessionState_, GetAnonyString(dhId_).c_str(), ret);
+                        sessionState_, GetAnonyString(dhId_).c_str(), ret);
                 }
             });
             break;
@@ -668,6 +672,13 @@ int32_t DCameraSinkController::HandleReceivedData(std::shared_ptr<DataBuffer>& d
             return ret;
         }
         sceneMode_ = captureInfoCmd.sceneMode_;
+        userId_ = captureInfoCmd.userId_;
+        tokenId_ = captureInfoCmd.tokenId_;
+        accountId_ = captureInfoCmd.accountId_;
+        if (!CheckAclRight()) {
+            DHLOGE("ACL check failed.");
+            return DCAMERA_BAD_VALUE;
+        }
         return StartCapture(captureInfoCmd.value_, sceneMode_);
     } else if ((!command.empty()) && (command.compare(DCAMERA_PROTOCOL_CMD_UPDATE_METADATA) == 0)) {
         DCameraMetadataSettingCmd metadataSettingCmd;
@@ -682,6 +693,54 @@ int32_t DCameraSinkController::HandleReceivedData(std::shared_ptr<DataBuffer>& d
         return StopCapture();
     }
     return DCAMERA_BAD_VALUE;
+}
+
+bool DCameraSinkController::CheckAclRight()
+{
+    if (userId_ == -1) {
+        DHLOGI("Acl check version compatibility processing.");
+        return true;
+    }
+    std::string sinkDevId;
+    int32_t ret = GetLocalDeviceNetworkId(sinkDevId);
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, false, "GetLocalDeviceNetworkId failed, ret: %{public}d", ret);
+    int32_t userId = -1;
+    std::string accountId = "";
+#ifdef OS_ACCOUNT_ENABLE
+    std::vector<int32_t> ids;
+    ret = AccountSA::OsAccountManager::QueryActiveOsAccountIds(ids);
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK || ids.empty(), false,
+        "Get userId from active os accountIds fail, ret: %{public}d", ret);
+    userId = ids[0];
+
+    AccountSA::OhosAccountInfo osAccountInfo;
+    ret = AccountSA::OhosAccountKits::GetInstance().GetOhosAccountInfo(osAccountInfo);
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, false,
+        "Get accountId from ohos account info fail, ret: %{public}d", ret);
+    accountId = osAccountInfo.uid_;
+#endif
+    ret = DeviceManager::GetInstance().InitDeviceManager(DCAMERA_PKG_NAME, initCallback_);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("InitDeviceManager failed ret = %{public}d", ret);
+        return false;
+    }
+    DmAccessCaller dmSrcCaller = {
+        .accountId = accountId_,
+        .pkgName = DCAMERA_PKG_NAME,
+        .networkId = srcDevId_,
+        .userId = userId_,
+        .tokenId = tokenId_,
+    };
+    DmAccessCallee dmDstCallee = {
+        .networkId = sinkDevId,
+        .accountId = accountId,
+        .userId = userId,
+        .tokenId = sinkTokenId_,
+        .pkgName = DCAMERA_PKG_NAME,
+    };
+    DHLOGI("CheckAclRight srcDevId: %{public}s, accountId: %{public}s, sinkDevId: %{public}s",
+        GetAnonyString(srcDevId_).c_str(), GetAnonyString(accountId).c_str(), GetAnonyString(sinkDevId).c_str());
+    return DeviceManager::GetInstance().CheckSinkAccessControl(dmSrcCaller, dmDstCallee);
 }
 
 int32_t DCameraSinkController::PauseDistributedHardware(const std::string &networkId)
@@ -820,6 +879,11 @@ bool DCameraSinkController::CheckPermission()
     DHLOGI("DCameraSinkController CheckPermission Start");
     auto uid = IPCSkeleton::GetCallingUid();
     return uid == DCAMERA_UID;
+}
+
+void DCameraSinkController::SetTokenId(uint64_t token)
+{
+    sinkTokenId_ = token;
 }
 
 void DeviceInitCallback::OnRemoteDied()

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -45,6 +45,7 @@ int32_t DCameraSinkDev::Init()
     DHLOGI("Init dhId: %{public}s", GetAnonyString(dhId_).c_str());
     accessControl_ = std::make_shared<DCameraSinkAccessControl>();
     controller_ = std::make_shared<DCameraSinkController>(accessControl_, sinkCallback_);
+    controller_->SetTokenId(tokenId_);
     DCameraIndex index("", dhId_);
     std::vector<DCameraIndex> indexs;
     indexs.push_back(index);
@@ -209,6 +210,11 @@ int32_t DCameraSinkDev::StopDistributedHardware(const std::string &networkId)
     }
 
     return controller_->StopDistributedHardware(networkId);
+}
+
+void DCameraSinkDev::SetTokenId(uint64_t token)
+{
+    tokenId_ = token;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
