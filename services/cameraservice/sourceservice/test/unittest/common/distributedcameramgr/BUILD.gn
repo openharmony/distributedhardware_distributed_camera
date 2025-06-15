@@ -59,7 +59,6 @@ ohos_unittest("DCameraSourceMgrTest") {
 
   sources = [
     "dcamera_feeding_smoother_test.cpp",
-    "dcamera_hdf_operate_test.cpp",
     "dcamera_provider_callback_impl_test.cpp",
     "dcamera_source_config_stream_state_test.cpp",
     "dcamera_source_controller_test.cpp",

@@ -84,7 +84,6 @@ ohos_shared_library("distributed_camera_source") {
     "src/distributedcameramgr/dcameradata/feedingsmoother/derived/dcamera_feeding_smoother.cpp",
     "src/distributedcameramgr/dcameradata/feedingsmoother/derived/dcamera_time_statistician.cpp",
     "src/distributedcameramgr/dcameradata/feedingsmoother/feeding_smoother_listener.cpp",
-    "src/distributedcameramgr/dcamerahdf/dcamera_hdf_operate.cpp",
     "src/distributedcameramgr/dcamerahdf/dcamera_provider_callback_impl.cpp",
     "src/distributedcameramgr/dcamerastate/dcamera_source_capture_state.cpp",
     "src/distributedcameramgr/dcamerastate/dcamera_source_config_stream_state.cpp",
