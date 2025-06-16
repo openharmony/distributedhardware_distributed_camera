@@ -192,10 +192,6 @@ int32_t DCameraSinkController::DCameraNotify(std::shared_ptr<DCameraEvent>& even
 int32_t DCameraSinkController::UpdateSettings(std::vector<std::shared_ptr<DCameraSettings>>& settings)
 {
     DHLOGI("UpdateSettings dhId: %{public}s", GetAnonyString(dhId_).c_str());
-    if (!CheckPermission()) {
-        DHLOGE("DCameraSinkController UpdateSettings fail, CheckPermission fail");
-        return DCAMERA_WRONG_STATE;
-    }
     int32_t ret = operator_->UpdateSettings(settings);
     if (ret != DCAMERA_OK) {
         DHLOGE("UpdateSettings failed, dhId: %{public}s, ret: %{public}d", GetAnonyString(dhId_).c_str(), ret);
@@ -244,10 +240,6 @@ int32_t DCameraSinkController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& ope
 {
     DHLOGI("DCameraSinkController OpenChannel Start, dhId: %{public}s", GetAnonyString(dhId_).c_str());
     ManageSelectChannel::GetInstance().SetSinkConnect(false);
-    if (!CheckPermission()) {
-        DHLOGE("DCameraSinkController OpenChannel fail, CheckPermission fail");
-        return DCAMERA_WRONG_STATE;
-    }
     if (sessionState_ != DCAMERA_CHANNEL_STATE_DISCONNECTED) {
         DHLOGE("wrong state, dhId: %{public}s, sessionState: %{public}d", GetAnonyString(dhId_).c_str(), sessionState_);
         return DCAMERA_WRONG_STATE;
@@ -872,13 +864,6 @@ std::string DCameraSinkController::GetUdidByNetworkId(const std::string &network
         return "";
     }
     return udid;
-}
-
-bool DCameraSinkController::CheckPermission()
-{
-    DHLOGI("DCameraSinkController CheckPermission Start");
-    auto uid = IPCSkeleton::GetCallingUid();
-    return uid == DCAMERA_UID;
 }
 
 void DCameraSinkController::SetTokenId(uint64_t token)
