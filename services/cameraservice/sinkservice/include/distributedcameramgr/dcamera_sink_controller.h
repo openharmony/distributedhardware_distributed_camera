@@ -81,7 +81,6 @@ private:
     int32_t GetDeviceSecurityLevel(const std::string &udid);
     std::string GetUdidByNetworkId(const std::string &networkId);
     int32_t PullUpPage();
-    bool CheckPermission();
     void ProcessFrameTrigger(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessPostAuthorization(const AppExecFwk::InnerEvent::Pointer &event);
     int32_t CreateCtrlSession();
