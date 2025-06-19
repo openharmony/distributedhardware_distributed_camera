@@ -36,6 +36,11 @@ void SoftbusOnSourceSessionOpenedFuzzTest(const uint8_t* data, size_t size)
         .dataType = TransDataType::DATA_TYPE_BYTES,
     };
     DCameraSoftbusAdapter::GetInstance().SourceOnBind(sessionId, socketInfo);
+    DCameraSoftbusAdapter::GetInstance().SinkOnBind(sessionId, socketInfo);
+
+    int32_t socket = 12345;
+    std::shared_ptr<DCameraSoftbusSession> session = nullptr;
+    DCameraSoftbusAdapter::GetInstance().SinkOnBind(socket, socketInfo);
 }
 }
 }

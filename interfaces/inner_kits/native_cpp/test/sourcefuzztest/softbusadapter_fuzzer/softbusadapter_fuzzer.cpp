@@ -32,6 +32,16 @@ void SoftbusCreatSoftBusSinkSocketServerFuzzTest(const uint8_t* data, size_t siz
     DCameraSessionMode sessionMode = DCameraSessionMode::DCAMERA_SESSION_MODE_CTRL;
     DCameraSoftbusAdapter::GetInstance().CreatSoftBusSinkSocketServer(sessionName, role,
         sessionMode, peerDevId, peerSessionName);
+    
+    int32_t sessionID = *(reinterpret_cast<const int32_t*>(data));
+    DCameraSoftbusAdapter::GetInstance().SourceOnShutDown(sessionID,ShutdownReason::SHUTDOWN_REASON_LOCAL);
+    uint32_t Len = static_cast<uint32_t>(size);
+    DCameraSoftbusAdapter::GetInstance().SourceOnBytes(sessionID,data,Len);
+    DCameraSoftbusAdapter::GetInstance().SourceOnMessage(sessionID,data,Len);
+
+    int32_t socket = 1234;
+    std::shared_ptr<DCameraSoftbusSession> session = std::make_shared<DCameraSoftbusSession>();
+    DCameraSoftbusAdapter::GetInstance().RecordSourceSocketSession(socket,session);
 }
 
 void SoftbusCreateSoftBusSourceSocketClientFuzzTest(const uint8_t* data, size_t size)
