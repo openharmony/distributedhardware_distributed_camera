@@ -15,7 +15,7 @@ import("//build/test.gni")
 import(
     "//foundation/distributedhardware/distributed_camera/distributedcamera.gni")
 
-module_out_path = "${unittest_output_path}/dcamera_source_handler_test"
+module_out_path = "${unittest_output_path}/dcamera_hdf_operate_test"
 
 config("module_private_config") {
   visibility = [ ":*" ]
@@ -31,13 +31,12 @@ config("module_private_config") {
   ]
 }
 
-ohos_unittest("DCameraSourceHandlerTest") {
+ohos_unittest("DCameraHdfOperateTest") {
   module_out_path = module_out_path
 
   sources = [
-    "callback/dcamera_source_callback_test.cpp",
-    "dcamera_source_handler_ipc_test.cpp",
-    "dcamera_source_handler_test.cpp",
+    "dcamera_hdf_operate_test.cpp",
+    "mock_hdfoperate_device_manager.cpp",
   ]
 
   configs = [ ":module_private_config" ]
@@ -47,9 +46,16 @@ ohos_unittest("DCameraSourceHandlerTest") {
     "${innerkits_path}/native_cpp/camera_source:distributed_camera_source_sdk",
   ]
 
+  cflags = [ "-Dprivate=public" ]
+
   external_deps = [
     "c_utils:utils",
     "distributed_hardware_fwk:distributedhardwareutils",
+    "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.1",
+    "googletest:gmock",
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdi",
+    "hdf_core:libpub_utils",
     "hilog:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
@@ -57,15 +63,12 @@ ohos_unittest("DCameraSourceHandlerTest") {
 
   defines = [
     "HI_LOG_ENABLE",
-    "DH_LOG_TAG=\"DCameraSourceHandlerTest\"",
+    "DH_LOG_TAG=\"DCameraHdfOperateTest\"",
     "LOG_DOMAIN=0xD004150",
   ]
 }
 
-group("dcamera_source_handler_test") {
+group("dcamera_hdf_operate_test") {
   testonly = true
-  deps = [
-    ":DCameraSourceHandlerTest",
-    "dcamera_hdf_operate_test:DCameraHdfOperateTest",
-  ]
+  deps = [ ":DCameraHdfOperateTest" ]
 }

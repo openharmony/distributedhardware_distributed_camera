@@ -310,10 +310,7 @@ int32_t DistributedCameraSourceService::LoadDCameraHDF()
     DCAMERA_SYNC_TRACE(DCAMERA_LOAD_HDF);
     DHLOGI("load hdf driver start");
     auto dHFwkKit = GetDHFwkKit();
-    if (dHFwkKit == nullptr) {
-        DHLOGE("Get dHFwkKit is null when load hdf driver.");
-        return DCAMERA_BAD_VALUE;
-    }
+    CHECK_NULL_RETURN((dHFwkKit == nullptr), DCAMERA_BAD_VALUE);
     int32_t ret = dHFwkKit->LoadDistributedHDF(DHType::CAMERA);
     if (ret != DCAMERA_OK) {
         DHLOGE("load hdf driver failed, ret %{public}d", ret);
@@ -328,10 +325,7 @@ int32_t DistributedCameraSourceService::UnLoadCameraHDF()
 {
     DHLOGI("unload hdf driver start");
     auto dHFwkKit = GetDHFwkKit();
-    if (dHFwkKit == nullptr) {
-        DHLOGE("Get dHFwkKit is null when unload hdf driver.");
-        return DCAMERA_BAD_VALUE;
-    }
+    CHECK_NULL_RETURN((dHFwkKit == nullptr), DCAMERA_BAD_VALUE);
     int32_t ret = dHFwkKit->UnLoadDistributedHDF(DHType::CAMERA);
     if (ret != DCAMERA_OK) {
         DHLOGE("unload hdf driver failed, ret %{public}d", ret);

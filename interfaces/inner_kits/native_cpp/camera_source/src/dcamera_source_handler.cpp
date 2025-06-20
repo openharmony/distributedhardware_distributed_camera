@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,7 @@
 #include "dcamera_source_handler.h"
 
 #include "anonymous_string.h"
+#include "dcamera_hdf_operate.h"
 #include "dcamera_hisysevent_adapter.h"
 #include "dcamera_radar.h"
 #include "dcamera_source_callback.h"
@@ -209,6 +210,16 @@ void DCameraSourceHandler::UnregisterDataSyncTriggerListener()
 {
     CHECK_AND_RETURN_LOG(callback_ == nullptr, "%{public}s", "ipc callback is null.");
     callback_->UnRegisterTriggerListener();
+}
+
+int32_t DCameraSourceHandler::LoadDistributedHDF(std::shared_ptr<HdfDeathCallback> callback)
+{
+    return DCameraHdfOperate::GetInstance().LoadDcameraHDFImpl(callback);
+}
+
+int32_t DCameraSourceHandler::UnLoadDistributedHDF()
+{
+    return DCameraHdfOperate::GetInstance().UnLoadDcameraHDFImpl();
 }
 
 void DCameraSourceHandler::SetSAState()
