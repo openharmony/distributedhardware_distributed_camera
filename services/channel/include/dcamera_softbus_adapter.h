@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,6 +26,7 @@
 #include "single_instance.h"
 #include "socket.h"
 #include "trans_type.h"
+#include "device_manager.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -79,6 +80,8 @@ private:
     int32_t DCameraSoftbusSourceGetSession(int32_t socket, std::shared_ptr<DCameraSoftbusSession>& session);
     int32_t DCameraSoftbusSinkGetSession(int32_t socket, std::shared_ptr<DCameraSoftbusSession>& session);
     void ReplaceSuffix(std::string &mySessNmRep, const std::string &suffix, const std::string &replacement);
+    int32_t CheckOsType(const std::string &networkId, bool &isInvalid);
+    int32_t ParseValueFromCjson(std::string args, std::string key);
 
 private:
     std::mutex optLock_;
@@ -101,6 +104,10 @@ private:
     std::map<int32_t, std::shared_ptr<DCameraSoftbusSession>> sinkSocketSessionMap_;
     std::mutex sourceSocketLock_;
     std::map<int32_t, std::shared_ptr<DCameraSoftbusSession>> sourceSocketSessionMap_;
+};
+
+class DeviceInitCallback : public DmInitCallback {
+    void OnRemoteDied() override;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -122,6 +122,10 @@ const std::string CAMERA_SURFACE_FORMAT = "CAMERA_SURFACE_FORMAT";
 const std::string HDF_DCAMERA_EXT_SERVICE = "distributed_camera_provider_service";
 const std::string CAMERA_SUPPORT_MODE = "Mode";
 constexpr static int8_t FRAME_HEAD = 0;
+
+const int32_t VALID_OS_TYPE = 10;
+const int32_t INVALID_OS_TYPE = -1;
+const std::string KEY_OS_TYPE = "OS_TYPE";
 
 const int32_t RESOLUTION_MAX_WIDTH_SNAPSHOT = 4096;
 const int32_t RESOLUTION_MAX_HEIGHT_SNAPSHOT = 3072;

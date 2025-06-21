@@ -341,12 +341,13 @@ int32_t DCameraSourceController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& o
         DHLOGE("ACL check failed.");
         return DCAMERA_BAD_OPERATE;
     }
+    bool isInvalid = false;
+    CHECK_AND_RETURN_RET_LOG(CheckOsType(devId, isInvalid) != DCAMERA_OK && isInvalid, DCAMERA_BAD_VALUE,
+        "CheckOsType failed or invalid osType");
     if (!ManageSelectChannel::GetInstance().GetSrcConnect()) {
         sptr<IDistributedCameraSink> camSinkSrv = DCameraSourceServiceIpc::GetInstance().GetSinkRemoteCamSrv(devId);
-        if (camSinkSrv == nullptr) {
-            DHLOGE("DCameraSourceController can not get service, devId: %{public}s", GetAnonyString(devId).c_str());
-            return DCAMERA_BAD_OPERATE;
-        }
+        CHECK_AND_RETURN_RET_LOG(camSinkSrv == nullptr, DCAMERA_BAD_OPERATE,
+            "DCameraSourceController can not get service, devId: %{public}s", GetAnonyString(devId).c_str());
         std::string jsonStr;
         DCameraOpenInfoCmd cmd;
         cmd.type_ = DCAMERA_PROTOCOL_TYPE_MESSAGE;
@@ -354,15 +355,11 @@ int32_t DCameraSourceController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& o
         cmd.command_ = DCAMERA_PROTOCOL_CMD_OPEN_CHANNEL;
         cmd.value_ = openInfo;
         int32_t ret = cmd.Marshal(jsonStr);
-        if (ret != DCAMERA_OK) {
-            DHLOGE("DCameraSourceController Marshal OpenInfo failed %{public}d", ret);
-            return ret;
-        }
+        CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret,
+            "DCameraSourceController Marshal OpenInfo failed %{public}d", ret);
         ret = camSinkSrv->OpenChannel(dhId, jsonStr);
-        if (ret != DCAMERA_OK) {
-            DHLOGE("DCameraSourceController SA OpenChannel failed %{public}d", ret);
-            return ret;
-        }
+        CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret,
+            "DCameraSourceController SA OpenChannel failed %{public}d", ret);
         DHLOGD("DCameraSourceController OpenChannel devId: %{public}s, dhId: %{public}s success",
             GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
     }
@@ -377,6 +374,39 @@ int32_t DCameraSourceController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& o
         return ret;
     }
     return PublishEnableLatencyMsg(devId);
+}
+
+int32_t DCameraSourceController::ParseValueFromCjson(std::string args, std::string key)
+{
+    DHLOGD("ParseValueFromCjson");
+    cJSON *jParam = cJSON_Parse(args.c_str());
+    CHECK_NULL_RETURN(jParam == nullptr, DCAMERA_BAD_VALUE);
+    cJSON *retItem = cJSON_GetObjectItemCaseSensitive(jParam, key.c_str());
+    CHECK_AND_FREE_RETURN_RET_LOG(retItem == nullptr || !cJSON_IsNumber(retItem),
+        DCAMERA_BAD_VALUE, jParam, "Not found key result");
+    int32_t ret = retItem->valueint;
+    cJSON_Delete(jParam);
+    return ret;
+}
+
+int32_t DCameraSourceController::CheckOsType(const std::string &networkId, bool &isInvalid)
+{
+    std::vector<DistributedHardware::DmDeviceInfo> dmDeviceInfoList;
+    int32_t errCode = DeviceManager::GetInstance().GetTrustedDeviceList(DCAMERA_PKG_NAME, "", dmDeviceInfoList);
+    CHECK_AND_RETURN_RET_LOG(errCode != DCAMERA_OK, DCAMERA_BAD_VALUE,
+        "Get device manager trusted device list fail, errCode %{public}d", errCode);
+    for (const auto& dmDeviceInfo : dmDeviceInfoList) {
+        if (dmDeviceInfo.networkId == networkId) {
+            int32_t osType = ParseValueFromCjson(dmDeviceInfo.extraData, KEY_OS_TYPE);
+            if (osType != VALID_OS_TYPE && osType != DCAMERA_BAD_VALUE) {
+                isInvalid = true;
+            }
+            DHLOGI("remote found, osType: %{public}d, isInvalid: %{public}d", osType, isInvalid);
+            return DCAMERA_OK;
+        }
+    }
+    DHLOGI("remote not found.");
+    return DCAMERA_OK;
 }
 
 bool DCameraSourceController::CheckAclRight()

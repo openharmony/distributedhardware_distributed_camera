@@ -1023,5 +1023,39 @@ HWTEST_F(DCameraSoftbusAdapterTest, DCameraSoftbusAdapterTest_038, TestSize.Leve
     DCameraSoftbusAdapter::GetInstance().sinkSessions_.erase(mySessionName);
     EXPECT_EQ(ret, DCAMERA_OK);
 }
+
+HWTEST_F(DCameraSoftbusAdapterTest, DCameraSoftbusAdapterTest_039, TestSize.Level1)
+{
+    std::string networkId = "testNetworkId";
+    bool isInvalid = false;
+    int32_t typeVal = DCameraSoftbusAdapter::GetInstance().CheckOsType(networkId, isInvalid);
+    typeVal = 50;
+    std::string jsonStr = "{\"OS_TYPE\": 50}";
+    std::string key = "OS_TYPE";
+    int32_t result = DCameraSoftbusAdapter::GetInstance().ParseValueFromCjson(jsonStr, key);
+    EXPECT_EQ(result, typeVal);
+
+    jsonStr = "invalid_json";
+    key = "typeVal";
+    result = DCameraSoftbusAdapter::GetInstance().ParseValueFromCjson(jsonStr, key);
+    EXPECT_EQ(result, DCAMERA_BAD_VALUE);
+
+    jsonStr = "{\"test\": 80}";
+    result = DCameraSoftbusAdapter::GetInstance().ParseValueFromCjson(jsonStr, key);
+    EXPECT_EQ(result, DCAMERA_BAD_VALUE);
+
+    jsonStr = "{\"test\": \"typeVal\"}";
+    result = DCameraSoftbusAdapter::GetInstance().ParseValueFromCjson(jsonStr, key);
+    EXPECT_EQ(result, DCAMERA_BAD_VALUE);
+
+    jsonStr = "";
+    result = DCameraSoftbusAdapter::GetInstance().ParseValueFromCjson(jsonStr, key);
+    EXPECT_EQ(result, DCAMERA_BAD_VALUE);
+
+    jsonStr = "null";
+    key = "typeVal";
+    result = DCameraSoftbusAdapter::GetInstance().ParseValueFromCjson(jsonStr, key);
+    EXPECT_EQ(result, DCAMERA_BAD_VALUE);
+}
 }
 }

@@ -767,5 +767,38 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_023, TestSi
     EXPECT_FALSE(controller_->CheckAclRight());
 }
 
+HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_024, TestSize.Level1)
+{
+    std::string networkId = "testNetworkId";
+    bool isInvalid = false;
+    int32_t typeVal = controller_->CheckOsType(networkId, isInvalid);
+    typeVal = 50;
+    std::string jsonStr = "{\"OS_TYPE\": 50}";
+    std::string key = "OS_TYPE";
+    int32_t result = controller_->ParseValueFromCjson(jsonStr, key);
+    EXPECT_EQ(result, typeVal);
+
+    jsonStr = "invalid_json";
+    key = "typeVal";
+    result = controller_->ParseValueFromCjson(jsonStr, key);
+    EXPECT_EQ(result, DCAMERA_BAD_VALUE);
+
+    jsonStr = "{\"test\": 80}";
+    result = controller_->ParseValueFromCjson(jsonStr, key);
+    EXPECT_EQ(result, DCAMERA_BAD_VALUE);
+
+    jsonStr = "{\"test\": \"typeVal\"}";
+    result = controller_->ParseValueFromCjson(jsonStr, key);
+    EXPECT_EQ(result, DCAMERA_BAD_VALUE);
+
+    jsonStr = "";
+    result = controller_->ParseValueFromCjson(jsonStr, key);
+    EXPECT_EQ(result, DCAMERA_BAD_VALUE);
+
+    jsonStr = "null";
+    key = "typeVal";
+    result = controller_->ParseValueFromCjson(jsonStr, key);
+    EXPECT_EQ(result, DCAMERA_BAD_VALUE);
+}
 }
 }

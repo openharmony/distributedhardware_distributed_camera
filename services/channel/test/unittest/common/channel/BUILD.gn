@@ -85,6 +85,7 @@ ohos_unittest("DCameraChannelTest") {
   external_deps = [
     "cJSON:cjson",
     "c_utils:utils",
+    "device_manager:devicemanagersdk",
     "distributed_hardware_fwk:distributedhardwareutils",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.1",
     "dsoftbus:softbus_client",
