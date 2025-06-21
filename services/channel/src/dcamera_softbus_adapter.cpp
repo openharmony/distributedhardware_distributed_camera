@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,6 +29,7 @@
 #include "distributed_camera_allconnect_manager.h"
 #include "dcamera_event_cmd.h"
 #include "dcamera_protocol.h"
+#include "cJSON.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -582,6 +583,10 @@ int32_t DCameraSoftbusAdapter::SinkOnBind(int32_t socket, PeerSocketInfo info)
         DHLOGE("sink bind socket error, can not find socket %{public}d", socket);
         return DCAMERA_NOT_FOUND;
     }
+    std::string peerNetworkId = info.networkId;
+    bool isInvalid = false;
+    CHECK_AND_RETURN_RET_LOG(CheckOsType(peerNetworkId, isInvalid) != DCAMERA_OK && isInvalid, DCAMERA_BAD_VALUE,
+        "CheckOsType failed or invalid osType");
     ret = session->OnSessionOpened(socket, info.networkId);
     if (ret != DCAMERA_OK) {
         DHLOGE("sink bind socket error, not find socket %{public}d", socket);
@@ -598,6 +603,42 @@ int32_t DCameraSoftbusAdapter::SinkOnBind(int32_t socket, PeerSocketInfo info)
     }
     DHLOGI("sink bind socket end, socket: %{public}d", socket);
     return ret;
+}
+
+int32_t DCameraSoftbusAdapter::ParseValueFromCjson(std::string args, std::string key)
+{
+    DHLOGD("ParseValueFromCjson");
+    cJSON *jParam = cJSON_Parse(args.c_str());
+    CHECK_NULL_RETURN(jParam == nullptr, DCAMERA_BAD_VALUE);
+    cJSON *retItem = cJSON_GetObjectItemCaseSensitive(jParam, key.c_str());
+    CHECK_AND_FREE_RETURN_RET_LOG(retItem == nullptr || !cJSON_IsNumber(retItem),
+        DCAMERA_BAD_VALUE, jParam, "Not found key result");
+    int32_t ret = retItem->valueint;
+    cJSON_Delete(jParam);
+    return ret;
+}
+
+int32_t DCameraSoftbusAdapter::CheckOsType(const std::string &networkId, bool &isInvalid)
+{
+    std::shared_ptr<DmInitCallback> initCallback = std::make_shared<DeviceInitCallback>();
+    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(DCAMERA_PKG_NAME, initCallback);
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, DCAMERA_BAD_VALUE, "InitDeviceManager failed, ret: %{public}d", ret);
+    std::vector<DistributedHardware::DmDeviceInfo> dmDeviceInfoList;
+    ret = DeviceManager::GetInstance().GetTrustedDeviceList(DCAMERA_PKG_NAME, "", dmDeviceInfoList);
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, DCAMERA_BAD_VALUE,
+        "Get device manager trusted device list fail, errCode %{public}d", ret);
+    for (const auto& dmDeviceInfo : dmDeviceInfoList) {
+        if (dmDeviceInfo.networkId == networkId) {
+            int32_t osType = ParseValueFromCjson(dmDeviceInfo.extraData, KEY_OS_TYPE);
+            if (osType != VALID_OS_TYPE && osType != DCAMERA_BAD_VALUE) {
+                isInvalid = true;
+            }
+            DHLOGI("remote found, osType: %{public}d, isInvalid: %{public}d", osType, isInvalid);
+            return DCAMERA_OK;
+        }
+    }
+    DHLOGI("remote not found.");
+    return DCAMERA_OK;
 }
 
 void DCameraSoftbusAdapter::SinkOnShutDown(int32_t socket, ShutdownReason reason)
@@ -737,5 +778,9 @@ void DCameraSoftbusAdapter::CloseSessionWithNetWorkId(const std::string &network
     }
 }
 
+void DeviceInitCallback::OnRemoteDied()
+{
+    DHLOGI("DeviceInitCallback OnRemoteDied");
+}
 } // namespace DistributedHardware
 } // namespace OHOS

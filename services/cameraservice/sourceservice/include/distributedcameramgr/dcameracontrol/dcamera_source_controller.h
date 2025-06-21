@@ -62,6 +62,8 @@ private:
     void HandleReceivedData(std::shared_ptr<DataBuffer> &dataBuffer);
     bool CheckAclRight();
     bool GetOsAccountInfo();
+    int32_t CheckOsType(const std::string &networkId, bool &isInvalid);
+    int32_t ParseValueFromCjson(std::string args, std::string key);
     class DCameraHdiRecipient : public IRemoteObject::DeathRecipient {
     public:
         void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
