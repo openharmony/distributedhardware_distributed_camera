@@ -120,9 +120,10 @@ void SourceServiceCamDevEraseFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
+    int32_t doubleNum = 2;
     DCameraIndex index;
-    index.devId_ = ExtractString(data, 0, size / 2);
-    index.dhId_ = ExtractString(data, size / 2, size / 2);
+    index.devId_ = ExtractString(data, 0, size / doubleNum);
+    index.dhId_ = ExtractString(data, size / doubleNum, size / doubleNum);
 
     std::shared_ptr<DistributedCameraSourceService> sourceService =
         std::make_shared<DistributedCameraSourceService>(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, true);
