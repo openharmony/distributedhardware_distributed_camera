@@ -24,7 +24,7 @@ namespace OHOS {
 namespace DistributedHardware {
 int32_t DistributedHardwareFwkKit::LoadDistributedHDF(const DHType dhType)
 {
-    return DCameraHdfOperate::GetInstance().LoadDcameraHDFImpl();
+    return DCameraHdfOperate::GetInstance().LoadDcameraHDFImpl(nullptr);
 }
 
 int32_t DistributedHardwareFwkKit::UnLoadDistributedHDF(const DHType dhType)

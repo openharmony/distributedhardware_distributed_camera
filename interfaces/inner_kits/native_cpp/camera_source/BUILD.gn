@@ -37,6 +37,7 @@ ohos_shared_library("distributed_camera_source_sdk") {
   sources = [
     "src/callback/dcamera_source_callback.cpp",
     "src/callback/dcamera_source_callback_stub.cpp",
+    "src/dcamera_hdf_operate.cpp",
     "src/dcamera_source_handler.cpp",
     "src/dcamera_source_handler_ipc.cpp",
     "src/dcamera_source_load_callback.cpp",
@@ -60,6 +61,10 @@ ohos_shared_library("distributed_camera_source_sdk") {
   external_deps = [
     "c_utils:utils",
     "distributed_hardware_fwk:distributedhardwareutils",
+    "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.1",
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdi",
+    "hdf_core:libpub_utils",
     "hilog:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",

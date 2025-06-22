@@ -20,6 +20,7 @@
 #include <condition_variable>
 #include <mutex>
 
+#include "idistributed_hardware_source.h"
 #include "iservstat_listener_hdi.h"
 #include "idevmgr_hdi.h"
 #include "iservmgr_hdi.h"
@@ -38,17 +39,22 @@ using OHOS::HDI::DistributedCamera::V1_1::IDCameraHdfCallback;
 using OHOS::HDI::DistributedCamera::V1_1::DCameraHDFEvent;
 const std::string CAMERA_SERVICE_NAME = "distributed_camera_service";
 const std::string PROVIDER_SERVICE_NAME = "distributed_camera_provider_service";
+const std::string HDF_LISTENER_SERVICE_NAME = "DHFWK";
 constexpr uint16_t CAMERA_INVALID_VALUE = 0xffff;
 constexpr int32_t CAMERA_WAIT_TIME = 2000;
 
 class FwkDCameraHdfCallback;
+class HdfDeathRecipient : public IRemoteObject::DeathRecipient {
+public:
+    void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
+};
 class DCameraHdfOperate {
 DECLARE_SINGLE_INSTANCE(DCameraHdfOperate);
 
 public:
-    int32_t LoadDcameraHDFImpl();
+    int32_t LoadDcameraHDFImpl(std::shared_ptr<HdfDeathCallback> callback);
     int32_t UnLoadDcameraHDFImpl();
-    void ResetRefCount();
+    void OnHdfHostDied();
 
 private:
     int32_t WaitLoadCameraService();
@@ -58,15 +64,22 @@ private:
     int32_t UnLoadDevice();
     int32_t RegisterHdfListener();
     int32_t UnRegisterHdfListener();
+    int32_t AddHdfDeathBind();
+    int32_t RemoveHdfDeathBind();
+    int32_t MakeFwkDCameraHdfCallback();
 
 private:
+    OHOS::sptr<IDeviceManager> devmgr_;
+    OHOS::sptr<IServiceManager> servMgr_;
+    sptr<IDCameraProvider> camHdiProvider_;
+    std::mutex fwkDCameraHdfCallbackMutex_;
     OHOS::sptr<FwkDCameraHdfCallback> fwkDCameraHdfCallback_;
     std::atomic<uint16_t> cameraServStatus_ = CAMERA_INVALID_VALUE;
     std::atomic<uint16_t> providerServStatus_ = CAMERA_INVALID_VALUE;
     std::condition_variable hdfOperateCon_;
     std::mutex hdfOperateMutex_;
-    int32_t hdfLoadRef_ = 0;
-    std::mutex hdfLoadRefMutex_;
+    std::shared_ptr<HdfDeathCallback> hdfDeathCallback_;
+    sptr<HdfDeathRecipient> hdfDeathRecipient_ = sptr<HdfDeathRecipient>(new HdfDeathRecipient());
 };
 
 class DCameraHdfServStatListener : public OHOS::HDI::ServiceManager::V1_0::ServStatListenerStub {

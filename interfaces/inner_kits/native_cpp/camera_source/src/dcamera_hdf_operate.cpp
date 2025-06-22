@@ -19,8 +19,9 @@
 #include <hdf_device_class.h>
 
 #include "anonymous_string.h"
-#include "distributed_hardware_errno.h"
+#include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
+#include "iproxy_broker.h"
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DCameraHdfOperate"
@@ -28,62 +29,59 @@
 namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(DCameraHdfOperate);
-int32_t DCameraHdfOperate::LoadDcameraHDFImpl()
+int32_t DCameraHdfOperate::LoadDcameraHDFImpl(std::shared_ptr<HdfDeathCallback> callback)
 {
     DHLOGI("Load camera hdf impl begin!");
-    std::unique_lock<std::mutex> loadRefLocker(hdfLoadRefMutex_);
-    if (hdfLoadRef_ > 0) {
-        hdfLoadRef_++;
-        DHLOGI("The camera hdf impl has been loaded, just inc ref!");
-        return DH_FWK_SUCCESS;
-    }
     int32_t ret = LoadDevice();
-    if (ret != DH_FWK_SUCCESS) {
+    if (ret != DCAMERA_OK) {
         DHLOGE("LoadDevice failed, ret: %{public}d.", ret);
         return ret;
     }
     ret = RegisterHdfListener();
-    if (ret != DH_FWK_SUCCESS) {
+    if (ret != DCAMERA_OK) {
         DHLOGE("RegisterHdfListener failed, ret: %{public}d.", ret);
         UnLoadDevice();
         return ret;
     }
-    hdfLoadRef_++;
+    hdfDeathCallback_ = callback;
+    ret = AddHdfDeathBind();
+    if (ret != DCAMERA_OK) {
+        DHLOGE("AddHdfDeathBind failed, ret: %{public}d.", ret);
+        UnRegisterHdfListener();
+        UnLoadDevice();
+        return ret;
+    }
     DHLOGI("Load camera hdf impl end!");
-    return DH_FWK_SUCCESS;
+    return DCAMERA_OK;
 }
 
 int32_t DCameraHdfOperate::UnLoadDcameraHDFImpl()
 {
     DHLOGI("UnLoad camera hdf impl begin!");
-    std::unique_lock<std::mutex> loadRefLocker(hdfLoadRefMutex_);
-    if (hdfLoadRef_ == 0) {
-        DHLOGI("The camera hdf impl has been unloaded!");
-        return DH_FWK_SUCCESS;
+    int32_t ret = RemoveHdfDeathBind();
+    if (ret != DCAMERA_OK) {
+        DHLOGE("RemoveHdfDeathBind failed, ret: %{public}d.", ret);
     }
-    if (hdfLoadRef_ > 1) {
-        hdfLoadRef_--;
-        DHLOGI("The camera hdf impl has been loaded, just dec ref!");
-        return DH_FWK_SUCCESS;
-    }
-    int32_t ret = UnRegisterHdfListener();
-    if (ret != DH_FWK_SUCCESS) {
+    ret = UnRegisterHdfListener();
+    if (ret != DCAMERA_OK) {
         DHLOGE("UnRegisterHdfListener failed, ret: %{public}d.", ret);
     }
     ret = UnLoadDevice();
-    if (ret != DH_FWK_SUCCESS) {
+    if (ret != DCAMERA_OK) {
         DHLOGE("UnLoadDevice failed, ret: %{public}d.", ret);
     }
-    hdfLoadRef_--;
     DHLOGI("UnLoad camera hdf impl end!");
-    return DH_FWK_SUCCESS;
+    return DCAMERA_OK;
 }
 
-void DCameraHdfOperate::ResetRefCount()
+void DCameraHdfOperate::OnHdfHostDied()
 {
-    DHLOGI("Reset reference count for dcamera.");
-    std::unique_lock<std::mutex> loadRefLocker(hdfLoadRefMutex_);
-    hdfLoadRef_ = 0;
+    DHLOGI("On hdf host died begin!");
+    if (hdfDeathCallback_) {
+        DHLOGI("Call hdf host died callback!");
+        hdfDeathCallback_->OnHdfHostDied();
+    }
+    DHLOGI("On hdf host died end!");
 }
 
 int32_t DCameraHdfOperate::WaitLoadCameraService()
@@ -95,9 +93,9 @@ int32_t DCameraHdfOperate::WaitLoadCameraService()
     });
     if (cameraServStatus_.load() != OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START) {
         DHLOGE("wait load cameraService failed, status %{public}d", cameraServStatus_.load());
-        return ERR_DH_FWK_LOAD_HDF_TIMEOUT;
+        return DCAMERA_BAD_OPERATE;
     }
-    return DH_FWK_SUCCESS;
+    return DCAMERA_OK;
 }
 
 int32_t DCameraHdfOperate::WaitLoadProviderService()
@@ -109,9 +107,9 @@ int32_t DCameraHdfOperate::WaitLoadProviderService()
     });
     if (providerServStatus_.load() != OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START) {
         DHLOGE("wait load providerService failed, status %{public}d", providerServStatus_.load());
-        return ERR_DH_FWK_LOAD_HDF_TIMEOUT;
+        return DCAMERA_BAD_OPERATE;
     }
-    return DH_FWK_SUCCESS;
+    return DCAMERA_OK;
 }
 
 OHOS::sptr<IServStatListener> DCameraHdfOperate::MakeServStatListener()
@@ -135,108 +133,159 @@ OHOS::sptr<IServStatListener> DCameraHdfOperate::MakeServStatListener()
 int32_t DCameraHdfOperate::LoadDevice()
 {
     DHLOGI("LoadDevice for camera begin!");
-    OHOS::sptr<IServiceManager> servMgr = IServiceManager::Get();
-    OHOS::sptr<IDeviceManager> devmgr = IDeviceManager::Get();
-    if (servMgr == nullptr || devmgr == nullptr) {
+    servMgr_ = IServiceManager::Get();
+    devmgr_ = IDeviceManager::Get();
+    if (servMgr_ == nullptr || devmgr_ == nullptr) {
         DHLOGE("get hdi service manager or device manager failed!");
-        return ERR_DH_FWK_POINTER_IS_NULL;
+        return DCAMERA_BAD_VALUE;
     }
     OHOS::sptr<IServStatListener> listener = MakeServStatListener();
-    if (servMgr->RegisterServiceStatusListener(listener, DEVICE_CLASS_CAMERA) != 0) {
+    if (servMgr_->RegisterServiceStatusListener(listener, DEVICE_CLASS_CAMERA) != 0) {
         DHLOGE("RegisterServiceStatusListener failed!");
-        return ERR_DH_FWK_REGISTER_HDF_LISTENER_FAIL;
+        return DCAMERA_BAD_OPERATE;
     }
     DHLOGI("Load camera service.");
-    int32_t ret = devmgr->LoadDevice(CAMERA_SERVICE_NAME);
+    int32_t ret = devmgr_->LoadDevice(CAMERA_SERVICE_NAME);
     if (ret != HDF_SUCCESS && ret != HDF_ERR_DEVICE_BUSY) {
         DHLOGE("Load camera service failed!");
-        servMgr->UnregisterServiceStatusListener(listener);
-        return ERR_DH_FWK_LOAD_HDF_FAIL;
+        servMgr_->UnregisterServiceStatusListener(listener);
+        return DCAMERA_BAD_OPERATE;
     }
-    if (WaitLoadCameraService() != DH_FWK_SUCCESS) {
+    if (WaitLoadCameraService() != DCAMERA_OK) {
         DHLOGE("Wait load camera service failed!");
-        servMgr->UnregisterServiceStatusListener(listener);
-        return ERR_DH_FWK_LOAD_HDF_TIMEOUT;
+        servMgr_->UnregisterServiceStatusListener(listener);
+        return DCAMERA_BAD_OPERATE;
     }
-    ret = devmgr->LoadDevice(PROVIDER_SERVICE_NAME);
+    ret = devmgr_->LoadDevice(PROVIDER_SERVICE_NAME);
     if (ret != HDF_SUCCESS && ret != HDF_ERR_DEVICE_BUSY) {
         DHLOGE("Load camera provider service failed!");
-        servMgr->UnregisterServiceStatusListener(listener);
-        return ERR_DH_FWK_LOAD_HDF_FAIL;
+        devmgr_->UnloadDevice(CAMERA_SERVICE_NAME);
+        servMgr_->UnregisterServiceStatusListener(listener);
+        return DCAMERA_BAD_OPERATE;
     }
-    if (WaitLoadProviderService() != DH_FWK_SUCCESS) {
+    if (WaitLoadProviderService() != DCAMERA_OK) {
         DHLOGE("Wait load camera provider service failed!");
-        servMgr->UnregisterServiceStatusListener(listener);
-        return ERR_DH_FWK_LOAD_HDF_TIMEOUT;
+        devmgr_->UnloadDevice(CAMERA_SERVICE_NAME);
+        servMgr_->UnregisterServiceStatusListener(listener);
+        return DCAMERA_BAD_OPERATE;
     }
-    if (servMgr->UnregisterServiceStatusListener(listener) != 0) {
+    if (servMgr_->UnregisterServiceStatusListener(listener) != 0) {
         DHLOGE("UnregisterServiceStatusListener failed!");
     }
     DHLOGI("LoadDevice for camera end!");
-    return DH_FWK_SUCCESS;
+    return DCAMERA_OK;
 }
 
 int32_t DCameraHdfOperate::UnLoadDevice()
 {
     DHLOGI("UnLoadDevice for camera begin!");
-    OHOS::sptr<IDeviceManager> devmgr = IDeviceManager::Get();
-    if (devmgr == nullptr) {
-        DHLOGE("get hdi device manager failed!");
-        return ERR_DH_FWK_POINTER_IS_NULL;
+    if (devmgr_ == nullptr) {
+        DHLOGE("hdi device manager is nullptr!");
+        return DCAMERA_BAD_VALUE;
     }
-    int32_t ret = devmgr->UnloadDevice(CAMERA_SERVICE_NAME);
+    int32_t ret = devmgr_->UnloadDevice(CAMERA_SERVICE_NAME);
     if (ret != 0) {
         DHLOGE("Unload camera service failed, ret: %{public}d", ret);
     }
-    ret = devmgr->UnloadDevice(PROVIDER_SERVICE_NAME);
+    ret = devmgr_->UnloadDevice(PROVIDER_SERVICE_NAME);
     if (ret != 0) {
         DHLOGE("Unload provider service failed, ret: %d", ret);
     }
     cameraServStatus_.store(CAMERA_INVALID_VALUE);
     providerServStatus_.store(CAMERA_INVALID_VALUE);
     DHLOGI("UnLoadDevice for camera end!");
-    return DH_FWK_SUCCESS;
+    return DCAMERA_OK;
 }
 
 int32_t DCameraHdfOperate::RegisterHdfListener()
 {
     DHLOGI("RegisterHdfListener for camera begin!");
-    sptr<IDCameraProvider> camHdiProvider = IDCameraProvider::Get(PROVIDER_SERVICE_NAME);
-    if (camHdiProvider == nullptr) {
+    camHdiProvider_ = IDCameraProvider::Get(PROVIDER_SERVICE_NAME);
+    if (camHdiProvider_ == nullptr) {
         DHLOGE("Get hdi camera provider failed.");
-        return ERR_DH_FWK_POINTER_IS_NULL;
+        return DCAMERA_BAD_VALUE;
     }
     if (fwkDCameraHdfCallback_ == nullptr) {
-        fwkDCameraHdfCallback_ = new FwkDCameraHdfCallback();
-        if (fwkDCameraHdfCallback_ == nullptr) {
+        if (MakeFwkDCameraHdfCallback() != DCAMERA_OK) {
             DHLOGE("Create FwkDCameraHdfCallback failed.");
-            return ERR_DH_FWK_POINTER_IS_NULL;
+            return DCAMERA_BAD_VALUE;
         }
     }
-    int32_t ret = camHdiProvider->RegisterCameraHdfListener("DHFWK", fwkDCameraHdfCallback_);
-    if (ret != DH_FWK_SUCCESS) {
+    int32_t ret = camHdiProvider_->RegisterCameraHdfListener(HDF_LISTENER_SERVICE_NAME, fwkDCameraHdfCallback_);
+    if (ret != DCAMERA_OK) {
         DHLOGE("Call hdf proxy RegisterCameraHdfListener failed, ret: %{public}d.", ret);
         return ret;
     }
     DHLOGI("RegisterHdfListener for camera end!");
-    return DH_FWK_SUCCESS;
+    return DCAMERA_OK;
 }
 
 int32_t DCameraHdfOperate::UnRegisterHdfListener()
 {
     DHLOGI("UnRegisterHdfListener for camera begin!");
-    sptr<IDCameraProvider> camHdiProvider = IDCameraProvider::Get(PROVIDER_SERVICE_NAME);
-    if (camHdiProvider == nullptr) {
-        DHLOGE("Get hdi camera provider failed.");
-        return ERR_DH_FWK_POINTER_IS_NULL;
+    if (camHdiProvider_ == nullptr) {
+        DHLOGE("hdi camera provider is nullptr.");
+        return DCAMERA_BAD_VALUE;
     }
-    int32_t ret = camHdiProvider->UnRegisterCameraHdfListener("DHFWK");
-    if (ret != DH_FWK_SUCCESS) {
+    int32_t ret = camHdiProvider_->UnRegisterCameraHdfListener(HDF_LISTENER_SERVICE_NAME);
+    if (ret != DCAMERA_OK) {
         DHLOGE("Call hdf proxy UnRegisterCameraHdfListener failed, ret: %{public}d.", ret);
         return ret;
     }
     DHLOGI("UnRegisterHdfListener for camera end!");
-    return DH_FWK_SUCCESS;
+    return DCAMERA_OK;
+}
+
+int32_t DCameraHdfOperate::AddHdfDeathBind()
+{
+    DHLOGI("AddHdfDeathBind for dcamera begin!");
+    if (camHdiProvider_ == nullptr) {
+        DHLOGE("hdi dcamera manager is nullptr!");
+        return DCAMERA_BAD_VALUE;
+    }
+    sptr<IRemoteObject> remote = OHOS::HDI::hdi_objcast<IDCameraProvider>(camHdiProvider_);
+    if (remote == nullptr) {
+        DHLOGE("Get remote from hdi dcamera manager failed!");
+        return DCAMERA_BAD_VALUE;
+    }
+    if (remote->AddDeathRecipient(hdfDeathRecipient_) == false) {
+        DHLOGE("Call AddDeathRecipient failed!");
+        return DCAMERA_BAD_VALUE;
+    }
+    DHLOGI("AddHdfDeathBind for dcamera end!");
+    return DCAMERA_OK;
+}
+
+int32_t DCameraHdfOperate::RemoveHdfDeathBind()
+{
+    DHLOGI("RemoveHdfDeathBind for dcamera begin!");
+    if (camHdiProvider_ == nullptr) {
+        DHLOGE("hdi dcamera manager is nullptr!");
+        return DCAMERA_BAD_VALUE;
+    }
+    sptr<IRemoteObject> remote = OHOS::HDI::hdi_objcast<IDCameraProvider>(camHdiProvider_);
+    if (remote == nullptr) {
+        DHLOGE("Get remote from hdi dcamera manager failed!");
+        return DCAMERA_BAD_VALUE;
+    }
+    if (remote->RemoveDeathRecipient(hdfDeathRecipient_) == false) {
+        DHLOGE("Call RemoveDeathRecipient failed!");
+        return DCAMERA_BAD_OPERATE;
+    }
+    DHLOGI("RemoveHdfDeathBind for dcamera end!");
+    return DCAMERA_OK;
+}
+
+int32_t DCameraHdfOperate::MakeFwkDCameraHdfCallback()
+{
+    std::lock_guard<std::mutex> locker(fwkDCameraHdfCallbackMutex_);
+    if (fwkDCameraHdfCallback_ == nullptr) {
+        fwkDCameraHdfCallback_ = new FwkDCameraHdfCallback();
+        if (fwkDCameraHdfCallback_ == nullptr) {
+            return DCAMERA_BAD_VALUE;
+        }
+    }
+    return DCAMERA_OK;
 }
 
 void DCameraHdfServStatListener::OnReceive(const ServiceStatus& status)
@@ -251,7 +300,13 @@ int32_t FwkDCameraHdfCallback::NotifyEvent(int32_t devId, const DCameraHDFEvent&
 {
     (void)devId;
     (void)event;
-    return DH_FWK_SUCCESS;
+    return DCAMERA_OK;
+}
+
+void HdfDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
+{
+    DHLOGI("On remote died!");
+    DCameraHdfOperate::GetInstance().OnHdfHostDied();
 }
 } // namespace DistributedHardware
 } // namespace OHOS
