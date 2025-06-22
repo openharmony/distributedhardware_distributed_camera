@@ -13,11 +13,19 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
+
 #include "softbusadapter_fuzzer.h"
 
 #include "dcamera_softbus_adapter.h"
 
 namespace OHOS {
+inline size_t GenerateBufferSize(FuzzedDataProvider& fuzzedData)
+{
+    constexpr size_t minBufferSize = 1;
+    constexpr size_t maxBufferSize = 1024;
+    return fuzzedData.ConsumeIntegralInRange<size_t>(minBufferSize, maxBufferSize);
+}
 namespace DistributedHardware {
 void SoftbusCreatSoftBusSinkSocketServerFuzzTest(const uint8_t* data, size_t size)
 {
@@ -117,6 +125,53 @@ void SoftbusGetLocalNetworkIdFuzzTest(const uint8_t* data, size_t size)
     std::string devId = "bb536a637105409e904d4da83790a4a7";
     DCameraSoftbusAdapter::GetInstance().GetLocalNetworkId(devId);
 }
+
+void FuzzReplaceSuffix(const uint8_t *data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(int64_t))) {
+        return;
+    }
+    FuzzedDataProvider fuzzedData(data, size);
+    std::string mySessNmRep = fuzzedData.ConsumeRandomLengthString(64);
+    std::string suffix = fuzzedData.ConsumeRandomLengthString(16);
+    std::string replacement = fuzzedData.ConsumeRandomLengthString(16);
+    DCameraSoftbusAdapter::GetInstance().ReplaceSuffix(mySessNmRep, suffix, replacement);
+}
+
+void FuzzSendSofbusBytes(const uint8_t *data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(int64_t))) {
+        return;
+    }
+    FuzzedDataProvider fuzzedData(data, size);
+    int32_t socket = fuzzedData.ConsumeIntegral<int32_t>();
+    size_t bufferSize = GenerateBufferSize(fuzzedData);
+
+    std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(bufferSize);
+    fuzzedData.ConsumeData(buffer->Data(), bufferSize);
+    DCameraSoftbusAdapter::GetInstance().SendSofbusBytes(socket, buffer);
+}
+
+void FuzzRecordSourceSocketSession(const uint8_t *data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(int64_t))) {
+        return;
+    }
+    FuzzedDataProvider fuzzedData(data, size);
+    int32_t socket = fuzzedData.ConsumeIntegral<int32_t>();
+    auto session = std::make_shared<DCameraSoftbusSession>();
+    DCameraSoftbusAdapter::GetInstance().RecordSourceSocketSession(socket, session);
+}
+
+void FuzzCloseSessionWithNetWorkId(const uint8_t *data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(int64_t))) {
+        return;
+    }
+    FuzzedDataProvider fuzzedData(data, size);
+    std::string networkId = fuzzedData.ConsumeRandomLengthString(64);
+    DCameraSoftbusAdapter::GetInstance().CloseSessionWithNetWorkId(networkId);
+}
 }
 }
 
@@ -130,5 +185,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DistributedHardware::SoftbusCloseSoftbusSessionFuzzTest(data, size);
     OHOS::DistributedHardware::SoftbusSendSofbusStreamFuzzTest(data, size);
     OHOS::DistributedHardware::SoftbusGetLocalNetworkIdFuzzTest(data, size);
+    OHOS::DistributedHardware::FuzzReplaceSuffix(data, size);
+    OHOS::DistributedHardware::FuzzSendSofbusBytes(data, size);
+    OHOS::DistributedHardware::FuzzRecordSourceSocketSession(data, size);
+    OHOS::DistributedHardware::FuzzCloseSessionWithNetWorkId(data, size);
     return 0;
 }

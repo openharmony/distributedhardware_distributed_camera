@@ -37,6 +37,74 @@ void SinkServiceStopDistributedHardwareFuzzTest(const uint8_t* data, size_t size
         std::make_shared<DistributedCameraSinkService>(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, true);
     sinkService->StopDistributedHardware(networkId);
 }
+
+void SinkServiceOnStartFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0)) {
+        return;
+    }
+
+    std::shared_ptr<DistributedCameraSinkService> sinkService =
+        std::make_shared<DistributedCameraSinkService>(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, true);
+
+    sinkService->OnStart();
+}
+
+void DistributedCameraSinkServiceInitFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0)) {
+        return;
+    }
+
+    std::shared_ptr<DistributedCameraSinkService> sinkService =
+        std::make_shared<DistributedCameraSinkService>(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, true);
+
+    sinkService->Init();
+}
+
+void DistributedCameraSinkServiceOnStopFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0)) {
+        return;
+    }
+
+    std::shared_ptr<DistributedCameraSinkService> sinkService =
+        std::make_shared<DistributedCameraSinkService>(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, true);
+
+    sinkService->OnStop();
+}
+
+void DistributedCameraSinkServiceDumpFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0)) {
+        return;
+    }
+
+    std::vector<std::u16string> args;
+    std::u16string arg(reinterpret_cast<const char16_t*>(data), size / sizeof(char16_t));
+    args.push_back(arg);
+
+    std::shared_ptr<DistributedCameraSinkService> sinkService =
+        std::make_shared<DistributedCameraSinkService>(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, true);
+
+    int fd = STDOUT_FILENO;
+
+    sinkService->Dump(fd, args);
+}
+
+void DistributedCameraSinkServiceGetCamDumpInfoFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0)) {
+        return;
+    }
+
+    std::shared_ptr<DistributedCameraSinkService> sinkService =
+        std::make_shared<DistributedCameraSinkService>(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, true);
+
+    CameraDumpInfo camDump;
+
+    sinkService->GetCamDumpInfo(camDump);
+}
 }
 }
 
@@ -45,6 +113,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
     OHOS::DistributedHardware::SinkServiceStopDistributedHardwareFuzzTest(data, size);
+    OHOS::DistributedHardware::SinkServiceOnStartFuzzTest(data, size);
+    OHOS::DistributedHardware::DistributedCameraSinkServiceInitFuzzTest(data, size);
+    OHOS::DistributedHardware::DistributedCameraSinkServiceOnStopFuzzTest(data, size);
+    OHOS::DistributedHardware::DistributedCameraSinkServiceDumpFuzzTest(data, size);
+    OHOS::DistributedHardware::DistributedCameraSinkServiceGetCamDumpInfoFuzzTest(data, size);
     return 0;
 }
 
