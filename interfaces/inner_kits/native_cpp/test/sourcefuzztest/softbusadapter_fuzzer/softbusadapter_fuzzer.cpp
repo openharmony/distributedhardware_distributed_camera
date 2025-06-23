@@ -131,10 +131,12 @@ void FuzzReplaceSuffix(const uint8_t *data, size_t size)
     if ((data == nullptr) || (size < sizeof(int64_t))) {
         return;
     }
+    int32_t tempStrLen = 64;
+    int32_t tempShortStrLen = 16;
     FuzzedDataProvider fuzzedData(data, size);
-    std::string mySessNmRep = fuzzedData.ConsumeRandomLengthString(64);
-    std::string suffix = fuzzedData.ConsumeRandomLengthString(16);
-    std::string replacement = fuzzedData.ConsumeRandomLengthString(16);
+    std::string mySessNmRep = fuzzedData.ConsumeRandomLengthString(tempStrLen);
+    std::string suffix = fuzzedData.ConsumeRandomLengthString(tempShortStrLen);
+    std::string replacement = fuzzedData.ConsumeRandomLengthString(tempShortStrLen);
     DCameraSoftbusAdapter::GetInstance().ReplaceSuffix(mySessNmRep, suffix, replacement);
 }
 
