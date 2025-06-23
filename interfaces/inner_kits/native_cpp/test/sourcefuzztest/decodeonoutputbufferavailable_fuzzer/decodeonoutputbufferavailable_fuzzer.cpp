@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -74,12 +74,12 @@ void DecodeVideoCallbackOnOutputFormatChangedFuzzTest(const uint8_t* data, size_
         return;
     }
 
-    int32_t strLenTemp = 32;
     FuzzedDataProvider fdp(data, size);
     Media::Format format;
     format.PutIntValue("width", fdp.ConsumeIntegral<int32_t>());
     format.PutIntValue("height", fdp.ConsumeIntegral<int32_t>());
-    format.PutStringValue("mime", fdp.ConsumeRandomLengthString(strLenTemp));
+    format.PutStringValue("mime", fdp.ConsumeRandomLengthString(32));
+
 
     std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(true);
     std::shared_ptr<AppExecFwk::EventHandler> handler = std::make_shared<AppExecFwk::EventHandler>(runner);

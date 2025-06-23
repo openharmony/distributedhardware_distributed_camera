@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -62,18 +62,6 @@ void DistributedCameraSinkServiceInitFuzzTest(const uint8_t* data, size_t size)
     sinkService->Init();
 }
 
-void DistributedCameraSinkServiceOnStopFuzzTest(const uint8_t* data, size_t size)
-{
-    if ((data == nullptr) || (size == 0)) {
-        return;
-    }
-
-    std::shared_ptr<DistributedCameraSinkService> sinkService =
-        std::make_shared<DistributedCameraSinkService>(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, true);
-
-    sinkService->OnStop();
-}
-
 void DistributedCameraSinkServiceDumpFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size == 0)) {
@@ -105,6 +93,18 @@ void DistributedCameraSinkServiceGetCamDumpInfoFuzzTest(const uint8_t* data, siz
 
     sinkService->GetCamDumpInfo(camDump);
 }
+
+void DistributedCameraSinkServiceOnStopFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0)) {
+        return;
+    }
+
+    std::shared_ptr<DistributedCameraSinkService> sinkService =
+        std::make_shared<DistributedCameraSinkService>(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, true);
+
+    sinkService->OnStop();
+}
 }
 }
 
@@ -115,9 +115,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DistributedHardware::SinkServiceStopDistributedHardwareFuzzTest(data, size);
     OHOS::DistributedHardware::SinkServiceOnStartFuzzTest(data, size);
     OHOS::DistributedHardware::DistributedCameraSinkServiceInitFuzzTest(data, size);
-    OHOS::DistributedHardware::DistributedCameraSinkServiceOnStopFuzzTest(data, size);
     OHOS::DistributedHardware::DistributedCameraSinkServiceDumpFuzzTest(data, size);
     OHOS::DistributedHardware::DistributedCameraSinkServiceGetCamDumpInfoFuzzTest(data, size);
+    OHOS::DistributedHardware::DistributedCameraSinkServiceOnStopFuzzTest(data, size);
     return 0;
 }
 
