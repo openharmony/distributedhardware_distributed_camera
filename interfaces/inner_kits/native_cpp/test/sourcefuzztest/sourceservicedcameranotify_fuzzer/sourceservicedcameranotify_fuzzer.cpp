@@ -27,6 +27,8 @@ inline std::string ExtractString(const uint8_t* data, size_t offset, size_t leng
     return std::string(reinterpret_cast<const char*>(data + offset), length);
 }
 namespace DistributedHardware {
+std::shared_ptr<OHOS::DistributedHardware::DistributedCameraSourceService> sourceService_ =
+    std::make_shared<DistributedCameraSourceService>(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, true);
 void SourceServiceDCameraNotifyFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size == 0)) {
@@ -37,10 +39,76 @@ void SourceServiceDCameraNotifyFuzzTest(const uint8_t* data, size_t size)
     std::string devId(reinterpret_cast<const char*>(data), size);
     std::string events(reinterpret_cast<const char*>(data), size);
 
-    std::shared_ptr<DistributedCameraSourceService> sourceService =
-        std::make_shared<DistributedCameraSourceService>(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, true);
+    sourceService_->DCameraNotify(devId, dhId, events);
+}
 
-    sourceService->DCameraNotify(devId, dhId, events);
+void SourceServiceOnStartFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0)) {
+        return;
+    }
+
+    sourceService_->OnStart();
+}
+
+void SourceServiceInitFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0)) {
+        return;
+    }
+
+    sourceService_->Init();
+}
+
+void SourceServiceOnStopFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0)) {
+        return;
+    }
+
+    sourceService_->OnStop();
+}
+
+void SourceServiceDumpFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0)) {
+        return;
+    }
+
+    std::vector<std::u16string> args;
+    std::u16string arg(reinterpret_cast<const char16_t*>(data), size / sizeof(char16_t));
+    if (arg.empty() || std::all_of(arg.begin(), arg.end(), [](char16_t c) { return c == 0; })) {
+        return;
+    }
+    args.push_back(arg);
+
+    int fd = STDOUT_FILENO;
+
+    sourceService_->Dump(fd, args);
+}
+
+void SourceServiceGetDumpInfoFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0)) {
+        return;
+    }
+
+    CameraDumpInfo camDump;
+
+    sourceService_->GetDumpInfo(camDump);
+}
+
+void SourceServiceCamDevEraseFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(DCameraIndex))) {
+        return;
+    }
+
+    DCameraIndex index;
+    index.devId_ = ExtractString(data, 0, size / 2);
+    index.dhId_ = ExtractString(data, size / 2, size / 2);
+
+    sourceService_->CamDevErase(index);
 }
 
 void SourceServiceOnStartFuzzTest(const uint8_t* data, size_t size)

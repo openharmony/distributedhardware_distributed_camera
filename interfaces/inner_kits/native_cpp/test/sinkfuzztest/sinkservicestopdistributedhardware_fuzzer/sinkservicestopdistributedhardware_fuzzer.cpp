@@ -25,6 +25,10 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+std::shared_ptr<DistributedCameraSinkService> sinkService_ =
+    std::make_shared<OHOS::DistributedHardware::DistributedCameraSinkService>(
+        DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, true);
+
 void SinkServiceStopDistributedHardwareFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size == 0)) {
@@ -32,10 +36,59 @@ void SinkServiceStopDistributedHardwareFuzzTest(const uint8_t* data, size_t size
     }
 
     std::string networkId(reinterpret_cast<const char*>(data), size);
+    sinkService_->StopDistributedHardware(networkId);
+}
 
-    std::shared_ptr<DistributedCameraSinkService> sinkService =
-        std::make_shared<DistributedCameraSinkService>(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, true);
-    sinkService->StopDistributedHardware(networkId);
+void SinkServiceOnStartFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0)) {
+        return;
+    }
+
+    sinkService_->OnStart();
+}
+
+void DistributedCameraSinkServiceInitFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0)) {
+        return;
+    }
+
+    sinkService_->Init();
+}
+
+void DistributedCameraSinkServiceDumpFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0)) {
+        return;
+    }
+
+    std::vector<std::u16string> args;
+    std::u16string arg(reinterpret_cast<const char16_t*>(data), size / sizeof(char16_t));
+    args.push_back(arg);
+    int fd = STDOUT_FILENO;
+
+    sinkService_->Dump(fd, args);
+}
+
+void DistributedCameraSinkServiceGetCamDumpInfoFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0)) {
+        return;
+    }
+
+    CameraDumpInfo camDump;
+
+    sinkService_->GetCamDumpInfo(camDump);
+}
+
+void DistributedCameraSinkServiceOnStopFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0)) {
+        return;
+    }
+
+    sinkService_->OnStop();
 }
 
 void SinkServiceOnStartFuzzTest(const uint8_t* data, size_t size)
@@ -115,9 +168,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DistributedHardware::SinkServiceStopDistributedHardwareFuzzTest(data, size);
     OHOS::DistributedHardware::SinkServiceOnStartFuzzTest(data, size);
     OHOS::DistributedHardware::DistributedCameraSinkServiceInitFuzzTest(data, size);
+    OHOS::DistributedHardware::DistributedCameraSinkServiceOnStopFuzzTest(data, size);
     OHOS::DistributedHardware::DistributedCameraSinkServiceDumpFuzzTest(data, size);
     OHOS::DistributedHardware::DistributedCameraSinkServiceGetCamDumpInfoFuzzTest(data, size);
-    OHOS::DistributedHardware::DistributedCameraSinkServiceOnStopFuzzTest(data, size);
     return 0;
 }
 

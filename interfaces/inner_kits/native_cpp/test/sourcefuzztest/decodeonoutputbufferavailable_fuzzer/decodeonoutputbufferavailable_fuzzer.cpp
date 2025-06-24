@@ -75,11 +75,11 @@ void DecodeVideoCallbackOnOutputFormatChangedFuzzTest(const uint8_t* data, size_
     }
 
     FuzzedDataProvider fdp(data, size);
-    int32_t tempStrLen = 32;
     Media::Format format;
     format.PutIntValue("width", fdp.ConsumeIntegral<int32_t>());
     format.PutIntValue("height", fdp.ConsumeIntegral<int32_t>());
-    format.PutStringValue("mime", fdp.ConsumeRandomLengthString(tempStrLen));
+    format.PutStringValue("mime", fdp.ConsumeRandomLengthString(32));
+
 
     std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(true);
     std::shared_ptr<AppExecFwk::EventHandler> handler = std::make_shared<AppExecFwk::EventHandler>(runner);
