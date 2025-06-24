@@ -103,10 +103,10 @@ void SourceServiceCamDevEraseFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(DCameraIndex))) {
         return;
     }
-
+    int doubleNum = 2;
     DCameraIndex index;
-    index.devId_ = ExtractString(data, 0, size / 2);
-    index.dhId_ = ExtractString(data, size / 2, size / 2);
+    index.devId_ = ExtractString(data, 0, size / doubleNum);
+    index.dhId_ = ExtractString(data, size / doubleNum, size / doubleNum);
 
     sourceService_->CamDevErase(index);
 }
