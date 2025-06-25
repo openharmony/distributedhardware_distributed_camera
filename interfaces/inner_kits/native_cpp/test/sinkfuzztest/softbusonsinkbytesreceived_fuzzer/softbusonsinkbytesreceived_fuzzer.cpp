@@ -38,7 +38,7 @@ void SoftbusOnSinkBytesReceivedFuzzTest(const uint8_t* data, size_t size)
     std::string testStr = "test_suffix";
     std::string randomSuffix = fdp.ConsumeRandomLengthString(10);
     std::string randomReplacement = fdp.ConsumeRandomLengthString(10);
-    DCameraSoftbusAdapter::GetInstance().ReplaceSuffix(testStr,randomSuffix,randomReplacement);
+    DCameraSoftbusAdapter::GetInstance().ReplaceSuffix(testStr, randomSuffix, randomReplacement);
 }
 }
 }

@@ -40,7 +40,6 @@ void SoftbusOnSinkSessionOpenedFuzzTest(const uint8_t* data, size_t size)
     uint32_t Len = static_cast<uint32_t>(size);
     DCameraSoftbusAdapter::GetInstance().SinkOnBytes(sessionId, data, Len);
     DCameraSoftbusAdapter::GetInstance().SinkOnMessage(sessionId, data, Len);
-
 }
 }
 }
