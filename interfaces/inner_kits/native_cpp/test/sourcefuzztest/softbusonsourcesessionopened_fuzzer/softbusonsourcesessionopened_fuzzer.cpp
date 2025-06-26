@@ -16,7 +16,7 @@
 #include "softbusonsourcesessionopened_fuzzer.h"
 
 #include "dcamera_softbus_adapter.h"
-#include "<fuzzer/FuzzedDataProvider.h>"
+#include <fuzzer/FuzzedDataProvider.h>
 namespace OHOS {
 namespace DistributedHardware {
 void SoftbusOnSourceSessionOpenedFuzzTest(const uint8_t* data, size_t size)
