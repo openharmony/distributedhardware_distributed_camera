@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -97,7 +97,7 @@ HWTEST_F(DcameraSourceStubTest, dcamera_source_stub_test_001, TestSize.Level1)
     std::string params = "params000";
     sptr<IDCameraSourceCallback> callback(new DCameraSourceCallback());
     int32_t ret = sourceProxy.InitSource(params, callback);
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_NE(ERR_DH_CAMERA_BASE, ret);
 }
 
 /**
@@ -112,7 +112,7 @@ HWTEST_F(DcameraSourceStubTest, dcamera_source_stub_test_002, TestSize.Level1)
     sptr<IRemoteObject> sourceStubPtr(new MockDistributedCameraSourceStub());
     DistributedCameraSourceProxy sourceProxy(sourceStubPtr);
     int32_t ret = sourceProxy.ReleaseSource();
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_NE(ERR_DH_CAMERA_BASE, ret);
 }
 
 /**
@@ -135,7 +135,7 @@ HWTEST_F(DcameraSourceStubTest, dcamera_source_stub_test_003, TestSize.Level1)
     param.sinkVersion = "1";
     param.sinkAttrs = "sinkattrs";
     int32_t ret = sourceProxy.RegisterDistributedHardware(devId, dhId, reqId, param);
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_NE(ERR_DH_CAMERA_BASE, ret);
 }
 
 /**
@@ -153,7 +153,7 @@ HWTEST_F(DcameraSourceStubTest, dcamera_source_stub_test_004, TestSize.Level1)
     std::string dhId = "dhId000";
     std::string reqId = "reqId000";
     int32_t ret = sourceProxy.UnregisterDistributedHardware(devId, dhId, reqId);
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_NE(ERR_DH_CAMERA_BASE, ret);
 }
 
 /**

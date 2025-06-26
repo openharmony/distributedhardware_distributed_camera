@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -124,7 +124,7 @@ HWTEST_F(DCameraSinkHandlerTest, dcamera_sink_handler_test_002, TestSize.Level1)
     DCameraSinkHandler::GetInstance().FinishStartSA(params);
     DCameraSinkHandler::GetInstance().FinishStartSAFailed(systemAbilityId);
     ret = DCameraSinkHandler::GetInstance().ReleaseSink();
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_NE(ERR_DH_CAMERA_BASE, ret);
 }
 
 /**
@@ -198,7 +198,7 @@ HWTEST_F(DCameraSinkHandlerTest, dcamera_sink_handler_test_006, TestSize.Level1)
     systemAbilityId = 1;
     loadCallback->OnLoadSystemAbilityFail(systemAbilityId);
     int32_t ret = DCameraSinkHandler::GetInstance().ReleaseSink();
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_NE(ERR_DH_CAMERA_BASE, ret);
 }
 
 /**

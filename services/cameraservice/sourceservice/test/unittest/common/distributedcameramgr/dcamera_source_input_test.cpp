@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -398,28 +398,12 @@ HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_012, TestSize.Level1)
 }
 
 /**
- * @tc.name: dcamera_source_input_test_014
- * @tc.desc: Verify source inptut EstablishContinuousFrameSession.
- * @tc.type: FUNC
- * @tc.require: Issue Number
- */
-HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_014, TestSize.Level1)
-{
-    int32_t rc = testInput_->Init();
-    rc = camDev_->InitDCameraSourceDev();
-    EXPECT_EQ(rc, DCAMERA_OK);
-
-    rc = testInput_->EstablishContinuousFrameSession(g_camIndexs);
-    EXPECT_NE(rc, DCAMERA_OK);
-}
-
-/**
- * @tc.name: dcamera_source_input_test_015
+ * @tc.name: dcamera_source_input_test_013
  * @tc.desc: Verify source inptut EstablishSnapshotFrameSession.
  * @tc.type: FUNC
  * @tc.require: Issue Number
  */
-HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_015, TestSize.Level1)
+HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_013, TestSize.Level1)
 {
     int32_t rc = testInput_->Init();
     rc = camDev_->InitDCameraSourceDev();
@@ -435,15 +419,18 @@ HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_015, TestSize.Level1)
     testInput_->OnSessionState(DCStreamType::CONTINUOUS_FRAME, state);
     rc = testInput_->EstablishSnapshotFrameSession(g_camIndexs);
     EXPECT_NE(rc, DCAMERA_OK);
+
+    rc = testInput_->EstablishContinuousFrameSession(g_camIndexs);
+    EXPECT_NE(rc, DCAMERA_OK);
 }
 
 /**
- * @tc.name: dcamera_source_input_test_016
+ * @tc.name: dcamera_source_input_test_014
  * @tc.desc: Verify source inptut EstablishSnapshotFrameSession.
  * @tc.type: FUNC
  * @tc.require: Issue Number
  */
-HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_016, TestSize.Level1)
+HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_014, TestSize.Level1)
 {
     auto testInputListener =
         std::make_shared<DCameraSourceInputChannelListener>(testInput_, DCStreamType::CONTINUOUS_FRAME);

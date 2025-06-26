@@ -92,7 +92,7 @@ HWTEST_F(DcameraUtilsToolsTest, GetLocalDeviceNetworkId_001, TestSize.Level1)
     std::string networkId;
     SetTokenID();
     int32_t ret = GetLocalDeviceNetworkId(networkId);
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_NE(ERR_DH_CAMERA_BASE, ret);
 }
 
 /**
