@@ -16,7 +16,7 @@
 #include "softbusonsourcesessionopened_fuzzer.h"
 
 #include "dcamera_softbus_adapter.h"
-
+#include "<fuzzer/FuzzedDataProvider.h>"
 namespace OHOS {
 namespace DistributedHardware {
 void SoftbusOnSourceSessionOpenedFuzzTest(const uint8_t* data, size_t size)
@@ -38,7 +38,8 @@ void SoftbusOnSourceSessionOpenedFuzzTest(const uint8_t* data, size_t size)
     DCameraSoftbusAdapter::GetInstance().SourceOnBind(sessionId, socketInfo);
     DCameraSoftbusAdapter::GetInstance().SinkOnBind(sessionId, socketInfo);
 
-    int32_t socket = 12345;
+    FuzzedDataProvider fdp(data,size);
+    int32_t socket = fdp.ConsumeIntegral<int32_t>();
     std::shared_ptr<DCameraSoftbusSession> session = nullptr;
     DCameraSoftbusAdapter::GetInstance().SinkOnBind(socket, socketInfo);
 }
