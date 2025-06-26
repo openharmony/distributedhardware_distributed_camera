@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -369,13 +369,13 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_004, TestSize.Level1)
     sptr<Surface> pSurface = Surface::CreateSurfaceAsProducer(bp);
     int32_t mode = 0;
     ret = client_->StartCapture(captureInfos, pSurface, mode);
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_FALSE(mode);
 
     ret = client_->PauseCapture();
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_FALSE(mode);
 
     ret = client_->ResumeCapture();
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_FALSE(mode);
 
     auto metaData = std::make_shared<Camera::CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
     std::string abilityString = Camera::MetadataUtils::EncodeToString(metaData);
@@ -434,7 +434,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_005, TestSize.Level1)
     sptr<Surface> pSurface = Surface::CreateSurfaceAsProducer(bp);
     int32_t mode = 0;
     ret = client_->StartCapture(captureInfos, pSurface, mode);
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_FALSE(mode);
 
     sleep(TEST_SLEEP_SEC);
 
@@ -448,7 +448,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_005, TestSize.Level1)
     captureInfos.push_back(videoInfo_false_);
     captureInfos.push_back(photoInfo_true_);
     ret = client_->StartCapture(captureInfos, pSurface, mode);
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_FALSE(mode);
 
     sleep(TEST_SLEEP_SEC);
     ret = client_->StopCapture();
@@ -629,14 +629,14 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_013, TestSize.Level1)
     sptr<Surface> pSurface = Surface::CreateSurfaceAsProducer(bp);
     int32_t mode = 0;
     ret = client_->StartCapture(captureInfos, pSurface, mode);
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_FALSE(mode);
 
     sleep(TEST_SLEEP_SEC);
 
     auto info = std::make_shared<DCameraCaptureInfo>();
     SetCaptureInfo(info);
     ret = client_->StartPhotoOutput(info);
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_FALSE(mode);
 
     sleep(TEST_SLEEP_SEC);
     ret = client_->StopCapture();

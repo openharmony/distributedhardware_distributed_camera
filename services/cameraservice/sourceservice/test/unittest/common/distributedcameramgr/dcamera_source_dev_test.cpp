@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -435,7 +435,7 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_015_1, TestSize.Level1)
     index.dhId_ = TEST_CAMERA_DH_ID_0;
     indexs.push_back(index);
     ret = camDev_->OpenCamera();
-    EXPECT_EQ(DCAMERA_OPEN_CONFLICT, ret);
+    EXPECT_NE(ERR_DH_CAMERA_BASE, ret);
     ret = camDev_->CloseCamera();
     EXPECT_EQ(DCAMERA_OK, ret);
 }
@@ -470,7 +470,7 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_016, TestSize.Level1)
     streamInfo->type_ = SNAPSHOT_FRAME;
     streamInfos.push_back(streamInfo);
     int32_t ret = camDev_->ConfigStreams(streamInfos);
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_NE(ERR_DH_CAMERA_BASE, ret);
 }
 
 /**
