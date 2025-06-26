@@ -36,7 +36,7 @@ void SoftbusCreatSoftBusSinkSocketServerFuzzTest(const uint8_t* data, size_t siz
     int32_t sessionID = *(reinterpret_cast<const int32_t*>(data));
     DCameraSoftbusAdapter::GetInstance().SourceOnShutDown(sessionID, ShutdownReason::SHUTDOWN_REASON_LOCAL);
     uint32_t Len = static_cast<uint32_t>(size);
-    DCameraSoftbusAdapter::GetInstance().SourceOnBytes(sessionID, data, en);
+    DCameraSoftbusAdapter::GetInstance().SourceOnBytes(sessionID, data, Len);
     DCameraSoftbusAdapter::GetInstance().SourceOnMessage(sessionID, data, Len);
 
     int32_t socket = 1234;
