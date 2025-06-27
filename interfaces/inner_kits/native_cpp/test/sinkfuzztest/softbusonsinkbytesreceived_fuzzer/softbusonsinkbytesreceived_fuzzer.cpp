@@ -34,6 +34,11 @@ void SoftbusOnSinkBytesReceivedFuzzTest(const uint8_t* data, size_t size)
     auto session = std::make_shared<DCameraSoftbusSession>();
     DCameraSoftbusAdapter::GetInstance().sinkSocketSessionMap_[socket] = session;
     DCameraSoftbusAdapter::GetInstance().SinkOnBytes(sessionId, receivedData, dataLen);
+    
+    std::string testStr = "test_suffix";
+    std::string randomSuffix = fdp.ConsumeRandomLengthString(10);
+    std::string randomReplacement = fdp.ConsumeRandomLengthString(10);
+    DCameraSoftbusAdapter::GetInstance().ReplaceSuffix(testStr, randomSuffix, randomReplacement);
 }
 }
 }

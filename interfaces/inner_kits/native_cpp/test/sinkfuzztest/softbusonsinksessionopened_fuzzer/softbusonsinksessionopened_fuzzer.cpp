@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,6 +36,10 @@ void SoftbusOnSinkSessionOpenedFuzzTest(const uint8_t* data, size_t size)
         .dataType = TransDataType::DATA_TYPE_BYTES,
     };
     DCameraSoftbusAdapter::GetInstance().SinkOnBind(sessionId, socketInfo);
+    DCameraSoftbusAdapter::GetInstance().SinkOnShutDown(sessionId, ShutdownReason::SHUTDOWN_REASON_LOCAL);
+    uint32_t Len = static_cast<uint32_t>(size);
+    DCameraSoftbusAdapter::GetInstance().SinkOnBytes(sessionId, data, Len);
+    DCameraSoftbusAdapter::GetInstance().SinkOnMessage(sessionId, data, Len);
 }
 }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,7 @@
 #include "softbusonsourcesessionopened_fuzzer.h"
 
 #include "dcamera_softbus_adapter.h"
-
+#include <fuzzer/FuzzedDataProvider.h>
 namespace OHOS {
 namespace DistributedHardware {
 void SoftbusOnSourceSessionOpenedFuzzTest(const uint8_t* data, size_t size)
@@ -36,6 +36,12 @@ void SoftbusOnSourceSessionOpenedFuzzTest(const uint8_t* data, size_t size)
         .dataType = TransDataType::DATA_TYPE_BYTES,
     };
     DCameraSoftbusAdapter::GetInstance().SourceOnBind(sessionId, socketInfo);
+    DCameraSoftbusAdapter::GetInstance().SinkOnBind(sessionId, socketInfo);
+
+    FuzzedDataProvider fdp(data, size);
+    int32_t socket = fdp.ConsumeIntegral<int32_t>();
+    std::shared_ptr<DCameraSoftbusSession> session = nullptr;
+    DCameraSoftbusAdapter::GetInstance().SinkOnBind(socket, socketInfo);
 }
 }
 }

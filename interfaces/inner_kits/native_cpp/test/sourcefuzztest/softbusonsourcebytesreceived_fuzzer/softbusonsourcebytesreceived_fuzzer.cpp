@@ -31,6 +31,11 @@ void SoftbusOnSourceBytesReceivedFuzzTest(const uint8_t* data, size_t size)
     const void *receivedData = reinterpret_cast<const void*>(data);
     uint32_t dataLen = fdp.ConsumeIntegral<uint32_t>();
     DCameraSoftbusAdapter::GetInstance().SourceOnBytes(sessionId, receivedData, dataLen);
+    
+    std::string testStr = "test_suffix";
+    std::string randomSuffix = fdp.ConsumeRandomLengthString(10);
+    std::string randomReplacement = fdp.ConsumeRandomLengthString(10);
+    DCameraSoftbusAdapter::GetInstance().ReplaceSuffix(testStr, randomSuffix, randomReplacement);
 }
 }
 }
