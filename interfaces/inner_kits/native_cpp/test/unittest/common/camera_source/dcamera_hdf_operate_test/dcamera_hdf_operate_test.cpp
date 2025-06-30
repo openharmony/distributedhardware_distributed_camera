@@ -54,6 +54,7 @@ void DCameraHdfOperateTest::SetUp(void)
 void DCameraHdfOperateTest::TearDown(void)
 {
     DHLOGI("DCameraHdfOperateTest::TearDown");
+    MockDeviceManager::ReleaseInstance();
     deviceManager_ = nullptr;
 }
 
