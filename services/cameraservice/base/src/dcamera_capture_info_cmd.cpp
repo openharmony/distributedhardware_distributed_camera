@@ -114,7 +114,7 @@ int32_t DCameraCaptureInfoCmd::Unmarshal(const std::string& jsonStr)
     if (tokenId == nullptr || !cJSON_IsNumber(tokenId)) {
         tokenId_ = 0;
     } else {
-        tokenId_ = tokenId->valueint;
+        tokenId_ = static_cast<uint64_t>(tokenId->valueint);
     }
     cJSON *accountId = cJSON_GetObjectItemCaseSensitive(rootValue, "accountId");
     if (accountId == nullptr || !cJSON_IsString(accountId) || (accountId->valuestring == nullptr)) {
