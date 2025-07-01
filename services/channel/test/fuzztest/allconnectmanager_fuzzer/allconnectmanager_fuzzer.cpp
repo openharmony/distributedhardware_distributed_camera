@@ -30,12 +30,12 @@ void DCameraAllConnectManagerInitFuzzTest(const uint8_t* data, size_t size)
 
     FuzzedDataProvider fuzzedData(data, size);
 #ifdef __LP64__
-    constexpr const char *AllConnectSoPath = "/system/lib64/";
+    constexpr const char *tmpAllConnectSoPath = "/system/lib64/";
 #else
-    constexpr const char *AllConnectSoPath = "/system/lib/";
+    constexpr const char *tmpAllConnectSoPath = "/system/lib/";
 #endif
     std::string randomPath = fuzzedData.ConsumeRandomLengthString(PATH_MAX);
-    std::string allConnectSoPath = AllConnectSoPath;
+    std::string allConnectSoPath = tmpAllConnectSoPath;
     allConnectSoPath = randomPath;
 
     DCameraAllConnectManager::GetInstance().InitDCameraAllConnectManager();
@@ -106,12 +106,12 @@ void DCameraAllConnectManagerGetAllConnectSoLoadFuzzTest(const uint8_t* data, si
 
     FuzzedDataProvider fuzzedData(data, size);
 #ifdef __LP64__
-    constexpr const char *AllConnectSoPath = "/system/lib64/";
+    constexpr const char *tmpAllConnectSoPath = "/system/lib64/";
 #else
-    constexpr const char *AllConnectSoPath = "/system/lib/";
+    constexpr const char *tmpAllConnectSoPath = "/system/lib/";
 #endif
     std::string randomPath = fuzzedData.ConsumeRandomLengthString(PATH_MAX + 10);
-    std::string allConnectSoPath = AllConnectSoPath;
+    std::string allConnectSoPath = tmpAllConnectSoPath;
     allConnectSoPath = randomPath;
 
     DCameraAllConnectManager::GetInstance().GetAllConnectSoLoad();
