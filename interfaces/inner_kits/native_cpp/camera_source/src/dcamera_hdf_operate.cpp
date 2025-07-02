@@ -280,7 +280,7 @@ int32_t DCameraHdfOperate::MakeFwkDCameraHdfCallback()
 {
     std::lock_guard<std::mutex> locker(fwkDCameraHdfCallbackMutex_);
     if (fwkDCameraHdfCallback_ == nullptr) {
-        fwkDCameraHdfCallback_ = new FwkDCameraHdfCallback();
+        fwkDCameraHdfCallback_ = OHOS::sptr<FwkDCameraHdfCallback>(new FwkDCameraHdfCallback());
         if (fwkDCameraHdfCallback_ == nullptr) {
             return DCAMERA_BAD_VALUE;
         }

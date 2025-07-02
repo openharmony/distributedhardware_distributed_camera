@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -211,7 +211,8 @@ int32_t DecodeDataProcess::SetDecoderOutputSurface()
         SurfaceBufferUsage::BUFFER_USAGE_CPU_READ);
     CHECK_AND_LOG(ret != GSERROR_OK || decodeConsumerSurface_ == nullptr, "%{public}s", "Set Usage failed.");
 
-    decodeSurfaceListener_ = new DecodeSurfaceListener(decodeConsumerSurface_, shared_from_this());
+    decodeSurfaceListener_ =
+        OHOS::sptr<IBufferConsumerListener>(new DecodeSurfaceListener(decodeConsumerSurface_, shared_from_this()));
     if (decodeConsumerSurface_->RegisterConsumerListener(decodeSurfaceListener_) !=
         SURFACE_ERROR_OK) {
         DHLOGE("Register consumer listener failed.");

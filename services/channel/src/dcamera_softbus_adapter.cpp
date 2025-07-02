@@ -135,14 +135,15 @@ DCameraSoftbusAdapter::~DCameraSoftbusAdapter()
 void DCameraSoftbusAdapter::ReplaceSuffix(std::string &mySessNmRep, const std::string &suffix,
                                           const std::string &replacement)
 {
-    DHLOGI("replacing suffix in mySessionName: %{public}s", mySessNmRep.c_str());
+    DHLOGI("replacing suffix in mySessionName: %{public}s", GetAnonyString(mySessNmRep).c_str());
     bool isModified = false;
     if (mySessNmRep.length() >= suffix.length() &&
         mySessNmRep.compare(mySessNmRep.length() - suffix.length(), suffix.length(), suffix) == 0) {
         mySessNmRep.replace(mySessNmRep.length() - suffix.length(), suffix.length(), replacement);
         isModified = true;
     }
-    DHLOGI("suffix replaced? %{public}s - Modified: %{public}s", isModified ? "Y" : "N", mySessNmRep.c_str());
+    DHLOGI("suffix replaced? %{public}s - Modified: %{public}s",
+        isModified ? "Y" : "N", GetAnonyString(mySessNmRep).c_str());
 }
 
 int32_t DCameraSoftbusAdapter::CreatSoftBusSinkSocketServer(std::string mySessionName, DCAMERA_CHANNEL_ROLE role,
@@ -245,7 +246,7 @@ int32_t DCameraSoftbusAdapter::CreateSoftBusSourceSocketClient(std::string myDhI
         DCameraAllConnectManager::SetSourceNetworkId(peerDevId, sourceSocketId_);
     }
     DHLOGI("DCamera allconnect create socket client publish scm connected success, dhId: %{public}s",
-        myDhId.c_str());
+        GetAnonyString(myDhId).c_str());
     DHLOGI("create socket client end, myDevId: %{public}s, peerSessionName: %{public}s",
         GetAnonyString(myDevId).c_str(), GetAnonyString(peerSessionName).c_str());
     return socketId;
@@ -368,7 +369,7 @@ int32_t DCameraSoftbusAdapter::SourceOnBind(int32_t socket, PeerSocketInfo info)
             DHLOGE("DCamera allconnect sourceonBind publish scm connected failed, ret: %{public}d", ret);
         }
         DHLOGI("DCamera allconnect sourceonBind publish scm connected success, dhId: %{public}s",
-            session->GetMyDhId().c_str());
+            GetAnonyString(session->GetMyDhId()).c_str());
         DCameraAllConnectManager::SetSourceNetworkId(info.networkId, socket);
     }
     DHLOGI("source bind socket end, socket: %{public}d end", socket);
@@ -598,7 +599,7 @@ int32_t DCameraSoftbusAdapter::SinkOnBind(int32_t socket, PeerSocketInfo info)
             DHLOGE("DCamera allconnect sink on bind, publish service state failed %{public}d", ret);
         }
         DHLOGI("DCamera allconnect sink on bind publish scm connected success, dhId: %{public}s",
-            session->GetMyDhId().c_str());
+            GetAnonyString(session->GetMyDhId()).c_str());
         DCameraAllConnectManager::SetSinkNetWorkId(info.networkId, socket);
     }
     DHLOGI("sink bind socket end, socket: %{public}d", socket);
@@ -661,7 +662,7 @@ void DCameraSoftbusAdapter::SinkOnShutDown(int32_t socket, ShutdownReason reason
             }
         }
         DHLOGI("DCamera allconnect sinkdown publish scm idle success, dhId: %{public}s",
-            session->GetMyDhId().c_str());
+            GetAnonyString(session->GetMyDhId()).c_str());
         DCameraAllConnectManager::RemoveSinkNetworkId(socket);
     }
 
@@ -774,7 +775,7 @@ void DCameraSoftbusAdapter::CloseSessionWithNetWorkId(const std::string &network
             DHLOGE("DCamera allconnect CloseSessionWithNetworkId publish service state failed");
         }
         DHLOGI("DCamera allconnect close session publish scm idle success, dhId: %{public}s",
-            session->GetMyDhId().c_str());
+            GetAnonyString(session->GetMyDhId()).c_str());
     }
 }
 

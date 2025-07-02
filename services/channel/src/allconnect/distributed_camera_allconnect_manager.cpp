@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2024 Huawei Device Co., Ltd.
+* Copyright (c) 2024-2025 Huawei Device Co., Ltd.
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  */
 
 #include "distributed_camera_allconnect_manager.h"
-
+#include "anonymous_string.h"
 #include <cstdio>
 #include <cstdlib>
 #include <dlfcn.h>
@@ -256,7 +256,7 @@ int32_t DCameraAllConnectManager::ApplyResult(int32_t errorcode, int32_t result,
 
 int32_t DCameraAllConnectManager::OnStop(const char *peerNetworkId)
 {
-    DHLOGI("DCamera allconnect OnStop begin peerNetworkId:%{public}s", peerNetworkId);
+    DHLOGI("DCamera allconnect OnStop begin peerNetworkId:%{public}s", GetAnonyString(peerNetworkId).c_str());
     DCameraSoftbusAdapter::GetInstance().CloseSessionWithNetWorkId(peerNetworkId);
 
     return DistributedCameraErrno::DCAMERA_OK;
