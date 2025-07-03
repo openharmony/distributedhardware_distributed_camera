@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -156,7 +156,8 @@ void InitPhotoOutput(void)
     DHLOGI("Distributed Camera Demo: Create PhotoOutput, width = %{public}d, height = %{public}d, format = %{public}d",
         g_photoInfo->width_, g_photoInfo->height_, g_photoInfo->format_);
     sptr<IConsumerSurface> photoSurface = IConsumerSurface::Create();
-    sptr<IBufferConsumerListener> photoListener = new DemoDCameraPhotoSurfaceListener(photoSurface);
+    sptr<IBufferConsumerListener> photoListener =
+        OHOS::sptr<IBufferConsumerListener>(new DemoDCameraPhotoSurfaceListener(photoSurface));
     photoSurface->RegisterConsumerListener(photoListener);
     CameraFormat photoFormat = ConvertToCameraFormat(g_photoInfo->format_);
     Size photoSize = {g_photoInfo->width_, g_photoInfo->height_};
@@ -175,7 +176,8 @@ void InitPreviewOutput(void)
     DHLOGI("Distributed Camera Demo: Create PreviewOutput, width = %{public}d, height = %{public}d, format = "
         "%{public}d", g_previewInfo->width_, g_previewInfo->height_, g_previewInfo->format_);
     sptr<IConsumerSurface> previewSurface = IConsumerSurface::Create();
-    sptr<IBufferConsumerListener> previewListener = new DemoDCameraPreviewSurfaceListener(previewSurface);
+    sptr<IBufferConsumerListener> previewListener =
+        OHOS::sptr<IBufferConsumerListener>(new DemoDCameraPreviewSurfaceListener(previewSurface));
     previewSurface->RegisterConsumerListener(previewListener);
     CameraFormat previewFormat = ConvertToCameraFormat(g_previewInfo->format_);
     Size previewSize = {g_previewInfo->width_, g_previewInfo->height_};
@@ -196,7 +198,8 @@ void InitVideoOutput(void)
     DHLOGI("Distributed Camera Demo: Create VideoOutput, width = %{public}d, height = %{public}d, format = %{public}d",
         g_videoInfo->width_, g_videoInfo->height_, g_videoInfo->format_);
     sptr<IConsumerSurface> videoSurface = IConsumerSurface::Create();
-    sptr<IBufferConsumerListener> videoListener = new DemoDCameraVideoSurfaceListener(videoSurface);
+    sptr<IBufferConsumerListener> videoListener =
+        OHOS::sptr<IBufferConsumerListener>(new DemoDCameraVideoSurfaceListener(videoSurface));
     videoSurface->RegisterConsumerListener(videoListener);
     CameraFormat videoFormat = ConvertToCameraFormat(g_videoInfo->format_);
     Size videoSize = {g_videoInfo->width_, g_videoInfo->height_};

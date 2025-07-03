@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -216,8 +216,8 @@ HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_produ
     sharedMemory.bufferHandle_ = sptr<NativeBuffer>(new NativeBuffer());
     ret = streamProcess1->CheckSharedMemory(sharedMemory, buffer);
     ret = streamProcess2->CheckSharedMemory(sharedMemory, buffer);
-    BufferHandle *bufferHandle = new BufferHandle();
-    sharedMemory.bufferHandle_ = sptr<NativeBuffer>(new NativeBuffer(bufferHandle));
+    auto bufferHandle = std::make_unique<BufferHandle>();
+    sharedMemory.bufferHandle_ = sptr<NativeBuffer>(new NativeBuffer(bufferHandle.get()));
     ret = streamProcess1->CheckSharedMemory(sharedMemory, buffer);
     ret = streamProcess2->CheckSharedMemory(sharedMemory, buffer);
     DHBase dhBase;
