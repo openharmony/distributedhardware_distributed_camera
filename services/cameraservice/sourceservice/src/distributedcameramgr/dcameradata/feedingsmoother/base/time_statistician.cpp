@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,6 +35,10 @@ void TimeStatistician::CalAverFeedInterval(const int64_t feedTime)
         return;
     }
     feedIndex_++;
+    if (feedIntervalSum_ > INT64_MAX - feedInterval_) {
+        DHLOGE("feedIntervalSum_ overflow");
+        return;
+    }
     feedIntervalSum_ += feedInterval_;
     averFeedInterval_ = feedIntervalSum_ / static_cast<int64_t>(feedIndex_);
     lastFeedTime_ = feedTime_;
@@ -49,6 +53,10 @@ void TimeStatistician::CalAverTimeStampInterval(const int64_t timeStamp)
         return;
     }
     timeStampIndex_++;
+    if (timeStampIntervalSum_ > INT64_MAX - timeStampInterval_) {
+        DHLOGE("timeStampIntervalSum_ overflow");
+        return;
+    }
     timeStampIntervalSum_ += timeStampInterval_;
     averTimeStampInterval_ = timeStampIntervalSum_ / static_cast<int64_t>(timeStampIndex_);
     lastTimeStamp_ = timeStamp_;

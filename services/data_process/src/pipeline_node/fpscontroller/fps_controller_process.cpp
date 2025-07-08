@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -143,6 +143,10 @@ void FpsControllerProcess::UpdateFrameRateCorrectionFactor(int64_t nowMs)
     const float msPerSecond = 1000;
     const float maxInstantaneousFrameRateCoefficient = 1.1;
     float maxInstantaneousFrameRateThreshold = targetFrameRate_ * maxInstantaneousFrameRateCoefficient;
+    if (recentFrameTimeSpanMs_ == 0) {
+        DHLOGE("Frame control, recentFrameTimeSpanMs_ is 0, cannot calculate frame rate.");
+        return;
+    }
     float instantaneousFrameRate = msPerSecond / recentFrameTimeSpanMs_;
     if (instantaneousFrameRate < 0) {
         instantaneousFrameRate = -instantaneousFrameRate;
@@ -275,6 +279,10 @@ bool FpsControllerProcess::ReduceFrameRateByUniformStrategy(int32_t incomingFrmR
      * rate, the incoming frames are reduced uniformly.
      */
     bool isDrop = false;
+    if (frameRateOvershootMdf_ > INT32_MAX - (incomingFrmRate - targetFrameRate_)) {
+        DHLOGE("Overshoot value is too large, reset to 0.");
+        return false;
+    }
     int32_t overshoot = frameRateOvershootMdf_ + (incomingFrmRate - targetFrameRate_);
     if (overshoot < 0) {
         overshoot = 0;
