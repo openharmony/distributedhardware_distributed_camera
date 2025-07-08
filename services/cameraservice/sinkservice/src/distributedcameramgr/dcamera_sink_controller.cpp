@@ -724,11 +724,11 @@ bool DCameraSinkController::CheckAclRight()
         .tokenId = tokenId_,
     };
     DmAccessCallee dmDstCallee = {
-        .networkId = sinkDevId,
         .accountId = accountId,
+        .pkgName = DCAMERA_PKG_NAME,
+        .networkId = sinkDevId,
         .userId = userId,
         .tokenId = sinkTokenId_,
-        .pkgName = DCAMERA_PKG_NAME,
     };
     DHLOGI("CheckAclRight srcDevId: %{public}s, accountId: %{public}s, sinkDevId: %{public}s",
         GetAnonyString(srcDevId_).c_str(), GetAnonyString(accountId).c_str(), GetAnonyString(sinkDevId).c_str());
