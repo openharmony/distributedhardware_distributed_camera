@@ -725,8 +725,8 @@ bool DCameraSinkController::CheckAclRight()
     };
     DmAccessCallee dmDstCallee = {
         .accountId = accountId,
-        .pkgName = DCAMERA_PKG_NAME,
         .networkId = sinkDevId,
+        .pkgName = DCAMERA_PKG_NAME,
         .userId = userId,
         .tokenId = sinkTokenId_,
     };
