@@ -95,6 +95,7 @@ void IFeedingSmoother::LooperSmooth()
 
 void IFeedingSmoother::SmoothFeeding(const std::shared_ptr<IFeedableData>& data)
 {
+    CHECK_AND_RETURN_LOG(data == nullptr, "data is nullptr");
     int64_t enterTime = GetNowTimeStampUs();
     SetClockTime(enterTime);
     int64_t timeStamp = data->GetTimeStamp();

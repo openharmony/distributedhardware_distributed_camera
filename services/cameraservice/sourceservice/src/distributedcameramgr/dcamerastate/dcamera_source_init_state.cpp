@@ -58,6 +58,7 @@ DCameraStateType DCameraSourceInitState::GetStateType()
 
 int32_t DCameraSourceInitState::DoRegisterTask(std::shared_ptr<DCameraSourceDev>& camDev, DCameraSourceEvent& event)
 {
+    CHECK_AND_RETURN_RET_LOG(camDev == nullptr, DCAMERA_BAD_VALUE, "camDev is nullptr");
     std::shared_ptr<DCameraRegistParam> param;
     int32_t ret = event.GetDCameraRegistParam(param);
     if (ret != DCAMERA_OK) {

@@ -108,6 +108,7 @@ void DCameraStreamDataProcessProducer::Stop()
 
 void DCameraStreamDataProcessProducer::FeedStream(const std::shared_ptr<DataBuffer>& buffer)
 {
+    CHECK_AND_RETURN_LOG(buffer == nullptr, "buffer is nullptr.");
     buffer->frameInfo_.timePonit.startSmooth = GetNowTimeStampUs();
     {
         std::lock_guard<std::mutex> lock(bufferMutex_);
@@ -269,6 +270,7 @@ int32_t DCameraStreamDataProcessProducer::CheckSharedMemory(const DCameraBuffer&
 void DCameraStreamDataProcessProducer::OnSmoothFinished(const std::shared_ptr<IFeedableData>& data)
 {
     std::shared_ptr<DataBuffer> buffer = std::reinterpret_pointer_cast<DataBuffer>(data);
+    CHECK_AND_RETURN_LOG(buffer == nullptr, "buffer is nullptr.");
     DHBase dhBase;
     dhBase.deviceId_ = devId_;
     dhBase.dhId_ = dhId_;

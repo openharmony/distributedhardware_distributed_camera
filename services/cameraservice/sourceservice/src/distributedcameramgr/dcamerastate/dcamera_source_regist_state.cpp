@@ -74,6 +74,7 @@ DCameraStateType DCameraSourceRegistState::GetStateType()
 
 int32_t DCameraSourceRegistState::DoRegisterTask(std::shared_ptr<DCameraSourceDev>& camDev, DCameraSourceEvent& event)
 {
+    CHECK_AND_RETURN_RET_LOG(camDev == nullptr, DCAMERA_BAD_VALUE, "camDev is nullptr");
     DHLOGI("DCameraSourceRegistState DoRegisterTask");
     std::shared_ptr<DCameraRegistParam> param;
     int32_t ret = event.GetDCameraRegistParam(param);
@@ -92,6 +93,7 @@ int32_t DCameraSourceRegistState::DoRegisterTask(std::shared_ptr<DCameraSourceDe
 
 int32_t DCameraSourceRegistState::DoUnregisterTask(std::shared_ptr<DCameraSourceDev>& camDev, DCameraSourceEvent& event)
 {
+    CHECK_AND_RETURN_RET_LOG(camDev == nullptr, DCAMERA_BAD_VALUE, "camDev is nullptr");
     std::shared_ptr<DCameraRegistParam> param;
     int32_t ret = event.GetDCameraRegistParam(param);
     if (ret != DCAMERA_OK) {
@@ -112,6 +114,7 @@ int32_t DCameraSourceRegistState::DoUnregisterTask(std::shared_ptr<DCameraSource
 
 int32_t DCameraSourceRegistState::DoOpenTask(std::shared_ptr<DCameraSourceDev>& camDev, DCameraSourceEvent& event)
 {
+    CHECK_AND_RETURN_RET_LOG(camDev == nullptr, DCAMERA_BAD_VALUE, "camDev is nullptr");
     int32_t ret = camDev->OpenCamera();
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceRegistState OpenCamera failed, ret: %{public}d", ret);
@@ -129,6 +132,7 @@ int32_t DCameraSourceRegistState::DoCloseTask(std::shared_ptr<DCameraSourceDev>&
 int32_t DCameraSourceRegistState::DoEventNofityTask(std::shared_ptr<DCameraSourceDev>& camDev,
     DCameraSourceEvent& event)
 {
+    CHECK_AND_RETURN_RET_LOG(camDev == nullptr, DCAMERA_BAD_VALUE, "camDev is nullptr");
     std::shared_ptr<DCameraEvent> camEvent;
     int32_t ret = event.GetCameraEvent(camEvent);
     if (ret != DCAMERA_OK) {

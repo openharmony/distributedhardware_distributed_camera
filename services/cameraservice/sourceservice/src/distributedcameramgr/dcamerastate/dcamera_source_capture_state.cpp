@@ -89,6 +89,7 @@ int32_t DCameraSourceCaptureState::DoRegisterTask(std::shared_ptr<DCameraSourceD
 int32_t DCameraSourceCaptureState::DoUnregisterTask(std::shared_ptr<DCameraSourceDev>& camDev,
     DCameraSourceEvent& event)
 {
+    CHECK_AND_RETURN_RET_LOG(camDev == nullptr, DCAMERA_BAD_VALUE, "camDev is nullptr");
     std::shared_ptr<DCameraEvent> camEvent = std::make_shared<DCameraEvent>();
     camEvent->eventType_ = DCAMERA_MESSAGE;
     camEvent->eventResult_ = DCAMERA_EVENT_CHANNEL_DISCONNECTED;
@@ -143,6 +144,7 @@ int32_t DCameraSourceCaptureState::DoOpenTask(std::shared_ptr<DCameraSourceDev>&
 
 int32_t DCameraSourceCaptureState::DoCloseTask(std::shared_ptr<DCameraSourceDev>& camDev, DCameraSourceEvent& event)
 {
+    CHECK_AND_RETURN_RET_LOG(camDev == nullptr, DCAMERA_BAD_VALUE, "camDev is nullptr");
     int32_t ret = camDev->StopAllCapture();
     if (ret != DCAMERA_OK) {
         DHLOGE("StopAllCapture failed, ret: %{public}d", ret);
@@ -172,6 +174,7 @@ int32_t DCameraSourceCaptureState::DoCloseTask(std::shared_ptr<DCameraSourceDev>
 int32_t DCameraSourceCaptureState::DoStartCaptureTask(std::shared_ptr<DCameraSourceDev>& camDev,
     DCameraSourceEvent& event)
 {
+    CHECK_AND_RETURN_RET_LOG(camDev == nullptr, DCAMERA_BAD_VALUE, "camDev is nullptr");
     std::vector<std::shared_ptr<DCCaptureInfo>> captureInfos;
     int32_t ret = event.GetCaptureInfos(captureInfos);
     if (ret != DCAMERA_OK) {
@@ -189,6 +192,7 @@ int32_t DCameraSourceCaptureState::DoStartCaptureTask(std::shared_ptr<DCameraSou
 int32_t DCameraSourceCaptureState::DoStopCaptureTask(std::shared_ptr<DCameraSourceDev>& camDev,
     DCameraSourceEvent& event)
 {
+    CHECK_AND_RETURN_RET_LOG(camDev == nullptr, DCAMERA_BAD_VALUE, "camDev is nullptr");
     std::vector<int> streamIds;
     int32_t ret = event.GetStreamIds(streamIds);
     if (ret != DCAMERA_OK) {
@@ -216,6 +220,7 @@ int32_t DCameraSourceCaptureState::DoStopCaptureTask(std::shared_ptr<DCameraSour
 int32_t DCameraSourceCaptureState::DoUpdateSettingsTask(std::shared_ptr<DCameraSourceDev>& camDev,
     DCameraSourceEvent& event)
 {
+    CHECK_AND_RETURN_RET_LOG(camDev == nullptr, DCAMERA_BAD_VALUE, "camDev is nullptr");
     std::vector<std::shared_ptr<DCameraSettings>> settings;
     int32_t ret = event.GetCameraSettings(settings);
     if (ret != DCAMERA_OK) {
@@ -233,6 +238,7 @@ int32_t DCameraSourceCaptureState::DoUpdateSettingsTask(std::shared_ptr<DCameraS
 int32_t DCameraSourceCaptureState::DoEventNofityTask(std::shared_ptr<DCameraSourceDev>& camDev,
     DCameraSourceEvent& event)
 {
+    CHECK_AND_RETURN_RET_LOG(camDev == nullptr, DCAMERA_BAD_VALUE, "camDev is nullptr");
     std::shared_ptr<DCameraEvent> camEvent;
     int32_t ret = event.GetCameraEvent(camEvent);
     if (ret != DCAMERA_OK) {

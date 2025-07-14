@@ -54,6 +54,8 @@ int32_t DCameraSourceDataProcess::FeedStream(std::vector<std::shared_ptr<DataBuf
     }
 
     auto buffer = *(buffers.begin());
+    CHECK_AND_RETURN_RET_LOG(buffer == nullptr, DCAMERA_BAD_VALUE, "DCameraSourceDataProcess FeedStream buffer is "
+        "nullptr");
     buffersSize = static_cast<uint64_t>(buffer->Size());
     DHLOGD("DCameraSourceDataProcess FeedStream devId %{public}s dhId %{public}s streamType %{public}d streamSize: "
         "%{public}" PRIu64, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, buffersSize);
@@ -76,6 +78,10 @@ int32_t DCameraSourceDataProcess::ConfigStreams(std::vector<std::shared_ptr<DCSt
     std::map<DCameraStreamConfig, std::set<int>> streamConfigs;
     for (auto iter = streamInfos.begin(); iter != streamInfos.end(); iter++) {
         std::shared_ptr<DCStreamInfo> streamInfo = *iter;
+        if (streamInfo == nullptr) {
+            DHLOGE("DCameraSourceDataProcess ConfigStreams streamInfo is nullptr");
+            continue;
+        }
         DCameraStreamConfig streamConfig(streamInfo->width_, streamInfo->height_, streamInfo->format_,
             streamInfo->dataspace_, streamInfo->encodeType_, streamInfo->type_);
         DHLOGI("DCameraSourceDataProcess ConfigStreams devId %{public}s dhId %{public}s, streamId: %{public}d info: "

@@ -20,6 +20,7 @@ namespace OHOS {
 namespace DistributedHardware {
 void TimeStatistician::CalProcessTime(const std::shared_ptr<IFeedableData>& data)
 {
+    CHECK_AND_RETURN_LOG(data == nullptr, "data is nullptr");
     int64_t feedTime  = GetNowTimeStampUs();
     int64_t timeStamp = data->GetTimeStamp();
     CalAverFeedInterval(feedTime);

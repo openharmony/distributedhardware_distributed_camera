@@ -51,7 +51,7 @@ int32_t DistributedCameraSourceProxy::InitSource(const std::string& params,
         return DCAMERA_BAD_VALUE;
     }
 
-    if (!data.WriteRemoteObject(callback->AsObject())) {
+    if (callback != nullptr && !data.WriteRemoteObject(callback->AsObject())) {
         DHLOGE("write callback failed");
         return DCAMERA_BAD_VALUE;
     }

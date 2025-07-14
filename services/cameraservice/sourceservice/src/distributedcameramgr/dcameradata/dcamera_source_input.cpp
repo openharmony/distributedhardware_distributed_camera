@@ -54,15 +54,17 @@ int32_t DCameraSourceInput::ConfigStreams(std::vector<std::shared_ptr<DCStreamIn
             "%{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return ret;
     }
-
     if (streamInfos.empty()) {
         return DCAMERA_OK;
     }
-
     std::vector<std::shared_ptr<DCStreamInfo>> snapStreams;
     std::vector<std::shared_ptr<DCStreamInfo>> continueStreams;
     for (auto iter = streamInfos.begin(); iter != streamInfos.end(); iter++) {
         std::shared_ptr<DCStreamInfo> streamInfo = *iter;
+        if (streamInfo == nullptr) {
+            DHLOGE("DCameraSourceInput ConfigStreams streamInfo is nullptr");
+            continue;
+        }
         DHLOGI("DCameraSourceInput ConfigStreams devId: %{public}s, dhId: %{public}s, streamId: %{public}d, width: "
             "%{public}d, height: %{public}d, format: %{public}d, dataspace: %{public}d, encodeType:%{public}d "
             "streamType: %{public}d", GetAnonyString(devId_).c_str(),
@@ -75,7 +77,6 @@ int32_t DCameraSourceInput::ConfigStreams(std::vector<std::shared_ptr<DCStreamIn
             snapStreams.push_back(streamInfo);
         }
     }
-
     do {
         ret = dataProcess_[CONTINUOUS_FRAME]->ConfigStreams(continueStreams);
         if (ret != DCAMERA_OK) {
@@ -90,7 +91,6 @@ int32_t DCameraSourceInput::ConfigStreams(std::vector<std::shared_ptr<DCStreamIn
             break;
         }
     } while (0);
-
     if (ret != DCAMERA_OK) {
         ReleaseAllStreams();
     }
@@ -101,6 +101,10 @@ int32_t DCameraSourceInput::ReleaseStreams(std::vector<int>& streamIds, bool& is
 {
     DHLOGI("DCameraSourceInput ReleaseStreams devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
+    CHECK_AND_RETURN_RET_LOG(dataProcess_[CONTINUOUS_FRAME] == nullptr,
+        DCAMERA_BAD_VALUE, "DCameraSourceInput ReleaseStreams continuous frame dataProcess_ is nullptr");
+    CHECK_AND_RETURN_RET_LOG(dataProcess_[SNAPSHOT_FRAME] == nullptr,
+        DCAMERA_BAD_VALUE, "DCameraSourceInput ReleaseStreams snapshot frame dataProcess_ is nullptr");
     int32_t ret = dataProcess_[CONTINUOUS_FRAME]->ReleaseStreams(streamIds);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceInput ReleaseStreams continue stream ReleaseStreams ret: %{public}d, devId: %{public}s,"
@@ -130,6 +134,10 @@ int32_t DCameraSourceInput::StartCapture(std::vector<std::shared_ptr<DCCaptureIn
         GetAnonyString(dhId_).c_str());
     for (auto iter = captureInfos.begin(); iter != captureInfos.end(); iter++) {
         int32_t ret = DCAMERA_OK;
+        if (*iter == nullptr) {
+            DHLOGE("DCameraSourceInput StartCapture captureInfo is nullptr");
+            continue;
+        }
         for (auto iterSet = (*iter)->streamIds_.begin(); iterSet != (*iter)->streamIds_.end(); iterSet++) {
             DHLOGI("DCameraSourceInput StartCapture devId %{public}s dhId %{public}s StartCapture id: %{public}d",
                 GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), *iterSet);
@@ -138,6 +146,10 @@ int32_t DCameraSourceInput::StartCapture(std::vector<std::shared_ptr<DCCaptureIn
         DHLOGI("DCameraSourceInput StartCapture Inner devId %{public}s dhId %{public}s streamType: %{public}d "
             "idSize: %{public}" PRIu64" isCap: %{public}d", GetAnonyString(devId_).c_str(),
             GetAnonyString(dhId_).c_str(), (*iter)->type_, idSize, (*iter)->isCapture_ ? 1 : 0);
+        if (dataProcess_[(*iter)->type_] == nullptr) {
+            DHLOGE("DCameraSourceInput StartCapture dataProcess_ is nullptr");
+            continue;
+        }
         ret = dataProcess_[(*iter)->type_]->StartCapture(*iter);
         if (ret != DCAMERA_OK) {
             DHLOGE("DCameraSourceInput StartCapture ret: %{public}d, devId: %{public}s, dhId: %{public}s", ret,
@@ -152,6 +164,8 @@ int32_t DCameraSourceInput::StopCapture(std::vector<int>& streamIds, bool& isAll
 {
     DHLOGI("DCameraSourceInput StopCapture devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
+    CHECK_AND_RETURN_RET_LOG(dataProcess_[CONTINUOUS_FRAME] == nullptr,
+        DCAMERA_BAD_VALUE, "DCameraSourceInput StopCapture continuous frame dataProcess_ is nullptr");
     int32_t ret = dataProcess_[CONTINUOUS_FRAME]->StopCapture(streamIds);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceInput StopCapture continue ret: %{public}d, devId: %{public}s, dhId: %{public}s", ret,
@@ -161,6 +175,8 @@ int32_t DCameraSourceInput::StopCapture(std::vector<int>& streamIds, bool& isAll
 
     int32_t size = dataProcess_[CONTINUOUS_FRAME]->GetProducerSize();
     if (size == 0) {
+        CHECK_AND_RETURN_RET_LOG(dataProcess_[SNAPSHOT_FRAME] == nullptr,
+            DCAMERA_BAD_VALUE, "DCameraSourceInput StopCapture snapshot frame dataProcess_ is nullptr");
         isAllStop = true;
         std::vector<int> snapStreamIds;
         dataProcess_[SNAPSHOT_FRAME]->GetAllStreamIds(snapStreamIds);
@@ -230,6 +246,8 @@ int32_t DCameraSourceInput::OpenChannel(std::vector<DCameraIndex>& indexs)
             isOpenChannelCond_.notify_one();
             DHLOGI("openChannel continuous frame task completed");
         };
+        CHECK_AND_RETURN_RET_LOG(handler_ == nullptr, DCAMERA_BAD_VALUE,
+            "DCameraSourceInput OpenChannel handler is nullptr");
         handler_->PostTask(task, "DCameraSourceInput:OpenChannel", 0, AppExecFwk::EventQueue::Priority::HIGH);
     }
     if (snapshotNeeded) {
@@ -394,6 +412,10 @@ int32_t DCameraSourceInput::ReleaseAllStreams()
 {
     DHLOGI("ReleaseAllStreams devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
+    CHECK_AND_RETURN_RET_LOG(dataProcess_[CONTINUOUS_FRAME] == nullptr,
+        DCAMERA_BAD_VALUE, "DCameraSourceInput ReleaseAllStreams continuous frame dataProcess_ is nullptr");
+    CHECK_AND_RETURN_RET_LOG(dataProcess_[SNAPSHOT_FRAME] == nullptr,
+        DCAMERA_BAD_VALUE, "DCameraSourceInput ReleaseAllStreams snapshot frame dataProcess_ is nullptr");
     std::vector<int> continueStreamIds;
     dataProcess_[CONTINUOUS_FRAME]->GetAllStreamIds(continueStreamIds);
     int32_t ret = dataProcess_[CONTINUOUS_FRAME]->ReleaseStreams(continueStreamIds);
@@ -419,6 +441,10 @@ int32_t DCameraSourceInput::StopAllCapture()
     DHLOGI("StopAllCapture devId %{public}s dhId %{public}s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     std::vector<int> continueStreamIds;
+    CHECK_AND_RETURN_RET_LOG(dataProcess_[CONTINUOUS_FRAME] == nullptr,
+        DCAMERA_BAD_VALUE, "DCameraSourceInput StopAllCapture continuous frame dataProcess_ is nullptr");
+    CHECK_AND_RETURN_RET_LOG(dataProcess_[SNAPSHOT_FRAME] == nullptr,
+        DCAMERA_BAD_VALUE, "DCameraSourceInput StopAllCapture snapshot frame dataProcess_ is nullptr");
     dataProcess_[CONTINUOUS_FRAME]->GetAllStreamIds(continueStreamIds);
     int32_t ret = dataProcess_[CONTINUOUS_FRAME]->StopCapture(continueStreamIds);
     if (ret != DCAMERA_OK) {

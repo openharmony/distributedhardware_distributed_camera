@@ -70,6 +70,7 @@ void DCameraSinkDataProcess::StartEventHandler()
 
 int32_t DCameraSinkDataProcess::StartCapture(std::shared_ptr<DCameraCaptureInfo>& captureInfo)
 {
+    CHECK_AND_RETURN_RET_LOG(captureInfo == nullptr, DCAMERA_BAD_VALUE, "StartCapture captureInfo is null");
     DHLOGI("StartCapture dhId: %{public}s, width: %{public}d, height: %{public}d, format: %{public}d, stream: "
         "%{public}d, encode: %{public}d", GetAnonyString(dhId_).c_str(), captureInfo->width_, captureInfo->height_,
         captureInfo->format_, captureInfo->streamType_, captureInfo->encodeType_);
