@@ -67,6 +67,7 @@ HWTEST_F(DcameraSinkCallbackProxyTest, dcamera_sink_callback_proxy_test_001, Tes
     DHLOGI("DcameraSinkCallbackProxyTest::dcamera_sink_callback_proxy_test_001");
     sptr<ISystemAbilityManager> samgr =
         SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    ASSERT_NE(samgr, nullptr);
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID);
     sptr<DCameraSinkCallbackProxy> callbackProxy(new DCameraSinkCallbackProxy(remoteObject));
     EXPECT_EQ(false, callbackProxy == nullptr);

@@ -134,6 +134,7 @@ HWTEST_F(DCameraSinkHandlerIpcTest, dcamera_sink_handler_ipc_test_005, TestSize.
     int32_t systemAbilityId = 4804;
     sptr<ISystemAbilityManager> samgr =
             SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    ASSERT_NE(samgr, nullptr);
     wptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(systemAbilityId);
     DCameraSinkHandlerIpc::GetInstance().OnSinkLocalCamSrvDied(remoteObject);
     EXPECT_EQ(nullptr, DCameraSinkHandlerIpc::GetInstance().localSink_);

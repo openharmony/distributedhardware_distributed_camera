@@ -37,6 +37,9 @@ void SinkOnLoadSystemAbilitySuccessFuzzTest(const uint8_t* data, size_t size)
 
     sptr<ISystemAbilityManager> samgr =
             SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgr == nullptr) {
+        return;
+    }
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(systemAbilityId);
 
     callback->OnLoadSystemAbilitySuccess(systemAbilityId, remoteObject);

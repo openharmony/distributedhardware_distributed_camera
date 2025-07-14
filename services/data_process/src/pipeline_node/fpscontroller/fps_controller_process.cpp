@@ -269,7 +269,7 @@ bool FpsControllerProcess::IsDropFrame(float incomingFps)
 bool FpsControllerProcess::ReduceFrameRateByUniformStrategy(int32_t incomingFrmRate)
 {
     DHLOGD("Frame control, reduce frame rate by uniform rate strategy");
-    if (incomingFrmRate > targetFrameRate_) {
+    if (incomingFrmRate <= targetFrameRate_) {
         DHLOGD("incoming fps not more than targetFrameRate_, not drop");
         return false;
     }

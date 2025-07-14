@@ -142,6 +142,7 @@ HWTEST_F(DCameraSourceServiceIpcTest, dcamera_source_service_ipc_test_005, TestS
     DCameraSourceServiceIpc::GetInstance().Init();
     sptr<ISystemAbilityManager> samgr =
             SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    ASSERT_NE(samgr, nullptr);
     wptr<IRemoteObject> remote = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID);
     DCameraSourceServiceIpc::GetInstance().OnSinkRemoteCamSrvDied(remote);
     DCameraSourceServiceIpc::GetInstance().UnInit();

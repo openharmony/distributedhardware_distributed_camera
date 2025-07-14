@@ -35,6 +35,9 @@ void OnSourceLocalCamSrvDiedFuzzTest(const uint8_t* data, size_t size)
     int32_t saId = *(reinterpret_cast<const int32_t*>(data));
     sptr<ISystemAbilityManager> samgr =
             SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgr == nullptr) {
+        return;
+    }
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(saId);
     wptr<IRemoteObject> remote (remoteObject);
 

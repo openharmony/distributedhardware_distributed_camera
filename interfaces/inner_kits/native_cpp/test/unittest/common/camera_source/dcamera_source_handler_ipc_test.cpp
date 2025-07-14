@@ -134,6 +134,7 @@ HWTEST_F(DCameraSourceHandlerIpcTest, dcamera_source_handler_ipc_test_005, TestS
     int32_t systemAbilityId = 4803;
     sptr<ISystemAbilityManager> samgr =
             SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    ASSERT_NE(samgr, nullptr);
     wptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(systemAbilityId);
     DCameraSourceHandlerIpc::GetInstance().OnSourceLocalCamSrvDied(remoteObject);
     EXPECT_EQ(nullptr, DCameraSourceHandlerIpc::GetInstance().localSource_);
