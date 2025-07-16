@@ -168,6 +168,7 @@ HWTEST_F(DCameraSinkHandlerTest, dcamera_sink_handler_test_005, TestSize.Level1)
     int32_t systemAbilityId = 4804;
     sptr<ISystemAbilityManager> samgr =
             SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    ASSERT_NE(samgr, nullptr);
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(systemAbilityId);
     sptr<DCameraSinkLoadCallback> loadCallback(new DCameraSinkLoadCallback(params));
     ASSERT_NE(loadCallback, nullptr);

@@ -154,6 +154,7 @@ HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_005, TestSize.Lev
     int32_t systemAbilityId = 4803;
     sptr<ISystemAbilityManager> samgr =
             SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    ASSERT_NE(samgr, nullptr);
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(systemAbilityId);
     sptr<DCameraSourceLoadCallback> loadCallback(new DCameraSourceLoadCallback(params));
     ASSERT_NE(loadCallback, nullptr);

@@ -324,7 +324,7 @@ FILE *DumpFileUtil::OpenDumpFileInner(std::string para, std::string fileName)
         g_lastPara[para] = dumpPara;
         return dumpFile;
     }
-    DHLOGD("%{public}s = %{public}s, filePath: %{public}s", para.c_str(), dumpPara.c_str(), path);
+
     if (dumpPara == "w") {
         dumpFile = fopen(path, "wb+");
         CHECK_AND_RETURN_RET_LOG(dumpFile == nullptr, dumpFile, "Error opening dump file!");

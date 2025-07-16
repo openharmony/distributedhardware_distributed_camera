@@ -34,6 +34,9 @@ void SinkProxyCloseChannelFuzzTest(const uint8_t* data, size_t size)
 
     sptr<ISystemAbilityManager> samgr =
             SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgr == nullptr) {
+        return;
+    }
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID);
     std::shared_ptr<DistributedCameraSinkProxy> dCSinkProxy =
         std::make_shared<DistributedCameraSinkProxy>(remoteObject);

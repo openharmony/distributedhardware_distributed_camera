@@ -74,6 +74,7 @@ HWTEST_F(DcameraSourceCallbackProxyTest, dcamera_source_callback_proxy_test_001,
     DHLOGI("DcameraSourceCallbackProxyTest::dcamera_source_callback_proxy_test_001");
     sptr<ISystemAbilityManager> samgr =
         SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    ASSERT_NE(samgr, nullptr);
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID);
     sptr<DCameraSourceCallbackProxy> callbackProxy(new DCameraSourceCallbackProxy(remoteObject));
     EXPECT_EQ(false, callbackProxy == nullptr);
@@ -98,6 +99,7 @@ HWTEST_F(DcameraSourceCallbackProxyTest, dcamera_source_callback_proxy_test_002,
     DHLOGI("DcameraSourceCallbackProxyTest::dcamera_source_callback_proxy_test_002");
     sptr<ISystemAbilityManager> samgr =
         SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    ASSERT_NE(samgr, nullptr);
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID);
     sptr<DCameraSourceCallbackProxy> callbackProxy(new DCameraSourceCallbackProxy(remoteObject));
     EXPECT_EQ(false, callbackProxy == nullptr);
@@ -122,6 +124,7 @@ HWTEST_F(DcameraSourceCallbackProxyTest, dcamera_source_callback_proxy_test_003,
     DHLOGI("DcameraSourceCallbackProxyTest::dcamera_source_callback_proxy_test_003");
     sptr<ISystemAbilityManager> samgr =
         SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    ASSERT_NE(samgr, nullptr);
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID);
     sptr<DCameraSourceCallbackProxy> callbackProxy(new DCameraSourceCallbackProxy(remoteObject));
     EXPECT_EQ(false, callbackProxy == nullptr);
@@ -145,6 +148,7 @@ HWTEST_F(DcameraSourceCallbackProxyTest, dcamera_source_callback_proxy_test_004,
     DHLOGI("DcameraSourceCallbackProxyTest::dcamera_source_callback_proxy_test_004");
     sptr<ISystemAbilityManager> samgr =
         SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    ASSERT_NE(samgr, nullptr);
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID);
     sptr<DCameraSourceCallbackProxy> callbackProxy(new DCameraSourceCallbackProxy(remoteObject));
     EXPECT_EQ(false, callbackProxy == nullptr);
@@ -183,6 +187,7 @@ HWTEST_F(DcameraSourceCallbackProxyTest, CheckParams_001, TestSize.Level1)
     DHLOGI("DcameraSourceCallbackProxyTest::CheckParams_001");
     sptr<ISystemAbilityManager> samgr =
         SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    ASSERT_NE(samgr, nullptr);
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID);
     sptr<DCameraSourceCallbackProxy> callbackProxy(new DCameraSourceCallbackProxy(remoteObject));
 
@@ -210,6 +215,7 @@ HWTEST_F(DcameraSourceCallbackProxyTest, OnDataSyncTrigger_001, TestSize.Level1)
     DHLOGI("DcameraSourceCallbackProxyTest::OnDataSyncTrigger_001");
     sptr<ISystemAbilityManager> samgr =
         SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    ASSERT_NE(samgr, nullptr);
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID);
     sptr<DCameraSourceCallbackProxy> callbackProxy(new DCameraSourceCallbackProxy(remoteObject));
 
@@ -245,6 +251,7 @@ HWTEST_F(DcameraSourceCallbackProxyTest, OnHardwareStateChanged_001, TestSize.Le
     DHLOGI("DcameraSourceCallbackProxyTest::OnHardwareStateChanged_001");
     sptr<ISystemAbilityManager> samgr =
         SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    ASSERT_NE(samgr, nullptr);
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID);
     sptr<DCameraSourceCallbackProxy> callbackProxy(new DCameraSourceCallbackProxy(remoteObject));
 

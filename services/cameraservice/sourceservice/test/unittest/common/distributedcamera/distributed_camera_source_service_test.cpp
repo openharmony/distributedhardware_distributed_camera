@@ -180,6 +180,7 @@ HWTEST_F(DistributedCameraSourceServiceTest, dcamera_source_service_test_006, Te
     std::string params = "test006";
     sptr<ISystemAbilityManager> samgr =
         SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    ASSERT_NE(samgr, nullptr);
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID);
     sptr<DCameraSourceCallbackProxy> callbackProxy(new DCameraSourceCallbackProxy(remoteObject));
     testSrcService_->listener_ = std::make_shared<DCameraServiceStateListener>();

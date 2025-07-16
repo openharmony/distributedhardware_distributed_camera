@@ -44,6 +44,9 @@ void SourceProxyRegisterDistributedHardwareFuzzTest(const uint8_t* data, size_t 
 
     sptr<ISystemAbilityManager> samgr =
             SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgr == nullptr) {
+        return;
+    }
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID);
     std::shared_ptr<DistributedCameraSourceProxy> dCSourceProxy =
         std::make_shared<DistributedCameraSourceProxy>(remoteObject);
