@@ -625,6 +625,10 @@ int32_t DCameraSourceDev::StartCapture(std::vector<std::shared_ptr<DCCaptureInfo
     }
     std::vector<std::shared_ptr<DCameraCaptureInfo>> captures;
     for (auto iter = captureInfos.begin(); iter != captureInfos.end(); iter++) {
+        if ((*iter) == nullptr) {
+            DHLOGE("DCameraSourceDev StartCapture captureInfos iter is nullptr");
+            continue;
+        }
         std::shared_ptr<DCameraCaptureInfo> capture = std::make_shared<DCameraCaptureInfo>();
         capture->width_ = (*iter)->width_;
         capture->height_ = (*iter)->height_;

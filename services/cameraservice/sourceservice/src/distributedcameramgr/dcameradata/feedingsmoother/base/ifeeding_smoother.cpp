@@ -238,11 +238,14 @@ int32_t IFeedingSmoother::StopSmooth()
         }
         state_ = SMOOTH_STOP;
     }
-    statistician_ = nullptr;
-    UnregisterListener();
     smoothCon_.notify_one();
     sleepCon_.notify_one();
-    smoothThread_.join();
+    if (smoothThread_.joinable()) {
+        smoothThread_.join();
+    }
+    statistician_ = nullptr;
+    UnregisterListener();
+
     std::queue<std::shared_ptr<IFeedableData>>().swap(dataQueue_);
     DHLOGD("Stop smooth success.");
     return SMOOTH_SUCCESS;

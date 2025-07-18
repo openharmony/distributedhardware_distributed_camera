@@ -96,7 +96,7 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_001, TestSize.Level1)
                                  TEST_HEIGTH);
     VideoConfigParams procConfig;
     int32_t rc = testDecodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_OK);
+    EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
 }
 
 /**
@@ -599,7 +599,7 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_017, TestSize.Level1)
     int32_t rc = testDecodeDataProcess_->InitNode(srcParams2, destParams2, procConfig2);
     testDecodeDataProcess_->OnError();
     testDecodeDataProcess_->isDecoderProcess_.store(true);
-    EXPECT_EQ(rc, DCAMERA_OK);
+    EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
 }
 
 /**
