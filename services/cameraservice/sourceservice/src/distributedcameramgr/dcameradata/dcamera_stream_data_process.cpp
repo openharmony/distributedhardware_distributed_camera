@@ -70,6 +70,7 @@ void DCameraStreamDataProcess::FeedStream(std::shared_ptr<DataBuffer>& buffer)
 void DCameraStreamDataProcess::ConfigStreams(std::shared_ptr<DCameraStreamConfig>& dstConfig,
     std::set<int32_t>& streamIds)
 {
+    CHECK_AND_RETURN_LOG(dstConfig == nullptr, "dstConfig is nullptr");
     for (auto streamId : streamIds) {
         DHLOGI("ConfigStreams devId %{public}s dhId %{public}s streamId %{public}d, width: %{public}d, height: "
             "%{public}d, format: %{public}d, dataspace: %{public}d, encodeType: %{public}d, streamType: %{public}d",
@@ -104,6 +105,7 @@ void DCameraStreamDataProcess::ReleaseStreams(std::set<int32_t>& streamIds)
 void DCameraStreamDataProcess::StartCapture(std::shared_ptr<DCameraStreamConfig>& srcConfig,
     std::set<int32_t>& streamIds)
 {
+    CHECK_AND_RETURN_LOG(srcConfig == nullptr, "srcConfig is nullptr");
     for (auto iter = streamIds.begin(); iter != streamIds.end(); iter++) {
         DHLOGI("StartCapture devId %{public}s dhId %{public}s streamType: %{public}d streamId: %{public}d, "
             "srcConfig: width: %{public}d, height: %{public}d, format: %{public}d, dataspace: %{public}d, "
@@ -221,6 +223,7 @@ void DCameraStreamDataProcess::FeedStreamToContinue(const std::shared_ptr<DataBu
 
 void DCameraStreamDataProcess::OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult)
 {
+    CHECK_AND_LOG(videoResult == nullptr, "videoResult is nullptr.");
     uint64_t resultSize = static_cast<uint64_t>(videoResult->Size());
     DHLOGI("DCameraStreamDataProcess OnProcessedVideoBuffer devId %{public}s dhId %{public}s streamType: %{public}d "
         "streamSize: %{public}" PRIu64, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(),

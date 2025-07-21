@@ -64,6 +64,10 @@ std::vector<DHItem> DCameraHandler::QueryMeta()
         return itemList;
     }
     for (auto& info : cameraList) {
+        if (info == nullptr) {
+            DHLOGE("camera info is null");
+            continue;
+        }
         if (info->GetConnectionType() != CameraStandard::ConnectionType::CAMERA_CONNECTION_BUILT_IN) {
             DHLOGI("connection type: %{public}d", info->GetConnectionType());
             continue;
@@ -92,7 +96,11 @@ std::vector<DHItem> DCameraHandler::Query()
         return itemList;
     }
     for (auto& info : cameraList) {
-        if ((info->GetConnectionType() != CameraStandard::ConnectionType::CAMERA_CONNECTION_BUILT_IN)) {
+        if (info == nullptr) {
+            DHLOGE("camera info is null");
+            continue;
+        }
+        if (info->GetConnectionType() != CameraStandard::ConnectionType::CAMERA_CONNECTION_BUILT_IN) {
             DHLOGI("connection type: %{public}d", info->GetConnectionType());
             continue;
         }
@@ -205,6 +213,7 @@ int32_t DCameraHandler::CreateAVCodecList(cJSON *root)
 
 int32_t DCameraHandler::CreateMetaDHItem(sptr<CameraStandard::CameraDevice>& info, DHItem& item)
 {
+    CHECK_AND_RETURN_RET_LOG(info == nullptr, DCAMERA_BAD_VALUE, "CreateMetaDHItem info is null");
     std::string id = info->GetID();
     item.dhId = CAMERA_ID_PREFIX + id;
     item.subtype = "camera";
@@ -226,6 +235,7 @@ int32_t DCameraHandler::CreateMetaDHItem(sptr<CameraStandard::CameraDevice>& inf
 
 int32_t DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraDevice>& info, DHItem& item)
 {
+    CHECK_AND_RETURN_RET_LOG(info == nullptr, DCAMERA_BAD_VALUE, "CreateDHItem info is null");
     std::string id = info->GetID();
     item.dhId = CAMERA_ID_PREFIX + id;
     item.subtype = "camera";
@@ -280,13 +290,14 @@ int32_t DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraDevice>& info, D
 
 int32_t DCameraHandler::CreateMeatdataStr(sptr<CameraStandard::CameraDevice>& info, cJSON *root)
 {
+    CHECK_AND_RETURN_RET_LOG(cameraManager_ == nullptr, DCAMERA_BAD_VALUE, "cameraManager is null");
     sptr<CameraStandard::CameraInput> cameraInput = nullptr;
     int32_t rv = cameraManager_->CreateCameraInput(info, &cameraInput);
     if (rv != DCAMERA_OK) {
         DHLOGE("create cameraInput failed");
         return DCAMERA_BAD_VALUE;
     }
-
+    CHECK_AND_RETURN_RET_LOG(cameraInput == nullptr, DCAMERA_BAD_VALUE, "cameraInput is null");
     std::hash<std::string> h;
     std::string abilityStr = cameraInput->GetCameraSettings();
     DHLOGI("abilityString hash: %{public}zu, length: %{public}zu", h(abilityStr), abilityStr.length());

@@ -21,6 +21,7 @@ namespace OHOS {
 namespace DistributedHardware {
 void DCameraTimeStatistician::CalProcessTime(const std::shared_ptr<IFeedableData>& data)
 {
+    CHECK_AND_RETURN_LOG(data == nullptr, "data is nullptr");
     TimeStatistician::CalProcessTime(data);
     std::shared_ptr<DataBuffer> dataBuffer = std::reinterpret_pointer_cast<DataBuffer>(data);
     DCameraFrameInfo frameInfo = dataBuffer->frameInfo_;
@@ -48,6 +49,7 @@ void DCameraTimeStatistician::CalProcessTime(const std::shared_ptr<IFeedableData
 
 void DCameraTimeStatistician::CalWholeProcessTime(const std::shared_ptr<DataBuffer>& data)
 {
+    CHECK_AND_RETURN_LOG(data == nullptr, "data is nullptr");
     DCameraFrameInfo frameInfo = data->frameInfo_;
     int64_t smooth = frameInfo.timePonit.finishSmooth - frameInfo.timePonit.startSmooth;
     int64_t sink = frameInfo.timePonit.send - frameInfo.timePonit.startEncode;

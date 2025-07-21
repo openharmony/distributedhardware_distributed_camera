@@ -35,6 +35,8 @@ DCameraSourceStateMachine::~DCameraSourceStateMachine()
 
 int32_t DCameraSourceStateMachine::Execute(DCAMERA_EVENT eventType, DCameraSourceEvent& event)
 {
+    CHECK_AND_RETURN_RET_LOG(currentState_ == nullptr, DCAMERA_BAD_VALUE,
+        "DCameraSourceStateMachine currentState_ is nullptr, please check the state machine initialization");
     DHLOGI("In state %{public}d execute event %{public}d", currentState_->GetStateType(), eventType);
     std::shared_ptr<DCameraSourceDev> camDev = camDev_.lock();
     if (camDev == nullptr) {
@@ -52,7 +54,7 @@ int32_t DCameraSourceStateMachine::Execute(DCAMERA_EVENT eventType, DCameraSourc
 
 void DCameraSourceStateMachine::UpdateState(DCameraStateType stateType)
 {
-    if (stateType != DCAMERA_STATE_INIT) {
+    if (currentState_ != nullptr && stateType != DCAMERA_STATE_INIT) {
         DHLOGI("DCameraSourceStateMachine update state from %{public}d to %{public}d",
             currentState_->GetStateType(), stateType);
     } else {
@@ -64,6 +66,8 @@ void DCameraSourceStateMachine::UpdateState(DCameraStateType stateType)
 
 int32_t DCameraSourceStateMachine::GetCameraState()
 {
+    CHECK_AND_RETURN_RET_LOG(currentState_ == nullptr, DCAMERA_BAD_VALUE,
+        "DCameraSourceStateMachine currentState_ is nullptr");
     DHLOGI("GetCameraState In state %{public}d", currentState_->GetStateType());
     return currentState_->GetStateType();
 }

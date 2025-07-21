@@ -815,6 +815,7 @@ void DCameraSourceDev::NotifyHalResult(DCAMERA_EVENT eventType, DCameraSourceEve
 
 int32_t DCameraSourceDev::GetStateInfo()
 {
+    CHECK_AND_RETURN_RET_LOG(stateMachine_ == nullptr, DCAMERA_BAD_VALUE, "stateMachine_ is nullptr.");
     DHLOGI("GetStateInfo In state %{public}d", stateMachine_->GetCameraState());
     return stateMachine_->GetCameraState();
 }

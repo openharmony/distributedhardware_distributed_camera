@@ -43,6 +43,7 @@ DCameraSinkOutput::~DCameraSinkOutput()
 
 int32_t DCameraSinkOutput::Init()
 {
+    CHECK_AND_RETURN_RET_LOG(operator_ == nullptr, DCAMERA_BAD_VALUE, "operator_ is null");
     DHLOGI("Init dhId: %{public}s", GetAnonyString(dhId_).c_str());
     auto output = std::shared_ptr<DCameraSinkOutput>(shared_from_this());
     std::shared_ptr<ResultCallback> resultCallback = std::make_shared<DCameraSinkOutputResultCallback>(output);
@@ -79,6 +80,7 @@ int32_t DCameraSinkOutput::UnInit()
 int32_t DCameraSinkOutput::OpenChannel(std::shared_ptr<DCameraChannelInfo>& info)
 {
     DHLOGI("OpenChannel dhId: %{public}s", GetAnonyString(dhId_).c_str());
+    CHECK_AND_RETURN_RET_LOG(info == nullptr, DCAMERA_BAD_VALUE, "OpenChannel info is null");
     std::map<DCStreamType, DCameraSessionMode> modeMaps;
     modeMaps.emplace(CONTINUOUS_FRAME, DCAMERA_SESSION_MODE_VIDEO);
     modeMaps.emplace(SNAPSHOT_FRAME, DCAMERA_SESSION_MODE_JPEG);
@@ -113,6 +115,8 @@ int32_t DCameraSinkOutput::CloseChannel()
     auto iterCon = channels_.find(CONTINUOUS_FRAME);
     if (iterCon != channels_.end()) {
         int32_t ret = DCAMERA_OK;
+        CHECK_AND_RETURN_RET_LOG(iterCon->second == nullptr, DCAMERA_BAD_VALUE,
+            "CloseChannel continuous channel is null");
         ret = iterCon->second->ReleaseSession();
         if (ret != DCAMERA_OK) {
             DHLOGI("DCameraSinkOutput UnInit release continue session failed, dhId: %{public}s, ret: %{public}d",
@@ -124,6 +128,8 @@ int32_t DCameraSinkOutput::CloseChannel()
     auto iterSnap = channels_.find(SNAPSHOT_FRAME);
     if (iterSnap != channels_.end()) {
         int32_t ret = DCAMERA_OK;
+        CHECK_AND_RETURN_RET_LOG(iterSnap->second == nullptr, DCAMERA_BAD_VALUE,
+            "CloseChannel snapshot channel is null");
         ret = iterSnap->second->ReleaseSession();
         if (ret != DCAMERA_OK) {
             DHLOGI("DCameraSinkOutput UnInit release snapshot session failed, dhId: %{public}s, ret: %{public}d",
@@ -138,6 +144,10 @@ int32_t DCameraSinkOutput::StartCapture(std::vector<std::shared_ptr<DCameraCaptu
 {
     DHLOGI("StartCapture dhId: %{public}s", GetAnonyString(dhId_).c_str());
     for (auto& info : captureInfos) {
+        if (info == nullptr) {
+            DHLOGE("StartCapture info is null");
+            continue;
+        }
         if (dataProcesses_.find(info->streamType_) == dataProcesses_.end()) {
             DHLOGE("has no data process, streamType: %{public}d", info->streamType_);
             break;
@@ -157,6 +167,8 @@ int32_t DCameraSinkOutput::StopCapture()
     auto iterCon = dataProcesses_.find(CONTINUOUS_FRAME);
     if (iterCon != dataProcesses_.end()) {
         DHLOGI("StopCapture %{public}s continuous frame stop capture", GetAnonyString(dhId_).c_str());
+        CHECK_AND_RETURN_RET_LOG(iterCon->second == nullptr, DCAMERA_BAD_VALUE,
+            "StopCapture continuous data process is null");
         int32_t ret = iterCon->second->StopCapture();
         if (ret != DCAMERA_OK) {
             DHLOGE("continuous data process stop capture failed, dhId: %{public}s, ret: %{public}d",
@@ -167,6 +179,8 @@ int32_t DCameraSinkOutput::StopCapture()
     auto iterSnap = dataProcesses_.find(SNAPSHOT_FRAME);
     if (iterSnap != dataProcesses_.end()) {
         DHLOGI("StopCapture %{public}s snapshot frame stop capture", GetAnonyString(dhId_).c_str());
+        CHECK_AND_RETURN_RET_LOG(iterSnap->second == nullptr, DCAMERA_BAD_VALUE,
+            "StopCapture snapshot data process is null");
         int32_t ret = iterSnap->second->StopCapture();
         if (ret != DCAMERA_OK) {
             DHLOGE("snapshot data process stop capture failed, dhId: %{public}s, ret: %{public}d",
@@ -188,6 +202,8 @@ void DCameraSinkOutput::OnVideoResult(std::shared_ptr<DataBuffer>& buffer)
         DHLOGE("OnVideoResult %{public}s has no continuous data process", GetAnonyString(dhId_).c_str());
         return;
     }
+    CHECK_AND_RETURN_LOG(dataProcesses_[CONTINUOUS_FRAME] == nullptr,
+        "OnVideoResult continuous data process is null");
     dataProcesses_[CONTINUOUS_FRAME]->FeedStream(buffer);
 }
 
@@ -197,6 +213,8 @@ void DCameraSinkOutput::OnPhotoResult(std::shared_ptr<DataBuffer>& buffer)
         DHLOGE("OnPhotoResult %{public}s has no snapshot data process", GetAnonyString(dhId_).c_str());
         return;
     }
+    CHECK_AND_RETURN_LOG(dataProcesses_[SNAPSHOT_FRAME] == nullptr,
+        "OnPhotoResult snapshot data process is null");
     dataProcesses_[SNAPSHOT_FRAME]->FeedStream(buffer);
 }
 

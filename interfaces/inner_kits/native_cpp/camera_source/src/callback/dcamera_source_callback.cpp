@@ -39,6 +39,13 @@ int32_t DCameraSourceCallback::OnNotifyRegResult(const std::string& devId, const
             GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
         return DCAMERA_NOT_FOUND;
     }
+
+    if (iter->second == nullptr) {
+        DHLOGE("DCameraSourceCallback OnNotifyRegResult callback is null");
+        regCallbacks_.erase(iter);
+        return DCAMERA_BAD_VALUE;
+    }
+    
     int32_t ret = iter->second->OnRegisterResult(devId, dhId, status, data);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceCallback OnNotifyRegResult failed, devId: %{public}s dhId: %{public}s ret: %{public}d",
@@ -59,6 +66,11 @@ int32_t DCameraSourceCallback::OnNotifyUnregResult(const std::string& devId, con
         DHLOGE("DCameraSourceCallback OnNotifyUnregResult not found devId: %{public}s dhId: %{public}s",
             GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
         return DCAMERA_NOT_FOUND;
+    }
+    if (iter->second == nullptr) {
+        DHLOGE("DCameraSourceCallback OnNotifyUnregResult callback is null");
+        unregCallbacks_.erase(iter);
+        return DCAMERA_BAD_VALUE;
     }
     int32_t ret = iter->second->OnUnregisterResult(devId, dhId, status, data);
     if (ret != DCAMERA_OK) {

@@ -66,7 +66,7 @@ int32_t DCameraClient::Init()
     uint64_t listSize = static_cast<uint64_t>(cameraList.size());
     DHLOGI("Init camera size: %{public}" PRIu64, listSize);
     for (auto& info : cameraList) {
-        if (info->GetID() == cameraId_) {
+        if (info != nullptr && info->GetID() == cameraId_) {
             DHLOGI("Init cameraInfo get id: %{public}s", GetAnonyString(info->GetID()).c_str());
             cameraInfo_ = info;
             break;
@@ -101,6 +101,10 @@ int32_t DCameraClient::UpdateSettings(std::vector<std::shared_ptr<DCameraSetting
 {
     DHLOGI("UpdateSettings cameraId: %{public}s", GetAnonyString(cameraId_).c_str());
     for (auto& setting : settings) {
+        if (setting == nullptr) {
+            DHLOGE("UpdateSettings setting is null");
+            continue;
+        }
         switch (setting->type_) {
             case UPDATE_METADATA: {
                 DHLOGI("UpdateSettings %{public}s update metadata settings", GetAnonyString(cameraId_).c_str());
@@ -194,6 +198,10 @@ int32_t DCameraClient::StartCapture(std::vector<std::shared_ptr<DCameraCaptureIn
     }
 
     for (auto& info : captureInfos) {
+        if (info == nullptr) {
+            DHLOGE("StartCapture info is null");
+            continue;
+        }
         if ((info->streamType_ == CONTINUOUS_FRAME) || (!info->isCapture_)) {
             continue;
         }
@@ -340,6 +348,7 @@ int32_t DCameraClient::ConfigCaptureSession(std::vector<std::shared_ptr<DCameraC
         DHLOGE("ConfigCaptureSession %{public}s create cameraInput failed", GetAnonyString(cameraId_).c_str());
         return DCAMERA_BAD_VALUE;
     }
+    CHECK_AND_RETURN_RET_LOG(cameraInput_ == nullptr, DCAMERA_BAD_VALUE, "cameraInput is null.");
     int32_t rc = ((sptr<CameraStandard::CameraInput> &)cameraInput_)->Open();
     if (rc != DCAMERA_OK) {
         DHLOGE("ConfigCaptureSession cameraInput_ Open failed, cameraId: %{public}s, ret: %{public}d",
@@ -384,6 +393,8 @@ int32_t DCameraClient::ConfigCaptureSession(std::vector<std::shared_ptr<DCameraC
 
 int32_t DCameraClient::ConfigCaptureSessionInner()
 {
+    CHECK_AND_RETURN_RET_LOG(captureSession_ == nullptr, DCAMERA_BAD_VALUE,
+        "ConfigCaptureSessionInner captureSession is null.");
     int32_t ret = captureSession_->BeginConfig();
     if (ret != DCAMERA_OK) {
         DHLOGE("ConfigCaptureSession %{public}s config captureSession failed, ret: %{public}d",
@@ -441,6 +452,10 @@ int32_t DCameraClient::CreateCaptureOutput(std::vector<std::shared_ptr<DCameraCa
     }
 
     for (auto& info : captureInfos) {
+        if (info == nullptr) {
+            DHLOGE("CreateCaptureOutput info is null");
+            continue;
+        }
         if (info->streamType_ == SNAPSHOT_FRAME) {
             int32_t ret = CreatePhotoOutput(info);
             if (ret != DCAMERA_OK) {
@@ -465,10 +480,13 @@ int32_t DCameraClient::CreateCaptureOutput(std::vector<std::shared_ptr<DCameraCa
 
 int32_t DCameraClient::CreatePhotoOutput(std::shared_ptr<DCameraCaptureInfo>& info)
 {
+    CHECK_AND_RETURN_RET_LOG(info == nullptr, DCAMERA_BAD_VALUE, "CreatePhotoOutput info is null");
     DHLOGI("CreatePhotoOutput dhId: %{public}s, width: %{public}d, height: %{public}d, format: %{public}d, stream: "
         "%{public}d, isCapture: %{public}d", GetAnonyString(cameraId_).c_str(), info->width_, info->height_,
         info->format_, info->streamType_, info->isCapture_);
     photoSurface_ = IConsumerSurface::Create();
+    CHECK_AND_RETURN_RET_LOG(photoSurface_ == nullptr, DCAMERA_BAD_VALUE,
+        "CreatePhotoOutput create photo surface failed");
     photoListener_ = sptr<DCameraPhotoSurfaceListener>(
         new DCameraPhotoSurfaceListener(photoSurface_, resultCallback_));
     photoSurface_->RegisterConsumerListener((sptr<IBufferConsumerListener> &)photoListener_);
@@ -478,7 +496,7 @@ int32_t DCameraClient::CreatePhotoOutput(std::shared_ptr<DCameraCaptureInfo>& in
     sptr<IBufferProducer> bp = photoSurface_->GetProducer();
     int32_t rv = cameraManager_->CreatePhotoOutput(
         photoProfile, bp, &((sptr<CameraStandard::PhotoOutput> &)photoOutput_));
-    if (rv != DCAMERA_OK) {
+    if (rv != DCAMERA_OK || photoOutput_ == nullptr) {
         DHLOGE("CreatePhotoOutput %{public}s create photo output failed", GetAnonyString(cameraId_).c_str());
         return DCAMERA_BAD_VALUE;
     }
@@ -490,6 +508,7 @@ int32_t DCameraClient::CreatePhotoOutput(std::shared_ptr<DCameraCaptureInfo>& in
 
 int32_t DCameraClient::CreatePreviewOutput(std::shared_ptr<DCameraCaptureInfo>& info)
 {
+    CHECK_AND_RETURN_RET_LOG(info == nullptr, DCAMERA_BAD_VALUE, "CreatePreviewOutput info is null");
     DHLOGI("CreatePreviewOutput dhId: %{public}s, width: %{public}d, height: %{public}d, format: %{public}d, stream:"
         " %{public}d, isCapture: %{public}d", GetAnonyString(cameraId_).c_str(), info->width_, info->height_,
         info->format_, info->streamType_, info->isCapture_);
@@ -533,6 +552,7 @@ CameraStandard::CameraFormat DCameraClient::ConvertToCameraFormat(int32_t format
 
 int32_t DCameraClient::StartCaptureInner(std::shared_ptr<DCameraCaptureInfo>& info)
 {
+    CHECK_AND_RETURN_RET_LOG(info == nullptr, DCAMERA_BAD_VALUE, "StartCaptureInner info is null");
     if (info->streamType_ != SNAPSHOT_FRAME) {
         DHLOGE("StartCaptureInner unknown stream type");
         return DCAMERA_BAD_VALUE;
@@ -542,6 +562,7 @@ int32_t DCameraClient::StartCaptureInner(std::shared_ptr<DCameraCaptureInfo>& in
 
 int32_t DCameraClient::StartPhotoOutput(std::shared_ptr<DCameraCaptureInfo>& info)
 {
+    CHECK_AND_RETURN_RET_LOG(info == nullptr, DCAMERA_BAD_VALUE, "StartPhotoOutput info is null");
     DHLOGI("StartPhotoOutput cameraId: %{public}s", GetAnonyString(cameraId_).c_str());
     if (photoOutput_ == nullptr) {
         DHLOGE("StartPhotoOutput photoOutput is null");
@@ -588,6 +609,8 @@ void DCameraClient::SetPhotoCaptureRotation(const std::shared_ptr<Camera::Camera
     std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSetting)
 {
     CHECK_AND_RETURN_LOG(cameraMetadata == nullptr, "SetPhotoCaptureRotation param cameraMetadata is null");
+    CHECK_AND_RETURN_LOG(photoCaptureSetting == nullptr,
+        "SetPhotoCaptureRotation param photoCaptureSetting is null");
     uint32_t rotationCount = 1;
     camera_metadata_item_t item;
     int32_t ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_JPEG_ORIENTATION, &item);
@@ -603,6 +626,9 @@ void DCameraClient::SetPhotoCaptureRotation(const std::shared_ptr<Camera::Camera
 void DCameraClient::SetPhotoCaptureQuality(const std::shared_ptr<Camera::CameraMetadata>& cameraMetadata,
     std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSetting)
 {
+    CHECK_AND_RETURN_LOG(cameraMetadata == nullptr, "SetPhotoCaptureRotation param cameraMetadata is null");
+    CHECK_AND_RETURN_LOG(photoCaptureSetting == nullptr,
+        "SetPhotoCaptureRotation param photoCaptureSetting is null");
     uint32_t qualityCount = 1;
     camera_metadata_item_t item;
     int32_t ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_JPEG_QUALITY, &item);
@@ -618,6 +644,9 @@ void DCameraClient::SetPhotoCaptureQuality(const std::shared_ptr<Camera::CameraM
 void DCameraClient::SetPhotoCaptureLocation(const std::shared_ptr<Camera::CameraMetadata>& cameraMetadata,
     std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSetting)
 {
+    CHECK_AND_RETURN_LOG(cameraMetadata == nullptr, "SetPhotoCaptureRotation param cameraMetadata is null");
+    CHECK_AND_RETURN_LOG(photoCaptureSetting == nullptr,
+        "SetPhotoCaptureRotation param photoCaptureSetting is null");
     uint32_t locationCount = 3;
     camera_metadata_item_t item;
     int32_t ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_JPEG_GPS_COORDINATES, &item);

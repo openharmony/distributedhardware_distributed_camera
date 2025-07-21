@@ -169,6 +169,7 @@ int32_t DCameraSourceController::StopCapture()
 
 int32_t DCameraSourceController::ChannelNeg(std::shared_ptr<DCameraChannelInfo>& info)
 {
+    CHECK_AND_RETURN_RET_LOG(info == nullptr, DCAMERA_BAD_VALUE, "ChannelNeg info is nullptr");
     if (!ManageSelectChannel::GetInstance().GetSrcConnect()) {
         if (indexs_.empty() || indexs_.size() > DCAMERA_MAX_NUM) {
             DHLOGE("ChannelNeg not support operate %{public}zu camera", indexs_.size());
@@ -212,6 +213,7 @@ int32_t DCameraSourceController::ChannelNeg(std::shared_ptr<DCameraChannelInfo>&
 
 int32_t DCameraSourceController::DCameraNotify(std::shared_ptr<DCameraEvent>& events)
 {
+    CHECK_AND_RETURN_RET_LOG(events == nullptr, DCAMERA_BAD_VALUE, "DCameraNotify events is nullptr");
     if (events->eventResult_ == DCAMERA_EVENT_CAMERA_SUCCESS &&
         events->eventContent_ == START_CAPTURE_SUCC) {
         DcameraRadar::GetInstance().ReportDcameraOpen("StartCapture", CameraOpen::START_CAPTURE,
@@ -328,6 +330,7 @@ int32_t DCameraSourceController::GetCameraInfo(std::shared_ptr<DCameraInfo>& cam
 
 int32_t DCameraSourceController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& openInfo)
 {
+    CHECK_AND_RETURN_RET_LOG(openInfo == nullptr, DCAMERA_BAD_VALUE, "OpenChannel openInfo is nullptr");
     if (indexs_.empty() || indexs_.size() > DCAMERA_MAX_NUM) {
         DHLOGE("OpenChannel not support operate %{public}zu camera", indexs_.size());
         return DCAMERA_BAD_OPERATE;
@@ -542,6 +545,7 @@ void DCameraSourceController::OnSessionState(int32_t state, std::string networkI
         case DCAMERA_CHANNEL_STATE_CONNECTED: {
             DcameraFinishAsyncTrace(DCAMERA_OPEN_CHANNEL_CONTROL, DCAMERA_OPEN_CHANNEL_TASKID);
             isChannelConnected_.store(true);
+            CHECK_AND_RETURN_LOG(stateMachine_ == nullptr, "stateMachine_ is nullptr");
             stateMachine_->UpdateState(DCAMERA_STATE_OPENED);
             std::shared_ptr<DCameraSourceDev> camDev = camDev_.lock();
             if (camDev == nullptr) {
@@ -586,6 +590,7 @@ void DCameraSourceController::OnDataReceived(std::vector<std::shared_ptr<DataBuf
 
 void DCameraSourceController::HandleReceivedData(std::shared_ptr<DataBuffer>& dataBuffer)
 {
+    CHECK_AND_RETURN_LOG(dataBuffer == nullptr, "dataBuffer is nullptr");
     DHLOGI("DCameraSourceController::HandleReceivedData dhId: %{public}s", GetAnonyString(dhId_).c_str());
     uint8_t *data = dataBuffer->Data();
     std::string jsonStr(reinterpret_cast<const char *>(data), dataBuffer->Capacity());

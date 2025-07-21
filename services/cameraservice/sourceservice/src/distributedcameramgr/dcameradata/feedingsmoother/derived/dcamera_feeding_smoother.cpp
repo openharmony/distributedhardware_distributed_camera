@@ -52,6 +52,7 @@ int32_t DCameraFeedingSmoother::NotifySmoothFinished(const std::shared_ptr<IFeed
 {
     int64_t finishSmoothT = GetNowTimeStampUs();
     std::shared_ptr<DataBuffer> buffer = std::reinterpret_pointer_cast<DataBuffer>(data);
+    CHECK_AND_RETURN_RET_LOG(buffer == nullptr, NOTIFY_FAILED, "buffer is nullptr.");
     buffer->frameInfo_.timePonit.finishSmooth = finishSmoothT;
     CHECK_AND_RETURN_RET_LOG(dCameraStatistician_ == nullptr, NOTIFY_FAILED, "dCameraStatistician_ is null.");
     dCameraStatistician_->CalWholeProcessTime(buffer);

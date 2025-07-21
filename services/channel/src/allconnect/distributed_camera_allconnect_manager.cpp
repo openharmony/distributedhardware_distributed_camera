@@ -243,6 +243,8 @@ int32_t DCameraAllConnectManager::UnRegisterLifecycleCallback()
 
 int32_t DCameraAllConnectManager::ApplyResult(int32_t errorcode, int32_t result, const char *reason)
 {
+    CHECK_AND_RETURN_RET_LOG(applyResultBlock_ == nullptr, DistributedCameraErrno::DCAMERA_ERR_APPLY_RESULT,
+        "DCamera allconnect ApplyResult applyResultBlock_ is nullptr");
     DHLOGI("DCamera allconnect ApplyResult begin");
     if (result != PASS) {
         DHLOGE("DCamera allconnect Apply Result is Reject, errorcode is %{public}d, reason is %{public}s",

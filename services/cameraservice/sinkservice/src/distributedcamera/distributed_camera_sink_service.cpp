@@ -159,7 +159,8 @@ int32_t DistributedCameraSinkService::SubscribeLocalHardware(const std::string& 
         }
         sinkDevice = iter->second;
     }
-
+    CHECK_AND_RETURN_RET_LOG(sinkDevice == nullptr, DCAMERA_BAD_VALUE,
+        "sink device is null, dhId: %{public}s", GetAnonyString(dhId).c_str());
     int32_t ret = sinkDevice->SubscribeLocalHardware(parameters);
     CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "SubscribeLocalHardware failed, ret: %{public}d", ret);
     DHLOGI("SubscribeLocalHardware success");
@@ -179,7 +180,6 @@ int32_t DistributedCameraSinkService::UnsubscribeLocalHardware(const std::string
         }
         sinkDevice = iter->second;
     }
-
     int32_t ret = sinkDevice->UnsubscribeLocalHardware();
     CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "UnsubscribeLocalHardware failed, ret: %{public}d", ret);
     DHLOGI("UnsubscribeLocalHardware success");
@@ -199,7 +199,6 @@ int32_t DistributedCameraSinkService::StopCapture(const std::string& dhId)
         }
         sinkDevice = iter->second;
     }
-
     int32_t ret = sinkDevice->StopCapture();
     CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "StopCapture failed, ret: %{public}d", ret);
     DHLOGI("StopCapture success");
@@ -239,7 +238,6 @@ int32_t DistributedCameraSinkService::GetCameraInfo(const std::string& dhId, std
         }
         sinkDevice = iter->second;
     }
-
     int32_t ret = sinkDevice->GetCameraInfo(cameraInfo);
     CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "GetCameraInfo failed, ret: %{public}d", ret);
     DHLOGI("GetCameraInfo success");
@@ -259,7 +257,6 @@ int32_t DistributedCameraSinkService::OpenChannel(const std::string& dhId, std::
         }
         sinkDevice = iter->second;
     }
-
     int32_t ret = sinkDevice->OpenChannel(openInfo);
     if (ret != DCAMERA_OK) {
         DHLOGE("OpenChannel failed, ret: %{public}d", ret);

@@ -105,7 +105,7 @@ sptr<IDistributedCameraSink> DCameraSourceServiceIpc::GetSinkRemoteCamSrv(const 
     {
         std::lock_guard<std::mutex> autoLock(sinkRemoteCamSrvLock_);
         auto iter = remoteSinks_.find(deviceId);
-        if (iter != remoteSinks_.end()) {
+        if (iter != remoteSinks_.end() && iter->second != nullptr) {
             iter->second->AsObject()->RemoveDeathRecipient(sinkRemoteRecipient_);
         }
         remoteSinks_[deviceId] = remoteCamSrvObj;
@@ -160,6 +160,8 @@ void DCameraSourceServiceIpc::OnSinkRemoteCamSrvDied(const wptr<IRemoteObject>& 
     }
     auto iter = std::find_if(remoteSinks_.begin(), remoteSinks_.end(), [&](
         const std::pair<std::string, sptr<IDistributedCameraSink>> &item)->bool {
+            CHECK_AND_RETURN_RET_LOG(item.second == nullptr, false,
+                "OnSinkRemoteCamSrvDied item.second is null");
             return item.second->AsObject() == diedRemoted;
         });
     if (iter == remoteSinks_.end()) {
