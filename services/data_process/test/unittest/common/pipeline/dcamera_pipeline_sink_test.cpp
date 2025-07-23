@@ -38,7 +38,7 @@ public:
 
 namespace {
 const int32_t TEST_WIDTH = 1920;
-const int32_t TEST_HEIGTH = 1080;
+const int32_t TEST_HEIGHT = 1080;
 const int32_t SLEEP_TIME = 200000;
 }
 
@@ -77,12 +77,12 @@ HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_001, TestSize.Level
                                 Videoformat::NV21,
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
-                                TEST_HEIGTH);
+                                TEST_HEIGHT);
     VideoConfigParams destParams(VideoCodecType::CODEC_H264,
                                  Videoformat::NV21,
                                  DCAMERA_PRODUCER_FPS_DEFAULT,
                                  TEST_WIDTH,
-                                 TEST_HEIGTH);
+                                 TEST_HEIGHT);
     int32_t rc = testSinkPipeline_->CreateDataProcessPipeline(PipelineType::VIDEO, srcParams, destParams, listener);
     EXPECT_EQ(rc, DCAMERA_OK);
     usleep(SLEEP_TIME);
@@ -103,12 +103,12 @@ HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_002, TestSize.Level
                                 Videoformat::NV21,
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
-                                TEST_HEIGTH);
+                                TEST_HEIGHT);
     VideoConfigParams destParams(VideoCodecType::CODEC_H264,
                                  Videoformat::NV21,
                                  DCAMERA_PRODUCER_FPS_DEFAULT,
                                  TEST_WIDTH,
-                                 TEST_HEIGTH);
+                                 TEST_HEIGHT);
     int32_t rc = testSinkPipeline_->CreateDataProcessPipeline(PipelineType::VIDEO, srcParams, destParams, listener);
     EXPECT_EQ(rc, DCAMERA_OK);
 
@@ -137,12 +137,12 @@ HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_003, TestSize.Level
                                 Videoformat::NV21,
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
-                                TEST_HEIGTH);
+                                TEST_HEIGHT);
     VideoConfigParams destParams(VideoCodecType::CODEC_H264,
                                  Videoformat::NV21,
                                  DCAMERA_PRODUCER_FPS_DEFAULT,
                                  TEST_WIDTH,
-                                 TEST_HEIGTH);
+                                 TEST_HEIGHT);
     int32_t rc = testSinkPipeline_->CreateDataProcessPipeline(
         PipelineType::PHOTO_JPEG, srcParams, destParams, listener);
     EXPECT_EQ(rc, DCAMERA_NOT_FOUND);
@@ -164,12 +164,12 @@ HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_004, TestSize.Level
                                 Videoformat::NV21,
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
-                                TEST_HEIGTH);
+                                TEST_HEIGHT);
     VideoConfigParams destParams(VideoCodecType::CODEC_H264,
                                  Videoformat::NV21,
                                  DCAMERA_PRODUCER_FPS_DEFAULT,
                                  TEST_WIDTH,
-                                 TEST_HEIGTH);
+                                 TEST_HEIGHT);
     int32_t rc = testSinkPipeline_->CreateDataProcessPipeline(PipelineType::VIDEO, srcParams, destParams, listener);
     EXPECT_EQ(rc, DCAMERA_OK);
 
@@ -209,39 +209,39 @@ HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_006, TestSize.Level
     EXPECT_EQ(false, testPipelineSink_ == nullptr);
 
     VideoConfigParams vcParams(VideoCodecType::NO_CODEC, Videoformat::NV21, DCAMERA_PRODUCER_FPS_DEFAULT,
-        TEST_WIDTH, TEST_HEIGTH);
+        TEST_WIDTH, TEST_HEIGHT);
     bool vc = testPipelineSink_->IsInRange(vcParams);
     EXPECT_EQ(true, vc);
 
     VideoConfigParams vcParams1(VideoCodecType::NO_CODEC, Videoformat::NV21, -1,
-        TEST_WIDTH, TEST_HEIGTH);
+        TEST_WIDTH, TEST_HEIGHT);
     bool vc1 = testPipelineSink_->IsInRange(vcParams1);
-    EXPECT_EQ(true, vc1);
+    EXPECT_EQ(false, vc1);
 
     VideoConfigParams vcParams2(VideoCodecType::NO_CODEC, Videoformat::NV21, 31,
-        TEST_WIDTH, TEST_HEIGTH);
+        TEST_WIDTH, TEST_HEIGHT);
     bool vc2 = testPipelineSink_->IsInRange(vcParams2);
-    EXPECT_EQ(true, vc2);
+    EXPECT_EQ(false, vc2);
 
     VideoConfigParams vcParams3(VideoCodecType::NO_CODEC, Videoformat::NV21, DCAMERA_PRODUCER_FPS_DEFAULT,
-        300, TEST_HEIGTH);
+        300, TEST_HEIGHT);
     bool vc3 = testPipelineSink_->IsInRange(vcParams3);
-    EXPECT_EQ(true, vc3);
+    EXPECT_EQ(false, vc3);
 
     VideoConfigParams vcParams4(VideoCodecType::NO_CODEC, Videoformat::NV21, DCAMERA_PRODUCER_FPS_DEFAULT,
-        2000, TEST_HEIGTH);
+        2000, TEST_HEIGHT);
     bool vc4 = testPipelineSink_->IsInRange(vcParams4);
-    EXPECT_EQ(true, vc4);
+    EXPECT_EQ(false, vc4);
 
     VideoConfigParams vcParams5(VideoCodecType::NO_CODEC, Videoformat::NV21, DCAMERA_PRODUCER_FPS_DEFAULT,
         TEST_WIDTH, 200);
     bool vc5 = testPipelineSink_->IsInRange(vcParams5);
-    EXPECT_EQ(true, vc5);
+    EXPECT_EQ(false, vc5);
 
     VideoConfigParams vcParams6(VideoCodecType::NO_CODEC, Videoformat::NV21, DCAMERA_PRODUCER_FPS_DEFAULT,
         TEST_WIDTH, 1100);
     bool vc6 = testPipelineSink_->IsInRange(vcParams6);
-    EXPECT_EQ(true, vc6);
+    EXPECT_EQ(false, vc6);
 }
 
 /**

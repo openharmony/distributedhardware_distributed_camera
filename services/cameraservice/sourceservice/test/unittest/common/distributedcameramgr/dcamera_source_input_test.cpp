@@ -56,8 +56,6 @@ std::vector<DCameraIndex> g_camIndexs;
 
 void DCameraSourceInputTest::SetUpTestCase(void)
 {
-    SetStreamInfos();
-    SetCaptureInfos();
 }
 
 void DCameraSourceInputTest::SetStreamInfos()
@@ -131,6 +129,15 @@ void DCameraSourceInputTest::TearDownTestCase(void)
 
 void DCameraSourceInputTest::SetUp(void)
 {
+    g_streamInfos.clear();
+    g_captureInfos.clear();
+    g_cameraSettings.clear();
+    g_streamIds.clear();
+    g_camIndexs.clear();
+
+    SetStreamInfos();
+    SetCaptureInfos();
+
     stateListener_ = std::make_shared<MockDCameraSourceStateListener>();
     camDev_ = std::make_shared<DCameraSourceDev>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, stateListener_);
     testInput_ = std::make_shared<DCameraSourceInput>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, camDev_);

@@ -132,7 +132,7 @@ int32_t DCameraProviderCallbackImpl::ConfigureStreams(const DHBase& dhBase,
     }
     int32_t ret = sourceDev->ConfigCameraStreams(streams);
     if (ret != DCAMERA_OK) {
-        DHLOGE("CloseSession failed, ret: %{public}d, devId: %{public}s, dhId: %{public}s", ret,
+        DHLOGE("ConfigCameraStreams failed, ret: %{public}d, devId: %{public}s, dhId: %{public}s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return FAILED;
     }
@@ -228,14 +228,14 @@ int32_t DCameraProviderCallbackImpl::StartCapture(const DHBase& dhBase, const st
 
 bool DCameraProviderCallbackImpl::CheckCaptureInfo(const DCCaptureInfo& captureInfo)
 {
-    if (sizeof(captureInfo.streamIds_) > PARAM_MAX_SIZE || captureInfo.width_ < 0 || captureInfo.height_ < 0 ||
+    if (captureInfo.streamIds_.size() > PARAM_MAX_SIZE || captureInfo.width_ < 0 || captureInfo.height_ < 0 ||
         (captureInfo.width_ * captureInfo.height_ > RESOLUTION_MAX_WIDTH * RESOLUTION_MAX_HEIGHT)) {
         DHLOGE("captureInfo is invalid");
         return false;
     }
 
     if (captureInfo.stride_ < 0 || captureInfo.format_ < 0 || captureInfo.dataspace_ < 0 ||
-        sizeof(captureInfo.captureSettings_) > PARAM_MAX_SIZE) {
+        captureInfo.captureSettings_.size() > PARAM_MAX_SIZE) {
         DHLOGE("captureInfo is invalid");
         return false;
     }

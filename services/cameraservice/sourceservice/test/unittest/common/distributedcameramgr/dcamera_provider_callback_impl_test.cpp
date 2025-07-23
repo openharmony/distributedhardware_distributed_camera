@@ -61,8 +61,6 @@ std::vector<int> g_streamIdSnap;
 
 void DCameraProviderCallbackImplTest::SetUpTestCase(void)
 {
-    SetStreamInfos();
-    SetCaptureInfos();
 }
 
 void DCameraProviderCallbackImplTest::SetStreamInfos()
@@ -134,6 +132,14 @@ void DCameraProviderCallbackImplTest::TearDownTestCase(void)
 
 void DCameraProviderCallbackImplTest::SetUp(void)
 {
+    g_streamInfosSnap.clear();
+    g_captureInfoSnap.clear();
+    g_cameraSettingSnap.clear();
+    g_streamIdSnap.clear();
+
+    SetStreamInfos();
+    SetCaptureInfos();
+
     stateListener_ = std::make_shared<MockDCameraSourceStateListener>();
     camDev_ = std::make_shared<MockDCameraSourceDev>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, stateListener_);
     camDev_->InitDCameraSourceDev();

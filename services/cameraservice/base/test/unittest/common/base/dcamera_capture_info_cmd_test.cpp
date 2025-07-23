@@ -32,7 +32,7 @@ public:
 };
 
 static const std::string TEST_CAPTURE_INFO_CMD_JSON_LACK_TYPE = R"({
-    "dhId": "camrea_0",
+    "dhId": "camera_0",
     "Command": "CAPTURE",
     "Value": [
         {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": 1,
@@ -43,7 +43,7 @@ static const std::string TEST_CAPTURE_INFO_CMD_JSON_LACK_TYPE = R"({
 
 static const std::string TEST_CAPTURE_INFO_CMD_JSON_TYPE_EXCEPTION = R"({
     "Type": 0,
-    "dhId": "camrea_0",
+    "dhId": "camera_0",
     "Command": "CAPTURE",
     "Value": [
         {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": 1,
@@ -75,7 +75,7 @@ static const std::string TEST_CAPTURE_INFO_CMD_JSON_DHID_EXCEPTION = R"({
 
 static const std::string TEST_CAPTURE_INFO_CMD_JSON_LACK_COMMAND = R"({
     "Type": "OPERATION",
-    "dhId": "camrea_0",
+    "dhId": "camera_0",
     "Value": [
         {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": 1,
         "IsCapture": true, "EncodeType": 1, "StreamType": 1,
@@ -85,7 +85,7 @@ static const std::string TEST_CAPTURE_INFO_CMD_JSON_LACK_COMMAND = R"({
 
 static const std::string TEST_CAPTURE_INFO_CMD_JSON_COMMAND_EXCEPTION = R"({
     "Type": "OPERATION",
-    "dhId": "camrea_0",
+    "dhId": "camera_0",
     "Command": 0,
     "Value": [
         {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": 1,
@@ -96,13 +96,13 @@ static const std::string TEST_CAPTURE_INFO_CMD_JSON_COMMAND_EXCEPTION = R"({
 
 static const std::string TEST_CAPTURE_INFO_CMD_JSON_LACK_VALUE = R"({
     "Type": "OPERATION",
-    "dhId": "camrea_0",
+    "dhId": "camera_0",
     "Command": "CAPTURE",
 })";
 
 static const std::string TEST_CAPTURE_INFO_CMD_JSON_VALUE_ARRAY = R"({
     "Type": "OPERATION",
-    "dhId": "camrea_0",
+    "dhId": "camera_0",
     "Command": "CAPTURE",
     "Value":"[
         {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": 1,
@@ -113,7 +113,7 @@ static const std::string TEST_CAPTURE_INFO_CMD_JSON_VALUE_ARRAY = R"({
 
 static const std::string TEST_CAPTURE_INFO_CMD_JSON_VALUE_EXCEPTION = R"({
     "Type": "OPERATION",
-    "dhId": "camrea_0",
+    "dhId": "camera_0",
     "Command": "CAPTURE",
     "Value": "[
         {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": 1,
@@ -124,7 +124,7 @@ static const std::string TEST_CAPTURE_INFO_CMD_JSON_VALUE_EXCEPTION = R"({
 
 static const std::string TEST_CAPTURE_INFO_CMD_JSON_LACK_VALUE_BODY_WIDTH = R"({
     "Type": "OPERATION",
-    "dhId": "camrea_0",
+    "dhId": "camera_0",
     "Command": "CAPTURE",
     "Value": [
         {"Height": 1080, "Format": 1, "DataSpace": 1,
@@ -135,7 +135,7 @@ static const std::string TEST_CAPTURE_INFO_CMD_JSON_LACK_VALUE_BODY_WIDTH = R"({
 
 static const std::string TEST_CAPTURE_INFO_CMD_JSON_VALUE_BODY_WIDTH_EXCEPTION = R"({
     "Type": "OPERATION",
-    "dhId": "camrea_0",
+    "dhId": "camera_0",
     "Command": "CAPTURE",
     "Value": [
         {"Width": "1920", "Height": 1080, "Format": 1, "DataSpace": 1,
@@ -146,7 +146,7 @@ static const std::string TEST_CAPTURE_INFO_CMD_JSON_VALUE_BODY_WIDTH_EXCEPTION =
 
 static const std::string TEST_CAPTURE_INFO_CMD_JSON_LACK_VALUE_BODY_HEIGHT = R"({
     "Type": "OPERATION",
-    "dhId": "camrea_0",
+    "dhId": "camera_0",
     "Command": "CAPTURE",
     "Value": [
         {"Width": 1920, "Format": 1, "DataSpace": 1,
@@ -157,7 +157,7 @@ static const std::string TEST_CAPTURE_INFO_CMD_JSON_LACK_VALUE_BODY_HEIGHT = R"(
 
 static const std::string TEST_CAPTURE_INFO_CMD_JSON_VALUE_BODY_HEIGHT_EXCEPTION = R"({
     "Type": "OPERATION",
-    "dhId": "camrea_0",
+    "dhId": "camera_0",
     "Command": "CAPTURE",
     "Value": [
         {"Width": 1920, "Height": "1080", "Format": 1, "DataSpace": 1,
@@ -168,7 +168,7 @@ static const std::string TEST_CAPTURE_INFO_CMD_JSON_VALUE_BODY_HEIGHT_EXCEPTION 
 
 static const std::string TEST_CAPTURE_INFO_CMD_JSON_LACK_VALUE_BODY_FORMAT = R"({
     "Type": "OPERATION",
-    "dhId": "camrea_0",
+    "dhId": "camera_0",
     "Command": "CAPTURE",
     "Value": [
         {"Width": 1920, "Height": 1080, "DataSpace": 1,
@@ -179,7 +179,7 @@ static const std::string TEST_CAPTURE_INFO_CMD_JSON_LACK_VALUE_BODY_FORMAT = R"(
 
 static const std::string TEST_CAPTURE_INFO_CMD_JSON_VALUE_BODY_FORMAT_EXCEPTION = R"({
     "Type": "OPERATION",
-    "dhId": "camrea_0",
+    "dhId": "camera_0",
     "Command": "CAPTURE",
     "Value": [
         {"Width": 1920, "Height": 1080, "Format": "1", "DataSpace": 1,
@@ -190,7 +190,7 @@ static const std::string TEST_CAPTURE_INFO_CMD_JSON_VALUE_BODY_FORMAT_EXCEPTION 
 
 static const std::string TEST_CAPTURE_INFO_CMD_JSON_LACK_VALUE_BODY_DATASPACE = R"({
     "Type": "OPERATION",
-    "dhId": "camrea_0",
+    "dhId": "camera_0",
     "Command": "CAPTURE",
     "Value": [
         {"Width": 1920, "Height": 1080, "Format": 1,
@@ -201,7 +201,7 @@ static const std::string TEST_CAPTURE_INFO_CMD_JSON_LACK_VALUE_BODY_DATASPACE = 
 
 static const std::string TEST_CAPTURE_INFO_CMD_JSON_VALUE_BODY_DATASPACE_EXCEPTION = R"({
     "Type": "OPERATION",
-    "dhId": "camrea_0",
+    "dhId": "camera_0",
     "Command": "CAPTURE",
     "Value": [
         {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": "1",
@@ -212,7 +212,7 @@ static const std::string TEST_CAPTURE_INFO_CMD_JSON_VALUE_BODY_DATASPACE_EXCEPTI
 
 static const std::string TEST_CAPTURE_INFO_CMD_JSON_LACK_VALUE_BODY_ISCAPTURE = R"({
     "Type": "OPERATION",
-    "dhId": "camrea_0",
+    "dhId": "camera_0",
     "Command": "CAPTURE",
     "Value": [
         {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": 1,
@@ -223,7 +223,7 @@ static const std::string TEST_CAPTURE_INFO_CMD_JSON_LACK_VALUE_BODY_ISCAPTURE = 
 
 static const std::string TEST_CAPTURE_INFO_CMD_JSON_VALUE_BODY_ISCAPTURE_EXCEPTION = R"({
     "Type": "OPERATION",
-    "dhId": "camrea_0",
+    "dhId": "camera_0",
     "Command": "CAPTURE",
     "Value": [
         {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": 1,
@@ -234,7 +234,7 @@ static const std::string TEST_CAPTURE_INFO_CMD_JSON_VALUE_BODY_ISCAPTURE_EXCEPTI
 
 static const std::string TEST_CAPTURE_INFO_CMD_JSON_LACK_VALUE_BODY_ENCODETYPE = R"({
     "Type": "OPERATION",
-    "dhId": "camrea_0",
+    "dhId": "camera_0",
     "Command": "CAPTURE",
     "Value": [
         {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": 1,
@@ -245,7 +245,7 @@ static const std::string TEST_CAPTURE_INFO_CMD_JSON_LACK_VALUE_BODY_ENCODETYPE =
 
 static const std::string TEST_CAPTURE_INFO_CMD_JSON_LACK_VALUE_BODY_STREAMTYPE = R"({
     "Type": "OPERATION",
-    "dhId": "camrea_0",
+    "dhId": "camera_0",
     "Command": "CAPTURE",
     "Value": [
         {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": 1,
@@ -256,7 +256,7 @@ static const std::string TEST_CAPTURE_INFO_CMD_JSON_LACK_VALUE_BODY_STREAMTYPE =
 
 static const std::string TEST_CAPTURE_INFO_CMD_JSON_VALUE_BODY_ENCODETYPE_EXCEPTION = R"({
     "Type": "OPERATION",
-    "dhId": "camrea_0",
+    "dhId": "camera_0",
     "Command": "CAPTURE",
     "Value": [
         {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": 1,
@@ -267,7 +267,7 @@ static const std::string TEST_CAPTURE_INFO_CMD_JSON_VALUE_BODY_ENCODETYPE_EXCEPT
 
 static const std::string TEST_CAPTURE_INFO_CMD_JSON_LACK_VALUE_BODY_CAPTURESETTINGS = R"({
     "Type": "OPERATION",
-    "dhId": "camrea_0",
+    "dhId": "camera_0",
     "Command": "CAPTURE",
     "Value": [
         {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": 1,
@@ -277,7 +277,7 @@ static const std::string TEST_CAPTURE_INFO_CMD_JSON_LACK_VALUE_BODY_CAPTURESETTI
 
 static const std::string TEST_CAPTURE_INFO_CMD_JSON_VALUE_BODY_CAPTURESETTINGS_EXCEPTION = R"({
     "Type": "OPERATION",
-    "dhId": "camrea_0",
+    "dhId": "camera_0",
     "Command": "CAPTURE",
     "Value": [
         {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": 1,
@@ -288,7 +288,7 @@ static const std::string TEST_CAPTURE_INFO_CMD_JSON_VALUE_BODY_CAPTURESETTINGS_E
 
 static const std::string TEST_CAPTURE_INFO_CMD_JSON_LACK_CAPTURESETTINGS_BODY_TYPE = R"({
     "Type": "OPERATION",
-    "dhId": "camrea_0",
+    "dhId": "camera_0",
     "Command": "CAPTURE",
     "Value": [
         {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": 1,
@@ -299,7 +299,7 @@ static const std::string TEST_CAPTURE_INFO_CMD_JSON_LACK_CAPTURESETTINGS_BODY_TY
 
 static const std::string TEST_CAPTURE_INFO_CMD_JSON_CAPTURESETTINGS_BODY_TYPE_EXCEPTION = R"({
     "Type": "OPERATION",
-    "dhId": "camrea_0",
+    "dhId": "camera_0",
     "Command": "CAPTURE",
     "Value": [
         {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": 1,
@@ -310,7 +310,7 @@ static const std::string TEST_CAPTURE_INFO_CMD_JSON_CAPTURESETTINGS_BODY_TYPE_EX
 
 static const std::string TEST_CAPTURE_INFO_CMD_JSON_LACK_CAPTURESETTINGS_BODY_VALUE = R"({
     "Type": "OPERATION",
-    "dhId": "camrea_0",
+    "dhId": "camera_0",
     "Command": "CAPTURE",
     "Value": [
         {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": 1,
@@ -321,7 +321,7 @@ static const std::string TEST_CAPTURE_INFO_CMD_JSON_LACK_CAPTURESETTINGS_BODY_VA
 
 static const std::string TEST_CAPTURE_INFO_CMD_JSON_CAPTURESETTINGS_BODY_VALUE_EXCEPTION = R"({
     "Type": "OPERATION",
-    "dhId": "camrea_0",
+    "dhId": "camera_0",
     "Command": "CAPTURE",
     "Value": [
         {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": 1,
@@ -332,7 +332,7 @@ static const std::string TEST_CAPTURE_INFO_CMD_JSON_CAPTURESETTINGS_BODY_VALUE_E
 
 static const std::string TEST_CAPTURE_INFO_CMD_JSON_CAPTURESETTINGS_CHECK = R"({
     "Type": "OPERATION",
-    "dhId": "camrea_0",
+    "dhId": "camera_0",
     "Command": "CAPTURE",
     "Value": [
         {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": 1,

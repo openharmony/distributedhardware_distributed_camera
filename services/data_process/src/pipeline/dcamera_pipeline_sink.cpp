@@ -71,9 +71,10 @@ int32_t DCameraPipelineSink::CreateDataProcessPipeline(PipelineType piplineType,
 
 bool DCameraPipelineSink::IsInRange(const VideoConfigParams& curConfig)
 {
-    return (curConfig.GetFrameRate() >= MIN_FRAME_RATE || curConfig.GetFrameRate() <= MAX_FRAME_RATE ||
-        curConfig.GetWidth() >= MIN_VIDEO_WIDTH || curConfig.GetWidth() <= MAX_VIDEO_WIDTH ||
-        curConfig.GetHeight() >= MIN_VIDEO_HEIGHT || curConfig.GetHeight() <= MAX_VIDEO_HEIGHT);
+    bool isWidthValid = (curConfig.GetWidth() >= MIN_VIDEO_WIDTH && curConfig.GetWidth() <= MAX_VIDEO_WIDTH);
+    bool isHeightValid = (curConfig.GetHeight() >= MIN_VIDEO_HEIGHT && curConfig.GetHeight() <= MAX_VIDEO_HEIGHT);
+    bool isFrameRateValid = (curConfig.GetFrameRate() >= MIN_FRAME_RATE && curConfig.GetFrameRate() <= MAX_FRAME_RATE);
+    return isWidthValid && isHeightValid && isFrameRateValid;
 }
 
 int32_t DCameraPipelineSink::InitDCameraPipNodes(const VideoConfigParams& sourceConfig,

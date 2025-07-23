@@ -78,8 +78,6 @@ DCameraIndex g_camIndex;
 
 void DCameraSourceStateMachineTest::SetUpTestCase(void)
 {
-    SetStreamInfos();
-    SetCaptureInfos();
 }
 
 void DCameraSourceStateMachineTest::SetStreamInfos()
@@ -157,6 +155,20 @@ void DCameraSourceStateMachineTest::TearDownTestCase(void)
 
 void DCameraSourceStateMachineTest::SetUp(void)
 {
+    g_streamInfosSnap.clear();
+    g_captureInfoSnap.clear();
+    g_cameraSettingSnap.clear();
+    g_streamIdSnap.clear();
+    g_camEvent = nullptr;
+    g_registParam = nullptr;
+    g_camIndex = {}; // Reset struct to default
+    g_regisStateStr = "";
+    g_openStateStr = "";
+    g_captureStateStr = "";
+
+    SetStreamInfos();
+    SetCaptureInfos();
+
     stateListener_ = std::make_shared<MockDCameraSourceStateListener>();
     camDev_ = std::make_shared<MockDCameraSourceDev>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, stateListener_);
     stateMachine_ = std::make_shared<DCameraSourceStateMachine>(camDev_);
@@ -471,7 +483,7 @@ HWTEST_F(DCameraSourceStateMachineTest, dcamera_source_state_machine_test_009, T
     EXPECT_EQ(DCAMERA_OK, ret);
 
     ret = stateMachine_ ->Execute(DCAMERA_EVENT_UNREGIST, event1);
-    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
 
     ret = stateMachine_ ->Execute(static_cast<DCAMERA_EVENT>(-1), event4);
     EXPECT_EQ(DCAMERA_WRONG_STATE, ret);
@@ -571,10 +583,10 @@ HWTEST_F(DCameraSourceStateMachineTest, dcamera_source_state_machine_test_013, T
     EXPECT_EQ(DCAMERA_OK, ret);
 
     ret = stateMachine_ ->Execute(DCAMERA_EVENT_CLOSE, event3);
-    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+    EXPECT_EQ(DCAMERA_OK, ret);
 
     ret = stateMachine_ ->Execute(DCAMERA_EVENT_UNREGIST, event1);
-    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
 
     ret = stateMachine_ ->Execute(static_cast<DCAMERA_EVENT>(-1), event4);
     EXPECT_EQ(DCAMERA_WRONG_STATE, ret);

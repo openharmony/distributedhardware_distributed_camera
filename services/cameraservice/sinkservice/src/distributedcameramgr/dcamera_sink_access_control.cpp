@@ -35,7 +35,7 @@ bool DCameraSinkAccessControl::NotifySensitiveSrc(const std::string& srcType)
 
 int32_t DCameraSinkAccessControl::TriggerFrame(const std::string& deviceName)
 {
-    DHLOGI("DCameraSinkAccessControl::TriggerFrame deviceName: %{public}s", deviceName.c_str());
+    DHLOGI("DCameraSinkAccessControl::TriggerFrame start");
     return DCAMERA_OK;
 }
 

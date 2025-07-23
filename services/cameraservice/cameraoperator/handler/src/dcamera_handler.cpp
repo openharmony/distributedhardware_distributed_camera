@@ -202,7 +202,7 @@ int32_t DCameraHandler::CreateAVCodecList(cJSON *root)
             MediaAVCodec::AVCodecCategory::AVCODEC_HARDWARE);
         if (capData == nullptr) {
             DHLOGI("capData is nullptr");
-            return DCAMERA_BAD_VALUE;
+            continue;
         }
         std::string mimeType = capData->mimeType;
         cJSON_AddItemToArray(array, cJSON_CreateString(mimeType.c_str()));

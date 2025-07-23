@@ -46,8 +46,8 @@ public:
 };
 
 const int32_t SLEEP_TIME_MS = 500;
-const int32_t TEST_WIDTH = 1080;
-const int32_t TEST_HEIGHT = 1920;
+const int32_t TEST_WIDTH = 1920;
+const int32_t TEST_HEIGHT = 1080;
 const std::string TEST_STRING = "test_string";
 const int32_t TEST_TWENTY_MS = 20000;
 

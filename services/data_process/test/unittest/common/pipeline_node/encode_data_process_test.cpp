@@ -37,9 +37,9 @@ public:
 
 namespace {
 const int32_t TEST_WIDTH = 1920;
-const int32_t TEST_HEIGTH = 1080;
+const int32_t TEST_HEIGHT = 1080;
 const int32_t TEST_WIDTH2 = 640;
-const int32_t TEST_HEIGTH2 = 480;
+const int32_t TEST_HEIGHT2 = 480;
 }
 
 void EncodeDataProcessTest::SetUpTestCase(void)
@@ -76,15 +76,15 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_001, TestSize.Level1)
                                 Videoformat::YUVI420,
                                 frameRate,
                                 TEST_WIDTH,
-                                TEST_HEIGTH);
+                                TEST_HEIGHT);
     VideoConfigParams destParams(VideoCodecType::CODEC_H264,
                                  Videoformat::NV21,
                                  frameRate,
                                  TEST_WIDTH,
-                                 TEST_HEIGTH);
+                                 TEST_HEIGHT);
     VideoConfigParams procConfig;
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_OK);
+    EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
 }
 
 /**
@@ -101,12 +101,12 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_002, TestSize.Level1)
                                 Videoformat::NV12,
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
-                                TEST_HEIGTH);
+                                TEST_HEIGHT);
     VideoConfigParams destParams(VideoCodecType::CODEC_H265,
                                  Videoformat::NV21,
                                  DCAMERA_PRODUCER_FPS_DEFAULT,
                                  TEST_WIDTH2,
-                                 TEST_HEIGTH2);
+                                 TEST_HEIGHT2);
     VideoConfigParams procConfig;
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
     EXPECT_EQ(rc, DCAMERA_BAD_TYPE);
@@ -126,12 +126,12 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_003, TestSize.Level1)
                                 Videoformat::NV12,
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
-                                TEST_HEIGTH);
+                                TEST_HEIGHT);
     VideoConfigParams destParams(VideoCodecType::CODEC_H264,
                                  Videoformat::NV21,
                                  DCAMERA_PRODUCER_FPS_DEFAULT,
                                  TEST_WIDTH2,
-                                 TEST_HEIGTH2);
+                                 TEST_HEIGHT2);
     VideoConfigParams procConfig;
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
     EXPECT_EQ(rc, DCAMERA_OK);
@@ -151,12 +151,12 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_004, TestSize.Level1)
                                 Videoformat::NV12,
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
-                                TEST_HEIGTH);
+                                TEST_HEIGHT);
     VideoConfigParams destParams(VideoCodecType::CODEC_MPEG4_ES,
                                  Videoformat::NV21,
                                  DCAMERA_PRODUCER_FPS_DEFAULT,
                                  TEST_WIDTH2,
-                                 TEST_HEIGTH2);
+                                 TEST_HEIGHT2);
     VideoConfigParams procConfig;
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
     EXPECT_EQ(rc, DCAMERA_INIT_ERR);
@@ -208,12 +208,12 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_006, TestSize.Level1)
                                 Videoformat::NV12,
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
-                                TEST_HEIGTH);
+                                TEST_HEIGHT);
     VideoConfigParams destParams(VideoCodecType::CODEC_H264,
                                  Videoformat::NV21,
                                  DCAMERA_PRODUCER_FPS_DEFAULT,
                                  TEST_WIDTH,
-                                 TEST_HEIGTH);
+                                 TEST_HEIGHT);
     VideoConfigParams procConfig;
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
     EXPECT_EQ(rc, DCAMERA_OK);
@@ -240,12 +240,12 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_007, TestSize.Level1)
                                 Videoformat::NV12,
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
-                                TEST_HEIGTH);
+                                TEST_HEIGHT);
     VideoConfigParams destParams(VideoCodecType::CODEC_H265,
                                  Videoformat::NV21,
                                  DCAMERA_PRODUCER_FPS_DEFAULT,
                                  TEST_WIDTH,
-                                 TEST_HEIGTH);
+                                 TEST_HEIGHT);
     VideoConfigParams procConfig;
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
     EXPECT_EQ(rc, DCAMERA_OK);
@@ -268,12 +268,12 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_008, TestSize.Level1)
                                 Videoformat::RGBA_8888,
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
-                                TEST_HEIGTH);
+                                TEST_HEIGHT);
     VideoConfigParams destParams(VideoCodecType::CODEC_H264,
                                  Videoformat::NV21,
                                  DCAMERA_PRODUCER_FPS_DEFAULT,
                                  TEST_WIDTH2,
-                                 TEST_HEIGTH2);
+                                 TEST_HEIGHT2);
     VideoConfigParams procConfig;
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
     EXPECT_EQ(rc, DCAMERA_OK);
@@ -296,12 +296,12 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_009, TestSize.Level1)
                                 Videoformat::NV12,
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
-                                TEST_HEIGTH);
+                                TEST_HEIGHT);
     VideoConfigParams destParams(VideoCodecType::CODEC_H264,
                                  Videoformat::NV21,
                                  DCAMERA_PRODUCER_FPS_DEFAULT,
                                  TEST_WIDTH,
-                                 TEST_HEIGTH);
+                                 TEST_HEIGHT);
     VideoConfigParams procConfig;
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
     EXPECT_EQ(rc, DCAMERA_OK);
@@ -340,12 +340,12 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_010, TestSize.Level1)
                                 Videoformat::YUVI420,
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
-                                TEST_HEIGTH);
+                                TEST_HEIGHT);
     VideoConfigParams destParams(VideoCodecType::CODEC_H264,
                                  Videoformat::NV21,
                                  DCAMERA_PRODUCER_FPS_DEFAULT,
                                  TEST_WIDTH,
-                                 TEST_HEIGTH);
+                                 TEST_HEIGHT);
     VideoConfigParams procConfig;
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
     EXPECT_EQ(rc, DCAMERA_OK);
@@ -368,12 +368,12 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_011, TestSize.Level1)
                                 Videoformat::YUVI420,
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
-                                TEST_HEIGTH);
+                                TEST_HEIGHT);
     VideoConfigParams destParams(VideoCodecType::CODEC_H264,
                                  Videoformat::NV21,
                                  DCAMERA_PRODUCER_FPS_DEFAULT,
                                  TEST_WIDTH,
-                                 TEST_HEIGTH);
+                                 TEST_HEIGHT);
     VideoConfigParams procConfig;
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
     EXPECT_EQ(rc, DCAMERA_OK);
@@ -441,12 +441,12 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_014, TestSize.Level1)
                                 Videoformat::NV12,
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
-                                TEST_HEIGTH);
+                                TEST_HEIGHT);
     VideoConfigParams destParams(VideoCodecType::CODEC_H264,
                                  Videoformat::NV21,
                                  DCAMERA_PRODUCER_FPS_DEFAULT,
                                  TEST_WIDTH,
-                                 TEST_HEIGTH);
+                                 TEST_HEIGHT);
     VideoConfigParams procConfig;
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
     EXPECT_EQ(rc, DCAMERA_OK);
@@ -503,12 +503,12 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_016, TestSize.Level1)
                                 Videoformat::NV12,
                                 DCAMERA_PRODUCER_FPS_DEFAULT,
                                 TEST_WIDTH,
-                                TEST_HEIGTH);
+                                TEST_HEIGHT);
     VideoConfigParams destParams(VideoCodecType::CODEC_H264,
                                  Videoformat::NV21,
                                  DCAMERA_PRODUCER_FPS_DEFAULT,
                                  TEST_WIDTH,
-                                 TEST_HEIGTH);
+                                 TEST_HEIGHT);
     VideoConfigParams procConfig;
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
     EXPECT_EQ(rc, DCAMERA_OK);

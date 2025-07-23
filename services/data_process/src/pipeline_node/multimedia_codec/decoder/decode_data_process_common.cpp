@@ -81,9 +81,10 @@ int32_t DecodeDataProcess::InitNode(const VideoConfigParams& sourceConfig, const
 
 bool DecodeDataProcess::IsInDecoderRange(const VideoConfigParams& curConfig)
 {
-    return (curConfig.GetWidth() >= MIN_VIDEO_WIDTH || curConfig.GetWidth() <= MAX_VIDEO_WIDTH ||
-        curConfig.GetHeight() >= MIN_VIDEO_HEIGHT || curConfig.GetHeight() <= MAX_VIDEO_HEIGHT ||
-        curConfig.GetFrameRate() >= MIN_FRAME_RATE || curConfig.GetFrameRate() <= MAX_FRAME_RATE);
+    bool isWidthValid = (curConfig.GetWidth() >= MIN_VIDEO_WIDTH && curConfig.GetWidth() <= MAX_VIDEO_WIDTH);
+    bool isHeightValid = (curConfig.GetHeight() >= MIN_VIDEO_HEIGHT && curConfig.GetHeight() <= MAX_VIDEO_HEIGHT);
+    bool isFrameRateValid = (curConfig.GetFrameRate() >= MIN_FRAME_RATE && curConfig.GetFrameRate() <= MAX_FRAME_RATE);
+    return isWidthValid && isHeightValid && isFrameRateValid;
 }
 
 bool DecodeDataProcess::IsConvertible(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig)
@@ -790,7 +791,7 @@ int32_t DecodeDataProcess::GetProperty(const std::string& propertyName, Property
 
 void DecodeDataProcess::AlignFirstFrameTime()
 {
-    if (frameInfoDeque_.empty()) {
+    if (frameInfoDeque_.size() < FIRST_FRAME_INPUT_NUM) {
         return;
     }
     DCameraFrameInfo frameInfo = frameInfoDeque_.front();
