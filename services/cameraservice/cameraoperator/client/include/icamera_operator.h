@@ -26,6 +26,7 @@
 #include "dcamera_event_cmd.h"
 #include "v1_1/dcamera_types.h"
 
+#include "distributed_camera_errno.h"
 #include "surface.h"
 
 namespace OHOS {
@@ -59,6 +60,14 @@ public:
     virtual int32_t UpdateSettings(std::vector<std::shared_ptr<DCameraSettings>>& settings) = 0;
     virtual int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos,
         sptr<Surface>& surface, int32_t sceneMode) = 0;
+    virtual int32_t PrepareCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos, int32_t sceneMode)
+    {
+        return DCAMERA_BAD_OPERATE;
+    }
+    virtual int32_t CommitCapture(sptr<Surface>& surface)
+    {
+        return DCAMERA_BAD_OPERATE;
+    }
     virtual int32_t StopCapture() = 0;
     virtual int32_t SetStateCallback(std::shared_ptr<StateCallback>& callback) = 0;
     virtual int32_t SetResultCallback(std::shared_ptr<ResultCallback>& callback) = 0;

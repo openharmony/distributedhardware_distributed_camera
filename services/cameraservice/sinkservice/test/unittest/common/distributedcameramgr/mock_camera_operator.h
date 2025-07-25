@@ -18,6 +18,8 @@
 
 #include "distributed_camera_errno.h"
 #include "icamera_operator.h"
+#include <mutex>
+#include <condition_variable>
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -30,6 +32,18 @@ public:
 
     ~MockCameraOperator()
     {
+    }
+
+    std::mutex mtx_;
+    std::condition_variable cv_;
+    std::atomic<int> asyncOperationState = {0};
+    bool stopCaptureFinished = false;
+    const int32_t commitCaptureState = 1;
+    const int32_t stopCaptureState = 2;
+    void ResetAsyncState()
+    {
+        asyncOperationState = 0;
+        stopCaptureFinished = false;
     }
 
     int32_t Init()
@@ -77,11 +91,32 @@ public:
         return DCAMERA_OK;
     }
 
-    int32_t StopCapture()
+    int32_t PrepareCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos, int32_t sceneMode)
     {
-        if (g_operatorStr == "test027") {
+        if (g_operatorStr == "test_prepare_fail") {
             return DCAMERA_BAD_VALUE;
         }
+        return DCAMERA_OK;
+    }
+
+    int32_t CommitCapture(sptr<Surface>& surface)
+    {
+        {
+            std::lock_guard<std::mutex> lock(mtx_);
+            asyncOperationState = commitCaptureState;
+        }
+        cv_.notify_one();
+        return DCAMERA_OK;
+    }
+
+    int32_t StopCapture()
+    {
+        {
+            std::lock_guard<std::mutex> lock(mtx_);
+            asyncOperationState = stopCaptureState;
+            stopCaptureFinished = true;  // for test_011
+        }
+        cv_.notify_one();
         return DCAMERA_OK;
     }
 

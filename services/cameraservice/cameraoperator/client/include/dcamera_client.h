@@ -44,6 +44,8 @@ public:
     int32_t UpdateSettings(std::vector<std::shared_ptr<DCameraSettings>>& settings) override;
     int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos,
         sptr<Surface>& surface, int32_t sceneMode) override;
+    int32_t PrepareCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos, int32_t sceneMode) override;
+    int32_t CommitCapture(sptr<Surface>& surface) override;
     int32_t StopCapture() override;
     int32_t SetStateCallback(std::shared_ptr<StateCallback>& callback) override;
     int32_t SetResultCallback(std::shared_ptr<ResultCallback>& callback) override;
@@ -88,6 +90,7 @@ private:
     sptr<DCameraPhotoSurfaceListener> photoListener_;
     std::shared_ptr<StateCallback> stateCallback_;
     std::shared_ptr<ResultCallback> resultCallback_;
+    std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfosCache_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

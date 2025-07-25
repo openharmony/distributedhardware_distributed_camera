@@ -17,7 +17,6 @@
 #include "dcamera_sink_data_process.h"
 #include "mock_camera_channel.h"
 #include "dcamera_sink_data_process_listener.h"
-
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 
