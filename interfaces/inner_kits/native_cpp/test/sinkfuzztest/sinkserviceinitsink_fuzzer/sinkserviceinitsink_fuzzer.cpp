@@ -32,6 +32,14 @@ namespace {
 const int32_t SINK_FUZZ_TEST_SLEEP = 200000;
 }
 
+std::shared_ptr<OHOS::DistributedHardware::DistributedCameraSinkService> sinkService_ =
+    std::make_shared<DistributedCameraSinkService>(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, true);
+
+void SinkServiceOnStartFuzzTest()
+{
+    sinkService_->OnStart();
+}
+
 void SinkServiceInitSinkFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size == 0)) {
@@ -50,6 +58,16 @@ void SinkServiceInitSinkFuzzTest(const uint8_t* data, size_t size)
     sinkService->InitSink(param, sinkCallback);
     usleep(SINK_FUZZ_TEST_SLEEP);
 }
+
+void SinkServiceReleaseSinkFuzzTest()
+{
+    sinkService_->ReleaseSink();
+}
+
+void SinkServiceOnStopFuzzTest()
+{
+    sinkService_->OnStop();
+}
 }
 }
 
@@ -57,6 +75,9 @@ void SinkServiceInitSinkFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
+    OHOS::DistributedHardware::SinkServiceOnStartFuzzTest();
+    OHOS::DistributedHardware::SinkServiceReleaseSinkFuzzTest();
+    OHOS::DistributedHardware::SinkServiceOnStopFuzzTest();
     OHOS::DistributedHardware::SinkServiceInitSinkFuzzTest(data, size);
     return 0;
 }
