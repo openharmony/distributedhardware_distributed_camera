@@ -521,6 +521,8 @@ void DecodeDataProcess::GetDecoderOutputBuffer(const sptr<IConsumerSurface>& sur
         DHLOGE("Acquire surface buffer failed!");
         return;
     }
+    ret = surfaceBuffer->InvalidateCache();
+    CHECK_AND_LOG(ret != GSERROR_OK, "Invalidate cache failed.");
     int32_t alignedWidth = surfaceBuffer->GetStride();
     if (surfaceBuffer->GetSize() > BUFFER_MAX_SIZE || alignedWidth > ALIGNED_WIDTH_MAX_SIZE) {
         DHLOGE("surface buffer size or alignedWidth too long");
