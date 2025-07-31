@@ -17,7 +17,7 @@
     "signingConfigs": [
       {
         "name": "default",
-        "type": "HarmonyOS",
+        "type": "OpenHarmony",
         "material": {
           "certpath": "C:\\Users\\admin\\.ohos\\config\\default_dcameraSample_MQGVIkitSxUdBu-kMBECw1W0Rx8UVies_9x-1tKD7hc=.cer",
           "storePassword": "0000001A0DFB8F6A5166B2EFAE02A902D3A40D38BDB0CC1C505061D261ABA85CBA447876815B88989AD1",
@@ -34,7 +34,7 @@
         "name": "default",
         "signingConfig": "default",
         "compatibleSdkVersion": "5.0.1(13)",
-        "runtimeOS": "HarmonyOS",
+        "runtimeOS": "OpenHarmony",
         "buildOption": {
           "strictMode": {
             "caseSensitiveCheck": true,
