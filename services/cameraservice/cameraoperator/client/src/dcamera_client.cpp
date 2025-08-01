@@ -633,11 +633,10 @@ void DCameraClient::SetPhotoCaptureQuality(const std::shared_ptr<Camera::CameraM
     camera_metadata_item_t item;
     int32_t ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_JPEG_QUALITY, &item);
     if ((ret == CAM_META_SUCCESS) && (qualityCount == item.count)) {
-        CameraStandard::PhotoCaptureSetting::QualityLevel quality =
-            static_cast<CameraStandard::PhotoCaptureSetting::QualityLevel>(item.data.u8[0]);
-        photoCaptureSetting->SetQuality(quality);
-        DHLOGI("SetPhotoCaptureQuality %{public}s photo capture settings set %{public}d quality: %{public}d",
-            GetAnonyString(cameraId_).c_str(), item.count, quality);
+        bool status = CameraStandard::AddOrUpdateMetadata(photoCaptureSetting->GetCaptureMetadataSetting()->get(),
+            OHOS_JPEG_QUALITY, &item.data.u8[0], item.count);
+        DHLOGI("SetPhotoCaptureQuality %{public}s photo capture settings set %{public}d quality: %{public}d"
+            "status: %{public}d", GetAnonyString(cameraId_).c_str(), item.count, item.data.u8[0], status);
     }
 }
 
