@@ -474,8 +474,14 @@ int32_t EncodeDataProcess::GetEncoderOutputBuffer(uint32_t index, MediaAVCodec::
     CHECK_AND_RETURN_RET_LOG(info.size <= 0 || info.size > DATABUFF_MAX_SIZE, DCAMERA_BAD_VALUE,
         "AVCodecBufferInfo error, buffer size : %{public}d", info.size);
     size_t outputMemoDataSize = static_cast<size_t>(info.size);
+    CHECK_AND_RETURN_RET_LOG(buffer->GetBase() == nullptr, DCAMERA_BAD_OPERATE,
+        "Sink point check failed: Source buffer base is null.");
+    CHECK_AND_RETURN_RET_LOG(outputMemoDataSize > buffer->GetSize(), DCAMERA_BAD_VALUE,
+        "Sink point check failed: outputMemoDataSize exceeds source allocated size.");
     DHLOGD("Encoder output buffer size : %{public}zu", outputMemoDataSize);
     std::shared_ptr<DataBuffer> bufferOutput = std::make_shared<DataBuffer>(outputMemoDataSize);
+    CHECK_AND_RETURN_RET_LOG(bufferOutput->Data() == nullptr, DCAMERA_MEMORY_OPT_ERROR,
+        "Sink point check failed: Failed to allocate output buffer.");
     errno_t err = memcpy_s(bufferOutput->Data(), bufferOutput->Size(),
         buffer->GetBase(), outputMemoDataSize);
     CHECK_AND_RETURN_RET_LOG(err != EOK, DCAMERA_MEMORY_OPT_ERROR, "%{public}s", "memcpy_s buffer failed.");
