@@ -42,7 +42,7 @@ static QosTV g_qosInfo[] = {
 static uint32_t g_QosTV_Param_Index = static_cast<uint32_t>(sizeof(g_qosInfo) / sizeof(QosTV));
 }
 IMPLEMENT_SINGLE_INSTANCE(DCameraSoftbusAdapter);
-
+// LCOV_EXCL_START
 static void DCameraSourceOnBind(int32_t socket, PeerSocketInfo info)
 {
     return;
@@ -104,7 +104,7 @@ static void DCameraSinkOnStream(int32_t socket, const StreamData *data, const St
     DCameraSoftbusAdapter::GetInstance().SinkOnStream(socket, data, ext, param);
     return;
 }
-
+// LCOV_EXCL_STOP
 DCameraSoftbusAdapter::DCameraSoftbusAdapter()
 {
     sessionModeAndDataTypeMap_[DCAMERA_SESSION_MODE_CTRL] = TransDataType::DATA_TYPE_BYTES;

@@ -18,10 +18,10 @@ import(
     "//foundation/distributedhardware/distributed_camera/distributedcamera.gni")
 
 ##############################fuzztest##########################################
-ohos_fuzztest("SourceServiceInitSourceFuzzTest") {
-  module_out_path = "${fuzz_test_output_path}/sourceserviceinitsource"
+ohos_fuzztest("SourceServiceDumpFuzzTest") {
+  module_out_path = "${fuzz_test_output_path}/sourceservicedump"
 
-  fuzz_config_file = "${innerkits_path}/native_cpp/test/sourcefuzztest/sourceserviceinitsource_fuzzer"
+  fuzz_config_file = "${innerkits_path}/native_cpp/test/sourcefuzztest/sourceservicedump_fuzzer"
 
   include_dirs =
       [ "${innerkits_path}/native_cpp/camera_source/include/callback" ]
@@ -47,11 +47,9 @@ ohos_fuzztest("SourceServiceInitSourceFuzzTest") {
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
-    "-Dprivate=public",
-    "-Dprotected=public",
   ]
 
-  sources = [ "sourceserviceinitsource_fuzzer.cpp" ]
+  sources = [ "sourceservicedump_fuzzer.cpp" ]
 
   deps = [
     "${common_path}:distributed_camera_utils",
@@ -61,7 +59,7 @@ ohos_fuzztest("SourceServiceInitSourceFuzzTest") {
 
   defines = [
     "HI_LOG_ENABLE",
-    "DH_LOG_TAG=\"SourceServiceInitSourceFuzzTest\"",
+    "DH_LOG_TAG=\"SourceServiceDumpFuzzTest\"",
     "LOG_DOMAIN=0xD004150",
   ]
 
@@ -83,6 +81,6 @@ ohos_fuzztest("SourceServiceInitSourceFuzzTest") {
 ###############################################################################
 group("fuzztest") {
   testonly = true
-  deps = [ ":SourceServiceInitSourceFuzzTest" ]
+  deps = [ ":SourceServiceDumpFuzzTest" ]
 }
 ###############################################################################

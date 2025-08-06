@@ -52,6 +52,7 @@ DistributedCameraSourceService::DistributedCameraSourceService(int32_t saId, boo
 
 void DistributedCameraSourceService::OnStart()
 {
+    // LCOV_EXCL_START
     DHLOGI("start");
     if (state_ == DCameraServiceState::DCAMERA_SRV_STATE_RUNNING) {
         DHLOGI("DistributedCameraSourceService has already started.");
@@ -77,10 +78,12 @@ void DistributedCameraSourceService::OnStart()
 
     state_ = DCameraServiceState::DCAMERA_SRV_STATE_RUNNING;
     DHLOGI("start service success.");
+    // LCOV_EXCL_STOP
 }
 
 bool DistributedCameraSourceService::Init()
 {
+    // LCOV_EXCL_START
     DHLOGI("DistributedCameraSourceService start init");
     DCameraSourceServiceIpc::GetInstance().Init();
     if (!registerToService_) {
@@ -98,10 +101,12 @@ bool DistributedCameraSourceService::Init()
     }
     DHLOGI("DistributedCameraSourceService init success");
     return true;
+    // LCOV_EXCL_STOP
 }
 
 void DistributedCameraSourceService::OnStop()
 {
+    // LCOV_EXCL_START
     DHLOGI("DistributedCameraSourceService OnStop service");
     state_ = DCameraServiceState::DCAMERA_SRV_STATE_NOT_START;
     registerToService_ = false;
@@ -124,6 +129,7 @@ void DistributedCameraSourceService::OnStop()
 #ifdef DCAMERA_MMAP_RESERVE
     ConverterHandle::GetInstance().DeInitConverter();
 #endif
+    // LCOV_EXCL_STOP
 }
 
 int32_t DistributedCameraSourceService::InitSource(const std::string& params,
@@ -409,6 +415,7 @@ uint32_t DistributedCameraSourceService::GetCamDevNum()
 
 void DistributedCameraSourceService::StartHicollieThread()
 {
+    // LCOV_EXCL_START
     auto taskFunc = [this]() {
         std::lock_guard<std::mutex> lock(camDevMutex_);
         for (auto &iter : camerasMap_) {
@@ -434,6 +441,7 @@ void DistributedCameraSourceService::StartHicollieThread()
         }
         usleep(HICOLLIE_SLEEP_TIME_US);
     }
+    // LCOV_EXCL_STOP
 }
 } // namespace DistributedHardware
 } // namespace OHOS

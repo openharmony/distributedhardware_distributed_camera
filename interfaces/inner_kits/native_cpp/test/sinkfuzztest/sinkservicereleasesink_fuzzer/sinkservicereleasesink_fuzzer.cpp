@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,38 +14,28 @@
  */
 
 #include "sinkservicereleasesink_fuzzer.h"
-
-#include <cstddef>
-#include <cstdint>
-
+#include "distributed_camera_sink_service.h"
 #include "dcamera_sink_callback.h"
 #include "distributed_camera_constants.h"
-#include "distributed_camera_sink_service.h"
-#include "if_system_ability_manager.h"
-#include "iservice_registry.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 void SinkServiceReleaseSinkFuzzTest(const uint8_t* data, size_t size)
 {
-    if (data == nullptr) {
-        return;
-    }
-    std::string dhId = "1";
-    std::shared_ptr<DistributedCameraSinkService> sinkService =
-        std::make_shared<DistributedCameraSinkService>(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, true);
-    sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
-    std::shared_ptr<DCameraSinkDev> sinkDevice = std::make_shared<DCameraSinkDev>(dhId, sinkCallback);
-    sinkService->camerasMap_.emplace(dhId, sinkDevice);
+    auto sinkService = std::make_shared<DistributedCameraSinkService>(
+        DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, true);
+
+    std::string params = "fuzz_test_params";
+    sptr<IDCameraSinkCallback> callback(new DCameraSinkCallback());
+    sinkService->InitSink(params, callback);
+    
     sinkService->ReleaseSink();
 }
 }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DistributedHardware::SinkServiceReleaseSinkFuzzTest(data, size);
     return 0;
 }
