@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,27 +13,20 @@
  * limitations under the License.
  */
 
-#include "sourceservicedcameranotify_fuzzer.h"
+#include "sourceservicegetdumpinfo_fuzzer.h"
 #include "distributed_camera_source_service.h"
 #include "distributed_camera_constants.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 
-void SourceServiceDCameraNotifyFuzzTest(const uint8_t* data, size_t size)
+void SourceServiceGetDumpInfoFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
-        return;
-    }
-
     auto sourceService = std::make_shared<DistributedCameraSourceService>(
         DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, true);
-
-    std::string dhId(reinterpret_cast<const char*>(data), size);
-    std::string devId(reinterpret_cast<const char*>(data), size);
-    std::string events(reinterpret_cast<const char*>(data), size);
-
-    sourceService->DCameraNotify(devId, dhId, events);
+    
+    CameraDumpInfo camDump;
+    sourceService->GetDumpInfo(camDump);
 }
 
 } // namespace DistributedHardware
@@ -42,6 +35,7 @@ void SourceServiceDCameraNotifyFuzzTest(const uint8_t* data, size_t size)
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    OHOS::DistributedHardware::SourceServiceDCameraNotifyFuzzTest(data, size);
+    OHOS::DistributedHardware::SourceServiceGetDumpInfoFuzzTest(data, size);
     return 0;
 }
+

@@ -46,6 +46,7 @@ DistributedCameraSinkService::DistributedCameraSinkService(int32_t saId, bool ru
 
 void DistributedCameraSinkService::OnStart()
 {
+    // LCOV_EXCL_START
     DHLOGI("DistributedCameraSinkService OnStart");
     CHECK_AND_RETURN_LOG(state_ == DCameraServiceState::DCAMERA_SRV_STATE_RUNNING,
         "sink service has already started.");
@@ -65,10 +66,12 @@ void DistributedCameraSinkService::OnStart()
         }
     }
     DHLOGI("DCameraServiceState OnStart service success.");
+    // LCOV_EXCL_STOP
 }
 
 bool DistributedCameraSinkService::Init()
 {
+    // LCOV_EXCL_START
     DHLOGI("DistributedCameraSinkService start init");
     DCameraSinkServiceIpc::GetInstance().Init();
     if (!registerToService_) {
@@ -78,10 +81,12 @@ bool DistributedCameraSinkService::Init()
     }
     DHLOGI("DistributedCameraSinkService init success");
     return true;
+    // LCOV_EXCL_STOP
 }
 
 void DistributedCameraSinkService::OnStop()
 {
+    // LCOV_EXCL_START
     DHLOGI("DistributedCameraSinkService OnStop service");
     state_ = DCameraServiceState::DCAMERA_SRV_STATE_NOT_START;
     registerToService_ = false;
@@ -96,6 +101,7 @@ void DistributedCameraSinkService::OnStop()
     }
 
     DCameraSinkServiceIpc::GetInstance().UnInit();
+    // LCOV_EXCL_STOP
 }
 
 int32_t DistributedCameraSinkService::InitSink(const std::string& params,

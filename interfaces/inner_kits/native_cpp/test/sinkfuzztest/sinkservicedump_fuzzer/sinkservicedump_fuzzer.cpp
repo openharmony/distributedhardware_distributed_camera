@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,30 +13,39 @@
  * limitations under the License.
  */
 
-#include "sinkserviceinitsink_fuzzer.h"
+#include "sinkservicedump_fuzzer.h"
 #include "distributed_camera_sink_service.h"
-#include "dcamera_sink_callback.h"
 #include "distributed_camera_constants.h"
+#include <vector>
+#include <string>
+#include <unistd.h>
+#include <algorithm>
 
 namespace OHOS {
 namespace DistributedHardware {
-
-void SinkServiceInitSinkFuzzTest(const uint8_t* data, size_t size)
+void SinkServiceDumpFuzzTest(const uint8_t* data, size_t size)
 {
     if (data == nullptr || size == 0) {
         return;
     }
     auto sinkService = std::make_shared<DistributedCameraSinkService>(
         DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, true);
-    std::string param(reinterpret_cast<const char*>(data), size);
-    sptr<IDCameraSinkCallback> callback(new DCameraSinkCallback());
-    sinkService->InitSink(param, callback);
+    
+    std::vector<std::u16string> args;
+    std::u16string arg(reinterpret_cast<const char16_t*>(data), size / sizeof(char16_t));
+    if (arg.empty() || std::all_of(arg.begin(), arg.end(), [](char16_t c) { return c == 0; })) {
+        return;
+    }
+    args.push_back(arg);
+    int fd = STDOUT_FILENO;
+
+    sinkService->Dump(fd, args);
 }
 }
 }
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    OHOS::DistributedHardware::SinkServiceInitSinkFuzzTest(data, size);
+    OHOS::DistributedHardware::SinkServiceDumpFuzzTest(data, size);
     return 0;
 }
