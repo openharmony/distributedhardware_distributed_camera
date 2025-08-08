@@ -145,6 +145,7 @@ const int32_t DCAMERA_QOS_TYPE_MIN_LATENCY = 2000;
 const int32_t CAMERA_META_DATA_ITEM_CAPACITY = 10;
 const int32_t CAMERA_META_DATA_DATA_CAPACITY = 100;
 const int32_t DCAMERA_UID = 3052;
+const int32_t CAMERA_SERVICE_ID = 3008;
 
 const uint32_t DCAMERA_SHIFT_32 = 32;
 const uint32_t DCAMERA_SHIFT_24 = 24;
@@ -176,6 +177,7 @@ const std::string BEFORE_DECODE = "SourceBeforeDecode.h265";
 const std::string CAMERA_HICOLLIE = "CameraHicollie";
 const std::string SEPARATE_SINK_VERSION = "2.0";
 const std::string START_CAPTURE_SUCC = "operator start capture success";
+const std::string CAMERA_SERVICE_DIED = "camera service died";
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DISTRIBUTED_CAMERA_CONSTANTS_H

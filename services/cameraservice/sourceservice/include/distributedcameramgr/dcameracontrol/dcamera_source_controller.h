@@ -25,6 +25,7 @@
 #include "icamera_channel.h"
 #include "iremote_object.h"
 #include "device_manager.h"
+#include "camera_service_proxy.h"
 
 #include "v1_1/id_camera_provider.h"
 
@@ -64,11 +65,22 @@ private:
     bool GetOsAccountInfo();
     int32_t CheckOsType(const std::string &networkId, bool &isInvalid);
     int32_t ParseValueFromCjson(std::string args, std::string key);
+    int32_t AddCameraServiceDeathRecipient();
     class DCameraHdiRecipient : public IRemoteObject::DeathRecipient {
     public:
         void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
     };
     sptr<DCameraHdiRecipient> cameraHdiRecipient_;
+    class CameraServiceRecipient : public IRemoteObject::DeathRecipient {
+    public:
+        CameraServiceRecipient(std::shared_ptr<DCameraSourceController> sourceContrlPtr);
+        ~CameraServiceRecipient() override = default;
+        void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
+
+    private:
+        std::weak_ptr<DCameraSourceController> sourceContrlPtr_;
+    };
+    sptr<CameraServiceRecipient> cameraServiceRecipient_;
 
 private:
     std::string devId_;
@@ -81,6 +93,8 @@ private:
     int32_t channelState_;
     sptr<IDCameraProvider> camHdiProvider_;
     sptr<IRemoteObject> remote_;
+    sptr<CameraStandard::ICameraService> cameraServiceProxy_;
+    std::shared_ptr<DCameraSourceController> controller_;
 
     bool isInit;
     const std::string SESSION_FLAG = "control";

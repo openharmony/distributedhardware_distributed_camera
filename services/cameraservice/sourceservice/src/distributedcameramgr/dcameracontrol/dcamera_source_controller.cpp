@@ -335,6 +335,8 @@ int32_t DCameraSourceController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& o
         DHLOGE("OpenChannel not support operate %{public}zu camera", indexs_.size());
         return DCAMERA_BAD_OPERATE;
     }
+    CHECK_AND_RETURN_RET_LOG(AddCameraServiceDeathRecipient() != DCAMERA_OK, DCAMERA_BAD_VALUE,
+        "AddCameraServiceDeathRecipient failed");
     std::string dhId = indexs_.begin()->dhId_;
     std::string devId = indexs_.begin()->devId_;
     DHLOGI("DCameraSourceController OpenChannel Start, devId: %{public}s, dhId: %{public}s",
@@ -465,6 +467,10 @@ int32_t DCameraSourceController::CloseChannel()
         DHLOGE("CloseChannel not support operate %{public}zu camera", indexs_.size());
         return DCAMERA_BAD_OPERATE;
     }
+    if (cameraServiceProxy_ != nullptr && cameraServiceProxy_->AsObject() != nullptr) {
+        (void)cameraServiceProxy_->AsObject()->RemoveDeathRecipient(cameraServiceRecipient_);
+    }
+    cameraServiceRecipient_ = nullptr;
     DCameraLowLatency::GetInstance().DisableLowLatency();
     DCameraSoftbusLatency::GetInstance().StopSoftbusTimeSync(devId_);
     std::string dhId = indexs_.begin()->dhId_;
@@ -516,8 +522,8 @@ int32_t DCameraSourceController::Init(std::vector<DCameraIndex>& indexs)
     indexs_.assign(indexs.begin(), indexs.end());
     std::string dhId = indexs_.begin()->dhId_;
     std::string devId = indexs_.begin()->devId_;
-    auto controller = std::shared_ptr<DCameraSourceController>(shared_from_this());
-    listener_ = std::make_shared<DCameraSourceControllerChannelListener>(controller);
+    controller_ = std::shared_ptr<DCameraSourceController>(shared_from_this());
+    listener_ = std::make_shared<DCameraSourceControllerChannelListener>(controller_);
     channel_ = std::make_shared<DCameraChannelSourceImpl>();
     DHLOGI("DCameraSourceController Init GetProvider end devId: %{public}s, dhId: %{public}s",
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
@@ -686,6 +692,40 @@ void DCameraSourceController::DCameraHdiRecipient::OnRemoteDied(const wptr<IRemo
 {
     DHLOGE("Exit the current process.");
     _Exit(0);
+}
+
+int32_t DCameraSourceController::AddCameraServiceDeathRecipient()
+{
+    cameraServiceRecipient_ = sptr<CameraServiceRecipient>(new CameraServiceRecipient(controller_));
+    auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    CHECK_AND_RETURN_RET_LOG(samgr == nullptr, DCAMERA_BAD_VALUE, "GetSystemAbilityManager failed.");
+    auto object = samgr->CheckSystemAbility(CAMERA_SERVICE_ID);
+    CHECK_AND_RETURN_RET_LOG(object == nullptr, DCAMERA_BAD_VALUE,
+        "CheckSystemAbility %{public}d failed.", CAMERA_SERVICE_ID);
+    cameraServiceProxy_ = iface_cast<CameraStandard::ICameraService>(object);
+    CHECK_AND_RETURN_RET_LOG(cameraServiceProxy_ == nullptr, DCAMERA_BAD_VALUE, "Get ICameraService failed.");
+    auto remoteObj = cameraServiceProxy_->AsObject();
+    CHECK_AND_RETURN_RET_LOG(remoteObj == nullptr, DCAMERA_BAD_VALUE, "Get remote object failed.");
+    remoteObj->AddDeathRecipient(cameraServiceRecipient_);
+    return DCAMERA_OK;
+}
+
+DCameraSourceController::CameraServiceRecipient::CameraServiceRecipient(
+    std::shared_ptr<DCameraSourceController> sourceContrlPtr) : sourceContrlPtr_(sourceContrlPtr)
+{
+    DHLOGI("Ctor CameraServiceRecipient()");
+}
+
+void DCameraSourceController::CameraServiceRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
+{
+    DHLOGE("CameraService died, Exit the current process.");
+    std::shared_ptr<DCameraEvent> events = std::make_shared<DCameraEvent>();
+    events->eventType_ = DCAMERA_MESSAGE;
+    events->eventResult_ = DCAMERA_EVENT_DEVICE_ERROR;
+    events->eventContent_ = CAMERA_SERVICE_DIED;
+    auto sourceContrl = sourceContrlPtr_.lock();
+    CHECK_AND_RETURN_LOG(sourceContrl == nullptr, "sourceContrl is nullptr.");
+    sourceContrl->DCameraNotify(events);
 }
 
 void DCameraSourceController::SetTokenId(uint64_t token)
