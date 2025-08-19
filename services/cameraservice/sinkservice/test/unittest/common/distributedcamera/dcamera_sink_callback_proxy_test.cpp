@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,7 +34,16 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
+
+    std::string GenerateString(size_t length)
+    {
+        return std::string(length, 'a');
+    }
 };
+
+namespace {
+const size_t DID_MAX_SIZE = 256;
+}
 
 void DcameraSinkCallbackProxyTest::SetUpTestCase(void)
 {
@@ -94,6 +103,75 @@ HWTEST_F(DcameraSinkCallbackProxyTest, dcamera_sink_callback_proxy_test_002, Tes
     bool isSameAccout = false;
     ret = callbackProxy->OnNotifyResourceInfo(type, subtype, newworkId, isSensitive, isSameAccout);
     EXPECT_EQ(DCAMERA_OK, ret);
+    remoteObject = nullptr;
+    callbackProxy = nullptr;
+}
+
+/**
+ * @tc.name: dcamera_sink_callback_proxy_test_003
+ * @tc.desc: Verify the OnHardwareStateChanged function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSinkCallbackProxyTest, dcamera_sink_callback_proxy_test_003, TestSize.Level1)
+{
+    DHLOGI("DcameraSinkCallbackProxyTest::dcamera_sink_callback_proxy_test_003");
+    sptr<IRemoteObject> remoteObject = sptr<IRemoteObject>(new DCameraSinkCallback());
+    sptr<DCameraSinkCallbackProxy> callbackProxy(new DCameraSinkCallbackProxy(remoteObject));
+    EXPECT_EQ(false, callbackProxy == nullptr);
+
+    int32_t ret = DCAMERA_BAD_VALUE;
+    std::string devId = "test_dev_id";
+    std::string dhId = "test_dh_id";
+    int32_t status = 1;
+    ret = callbackProxy->OnHardwareStateChanged(devId, dhId, status);
+    EXPECT_NE(DCAMERA_OK, ret);
+    remoteObject = nullptr;
+    callbackProxy = nullptr;
+}
+
+/**
+ * @tc.name: dcamera_sink_callback_proxy_test_004
+ * @tc.desc: Verify the CheckParams function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSinkCallbackProxyTest, dcamera_sink_callback_proxy_test_004, TestSize.Level1)
+{
+    DHLOGI("DcameraSinkCallbackProxyTest::dcamera_sink_callback_proxy_test_004");
+    sptr<IRemoteObject> remoteObject = sptr<IRemoteObject>(new DCameraSinkCallback());
+    sptr<DCameraSinkCallbackProxy> callbackProxy(new DCameraSinkCallbackProxy(remoteObject));
+    EXPECT_EQ(false, callbackProxy == nullptr);
+
+    std::string devId = "";
+    std::string dhId = "valid_dh_id";
+    int32_t status = 0;
+    bool result = callbackProxy->CheckParams(devId, dhId, status);
+    EXPECT_FALSE(result);
+
+    devId = GenerateString(DID_MAX_SIZE + 1);
+    result = callbackProxy->CheckParams(devId, dhId, status);
+    EXPECT_FALSE(result);
+
+    devId = "valid_dev_id";
+    dhId = "";
+    result = callbackProxy->CheckParams(devId, dhId, status);
+    EXPECT_FALSE(result);
+
+    dhId = GenerateString(DID_MAX_SIZE + 1);
+    result = callbackProxy->CheckParams(devId, dhId, status);
+    EXPECT_FALSE(result);
+
+    dhId = "valid_dh_id";
+    status = -1;
+    result = callbackProxy->CheckParams(devId, dhId, status);
+    EXPECT_FALSE(result);
+
+    status = 0;
+    result = callbackProxy->CheckParams(devId, dhId, status);
+    EXPECT_TRUE(result);
+    remoteObject = nullptr;
+    callbackProxy = nullptr;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

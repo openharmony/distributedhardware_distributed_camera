@@ -55,6 +55,8 @@ ohos_unittest("DistributedCameraSinkServiceTest") {
 
   configs = [ ":module_private_config" ]
 
+  cflags = [ "-Dprivate=public" ]
+
   deps = [
     "${common_path}:distributed_camera_utils",
     "${innerkits_path}/native_cpp/camera_sink:distributed_camera_sink_sdk",

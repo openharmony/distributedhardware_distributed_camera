@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,6 +26,7 @@ namespace DistributedHardware {
 DCameraSinkCallbackStub::DCameraSinkCallbackStub() : IRemoteStub(true)
 {
     memberFuncMap_[NOTIFY_RESOURCEINFO] = &DCameraSinkCallbackStub::OnNotifyResourceInfoInner;
+    memberFuncMap_[NOTIFY_STATE_CHANGEINFO] = &DCameraSinkCallbackStub::OnHardwareStateChangedInner;
 }
 
 DCameraSinkCallbackStub::~DCameraSinkCallbackStub()
@@ -45,6 +46,8 @@ int32_t DCameraSinkCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &d
     switch (code) {
         case NOTIFY_RESOURCEINFO:
             return OnNotifyResourceInfoInner(data, reply);
+        case NOTIFY_STATE_CHANGEINFO:
+            return OnHardwareStateChangedInner(data, reply);
         default:
             DHLOGE("Invalid OnRemoteRequest code=%{public}d", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -67,6 +70,17 @@ int32_t DCameraSinkCallbackStub::OnNotifyResourceInfoInner(MessageParcel &data, 
     reply.WriteInt32(ret);
     reply.WriteBool(isSensitive);
     reply.WriteBool(isSameAccout);
+    return DCAMERA_OK;
+}
+
+int32_t DCameraSinkCallbackStub::OnHardwareStateChangedInner(MessageParcel &data, MessageParcel &reply)
+{
+    DHLOGI("DCameraSinkCallbackStub OnHardwareStateChangedInner");
+    std::string devId = data.ReadString();
+    std::string dhId = data.ReadString();
+    int32_t status = data.ReadInt32();
+    int32_t ret = OnHardwareStateChanged(devId, dhId, status);
+    reply.WriteInt32(ret);
     return DCAMERA_OK;
 }
 } // namespace DistributedHardware

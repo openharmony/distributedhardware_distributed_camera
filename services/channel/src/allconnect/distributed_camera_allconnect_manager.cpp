@@ -229,7 +229,7 @@ int32_t DCameraAllConnectManager::UnRegisterLifecycleCallback()
         return DistributedCameraErrno::DCAMERA_ERR_DLOPEN;
     }
     if (allConnect_.dCameraCollaborationUnRegisterLifecycleCallback == nullptr) {
-        DHLOGE("DCamera allconnect RegisterLifecycleCallback is nullptr, all connect function not load.");
+        DHLOGE("DCamera allconnect UnRegisterLifecycleCallback is nullptr, all connect function not load.");
         return DistributedCameraErrno::DCAMERA_ERR_DLOPEN;
     }
 
