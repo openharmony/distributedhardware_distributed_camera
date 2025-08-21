@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +14,7 @@
  */
 
 #include "sourceserviceinitsource_fuzzer.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "dcamera_source_callback.h"
 #include "distributed_camera_constants.h"
@@ -25,10 +26,13 @@ namespace OHOS {
 namespace DistributedHardware {
 void SourceServiceInitSourceFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
-    std::string params(reinterpret_cast<const char*>(data), size);
+
+    FuzzedDataProvider fdp(data, size);
+    int32_t tempLen = 32;
+    std::string params(fdp.ConsumeRandomLengthString(tempLen));
 
     std::shared_ptr<DistributedCameraSourceService> sourceService =
         std::make_shared<DistributedCameraSourceService>(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, true);
