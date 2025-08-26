@@ -181,39 +181,68 @@ void DCameraClient::FindCameraMetadata(const std::string& metadataStr)
 int32_t DCameraClient::StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos,
     sptr<Surface>& surface, int32_t sceneMode)
 {
-    DHLOGI("StartCapture cameraId: %{public}s, mode: %{public}d", GetAnonyString(cameraId_).c_str(), sceneMode);
-    if ((photoOutput_ == nullptr) && (previewOutput_ == nullptr)) {
-        DHLOGI("StartCapture %{public}s config capture session", GetAnonyString(cameraId_).c_str());
-        if (surface == nullptr) {
-            DHLOGE("StartCapture: input surface is nullptr.");
-            return DCAMERA_BAD_VALUE;
-        }
-        previewSurface_ = surface;
-        int32_t ret = ConfigCaptureSession(captureInfos, sceneMode);
+    DHLOGI("StartCapture (legacy entry) cameraId: %{public}s", GetAnonyString(cameraId_).c_str());
+    int32_t ret = PrepareCapture(captureInfos, sceneMode);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("StartCapture failed during PrepareCapture phase, raw ret: %{public}d", ret);
+        return ret;
+    }
+    ret = CommitCapture(surface);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("StartCapture failed during CommitCapture phase, raw ret: %{public}d", ret);
+        return ret;
+    }
+    return DCAMERA_OK;
+}
+
+int32_t DCameraClient::PrepareCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos, int32_t sceneMode)
+{
+    DHLOGI("PrepareCapture cameraId: %{public}s", GetAnonyString(cameraId_).c_str());
+    int32_t ret = DCAMERA_OK;
+    if (photoOutput_ == nullptr && previewOutput_ == nullptr) {
+        ret = ConfigCaptureSession(captureInfos, sceneMode);
+    }
+    captureInfosCache_ = captureInfos;
+
+    return CameraServiceErrorType(ret);
+}
+
+int32_t DCameraClient::CommitCapture(sptr<Surface>& surface)
+{
+    DHLOGI("CommitCapture cameraId: %{public}s", GetAnonyString(cameraId_).c_str());
+    if (surface == nullptr) {
+        DHLOGE("CommitCapture: input surface is null.");
+        return DCAMERA_BAD_VALUE;
+    }
+    previewSurface_ = surface;
+    int32_t ret = DCAMERA_OK;
+    if (photoOutput_ == nullptr && previewOutput_ == nullptr) {
+        ret = CreateCaptureOutput(captureInfosCache_);
         if (ret != DCAMERA_OK) {
-            DHLOGE("StartCapture config capture session failed, cameraId: %{public}s, ret: %{public}d",
-                   GetAnonyString(cameraId_).c_str(), ret);
+            DHLOGE("CommitCapture: CreateCaptureOutput failed, ret: %{public}d", ret);
+            return CameraServiceErrorType(ret);
+        }
+        ret = ConfigCaptureSessionInner();
+        if (ret != DCAMERA_OK) {
+            DHLOGE("CommitCapture: ConfigCaptureSessionInner failed, ret: %{public}d", ret);
             return CameraServiceErrorType(ret);
         }
     }
-
-    for (auto& info : captureInfos) {
+    for (auto& info : captureInfosCache_) {
         if (info == nullptr) {
-            DHLOGE("StartCapture info is null");
             continue;
         }
         if ((info->streamType_ == CONTINUOUS_FRAME) || (!info->isCapture_)) {
             continue;
         }
-        int32_t ret = StartCaptureInner(info);
-        if (ret != DCAMERA_OK) {
-            DHLOGE("StartCapture failed, cameraId: %{public}s, ret: %{public}d",
-                GetAnonyString(cameraId_).c_str(), ret);
-            return CameraServiceErrorType(ret);
+        int32_t innerRet = StartCaptureInner(info);
+        if (innerRet != DCAMERA_OK) {
+            DHLOGE("CommitCapture failed during StartCaptureInner, streamType: %d, ret: %{public}d",
+                info->streamType_, innerRet);
+            ret = innerRet;
         }
     }
-    DHLOGI("StartCapture %{public}s success", GetAnonyString(cameraId_).c_str());
-    return DCAMERA_OK;
+    return CameraServiceErrorType(ret);
 }
 
 int32_t DCameraClient::CameraServiceErrorType(const int32_t errorType)
@@ -337,24 +366,26 @@ int32_t DCameraClient::SetResultCallback(std::shared_ptr<ResultCallback>& callba
     resultCallback_ = callback;
     return DCAMERA_OK;
 }
-
 int32_t DCameraClient::ConfigCaptureSession(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos,
     int32_t sceneMode)
 {
     DHLOGI("ConfigCaptureSession cameraId: %{public}s", GetAnonyString(cameraId_).c_str());
     CHECK_AND_RETURN_RET_LOG(cameraManager_ == nullptr, DCAMERA_BAD_VALUE, "cameraManager is null.");
+
     int rv = cameraManager_->CreateCameraInput(cameraInfo_, &((sptr<CameraStandard::CameraInput> &)cameraInput_));
     if (rv != DCAMERA_OK) {
         DHLOGE("ConfigCaptureSession %{public}s create cameraInput failed", GetAnonyString(cameraId_).c_str());
         return DCAMERA_BAD_VALUE;
     }
     CHECK_AND_RETURN_RET_LOG(cameraInput_ == nullptr, DCAMERA_BAD_VALUE, "cameraInput is null.");
+
     int32_t rc = ((sptr<CameraStandard::CameraInput> &)cameraInput_)->Open();
     if (rc != DCAMERA_OK) {
         DHLOGE("ConfigCaptureSession cameraInput_ Open failed, cameraId: %{public}s, ret: %{public}d",
             GetAnonyString(cameraId_).c_str(), rc);
         return DCAMERA_BAD_VALUE;
     }
+
     std::shared_ptr<DCameraInputCallback> inputCallback = std::make_shared<DCameraInputCallback>(stateCallback_);
     ((sptr<CameraStandard::CameraInput> &)cameraInput_)->SetErrorCallback(inputCallback);
 
@@ -381,14 +412,8 @@ int32_t DCameraClient::ConfigCaptureSession(std::vector<std::shared_ptr<DCameraC
     captureSession_->SetFocusCallback(sessionCallback);
     captureSession_->SetCallback(sessionCallback);
 
-    int32_t ret = CreateCaptureOutput(captureInfos);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("ConfigCaptureSession create capture output failed, cameraId: %{public}s, ret: %{public}d",
-               GetAnonyString(cameraId_).c_str(), ret);
-        return ret;
-    }
-
-    return ConfigCaptureSessionInner();
+    DHLOGI("ConfigCaptureSession %{public}s finished pre-configuration.", GetAnonyString(cameraId_).c_str());
+    return DCAMERA_OK;
 }
 
 int32_t DCameraClient::ConfigCaptureSessionInner()

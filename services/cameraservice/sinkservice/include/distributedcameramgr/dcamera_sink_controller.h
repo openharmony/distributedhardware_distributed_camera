@@ -68,6 +68,11 @@ public:
                 std::shared_ptr<DCameraSinkController> sinkContrPtr);
             ~DCameraSinkContrEventHandler() override = default;
             void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
+            enum {
+                EVENT_START_BASE = 100,
+                EVENT_ENCODER_PREPARED,
+                EVENT_CAMERA_PREPARED,
+            };
         private:
             std::weak_ptr<DCameraSinkController> sinkContrWPtr_;
     };
@@ -86,6 +91,21 @@ private:
     int32_t CreateCtrlSession();
     int32_t CheckSensitive();
     bool CheckAclRight();
+    class DCameraSurfaceHolder {
+    public:
+        DCameraSurfaceHolder(int32_t r, sptr<Surface> s) : result(r), surface(s) {}
+        int32_t result;
+        sptr<Surface> surface;
+    };
+    void HandleCaptureError(int32_t errorCode, const std::string& errorMsg);
+    void CheckAndCommitCapture();
+    std::atomic<bool> isEncoderReady_ {false};
+    std::atomic<bool> isCameraReady_ {false};
+    int32_t encoderResult_ = DCAMERA_OK;
+    int32_t cameraResult_ = DCAMERA_OK;
+    sptr<Surface> preparedSurface_ = nullptr;
+    std::mutex stateMutex_;
+    std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfosCache_;
 
     bool isInit_;
     int32_t sessionState_;

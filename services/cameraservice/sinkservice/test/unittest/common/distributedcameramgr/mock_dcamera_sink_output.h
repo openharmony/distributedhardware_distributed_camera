@@ -19,64 +19,73 @@
 #include "distributed_camera_errno.h"
 #include "icamera_operator.h"
 #include "icamera_sink_output.h"
+#include "iconsumer_surface.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 extern std::string g_outputStr;
 class MockDCameraSinkOutput : public ICameraSinkOutput {
 public:
-    explicit MockDCameraSinkOutput(const std::string& dhId, const std::shared_ptr<ICameraOperator>& cameraOperator)
-    {
-    }
+    explicit MockDCameraSinkOutput(const std::string& dhId, const std::shared_ptr<ICameraOperator>& cameraOperator) {}
+    ~MockDCameraSinkOutput() override = default;
 
-    ~MockDCameraSinkOutput()
-    {
-    }
-
-    int32_t Init()
+    int32_t Init() override
     {
         if (g_outputStr == "test026") {
             return DCAMERA_BAD_VALUE;
         }
         return DCAMERA_OK;
     }
-    int32_t UnInit()
+
+    int32_t UnInit() override
     {
         if (g_outputStr == "test019") {
             return DCAMERA_BAD_VALUE;
         }
         return DCAMERA_OK;
     }
-    int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos)
+
+    int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos) override
     {
-        if (g_outputStr == "test021" || g_outputStr == "test_025") {
+        if (g_outputStr == "ParallelStartCapture_EncoderFail_Test" || g_outputStr == "test021") {
             return DCAMERA_BAD_VALUE;
         }
         return DCAMERA_OK;
     }
-    int32_t StopCapture()
+
+    int32_t StopCapture() override
     {
         return DCAMERA_OK;
     }
-    int32_t OpenChannel(std::shared_ptr<DCameraChannelInfo>& info)
+
+    int32_t OpenChannel(std::shared_ptr<DCameraChannelInfo>& info) override
     {
         return DCAMERA_OK;
     }
-    int32_t CloseChannel()
+    int32_t CloseChannel() override
     {
         if (g_outputStr == "test018") {
             return DCAMERA_BAD_VALUE;
         }
         return DCAMERA_OK;
     }
-    int32_t GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier)
+
+    int32_t GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier) override
     {
-        if (g_outputStr == "test_025") {
+        if (g_outputStr == "GetPropertyFail_Test") {
             return DCAMERA_BAD_VALUE;
         }
+        
+        if (propertyName == "surface") {
+            sptr<IConsumerSurface> consumerSurface = IConsumerSurface::Create("test_surface");
+            sptr<IBufferProducer> producer = consumerSurface->GetProducer();
+            sptr<Surface> mockSurface = Surface::CreateSurfaceAsProducer(producer);
+            propertyCarrier.surface_ = mockSurface;
+        }
+        
         return DCAMERA_OK;
     }
 };
-} // namespace DistributedHardware
-} // namespace OHOS
-#endif // OHOS_MOCK_DCAMERA_SINK_OUTPUT_H
+}
+}
+#endif
