@@ -56,7 +56,8 @@ private:
     int32_t CreateAVCodecList(cJSON* root);
     std::string GetCameraPosition(CameraStandard::CameraPosition position);
     void ProcessProfile(const DCStreamType type, std::map<std::string, std::list<std::string>>& formatMap,
-    std::vector<CameraStandard::Profile>& profileList, std::set<int32_t>& formatSet);
+        std::map<std::string, std::list<std::string>>& fpsMap, std::vector<CameraStandard::Profile>& profileList,
+        std::set<int32_t>& formatSet);
     void ConfigFormatphoto(const DCStreamType type, cJSON* root,
         std::vector<CameraStandard::Profile>& profileList);
     void ConfigFormatvideo(const DCStreamType type, cJSON* root,
