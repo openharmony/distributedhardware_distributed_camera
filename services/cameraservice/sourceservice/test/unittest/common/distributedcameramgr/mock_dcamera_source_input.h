@@ -73,6 +73,10 @@ public:
     {
         return DCAMERA_OK;
     }
+    int32_t UpdateWorkMode(const WorkModeParam& param)
+    {
+        return DCAMERA_OK;
+    }
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -455,5 +455,30 @@ HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_014, TestSize.Level1)
     testInputListener->OnDataReceived(buffers);
     EXPECT_EQ(true, capacity == 0);
 }
+
+/**
+ * @tc.name: dcamera_source_input_test_015
+ * @tc.desc: Verify source inptut UpdateWorkMode.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_015, TestSize.Level1)
+{
+    EXPECT_EQ(false, testInput_ == nullptr);
+
+    int32_t rc = testInput_->Init();
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    rc = testInput_->ConfigStreams(g_streamInfos);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    WorkModeParam param(12, 120, 0, false);
+    rc = testInput_->UpdateWorkMode(param);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    rc = testInput_->UnInit();
+    EXPECT_EQ(rc, DCAMERA_OK);
+}
+
 } // namespace DistributedHardware
 } // namespace OHOS

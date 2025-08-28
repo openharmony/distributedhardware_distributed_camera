@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "accesstoken_kit.h"
+#include "ashmem.h"
 #include "nativetoken_kit.h"
 #include "token_setproc.h"
 #include "softbus_common.h"
@@ -269,6 +270,84 @@ HWTEST_F(DcameraSourceStubTest, dcamera_source_stub_test_008, TestSize.Level1)
     param.sinkAttrs = "";
     ret = sourceProxy.RegisterDistributedHardware(devId, dhId, reqId, param);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_stub_test_009
+ * @tc.desc: Verify the UpdateDistributedHardwareWorkMode function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSourceStubTest, dcamera_source_stub_test_009, TestSize.Level1)
+{
+    DHLOGI("DcameraSourceStubTest::dcamera_source_stub_test_009");
+    sptr<IRemoteObject> sourceStubPtr(new MockDistributedCameraSourceStub());
+    DistributedCameraSourceProxy sourceProxy(sourceStubPtr);
+    std::string devId = "";
+    std::string dhId = "dhId000";
+    WorkModeParam param(-1, 0, 0, false);
+
+    int32_t ret = sourceProxy.UpdateDistributedHardwareWorkMode(devId, dhId, param);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    devId = "devId000";
+    ret = sourceProxy.UpdateDistributedHardwareWorkMode(devId, dhId, param);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    dhId = "";
+    ret = sourceProxy.UpdateDistributedHardwareWorkMode(devId, dhId, param);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    dhId = "dhId000";
+    param.sharedMemLen = 120;
+    ret = sourceProxy.UpdateDistributedHardwareWorkMode(devId, dhId, param);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    param.fd = 12;
+    param.sharedMemLen = 0;
+    ret = sourceProxy.UpdateDistributedHardwareWorkMode(devId, dhId, param);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_stub_test_010
+ * @tc.desc: Verify the UpdateDistributedHardwareWorkMode function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSourceStubTest, dcamera_source_stub_test_010, TestSize.Level1)
+{
+    DHLOGI("DcameraSourceStubTest::dcamera_source_stub_test_009");
+    sptr<IRemoteObject> sourceStubPtr(new MockDistributedCameraSourceStub());
+    DistributedCameraSourceProxy sourceProxy(sourceStubPtr);
+    std::string devId = "";
+    std::string dhId = "dhId000";
+    WorkModeParam param(-1, 0, 0, false);
+
+    int32_t ret = sourceProxy.UpdateDistributedHardwareWorkMode(devId, dhId, param);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    devId = "devId000";
+    ret = sourceProxy.UpdateDistributedHardwareWorkMode(devId, dhId, param);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    dhId = "";
+    ret = sourceProxy.UpdateDistributedHardwareWorkMode(devId, dhId, param);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    dhId = "dhId000";
+    param.sharedMemLen = 120;
+    ret = sourceProxy.UpdateDistributedHardwareWorkMode(devId, dhId, param);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    uint32_t memLen = sizeof(static_cast<uint32_t>(120));
+    std::string memName = "testMemory";
+    auto syncSharedMem = OHOS::Ashmem::CreateAshmem(memName.c_str(), memLen);
+    param.fd = syncSharedMem->GetAshmemFd();
+    param.sharedMemLen = 120;
+    ret = sourceProxy.UpdateDistributedHardwareWorkMode(devId, dhId, param);
+    EXPECT_EQ(DCAMERA_OK, ret);
+    syncSharedMem->CloseAshmem();
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -62,6 +62,15 @@ public:
         (void)devId;
         (void)dhId;
         (void)events;
+        return DCAMERA_OK;
+    }
+
+    int32_t UpdateDistributedHardwareWorkMode(const std::string& devId, const std::string& dhId,
+        const WorkModeParam& param)
+    {
+        (void)devId;
+        (void)dhId;
+        (void)param;
         return DCAMERA_OK;
     }
 };

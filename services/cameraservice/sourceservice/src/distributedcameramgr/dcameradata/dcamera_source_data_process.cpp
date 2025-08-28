@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -215,6 +215,21 @@ int32_t DCameraSourceDataProcess::GetProducerSize()
 void DCameraSourceDataProcess::GetAllStreamIds(std::vector<int32_t>& streamIds)
 {
     streamIds.assign(streamIds_.begin(), streamIds_.end());
+}
+
+int32_t DCameraSourceDataProcess::UpdateProducerWorkMode(std::vector<int32_t>& streamIds, const WorkModeParam& param)
+{
+    DHLOGI("DCameraSourceDataProcess UpdateProducerWorkMode devId %{public}s dhId %{public}s",
+        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+    int32_t ret = DCAMERA_OK;
+    for (auto iter = streamProcess_.begin(); iter !=  streamProcess_.end(); iter++) {
+        int32_t currentRet = (*iter)->UpdateProducerWorkMode(streamIds, param);
+        if (currentRet != DCAMERA_OK) {
+            DHLOGE("DCameraSourceDataProcess UpdateProducerWorkMode failed, ret:%{public}d", currentRet);
+            ret = currentRet;
+        }
+    }
+    return ret;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

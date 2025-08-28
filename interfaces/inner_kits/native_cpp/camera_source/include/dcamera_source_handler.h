@@ -47,6 +47,8 @@ public:
     int32_t LoadDistributedHDF(std::shared_ptr<HdfDeathCallback> callback) override;
     int32_t UnLoadDistributedHDF() override;
     void SetSAState();
+    int32_t UpdateDistributedHardwareWorkMode(const std::string& devId, const std::string& dhId,
+        const WorkModeParam& param) override;
 private:
     typedef enum {
         DCAMERA_SA_STATE_STOP = 0,

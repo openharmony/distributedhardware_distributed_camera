@@ -506,5 +506,19 @@ int32_t DCameraSourceInput::EstablishSnapshotFrameSession(std::vector<DCameraInd
     isChannelConnected_.store(false);
     return DCAMERA_OK;
 }
+
+int32_t DCameraSourceInput::UpdateWorkMode(const WorkModeParam& param)
+{
+    DHLOGI("UpdateWorkMode UpdateProducerWorkMode devId %{public}s dhId %{public}s",
+        GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+    std::vector<int> streamIds;
+    auto dataprocess = dataProcess_.find(CONTINUOUS_FRAME);
+    CHECK_AND_RETURN_RET_LOG(dataprocess == dataProcess_.end(), DCAMERA_BAD_OPERATE, "can not find continuous frame");
+    CHECK_AND_RETURN_RET_LOG(dataprocess->second == nullptr, DCAMERA_BAD_OPERATE, "dataprocess->second is nullptr");
+    dataprocess->second->GetAllStreamIds(streamIds);
+    int32_t ret = dataprocess->second->UpdateProducerWorkMode(streamIds, param);
+    DHLOGI("update continue stream workmode finished, ret:%{public}d", ret);
+    return ret;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

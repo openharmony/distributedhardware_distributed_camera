@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,13 +33,15 @@ namespace DistributedHardware {
 DCameraStreamDataProcessProducer::DCameraStreamDataProcessProducer(std::string devId, std::string dhId,
     int32_t streamId, DCStreamType streamType)
     : devId_(devId), dhId_(dhId), streamId_(streamId), streamType_(streamType), eventHandler_(nullptr),
-    camHdiProvider_(nullptr)
+    camHdiProvider_(nullptr), workModeParam_(-1, 0, 0, false)
 {
     DHLOGI("DCameraStreamDataProcessProducer Constructor devId %{public}s dhId %{public}s streamType: %{public}d "
         "streamId: %{public}d", GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_);
     state_ = DCAMERA_PRODUCER_STATE_STOP;
     interval_ = DCAMERA_PRODUCER_ONE_MINUTE_MS / DCAMERA_PRODUCER_FPS_DEFAULT;
     photoCount_ = COUNT_INIT_NUM;
+    syncRunning_.store(false);
+    isFirstFrame_.store(true);
 }
 
 DCameraStreamDataProcessProducer::~DCameraStreamDataProcessProducer()
@@ -71,6 +73,10 @@ void DCameraStreamDataProcessProducer::Start()
         smootherListener_ = std::make_shared<FeedingSmootherListener>(shared_from_this());
         smoother_->RegisterListener(smootherListener_);
         smoother_->StartSmooth();
+
+        // Start the audio and video synchronization thread
+        syncRunning_.store(true);
+        syncThread_ = std::thread([this]() { this->SyncVideoThread(); });
     } else {
         producerThread_ = std::thread([this]() { this->LooperSnapShot(); });
     }
@@ -96,6 +102,17 @@ void DCameraStreamDataProcessProducer::Stop()
         }
         eventThread_.join();
         eventHandler_ = nullptr;
+        // Stop the audio and video synchronization thread
+        if (syncMem_ != nullptr) {
+            syncMem_->UnmapAshmem();
+            syncMem_->CloseAshmem();
+            syncMem_ = nullptr;
+        }
+        syncRunning_.store(false);
+        syncBufferCond_.notify_all();
+        if (syncThread_.joinable()) {
+            syncThread_.join();
+        }
     } else {
         producerCon_.notify_one();
         producerThread_.join();
@@ -280,12 +297,243 @@ void DCameraStreamDataProcessProducer::OnSmoothFinished(const std::shared_ptr<IF
         DumpBufferToFile(DUMP_PATH + TO_DISPLAY, buffer->Data(), buffer->Size());
     }
 #endif
+    {
+        // Check if audio-video synchronization is enabled
+        std::lock_guard<std::mutex> lock(workModeParamMtx_);
+        DHLOGD("OnSmoothFinished rawTime: %{public}" PRIu64 ", isAVsync: %{public}d",
+            buffer->frameInfo_.rawTime, workModeParam_.isAVsync);
+        if (workModeParam_.isAVsync) {
+            WritePtsAndAddBuffer(buffer);
+            return;
+        }
+    }
     auto feedFunc = [this, dhBase, buffer]() {
         FeedStreamToDriver(dhBase, buffer);
     };
     if (eventHandler_ != nullptr) {
         eventHandler_->PostTask(feedFunc);
     }
+}
+
+void DCameraStreamDataProcessProducer::WritePtsAndAddBuffer(const std::shared_ptr<DataBuffer>& buffer)
+{
+    bool ret = false;
+    if (syncMem_ == nullptr) {
+        syncMem_ = sptr<Ashmem>(new (std::nothrow) Ashmem(workModeParam_.fd, workModeParam_.sharedMemLen));
+        CHECK_AND_RETURN_LOG(syncMem_ == nullptr, "SyncVideoFrame: syncMem_ is nullptr");
+
+        ret = syncMem_->MapReadAndWriteAshmem();
+        CHECK_AND_RETURN_LOG(!ret, "SyncVideoFrame: MapReadAndWriteAshmem failed");
+    } else {
+        DHLOGI("SyncVideoFrame: syncMem_ is already init");
+    }
+    auto syncData = syncMem_->ReadFromAshmem(workModeParam_.sharedMemLen, 0);
+    SyncSharedData *readSyncSharedData = reinterpret_cast<SyncSharedData *>(const_cast<void *>(syncData));
+    CHECK_AND_RETURN_LOG(readSyncSharedData == nullptr, "read SyncData failed");
+    // get voliate lock
+    while (!readSyncSharedData->lock) {
+        DHLOGI("readSyncSharedData->lock is false");
+        syncData = syncMem_->ReadFromAshmem(workModeParam_.sharedMemLen, 0);
+        readSyncSharedData = reinterpret_cast<SyncSharedData *>(const_cast<void *>(syncData));
+    }
+    DHLOGI("readSyncSharedData->lock is true");
+    readSyncSharedData->lock = 0;
+    ret = syncMem_->WriteToAshmem(static_cast<void *>(readSyncSharedData), sizeof(SyncSharedData), 0);
+    CHECK_AND_RETURN_LOG(!ret, "write sync data failed!");
+    readSyncSharedData->video_current_pts = buffer->frameInfo_.rawTime;
+    readSyncSharedData->video_update_clock = GetNowTimeStampUs();
+    readSyncSharedData->reset = false;
+    readSyncSharedData->lock = 1;
+    ret = syncMem_->WriteToAshmem(static_cast<void *>(readSyncSharedData), sizeof(SyncSharedData), 0);
+    CHECK_AND_RETURN_LOG(!ret, "write sync data failed!");
+    std::lock_guard<std::mutex> lock(syncBufferMutex_);
+    if (syncBufferQueue_.size() >= DCAMERA_MAX_SYNC_BUFFER_SIZE) {
+        DHLOGI("Sync buffer full, drop oldest frame, streamId: %{public}d", streamId_);
+        syncBufferQueue_.pop_front();
+    }
+    syncBufferQueue_.push_back(buffer);
+    syncBufferCond_.notify_one(); // Notify the synchronization thread to process
+    return;
+}
+
+void DCameraStreamDataProcessProducer::SyncVideoThread()
+{
+    DHLOGI("SyncVideoThread started for streamId: %{public}d", streamId_);
+    const std::chrono::milliseconds FRAME_INTERVAL(DCAMERA_SYNC_TIME_INTERVAL); // 33ms per frame
+    std::chrono::steady_clock::time_point nextScheduleTime;
+
+    while (syncRunning_.load()) {
+        std::shared_ptr<DataBuffer> buffer = nullptr;
+
+        // Wait for video frames in the sync queue
+        bool shouldBreak = WaitForVideoFrame(buffer);
+        if (shouldBreak) {
+            break;
+        }
+
+        if (buffer == nullptr) {
+            continue;
+        }
+
+        // Record the start time when the first frame is sent
+        if (isFirstFrame_.load()) {
+            nextScheduleTime = std::chrono::steady_clock::now();
+            isFirstFrame_.store(false);
+            DHLOGI("First frame timestamp recorded, streamId: %{public}d", streamId_);
+        }
+
+        // Synchronization frame judgment
+        uint64_t videoPtsUs = buffer->frameInfo_.rawTime;
+        int32_t syncResult = SyncVideoFrame(videoPtsUs);
+        if (syncResult == 1) {
+            // Synchronization successful, sending video frame
+            DHLOGI("Video frame in sync range, sending...");
+            DHBase dhBase;
+            dhBase.deviceId_ = devId_;
+            dhBase.dhId_ = dhId_;
+
+            int32_t ret = FeedStreamToDriver(dhBase, buffer);
+            if (ret != DCAMERA_OK) {
+                DHLOGE("FeedStreamToDriver failed, ret: %{public}d, streamId: %{public}d", ret, streamId_);
+            } else {
+                // FeedStreamToDriver success video_update_clock
+                DHLOGI("FeedStreamToDriver success, streamId: %{public}d", streamId_);
+                UpdateVideoClock(videoPtsUs);
+            }
+            nextScheduleTime += FRAME_INTERVAL; // Perform timed scheduling after successful transmission
+            std::this_thread::sleep_until(nextScheduleTime);
+        } else if (syncResult == 0) {
+            DHLOGI("Video frame too early, rescheduling for next cycle...");
+            {
+                std::lock_guard<std::mutex> lock(syncBufferMutex_);
+                syncBufferQueue_.push_front(buffer);
+            }
+
+            // Perform timed scheduling after successful transmission
+            nextScheduleTime += FRAME_INTERVAL;
+            std::this_thread::sleep_until(nextScheduleTime);
+        } else {
+            // Video frame is too late, discard directly and process next frame immediately
+            DHLOGI("Video frame too late, dropped...");
+            continue;
+        }
+    }
+
+    DHLOGI("SyncVideoThread exited for streamId: %{public}d", streamId_);
+}
+
+bool DCameraStreamDataProcessProducer::WaitForVideoFrame(std::shared_ptr<DataBuffer>& buffer)
+{
+    std::unique_lock<std::mutex> lock(syncBufferMutex_);
+    syncBufferCond_.wait(lock, [this] {
+        return !syncBufferQueue_.empty() || !syncRunning_.load();
+    });
+
+    if (!syncRunning_.load()) {
+        return true; // exit
+    }
+
+    if (!syncBufferQueue_.empty() && syncBufferQueue_.size() >= DCAMERA_SYNC_WATERMARK) {
+        buffer = syncBufferQueue_.front();
+        syncBufferQueue_.pop_front();
+    }
+    
+    return false; // don't exit
+}
+
+int32_t DCameraStreamDataProcessProducer::SyncVideoFrame(uint64_t videoPtsUs)
+{
+    int64_t videoPts = videoPtsUs / DCAMERA_NS_TO_MS; // us -> ms
+    int64_t audioPts = 0; // get audio timestamp from shared memory
+    int64_t audioUpdatePts = 0; // audio update time
+    float audioSpeed = 1.0f; // audio playback speed factor
+    bool ret = false;
+    CHECK_AND_RETURN_RET_LOG(syncMem_ == nullptr, DCAMERA_BAD_VALUE, "SyncVideoFrame: syncMem_ is nullptr.");
+    auto syncData = syncMem_->ReadFromAshmem(workModeParam_.sharedMemLen, 0);
+    SyncSharedData *readSyncSharedData = reinterpret_cast<SyncSharedData *>(const_cast<void *>(syncData));
+    CHECK_AND_RETURN_RET_LOG(readSyncSharedData == nullptr, DCAMERA_BAD_VALUE, "read SyncData failed");
+    // get voliate lock
+    while (!readSyncSharedData->lock) {
+        DHLOGI("readSyncSharedData->lock is false");
+        syncData = syncMem_->ReadFromAshmem(workModeParam_.sharedMemLen, 0);
+        readSyncSharedData = reinterpret_cast<SyncSharedData *>(const_cast<void *>(syncData));
+    }
+    readSyncSharedData->lock = 0;
+    ret = syncMem_->WriteToAshmem(static_cast<void *>(readSyncSharedData), sizeof(SyncSharedData), 0);
+    CHECK_AND_RETURN_RET_LOG(!ret, DCAMERA_BAD_VALUE, "write sync data failed!");
+    audioPts = readSyncSharedData->audio_current_pts / DCAMERA_US_TO_MS; // us -> ms
+    audioUpdatePts = readSyncSharedData->audio_update_clock / DCAMERA_US_TO_MS; // us -> ms
+    audioSpeed = readSyncSharedData->audio_speed;
+    readSyncSharedData->lock = 1;
+    ret = syncMem_->WriteToAshmem(static_cast<void *>(readSyncSharedData), sizeof(SyncSharedData), 0);
+    CHECK_AND_RETURN_RET_LOG(!ret, DCAMERA_BAD_VALUE, "write sync data failed!");
+
+    int64_t currentTime = static_cast<int64_t>(GetNowTimeStampMs());
+    int64_t estimatedPts = static_cast<int64_t>(audioPts + (currentTime - audioUpdatePts) * audioSpeed);
+
+    int64_t diff = static_cast<int64_t>(estimatedPts - videoPts); // calculate audio-video time difference
+    DHLOGD("SyncCheck: videoPts=%{public}" PRIu64 ", estimatedPts=%{public}" PRIu64 ", diff=%{public}" PRId64 "ms",
+           videoPts, estimatedPts, diff);
+
+    if (diff > DCAMERA_TIME_DIFF_MAX) {
+        DHLOGI("SyncVideoFrame::Video is too late (diff=%{public}" PRId64 "ms), skip this frame.", diff);
+        // Drop if there is still data in the queue, play the last frame directly
+        return (syncBufferQueue_.size() > 0) ? -1 : 1;
+    } else if (diff < DCAMERA_TIME_DIFF_MIN) {
+        DHLOGI("SyncVideoFrame::Video is too early (diff=%{public}" PRId64 "ms), wait for next scheduling.", diff);
+        return 0;
+    } else {
+        DHLOGD("SyncVideoFrame::Video frame in sync range, will be sent. diff=%{public}" PRId64 "ms", diff);
+        return 1;
+    }
+}
+
+void DCameraStreamDataProcessProducer::UpdateVideoClock(uint64_t videoPtsUs)
+{
+    {
+        std::lock_guard<std::mutex> lock(workModeParamMtx_);
+        if (!workModeParam_.isAVsync) {
+            return;
+        }
+    }
+
+    CHECK_AND_RETURN_LOG(syncMem_ == nullptr, "UpdateVideoClock: syncMem_ is nullptr.");
+
+    auto syncData = syncMem_->ReadFromAshmem(workModeParam_.sharedMemLen, 0);
+    SyncSharedData *readSyncSharedData = reinterpret_cast<SyncSharedData *>(const_cast<void *>(syncData));
+    CHECK_AND_RETURN_LOG(readSyncSharedData == nullptr, "read SyncData failed");
+    while (!readSyncSharedData->lock) {
+        syncData = syncMem_->ReadFromAshmem(workModeParam_.sharedMemLen, 0);
+        readSyncSharedData = reinterpret_cast<SyncSharedData *>(const_cast<void *>(syncData));
+    }
+    readSyncSharedData->lock = 0;
+    bool ret = syncMem_->WriteToAshmem(static_cast<void *>(readSyncSharedData), sizeof(SyncSharedData), 0);
+    CHECK_AND_RETURN_LOG(!ret, "write sync data failed!");
+    readSyncSharedData->video_current_pts = videoPtsUs;
+    readSyncSharedData->video_update_clock = GetNowTimeStampUs();
+    readSyncSharedData->reset = false;
+    readSyncSharedData->lock = 1;
+    ret = syncMem_->WriteToAshmem(static_cast<void *>(readSyncSharedData), sizeof(SyncSharedData), 0);
+    CHECK_AND_RETURN_LOG(!ret, "write sync data failed!");
+    DHLOGD("Video update clock updated to: %" PRIu64 " us", readSyncSharedData->video_update_clock);
+}
+
+void DCameraStreamDataProcessProducer::UpdateProducerWorkMode(const WorkModeParam& param)
+{
+    DHLOGI("begin update producer workmode");
+    if (!param.isAVsync) {
+        if (syncMem_ != nullptr) {
+            syncMem_->UnmapAshmem();
+            syncMem_->CloseAshmem();
+            syncMem_ = nullptr;
+            DHLOGI("syncMem_ release success.");
+        }
+    }
+    {
+        std::lock_guard<std::mutex> lock(workModeParamMtx_);
+        workModeParam_ = param;
+    }
+    DHLOGI("update producer workmode success");
 }
 } // namespace DistributedHardware
 } // namespace OHOS

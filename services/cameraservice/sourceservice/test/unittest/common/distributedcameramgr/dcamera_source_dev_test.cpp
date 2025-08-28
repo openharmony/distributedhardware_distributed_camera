@@ -704,6 +704,23 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_022, TestSize.Level1)
 }
 
 /**
+ * @tc.name: dcamera_source_dev_test_023
+ * @tc.desc: Verify source dev UpdateDCameraWorkMode.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_023, TestSize.Level1)
+{
+    WorkModeParam param(12, 120, 0, false);
+    int32_t ret = camDev_->UpdateDCameraWorkMode(param);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+    camDev_->InitDCameraSourceDev();
+    camDev_->input_->Init();
+    ret = camDev_->UpdateDCameraWorkMode(param);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
  * @tc.name: SetHicollieFlag_001
  * @tc.desc: Verify source dev SetHicollieFlag.
  * @tc.type: FUNC

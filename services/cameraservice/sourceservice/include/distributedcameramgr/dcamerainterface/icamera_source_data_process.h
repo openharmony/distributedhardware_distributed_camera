@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,6 +18,7 @@
 
 #include <vector>
 
+#include "idistributed_camera_source.h"
 #include "data_buffer.h"
 #include "v1_1/dcamera_types.h"
 
@@ -63,6 +64,7 @@ public:
     virtual int32_t StopCapture(std::vector<int32_t>& streamIds) = 0;
     virtual int32_t GetProducerSize() = 0;
     virtual void GetAllStreamIds(std::vector<int32_t>& streamIds) = 0;
+    virtual int32_t UpdateProducerWorkMode(std::vector<int32_t>& streamIds, const WorkModeParam& param) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

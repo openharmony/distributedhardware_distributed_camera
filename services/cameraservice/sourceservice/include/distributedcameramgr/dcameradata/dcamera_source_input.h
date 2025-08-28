@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -43,6 +43,7 @@ public:
     int32_t Init() override;
     int32_t UnInit() override;
     int32_t UpdateSettings(std::vector<std::shared_ptr<DCameraSettings>>& settings) override;
+    int32_t UpdateWorkMode(const WorkModeParam& param) override;
 
     void OnSessionState(DCStreamType streamType, int32_t state);
     void OnSessionError(DCStreamType streamType, int32_t eventType, int32_t eventReason, std::string detail);

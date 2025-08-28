@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,7 @@
 #ifndef OHOS_ICAMERA_INPUT_H
 #define OHOS_ICAMERA_INPUT_H
 
+#include "idistributed_camera_source.h"
 #include "v1_1/dcamera_types.h"
 
 namespace OHOS {
@@ -36,6 +37,7 @@ public:
     virtual int32_t Init() = 0;
     virtual int32_t UnInit() = 0;
     virtual int32_t UpdateSettings(std::vector<std::shared_ptr<DCameraSettings>>& settings) = 0;
+    virtual int32_t UpdateWorkMode(const WorkModeParam& param) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

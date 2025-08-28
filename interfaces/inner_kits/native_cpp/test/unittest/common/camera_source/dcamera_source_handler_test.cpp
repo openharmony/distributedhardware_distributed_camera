@@ -187,5 +187,24 @@ HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_006, TestSize.Lev
     int32_t ret = DCameraSourceHandler::GetInstance().InitSource(params);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
+
+/**
+ * @tc.name: dcamera_source_handler_test_007
+ * @tc.desc: Verify the UpdateDistributedHardwareWorkMode function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_007, TestSize.Level0)
+{
+    std::string devId = TEST_DEVICE_ID;
+    std::string dhId = TEST_CAMERA_DH_ID_0;
+    WorkModeParam param(-1, 0, 0, false);
+    int32_t ret = DCameraSourceHandler::GetInstance().UpdateDistributedHardwareWorkMode(devId, dhId, param);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+    param.fd = 12;
+    param.sharedMemLen = 120;
+    ret = DCameraSourceHandler::GetInstance().UpdateDistributedHardwareWorkMode(devId, dhId, param);
+    EXPECT_NE(DCAMERA_OK, ret);
+}
 }
 }

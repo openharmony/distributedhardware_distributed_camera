@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -222,6 +222,46 @@ bool DistributedCameraSourceProxy::CheckNotifyParams(const std::string& devId, c
 
     if (events.empty() || events.size() > PARAM_MAX_SIZE) {
         DHLOGE("events is invalid");
+        return false;
+    }
+    return true;
+}
+
+int32_t DistributedCameraSourceProxy::UpdateDistributedHardwareWorkMode(const std::string& devId,
+    const std::string& dhId, const WorkModeParam& param)
+{
+    DHLOGI("devId: %{public}s dhId: %{public}s", GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
+    if (!CheckUpdateParams(devId, dhId, param)) {
+        DHLOGE("workmode param is invalid");
+        return DCAMERA_BAD_VALUE;
+    }
+    sptr<IRemoteObject> remote = Remote();
+    CHECK_AND_RETURN_RET_LOG(remote == nullptr, DCAMERA_BAD_VALUE, "remote service is null");
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(DistributedCameraSourceProxy::GetDescriptor())) {
+        DHLOGE("write token failed");
+        return DCAMERA_BAD_VALUE;
+    }
+    bool writeRet = !data.WriteString(devId) || !data.WriteString(dhId) || !data.WriteFileDescriptor(param.fd) ||
+        !data.WriteInt32(param.sharedMemLen) || !data.WriteUint32(param.scene) || !data.WriteInt32(param.isAVsync);
+    CHECK_AND_RETURN_RET_LOG(writeRet, DCAMERA_BAD_VALUE, "write params failed");
+    remote->SendRequest(static_cast<uint32_t>(IDCameraSourceInterfaceCode::UPDATE_WORKMODE),
+        data, reply, option);
+    int32_t result = reply.ReadInt32();
+    return result;
+}
+
+bool DistributedCameraSourceProxy::CheckUpdateParams(const std::string& devId, const std::string& dhId,
+    const WorkModeParam& param)
+{
+    if (devId.empty() || devId.size() > DID_MAX_SIZE || dhId.empty() || dhId.size() > DID_MAX_SIZE) {
+        DHLOGE("input params is invalid");
+        return false;
+    }
+    if (param.fd < 0 || param.sharedMemLen < 0) {
+        DHLOGE("workmode param is invalid");
         return false;
     }
     return true;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,6 +37,8 @@ DistributedCameraSourceStub::DistributedCameraSourceStub() : IRemoteStub(true)
         &DistributedCameraSourceStub::UnregisterDistributedHardwareInner;
     memberFuncMap_[static_cast<uint32_t>(IDCameraSourceInterfaceCode::CAMERA_NOTIFY)] =
         &DistributedCameraSourceStub::DCameraNotifyInner;
+    memberFuncMap_[static_cast<uint32_t>(IDCameraSourceInterfaceCode::UPDATE_WORKMODE)] =
+        &DistributedCameraSourceStub::UpdateDCameraWorkModeInner;
 }
 
 DistributedCameraSourceStub::~DistributedCameraSourceStub()
@@ -73,6 +75,8 @@ int32_t DistributedCameraSourceStub::OnRemoteRequest(uint32_t code, MessageParce
             return UnregisterDistributedHardwareInner(data, reply);
         case static_cast<uint32_t>(IDCameraSourceInterfaceCode::CAMERA_NOTIFY):
             return DCameraNotifyInner(data, reply);
+        case static_cast<uint32_t>(IDCameraSourceInterfaceCode::UPDATE_WORKMODE):
+            return UpdateDCameraWorkModeInner(data, reply);
         default:
             DHLOGE("Invalid OnRemoteRequest code=%{public}d", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -251,6 +255,45 @@ bool DistributedCameraSourceStub::CheckNotifyParams(const std::string& devId, co
         DHLOGE("events is invalid");
         return false;
     }
+    return true;
+}
+
+int32_t DistributedCameraSourceStub::UpdateDCameraWorkModeInner(MessageParcel &data, MessageParcel &reply)
+{
+    DHLOGD("update dcamera workmode");
+    int32_t ret = DCAMERA_OK;
+    do {
+        if (!HasEnableDHPermission()) {
+            DHLOGE("The caller has no ENABLE_DISTRIBUTED_HARDWARE permission.");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
+        std::string devId = data.ReadString();
+        std::string dhId = data.ReadString();
+        WorkModeParam params(-1, 0, 0, false);
+        params.fd = data.ReadFileDescriptor();
+        params.sharedMemLen = data.ReadInt32();
+        params.scene = data.ReadUint32();
+        params.isAVsync = static_cast<bool>(data.ReadInt32());
+        if (!CheckUpdateParams(devId, dhId, params)) {
+            DHLOGE("input param is invalid");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
+        ret = UpdateDistributedHardwareWorkMode(devId, dhId, params);
+        DHLOGI("DistributedCameraSourceStub UpdateDistributedHardwareWorkMode %{public}d", ret);
+    } while (0);
+    reply.WriteInt32(ret);
+    return ret;
+}
+
+bool DistributedCameraSourceStub::CheckUpdateParams(const std::string& devId, const std::string& dhId,
+    const WorkModeParam& param)
+{
+    bool ret = devId.empty() || devId.size() > DID_MAX_SIZE || dhId.empty() || dhId.size() > DID_MAX_SIZE;
+    CHECK_AND_RETURN_RET_LOG(ret, false, "input params is invalid");
+    ret = param.fd < 0 || param.sharedMemLen < 0;
+    CHECK_AND_RETURN_RET_LOG(ret, false, "workmode param is invalid");
     return true;
 }
 } // namespace DistributedHardware

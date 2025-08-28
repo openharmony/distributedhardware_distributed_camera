@@ -503,7 +503,6 @@ int32_t DCameraSourceDev::OpenCamera()
     }
 
     CHECK_AND_RETURN_RET_LOG(stateListener_ == nullptr, DCAMERA_BAD_VALUE, "stateListener_ is nullptr.");
-    stateListener_->OnHardwareStateChanged(devId_, dhId_, DcameraBusinessState::RUNNING);
     return DCAMERA_OK;
 }
 
@@ -638,10 +637,9 @@ int32_t DCameraSourceDev::StartCapture(std::vector<std::shared_ptr<DCCaptureInfo
         capture->encodeType_ = (*iter)->encodeType_;
         capture->streamType_ = (*iter)->type_;
         DHLOGI("StartCapture devId %{public}s dhId %{public}s settings size: %{public}zu w: %{public}d h: %{public}d "
-            "fmt: %{public}d isC: %{public}d enc: %{public}d streamT: %{public}d",
-            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), (*iter)->captureSettings_.size(),
-            capture->width_, capture->height_, capture->format_, capture->isCapture_ ? 1 : 0, capture->encodeType_,
-            capture->streamType_);
+            "fmt: %{public}d isC: %{public}d enc: %{public}d streamT: %{public}d", GetAnonyString(devId_).c_str(),
+            GetAnonyString(dhId_).c_str(), (*iter)->captureSettings_.size(), capture->width_, capture->height_,
+            capture->format_, capture->isCapture_ ? 1 : 0, capture->encodeType_, capture->streamType_);
         for (auto settingIter = (*iter)->captureSettings_.begin(); settingIter != (*iter)->captureSettings_.end();
             settingIter++) {
             std::shared_ptr<DCameraSettings> setting = std::make_shared<DCameraSettings>();
@@ -660,6 +658,7 @@ int32_t DCameraSourceDev::StartCapture(std::vector<std::shared_ptr<DCCaptureInfo
         DcameraFinishAsyncTrace(DCAMERA_CONTINUE_FIRST_FRAME, DCAMERA_CONTINUE_FIRST_FRAME_TASKID);
         DcameraFinishAsyncTrace(DCAMERA_SNAPSHOT_FIRST_FRAME, DCAMERA_SNAPSHOT_FIRST_FRAME_TASKID);
     }
+    stateListener_->OnHardwareStateChanged(devId_, dhId_, DcameraBusinessState::RUNNING);
     return ret;
 }
 
@@ -884,6 +883,14 @@ bool DCameraSourceDev::GetHicollieFlag()
 void DCameraSourceDev::SetTokenId(uint64_t token)
 {
     tokenId_ = token;
+}
+
+int32_t DCameraSourceDev::UpdateDCameraWorkMode(const WorkModeParam& param)
+{
+    CHECK_AND_RETURN_RET_LOG(input_ == nullptr, DCAMERA_BAD_VALUE, "input_ is nullptr");
+    int32_t ret = input_->UpdateWorkMode(param);
+    DHLOGI("update dcamera workmode by input_ done, ret %{public}d", ret);
+    return ret;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
