@@ -336,11 +336,13 @@ std::string DCameraHandler::GetCameraPosition(CameraStandard::CameraPosition pos
 }
 
 void DCameraHandler::ProcessProfile(const DCStreamType type, std::map<std::string, std::list<std::string>>& formatMap,
-    std::vector<CameraStandard::Profile>& profileList, std::set<int32_t>& formatSet)
+    std::map<std::string, std::list<std::string>>& fpsMap, std::vector<CameraStandard::Profile>& profileList,
+    std::set<int32_t>& formatSet)
 {
     for (auto& profile : profileList) {
         CameraStandard::CameraFormat format = profile.GetCameraFormat();
         CameraStandard::Size picSize = profile.GetSize();
+        CameraStandard::Fps fps = profile.GetFps();
         int32_t dformat = CovertToDcameraFormat(format);
         if (dformat == INVALID_FORMAT) {
             continue;
@@ -350,7 +352,10 @@ void DCameraHandler::ProcessProfile(const DCStreamType type, std::map<std::strin
         std::string formatName = std::to_string(dformat);
         if (IsValid(type, picSize)) {
             std::string resolutionValue = std::to_string(picSize.width) + "*" + std::to_string(picSize.height);
+            std::string fpsValue = std::to_string(fps.fixedFps) + " " +
+                std::to_string(fps.minFps) + " " + std::to_string(fps.maxFps);
             formatMap[formatName].push_back(resolutionValue);
+            fpsMap[formatName].push_back(fpsValue);
         }
     }
 }
@@ -366,7 +371,8 @@ void DCameraHandler::ConfigFormatphoto(const DCStreamType type, cJSON* root,
     }
     cJSON_AddItemToObject(root, CAMERA_FORMAT_PHOTO.c_str(), formatphotoObj);
     std::map<std::string, std::list<std::string>> formatMap;
-    ProcessProfile(type, formatMap, profileList, formatSet);
+    std::map<std::string, std::list<std::string>> fpsMap;
+    ProcessProfile(type, formatMap, fpsMap, profileList, formatSet);
     cJSON* resolutionObj = cJSON_CreateObject();
     if (resolutionObj == nullptr) {
         return;
@@ -379,6 +385,20 @@ void DCameraHandler::ConfigFormatphoto(const DCStreamType type, cJSON* root,
         }
     }
     cJSON_AddItemToObject(formatphotoObj, CAMERA_RESOLUTION_KEY.c_str(), resolutionObj);
+    
+    cJSON* fpsObj = cJSON_CreateObject();
+    if (fpsObj == nullptr) {
+        return;
+    }
+    for (auto &pair : fpsMap) {
+        cJSON* array = cJSON_CreateArray();
+        cJSON_AddItemToObject(fpsObj, pair.first.c_str(), array);
+        for (auto &value : pair.second) {
+            cJSON_AddItemToArray(array, cJSON_CreateString(value.c_str()));
+        }
+    }
+    cJSON_AddItemToObject(formatphotoObj, CAMERA_FPS_KEY.c_str(), fpsObj);
+
     cJSON* array = cJSON_CreateArray();
     if (array == nullptr) {
         return;
@@ -400,7 +420,8 @@ void DCameraHandler::ConfigFormatvideo(const DCStreamType type, cJSON* root,
     }
     cJSON_AddItemToObject(root, CAMERA_FORMAT_PREVIEW.c_str(), formatpreviewObj);
     std::map<std::string, std::list<std::string>> formatMap;
-    ProcessProfile(type, formatMap, profileList, formatSet);
+    std::map<std::string, std::list<std::string>> fpsMap;
+    ProcessProfile(type, formatMap, fpsMap, profileList, formatSet);
     cJSON* resolutionObj = cJSON_CreateObject();
     if (resolutionObj == nullptr) {
         return;
@@ -413,6 +434,20 @@ void DCameraHandler::ConfigFormatvideo(const DCStreamType type, cJSON* root,
         }
     }
     cJSON_AddItemToObject(formatpreviewObj, CAMERA_RESOLUTION_KEY.c_str(), resolutionObj);
+
+    cJSON* fpsObj = cJSON_CreateObject();
+    if (fpsObj == nullptr) {
+        return;
+    }
+    for (auto &pair : fpsMap) {
+        cJSON* array = cJSON_CreateArray();
+        cJSON_AddItemToObject(fpsObj, pair.first.c_str(), array);
+        for (auto &value : pair.second) {
+            cJSON_AddItemToArray(array, cJSON_CreateString(value.c_str()));
+        }
+    }
+    cJSON_AddItemToObject(formatpreviewObj, CAMERA_FPS_KEY.c_str(), fpsObj);
+
     cJSON* array = cJSON_CreateArray();
     if (array == nullptr) {
         return;
