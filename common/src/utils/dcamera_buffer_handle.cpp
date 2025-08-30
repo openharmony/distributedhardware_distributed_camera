@@ -27,7 +27,7 @@ namespace DistributedHardware {
 void* DCameraMemoryMap(const BufferHandle *buffer)
 {
     if (buffer == nullptr) {
-        DHLOGE("mmap the buffer handle is NULL");
+        DHLOGE("mmap the buffer handle is null");
         return nullptr;
     }
 
