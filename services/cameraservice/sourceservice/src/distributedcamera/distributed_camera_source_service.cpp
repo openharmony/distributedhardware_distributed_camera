@@ -443,5 +443,20 @@ void DistributedCameraSourceService::StartHicollieThread()
     }
     // LCOV_EXCL_STOP
 }
+
+int32_t DistributedCameraSourceService::UpdateDistributedHardwareWorkMode(const std::string& devId,
+    const std::string& dhId, const WorkModeParam& param)
+{
+    DHLOGI("update camera workmode, networkId: %{public}s, dhId: %{public}s", GetAnonyString(devId).c_str(),
+        GetAnonyString(dhId).c_str());
+    DCameraIndex camIndex(devId, dhId);
+    int32_t ret = DCAMERA_OK;
+    std::shared_ptr<DCameraSourceDev> camDev = GetCamDevByIndex(camIndex);
+
+    CHECK_AND_RETURN_RET_LOG(camDev == nullptr, DCAMERA_NOT_FOUND, "can not found device");
+    ret = camDev->UpdateDCameraWorkMode(param);
+    DHLOGI("update camera workmode done,ret:%{public}d", ret);
+    return ret;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

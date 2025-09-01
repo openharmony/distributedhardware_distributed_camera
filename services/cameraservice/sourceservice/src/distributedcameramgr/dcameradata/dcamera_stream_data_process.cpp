@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -307,6 +307,24 @@ Videoformat DCameraStreamDataProcess::GetPipelineFormat(int32_t format)
             break;
     }
     return videoFormat;
+}
+
+int32_t DCameraStreamDataProcess::UpdateProducerWorkMode(std::vector<int32_t>& streamIds, const WorkModeParam& param)
+{
+    std::lock_guard<std::mutex> autoLock(producerMutex_);
+    for (auto iter = streamIds.begin(); iter != streamIds.end(); iter++) {
+        uint32_t streamId = *iter;
+        auto producerIter = producers_.find(streamId);
+        if (producerIter != producers_.end()) {
+            DHLOGI("update producer workmode, streamId: %{public}" PRIu32, streamId);
+            if (producerIter->second == nullptr) {
+                DHLOGE("update producer workmode failed, streamId: %{public}" PRIu32, streamId);
+                return DCAMERA_BAD_OPERATE;
+            }
+            producerIter->second->UpdateProducerWorkMode(param);
+        }
+    }
+    return DCAMERA_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

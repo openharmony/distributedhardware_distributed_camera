@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -212,6 +212,35 @@ HWTEST_F(DCameraSourceDataProcessTest, dcamera_source_data_process_test_006, Tes
     EXPECT_EQ(rc, DCAMERA_OK);
 
     rc = testSrcDataProcess_->ReleaseStreams(g_streamIds);
+    EXPECT_EQ(rc, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: dcamera_source_data_process_test_007
+ * @tc.desc: Verify UpdateProducerWorkMode.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceDataProcessTest, dcamera_source_data_process_test_007, TestSize.Level1)
+{
+    EXPECT_EQ(false, testSrcDataProcess_ == nullptr);
+
+    std::shared_ptr<DCCaptureInfo> captureInfo = std::make_shared<DCCaptureInfo>();
+    captureInfo->streamIds_.push_back(1);
+    captureInfo->width_ = TEST_WIDTH;
+    captureInfo->height_ = TEST_HEIGTH;
+    captureInfo->stride_ = 1;
+    captureInfo->format_ = 1;
+    captureInfo->dataspace_ = 1;
+    captureInfo->encodeType_ = ENCODE_TYPE_H265;
+    captureInfo->type_ = CONTINUOUS_FRAME;
+    int32_t rc = testSrcDataProcess_->StartCapture(captureInfo);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    std::vector<int32_t> streamIds;
+    streamIds.push_back(1);
+    WorkModeParam param(12, 120, 0, false);
+    rc = testSrcDataProcess_->UpdateProducerWorkMode(streamIds, param);
     EXPECT_EQ(rc, DCAMERA_OK);
 }
 } // namespace DistributedHardware

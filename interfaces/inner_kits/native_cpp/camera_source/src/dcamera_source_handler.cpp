@@ -228,6 +228,20 @@ void DCameraSourceHandler::SetSAState()
     state_ = DCAMERA_SA_STATE_STOP;
 }
 
+int32_t DCameraSourceHandler::UpdateDistributedHardwareWorkMode(const std::string& devId, const std::string& dhId,
+    const WorkModeParam& param)
+{
+    DHLOGI("update camera workmode, devId: %{public}s dhId: %{public}s", GetAnonyString(devId).c_str(),
+        GetAnonyString(dhId).c_str());
+    sptr<IDistributedCameraSource> dCameraSourceSrv = DCameraSourceHandlerIpc::GetInstance().GetSourceLocalCamSrv();
+    CHECK_AND_RETURN_RET_LOG(dCameraSourceSrv == nullptr, DCAMERA_BAD_VALUE, "get service failed");
+    int32_t ret = dCameraSourceSrv->UpdateDistributedHardwareWorkMode(devId, dhId, param);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("update camera workmode failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 IDistributedHardwareSource *GetSourceHardwareHandler()
 {
     DHLOGI("DCameraSourceHandler GetSourceHardwareHandler Start");

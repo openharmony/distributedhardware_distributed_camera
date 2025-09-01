@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,12 +41,15 @@ public:
     int32_t UnregisterDistributedHardware(const std::string& devId, const std::string& dhId,
         const std::string& reqId) override;
     int32_t DCameraNotify(const std::string& devId, const std::string& dhId, std::string& events) override;
+    int32_t UpdateDistributedHardwareWorkMode(const std::string& devId, const std::string& dhId,
+        const WorkModeParam& param) override;
 
 private:
     bool CheckRegParams(const std::string& devId, const std::string& dhId,
         const std::string& reqId, const EnableParam& param);
     bool CheckUnregParams(const std::string& devId, const std::string& dhId, const std::string& reqId);
     bool CheckNotifyParams(const std::string& devId, const std::string& dhId, std::string& events);
+    bool CheckUpdateParams(const std::string& devId, const std::string& dhId, const WorkModeParam& param);
 
     static inline BrokerDelegator<DistributedCameraSourceProxy> delegator_;
     const size_t PARAM_MAX_SIZE = 50 * 1024 * 1024;

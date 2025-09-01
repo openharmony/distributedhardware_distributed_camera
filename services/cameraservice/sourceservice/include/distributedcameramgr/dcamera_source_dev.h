@@ -70,6 +70,7 @@ public:
     bool GetHicollieFlag();
     int32_t GetFullCaps();
     void SetTokenId(uint64_t token);
+    int32_t UpdateDCameraWorkMode(const WorkModeParam& param);
 
     class DCameraSourceDevEventHandler : public AppExecFwk::EventHandler {
         public:

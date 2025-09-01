@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -240,6 +240,22 @@ HWTEST_F(DistributedCameraSourceServiceTest, dcamera_source_service_test_009, Te
     ret = testSrcService_->UnLoadCameraHDF();
     EXPECT_EQ(DCAMERA_OK, ret);
     usleep(TEST_SOURCE_SERVICE);
+}
+
+/**
+ * @tc.name: dcamera_source_service_test_010
+ * @tc.desc: Verify the UpdateDistributedHardwareWorkMode function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DistributedCameraSourceServiceTest, dcamera_source_service_test_010, TestSize.Level1)
+{
+    DHLOGI("DistributedCameraSourceServiceTest::dcamera_source_service_test_010");
+    EXPECT_EQ(false, testSrcService_ == nullptr);
+
+    WorkModeParam param(12, 120, 0, false);;
+    int32_t ret = testSrcService_->UpdateDistributedHardwareWorkMode(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, param);
+    EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

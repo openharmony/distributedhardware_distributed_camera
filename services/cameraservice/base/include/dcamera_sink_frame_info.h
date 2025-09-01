@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,6 +33,7 @@ public:
     int64_t finishEncodeT_;
     int64_t sendT_;
     std::string ver_;
+    std::string rawTime_;
 
 public:
     const std::string FRAME_INFO_TYPE = "type";
@@ -43,6 +44,7 @@ public:
     const std::string FRAME_INFO_ENCODET = "encodeT";
     const std::string FRAME_INFO_SENDT = "sendT";
     const std::string FRAME_INFO_VERSION = "ver";
+    const std::string RAW_TIME = "rawTime";
 
 public:
     void Marshal(std::string& jsonStr);

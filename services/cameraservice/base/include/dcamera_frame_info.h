@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,6 +38,7 @@ struct DCameraFrameInfo {
     int32_t index = 0;
     int32_t offset = 0;
     int64_t pts = 0;
+    int64_t rawTime = 0;
     DCameraFrameProcessTimePoint timePonit {0};
 };
 } // namespace DistributedHardware

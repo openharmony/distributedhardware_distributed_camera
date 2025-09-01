@@ -57,6 +57,8 @@ public:
     static void CamDevErase(DCameraIndex& index);
     static uint32_t GetCamDevNum();
     void StartHicollieThread();
+    int32_t UpdateDistributedHardwareWorkMode(const std::string& devId, const std::string& dhId,
+        const WorkModeParam& param) override;
 
 protected:
     void OnStart() override;
