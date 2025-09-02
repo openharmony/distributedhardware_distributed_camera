@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,30 +14,29 @@
  */
 
 #include "sinkhandlerregisterprivacyresources_fuzzer.h"
-
 #include "dcamera_sink_handler.h"
 #include "distributed_camera_constants.h"
 #include "mock_component_resourceinfo.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 void SinkHandlerRegisterPrivacyResourcesFuzzTest(const uint8_t* data, size_t size)
 {
-    if (data == nullptr) {
-        return;
+    FuzzedDataProvider fdp(data, size);
+    const size_t maxRegistrations = 5;
+    size_t numRegistrations = fdp.ConsumeIntegralInRange<size_t>(0, maxRegistrations);
+
+    for (size_t i = 0; i < numRegistrations; ++i) {
+        std::shared_ptr<PrivacyResourcesListener> callback = std::make_shared<MockComponentResourceInfo>();
+        DCameraSinkHandler::GetInstance().RegisterPrivacyResources(callback);
     }
-    std::shared_ptr<PrivacyResourcesListener> callback = std::make_shared<MockComponentResourceInfo>();
-
-    DCameraSinkHandler::GetInstance().RegisterPrivacyResources(callback);
 }
 }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DistributedHardware::SinkHandlerRegisterPrivacyResourcesFuzzTest(data, size);
     return 0;
 }
-

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,33 +14,30 @@
  */
 
 #include "encodeoninputbufferavailable_fuzzer.h"
-
 #include "encode_video_callback.h"
+#include "fuzzer/FuzzedDataProvider.h"
+#include <memory>
 
 namespace OHOS {
 namespace DistributedHardware {
 void EncodeOnInputBufferAvailableFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(uint32_t))) {
-        return;
-    }
+    FuzzedDataProvider fdp(data, size);
 
-    uint32_t index = *(reinterpret_cast<const uint32_t*>(data));
+    uint32_t index = fdp.ConsumeIntegral<uint32_t>();
+
     std::shared_ptr<DCameraPipelineSink> sinkPipeline = std::make_shared<DCameraPipelineSink>();
     std::shared_ptr<EncodeDataProcess> encodeDataProcess = std::make_shared<EncodeDataProcess>(sinkPipeline);
     std::shared_ptr<EncodeVideoCallback> encodeVideoCallback = std::make_shared<EncodeVideoCallback>(encodeDataProcess);
 
-    std::shared_ptr<Media::AVSharedMemory> buffer = nullptr;
+    std::shared_ptr<Media::AVSharedMemory> buffer;
     encodeVideoCallback->OnInputBufferAvailable(index, buffer);
 }
 }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DistributedHardware::EncodeOnInputBufferAvailableFuzzTest(data, size);
     return 0;
 }
-
