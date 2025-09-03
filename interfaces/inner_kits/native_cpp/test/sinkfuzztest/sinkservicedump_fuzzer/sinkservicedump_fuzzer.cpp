@@ -20,24 +20,32 @@
 #include <string>
 #include <unistd.h>
 #include <algorithm>
-
+#include "fuzzer/FuzzedDataProvider.h"
 namespace OHOS {
 namespace DistributedHardware {
 void SinkServiceDumpFuzzTest(const uint8_t* data, size_t size)
 {
-    if (data == nullptr || size == 0) {
-        return;
+    FuzzedDataProvider fdp(data, size);
+
+    int fd = fdp.ConsumeIntegral<int>();
+
+    std::vector<std::u16string> args;
+    int numArgs = fdp.ConsumeIntegralInRange<int>(0, 5);
+    for (int i = 0; i < numArgs; ++i) {
+        std::string s = fdp.ConsumeRandomLengthString();
+        std::u16string u16s;
+        u16s.reserve(s.length());
+        for (char c : s) {
+            u16s.push_back(static_cast<char16_t>(c));
+        }
+        args.push_back(u16s);
     }
+    
     auto sinkService = std::make_shared<DistributedCameraSinkService>(
         DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, true);
-    
-    std::vector<std::u16string> args;
-    std::u16string arg(reinterpret_cast<const char16_t*>(data), size / sizeof(char16_t));
-    if (arg.empty() || std::all_of(arg.begin(), arg.end(), [](char16_t c) { return c == 0; })) {
+    if (sinkService == nullptr) {
         return;
     }
-    args.push_back(arg);
-    int fd = STDOUT_FILENO;
 
     sinkService->Dump(fd, args);
 }

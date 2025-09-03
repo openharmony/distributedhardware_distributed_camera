@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,28 +22,24 @@
 #include "distributed_camera_constants.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
-
+#include "fuzzer/FuzzedDataProvider.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 void SinkHandlerSubscribeLocalHardwareFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0))  {
-        return;
-    }
-    std::string param(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+
+    std::string dhId = fdp.ConsumeRandomLengthString();
+    std::string param = fdp.ConsumeRemainingBytesAsString();
 
     DCameraSinkHandler::GetInstance().SubscribeLocalHardware(dhId, param);
 }
 }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DistributedHardware::SinkHandlerSubscribeLocalHardwareFuzzTest(data, size);
     return 0;
 }
-

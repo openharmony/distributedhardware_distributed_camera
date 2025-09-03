@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,9 +14,11 @@
  */
 
 #include "sinkservicegetcamerainfo_fuzzer.h"
-
+#include "fuzzer/FuzzedDataProvider.h"
 #include <cstddef>
 #include <cstdint>
+#include <string>
+#include <memory>
 
 #include "dcamera_sink_controller.h"
 #include "dcamera_sink_access_control.h"
@@ -28,22 +30,26 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+
+const size_t MAX_FUZZ_STRING_LENGTH = 1024;
+
 void SinkServiceGetCameraInfoFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
-        return;
-    }
+    FuzzedDataProvider fdp(data, size);
 
-    std::string dhId = "1";
-    std::string cameraInfo(reinterpret_cast<const char*>(data), size);
+    std::string dhId = fdp.ConsumeRandomLengthString(MAX_FUZZ_STRING_LENGTH);
+    std::string cameraInfo = fdp.ConsumeRemainingBytesAsString();
+    bool isDistributed = fdp.ConsumeBool();
 
     std::shared_ptr<DistributedCameraSinkService> sinkService =
-        std::make_shared<DistributedCameraSinkService>(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, true);
+        std::make_shared<DistributedCameraSinkService>(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, isDistributed);
     sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
     std::shared_ptr<DCameraSinkDev> sinkDevice = std::make_shared<DCameraSinkDev>(dhId, sinkCallback);
     sinkDevice->accessControl_ = std::make_shared<DCameraSinkAccessControl>();
     sinkDevice->controller_ = std::make_shared<DCameraSinkController>(sinkDevice->accessControl_, sinkCallback);
+
     sinkService->camerasMap_.emplace(dhId, sinkDevice);
+
     sinkService->GetCameraInfo(dhId, cameraInfo);
     sinkService->GetCamIds();
     sinkService->IsCurSinkDev(sinkDevice);
@@ -51,11 +57,8 @@ void SinkServiceGetCameraInfoFuzzTest(const uint8_t* data, size_t size)
 }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DistributedHardware::SinkServiceGetCameraInfoFuzzTest(data, size);
     return 0;
 }
-

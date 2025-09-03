@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,16 +14,15 @@
  */
 
 #include "callbackonnotifyresourceinfo_fuzzer.h"
-
 #include "dcamera_sink_callback.h"
 #include "distributed_camera_constants.h"
 #include "mock_component_resourceinfo.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-const uint32_t DC_RESOURCE_VALUE = 2;
-const uint32_t DC_RESOURCE_SIZE = 3;
-const ResourceEventType resourceEventType[DC_RESOURCE_SIZE] {
+
+const ResourceEventType VALID_EVENT_TYPES[] = {
     ResourceEventType::EVENT_TYPE_QUERY_RESOURCE,
     ResourceEventType::EVENT_TYPE_PULL_UP_PAGE,
     ResourceEventType::EVENT_TYPE_CLOSE_PAGE
@@ -31,14 +30,14 @@ const ResourceEventType resourceEventType[DC_RESOURCE_SIZE] {
 
 void CallbackOnNotifyResourceInfoFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-    ResourceEventType type = resourceEventType[data[0] % DC_RESOURCE_SIZE];
-    std::string subtype(reinterpret_cast<const char*>(data), size);
-    std::string networkId(reinterpret_cast<const char*>(data), size);
-    bool isSensitive = data[0] % DC_RESOURCE_VALUE;
-    bool isSameAccout = data[0] % DC_RESOURCE_VALUE;
+    FuzzedDataProvider fdp(data, size);
+
+    ResourceEventType type = fdp.PickValueInArray(VALID_EVENT_TYPES);
+    std::string subtype = fdp.ConsumeRandomLengthString();
+    std::string networkId = fdp.ConsumeRandomLengthString();
+    bool isSensitive = fdp.ConsumeBool();
+    bool isSameAccout = fdp.ConsumeBool();
+    
     std::shared_ptr<PrivacyResourcesListener> callback = std::make_shared<MockComponentResourceInfo>();
 
     sptr<DCameraSinkCallback> dcameraSinkCallback(new (std::nothrow) DCameraSinkCallback());
@@ -51,10 +50,8 @@ void CallbackOnNotifyResourceInfoFuzzTest(const uint8_t* data, size_t size)
 }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DistributedHardware::CallbackOnNotifyResourceInfoFuzzTest(data, size);
     return 0;
 }
