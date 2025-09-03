@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,9 +14,10 @@
  */
 
 #include "sinkproxychannelneg_fuzzer.h"
-
+#include "fuzzer/FuzzedDataProvider.h"
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 
 #include "distributed_camera_constants.h"
 #include "distributed_camera_sink_proxy.h"
@@ -27,12 +28,10 @@ namespace OHOS {
 namespace DistributedHardware {
 void SinkProxyChannelNegFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
-        return;
-    }
+    FuzzedDataProvider fdp(data, size);
 
-    std::string dhId(reinterpret_cast<const char*>(data), size);
-    std::string channelInfo(reinterpret_cast<const char*>(data), size);
+    std::string dhId = fdp.ConsumeRandomLengthString();
+    std::string channelInfo = fdp.ConsumeRemainingBytesAsString();
 
     sptr<ISystemAbilityManager> samgr =
             SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -40,6 +39,9 @@ void SinkProxyChannelNegFuzzTest(const uint8_t* data, size_t size)
         return;
     }
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID);
+    if (remoteObject == nullptr) {
+        return;
+    }
     std::shared_ptr<DistributedCameraSinkProxy> dCSinkProxy =
         std::make_shared<DistributedCameraSinkProxy>(remoteObject);
 
@@ -48,11 +50,8 @@ void SinkProxyChannelNegFuzzTest(const uint8_t* data, size_t size)
 }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DistributedHardware::SinkProxyChannelNegFuzzTest(data, size);
     return 0;
 }
-

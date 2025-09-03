@@ -17,19 +17,22 @@
 #include "distributed_camera_sink_service.h"
 #include "dcamera_sink_callback.h"
 #include "distributed_camera_constants.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 
 void SinkServiceInitSinkFuzzTest(const uint8_t* data, size_t size)
 {
-    if (data == nullptr || size == 0) {
-        return;
-    }
-    auto sinkService = std::make_shared<DistributedCameraSinkService>(
-        DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, true);
-    std::string param(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+
+    int serviceId = fdp.ConsumeIntegral<int>();
+    bool isServiceAvailable = fdp.ConsumeBool();
+    auto sinkService = std::make_shared<DistributedCameraSinkService>(serviceId, isServiceAvailable);
+    
+    std::string param = fdp.ConsumeRemainingBytesAsString();
     sptr<IDCameraSinkCallback> callback(new DCameraSinkCallback());
+    
     sinkService->InitSink(param, callback);
 }
 }

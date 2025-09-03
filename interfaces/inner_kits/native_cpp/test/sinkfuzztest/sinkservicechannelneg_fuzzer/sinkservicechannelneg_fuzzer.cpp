@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,9 +14,11 @@
  */
 
 #include "sinkservicechannelneg_fuzzer.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 #include <cstddef>
 #include <cstdint>
+#include <string>
 
 #include "dcamera_sink_callback.h"
 #include "distributed_camera_constants.h"
@@ -28,12 +30,11 @@ namespace OHOS {
 namespace DistributedHardware {
 void SinkServiceChannelNegFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
-        return;
-    }
+    FuzzedDataProvider fdp(data, size);
 
-    std::string dhId = "1";
-    std::string channelInfo(reinterpret_cast<const char*>(data), size);
+    std::string dhId = fdp.ConsumeBytesAsString(fdp.ConsumeIntegralInRange<size_t>(1, 64));
+
+    std::string channelInfo = fdp.ConsumeRemainingBytesAsString();
 
     std::shared_ptr<DistributedCameraSinkService> sinkService =
         std::make_shared<DistributedCameraSinkService>(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, true);
@@ -45,11 +46,8 @@ void SinkServiceChannelNegFuzzTest(const uint8_t* data, size_t size)
 }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DistributedHardware::SinkServiceChannelNegFuzzTest(data, size);
     return 0;
 }
-
