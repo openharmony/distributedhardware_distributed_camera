@@ -16,15 +16,17 @@
 #include "sourceservicegetdumpinfo_fuzzer.h"
 #include "distributed_camera_source_service.h"
 #include "distributed_camera_constants.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 
 void SourceServiceGetDumpInfoFuzzTest(const uint8_t* data, size_t size)
 {
-    auto sourceService = std::make_shared<DistributedCameraSourceService>(
-        DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, true);
-    
+    FuzzedDataProvider fdp(data, size);
+    int saId = fdp.ConsumeIntegral<int>();
+    bool isLocal = fdp.ConsumeBool();
+    auto sourceService = std::make_shared<DistributedCameraSourceService>(saId, isLocal);
     CameraDumpInfo camDump;
     sourceService->GetDumpInfo(camDump);
 }
@@ -32,10 +34,8 @@ void SourceServiceGetDumpInfoFuzzTest(const uint8_t* data, size_t size)
 } // namespace DistributedHardware
 } // namespace OHOS
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     OHOS::DistributedHardware::SourceServiceGetDumpInfoFuzzTest(data, size);
     return 0;
 }
-

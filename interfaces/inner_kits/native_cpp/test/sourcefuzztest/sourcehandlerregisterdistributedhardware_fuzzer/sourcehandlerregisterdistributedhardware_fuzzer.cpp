@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,30 +14,30 @@
  */
 
 #include "sourcehandlerregisterdistributedhardware_fuzzer.h"
-
-#include <cstddef>
-#include <cstdint>
-
 #include "dcamera_source_handler.h"
 #include "distributed_camera_constants.h"
 #include "mock_component_enable.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "refbase.h"
+#include "fuzzer/FuzzedDataProvider.h"
+#include <string>
+#include <vector>
+#include <cstddef>
+#include <cstdint>
 
 namespace OHOS {
 namespace DistributedHardware {
 void SourceHandlerRegisterDistributedHardwareFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
-        return;
-    }
-    std::string devId(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
-    std::string sourceVersion(reinterpret_cast<const char*>(data), size);
-    std::string sourceAttrs(reinterpret_cast<const char*>(data), size);
-    std::string sinkVersion(reinterpret_cast<const char*>(data), size);
-    std::string sinkAttrs(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    std::string devId = fdp.ConsumeRandomLengthString();
+    std::string dhId = fdp.ConsumeRandomLengthString();
+    std::string sourceVersion = fdp.ConsumeRandomLengthString();
+    std::string sourceAttrs = fdp.ConsumeRandomLengthString();
+    std::string sinkVersion = fdp.ConsumeRandomLengthString();
+    std::string sinkAttrs = fdp.ConsumeRemainingBytesAsString();
+
     EnableParam param;
     param.sourceVersion = sourceVersion;
     param.sourceAttrs = sourceAttrs;
@@ -50,11 +50,8 @@ void SourceHandlerRegisterDistributedHardwareFuzzTest(const uint8_t* data, size_
 }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DistributedHardware::SourceHandlerRegisterDistributedHardwareFuzzTest(data, size);
     return 0;
 }
-

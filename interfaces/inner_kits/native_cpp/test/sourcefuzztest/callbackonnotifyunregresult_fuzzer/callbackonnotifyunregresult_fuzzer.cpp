@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,23 +14,22 @@
  */
 
 #include "callbackonnotifyunregresult_fuzzer.h"
-
 #include "dcamera_source_callback.h"
 #include "distributed_camera_constants.h"
 #include "mock_component_disable.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 void CallbackOnNotifyRegResultFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-    std::string devId(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
-    std::string reqId(reinterpret_cast<const char*>(data), size);
-    int32_t status = *(reinterpret_cast<const int32_t*>(data));
-    std::string dataStr(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    std::string devId = fdp.ConsumeRandomLengthString();
+    std::string dhId = fdp.ConsumeRandomLengthString();
+    std::string reqId = fdp.ConsumeRandomLengthString();
+    int32_t status = fdp.ConsumeIntegral<int32_t>();
+    std::string dataStr = fdp.ConsumeRemainingBytesAsString();
+
     std::shared_ptr<UnregisterCallback> uncallback = std::make_shared<MockComponentDisable>();
 
     sptr<DCameraSourceCallback> dcameraSourceCallback(new (std::nothrow) DCameraSourceCallback());
@@ -43,11 +42,8 @@ void CallbackOnNotifyRegResultFuzzTest(const uint8_t* data, size_t size)
 }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DistributedHardware::CallbackOnNotifyRegResultFuzzTest(data, size);
     return 0;
 }
-

@@ -15,32 +15,31 @@
 
 #include "softbusonsourcemessagereceived_fuzzer.h"
 #include <fuzzer/FuzzedDataProvider.h>
-
 #include "dcamera_softbus_adapter.h"
+#include <algorithm>
+#include <vector>
 
 namespace OHOS {
 namespace DistributedHardware {
 void SoftbusOnSourceMessageReceivedFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(uint32_t))) {
-        return;
-    }
-
     FuzzedDataProvider fdp(data, size);
+
     int32_t sessionId = fdp.ConsumeIntegral<int32_t>();
-    const void *receivedData = reinterpret_cast<const void*>(data);
-    uint32_t dataLen = fdp.ConsumeIntegral<uint32_t>();
 
-    DCameraSoftbusAdapter::GetInstance().SourceOnMessage(sessionId, receivedData, dataLen);
+    uint32_t desiredDataLen = fdp.ConsumeIntegral<uint32_t>();
+    uint32_t actualDataLen = std::min(desiredDataLen, static_cast<uint32_t>(fdp.remaining_bytes()));
+
+    std::vector<uint8_t> receivedDataBuffer = fdp.ConsumeBytes<uint8_t>(actualDataLen);
+    const void* receivedData = receivedDataBuffer.data();
+
+    DCameraSoftbusAdapter::GetInstance().SourceOnMessage(sessionId, receivedData, actualDataLen);
 }
 }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DistributedHardware::SoftbusOnSourceMessageReceivedFuzzTest(data, size);
     return 0;
 }
-
