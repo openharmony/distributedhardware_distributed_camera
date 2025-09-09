@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,31 +14,56 @@
  */
 
 #include "softbusonsinkstreamreceived_fuzzer.h"
-
 #include "dcamera_softbus_adapter.h"
+#include "fuzzer/FuzzedDataProvider.h"
+#include <vector>
+#include <memory>
 
 namespace OHOS {
 namespace DistributedHardware {
 void SoftbusOnSinkStreamReceivedFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int64_t))) {
+    FuzzedDataProvider fdp(data, size);
+    const size_t minParamsSize = sizeof(int32_t) * 2 + sizeof(int) * 6 + sizeof(int64_t);
+    if (fdp.remaining_bytes() < minParamsSize) {
         return;
     }
 
-    int32_t sessionId = *(reinterpret_cast<const int32_t*>(data));
-    const StreamData receivedData = {
-        const_cast<char*>(reinterpret_cast<const char*>(data)), static_cast<int>(size)
-    };
-    const StreamData ext = {
-        const_cast<char*>(reinterpret_cast<const char*>(data)), static_cast<int>(size)
-    };
+    int32_t sessionId = fdp.ConsumeIntegral<int32_t>();
+    int32_t socket = fdp.ConsumeIntegral<int32_t>();
+
     const StreamFrameInfo param = {
-        *(reinterpret_cast<const int*>(data)), *(reinterpret_cast<const int64_t*>(data)),
-        *(reinterpret_cast<const int*>(data)), *(reinterpret_cast<const int*>(data)),
-        *(reinterpret_cast<const int*>(data)), *(reinterpret_cast<const int*>(data)),
-        *(reinterpret_cast<const int*>(data)), nullptr
+        fdp.ConsumeIntegral<int>(),
+        fdp.ConsumeIntegral<int64_t>(),
+        fdp.ConsumeIntegral<int>(),
+        fdp.ConsumeIntegral<int>(),
+        fdp.ConsumeIntegral<int>(),
+        fdp.ConsumeIntegral<int>(),
+        fdp.ConsumeIntegral<int>(),
+        nullptr
     };
-    int32_t socket = 1;
+
+    const int32_t doubleNum = 2;
+    size_t halfRemainingBytes = fdp.remaining_bytes() / doubleNum;
+
+    std::vector<uint8_t> receivedDataBuffer;
+    if (halfRemainingBytes > 0) {
+        receivedDataBuffer = fdp.ConsumeBytes<uint8_t>(halfRemainingBytes);
+    }
+    StreamData receivedData = {
+        reinterpret_cast<char*>(receivedDataBuffer.data()),
+        static_cast<int>(receivedDataBuffer.size())
+    };
+
+    std::vector<uint8_t> extBuffer;
+    if (fdp.remaining_bytes() > 0) {
+        extBuffer = fdp.ConsumeRemainingBytes<uint8_t>();
+    }
+    StreamData ext = {
+        reinterpret_cast<char*>(extBuffer.data()),
+        static_cast<int>(extBuffer.size())
+    };
+
     auto session = std::make_shared<DCameraSoftbusSession>();
     DCameraSoftbusAdapter::GetInstance().sinkSocketSessionMap_[socket] = session;
     DCameraSoftbusAdapter::GetInstance().SinkOnStream(sessionId, &receivedData, &ext, &param);
@@ -46,11 +71,8 @@ void SoftbusOnSinkStreamReceivedFuzzTest(const uint8_t* data, size_t size)
 }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DistributedHardware::SoftbusOnSinkStreamReceivedFuzzTest(data, size);
     return 0;
 }
-

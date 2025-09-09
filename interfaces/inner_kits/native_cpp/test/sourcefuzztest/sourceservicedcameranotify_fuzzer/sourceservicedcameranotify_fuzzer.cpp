@@ -16,30 +16,25 @@
 #include "sourceservicedcameranotify_fuzzer.h"
 #include "distributed_camera_source_service.h"
 #include "distributed_camera_constants.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 
 void SourceServiceDCameraNotifyFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
-        return;
-    }
-
+    FuzzedDataProvider fdp(data, size);
     auto sourceService = std::make_shared<DistributedCameraSourceService>(
         DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, true);
-
-    std::string dhId(reinterpret_cast<const char*>(data), size);
-    std::string devId(reinterpret_cast<const char*>(data), size);
-    std::string events(reinterpret_cast<const char*>(data), size);
+    std::string devId = fdp.ConsumeRandomLengthString();
+    std::string dhId = fdp.ConsumeRandomLengthString();
+    std::string events = fdp.ConsumeRemainingBytesAsString();
 
     sourceService->DCameraNotify(devId, dhId, events);
 }
-
 } // namespace DistributedHardware
 } // namespace OHOS
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     OHOS::DistributedHardware::SourceServiceDCameraNotifyFuzzTest(data, size);

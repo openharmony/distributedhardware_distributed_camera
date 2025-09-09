@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,47 +14,45 @@
  */
 
 #include "sourceserviceregisterdistributedhardware_fuzzer.h"
-
+#include "fuzzer/FuzzedDataProvider.h"
 #include "dcamera_source_callback.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_source_service.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
+#include <string>
+#include <memory>
 
 namespace OHOS {
 namespace DistributedHardware {
 void SourceServiceRegisterDistributedHardwareFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
-        return;
-    }
+    FuzzedDataProvider fdp(data, size);
 
-    std::string dhId(reinterpret_cast<const char*>(data), size);
-    std::string devId(reinterpret_cast<const char*>(data), size);
-    std::string reqId(reinterpret_cast<const char*>(data), size);
-    std::string sourceVersion(reinterpret_cast<const char*>(data), size);
-    std::string sourceAttrs(reinterpret_cast<const char*>(data), size);
-    std::string sinkVersion(reinterpret_cast<const char*>(data), size);
-    std::string sinkAttrs(reinterpret_cast<const char*>(data), size);
+    std::string devId = fdp.ConsumeRandomLengthString();
+    std::string dhId = fdp.ConsumeRandomLengthString();
+    std::string reqId = fdp.ConsumeRandomLengthString();
+    
     EnableParam param;
-    param.sourceVersion = sourceVersion;
-    param.sourceAttrs = sourceAttrs;
-    param.sinkVersion = sinkVersion;
-    param.sinkAttrs = sinkAttrs;
+    param.sourceVersion = fdp.ConsumeRandomLengthString();
+    param.sourceAttrs = fdp.ConsumeRandomLengthString();
+    param.sinkVersion = fdp.ConsumeRandomLengthString();
+    param.sinkAttrs = fdp.ConsumeRandomLengthString();
 
     std::shared_ptr<DistributedCameraSourceService> sourceService =
         std::make_shared<DistributedCameraSourceService>(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, true);
+
+    if (sourceService == nullptr) {
+        return;
+    }
 
     sourceService->RegisterDistributedHardware(devId, dhId, reqId, param);
 }
 }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DistributedHardware::SourceServiceRegisterDistributedHardwareFuzzTest(data, size);
     return 0;
 }
-

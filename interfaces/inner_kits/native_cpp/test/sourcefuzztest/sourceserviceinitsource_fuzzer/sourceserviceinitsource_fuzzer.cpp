@@ -26,28 +26,23 @@ namespace OHOS {
 namespace DistributedHardware {
 void SourceServiceInitSourceFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-
     FuzzedDataProvider fdp(data, size);
-    int32_t tempLen = 32;
-    std::string params(fdp.ConsumeRandomLengthString(tempLen));
-
+    // Fuzzing constructor parameters
+    int32_t saId = fdp.ConsumeIntegral<int32_t>();
+    bool isInit = fdp.ConsumeBool();
     std::shared_ptr<DistributedCameraSourceService> sourceService =
-        std::make_shared<DistributedCameraSourceService>(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, true);
+        std::make_shared<DistributedCameraSourceService>(saId, isInit);
     sptr<IDCameraSourceCallback> callback(new DCameraSourceCallback());
+    // Fuzzing InitSource parameter
+    std::string params = fdp.ConsumeRemainingBytesAsString();
 
     sourceService->InitSource(params, callback);
 }
 }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DistributedHardware::SourceServiceInitSourceFuzzTest(data, size);
     return 0;
 }
-

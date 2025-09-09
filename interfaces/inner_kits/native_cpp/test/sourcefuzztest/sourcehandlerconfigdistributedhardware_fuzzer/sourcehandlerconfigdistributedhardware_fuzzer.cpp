@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,35 +14,30 @@
  */
 
 #include "sourcehandlerconfigdistributedhardware_fuzzer.h"
-
 #include <cstddef>
 #include <cstdint>
-
 #include "dcamera_source_handler.h"
 #include "distributed_camera_constants.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 void SourceHandlerConfigDistributedHardwareFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
-        return;
-    }
-    std::string devId(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
-    std::string key(reinterpret_cast<const char*>(data), size);
-    std::string value(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+
+    std::string devId = fdp.ConsumeRandomLengthString();
+    std::string dhId = fdp.ConsumeRandomLengthString();
+    std::string key = fdp.ConsumeRandomLengthString();
+    std::string value = fdp.ConsumeRemainingBytesAsString();
 
     DCameraSourceHandler::GetInstance().ConfigDistributedHardware(devId, dhId, key, value);
 }
 }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DistributedHardware::SourceHandlerConfigDistributedHardwareFuzzTest(data, size);
     return 0;
 }
-

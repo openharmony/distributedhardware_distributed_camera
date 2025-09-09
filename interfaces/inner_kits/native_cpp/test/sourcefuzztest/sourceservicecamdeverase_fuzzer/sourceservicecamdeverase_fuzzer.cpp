@@ -16,36 +16,29 @@
 #include "sourceservicecamdeverase_fuzzer.h"
 #include "distributed_camera_source_service.h"
 #include "distributed_camera_constants.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 
-inline std::string ExtractString(const uint8_t* data, size_t offset, size_t length)
-{
-    return std::string(reinterpret_cast<const char*>(data + offset), length);
-}
-
 void SourceServiceCamDevEraseFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(DCameraIndex))) {
-        return;
-    }
-
+    FuzzedDataProvider fdp(data, size);
     auto sourceService = std::make_shared<DistributedCameraSourceService>(
         DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, true);
-    
-    int doubleNum = 2;
     DCameraIndex index;
-    index.devId_ = ExtractString(data, 0, size / doubleNum);
-    index.dhId_ = ExtractString(data, size / doubleNum, size / doubleNum);
+    const int32_t doubleNum = 2;
+    // Consume half of the remaining bytes for devId_ and the rest for dhId_.
+    // This mimics the original split logic using fdp's safe consumption.
+    size_t halfRemaingSize = fdp.remaining_bytes() / doubleNum;
+    index.devId_ = fdp.ConsumeBytesAsString(halfRemaingSize);
+    index.dhId_ = fdp.ConsumeRemainingBytesAsString();
 
     sourceService->CamDevErase(index);
 }
-
 } // namespace DistributedHardware
 } // namespace OHOS
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     OHOS::DistributedHardware::SourceServiceCamDevEraseFuzzTest(data, size);

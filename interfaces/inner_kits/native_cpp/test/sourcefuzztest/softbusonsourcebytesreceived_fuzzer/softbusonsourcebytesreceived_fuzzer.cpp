@@ -15,6 +15,9 @@
 
 #include "softbusonsourcebytesreceived_fuzzer.h"
 #include <fuzzer/FuzzedDataProvider.h>
+#include <vector>
+#include <string>
+#include <algorithm>
 
 #include "dcamera_softbus_adapter.h"
 
@@ -22,17 +25,14 @@ namespace OHOS {
 namespace DistributedHardware {
 void SoftbusOnSourceBytesReceivedFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(uint32_t))) {
-        return;
-    }
-
     FuzzedDataProvider fdp(data, size);
+
     int32_t sessionId = fdp.ConsumeIntegral<int32_t>();
-    const void *receivedData = reinterpret_cast<const void*>(data);
-    uint32_t dataLen = fdp.ConsumeIntegral<uint32_t>();
-    DCameraSoftbusAdapter::GetInstance().SourceOnBytes(sessionId, receivedData, dataLen);
-    
-    std::string testStr = "test_suffix";
+    uint32_t dataLen = fdp.ConsumeIntegralInRange<uint32_t>(0, fdp.remaining_bytes());
+    std::vector<uint8_t> receivedBytes = fdp.ConsumeBytes<uint8_t>(dataLen);
+    DCameraSoftbusAdapter::GetInstance().SourceOnBytes(sessionId, receivedBytes.data(), receivedBytes.size());
+
+    std::string testStr = fdp.ConsumeRandomLengthString(20);
     std::string randomSuffix = fdp.ConsumeRandomLengthString(10);
     std::string randomReplacement = fdp.ConsumeRandomLengthString(10);
     DCameraSoftbusAdapter::GetInstance().ReplaceSuffix(testStr, randomSuffix, randomReplacement);
@@ -40,11 +40,8 @@ void SoftbusOnSourceBytesReceivedFuzzTest(const uint8_t* data, size_t size)
 }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DistributedHardware::SoftbusOnSourceBytesReceivedFuzzTest(data, size);
     return 0;
 }
-
