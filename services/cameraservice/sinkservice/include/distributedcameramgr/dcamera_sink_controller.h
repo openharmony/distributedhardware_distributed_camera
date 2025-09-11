@@ -34,6 +34,12 @@ namespace OHOS {
 namespace DistributedHardware {
 constexpr uint32_t EVENT_FRAME_TRIGGER = 1;
 constexpr uint32_t EVENT_AUTHORIZATION = 2;
+enum DcameraBusinessState : int32_t {
+    UNKNOWN,
+    IDLE,
+    RUNNING,
+    PAUSING
+};
 class DCameraSinkController : public ICameraController, public std::enable_shared_from_this<DCameraSinkController> {
 public:
     explicit DCameraSinkController(std::shared_ptr<ICameraSinkAccessControl>& accessControl,

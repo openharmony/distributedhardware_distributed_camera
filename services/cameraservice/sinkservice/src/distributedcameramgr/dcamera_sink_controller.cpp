@@ -582,24 +582,29 @@ void DCameraSinkController::OnSessionState(int32_t state, std::string networkId)
     DHLOGI("DCameraSinkController::OnSessionState dhId: %{public}s, state: %{public}d",
         GetAnonyString(dhId_).c_str(), state);
     sessionState_ = state;
+    std::string sinkDevId;
+    int32_t val = GetLocalDeviceNetworkId(sinkDevId);
+    CHECK_AND_LOG(val != DCAMERA_OK, "GetLocalDeviceNetworkId failed, val: %{public}d", val);
     switch (state) {
         case DCAMERA_CHANNEL_STATE_CONNECTING:
             DHLOGI("channel is connecting");
             break;
         case DCAMERA_CHANNEL_STATE_CONNECTED: {
             DHLOGI("channel is connected");
+            if (sinkCallback_ != nullptr) {
+                sinkCallback_->OnHardwareStateChanged(sinkDevId, dhId_, DcameraBusinessState::RUNNING);
+            }
             if (!ManageSelectChannel::GetInstance().GetSinkConnect()) {
                 break;
             }
             srcDevId_ = networkId;
-            if (operator_ == nullptr) {
-                DHLOGE("operator_ is nullptr");
-                break;
-            }
             break;
         }
         case DCAMERA_CHANNEL_STATE_DISCONNECTED:
             DHLOGI("channel is disconnected");
+            if (sinkCallback_ != nullptr) {
+                sinkCallback_->OnHardwareStateChanged(sinkDevId, dhId_, DcameraBusinessState::IDLE);
+            }
             ffrt::submit([this]() {
                 DHLOGI("DCameraSinkController::OnSessionState %{public}s new thread session state: %{public}d",
                     GetAnonyString(dhId_).c_str(), sessionState_);

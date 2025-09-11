@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -43,11 +43,48 @@ int32_t DCameraSinkCallback::OnNotifyResourceInfo(const ResourceEventType &type,
     return ret;
 }
 
+int32_t DCameraSinkCallback::OnHardwareStateChanged(const std::string &devId, const std::string &dhId,
+    int32_t status)
+{
+    DHLOGI("On hardware state changed, devId: %{public}s, dhId: %{public}s, status: %{public}d",
+        GetAnonyString(devId).c_str(), dhId.c_str(), status);
+    std::lock_guard<std::mutex> stateLck(stateListenerMtx_);
+    if (stateListener_ == nullptr) {
+        DHLOGE("State listener is null.");
+        return DCAMERA_BAD_VALUE;
+    }
+    if (devId.empty() || devId.size() > DID_MAX_SIZE || dhId.empty() || dhId.size() > DID_MAX_SIZE) {
+        DHLOGE("devId or dhId is invalid");
+        return DCAMERA_BAD_VALUE;
+    }
+    if (status < 0) {
+        DHLOGE("status in invalid.");
+        return DCAMERA_BAD_VALUE;
+    }
+    BusinessSinkState currentState = static_cast<BusinessSinkState>(status);
+    stateListener_->OnStateChanged(devId, dhId, currentState);
+    return DCAMERA_OK;
+}
+
 void DCameraSinkCallback::PushPrivacyResCallback(const std::shared_ptr<PrivacyResourcesListener> &listener)
 {
     DHLOGI("push resource info callback.");
     std::lock_guard<std::mutex> lock(privacyResMutex_);
     privacyResCallback_.push_back(listener);
+}
+
+void DCameraSinkCallback::RegisterStateListener(const std::shared_ptr<DistributedHardwareSinkStateListener> listener)
+{
+    DHLOGD("Register sink state listener.");
+    std::lock_guard<std::mutex> stateLck(stateListenerMtx_);
+    stateListener_ = listener;
+}
+
+void DCameraSinkCallback::UnRegisterStateListener()
+{
+    DHLOGD("UnRegister sink state listener.");
+    std::lock_guard<std::mutex> stateLck(stateListenerMtx_);
+    stateListener_ = nullptr;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
