@@ -14,30 +14,42 @@
  */
 
 #include "softbusonsinksessionclosed_fuzzer.h"
-
 #include "dcamera_softbus_adapter.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+const ShutdownReason VALID_SHUTDOWN_REASONS[] = {
+    SHUTDOWN_REASON_UNKNOWN,       /**< Shutdown for unknown reason */
+    SHUTDOWN_REASON_LOCAL,         /**< Shutdown by local process */
+    SHUTDOWN_REASON_PEER,          /**< Shutdown by peer process */
+    SHUTDOWN_REASON_LNN_CHANGED,   /**< Shutdown for LNN changed */
+    SHUTDOWN_REASON_CONN_CHANGED,  /**< Shutdown for CONN Changed */
+    SHUTDOWN_REASON_TIMEOUT,       /**< Shutdown for timeout */
+    SHUTDOWN_REASON_SEND_FILE_ERR, /**< Shutdown for sending file error */
+    SHUTDOWN_REASON_RECV_FILE_ERR, /**< Shutdown for receiving file error */
+    SHUTDOWN_REASON_RECV_DATA_ERR, /**< Shutdown for receiving data error */
+    SHUTDOWN_REASON_UNEXPECTED,    /**< Shutdown for unexpected reason */
+    SHUTDOWN_REASON_SERVICE_DIED,  /**< Shutdown for death service */
+    SHUTDOWN_REASON_LNN_OFFLINE,   /**< Shutdown for offline */
+    SHUTDOWN_REASON_LINK_DOWN,     /**< Shutdown for link down */
+};
+
 void SoftbusOnSinkSessionClosedFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
+    FuzzedDataProvider fdp(data, size);
 
-    int32_t sessionId = *(reinterpret_cast<const int32_t*>(data));
+    int32_t sessionId = fdp.ConsumeIntegral<int32_t>();
+    ShutdownReason reason = fdp.PickValueInArray(VALID_SHUTDOWN_REASONS);
 
-    DCameraSoftbusAdapter::GetInstance().SinkOnShutDown(sessionId, ShutdownReason::SHUTDOWN_REASON_LOCAL);
-    DCameraSoftbusAdapter::GetInstance().SourceOnShutDown(sessionId, ShutdownReason::SHUTDOWN_REASON_LOCAL);
+    DCameraSoftbusAdapter::GetInstance().SinkOnShutDown(sessionId, reason);
+    DCameraSoftbusAdapter::GetInstance().SourceOnShutDown(sessionId, reason);
 }
 }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DistributedHardware::SoftbusOnSinkSessionClosedFuzzTest(data, size);
     return 0;
 }
-

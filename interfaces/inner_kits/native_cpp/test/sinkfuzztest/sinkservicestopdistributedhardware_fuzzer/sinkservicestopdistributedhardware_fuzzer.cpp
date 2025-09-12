@@ -16,18 +16,18 @@
 #include "sinkservicestopdistributedhardware_fuzzer.h"
 #include "distributed_camera_sink_service.h"
 #include "distributed_camera_constants.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 void SinkServiceStopDistributedHardwareFuzzTest(const uint8_t* data, size_t size)
 {
-    if (data == nullptr || size == 0) {
-        return;
-    }
+    FuzzedDataProvider fdp(data, size);
+    bool enableFeature = fdp.ConsumeBool();
     auto sinkService = std::make_shared<DistributedCameraSinkService>(
-        DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, true);
+        DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, enableFeature);
 
-    std::string networkId(reinterpret_cast<const char*>(data), size);
+    std::string networkId = fdp.ConsumeRemainingBytesAsString();
     sinkService->StopDistributedHardware(networkId);
 }
 }
@@ -38,4 +38,3 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DistributedHardware::SinkServiceStopDistributedHardwareFuzzTest(data, size);
     return 0;
 }
-

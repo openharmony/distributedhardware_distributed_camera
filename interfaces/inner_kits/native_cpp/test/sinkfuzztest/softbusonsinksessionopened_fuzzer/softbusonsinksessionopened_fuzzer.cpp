@@ -14,32 +14,83 @@
  */
 
 #include "softbusonsinksessionopened_fuzzer.h"
-
 #include "dcamera_softbus_adapter.h"
+#include "fuzzer/FuzzedDataProvider.h"
+#include <string>
+#include <vector>
+#include <array>
 
 namespace OHOS {
 namespace DistributedHardware {
+const TransDataType VALID_DATA_TYPES[] = {
+    DATA_TYPE_MESSAGE,  /**< Message */
+    DATA_TYPE_BYTES,        /**< Bytes */
+    DATA_TYPE_FILE,         /**< File */
+    DATA_TYPE_RAW_STREAM,   /**< Raw data stream */
+    DATA_TYPE_VIDEO_STREAM, /**< Video data stream*/
+    DATA_TYPE_AUDIO_STREAM, /**< Audio data stream*/
+    DATA_TYPE_SLICE_STREAM, /**< Video slice stream*/
+    DATA_TYPE_BUTT,
+};
+
+const ShutdownReason VALID_SHUTDOWN_REASONS[] = {
+    SHUTDOWN_REASON_UNKNOWN,       /**< Shutdown for unknown reason */
+    SHUTDOWN_REASON_LOCAL,         /**< Shutdown by local process */
+    SHUTDOWN_REASON_PEER,          /**< Shutdown by peer process */
+    SHUTDOWN_REASON_LNN_CHANGED,   /**< Shutdown for LNN changed */
+    SHUTDOWN_REASON_CONN_CHANGED,  /**< Shutdown for CONN Changed */
+    SHUTDOWN_REASON_TIMEOUT,       /**< Shutdown for timeout */
+    SHUTDOWN_REASON_SEND_FILE_ERR, /**< Shutdown for sending file error */
+    SHUTDOWN_REASON_RECV_FILE_ERR, /**< Shutdown for receiving file error */
+    SHUTDOWN_REASON_RECV_DATA_ERR, /**< Shutdown for receiving data error */
+    SHUTDOWN_REASON_UNEXPECTED,    /**< Shutdown for unexpected reason */
+    SHUTDOWN_REASON_SERVICE_DIED,  /**< Shutdown for death service */
+    SHUTDOWN_REASON_LNN_OFFLINE,   /**< Shutdown for offline */
+    SHUTDOWN_REASON_LINK_DOWN,     /**< Shutdown for link down */
+};
+
 void SoftbusOnSinkSessionOpenedFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
+    FuzzedDataProvider fdp(data, size);
+    int32_t sessionId = fdp.ConsumeIntegral<int32_t>();
+    const int maxLen = 32;
+    std::string peerSessionNameStr = fdp.ConsumeRandomLengthString(maxLen);
+    std::vector<char> nameBuf(peerSessionNameStr.begin(), peerSessionNameStr.end());
+    nameBuf.push_back('\0');
 
-    int32_t sessionId = *(reinterpret_cast<const int32_t*>(data));
-    std::string peerSessionName(reinterpret_cast<const char*>(data), size);
-    std::string peerDevId(reinterpret_cast<const char*>(data), size);
-    std::string pkgName = "ohos.dhardware.dcamera";
+    std::string peerDevIdStr = fdp.ConsumeRandomLengthString(maxLen);
+    std::vector<char> networkId_buf(peerDevIdStr.begin(), peerDevIdStr.end());
+    networkId_buf.push_back('\0');
+
+    std::string pkgNameStr = fdp.ConsumeRandomLengthString(maxLen);
+    std::vector<char> pkgNameBuf(pkgNameStr.begin(), pkgNameStr.end());
+    pkgNameBuf.push_back('\0');
+
+    TransDataType dataType = fdp.PickValueInArray(VALID_DATA_TYPES);
+
     PeerSocketInfo socketInfo = {
-        .name = const_cast<char*>(peerSessionName.c_str()),
-        .networkId = const_cast<char*>(peerDevId.c_str()),
-        .pkgName = const_cast<char*>(pkgName.c_str()),
-        .dataType = TransDataType::DATA_TYPE_BYTES,
+        .name = nameBuf.data(),
+        .networkId = networkId_buf.data(),
+        .pkgName = pkgNameBuf.data(),
+        .dataType = dataType,
     };
+
     DCameraSoftbusAdapter::GetInstance().SinkOnBind(sessionId, socketInfo);
-    DCameraSoftbusAdapter::GetInstance().SinkOnShutDown(sessionId, ShutdownReason::SHUTDOWN_REASON_LOCAL);
-    uint32_t Len = static_cast<uint32_t>(size);
-    DCameraSoftbusAdapter::GetInstance().SinkOnBytes(sessionId, data, Len);
-    DCameraSoftbusAdapter::GetInstance().SinkOnMessage(sessionId, data, Len);
+
+    ShutdownReason shutdownReason = fdp.PickValueInArray(VALID_SHUTDOWN_REASONS);
+    DCameraSoftbusAdapter::GetInstance().SinkOnShutDown(sessionId, shutdownReason);
+    
+    size_t remainingSize = fdp.remaining_bytes();
+    std::vector<uint8_t> remainingBytes = fdp.ConsumeBytes<uint8_t>(remainingSize);
+
+    if (!remainingBytes.empty()) {
+        uint32_t remainingLen = static_cast<uint32_t>(remainingBytes.size());
+        if (fdp.ConsumeBool()) {
+            DCameraSoftbusAdapter::GetInstance().SinkOnBytes(sessionId, remainingBytes.data(), remainingLen);
+        } else {
+            DCameraSoftbusAdapter::GetInstance().SinkOnMessage(sessionId, remainingBytes.data(), remainingLen);
+        }
+    }
 }
 }
 }
@@ -51,4 +102,3 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DistributedHardware::SoftbusOnSinkSessionOpenedFuzzTest(data, size);
     return 0;
 }
-
