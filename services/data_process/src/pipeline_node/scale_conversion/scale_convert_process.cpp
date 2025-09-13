@@ -72,6 +72,87 @@ void ScaleConvertProcess::ReleaseProcessNode()
     DHLOGI("Release [%{public}zu] node : ScaleConvertNode end.", nodeRank_);
 }
 
+void ScaleConvertProcess::Crop(ImageUnitInfo& sourceConfig, ImageUnitInfo& targetConfig)
+{
+    const double src_width = static_cast<double>(sourceConfig.width);
+    const double src_height = static_cast<double>(sourceConfig.height);
+    const double dst_width = static_cast<double>(targetConfig.width);
+    const double dst_height = static_cast<double>(targetConfig.height);
+    double src_ratio = src_width / src_height;
+    double dst_ratio = dst_width / dst_height;
+    if (std::abs(src_ratio - dst_ratio) < 1e-6) {
+        DHLOGI("Same aspect ratio");
+        return;
+    }
+    int crop_width = 0;
+    int crop_height = 0;
+    if (src_ratio > dst_ratio) {
+        DHLOGI("The source aspect ratio is greater than the target aspect ratio");
+        crop_width = static_cast<int>(src_height * dst_width / dst_height);
+        crop_height = src_height;
+    } else {
+        DHLOGI("The source aspect ratio is less than the target aspect ratio");
+        crop_width = src_width;
+        crop_height = static_cast<int>(src_width * dst_height / dst_width);
+    }
+    const size_t y_size = crop_width * crop_height;
+    const size_t uv_size = (crop_width  >> MEMORY_RATIO_UV) * (crop_height  >> MEMORY_RATIO_UV);
+    const size_t total_size = y_size + 2 * uv_size;
+    std::shared_ptr<DataBuffer> cropBuf = std::make_shared<DataBuffer>(total_size);
+    uint8_t* dstY = cropBuf->Data();
+    uint8_t* dstU = dstY + y_size;
+    uint8_t* dstV = dstU + uv_size;
+    CropConvert(sourceConfig, targetConfig, crop_width, crop_height, dstY, dstU, dstV, cropBuf);
+}
+
+void ScaleConvertProcess::CropConvert(ImageUnitInfo& sourceConfig, ImageUnitInfo& targetConfig, int crop_width,
+    int crop_height, uint8_t* dstY, uint8_t* dstU, uint8_t* dstV, std::shared_ptr<DataBuffer> cropBuf)
+{
+    const int offsetX = (sourceConfig.width - crop_width) >> MEMORY_RATIO_UV;
+    const int offsetY = (sourceConfig.height - crop_height) >> MEMORY_RATIO_UV;
+    uint8_t* srcY = sourceConfig.imgData->Data();
+    uint8_t* srcU = srcY + sourceConfig.width * sourceConfig.height;
+    uint8_t* srcV = srcU + (sourceConfig.width >> MEMORY_RATIO_UV)
+        * (sourceConfig.height >> MEMORY_RATIO_UV);
+    
+    for (int y = 0; y < crop_height; ++y) {
+        const uint8_t* src_row = srcY + (offsetY + y) * sourceConfig.width;
+        uint8_t* dst_row = dstY + y * crop_width;
+        errno_t err = memcpy_s(dst_row, crop_width, src_row + offsetX, crop_width);
+        if (err != EOK) {
+            DHLOGE("memcpy_s failed for Y plane at row %{public}d", y);
+            return;
+        }
+    }
+    for (int y = 0; y < crop_height  >> MEMORY_RATIO_UV; ++y) {
+        const uint8_t* src_row = srcU + ((offsetY >> MEMORY_RATIO_UV) + y) * (sourceConfig.width >> MEMORY_RATIO_UV);
+        uint8_t* dst_row = dstU + y * (crop_width >> MEMORY_RATIO_UV);
+        errno_t err = memcpy_s(dst_row, crop_width >> MEMORY_RATIO_UV, src_row + (offsetX >> MEMORY_RATIO_UV),
+            crop_width >> MEMORY_RATIO_UV);
+        if (err != EOK) {
+            DHLOGE("memcpy_s failed for U plane at row %{public}d", y);
+            return;
+        }
+    }
+    for (int y = 0; y < crop_height >> MEMORY_RATIO_UV; ++y) {
+        const uint8_t* src_row = srcV + ((offsetY >> MEMORY_RATIO_UV) + y) * (sourceConfig.width >> MEMORY_RATIO_UV);
+        uint8_t* dst_row = dstV + y * (crop_width >> MEMORY_RATIO_UV);
+        errno_t err = memcpy_s(dst_row, crop_width >> MEMORY_RATIO_UV, src_row + (offsetX >> MEMORY_RATIO_UV),
+            crop_width >> MEMORY_RATIO_UV);
+        if (err != EOK) {
+            DHLOGE("memcpy_s failed for V plane at row %{public}d", y);
+            return;
+        }
+    }
+    sourceConfig.imgData = cropBuf;
+    sourceConfig.width = crop_width;
+    sourceConfig.height = crop_height;
+    sourceConfig.chromaOffset = crop_width * crop_height;
+    sourceConfig.imgSize = cropBuf->Size();
+    DHLOGD("Cropped successfully: %{public}dx%{public}d -> %{public}dx%{public}d, offset (%{public}d,%{public}d)",
+           sourceConfig.width, sourceConfig.height, crop_width, crop_height, offsetX, offsetY);
+}
+
 int ScaleConvertProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& inputBuffers)
 {
     int64_t startScaleTime = GetNowTimeStampUs();
@@ -108,6 +189,7 @@ int ScaleConvertProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& i
     ImageUnitInfo dstImgInfo = { processedConfig_.GetVideoformat(), processedConfig_.GetWidth(),
         processedConfig_.GetHeight(), processedConfig_.GetWidth(), processedConfig_.GetHeight(),
         processedConfig_.GetWidth() * processedConfig_.GetHeight(), dstBuf->Size(), dstBuf };
+    Crop(srcImgInfo, dstImgInfo);
     if (ScaleConvert(srcImgInfo, dstImgInfo) != DCAMERA_OK) {
         DHLOGE("ScaleConvertProcess : Scale convert failed.");
         return DCAMERA_BAD_OPERATE;
