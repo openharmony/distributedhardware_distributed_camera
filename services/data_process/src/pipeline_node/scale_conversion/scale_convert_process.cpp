@@ -95,21 +95,26 @@ void ScaleConvertProcess::Crop(ImageUnitInfo& sourceConfig, ImageUnitInfo& targe
         crop_width = src_width;
         crop_height = static_cast<int>(src_width * dst_height / dst_width);
     }
-    const int offsetX = (sourceConfig.width - crop_width) / 2;
-    const int offsetY = (sourceConfig.height - crop_height) / 2;
-    uint8_t* srcY = sourceConfig.imgData->Data();
-    uint8_t* srcU = srcY + sourceConfig.width * sourceConfig.height;
-    uint8_t* srcV = srcU + (sourceConfig.width / 2) * (sourceConfig.height / 2);
-
     const size_t y_size = crop_width * crop_height;
-    const size_t uv_size = (crop_width / 2) * (crop_height / 2);
+    const size_t uv_size = (crop_width  >> MEMORY_RATIO_UV) * (crop_height  >> MEMORY_RATIO_UV);
     const size_t total_size = y_size + 2 * uv_size;
-
-    auto cropBuf = std::make_shared<DataBuffer>(total_size);
+    std::shared_ptr<DataBuffer> cropBuf = std::make_shared<DataBuffer>(total_size);
     uint8_t* dstY = cropBuf->Data();
     uint8_t* dstU = dstY + y_size;
     uint8_t* dstV = dstU + uv_size;
+    CropConvert(sourceConfig, targetConfig, crop_width, crop_height, dstY, dstU, dstV, cropBuf);
+}
 
+void ScaleConvertProcess::CropConvert(ImageUnitInfo& sourceConfig, ImageUnitInfo& targetConfig, int crop_width,
+    int crop_height, uint8_t* dstY, uint8_t* dstU, uint8_t* dstV, std::shared_ptr<DataBuffer> cropBuf)
+{
+    const int offsetX = (sourceConfig.width - crop_width) >> MEMORY_RATIO_UV;
+    const int offsetY = (sourceConfig.height - crop_height) >> MEMORY_RATIO_UV;
+    uint8_t* srcY = sourceConfig.imgData->Data();
+    uint8_t* srcU = srcY + sourceConfig.width * sourceConfig.height;
+    uint8_t* srcV = srcU + (sourceConfig.width >> MEMORY_RATIO_UV)
+        * (sourceConfig.height >> MEMORY_RATIO_UV);
+    
     for (int y = 0; y < crop_height; ++y) {
         const uint8_t* src_row = srcY + (offsetY + y) * sourceConfig.width;
         uint8_t* dst_row = dstY + y * crop_width;
@@ -119,19 +124,21 @@ void ScaleConvertProcess::Crop(ImageUnitInfo& sourceConfig, ImageUnitInfo& targe
             return;
         }
     }
-    for (int y = 0; y < crop_height / 2; ++y) {
-        const uint8_t* src_row = srcU + (offsetY / 2 + y) * (sourceConfig.width / 2);
-        uint8_t* dst_row = dstU + y * (crop_width / 2);
-        errno_t err = memcpy_s(dst_row, crop_width / 2, src_row + offsetX / 2, crop_width / 2);
+    for (int y = 0; y < crop_height  >> MEMORY_RATIO_UV; ++y) {
+        const uint8_t* src_row = srcU + ((offsetY >> MEMORY_RATIO_UV) + y) * (sourceConfig.width >> MEMORY_RATIO_UV);
+        uint8_t* dst_row = dstU + y * (crop_width >> MEMORY_RATIO_UV);
+        errno_t err = memcpy_s(dst_row, crop_width >> MEMORY_RATIO_UV, src_row + (offsetX >> MEMORY_RATIO_UV),
+            crop_width >> MEMORY_RATIO_UV);
         if (err != EOK) {
             DHLOGE("memcpy_s failed for U plane at row %{public}d", y);
             return;
         }
     }
-    for (int y = 0; y < crop_height / 2; ++y) {
-        const uint8_t* src_row = srcV + (offsetY / 2 + y) * (sourceConfig.width / 2);
-        uint8_t* dst_row = dstV + y * (crop_width / 2);
-        errno_t err = memcpy_s(dst_row, crop_width / 2, src_row + offsetX / 2, crop_width / 2);
+    for (int y = 0; y < crop_height >> MEMORY_RATIO_UV; ++y) {
+        const uint8_t* src_row = srcV + ((offsetY >> MEMORY_RATIO_UV) + y) * (sourceConfig.width >> MEMORY_RATIO_UV);
+        uint8_t* dst_row = dstV + y * (crop_width >> MEMORY_RATIO_UV);
+        errno_t err = memcpy_s(dst_row, crop_width >> MEMORY_RATIO_UV, src_row + (offsetX >> MEMORY_RATIO_UV),
+            crop_width >> MEMORY_RATIO_UV);
         if (err != EOK) {
             DHLOGE("memcpy_s failed for V plane at row %{public}d", y);
             return;
@@ -140,13 +147,10 @@ void ScaleConvertProcess::Crop(ImageUnitInfo& sourceConfig, ImageUnitInfo& targe
     sourceConfig.imgData = cropBuf;
     sourceConfig.width = crop_width;
     sourceConfig.height = crop_height;
-    sourceConfig.chromaOffset = y_size;
-    sourceConfig.imgSize = total_size;
+    sourceConfig.chromaOffset = crop_width * crop_height;
+    sourceConfig.imgSize = cropBuf->Size();
     DHLOGD("Cropped successfully: %{public}dx%{public}d -> %{public}dx%{public}d, offset (%{public}d,%{public}d)",
-           sourceConfig.width, sourceConfig.height,
-           crop_width, crop_height,
-           offsetX, offsetY);
-    return;
+           sourceConfig.width, sourceConfig.height, crop_width, crop_height, offsetX, offsetY);
 }
 
 int ScaleConvertProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& inputBuffers)

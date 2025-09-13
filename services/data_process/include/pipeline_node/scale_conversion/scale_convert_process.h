@@ -61,6 +61,8 @@ private:
     int32_t GetImageUnitInfo(ImageUnitInfo& imgInfo, const std::shared_ptr<DataBuffer>& imgBuf);
     int32_t ScaleConvert(ImageUnitInfo& srcImgInfo, ImageUnitInfo& dstImgInfo);
     void Crop(ImageUnitInfo& sourceConfig, ImageUnitInfo& targetConfig);
+    void CropConvert(ImageUnitInfo& sourceConfig, ImageUnitInfo& targetConfig, int crop_width,
+        int crop_height, uint8_t* dstY, uint8_t* dstU, uint8_t* dstV, std::shared_ptr<DataBuffer> cropBuf);
 #ifdef DCAMERA_SUPPORT_FFMPEG
     int32_t CopyYUV420SrcData(const ImageUnitInfo& srcImgInfo);
     int32_t CopyNV12SrcData(const ImageUnitInfo& srcImgInfo);
