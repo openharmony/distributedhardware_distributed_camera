@@ -60,6 +60,7 @@ private:
     bool CheckScaleConvertInfo(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo);
     int32_t GetImageUnitInfo(ImageUnitInfo& imgInfo, const std::shared_ptr<DataBuffer>& imgBuf);
     int32_t ScaleConvert(ImageUnitInfo& srcImgInfo, ImageUnitInfo& dstImgInfo);
+    void Crop(ImageUnitInfo& sourceConfig, ImageUnitInfo& targetConfig);
 #ifdef DCAMERA_SUPPORT_FFMPEG
     int32_t CopyYUV420SrcData(const ImageUnitInfo& srcImgInfo);
     int32_t CopyNV12SrcData(const ImageUnitInfo& srcImgInfo);

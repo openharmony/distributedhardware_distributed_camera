@@ -41,6 +41,7 @@ enum DcameraBusinessState : int32_t {
 const uint32_t EVENT_SOURCE_DEV_PROCESS = 0;
 const uint32_t EVENT_HICOLLIE = 1;
 const uint32_t EVENT_PROCESS_HDF_NOTIFY = 2;
+const uint32_t EVENT_DCAMERA_FORCE_SWITCH = 4;
 class DCameraSourceDev : public std::enable_shared_from_this<DCameraSourceDev> {
 public:
     explicit DCameraSourceDev(std::string devId, std::string dhId, std::shared_ptr<ICameraStateListener>& stateLisener);
@@ -71,6 +72,7 @@ public:
     int32_t GetFullCaps();
     void SetTokenId(uint64_t token);
     int32_t UpdateDCameraWorkMode(const WorkModeParam& param);
+    bool GetForceSwitchFlag();
 
     class DCameraSourceDevEventHandler : public AppExecFwk::EventHandler {
         public:
@@ -123,6 +125,7 @@ private:
     sptr<IDCameraProviderCallback> hdiCallback_;
     int32_t sceneMode_ = 0;
     uint64_t tokenId_ = 0;
+    bool isForceSwitch_ = false;
 
     std::map<uint32_t, DCameraNotifyFunc> memberFuncMap_;
     std::map<uint32_t, DCameraEventResult> eventResultMap_;
