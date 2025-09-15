@@ -340,8 +340,8 @@ void DCameraStreamDataProcessProducer::WritePtsAndAddBuffer(const std::shared_pt
     readSyncSharedData->lock = 0;
     ret = syncMem_->WriteToAshmem(static_cast<void *>(readSyncSharedData), sizeof(SyncSharedData), 0);
     CHECK_AND_RETURN_LOG(!ret, "write sync data failed!");
-    readSyncSharedData->video_current_pts = buffer->frameInfo_.rawTime;
-    readSyncSharedData->video_update_clock = GetNowTimeStampUs();
+    readSyncSharedData->video_current_pts = static_cast<uint64_t>(buffer->frameInfo_.rawTime);
+    readSyncSharedData->video_update_clock = static_cast<uint64_t>(GetNowTimeStampUs());
     readSyncSharedData->reset = false;
     readSyncSharedData->lock = 1;
     ret = syncMem_->WriteToAshmem(static_cast<void *>(readSyncSharedData), sizeof(SyncSharedData), 0);
@@ -383,7 +383,7 @@ void DCameraStreamDataProcessProducer::SyncVideoThread()
         }
 
         // Synchronization frame judgment
-        uint64_t videoPtsUs = buffer->frameInfo_.rawTime;
+        uint64_t videoPtsUs = static_cast<uint64_t>(buffer->frameInfo_.rawTime);
         int32_t syncResult = SyncVideoFrame(videoPtsUs);
         if (syncResult == 1) {
             // Synchronization successful, sending video frame
@@ -443,7 +443,7 @@ bool DCameraStreamDataProcessProducer::WaitForVideoFrame(std::shared_ptr<DataBuf
 
 int32_t DCameraStreamDataProcessProducer::SyncVideoFrame(uint64_t videoPtsUs)
 {
-    int64_t videoPts = videoPtsUs / DCAMERA_NS_TO_MS; // us -> ms
+    int64_t videoPts = static_cast<int64_t>(videoPtsUs / DCAMERA_NS_TO_MS); // us -> ms
     int64_t audioPts = 0; // get audio timestamp from shared memory
     int64_t audioUpdatePts = 0; // audio update time
     float audioSpeed = 1.0f; // audio playback speed factor
@@ -461,8 +461,8 @@ int32_t DCameraStreamDataProcessProducer::SyncVideoFrame(uint64_t videoPtsUs)
     readSyncSharedData->lock = 0;
     ret = syncMem_->WriteToAshmem(static_cast<void *>(readSyncSharedData), sizeof(SyncSharedData), 0);
     CHECK_AND_RETURN_RET_LOG(!ret, DCAMERA_BAD_VALUE, "write sync data failed!");
-    audioPts = readSyncSharedData->audio_current_pts / DCAMERA_US_TO_MS; // us -> ms
-    audioUpdatePts = readSyncSharedData->audio_update_clock / DCAMERA_US_TO_MS; // us -> ms
+    audioPts = static_cast<int64_t>(readSyncSharedData->audio_current_pts / DCAMERA_US_TO_MS); // us -> ms
+    audioUpdatePts = static_cast<int64_t>(readSyncSharedData->audio_update_clock / DCAMERA_US_TO_MS); // us -> ms
     audioSpeed = readSyncSharedData->audio_speed;
     readSyncSharedData->lock = 1;
     ret = syncMem_->WriteToAshmem(static_cast<void *>(readSyncSharedData), sizeof(SyncSharedData), 0);
@@ -510,7 +510,7 @@ void DCameraStreamDataProcessProducer::UpdateVideoClock(uint64_t videoPtsUs)
     bool ret = syncMem_->WriteToAshmem(static_cast<void *>(readSyncSharedData), sizeof(SyncSharedData), 0);
     CHECK_AND_RETURN_LOG(!ret, "write sync data failed!");
     readSyncSharedData->video_current_pts = videoPtsUs;
-    readSyncSharedData->video_update_clock = GetNowTimeStampUs();
+    readSyncSharedData->video_update_clock = static_cast<uint64_t>(GetNowTimeStampUs());
     readSyncSharedData->reset = false;
     readSyncSharedData->lock = 1;
     ret = syncMem_->WriteToAshmem(static_cast<void *>(readSyncSharedData), sizeof(SyncSharedData), 0);

@@ -490,7 +490,19 @@ int32_t DCameraSoftbusAdapter::HandleSourceStreamExt(std::shared_ptr<DataBuffer>
     frameInfo.pts = sinkFrameInfo.pts_;
     frameInfo.index = sinkFrameInfo.index_;
     frameInfo.ver = sinkFrameInfo.ver_;
-    frameInfo.rawTime = sinkFrameInfo.rawTime_.empty() ? 0 : std::stoll(sinkFrameInfo.rawTime_);
+    if (sinkFrameInfo.rawTime_.empty()) {
+        frameInfo.rawTime = 0;
+    } else {
+        char *endptr = nullptr;
+        errno = 0;
+        long long raw_time_val = strtoll(sinkFrameInfo.rawTime_.c_str(), &endptr, 10);
+        if (errno == ERANGE || (endptr != nullptr && *endptr != '\0') || endptr == sinkFrameInfo.rawTime_.c_str()) {
+            DHLOGE("Failed to convert rawTime string to long long: %s", sinkFrameInfo.rawTime_.c_str());
+            frameInfo.rawTime = 0;
+        } else {
+            frameInfo.rawTime = raw_time_val;
+        }
+    }
     frameInfo.timePonit.startEncode = sinkFrameInfo.startEncodeT_;
     frameInfo.timePonit.finishEncode = sinkFrameInfo.finishEncodeT_;
     frameInfo.timePonit.send = sinkFrameInfo.sendT_;
