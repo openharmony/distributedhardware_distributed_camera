@@ -22,22 +22,32 @@ namespace OHOS {
 namespace DistributedHardware {
 void SoftbusOnSinkBytesReceivedFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(uint32_t))) {
-        return;
-    }
-
     FuzzedDataProvider fdp(data, size);
-    int32_t sessionId = fdp.ConsumeIntegral<int32_t>();
-    int32_t socket = 1;
-    const void *receivedData = reinterpret_cast<const void*>(data);
-    uint32_t dataLen = fdp.ConsumeIntegral<uint32_t>();
+    size_t part1_size = fdp.ConsumeIntegralInRange<size_t>(0, fdp.remaining_bytes());
+    std::vector<uint8_t> part1_data = fdp.ConsumeBytes<uint8_t>(part1_size);
+    FuzzedDataProvider fdp1(part1_data.data(), part1_data.size());
+
+    int32_t sessionId = fdp1.ConsumeIntegral<int32_t>();
+    int32_t socket = fdp1.ConsumeIntegral<int32_t>();
+
     auto session = std::make_shared<DCameraSoftbusSession>();
     DCameraSoftbusAdapter::GetInstance().sinkSocketSessionMap_[socket] = session;
-    DCameraSoftbusAdapter::GetInstance().SinkOnBytes(sessionId, receivedData, dataLen);
     
-    std::string testStr = "test_suffix";
-    std::string randomSuffix = fdp.ConsumeRandomLengthString(10);
-    std::string randomReplacement = fdp.ConsumeRandomLengthString(10);
+    std::vector<uint8_t> receivedData = fdp1.ConsumeRemainingBytes<uint8_t>();
+    
+    DCameraSoftbusAdapter::GetInstance().SinkOnBytes(
+        sessionId,
+        receivedData.data(),
+        static_cast<uint32_t>(receivedData.size())
+    );
+
+    std::vector<uint8_t> part2_data = fdp.ConsumeRemainingBytes<uint8_t>();
+    FuzzedDataProvider fdp2(part2_data.data(), part2_data.size());
+
+    std::string testStr = fdp2.ConsumeRandomLengthString(256);
+    std::string randomSuffix = fdp2.ConsumeRandomLengthString(32);
+    std::string randomReplacement = fdp2.ConsumeRandomLengthString(32);
+
     DCameraSoftbusAdapter::GetInstance().ReplaceSuffix(testStr, randomSuffix, randomReplacement);
 }
 }

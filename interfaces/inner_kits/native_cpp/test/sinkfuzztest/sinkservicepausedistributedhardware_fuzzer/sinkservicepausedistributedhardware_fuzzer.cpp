@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,29 +22,25 @@
 #include "distributed_camera_sink_service.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 void SinkServicePauseDistributedHardwareFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
-        return;
-    }
+    FuzzedDataProvider fdp(data, size);
 
-    std::string networkId(reinterpret_cast<const char*>(data), size);
+    std::string networkId = fdp.ConsumeRemainingBytesAsString();
 
     std::shared_ptr<DistributedCameraSinkService> sinkService =
-        std::make_shared<DistributedCameraSinkService>(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, true);
+        std::make_shared<DistributedCameraSinkService>(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, fdp.ConsumeBool());
     sinkService->PauseDistributedHardware(networkId);
 }
 }
 }
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     OHOS::DistributedHardware::SinkServicePauseDistributedHardwareFuzzTest(data, size);
     return 0;
 }
-
