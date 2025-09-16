@@ -313,7 +313,11 @@ int32_t DCameraStreamDataProcess::UpdateProducerWorkMode(std::vector<int32_t>& s
 {
     std::lock_guard<std::mutex> autoLock(producerMutex_);
     for (auto iter = streamIds.begin(); iter != streamIds.end(); iter++) {
-        uint32_t streamId = *iter;
+        if (*iter < 0) {
+            DHLOGE("Invalid stream ID received: %{public}d", *iter);
+            return DCAMERA_BAD_VALUE;
+        }
+        uint32_t streamId = static_cast<uint32_t>(*iter);
         auto producerIter = producers_.find(streamId);
         if (producerIter != producers_.end()) {
             DHLOGI("update producer workmode, streamId: %{public}" PRIu32, streamId);
