@@ -310,11 +310,14 @@ void DecodeDataProcess::ReleaseDecoderSurface()
 
 void DecodeDataProcess::ReleaseCodecEvent()
 {
-    if ((decEventHandler_ != nullptr) && (decEventHandler_->GetEventRunner() != nullptr)) {
-        decEventHandler_->GetEventRunner()->Stop();
-        eventThread_.join();
+    {
+        std::lock_guard<std::mutex> lock(eventMutex_);
+        if ((decEventHandler_ != nullptr) && (decEventHandler_->GetEventRunner() != nullptr)) {
+            decEventHandler_->GetEventRunner()->Stop();
+            eventThread_.join();
+        }
+        decEventHandler_ = nullptr;
     }
-    decEventHandler_ = nullptr;
     pipeSrcEventHandler_ = nullptr;
     DHLOGD("Release DecodeNode eventBusDecode and eventBusPipeline end.");
 }
@@ -331,7 +334,10 @@ void DecodeDataProcess::ReleaseProcessNode()
     std::queue<std::shared_ptr<DataBuffer>>().swap(inputBuffersQueue_);
     std::queue<uint32_t>().swap(availableInputIndexsQueue_);
     std::queue<std::shared_ptr<Media::AVSharedMemory>>().swap(availableInputBufferQueue_);
-    std::deque<DCameraFrameInfo>().swap(frameInfoDeque_);
+    {
+        std::lock_guard<std::mutex> lock(mtxDequeLock_);
+        std::deque<DCameraFrameInfo>().swap(frameInfoDeque_);
+    }
     waitDecoderOutputCount_ = 0;
     lastFeedDecoderInputBufferTimeUs_ = 0;
     outputTimeStampUs_ = 0;
@@ -500,6 +506,7 @@ void DecodeDataProcess::OnSurfaceOutputBufferAvailable(const sptr<IConsumerSurfa
         GetDecoderOutputBuffer(surface);
         DHLOGD("excute GetDecoderOutputBuffer.");
     };
+    std::lock_guard<std::mutex> lock(eventMutex_);
     if (decEventHandler_ != nullptr) {
         decEventHandler_->PostTask(sendFunc);
     }
@@ -625,6 +632,7 @@ void DecodeDataProcess::PostOutputDataBuffers(std::shared_ptr<DataBuffer>& outpu
         int32_t ret = DecodeDone(multiDataBuffers);
         DHLOGD("excute DecodeDone ret %{public}d.", ret);
     };
+    std::lock_guard<std::mutex> lock(eventMutex_);
     if (decEventHandler_ != nullptr) {
         decEventHandler_->PostTask(sendFunc);
     }

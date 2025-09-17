@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -69,7 +69,10 @@ int32_t DCameraPipelineSource::CreateDataProcessPipeline(PipelineType piplineTyp
         return err;
     }
     piplineType_ = piplineType;
-    processListener_ = listener;
+    {
+        std::unique_lock<std::mutex> lock(listenerMutex_);
+        processListener_ = listener;
+    }
     isProcess_ = true;
     return DCAMERA_OK;
 }
@@ -197,6 +200,7 @@ int32_t DCameraPipelineSource::ProcessData(std::vector<std::shared_ptr<DataBuffe
         int32_t ret = pipelineHead_->ProcessData(inputBuffers);
         DHLOGD("excute ProcessData ret %{public}d.", ret);
     };
+    std::unique_lock<std::mutex> lock(eventMutex_);
     CHECK_AND_RETURN_RET_LOG(pipeEventHandler_ == nullptr, DCAMERA_BAD_VALUE, "pipeEventHandler_ is nullptr.");
     pipeEventHandler_->PostTask(sendFunc);
     return DCAMERA_OK;
@@ -211,12 +215,18 @@ void DCameraPipelineSource::DestroyDataProcessPipeline()
         pipelineHead_->ReleaseProcessNode();
         pipelineHead_ = nullptr;
     }
-    if ((pipeEventHandler_ != nullptr) && (pipeEventHandler_->GetEventRunner() != nullptr)) {
-        pipeEventHandler_->GetEventRunner()->Stop();
-        eventThread_.join();
+    {
+        std::unique_lock<std::mutex> lock(eventMutex_);
+        if ((pipeEventHandler_ != nullptr) && (pipeEventHandler_->GetEventRunner() != nullptr)) {
+            pipeEventHandler_->GetEventRunner()->Stop();
+            eventThread_.join();
+        }
+        pipeEventHandler_ = nullptr;
     }
-    pipeEventHandler_ = nullptr;
-    processListener_ = nullptr;
+    {
+        std::unique_lock<std::mutex> lock(listenerMutex_);
+        processListener_ = nullptr;
+    }
     pipNodeRanks_.clear();
     piplineType_ = PipelineType::VIDEO;
     DHLOGD("Destroy source data process pipeline end.");
@@ -226,6 +236,7 @@ void DCameraPipelineSource::OnError(DataProcessErrorType errorType)
 {
     DHLOGE("A runtime error occurred in the source pipeline.");
     isProcess_ = false;
+    std::unique_lock<std::mutex> lock(listenerMutex_);
     if (processListener_ == nullptr) {
         DHLOGE("The process listener of source pipeline is empty.");
         return;
@@ -236,6 +247,7 @@ void DCameraPipelineSource::OnError(DataProcessErrorType errorType)
 void DCameraPipelineSource::OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult)
 {
     DHLOGD("Source pipeline output the processed video buffer.");
+    std::unique_lock<std::mutex> lock(listenerMutex_);
     if (processListener_ == nullptr) {
         DHLOGE("The process listener of source pipeline is empty.");
         return;

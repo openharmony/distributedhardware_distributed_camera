@@ -97,11 +97,14 @@ void DCameraStreamDataProcessProducer::Stop()
             smoother_ = nullptr;
         }
         smootherListener_ = nullptr;
-        if ((eventHandler_ != nullptr) && (eventHandler_->GetEventRunner() != nullptr)) {
-            eventHandler_->GetEventRunner()->Stop();
+        {
+            std::unique_lock<std::mutex> lock(eventMutex_);
+            if ((eventHandler_ != nullptr) && (eventHandler_->GetEventRunner() != nullptr)) {
+                eventHandler_->GetEventRunner()->Stop();
+            }
+            eventThread_.join();
+            eventHandler_ = nullptr;
         }
-        eventThread_.join();
-        eventHandler_ = nullptr;
         // Stop the audio and video synchronization thread
         if (syncMem_ != nullptr) {
             syncMem_->UnmapAshmem();
@@ -310,6 +313,7 @@ void DCameraStreamDataProcessProducer::OnSmoothFinished(const std::shared_ptr<IF
     auto feedFunc = [this, dhBase, buffer]() {
         FeedStreamToDriver(dhBase, buffer);
     };
+    std::unique_lock<std::mutex> lock(eventMutex_);
     if (eventHandler_ != nullptr) {
         eventHandler_->PostTask(feedFunc);
     }
