@@ -133,10 +133,19 @@ int32_t DecodeDataProcess::InitDecoder()
     ret = StartVideoDecoder();
     if (ret != DCAMERA_OK) {
         DHLOGE("Start Video decoder failed.");
-        ReportDcamerOptFail(DCAMERA_OPT_FAIL, DCAMERA_DECODE_ERROR,
-            CreateMsg("start video decoder failed, width: %d, height: %d, format: %s",
-            sourceConfig_.GetWidth(), sourceConfig_.GetHeight(),
-            ENUM_VIDEOFORMAT_STRINGS[static_cast<int32_t>(sourceConfig_.GetVideoformat())].c_str()));
+        auto videoFormat = sourceConfig_.GetVideoformat();
+        auto formatIndex = static_cast<int32_t>(videoFormat);
+        if (formatIndex >= 0 && formatIndex < std::size(ENUM_VIDEOFORMAT_STRINGS)) {
+            ReportDcamerOptFail(DCAMERA_OPT_FAIL, DCAMERA_DECODE_ERROR,
+                CreateMsg("start video decoder failed, width: %d, height: %d, format: %s",
+                sourceConfig_.GetWidth(), sourceConfig_.GetHeight(),
+                ENUM_VIDEOFORMAT_STRINGS[formatIndex].c_str()));
+        } else {
+            DHLOGE("Invalid video format received from source: %d", formatIndex);
+            ReportDcamerOptFail(DCAMERA_OPT_FAIL, DCAMERA_DECODE_ERROR,
+                CreateMsg("start video decoder failed with INVALID format index %d, width: %d, height: %d",
+                formatIndex, sourceConfig_.GetWidth(), sourceConfig_.GetHeight()));
+        }
         return ret;
     }
     return DCAMERA_OK;
