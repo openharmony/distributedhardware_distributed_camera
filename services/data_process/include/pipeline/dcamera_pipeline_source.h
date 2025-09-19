@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -58,8 +58,8 @@ private:
     constexpr static int32_t MAX_FRAME_RATE = 30;
     constexpr static int32_t MIN_VIDEO_WIDTH = 320;
     constexpr static int32_t MIN_VIDEO_HEIGHT = 240;
-    constexpr static int32_t MAX_VIDEO_WIDTH = 1920;
-    constexpr static int32_t MAX_VIDEO_HEIGHT = 1080;
+    constexpr static int32_t MAX_VIDEO_WIDTH = 4160;
+    constexpr static int32_t MAX_VIDEO_HEIGHT = 3120;
 
     std::shared_ptr<DataProcessListener> processListener_ = nullptr;
     std::shared_ptr<AbstractDataProcess> pipelineHead_ = nullptr;

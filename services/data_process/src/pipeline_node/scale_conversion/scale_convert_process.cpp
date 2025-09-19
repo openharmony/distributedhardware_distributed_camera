@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -97,7 +97,7 @@ void ScaleConvertProcess::Crop(ImageUnitInfo& sourceConfig, ImageUnitInfo& targe
     }
     const size_t y_size = crop_width * crop_height;
     const size_t uv_size = (crop_width  >> MEMORY_RATIO_UV) * (crop_height  >> MEMORY_RATIO_UV);
-    const size_t total_size = y_size + 2 * uv_size;
+    const size_t total_size = static_cast<size_t>(crop_width * crop_height * YUV_BYTES_PER_PIXEL / Y2UV_RATIO);
     std::shared_ptr<DataBuffer> cropBuf = std::make_shared<DataBuffer>(total_size);
     uint8_t* dstY = cropBuf->Data();
     uint8_t* dstU = dstY + y_size;
@@ -124,7 +124,7 @@ void ScaleConvertProcess::CropConvert(ImageUnitInfo& sourceConfig, ImageUnitInfo
             return;
         }
     }
-    for (int y = 0; y < crop_height  >> MEMORY_RATIO_UV; ++y) {
+    for (int y = 0; y < crop_height >> MEMORY_RATIO_UV; ++y) {
         const uint8_t* src_row = srcU + ((offsetY >> MEMORY_RATIO_UV) + y) * (sourceConfig.width >> MEMORY_RATIO_UV);
         uint8_t* dst_row = dstU + y * (crop_width >> MEMORY_RATIO_UV);
         errno_t err = memcpy_s(dst_row, crop_width >> MEMORY_RATIO_UV, src_row + (offsetX >> MEMORY_RATIO_UV),
@@ -147,6 +147,8 @@ void ScaleConvertProcess::CropConvert(ImageUnitInfo& sourceConfig, ImageUnitInfo
     sourceConfig.imgData = cropBuf;
     sourceConfig.width = crop_width;
     sourceConfig.height = crop_height;
+    sourceConfig.alignedWidth = crop_width;
+    sourceConfig.alignedHeight = crop_height;
     sourceConfig.chromaOffset = crop_width * crop_height;
     sourceConfig.imgSize = cropBuf->Size();
     DHLOGD("Cropped successfully: %{public}dx%{public}d -> %{public}dx%{public}d, offset (%{public}d,%{public}d)",
