@@ -58,8 +58,8 @@ private:
     constexpr static int32_t MAX_FRAME_RATE = 30;
     constexpr static int32_t MIN_VIDEO_WIDTH = 320;
     constexpr static int32_t MIN_VIDEO_HEIGHT = 240;
-    constexpr static int32_t MAX_VIDEO_WIDTH = 1920;
-    constexpr static int32_t MAX_VIDEO_HEIGHT = 1080;
+    constexpr static int32_t MAX_VIDEO_WIDTH = 4160;
+    constexpr static int32_t MAX_VIDEO_HEIGHT = 3120;
 
     std::mutex listenerMutex_;
     std::shared_ptr<DataProcessListener> processListener_ = nullptr;
