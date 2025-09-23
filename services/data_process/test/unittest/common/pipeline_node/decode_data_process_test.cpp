@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -592,9 +592,9 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_017, TestSize.Level1)
     DHLOGI("DecodeDataProcessTest decode_data_process_test_017");
     EXPECT_EQ(false, testDecodeDataProcess_ == nullptr);
     VideoConfigParams srcParams2(VideoCodecType::CODEC_H264,
-        Videoformat::NV12, DCAMERA_PRODUCER_FPS_DEFAULT, 2000, 2000);
+        Videoformat::NV12, DCAMERA_PRODUCER_FPS_DEFAULT, 4000, 4000);
     VideoConfigParams destParams2(VideoCodecType::NO_CODEC,
-        Videoformat::NV21, DCAMERA_PRODUCER_FPS_DEFAULT, 2000, 2000);
+        Videoformat::NV21, DCAMERA_PRODUCER_FPS_DEFAULT, 4000, 4000);
     VideoConfigParams procConfig2;
     int32_t rc = testDecodeDataProcess_->InitNode(srcParams2, destParams2, procConfig2);
     testDecodeDataProcess_->OnError();
