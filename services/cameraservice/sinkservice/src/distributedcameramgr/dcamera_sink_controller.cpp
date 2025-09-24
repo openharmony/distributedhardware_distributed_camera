@@ -17,6 +17,7 @@
 
 #include <securec.h>
 #include <thread>
+#include <chrono>
 
 #include "anonymous_string.h"
 #include "dcamera_channel_sink_impl.h"
@@ -98,7 +99,18 @@ int32_t DCameraSinkController::StartCapture(std::vector<std::shared_ptr<DCameraC
 int32_t DCameraSinkController::StopCapture()
 {
     DHLOGI("StopCapture dhId: %{public}s", GetAnonyString(dhId_).c_str());
-    std::lock_guard<std::mutex> autoLock(captureLock_);
+    std::unique_lock<std::mutex> lock(captureStateMutex_);
+    if (!captureStateCv_.wait_for(lock, std::chrono::seconds(MAX_RETRY_TIMES_),
+        [this] { return captureState_ != CAPTURE_STARTING; })) {
+        DHLOGE("StopCapture timed out waiting for state to change from STARTING. dhId: %{public}s",
+               GetAnonyString(dhId_).c_str());
+        return DCAMERA_WRONG_STATE;
+    }
+    if (captureState_ == CAPTURE_IDLE) {
+        DHLOGI("StopCapture called when state is already IDLE. dhId: %{public}s", GetAnonyString(dhId_).c_str());
+        return DCAMERA_OK;
+    }
+    captureState_ = CAPTURE_IDLE;
     if (operator_ == nullptr) {
         return DCAMERA_BAD_VALUE;
     }
@@ -457,7 +469,7 @@ void DCameraSinkController::DCameraSinkContrEventHandler::ProcessEvent(const App
             std::shared_ptr<DCameraSurfaceHolder> holder = event->GetSharedObject<DCameraSurfaceHolder>();
             if (holder != nullptr) {
                 {
-                    std::lock_guard<std::mutex> lock(sinkContr->stateMutex_);
+                    std::lock_guard<std::mutex> lock(sinkContr->captureStateMutex_);
                     sinkContr->isEncoderReady_ = true;
                     sinkContr->encoderResult_ = holder->result;
                     sinkContr->preparedSurface_ = holder->surface;
@@ -468,7 +480,7 @@ void DCameraSinkController::DCameraSinkContrEventHandler::ProcessEvent(const App
         }
         case EVENT_CAMERA_PREPARED: {
             int32_t result = event->GetParam();
-            std::lock_guard<std::mutex> lock(sinkContr->stateMutex_);
+            std::lock_guard<std::mutex> lock(sinkContr->captureStateMutex_);
             sinkContr->isCameraReady_ = true;
             sinkContr->cameraResult_ = result;
             sinkContr->CheckAndCommitCapture();
@@ -499,6 +511,8 @@ void DCameraSinkController::CheckAndCommitCapture()
             finalErrorCode = encoderResult_;
             errorMsg = "output start capture failed";
         }
+        captureState_ = CAPTURE_IDLE;
+        captureStateCv_.notify_all();
         HandleCaptureError(finalErrorCode, errorMsg);
         return;
     }
@@ -507,9 +521,13 @@ void DCameraSinkController::CheckAndCommitCapture()
     int32_t ret = operator_->CommitCapture(preparedSurface_);
     if (ret != DCAMERA_OK) {
         DHLOGE("CommitCapture failed, ret: %d", ret);
+        captureState_ = CAPTURE_IDLE;
+        captureStateCv_.notify_all();
         HandleCaptureError(ret, "commit capture failed.");
         return;
     }
+    captureState_ = CAPTURE_RUNNING;
+    captureStateCv_.notify_all();
     
     DCameraNotifyInner(DCAMERA_MESSAGE, DCAMERA_EVENT_CAMERA_SUCCESS, START_CAPTURE_SUCC);
     DHLOGI("CheckAndCommitCapture successfully started capture.");
@@ -658,18 +676,19 @@ void DCameraSinkController::PostAuthorization(std::vector<std::shared_ptr<DCamer
 int32_t DCameraSinkController::StartCaptureInner(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos)
 {
     DHLOGI("StartCaptureInner (EventHandler) dhId: %{public}s", GetAnonyString(dhId_).c_str());
-    std::lock_guard<std::mutex> autoLock(captureLock_);
-
-    {
-        std::lock_guard<std::mutex> stateLock(stateMutex_);
-        isEncoderReady_ = false;
-        isCameraReady_ = false;
-        encoderResult_ = DCAMERA_OK;
-        cameraResult_ = DCAMERA_OK;
-        preparedSurface_ = nullptr;
-        captureInfosCache_ = captureInfos;
+    std::lock_guard<std::mutex> lock(captureStateMutex_);
+    if (captureState_ == CAPTURE_STARTING) {
+        DHLOGW("StartCaptureInner called while another start is in progress. Call ignored.");
+        return DCAMERA_WRONG_STATE;
     }
+    captureState_ = CAPTURE_STARTING;
 
+    isEncoderReady_ = false;
+    isCameraReady_ = false;
+    encoderResult_ = DCAMERA_OK;
+    cameraResult_ = DCAMERA_OK;
+    preparedSurface_ = nullptr;
+    captureInfosCache_ = captureInfos;
     ffrt::submit([this]() {
         DHLOGI("Output initialization task start.");
         int32_t ret = output_->StartCapture(captureInfosCache_);

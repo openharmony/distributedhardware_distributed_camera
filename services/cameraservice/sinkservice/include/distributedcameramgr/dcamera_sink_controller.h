@@ -133,6 +133,7 @@ private:
     bool isCheckSecLevel_ = false;
     int32_t sceneMode_ = 0;
     int32_t userId_ = -1;
+    const int32_t MAX_RETRY_TIMES_ = 3;
     uint64_t tokenId_ = 0;
     uint64_t sinkTokenId_ = 0;
     std::string accountId_ = "";
@@ -140,6 +141,15 @@ private:
     const std::string SESSION_FLAG = "control";
     const std::string SRC_TYPE = "camera";
     const size_t DATABUFF_MAX_SIZE = 100 * 1024 * 1024;
+    enum DcameraCaptureState : int32_t {
+        CAPTURE_IDLE,
+        CAPTURE_STARTING,
+        CAPTURE_RUNNING,
+    };
+
+    std::mutex captureStateMutex_;
+    std::condition_variable captureStateCv_;
+    DcameraCaptureState captureState_ {CAPTURE_IDLE};
 };
 
 class DeviceInitCallback : public DmInitCallback {
