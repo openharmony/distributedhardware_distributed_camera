@@ -480,11 +480,13 @@ int32_t DCameraStreamDataProcessProducer::SyncVideoFrame(uint64_t videoPtsUs)
            videoPts, estimatedPts, diff);
 
     if (diff > DCAMERA_TIME_DIFF_MAX) {
-        DHLOGI("SyncVideoFrame::Video is too late (diff=%{public}" PRId64 "ms), skip this frame.", diff);
+        DHLOGI("SyncVideoFrame::late (diff=%{public}" PRId64 "ms, videoPts=%{public}" PRId64 "ms), skip this frame.",
+            diff, videoPts);
         // Drop if there is still data in the queue, play the last frame directly
         return (syncBufferQueue_.size() > 0) ? -1 : 1;
     } else if (diff < DCAMERA_TIME_DIFF_MIN) {
-        DHLOGI("SyncVideoFrame::Video is too early (diff=%{public}" PRId64 "ms), wait for next scheduling.", diff);
+        DHLOGI("SyncVideoFrame::early (diff=%{public}" PRId64 "ms, videoPts=%{public}" PRId64 "ms),"
+            " wait for next scheduling.", diff, videoPts);
         return 0;
     } else {
         DHLOGD("SyncVideoFrame::Video frame in sync range, will be sent. diff=%{public}" PRId64 "ms", diff);
