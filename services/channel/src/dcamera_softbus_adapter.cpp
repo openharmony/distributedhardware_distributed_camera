@@ -504,7 +504,7 @@ int32_t DCameraSoftbusAdapter::HandleSourceStreamExt(std::shared_ptr<DataBuffer>
             frameInfo.rawTime = raw_time_val;
         }
     }
-    DHLOGD("get videoPts=%{public}s from softbus", frameInfo.rawTime.c_str());
+    DHLOGD("get videoPts=%{public}" PRId64 " from softbus", frameInfo.rawTime);
     frameInfo.timePonit.startEncode = sinkFrameInfo.startEncodeT_;
     frameInfo.timePonit.finishEncode = sinkFrameInfo.finishEncodeT_;
     frameInfo.timePonit.send = sinkFrameInfo.sendT_;
