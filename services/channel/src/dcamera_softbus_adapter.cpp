@@ -326,6 +326,7 @@ int32_t DCameraSoftbusAdapter::SendSofbusStream(int32_t socket, std::shared_ptr<
     sinkFrameInfo.sendT_ = GetNowTimeStampUs();
     sinkFrameInfo.rawTime_ = std::to_string(timeStamp);
     sinkFrameInfo.Marshal(jsonStr);
+    DHLOGD("send videoPts=%{public}s to softbus", sinkFrameInfo.rawTime_.c_str());
     StreamData ext = { const_cast<char *>(jsonStr.c_str()), jsonStr.length() };
     StreamFrameInfo param = { 0 };
     int32_t ret = SendStream(socket, &streamData, &ext, &param);
@@ -503,6 +504,7 @@ int32_t DCameraSoftbusAdapter::HandleSourceStreamExt(std::shared_ptr<DataBuffer>
             frameInfo.rawTime = raw_time_val;
         }
     }
+    DHLOGD("get videoPts=%{public}" PRId64 " from softbus", frameInfo.rawTime);
     frameInfo.timePonit.startEncode = sinkFrameInfo.startEncodeT_;
     frameInfo.timePonit.finishEncode = sinkFrameInfo.finishEncodeT_;
     frameInfo.timePonit.send = sinkFrameInfo.sendT_;

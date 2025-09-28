@@ -496,6 +496,7 @@ int32_t EncodeDataProcess::GetEncoderOutputBuffer(uint32_t index, MediaAVCodec::
         buffer->GetBase(), outputMemoDataSize);
     CHECK_AND_RETURN_RET_LOG(err != EOK, DCAMERA_MEMORY_OPT_ERROR, "%{public}s", "memcpy_s buffer failed.");
     int64_t timeStamp = info.presentationTimeUs;
+    DHLOGD("get videoPts=%{public}" PRId64" from encoder", timeStamp);
     struct timespec time = {0, 0};
     clock_gettime(CLOCK_REALTIME, &time);
     int64_t timeNs = static_cast<int64_t>(time.tv_sec) * S2NS + static_cast<int64_t>(time.tv_nsec);

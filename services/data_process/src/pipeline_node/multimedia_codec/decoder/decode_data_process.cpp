@@ -135,7 +135,7 @@ int32_t DecodeDataProcess::InitDecoder()
         DHLOGE("Start Video decoder failed.");
         auto videoFormat = sourceConfig_.GetVideoformat();
         auto formatIndex = static_cast<int32_t>(videoFormat);
-        if (formatIndex >= 0 && formatIndex < std::size(ENUM_VIDEOFORMAT_STRINGS)) {
+        if (formatIndex >= 0 && static_cast<size_t>(formatIndex) < std::size(ENUM_VIDEOFORMAT_STRINGS)) {
             ReportDcamerOptFail(DCAMERA_OPT_FAIL, DCAMERA_DECODE_ERROR,
                 CreateMsg("start video decoder failed, width: %d, height: %d, format: %s",
                 sourceConfig_.GetWidth(), sourceConfig_.GetHeight(),
@@ -578,9 +578,8 @@ void DecodeDataProcess::CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int3
     uint8_t *dstDataV = bufferOutput->Data() + dstSizeY + dstSizeUV;
     auto converter = ConverterHandle::GetInstance().GetHandle();
     CHECK_AND_RETURN_LOG(converter.NV12ToI420 == nullptr, "converter is null.");
-    int32_t ret = converter.NV12ToI420(srcDataY, alignedWidth, srcDataUV, alignedWidth,
-        dstDataY, sourceConfig_.GetWidth(),
-        dstDataU, static_cast<uint32_t>(sourceConfig_.GetWidth()) >> MEMORY_RATIO_UV,
+    int32_t ret = converter.NV12ToI420(srcDataY, alignedWidth, srcDataUV, alignedWidth, dstDataY,
+        sourceConfig_.GetWidth(), dstDataU, static_cast<uint32_t>(sourceConfig_.GetWidth()) >> MEMORY_RATIO_UV,
         dstDataV, static_cast<uint32_t>(sourceConfig_.GetWidth()) >> MEMORY_RATIO_UV,
         processedConfig_.GetWidth(), processedConfig_.GetHeight());
     if (ret != DCAMERA_OK) {
@@ -592,6 +591,7 @@ void DecodeDataProcess::CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int3
         bufferOutput->frameInfo_ = frameInfoDeque_.front();
         frameInfoDeque_.pop_front();
     }
+    DHLOGD("get videoPts=%{public}" PRId64 " from decoder", bufferOutput->frameInfo_.rawTime);
     bufferOutput->SetInt32("Videoformat", static_cast<int32_t>(Videoformat::YUVI420));
     bufferOutput->SetInt32("alignedWidth", processedConfig_.GetWidth());
     bufferOutput->SetInt32("alignedHeight", processedConfig_.GetHeight());
