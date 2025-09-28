@@ -98,7 +98,7 @@ void DCameraStreamDataProcessProducer::Stop()
         }
         smootherListener_ = nullptr;
         {
-            std::unique_lock<std::mutex> lock(eventMutex_);
+            std::lock_guard<std::mutex> lock(eventMutex_);
             if ((eventHandler_ != nullptr) && (eventHandler_->GetEventRunner() != nullptr)) {
                 eventHandler_->GetEventRunner()->Stop();
             }
@@ -197,10 +197,10 @@ void DCameraStreamDataProcessProducer::LooperSnapShot()
             continue;
         }
 #ifdef DUMP_DCAMERA_FILE
-    std::string fileName = DUMP_PHOTO_PATH +
+    std::string name =
         "SourceCapture_streamId(" + std::to_string(streamId_) + ")_" + std::to_string(photoCount_++) + ".jpg";
-    if (DcameraHidumper::GetInstance().GetDumpFlag() && (IsUnderDumpMaxSize(fileName) == DCAMERA_OK)) {
-        DumpBufferToFile(fileName, buffer->Data(), buffer->Size());
+    if (DcameraHidumper::GetInstance().GetDumpFlag() && (IsUnderDumpMaxSize(DUMP_PHOTO_PATH, name) == DCAMERA_OK)) {
+        DumpBufferToFile(DUMP_PHOTO_PATH, name, buffer->Data(), buffer->Size());
     }
 #endif
         int32_t ret = FeedStreamToDriver(dhBase, buffer);
@@ -296,8 +296,8 @@ void DCameraStreamDataProcessProducer::OnSmoothFinished(const std::shared_ptr<IF
     dhBase.dhId_ = dhId_;
 #ifdef DUMP_DCAMERA_FILE
     if (DcameraHidumper::GetInstance().GetDumpFlag() &&
-        (IsUnderDumpMaxSize(DUMP_PATH + TO_DISPLAY) == DCAMERA_OK)) {
-        DumpBufferToFile(DUMP_PATH + TO_DISPLAY, buffer->Data(), buffer->Size());
+        (IsUnderDumpMaxSize(DUMP_PATH, TO_DISPLAY) == DCAMERA_OK)) {
+        DumpBufferToFile(DUMP_PATH, TO_DISPLAY, buffer->Data(), buffer->Size());
     }
 #endif
     {
@@ -313,7 +313,7 @@ void DCameraStreamDataProcessProducer::OnSmoothFinished(const std::shared_ptr<IF
     auto feedFunc = [this, dhBase, buffer]() {
         FeedStreamToDriver(dhBase, buffer);
     };
-    std::unique_lock<std::mutex> lock(eventMutex_);
+    std::lock_guard<std::mutex> lock(eventMutex_);
     if (eventHandler_ != nullptr) {
         eventHandler_->PostTask(feedFunc);
     }

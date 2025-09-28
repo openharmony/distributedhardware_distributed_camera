@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -195,18 +195,21 @@ bool IsBase64(unsigned char c)
     return (isalnum(c) || (c == '+') || (c == '/'));
 }
 
-void DumpBufferToFile(const std::string fileName, uint8_t *buffer, size_t bufSize)
+void DumpBufferToFile(const std::string& dumpPath, const std::string& fileName, uint8_t *buffer, size_t bufSize)
 {
-    if (fileName.empty() || buffer == nullptr) {
+    if (dumpPath.empty() || fileName.empty() || buffer == nullptr) {
         DHLOGE("dumpsaving : input param err.");
         return;
     }
     char path[PATH_MAX + 1] = {0x00};
-    if (fileName.length() > PATH_MAX || realpath(fileName.c_str(), path) == nullptr) {
+    if (dumpPath.length() > PATH_MAX || realpath(dumpPath.c_str(), path) == nullptr) {
         DHLOGE("The file path is invalid.");
         return;
     }
-    std::ofstream ofs(path, std::ios::binary | std::ios::out | std::ios::app);
+    CHECK_AND_RETURN_LOG(path != DUMP_PATH || path != DUMP_PHOTO_PATH, "The file path is invalid.");
+    std::string name = "/" + fileName;
+    std::string file = path + name;
+    std::ofstream ofs(file.c_str(), std::ios::binary | std::ios::out | std::ios::app);
     if (!ofs.is_open()) {
         DHLOGE("dumpsaving : open file failed.");
         return;
@@ -216,18 +219,22 @@ void DumpBufferToFile(const std::string fileName, uint8_t *buffer, size_t bufSiz
     return;
 }
 
-int32_t IsUnderDumpMaxSize(const std::string fileName)
+int32_t IsUnderDumpMaxSize(const std::string& dumpPath, const std::string& fileName)
 {
-    if (fileName.empty()) {
-        DHLOGE("dumpsaving : input fileName empty.");
+    if (dumpPath.empty() || fileName.empty()) {
+        DHLOGE("dumpsaving : input param empty.");
         return DCAMERA_INIT_ERR;
     }
     char path[PATH_MAX + 1] = {0x00};
-    if (fileName.length() > PATH_MAX || realpath(fileName.c_str(), path) == nullptr) {
+    if (dumpPath.length() > PATH_MAX || realpath(dumpPath.c_str(), path) == nullptr) {
         DHLOGE("The file path is invalid.");
         return DCAMERA_INIT_ERR;
     }
-    std::ofstream ofs(path, std::ios::binary | std::ios::out | std::ios::app);
+    CHECK_AND_RETURN_RET_LOG(path != DUMP_PATH || path != DUMP_PHOTO_PATH,
+        DCAMERA_INIT_ERR, "The file path is invalid.");
+    std::string name = "/" + fileName;
+    std::string file = path + name;
+    std::ofstream ofs(file.c_str(), std::ios::binary | std::ios::out | std::ios::app);
     if (!ofs.is_open()) {
         DHLOGE("dumpsaving : open file failed.");
         return DCAMERA_INIT_ERR;
@@ -310,14 +317,14 @@ std::map<std::string, std::string> DumpFileUtil::g_lastPara = {};
 
 FILE *DumpFileUtil::OpenDumpFileInner(std::string para, std::string fileName)
 {
-    std::string filePath = DUMP_SERVICE_DIR + fileName;
+    std::string dumpPath = DUMP_SERVICE_DIR;
     std::string dumpPara;
     FILE *dumpFile = nullptr;
     char path[PATH_MAX + 1] = {0x00};
-    if (filePath.length() > PATH_MAX || realpath(filePath.c_str(), path) == nullptr) {
-        DHLOGE("The file path is invalid.");
+    if (dumpPath.length() > PATH_MAX || realpath(dumpPath.c_str(), path) == nullptr) {
         return dumpFile;
     }
+    DHLOGI("dump file path: %{public}s, fileName: %{public}s", path, fileName.c_str());
     bool res = GetSysPara(para.c_str(), dumpPara);
     if (!res || dumpPara.empty()) {
         DHLOGI("%{public}s is not set, dump dcamera is not required", para.c_str());
@@ -325,11 +332,13 @@ FILE *DumpFileUtil::OpenDumpFileInner(std::string para, std::string fileName)
         return dumpFile;
     }
 
+    fileName = "/" + fileName;
+    std::string file = path + fileName;
     if (dumpPara == "w") {
-        dumpFile = fopen(path, "wb+");
+        dumpFile = fopen(file.c_str(), "wb+");
         CHECK_AND_RETURN_RET_LOG(dumpFile == nullptr, dumpFile, "Error opening dump file!");
     } else if (dumpPara == "a") {
-        dumpFile = fopen(path, "ab+");
+        dumpFile = fopen(file.c_str(), "ab+");
         CHECK_AND_RETURN_RET_LOG(dumpFile == nullptr, dumpFile, "Error opening dump file!");
     }
     g_lastPara[para] = dumpPara;

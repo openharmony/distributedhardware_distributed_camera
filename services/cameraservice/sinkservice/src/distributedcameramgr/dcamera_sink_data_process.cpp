@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -164,8 +164,8 @@ void DCameraSinkDataProcess::SendDataAsync(const std::shared_ptr<DataBuffer>& bu
 void DCameraSinkDataProcess::OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult)
 {
 #ifdef DUMP_DCAMERA_FILE
-    if (DcameraHidumper::GetInstance().GetDumpFlag() && (IsUnderDumpMaxSize(DUMP_PATH + AFTER_ENCODE) == DCAMERA_OK)) {
-        DumpBufferToFile(DUMP_PATH + AFTER_ENCODE, videoResult->Data(), videoResult->Size());
+    if (DcameraHidumper::GetInstance().GetDumpFlag() && (IsUnderDumpMaxSize(DUMP_PATH, AFTER_ENCODE) == DCAMERA_OK)) {
+        DumpBufferToFile(DUMP_PATH, AFTER_ENCODE, videoResult->Data(), videoResult->Size());
     }
 #endif
     DumpFileUtil::WriteDumpFile(dumpFile_, static_cast<void *>(videoResult->Data()), videoResult->Size());

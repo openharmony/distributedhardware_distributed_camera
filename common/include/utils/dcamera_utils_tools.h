@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,9 +37,9 @@ int64_t GetNowTimeStampUs();
 int32_t GetAlignedHeight(int32_t width);
 std::string Base64Encode(const unsigned char *toEncode, unsigned int len);
 std::string Base64Decode(const std::string& basicString);
-void DumpBufferToFile(std::string fileName, uint8_t *buffer, size_t bufSize);
+void DumpBufferToFile(const std::string& dumpPath, const std::string& fileName, uint8_t *buffer, size_t bufSize);
 bool IsBase64(unsigned char c);
-int32_t IsUnderDumpMaxSize(std::string fileName);
+int32_t IsUnderDumpMaxSize(const std::string& dumpPath, const std::string& fileName);
 
 #ifdef DCAMERA_MMAP_RESERVE
 class ConverterHandle {

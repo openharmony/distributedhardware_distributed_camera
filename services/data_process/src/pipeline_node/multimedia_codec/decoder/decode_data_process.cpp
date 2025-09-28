@@ -416,8 +416,8 @@ void DecodeDataProcess::BeforeDecodeDump(uint8_t *buffer, size_t bufSize)
         DHLOGE("dumpsaving : input param nullptr.");
         return;
     }
-    if (DcameraHidumper::GetInstance().GetDumpFlag() && (IsUnderDumpMaxSize(DUMP_PATH + BEFORE_DECODE) == DCAMERA_OK)) {
-        DumpBufferToFile(DUMP_PATH + BEFORE_DECODE, buffer, bufSize);
+    if (DcameraHidumper::GetInstance().GetDumpFlag() && (IsUnderDumpMaxSize(DUMP_PATH, BEFORE_DECODE) == DCAMERA_OK)) {
+        DumpBufferToFile(DUMP_PATH, BEFORE_DECODE, buffer, bufSize);
     }
 #endif
     return;
@@ -600,8 +600,8 @@ void DecodeDataProcess::CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int3
 #ifdef DUMP_DCAMERA_FILE
     std::string fileName = "SourceAfterDecode_width(" + std::to_string(processedConfig_.GetWidth())
         + ")height(" + std::to_string(processedConfig_.GetHeight()) + ").yuv";
-    if (DcameraHidumper::GetInstance().GetDumpFlag() && (IsUnderDumpMaxSize(DUMP_PATH + fileName) == DCAMERA_OK)) {
-        DumpBufferToFile(DUMP_PATH + fileName, bufferOutput->Data(), bufferOutput->Size());
+    if (DcameraHidumper::GetInstance().GetDumpFlag() && (IsUnderDumpMaxSize(DUMP_PATH, fileName) == DCAMERA_OK)) {
+        DumpBufferToFile(DUMP_PATH, fileName, bufferOutput->Data(), bufferOutput->Size());
     }
 #endif
     DumpFileUtil::WriteDumpFile(dumpDecAfterFile_, static_cast<void *>(bufferOutput->Data()), bufferOutput->Size());
