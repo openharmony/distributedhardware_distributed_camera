@@ -189,7 +189,7 @@ HWTEST_F(DcameraUtilsToolsTest, GetAnonyInt32_001, TestSize.Level1)
  */
 HWTEST_F(DcameraUtilsToolsTest, IsOverDumpSize_001, TestSize.Level1)
 {
-    std::string dumpFileName = "/data/dump.txt";
+    std::string dumpFileName = "/data/test.txt";
     std::ofstream ofs(dumpFileName, std::ios::out);
     if (!ofs) {
         DHLOGI("open file failed");
@@ -197,20 +197,29 @@ HWTEST_F(DcameraUtilsToolsTest, IsOverDumpSize_001, TestSize.Level1)
         ofs.close();
     }
 
+    std::string dumpPath = "";
     std::string fileName = "";
     uint8_t *buf = nullptr;
     size_t size = 0;
-    DumpBufferToFile(fileName, buf, size);
-    EXPECT_EQ(DCAMERA_INIT_ERR, IsUnderDumpMaxSize(fileName));
+    DumpBufferToFile(dumpPath, fileName, buf, size);
+    EXPECT_EQ(DCAMERA_INIT_ERR, IsUnderDumpMaxSize(dumpPath, fileName));
+
+    dumpPath = "test";
+    DumpBufferToFile(dumpPath, fileName, buf, size);
+    EXPECT_EQ(DCAMERA_INIT_ERR, IsUnderDumpMaxSize(dumpPath, fileName));
 
     fileName = "test";
+    DumpBufferToFile(dumpPath, fileName, buf, size);
+    EXPECT_EQ(DCAMERA_INIT_ERR, IsUnderDumpMaxSize(dumpPath, fileName));
+
     uint8_t str[] = "test";
     size = strlen(reinterpret_cast<const char*>(str));
-    DumpBufferToFile(fileName, str, size);
-    EXPECT_EQ(DCAMERA_INIT_ERR, IsUnderDumpMaxSize(fileName));
+    DumpBufferToFile(dumpPath, fileName, str, size);
+    EXPECT_EQ(DCAMERA_INIT_ERR, IsUnderDumpMaxSize(dumpPath, fileName));
 
-    DumpBufferToFile(dumpFileName, str, size);
-    EXPECT_EQ(DCAMERA_OK, IsUnderDumpMaxSize(dumpFileName));
+    fileName = "test.txt";
+    DumpBufferToFile("/data/", fileName, str, size);
+    EXPECT_NE(DCAMERA_OK, IsUnderDumpMaxSize("/data/", fileName));
 }
 
 /**
@@ -222,7 +231,8 @@ HWTEST_F(DcameraUtilsToolsTest, IsOverDumpSize_001, TestSize.Level1)
 HWTEST_F(DcameraUtilsToolsTest, IsUnderDumpMaxSize_001, TestSize.Level1)
 {
     std::string longFileName(PATH_MAX + 1, 'a');
-    EXPECT_EQ(IsUnderDumpMaxSize(longFileName), DCAMERA_INIT_ERR);
+    std::string fileName = "test";
+    EXPECT_EQ(IsUnderDumpMaxSize(longFileName, fileName), DCAMERA_INIT_ERR);
 }
 
 /**
@@ -233,12 +243,12 @@ HWTEST_F(DcameraUtilsToolsTest, IsUnderDumpMaxSize_001, TestSize.Level1)
  */
 HWTEST_F(DcameraUtilsToolsTest, IsUnderDumpMaxSize_002, TestSize.Level1)
 {
-    EXPECT_EQ(IsUnderDumpMaxSize("/nonexistent/file"), DCAMERA_INIT_ERR);
+    EXPECT_EQ(IsUnderDumpMaxSize("/nonexistent/file", "test"), DCAMERA_INIT_ERR);
 }
 
 /**
  * @tc.name: OpenDumpFile_001
- * @tc.desc: Verify the IsUnderDumpMaxSize.
+ * @tc.desc: Verify the WriteDumpFile.
  * @tc.type: FUNC
  * @tc.require: Issue Number
  */

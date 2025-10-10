@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -68,9 +68,9 @@ void DCameraPhotoSurfaceListener::OnBufferAvailable()
             break;
         }
 #ifdef DUMP_DCAMERA_FILE
-        std::string fileName = DUMP_PHOTO_PATH + std::to_string(photoCount_++) + SINK_PHOTO;
-        if (DcameraHidumper::GetInstance().GetDumpFlag() && (IsUnderDumpMaxSize(fileName) == DCAMERA_OK)) {
-            DumpBufferToFile(fileName, dataBuffer->Data(), dataBuffer->Size());
+        std::string name = std::to_string(photoCount_++) + SINK_PHOTO;
+        if (DcameraHidumper::GetInstance().GetDumpFlag() && (IsUnderDumpMaxSize(DUMP_PHOTO_PATH, name) == DCAMERA_OK)) {
+            DumpBufferToFile(DUMP_PHOTO_PATH, name, dataBuffer->Data(), dataBuffer->Size());
         }
 #endif
         callback_->OnPhotoResult(dataBuffer);

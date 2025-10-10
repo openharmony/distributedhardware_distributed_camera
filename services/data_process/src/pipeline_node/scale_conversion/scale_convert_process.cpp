@@ -96,7 +96,7 @@ void ScaleConvertProcess::Crop(ImageUnitInfo& sourceConfig, ImageUnitInfo& targe
         crop_height = static_cast<int>(src_width * dst_height / dst_width);
     }
     const size_t y_size = crop_width * crop_height;
-    const size_t uv_size = (crop_width  >> MEMORY_RATIO_UV) * (crop_height  >> MEMORY_RATIO_UV);
+    const size_t uv_size = (crop_width >> MEMORY_RATIO_UV) * (crop_height >> MEMORY_RATIO_UV);
     const size_t total_size = static_cast<size_t>(crop_width * crop_height * YUV_BYTES_PER_PIXEL / Y2UV_RATIO);
     std::shared_ptr<DataBuffer> cropBuf = std::make_shared<DataBuffer>(total_size);
     uint8_t* dstY = cropBuf->Data();
