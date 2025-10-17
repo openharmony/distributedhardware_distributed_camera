@@ -506,7 +506,7 @@ bool DCameraHandler::IsValid(const DCStreamType type, const CameraStandard::Size
                 DHLOGE("size width out of range.");
                 return ret;
             }
-            uint64_t dcResolution = static_cast<uint64_t>(size.width * size.width);
+            uint64_t dcResolution = static_cast<uint64_t>(size.width * size.height);
             uint64_t dcMaxResolution = static_cast<uint64_t>(RESOLUTION_MAX_WIDTH_SNAPSHOT *
                                                              RESOLUTION_MAX_HEIGHT_SNAPSHOT);
             uint64_t dcMinResolution = static_cast<uint64_t>(RESOLUTION_MIN_WIDTH *
