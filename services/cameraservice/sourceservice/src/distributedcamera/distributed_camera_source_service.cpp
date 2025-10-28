@@ -94,7 +94,10 @@ bool DistributedCameraSourceService::Init()
         }
         registerToService_ = true;
     }
-    listener_ = std::make_shared<DCameraServiceStateListener>();
+    {
+        std::lock_guard<std::mutex> lock(listenerMutex_);
+        listener_ = std::make_shared<DCameraServiceStateListener>();
+    }
     if (!isHicollieRunning_.load()) {
         isHicollieRunning_.store(true);
         hicollieThread_ = std::thread([this]() { this->StartHicollieThread(); });
@@ -110,7 +113,10 @@ void DistributedCameraSourceService::OnStop()
     DHLOGI("DistributedCameraSourceService OnStop service");
     state_ = DCameraServiceState::DCAMERA_SRV_STATE_NOT_START;
     registerToService_ = false;
-    listener_ = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(listenerMutex_);
+        listener_ = nullptr;
+    }
     DCameraSourceServiceIpc::GetInstance().UnInit();
     isHicollieRunning_.store(false);
     if (hicollieThread_.joinable()) {
@@ -143,9 +149,15 @@ int32_t DistributedCameraSourceService::InitSource(const std::string& params,
         DHLOGE("DistributedCameraSourceService InitSource LoadHDF failed, ret: %{public}d", ret);
         return ret;
     }
-    sourceVer_ = params;
-    if (listener_ != nullptr) {
-        listener_->SetCallback(callback);
+
+    std::shared_ptr<ICameraStateListener> listenerCopy = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(listenerMutex_);
+        sourceVer_ = params;
+        listenerCopy = listener_;
+    }
+    if (listenerCopy != nullptr) {
+        listenerCopy->SetCallback(callback);
     }
     return DCAMERA_OK;
 }
@@ -223,11 +235,9 @@ std::string DistributedCameraSourceService::GetCodecInfo()
 
 std::shared_ptr<DistributedHardwareFwkKit> DistributedCameraSourceService::GetDHFwkKit()
 {
+    std::lock_guard<std::mutex> lock(dHFwkKitMutex_);
     if (dHFwkKit_ == nullptr) {
-        std::lock_guard<std::mutex> lock(dHFwkKitMutex_);
-        if (dHFwkKit_ == nullptr) {
-            dHFwkKit_ = std::make_shared<DistributedHardwareFwkKit>();
-        }
+        dHFwkKit_ = std::make_shared<DistributedHardwareFwkKit>();
     }
     return dHFwkKit_;
 }
@@ -248,9 +258,14 @@ int32_t DistributedCameraSourceService::RegisterDistributedHardware(const std::s
     int32_t ret = DCAMERA_OK;
     std::shared_ptr<DCameraSourceDev> camDev = GetCamDevByIndex(camIndex);
     if (camDev == nullptr) {
+        std::shared_ptr<ICameraStateListener> listenerCopy = nullptr;
+        {
+            std::lock_guard<std::mutex> lock(listenerMutex_);
+            listenerCopy = listener_;
+        }
         DHLOGI("new dev devId: %{public}s, dhId: %{public}s, sinkVersion: %{public}s",
             GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), params.sinkVersion.c_str());
-        camDev = std::make_shared<DCameraSourceDev>(devId, dhId, listener_);
+        camDev = std::make_shared<DCameraSourceDev>(devId, dhId, listenerCopy);
         ret = camDev->InitDCameraSourceDev();
         if (ret != DCAMERA_OK) {
             DHLOGE("RegisterDistributedHardware failed %{public}d InitDev devId: %{public}s, dhId: %{public}s",

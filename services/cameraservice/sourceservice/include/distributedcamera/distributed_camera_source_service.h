@@ -82,6 +82,7 @@ private:
 
     static std::map<DCameraIndex, std::shared_ptr<DCameraSourceDev>> camerasMap_;
     static std::mutex camDevMutex_;
+    std::mutex listenerMutex_;
     std::thread hicollieThread_;
     std::atomic<bool> isHicollieRunning_ = false;
     std::shared_ptr<DistributedHardwareFwkKit> dHFwkKit_;

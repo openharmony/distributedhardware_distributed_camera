@@ -94,11 +94,9 @@ int32_t DCameraLowLatency::DisableLowLatency()
 
 std::shared_ptr<DistributedHardwareFwkKit> DCameraLowLatency::GetDHFwkKit()
 {
+    std::lock_guard<std::mutex> lock(dHFwkKitMutex_);
     if (dHFwkKit_ == nullptr) {
-        std::lock_guard<std::mutex> lock(dHFwkKitMutex_);
-        if (dHFwkKit_ == nullptr) {
-            dHFwkKit_ = std::make_shared<DistributedHardwareFwkKit>();
-        }
+        dHFwkKit_ = std::make_shared<DistributedHardwareFwkKit>();
     }
     return dHFwkKit_;
 }
