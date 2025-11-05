@@ -427,52 +427,83 @@ int32_t DecodeDataProcess::FeedDecoderInputBuffer()
 {
     DHLOGD("Feed decoder input buffer.");
     while ((!inputBuffersQueue_.empty()) && (isDecoderProcess_.load())) {
-        std::shared_ptr<DataBuffer> buffer = inputBuffersQueue_.front();
-        if (buffer == nullptr || availableInputIndexsQueue_.empty() || availableInputBufferQueue_.empty()) {
-            DHLOGE("inputBuffersQueue size %{public}zu, availableInputIndexsQueue size %{public}zu, "
-                "availableInputBufferQueue size %{public}zu",
-                inputBuffersQueue_.size(), availableInputIndexsQueue_.size(), availableInputBufferQueue_.size());
-            return DCAMERA_BAD_VALUE;
+        int32_t ret = ProcessSingleInputBuffer();
+        if (ret != DCAMERA_OK) {
+            DHLOGD("ProcessSingleInputBuffer failed with %{public}d, stopping feed.", ret);
+            return ret;
         }
-        buffer->frameInfo_.timePonit.startDecode = GetNowTimeStampUs();
-        {
-            std::lock_guard<std::mutex> lock(mtxDequeLock_);
-            frameInfoDeque_.push_back(buffer->frameInfo_);
-        }
-        int64_t timeStamp = buffer->frameInfo_.pts;
-        {
-            std::lock_guard<std::mutex> inputLock(mtxDecoderLock_);
-            CHECK_AND_RETURN_RET_LOG(
-                videoDecoder_ == nullptr, DCAMERA_OK, "The video decoder does not exist before GetInputBuffer.");
-            uint32_t index = availableInputIndexsQueue_.front();
-            std::shared_ptr<Media::AVSharedMemory> sharedMemoryInput = availableInputBufferQueue_.front();
-            if (sharedMemoryInput == nullptr) {
-                DHLOGE("Failed to obtain the input shared memory corresponding to the [%{public}u] index.", index);
-                return DCAMERA_BAD_VALUE;
-            }
-            BeforeDecodeDump(buffer->Data(), buffer->Size());
-            DumpFileUtil::WriteDumpFile(dumpDecBeforeFile_, static_cast<void *>(buffer->Data()), buffer->Size());
-            size_t inputMemoDataSize = static_cast<size_t>(sharedMemoryInput->GetSize());
-            errno_t err = memcpy_s(sharedMemoryInput->GetBase(), inputMemoDataSize, buffer->Data(), buffer->Size());
-            CHECK_AND_RETURN_RET_LOG(err != EOK, DCAMERA_MEMORY_OPT_ERROR, "memcpy_s buffer failed.");
-            DHLOGD("Decoder input buffer size %{public}zu, timeStamp %{public}" PRId64"us.", buffer->Size(), timeStamp);
-            MediaAVCodec::AVCodecBufferInfo bufferInfo {timeStamp, static_cast<int32_t>(buffer->Size()), 0};
-            int32_t ret = videoDecoder_->QueueInputBuffer(index, bufferInfo,
-                MediaAVCodec::AVCODEC_BUFFER_FLAG_NONE);
-            if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
-                DHLOGE("queue Input buffer failed.");
-                return DCAMERA_BAD_OPERATE;
-            }
-        }
-
-        inputBuffersQueue_.pop();
-        DHLOGD("Push inputBuffer sucess. inputBuffersQueue size is %{public}zu.", inputBuffersQueue_.size());
-
-        IncreaseWaitDecodeCnt();
     }
     return DCAMERA_OK;
 }
 
+int32_t DecodeDataProcess::ProcessSingleInputBuffer()
+{
+    std::shared_ptr<DataBuffer> buffer = inputBuffersQueue_.front();
+    if (buffer == nullptr) {
+        DHLOGE("Input buffer is null, skipping this frame.");
+        inputBuffersQueue_.pop();
+        return DCAMERA_OK;
+    }
+    uint32_t index;
+    std::shared_ptr<Media::AVSharedMemory> sharedMemoryInput;
+    int32_t ret = GetAvailableDecoderBuffer(index, sharedMemoryInput);
+    CHECK_AND_RETURN_LOG(ret != DCAMERA_OK,
+        "Get available decoder buffer failed. ret %{public}d.", ret);
+    buffer->frameInfo_.timePonit.startDecode = GetNowTimeStampUs();
+    {
+        std::lock_guard<std::mutex> lock(mtxDequeLock_);
+        frameInfoDeque_.push_back(buffer->frameInfo_);
+    }
+    ret = QueueBufferToDecoder(buffer, index, sharedMemoryInput);
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK,
+        "Queue buffer to decoder failed. ret %{public}d.", ret);
+    inputBuffersQueue_.pop();
+    DHLOGD("Push inputBuffer sucess. inputBuffersQueue size is %{public}zu.", inputBuffersQueue_.size());
+
+    IncreaseWaitDecodeCnt();
+    return DCAMERA_OK;
+}
+
+int32_t DecodeDataProcess::GetAvailableDecoderBuffer(uint32_t& index,
+    std::shared_ptr<Media::AVSharedMemory>& sharedMemoryInput)
+{
+    std::lock_guard<std::mutex> lock(mtxHoldCount_);
+    if (availableInputIndexsQueue_.empty() || availableInputBufferQueue_.empty()) {
+        DHLOGD("No available decoder buffers, wait for callback.");
+        return DCAMERA_BAD_VALUE;
+    }
+    index = availableInputIndexsQueue_.front();
+    sharedMemoryInput = availableInputBufferQueue_.front();
+    return DCAMERA_OK;
+}
+
+int32_t DecodeDataProcess::QueueBufferToDecoder(std::shared_ptr<DataBuffer>& buffer, uint32_t index,
+    std::shared_ptr<Media::AVSharedMemory>& sharedMemoryInput)
+{
+    int64_t timeStamp = buffer->frameInfo_.pts;
+    std::lock_guard<std::mutex> inputLock(mtxDecoderLock_);
+
+    CHECK_AND_RETURN_RET_LOG(
+        videoDecoder_ == nullptr, DCAMERA_OK, "The video decoder does not exist before GetInputBuffer.");
+
+    if (sharedMemoryInput == nullptr) {
+        DHLOGE("Failed to obtain the input shared memory corresponding to the [%{public}u] index.", index);
+        return DCAMERA_BAD_VALUE;
+    }
+
+    BeforeDecodeDump(buffer->Data(), buffer->Size());
+    DumpFileUtil::WriteDumpFile(dumpDecBeforeFile_, static_cast<void *>(buffer->Data()), buffer->Size());
+
+    size_t inputMemoDataSize = static_cast<size_t>(sharedMemoryInput->GetSize());
+    errno_t err = memcpy_s(sharedMemoryInput->GetBase(), inputMemoDataSize, buffer->Data(), buffer->Size());
+    CHECK_AND_RETURN_RET_LOG(err != EOK, DCAMERA_MEMORY_OPT_ERROR, "memcpy_s buffer failed.");
+    DHLOGD("Decoder input buffer size %{public}zu, timeStamp %{public}" PRId64"us.", buffer->Size(), timeStamp);
+    MediaAVCodec::AVCodecBufferInfo bufferInfo {timeStamp, static_cast<int32_t>(buffer->Size()), 0};
+    int32_t ret = videoDecoder_->QueueInputBuffer(index, bufferInfo, MediaAVCodec::AVCODEC_BUFFER_FLAG_NONE);
+    CHECK_AND_RETURN_LOG(ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK,
+        "Queue input buffer to decoder failed. ret %{public}d.", ret);
+    return DCAMERA_OK;
+}
 int64_t DecodeDataProcess::GetDecoderTimeStamp()
 {
     int64_t TimeIntervalStampUs = 0;
