@@ -37,6 +37,7 @@ namespace DistributedHardware {
 REGISTER_SYSTEM_ABILITY_BY_ID(DistributedCameraSinkService, DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, true);
 
 static CameraDumpInfo g_camDump;
+static std::mutex g_camDumpMutex;
 DistributedCameraSinkService* DistributedCameraSinkService::dcSinkService;
 DistributedCameraSinkService::DistributedCameraSinkService(int32_t saId, bool runOnCreate)
     : SystemAbility(saId, runOnCreate)
@@ -109,13 +110,16 @@ int32_t DistributedCameraSinkService::InitSink(const std::string& params,
 {
     DHLOGI("start");
     sinkVer_ = params;
-    g_camDump.version = sinkVer_;
     int32_t ret = DCameraHandler::GetInstance().Initialize();
     CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "handler initialize failed, ret: %{public}d", ret);
 
     std::vector<std::string> cameras = DCameraHandler::GetInstance().GetCameras();
     CHECK_AND_RETURN_RET_LOG(cameras.empty(), DCAMERA_BAD_VALUE, "no camera device");
-    g_camDump.camNumber = static_cast<int32_t>(cameras.size());
+    {
+        std::lock_guard<std::mutex> lock(g_camDumpMutex);
+        g_camDump.version = sinkVer_;
+        g_camDump.camNumber = static_cast<int32_t>(cameras.size());
+    }
     for (auto& dhId : cameras) {
         std::shared_ptr<DCameraSinkDev> sinkDevice = std::make_shared<DCameraSinkDev>(dhId, sinkCallback);
         sinkDevice->SetTokenId(GetFirstCallerTokenID());
@@ -327,12 +331,14 @@ void DistributedCameraSinkService::GetCamIds()
             camIds.push_back(it->second->GetDhid());
         }
     }
+    std::lock_guard<std::mutex> lock(g_camDumpMutex);
     g_camDump.camIds = camIds;
 }
 
 void DistributedCameraSinkService::GetCamDumpInfo(CameraDumpInfo& camDump)
 {
     dcSinkService->GetCamIds();
+    std::lock_guard<std::mutex> lock(g_camDumpMutex);
     camDump = g_camDump;
 }
 

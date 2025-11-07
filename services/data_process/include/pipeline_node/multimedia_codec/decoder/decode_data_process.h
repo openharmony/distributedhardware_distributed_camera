@@ -114,7 +114,6 @@ private:
     constexpr static int32_t BUFFER_MAX_SIZE = 50 * 1024 * 1024;
     constexpr static int32_t ALIGNED_WIDTH_MAX_SIZE = 10000;
     constexpr static uint32_t MEMORY_RATIO_UV = 1;
-
     std::shared_ptr<AppExecFwk::EventHandler> pipeSrcEventHandler_;
     std::weak_ptr<DCameraPipelineSource> callbackPipelineSource_;
     std::mutex mtxDecoderLock_;
@@ -150,6 +149,10 @@ private:
     std::thread eventThread_;
     std::condition_variable eventCon_;
     std::shared_ptr<AppExecFwk::EventHandler> decEventHandler_ = nullptr;
+    int32_t ProcessSingleInputBuffer();
+    int32_t GetAvailableDecoderBuffer(uint32_t& index, std::shared_ptr<Media::AVSharedMemory>& sharedMemoryInput);
+    int32_t QueueBufferToDecoder(std::shared_ptr<DataBuffer>& buffer, uint32_t index,
+        std::shared_ptr<Media::AVSharedMemory>& sharedMemoryInput);
 };
 } // namespace DistributedHardware
 } // namespace OHOS
