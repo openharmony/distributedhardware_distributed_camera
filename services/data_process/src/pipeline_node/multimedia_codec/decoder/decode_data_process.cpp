@@ -447,7 +447,7 @@ int32_t DecodeDataProcess::ProcessSingleInputBuffer()
     uint32_t index;
     std::shared_ptr<Media::AVSharedMemory> sharedMemoryInput;
     int32_t ret = GetAvailableDecoderBuffer(index, sharedMemoryInput);
-    CHECK_AND_RETURN_LOG(ret != DCAMERA_OK,
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret,
         "Get available decoder buffer failed. ret %{public}d.", ret);
     buffer->frameInfo_.timePonit.startDecode = GetNowTimeStampUs();
     {
@@ -455,7 +455,7 @@ int32_t DecodeDataProcess::ProcessSingleInputBuffer()
         frameInfoDeque_.push_back(buffer->frameInfo_);
     }
     ret = QueueBufferToDecoder(buffer, index, sharedMemoryInput);
-    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK,
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret,
         "Queue buffer to decoder failed. ret %{public}d.", ret);
     inputBuffersQueue_.pop();
     DHLOGD("Push inputBuffer sucess. inputBuffersQueue size is %{public}zu.", inputBuffersQueue_.size());
@@ -500,7 +500,7 @@ int32_t DecodeDataProcess::QueueBufferToDecoder(std::shared_ptr<DataBuffer>& buf
     DHLOGD("Decoder input buffer size %{public}zu, timeStamp %{public}" PRId64"us.", buffer->Size(), timeStamp);
     MediaAVCodec::AVCodecBufferInfo bufferInfo {timeStamp, static_cast<int32_t>(buffer->Size()), 0};
     int32_t ret = videoDecoder_->QueueInputBuffer(index, bufferInfo, MediaAVCodec::AVCODEC_BUFFER_FLAG_NONE);
-    CHECK_AND_RETURN_LOG(ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK,
+    CHECK_AND_RETURN_RET_LOG(ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK, ret,
         "Queue input buffer to decoder failed. ret %{public}d.", ret);
     return DCAMERA_OK;
 }
