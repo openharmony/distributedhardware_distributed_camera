@@ -378,6 +378,8 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_004, TestSize.Level1)
     EXPECT_FALSE(mode);
 
     auto metaData = std::make_shared<Camera::CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
+    std::vector<int32_t> fpsRange = { ENTRY_CAPACITY, ENTRY_CAPACITY };
+    metaData->addEntry(OHOS_CONTROL_FPS_RANGES, fpsRange.data(), fpsRange.size());
     std::string abilityString = Camera::MetadataUtils::EncodeToString(metaData);
     std::vector<std::shared_ptr<DCameraSettings>> settings;
     auto setting = std::make_shared<DCameraSettings>();
@@ -385,6 +387,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_004, TestSize.Level1)
     setting->value_ = Base64Encode(reinterpret_cast<const unsigned char *>(abilityString.c_str()),
         abilityString.length());
     settings.push_back(setting);
+    client_->GetFpsRanges();
     ret = client_->UpdateSettings(settings);
     EXPECT_EQ(DCAMERA_OK, ret);
 
