@@ -215,6 +215,7 @@ int32_t DCameraClient::CommitCapture(sptr<Surface>& surface)
         return DCAMERA_BAD_VALUE;
     }
     previewSurface_ = surface;
+    GetFpsRanges();
     int32_t ret = DCAMERA_OK;
     if (photoOutput_ == nullptr && previewOutput_ == nullptr) {
         ret = CreateCaptureOutput(captureInfosCache_);
@@ -245,6 +246,46 @@ int32_t DCameraClient::CommitCapture(sptr<Surface>& surface)
     return CameraServiceErrorType(ret);
 }
 
+void DCameraClient::GetFpsRanges()
+{
+    for (auto& info : captureInfosCache_) {
+        if (info == nullptr || info->streamType_ != CONTINUOUS_FRAME) {
+            continue;
+        }
+        std::vector<std::shared_ptr<DCameraSettings>> captureSettings = info->captureSettings_;
+        std::string metadataSetting;
+        for (const auto& setting : captureSettings) {
+            if (setting->type_ == UPDATE_METADATA) {
+                DHLOGI("update metadata settings");
+                metadataSetting = setting->value_;
+            }
+        }
+
+        if (metadataSetting.empty()) {
+            DHLOGE("no metadata settings to update");
+            continue;
+        }
+
+        std::string metadataStr = Base64Decode(metadataSetting);
+        std::shared_ptr<Camera::CameraMetadata> cameraMetadata = Camera::MetadataUtils::DecodeFromString(metadataStr);
+        camera_metadata_item_t fpsItem;
+        int32_t val = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_CONTROL_FPS_RANGES, &fpsItem);
+        if (val == CAM_META_SUCCESS) {
+            uint32_t fpscount = fpsItem.count;
+            DHLOGI("GetFpsRanges: find fps ranges fpscount %{public}d", fpscount);
+            CHECK_AND_RETURN_LOG(fpscount != DCAMERA_FPS_SIZE,
+                "GetFpsRanges: find fps ranges fpscount: %{public}d is not DCAMERA_FPS_SIZE.", fpscount);
+            std::vector<int32_t> fpsRanges;
+            for (uint32_t i = 0; i < fpscount; i++) {
+                fpsRanges.push_back(fpsItem.data.i32[i]);
+            }
+            fpsRanges_ = fpsRanges;
+        } else {
+            DHLOGI("GetFpsRanges: find fps ranges failed, ret: %{public}d", val);
+        }
+    }
+}
+
 int32_t DCameraClient::CameraServiceErrorType(const int32_t errorType)
 {
     if (errorType == CameraStandard::CameraErrorCode::SERVICE_FATL_ERROR) {
@@ -258,6 +299,7 @@ int32_t DCameraClient::CameraServiceErrorType(const int32_t errorType)
 int32_t DCameraClient::StopCapture()
 {
     DHLOGI("StopCapture cameraId: %{public}s", GetAnonyString(cameraId_).c_str());
+    fpsRanges_.clear();
     StopOutput();
 
     if (cameraInput_ != nullptr) {
@@ -418,14 +460,10 @@ int32_t DCameraClient::ConfigCaptureSession(std::vector<std::shared_ptr<DCameraC
 
 int32_t DCameraClient::ConfigCaptureSessionInner()
 {
-    CHECK_AND_RETURN_RET_LOG(captureSession_ == nullptr, DCAMERA_BAD_VALUE,
-        "ConfigCaptureSessionInner captureSession is null.");
+    CHECK_AND_RETURN_RET_LOG(captureSession_ == nullptr, DCAMERA_BAD_VALUE, "captureSession is null.");
     int32_t ret = captureSession_->BeginConfig();
-    if (ret != DCAMERA_OK) {
-        DHLOGE("ConfigCaptureSession %{public}s config captureSession failed, ret: %{public}d",
-               GetAnonyString(cameraId_).c_str(), ret);
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "%{public}s BeginConfig failed, ret: %{public}d",
+        GetAnonyString(cameraId_).c_str(), ret);
 
     ret = captureSession_->AddInput(cameraInput_);
     if (ret != DCAMERA_OK) {
@@ -463,6 +501,15 @@ int32_t DCameraClient::ConfigCaptureSessionInner()
     if (ret != DCAMERA_OK) {
         DHLOGE("ConfigCaptureSession %{public}s start captureSession failed, ret: %{public}d",
                GetAnonyString(cameraId_).c_str(), ret);
+    }
+
+    if (fpsRanges_.size() == DCAMERA_FPS_SIZE && fpsRanges_[0] <= DCAMERA_MAX_FPS && fpsRanges_[1] <= DCAMERA_MAX_FPS) {
+        ret = ((sptr<CameraStandard::PreviewOutput> &)previewOutput_)->SetFrameRate(fpsRanges_[0], fpsRanges_[1]);
+        if (ret != DCAMERA_OK) {
+            DHLOGE("ConfigCaptureSession %{public}s set frame rate failed, ret: %{public}d",
+                GetAnonyString(cameraId_).c_str(), ret);
+        }
+        DHLOGI("SetFrameRate minfps: %{public}d, maxfps: %{public}d", fpsRanges_[0], fpsRanges_[1]);
     }
 
     DHLOGI("ConfigCaptureSession %{public}s success", GetAnonyString(cameraId_).c_str());

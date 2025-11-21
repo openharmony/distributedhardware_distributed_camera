@@ -72,9 +72,12 @@ private:
     int32_t CameraServiceErrorType(const int32_t errorType);
     CameraStandard::CameraFormat ConvertToCameraFormat(int32_t format);
     void UpdateSettingCache(const std::string& metadataStr);
+    void GetFpsRanges();
 
 private:
     constexpr static uint32_t DCAMERA_MAX_METADATA_SIZE = 20;
+    constexpr static uint32_t DCAMERA_FPS_SIZE = 2;
+    constexpr static uint32_t DCAMERA_MAX_FPS = 30;
 
     bool isInit_;
     std::string cameraId_;
@@ -91,6 +94,7 @@ private:
     std::shared_ptr<StateCallback> stateCallback_;
     std::shared_ptr<ResultCallback> resultCallback_;
     std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfosCache_;
+    std::vector<int32_t> fpsRanges_ = {};
 };
 } // namespace DistributedHardware
 } // namespace OHOS
