@@ -302,6 +302,9 @@ Videoformat DCameraStreamDataProcess::GetPipelineFormat(int32_t format)
         case OHOS_CAMERA_FORMAT_RGBA_8888:
             videoFormat = Videoformat::RGBA_8888;
             break;
+        case OHOS_CAMERA_FORMAT_YCBCB_P010:
+            videoFormat = Videoformat::P010;
+            break;
         default:
             videoFormat = Videoformat::NV21;
             break;

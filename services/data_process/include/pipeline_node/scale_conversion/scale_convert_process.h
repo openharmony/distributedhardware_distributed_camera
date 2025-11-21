@@ -18,7 +18,6 @@
 
 #include "abstract_data_process.h"
 
-#ifdef DCAMERA_SUPPORT_FFMPEG
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -29,8 +28,9 @@ extern "C" {
 #ifdef __cplusplus
 };
 #endif
-#endif
 
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
 #include <mutex>
 #include <securec.h>
 
@@ -67,7 +67,6 @@ private:
     int32_t CopyYUV420SrcData(const ImageUnitInfo& srcImgInfo);
     int32_t CopyNV12SrcData(const ImageUnitInfo& srcImgInfo);
     int32_t CopyNV21SrcData(const ImageUnitInfo& srcImgInfo);
-    AVPixelFormat GetAVPixelFormat(Videoformat colorFormat);
 #else
     int32_t ConvertResolution(ImageUnitInfo& srcImgInfo, ImageUnitInfo& dstImgInfo,
         std::shared_ptr<DataBuffer>& dstBuf);
@@ -75,8 +74,10 @@ private:
         std::shared_ptr<DataBuffer>& dstBuf);
     int32_t ConvertFormatToRGBA(ImageUnitInfo& srcImgInfo, ImageUnitInfo& dstImgInfo,
         std::shared_ptr<DataBuffer>& dstBuf);
+    int32_t ConvertFormatToP010(ImageUnitInfo& srcImgInfo, ImageUnitInfo& dstImgInfo);
     void CalculateBuffSize(size_t& dstBuffSize);
 #endif
+    AVPixelFormat GetAVPixelFormat(Videoformat colorFormat);
     int32_t ConvertDone(std::vector<std::shared_ptr<DataBuffer>>& outputBuffers);
 
 private:
@@ -96,9 +97,9 @@ private:
     int32_t srcLineSize_[DATA_LEN] = { 0 };
     int32_t dstLineSize_[DATA_LEN] = { 0 };
     int32_t dstBuffSize_ = 0;
+#endif
     SwsContext *swsContext_ = nullptr;
     std::mutex scaleMutex_;
-#endif
     VideoConfigParams sourceConfig_;
     VideoConfigParams targetConfig_;
     VideoConfigParams processedConfig_;
