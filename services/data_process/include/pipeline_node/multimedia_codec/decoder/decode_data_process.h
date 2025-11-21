@@ -41,11 +41,23 @@
 #include "distributed_camera_errno.h"
 #include "image_common_type.h"
 #include "dcamera_utils_tools.h"
+#include "image_converter.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 class DCameraPipelineSource;
 class DecodeVideoCallback;
+
+typedef struct {
+    int32_t width;
+    int32_t height;
+    uint8_t* dataY;
+    int32_t strideY;
+    uint8_t* dataU;
+    int32_t strideU;
+    uint8_t* dataV;
+    int32_t strideV;
+} ImageDataInfo;
 
 class DecodeDataProcess : public AbstractDataProcess, public std::enable_shared_from_this<DecodeDataProcess> {
 public:
@@ -95,6 +107,16 @@ private:
     void PostOutputDataBuffers(std::shared_ptr<DataBuffer>& outputBuffer);
     int32_t DecodeDone(std::vector<std::shared_ptr<DataBuffer>>& outputBuffers);
     void StartEventHandler();
+    bool UniversalRotateCropAndPadNv12ToI420(ImageDataInfo srcInfo, ImageDataInfo dstInfo, int angleDegrees);
+    bool ConverToI420BySystemSwitch(uint8_t *srcDataY, uint8_t *srcDataUV, int32_t alignedWidth,
+        int32_t alignedHeight, std::shared_ptr<DataBuffer> bufferOutput);
+    bool ConverToI420(uint8_t *srcDataY, uint8_t *srcDataUV, int32_t alignedWidth,
+        int32_t alignedHeight, std::shared_ptr<DataBuffer> bufferOutput);
+    bool NV12ToI420RotateBySystemSwitch(ImageDataInfo dataInfo, std::vector<uint8_t> rotatedBuffer,
+        int srcWidth, int srcHeight, OpenSourceLibyuv::RotationMode mode);
+    bool I420CopyBySystemSwitch(ImageDataInfo srcInfo, ImageDataInfo dstInfo,
+        int srcWidth, int srcHeight, int32_t normalizedAngle);
+    bool CheckParamerters(ImageDataInfo srcInfo, ImageDataInfo dstInfo);
 
 private:
     constexpr static int32_t VIDEO_DECODER_QUEUE_MAX = 1000;
@@ -114,6 +136,10 @@ private:
     constexpr static int32_t BUFFER_MAX_SIZE = 50 * 1024 * 1024;
     constexpr static int32_t ALIGNED_WIDTH_MAX_SIZE = 10000;
     constexpr static uint32_t MEMORY_RATIO_UV = 1;
+    constexpr static uint32_t OFFSET_X_0 = 0;
+    constexpr static uint32_t OFFSET_Y_0 = 0;
+    constexpr static uint32_t BLACK_COLOR_PEXEL = 0;
+    constexpr static uint32_t WHITE_COLOR_PEXEL = 128;
     std::shared_ptr<AppExecFwk::EventHandler> pipeSrcEventHandler_;
     std::weak_ptr<DCameraPipelineSource> callbackPipelineSource_;
     std::mutex mtxDecoderLock_;
@@ -144,6 +170,7 @@ private:
     std::deque<DCameraFrameInfo> frameInfoDeque_;
     FILE *dumpDecBeforeFile_ = nullptr;
     FILE *dumpDecAfterFile_ = nullptr;
+    int32_t rotate_ = 0;
 
     std::mutex eventMutex_;
     std::thread eventThread_;

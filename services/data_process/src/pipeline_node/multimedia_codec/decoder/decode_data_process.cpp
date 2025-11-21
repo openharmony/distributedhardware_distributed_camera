@@ -31,6 +31,12 @@ const std::string ENUM_VIDEOFORMAT_STRINGS[] = {
     "YUVI420", "NV12", "NV21", "RGBA_8888"
 };
 
+const static int32_t ROTATION_0 = 0;
+const static int32_t ROTATION_90 = 90;
+const static int32_t ROTATION_180 = 180;
+const static int32_t ROTATION_270 = 270;
+const static int32_t ROTATION_360 = 360;
+
 DecodeDataProcess::~DecodeDataProcess()
 {
     DumpFileUtil::CloseDumpFile(&dumpDecBeforeFile_);
@@ -77,6 +83,13 @@ int32_t DecodeDataProcess::InitNode(const VideoConfigParams& sourceConfig, const
     }
     alignedHeight_ = GetAlignedHeight(sourceConfig_.GetHeight());
     processedConfig = processedConfig_;
+    if (targetConfig_.GetIsSystemSwitch()) {
+        int32_t rotate = targetConfig_.GetRotation();
+        DHLOGI("DecodeDataProcess::InitNode current stream is system switch, orientation: %{public}d", rotate);
+        if (rotate > 0) {
+            rotate_ = ROTATION_360 - rotate;
+        }
+    }
     isDecoderProcess_.store(true);
     return DCAMERA_OK;
 }
@@ -584,6 +597,198 @@ void DecodeDataProcess::GetDecoderOutputBuffer(const sptr<IConsumerSurface>& sur
     ReduceWaitDecodeCnt();
 }
 
+OpenSourceLibyuv::RotationMode ParseAngle(int normalizedAngle)
+{
+    switch (normalizedAngle) {
+        case ROTATION_0:   return OpenSourceLibyuv::RotationMode::kRotate0;
+        case ROTATION_90:  return OpenSourceLibyuv::RotationMode::kRotate90;
+        case ROTATION_180: return OpenSourceLibyuv::RotationMode::kRotate180;
+        case ROTATION_270: return OpenSourceLibyuv::RotationMode::kRotate270;
+        default: return OpenSourceLibyuv::RotationMode::kRotate0;
+    }
+}
+
+bool DecodeDataProcess::I420CopyBySystemSwitch(ImageDataInfo srcInfo, ImageDataInfo dstInfo, int srcWidth,
+    int srcHeight, int32_t normalizedAngle)
+{
+    int32_t cropWidth = 0;
+    int32_t cropHeight = 0;
+    int32_t pasteX = 0;
+    int32_t pasteY = 0;
+    if (normalizedAngle == ROTATION_90 || normalizedAngle == ROTATION_270) {
+        const int32_t min_dimension = std::min(srcWidth, srcHeight);
+        cropWidth = min_dimension;
+        cropHeight = min_dimension;
+        pasteX = (srcWidth - min_dimension) / Y2UV_RATIO;
+        pasteY = (srcHeight - min_dimension) / Y2UV_RATIO;
+    } else {
+        cropWidth = srcWidth;
+        cropHeight = srcHeight;
+        pasteX = 0;
+        pasteY = 0;
+    }
+    int32_t cropX = 0;
+    int32_t cropY = 0;
+    if (normalizedAngle == ROTATION_90 || normalizedAngle == ROTATION_270) {
+        cropX = (srcInfo.width - cropWidth) / Y2UV_RATIO;
+        cropY = (srcInfo.height - cropHeight) / Y2UV_RATIO;
+    } else {
+        cropX = 0;
+        cropY = 0;
+    }
+    cropX = cropX & ~1;
+    cropY = cropY & ~1;
+    pasteX = pasteX & ~1;
+    pasteY = pasteY & ~1;
+    uint8_t* srcDataY = srcInfo.dataY + cropY * srcInfo.strideY + cropX;
+    uint8_t* srcDataU = srcInfo.dataU + (cropY / Y2UV_RATIO) * srcInfo.strideU + (cropX / Y2UV_RATIO);
+    uint8_t* srcDataV = srcInfo.dataV + (cropY / Y2UV_RATIO) * srcInfo.strideV + (cropX / Y2UV_RATIO);
+
+    uint8_t* dstDataY = dstInfo.dataY + pasteY * dstInfo.strideY + pasteX;
+    uint8_t* dstDataU = dstInfo.dataU + (pasteY / Y2UV_RATIO) * dstInfo.strideU + (pasteX / Y2UV_RATIO);
+    uint8_t* dstDataV = dstInfo.dataV + (pasteY / Y2UV_RATIO) * dstInfo.strideV + (pasteX / Y2UV_RATIO);
+    auto converter = ConverterHandle::GetInstance().GetHandle();
+    return converter.I420Copy(srcDataY, srcInfo.strideY, srcDataU, srcInfo.strideU, srcDataV,
+        srcInfo.strideV, dstDataY, dstInfo.strideY, dstDataU, dstInfo.strideU, dstDataV, dstInfo.strideV,
+        cropWidth, cropHeight) == 0;
+}
+
+bool DecodeDataProcess::CheckParamerters(ImageDataInfo srcInfo, ImageDataInfo dstInfo)
+{
+    if (!srcInfo.dataY || !srcInfo.dataU || !dstInfo.dataY || !dstInfo.dataU || !dstInfo.dataV) {
+        return false;
+    }
+    if (srcInfo.width <= 0 || srcInfo.height <= 0) {
+        return false;
+    }
+    if ((srcInfo.width % Y2UV_RATIO != 0) || (srcInfo.height % Y2UV_RATIO != 0)) {
+        return false;
+    }
+    return true;
+}
+
+bool DecodeDataProcess::UniversalRotateCropAndPadNv12ToI420(ImageDataInfo srcInfo, ImageDataInfo dstInfo,
+    int angleDegrees)
+{
+    if (!CheckParamerters(srcInfo, dstInfo)) {
+        return false;
+    }
+    const int normalizedAngle = (angleDegrees % ROTATION_360 + ROTATION_360) % ROTATION_360;
+    OpenSourceLibyuv::RotationMode rotationMode = ParseAngle(normalizedAngle);
+    int rotatedNaturalWidth = srcInfo.width;
+    int rotatedNaturalHeight = srcInfo.height;
+    if (normalizedAngle == ROTATION_90 || normalizedAngle == ROTATION_270) {
+        rotatedNaturalWidth = srcInfo.height;
+        rotatedNaturalHeight = srcInfo.width;
+    }
+    bool needs_crop_and_pad = (rotatedNaturalWidth != srcInfo.width) ||
+        (rotatedNaturalHeight != srcInfo.height);
+    auto converter = ConverterHandle::GetInstance().GetHandle();
+    if (!needs_crop_and_pad) {
+        return converter.NV12ToI420Rotate(srcInfo.dataY, srcInfo.strideY, srcInfo.dataU, srcInfo.strideU,
+            dstInfo.dataY, dstInfo.strideY, dstInfo.dataU, dstInfo.strideU, dstInfo.dataV, dstInfo.strideV,
+            srcInfo.width, srcInfo.height, rotationMode) == 0;
+    }
+    int ret = converter.I420Rect(dstInfo.dataY,  dstInfo.strideY, dstInfo.dataU, dstInfo.strideU, dstInfo.dataV,
+        dstInfo.strideV, OFFSET_X_0, OFFSET_Y_0, srcInfo.width, srcInfo.height, BLACK_COLOR_PEXEL,
+        WHITE_COLOR_PEXEL, WHITE_COLOR_PEXEL);
+    if (ret != 0) {
+        DHLOGE("I420Rect fail ret = %{public}d", ret);
+        return false;
+    }
+    std::vector<uint8_t> rotatedBuffer(
+        rotatedNaturalWidth * rotatedNaturalHeight * YUV_BYTES_PER_PIXEL / Y2UV_RATIO);
+    uint8_t* rotatedY = rotatedBuffer.data();
+    uint8_t* rotatedU = rotatedY + rotatedNaturalWidth * rotatedNaturalHeight;
+    uint8_t* rotatedV = rotatedU + (rotatedNaturalWidth * rotatedNaturalHeight) / RGB32_MEMORY_COEFFICIENT;
+    int rotatedStrideY = rotatedNaturalWidth;
+    int rotatedStrideU = (rotatedNaturalWidth + 1) / Y2UV_RATIO;
+    int rotatedStrideV = (rotatedNaturalWidth + 1) / Y2UV_RATIO;
+    int rotateResult = converter.NV12ToI420Rotate(
+        srcInfo.dataY, srcInfo.strideY, srcInfo.dataU, srcInfo.strideU,
+        rotatedY, rotatedStrideY, rotatedU, rotatedStrideU, rotatedV, rotatedStrideV,
+        srcInfo.width, srcInfo.height, rotationMode);
+    if (rotateResult != 0) {
+        DHLOGE("NV12ToI420RotateBySystemSwitch fail");
+        return false;
+    }
+    ImageDataInfo rotateInfo = { .width = rotatedNaturalWidth, .height = rotatedNaturalHeight, .dataY = rotatedY,
+        .strideY = rotatedStrideY, .dataU = rotatedU, .strideU = rotatedStrideU, .dataV = rotatedV,
+        .strideV = rotatedStrideV };
+    return I420CopyBySystemSwitch(rotateInfo, dstInfo, srcInfo.width, srcInfo.height, normalizedAngle);
+}
+
+bool DecodeDataProcess::ConverToI420BySystemSwitch(uint8_t *srcDataY, uint8_t *srcDataUV, int32_t alignedWidth,
+    int32_t alignedHeight, std::shared_ptr<DataBuffer> bufferOutput)
+{
+    int dstSizeY = sourceConfig_.GetWidth() * sourceConfig_.GetHeight();
+    int dstSizeUV = (static_cast<uint32_t>(sourceConfig_.GetWidth()) >> MEMORY_RATIO_UV) *
+                    (static_cast<uint32_t>(sourceConfig_.GetHeight()) >> MEMORY_RATIO_UV);
+    uint8_t *dstDataY = static_cast<uint8_t*>(aligned_alloc(16, dstSizeY));
+    uint8_t *dstDataU = static_cast<uint8_t*>(aligned_alloc(16, dstSizeUV));
+    uint8_t *dstDataV = static_cast<uint8_t*>(aligned_alloc(16, dstSizeUV));
+
+    if (dstDataY == nullptr || dstDataU == nullptr || dstDataV == nullptr) {
+        DHLOGE("aligned_alloc buffer failed.");
+        return false;
+    }
+
+    int width = sourceConfig_.GetWidth();
+    int dstStrideY = width;
+    int dstStrideUV = width / Y2UV_RATIO;
+    ImageDataInfo srcInfo = { .width = sourceConfig_.GetWidth(), .height = sourceConfig_.GetHeight(),
+        .dataY = srcDataY, .strideY = alignedWidth, .dataU = srcDataUV, .strideU = alignedWidth };
+    ImageDataInfo dstInfo = { .dataY = dstDataY, .strideY = dstStrideY, .dataU = dstDataU, .strideU = dstStrideUV,
+        .dataV = dstDataV, .strideV = dstStrideUV };
+    bool result = UniversalRotateCropAndPadNv12ToI420(srcInfo, dstInfo, rotate_);
+    CHECK_AND_RETURN_RET_LOG(!result, false, "Convert NV12 to I420 failed.");
+    if (memcpy_s(bufferOutput->Data(), dstSizeY, dstDataY, dstSizeY) != EOK) {
+        DHLOGE("memcpy_s buffer failed.");
+        free(dstDataY);
+        free(dstDataU);
+        free(dstDataV);
+        return false;
+    }
+    if (memcpy_s(bufferOutput->Data() + dstSizeY, dstSizeUV, dstDataU, dstSizeUV) != EOK) {
+        DHLOGE("memcpy_s buffer failed.");
+        free(dstDataY);
+        free(dstDataU);
+        free(dstDataV);
+        return false;
+    }
+    if (memcpy_s(bufferOutput->Data() + dstSizeY + dstSizeUV, dstSizeUV, dstDataV, dstSizeUV) != EOK) {
+        DHLOGE("memcpy_s buffer failed.");
+        free(dstDataY);
+        free(dstDataU);
+        free(dstDataV);
+        return false;
+    }
+    free(dstDataY);
+    free(dstDataU);
+    free(dstDataV);
+    return true;
+}
+
+bool DecodeDataProcess::ConverToI420(uint8_t *srcDataY, uint8_t *srcDataUV, int32_t alignedWidth,
+    int32_t alignedHeight, std::shared_ptr<DataBuffer> bufferOutput)
+{
+    int dstSizeY = sourceConfig_.GetWidth() * sourceConfig_.GetHeight();
+    int dstSizeUV = (static_cast<uint32_t>(sourceConfig_.GetWidth()) >> MEMORY_RATIO_UV) *
+                    (static_cast<uint32_t>(sourceConfig_.GetHeight()) >> MEMORY_RATIO_UV);
+    uint8_t *dstDataY = bufferOutput->Data();
+    uint8_t *dstDataU = bufferOutput->Data() + dstSizeY;
+    uint8_t *dstDataV = bufferOutput->Data() + dstSizeY + dstSizeUV;
+
+    auto converter = ConverterHandle::GetInstance().GetHandle();
+    CHECK_AND_RETURN_RET_LOG(converter.NV12ToI420 == nullptr, false, "converter is null.");
+    int32_t ret = converter.NV12ToI420(srcDataY, alignedWidth, srcDataUV, alignedWidth, dstDataY,
+        sourceConfig_.GetWidth(), dstDataU, static_cast<uint32_t>(sourceConfig_.GetWidth()) >> MEMORY_RATIO_UV,
+        dstDataV, static_cast<uint32_t>(sourceConfig_.GetWidth()) >> MEMORY_RATIO_UV,
+        processedConfig_.GetWidth(), processedConfig_.GetHeight());
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, false, "Convert NV12 to I420 failed.");
+    return true;
+}
+
 void DecodeDataProcess::CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int32_t alignedWidth,
     int32_t alignedHeight)
 {
@@ -600,22 +805,17 @@ void DecodeDataProcess::CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int3
     uint8_t *srcDataUV = static_cast<uint8_t *>(surBuf->GetVirAddr()) + srcSizeY;
 
     int dstSizeY = sourceConfig_.GetWidth() * sourceConfig_.GetHeight();
-    int dstSizeUV = (static_cast<uint32_t>(sourceConfig_.GetWidth()) >> MEMORY_RATIO_UV) *
-                    (static_cast<uint32_t>(sourceConfig_.GetHeight()) >> MEMORY_RATIO_UV);
     std::shared_ptr<DataBuffer> bufferOutput =
         std::make_shared<DataBuffer>(dstSizeY * YUV_BYTES_PER_PIXEL / Y2UV_RATIO);
-    uint8_t *dstDataY = bufferOutput->Data();
-    uint8_t *dstDataU = bufferOutput->Data() + dstSizeY;
-    uint8_t *dstDataV = bufferOutput->Data() + dstSizeY + dstSizeUV;
-    auto converter = ConverterHandle::GetInstance().GetHandle();
-    CHECK_AND_RETURN_LOG(converter.NV12ToI420 == nullptr, "converter is null.");
-    int32_t ret = converter.NV12ToI420(srcDataY, alignedWidth, srcDataUV, alignedWidth, dstDataY,
-        sourceConfig_.GetWidth(), dstDataU, static_cast<uint32_t>(sourceConfig_.GetWidth()) >> MEMORY_RATIO_UV,
-        dstDataV, static_cast<uint32_t>(sourceConfig_.GetWidth()) >> MEMORY_RATIO_UV,
-        processedConfig_.GetWidth(), processedConfig_.GetHeight());
-    if (ret != DCAMERA_OK) {
-        DHLOGE("Convert NV12 to I420 failed.");
-        return;
+    if (targetConfig_.GetIsSystemSwitch()) {
+        if (!ConverToI420BySystemSwitch(srcDataY, srcDataUV, alignedWidth, alignedHeight, bufferOutput)) {
+            DHLOGE("Convert NV12 to I420 by systemSwitch failed.");
+            return;
+        }
+    } else {
+        if (!ConverToI420(srcDataY, srcDataUV, alignedWidth, alignedHeight, bufferOutput)) {
+            return;
+        }
     }
     {
         std::lock_guard<std::mutex> lock(mtxDequeLock_);

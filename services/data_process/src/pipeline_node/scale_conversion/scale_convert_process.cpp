@@ -191,7 +191,9 @@ int ScaleConvertProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& i
     ImageUnitInfo dstImgInfo = { processedConfig_.GetVideoformat(), processedConfig_.GetWidth(),
         processedConfig_.GetHeight(), processedConfig_.GetWidth(), processedConfig_.GetHeight(),
         processedConfig_.GetWidth() * processedConfig_.GetHeight(), dstBuf->Size(), dstBuf };
-    Crop(srcImgInfo, dstImgInfo);
+    if (targetConfig_.GetIsSystemSwitch()) {
+        Crop(srcImgInfo, dstImgInfo);
+    }
     if (ScaleConvert(srcImgInfo, dstImgInfo) != DCAMERA_OK) {
         DHLOGE("ScaleConvertProcess : Scale convert failed.");
         return DCAMERA_BAD_OPERATE;

@@ -204,6 +204,10 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_007, TestSize.Level
     testScaleConvertProcess_->callbackPipelineSource_ = sourcePipeline;
     testScaleConvertProcess_->ProcessData(inputBuffers);
     EXPECT_EQ(rc, DCAMERA_OK);
+
+    DEST_PARAMS2.SetSystemSwitchFlagAndRotation(true, 90);
+    testScaleConvertProcess_->ProcessData(inputBuffers);
+    EXPECT_EQ(rc, DCAMERA_OK);
 }
 
 /**

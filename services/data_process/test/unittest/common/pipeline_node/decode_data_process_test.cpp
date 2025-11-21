@@ -645,5 +645,182 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_019, TestSize.Level1)
     EXPECT_EQ(rc, DCAMERA_OK);
 }
 
+/**
+ * @tc.name: decode_data_process_test_020
+ * @tc.desc: Verify decode data process func.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DecodeDataProcessTest, decode_data_process_test_020, TestSize.Level1)
+{
+    DHLOGI("DecodeDataProcessTest decode_data_process_test_020");
+    EXPECT_EQ(false, testDecodeDataProcess_ == nullptr);
+    VideoConfigParams srcParams4(VideoCodecType::NO_CODEC,
+        Videoformat::NV12, DCAMERA_PRODUCER_FPS_DEFAULT, TEST_WIDTH, TEST_HEIGTH);
+    VideoConfigParams destParams4(VideoCodecType::NO_CODEC,
+        Videoformat::NV21, DCAMERA_PRODUCER_FPS_DEFAULT, TEST_WIDTH, TEST_HEIGTH);
+    destParams4.SetSystemSwitchFlagAndRotation(true, 0);
+    VideoConfigParams procConfig4;
+    int32_t rc = testDecodeDataProcess_->InitNode(srcParams4, destParams4, procConfig4);
+    testDecodeDataProcess_->OnError();
+    testDecodeDataProcess_->isDecoderProcess_.store(true);
+    EXPECT_EQ(rc, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: decode_data_process_test_021
+ * @tc.desc: Verify decode data process func.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DecodeDataProcessTest, decode_data_process_test_021, TestSize.Level1)
+{
+    DHLOGI("DecodeDataProcessTest decode_data_process_test_021");
+    EXPECT_EQ(false, testDecodeDataProcess_ == nullptr);
+    VideoConfigParams srcParams4(VideoCodecType::NO_CODEC,
+        Videoformat::NV12, DCAMERA_PRODUCER_FPS_DEFAULT, TEST_WIDTH, TEST_HEIGTH);
+    VideoConfigParams destParams4(VideoCodecType::NO_CODEC,
+        Videoformat::NV21, DCAMERA_PRODUCER_FPS_DEFAULT, TEST_WIDTH, TEST_HEIGTH);
+    destParams4.SetSystemSwitchFlagAndRotation(true, 90);
+    VideoConfigParams procConfig4;
+    int32_t rc = testDecodeDataProcess_->InitNode(srcParams4, destParams4, procConfig4);
+    testDecodeDataProcess_->OnError();
+    testDecodeDataProcess_->isDecoderProcess_.store(true);
+    EXPECT_EQ(rc, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: decode_data_process_test_022
+ * @tc.desc: Verify CopyDecodedImage func.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DecodeDataProcessTest, decode_data_process_test_022, TestSize.Level1)
+{
+    DHLOGI("DecodeDataProcessTest decode_data_process_test_022");
+    EXPECT_EQ(false, testDecodeDataProcess_ == nullptr);
+
+    VideoConfigParams srcParams(VideoCodecType::CODEC_H264,
+                                Videoformat::NV12,
+                                DCAMERA_PRODUCER_FPS_DEFAULT,
+                                TEST_WIDTH2,
+                                TEST_HEIGTH2);
+    VideoConfigParams destParams(VideoCodecType::NO_CODEC,
+                                 Videoformat::NV21,
+                                 DCAMERA_PRODUCER_FPS_DEFAULT,
+                                 TEST_WIDTH2,
+                                 TEST_HEIGTH2);
+    destParams.SetSystemSwitchFlagAndRotation(true, 90);
+    VideoConfigParams procConfig;
+    int32_t rc = testDecodeDataProcess_->InitNode(srcParams, destParams, procConfig);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    sptr<SurfaceBuffer> surBuf = nullptr;
+    int32_t alignedWidth = TEST_WIDTH;
+    int32_t alignedHeight = TEST_HEIGTH;
+    testDecodeDataProcess_->CopyDecodedImage(surBuf, alignedWidth, alignedHeight);
+    EXPECT_EQ(rc, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: decode_data_process_test_023
+ * @tc.desc: Verify CopyDecodedImage func.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DecodeDataProcessTest, decode_data_process_test_023, TestSize.Level1)
+{
+    DHLOGI("DecodeDataProcessTest decode_data_process_test_023");
+    EXPECT_EQ(false, testDecodeDataProcess_ == nullptr);
+    int dstSizeY = TEST_WIDTH * TEST_HEIGTH;
+    int dstSizeUV = TEST_WIDTH * TEST_HEIGTH / 4;
+    uint8_t* srcY = (uint8_t *)malloc(dstSizeY);
+    int srcStrideY = TEST_WIDTH;
+    uint8_t* srcUV = (uint8_t *)malloc(dstSizeUV);
+    int srcStrideUV = TEST_WIDTH / 2;
+    int srcWidth = TEST_WIDTH;
+    int srcHeight = TEST_HEIGTH;
+    uint8_t* dstY = static_cast<uint8_t*>(aligned_alloc(16, dstSizeY));
+    int dstStrideY = TEST_WIDTH;
+    uint8_t* dstU = static_cast<uint8_t*>(aligned_alloc(16, dstSizeUV));
+    int dstStrideU = TEST_WIDTH;
+    uint8_t* dstV = static_cast<uint8_t*>(aligned_alloc(16, dstSizeUV));
+    int dstStrideV = TEST_WIDTH;
+    int angleDegrees = 0;
+    ImageDataInfo srcInfo = { .width = srcWidth, .height = srcHeight,
+        .dataY = srcY, .strideY = srcStrideY, .dataU = srcUV, .strideU = srcStrideUV };
+    ImageDataInfo dstInfo = { .dataY = dstY, .strideY = dstStrideY, .dataU = dstU, .strideU = dstStrideU,
+        .dataV = dstV, .strideV = dstStrideV };
+    srcInfo.dataY = nullptr;
+    bool ret = testDecodeDataProcess_->UniversalRotateCropAndPadNv12ToI420(srcInfo, dstInfo, angleDegrees);
+    EXPECT_EQ(ret, false);
+    srcInfo.dataY = srcY;
+    srcInfo.width = 0;
+    ret = testDecodeDataProcess_->UniversalRotateCropAndPadNv12ToI420(srcInfo, dstInfo, angleDegrees);
+    EXPECT_EQ(ret, false);
+    srcInfo.width = TEST_WIDTH;
+    ret = testDecodeDataProcess_->UniversalRotateCropAndPadNv12ToI420(srcInfo, dstInfo, angleDegrees);
+    EXPECT_EQ(ret, true);
+    angleDegrees = 90;
+    ret = testDecodeDataProcess_->UniversalRotateCropAndPadNv12ToI420(srcInfo, dstInfo, angleDegrees);
+    EXPECT_EQ(ret, true);
+    free(srcY);
+    free(srcUV);
+    free(dstY);
+    free(dstU);
+    free(dstV);
+}
+
+/**
+ * @tc.name: decode_data_process_test_024
+ * @tc.desc: Verify I420CopyBySystemSwitch func.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DecodeDataProcessTest, decode_data_process_test_024, TestSize.Level1)
+{
+    DHLOGI("DecodeDataProcessTest decode_data_process_test_024");
+    EXPECT_EQ(false, testDecodeDataProcess_ == nullptr);
+    int dstSizeY = TEST_WIDTH * TEST_HEIGTH;
+    int dstSizeUV = TEST_WIDTH * TEST_HEIGTH / 4;
+    uint8_t* rotatedY = (uint8_t *)malloc(dstSizeY);
+    int rotatedStrideY = TEST_WIDTH;
+    uint8_t* rotatedU = (uint8_t *)malloc(dstSizeUV);
+    int rotatedStrideU = TEST_WIDTH / 2;
+    uint8_t* rotatedV = (uint8_t *)malloc(dstSizeUV);
+    int rotatedStrideV = TEST_WIDTH / 2;
+
+    uint8_t* dstY = static_cast<uint8_t*>(aligned_alloc(16, dstSizeY));
+    int dstStrideY = TEST_WIDTH;
+    uint8_t* dstU = static_cast<uint8_t*>(aligned_alloc(16, dstSizeUV));
+    int dstStrideU = TEST_WIDTH / 2;
+    uint8_t* dstV = static_cast<uint8_t*>(aligned_alloc(16, dstSizeUV));
+    int dstStrideV = TEST_WIDTH / 2;
+
+    int srcWidth = TEST_WIDTH;
+    int srcHeight = TEST_HEIGTH;
+    int rotatedWidth = TEST_HEIGTH;
+    int rotatedHeight = TEST_WIDTH;
+    int normalizedAngle = 90;
+    ImageDataInfo rotateInfo = { .width = rotatedWidth, .height = rotatedHeight, .dataY = rotatedY,
+        .strideY = rotatedStrideY, .dataU = rotatedU, .strideU = rotatedStrideU, .dataV = rotatedV,
+        .strideV = rotatedStrideV };
+    ImageDataInfo dstInfo = { .width = TEST_WIDTH, .height = TEST_HEIGTH, .dataY = dstY,
+        .strideY = dstStrideY, .dataU = dstU, .strideU = dstStrideU, .dataV = dstV,
+        .strideV = dstStrideV };
+    bool ret = testDecodeDataProcess_->I420CopyBySystemSwitch(rotateInfo, dstInfo, 0, srcHeight, normalizedAngle);
+    EXPECT_EQ(ret, false);
+    ret = testDecodeDataProcess_->I420CopyBySystemSwitch(rotateInfo, dstInfo, srcWidth, srcHeight, normalizedAngle);
+    EXPECT_EQ(ret, true);
+    normalizedAngle = 0;
+    ret = testDecodeDataProcess_->I420CopyBySystemSwitch(rotateInfo, dstInfo, srcWidth, srcHeight, normalizedAngle);
+    EXPECT_EQ(ret, true);
+    free(rotatedY);
+    free(rotatedU);
+    free(rotatedV);
+    free(dstY);
+    free(dstU);
+    free(dstV);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

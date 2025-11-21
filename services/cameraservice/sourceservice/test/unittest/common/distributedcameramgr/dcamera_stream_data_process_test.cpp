@@ -26,6 +26,7 @@
 
 #include "dcamera_pipeline_source.h"
 #include "dcamera_stream_data_process_pipeline_listener.h"
+#include "dcamera_utils_tools.h"
 
 using namespace testing::ext;
 
@@ -287,6 +288,36 @@ HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_009, Tes
         std::make_shared<DCameraStreamConfig>(TEST_WIDTH, TEST_HEIGTH, TEST_FORMAT, TEST_DATASPACE,
         DCEncodeType::ENCODE_TYPE_H264, DCStreamType::SNAPSHOT_FRAME);
 
+    std::set<int32_t> streamIds;
+    streamIds.insert(1);
+    WorkModeParam param(12, 120, 0, false);
+    std::vector<int32_t> streamId;
+    streamId.push_back(1);
+    int32_t ret = streamProcess->UpdateProducerWorkMode(streamId, param);
+    EXPECT_EQ(DCAMERA_OK, ret);
+    streamProcess->ConfigStreams(srcConfig, streamIds);
+    streamProcess->StartCapture(srcConfig, streamIds);
+    ret = streamProcess->UpdateProducerWorkMode(streamId, param);
+    EXPECT_EQ(DCAMERA_OK, ret);
+    streamProcess->StopCapture(streamIds);
+}
+
+/**
+ * @tc.name: dcamera_stream_data_process_test_010
+ * @tc.desc: Verify StartCapture func.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_010, TestSize.Level1)
+{
+    DHLOGI("DCameraStreamDataProcessTest::dcamera_stream_data_process_test_010");
+    std::shared_ptr<DCameraStreamDataProcess> streamProcess =
+        std::make_shared<DCameraStreamDataProcess>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, DCStreamType::CONTINUOUS_FRAME);
+    std::shared_ptr<DCameraStreamConfig> srcConfig =
+        std::make_shared<DCameraStreamConfig>(TEST_WIDTH, TEST_HEIGTH, TEST_FORMAT, TEST_DATASPACE,
+        DCEncodeType::ENCODE_TYPE_H264, DCStreamType::SNAPSHOT_FRAME);
+
+    DCameraSystemSwitchInfo::GetInstance().SetSystemSwitchFlagAndRotation(TEST_DEVICE_ID, true, 90);
     std::set<int32_t> streamIds;
     streamIds.insert(1);
     WorkModeParam param(12, 120, 0, false);

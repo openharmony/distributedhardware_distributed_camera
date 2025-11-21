@@ -38,6 +38,12 @@ void VideoConfigParams::SetWidthAndHeight(int32_t width, int32_t height)
     height_ = height;
 }
 
+void VideoConfigParams::SetSystemSwitchFlagAndRotation(bool flag, int32_t rotation)
+{
+    isSystemSwitch_ = flag;
+    rotation_ = rotation;
+}
+
 VideoCodecType VideoConfigParams::GetVideoCodecType() const
 {
     return videoCodec_;
@@ -61,6 +67,15 @@ int32_t VideoConfigParams::GetWidth() const
 int32_t VideoConfigParams::GetHeight() const
 {
     return height_;
+}
+
+bool VideoConfigParams::GetIsSystemSwitch() const
+{
+    return isSystemSwitch_;
+}
+int32_t VideoConfigParams::GetRotation() const
+{
+    return rotation_;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

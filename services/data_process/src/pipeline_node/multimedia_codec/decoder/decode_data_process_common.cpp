@@ -816,5 +816,49 @@ void DecodeDataProcess::AlignFirstFrameTime()
     frameInfo.timePonit.finishEncode = front.timePonit.finishEncode;
     frameInfoDeque_.emplace(frameInfoDeque_.erase(frameInfoDeque_.begin()), frameInfo);
 }
+
+bool DecodeDataProcess::UniversalRotateCropAndPadNv12ToI420(ImageDataInfo srcInfo, ImageDataInfo dstInfo,
+    int angleDegrees)
+{
+    if (!CheckParamerters(srcInfo, dstInfo)) {
+        return false;
+    }
+    return true;
+}
+
+bool DecodeDataProcess::ConverToI420BySystemSwitch(uint8_t *srcDataY, uint8_t *srcDataUV, int32_t alignedWidth,
+    int32_t alignedHeight, std::shared_ptr<DataBuffer> bufferOutput)
+{
+    return true;
+}
+
+bool DecodeDataProcess::ConverToI420(uint8_t *srcDataY, uint8_t *srcDataUV, int32_t alignedWidth,
+    int32_t alignedHeight, std::shared_ptr<DataBuffer> bufferOutput)
+{
+    return true;
+}
+
+bool DecodeDataProcess::I420CopyBySystemSwitch(ImageDataInfo srcInfo, ImageDataInfo dstInfo,
+    int srcWidth, int srcHeight, int32_t normalizedAngle)
+{
+    if (srcWidth <= 0 || srcHeight <= 0) {
+        return false;
+    }
+    return true;
+}
+
+bool DecodeDataProcess::CheckParamerters(ImageDataInfo srcInfo, ImageDataInfo dstInfo)
+{
+    if (!srcInfo.dataY || !srcInfo.dataU || !dstInfo.dataY || !dstInfo.dataU || !dstInfo.dataV) {
+        return false;
+    }
+    if (srcInfo.width <= 0 || srcInfo.height <= 0) {
+        return false;
+    }
+    if ((srcInfo.width % Y2UV_RATIO != 0) || (srcInfo.height % Y2UV_RATIO != 0)) {
+        return false;
+    }
+    return true;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

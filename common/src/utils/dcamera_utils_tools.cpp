@@ -411,5 +411,47 @@ bool ManageSelectChannel::GetSinkConnect()
 {
     return isSoftbusConnectSink_;
 }
+
+bool DCameraSystemSwitchItem::IsSystemSwitch()
+{
+    return isSystemSwitch_;
+}
+
+int32_t DCameraSystemSwitchItem::GetRotate()
+{
+    return rotation_;
+}
+
+IMPLEMENT_SINGLE_INSTANCE(DCameraSystemSwitchInfo);
+int32_t DCameraSystemSwitchInfo::SetSystemSwitchFlagAndRotation(std::string devId,
+    bool isSystemSwitch, int32_t rotation)
+{
+    std::lock_guard<std::mutex> lock(mtxLock_);
+    if (map_.find(devId) != map_.end() && !isSystemSwitch) {
+        map_.erase(devId);
+        return DCAMERA_OK;
+    }
+    DCameraSystemSwitchItem info(isSystemSwitch, rotation);
+    map_[devId] = info;
+    return DCAMERA_OK;
+}
+
+bool DCameraSystemSwitchInfo::GetSystemSwitchFlag(std::string devId)
+{
+    std::lock_guard<std::mutex> lock(mtxLock_);
+    if (map_.find(devId) == map_.end()) {
+        return false;
+    }
+    return map_[devId].IsSystemSwitch();
+}
+
+int32_t DCameraSystemSwitchInfo::GetSystemSwitchRotation(std::string devId)
+{
+    std::lock_guard<std::mutex> lock(mtxLock_);
+    if (map_.find(devId) == map_.end()) {
+        return 0;
+    }
+    return map_[devId].GetRotate();
+}
 } // namespace DistributedHardware
 } // namespace OHOS
