@@ -58,7 +58,7 @@ int32_t ScaleConvertProcess::InitNode(const VideoConfigParams& sourceConfig, con
         swsContext_ = sws_getContext(sourceConfig_.GetWidth(), sourceConfig_.GetHeight(), sourceFmt,
             processedConfig_.GetWidth(), processedConfig_.GetHeight(), targetFmt,
             SWS_FAST_BILINEAR | SWS_FULL_CHR_H_INT, nullptr, nullptr, nullptr);
-        CHECK_AND_RETURN_RET_LOG(swsContext_ == nullptr, DCAMERA_MEMORY_OPT_ERROR, 
+        CHECK_AND_RETURN_RET_LOG(swsContext_ == nullptr, DCAMERA_MEMORY_OPT_ERROR,
             "Failed to create sws context for P010 conversion");
     }
     isScaleConvert_.store(true);
