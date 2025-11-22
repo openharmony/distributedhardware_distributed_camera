@@ -19,6 +19,7 @@
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
 #include "dcamera_frame_info.h"
+#include <cmath>
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -49,6 +50,17 @@ int32_t ScaleConvertProcess::InitNode(const VideoConfigParams& sourceConfig, con
             targetConfig.GetVideoformat(), targetConfig.GetWidth(), targetConfig.GetHeight());
     }
 
+    if (targetConfig.GetVideoformat() == Videoformat::P010) {
+        AVPixelFormat sourceFmt = GetAVPixelFormat(sourceConfig.GetVideoformat());
+        AVPixelFormat targetFmt = GetAVPixelFormat(targetConfig.GetVideoformat());
+        DHLOGI("VideoFormat P010 src fmt: %{public}d -> %{public}d, dst fmt: %{public}d -> %{public}d",
+            sourceConfig.GetVideoformat(), sourceFmt, targetConfig.GetVideoformat(), targetFmt);
+        swsContext_ = sws_getContext(sourceConfig_.GetWidth(), sourceConfig_.GetHeight(), sourceFmt,
+            processedConfig_.GetWidth(), processedConfig_.GetHeight(), targetFmt,
+            SWS_FAST_BILINEAR | SWS_FULL_CHR_H_INT, nullptr, nullptr, nullptr);
+        CHECK_AND_RETURN_RET_LOG(swsContext_ == nullptr, DCAMERA_MEMORY_OPT_ERROR,
+            "Failed to create sws context for P010 conversion");
+    }
     isScaleConvert_.store(true);
     return DCAMERA_OK;
 }
@@ -64,6 +76,14 @@ void ScaleConvertProcess::ReleaseProcessNode()
 {
     DHLOGI("Start release [%{public}zu] node : ScaleConvertNode.", nodeRank_);
     isScaleConvert_.store(false);
+
+    {
+        std::lock_guard<std::mutex> autoLock(scaleMutex_);
+        if (swsContext_ != nullptr) {
+            sws_freeContext(swsContext_);
+            swsContext_ = nullptr;
+        }
+    }
 
     if (nextDataProcess_ != nullptr) {
         nextDataProcess_->ReleaseProcessNode();
@@ -217,6 +237,9 @@ void ScaleConvertProcess::CalculateBuffSize(size_t& dstBuffSize)
     if (processedConfig_.GetVideoformat() == Videoformat::RGBA_8888) {
         dstBuffSize = static_cast<size_t>(processedConfig_.GetWidth() * processedConfig_.GetHeight() *
             RGB32_MEMORY_COEFFICIENT);
+    } else if (processedConfig_.GetVideoformat() == Videoformat::P010) {
+        dstBuffSize = static_cast<size_t>(
+            processedConfig_.GetWidth() * processedConfig_.GetHeight() * YUV_BYTES_PER_PIXEL);
     } else {
         dstBuffSize = static_cast<size_t>(
             processedConfig_.GetWidth() * processedConfig_.GetHeight() * YUV_BYTES_PER_PIXEL / Y2UV_RATIO);
@@ -335,6 +358,8 @@ int32_t ScaleConvertProcess::ScaleConvert(ImageUnitInfo& srcImgInfo, ImageUnitIn
         ret = ConvertFormatToNV21(srcImgInfo, dstImgInfo, dstBuf);
     } else if (processedConfig_.GetVideoformat() == Videoformat::RGBA_8888) {
         ret = ConvertFormatToRGBA(srcImgInfo, dstImgInfo, dstBuf);
+    } else if (targetConfig_.GetVideoformat() == Videoformat::P010) {
+        ret = ConvertFormatToP010(srcImgInfo, dstImgInfo);
     }
     if (ret != DCAMERA_OK) {
         DHLOGE("Convert I420 to format: %{public}d failed.", processedConfig_.GetVideoformat());
@@ -477,6 +502,40 @@ int32_t ScaleConvertProcess::ConvertFormatToRGBA(ImageUnitInfo& srcImgInfo, Imag
     return DCAMERA_OK;
 }
 
+int32_t ScaleConvertProcess::ConvertFormatToP010(ImageUnitInfo& srcImgInfo, ImageUnitInfo& dstImgInfo)
+{
+    CHECK_AND_RETURN_RET_LOG((srcImgInfo.imgData == nullptr), DCAMERA_BAD_VALUE, "Data buffer exists null data");
+    int32_t srcSizeY = srcImgInfo.width * srcImgInfo.height;
+    int32_t srcSizeUV = (static_cast<uint32_t>(srcImgInfo.width) >> MEMORY_RATIO_UV) *
+        (static_cast<uint32_t>(srcImgInfo.height) >> MEMORY_RATIO_UV);
+    uint8_t* srcDataY = srcImgInfo.imgData->Data();
+    uint8_t* srcDataU = srcImgInfo.imgData->Data() + srcSizeY;
+    uint8_t* srcDataV = srcImgInfo.imgData->Data() + srcSizeY + srcSizeUV;
+    for (int i = 0; i < srcSizeUV; i++) {
+        uint8_t temp = srcDataU[i];
+        srcDataU[i] = srcDataV[i];
+        srcDataV[i] = temp;
+    }
+    uint8_t* srcData[3] = { srcDataY, srcDataU, srcDataV };
+    int32_t srcLinsize[3] = { srcImgInfo.width, srcImgInfo.width / 2, srcImgInfo.width / 2 };
+
+    int32_t dstWidth = dstImgInfo.width;
+    int32_t dstHeight = dstImgInfo.height;
+    int32_t dstLinsize[3] = { dstWidth * 2, dstWidth * 2, dstWidth * 2 };
+
+    uint8_t* dstDataY = dstImgInfo.imgData->Data();
+    uint8_t* dstDataU = dstImgInfo.imgData->Data() + dstWidth * dstHeight * 2;
+    uint8_t* dstDataV = dstImgInfo.imgData->Data() + dstWidth * dstHeight * 2 + dstWidth * dstHeight * 2;
+
+    uint8_t* dstData[3] = { dstDataY, dstDataU, dstDataV };
+    int32_t ret = sws_scale(swsContext_, srcData, srcLinsize, 0, srcImgInfo.height, dstData, dstLinsize);
+    if (ret < 0) {
+        DHLOGE("ScaleConvertProcess::ConvertFormatToP010 sws_scale failed, ret = %{public}d", ret);
+        return DCAMERA_MEMORY_OPT_ERROR;
+    }
+    return DCAMERA_OK;
+}
+
 int32_t ScaleConvertProcess::ConvertDone(std::vector<std::shared_ptr<DataBuffer>>& outputBuffers)
 {
     int64_t finishScaleTime = GetNowTimeStampUs();
@@ -504,6 +563,26 @@ int32_t ScaleConvertProcess::ConvertDone(std::vector<std::shared_ptr<DataBuffer>
     }
     targetPipelineSource->OnProcessedVideoBuffer(outputBuffers[0]);
     return DCAMERA_OK;
+}
+
+AVPixelFormat ScaleConvertProcess::GetAVPixelFormat(Videoformat colorFormat)
+{
+    AVPixelFormat format;
+    switch (colorFormat) {
+        case Videoformat::NV12:
+            format = AVPixelFormat::AV_PIX_FMT_NV12;
+            break;
+        case Videoformat::NV21:
+            format = AVPixelFormat::AV_PIX_FMT_NV21;
+            break;
+        case Videoformat::P010:
+            format = AVPixelFormat::AV_PIX_FMT_P010LE;
+            break;
+        default:
+            format = AVPixelFormat::AV_PIX_FMT_YUV420P;
+            break;
+    }
+    return format;
 }
 
 int32_t ScaleConvertProcess::GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier)

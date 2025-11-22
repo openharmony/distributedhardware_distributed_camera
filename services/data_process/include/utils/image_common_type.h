@@ -39,6 +39,7 @@ enum class Videoformat : int32_t {
     NV12 = 1,
     NV21 = 2,
     RGBA_8888 = 3,
+    P010 = 4,
 };
 
 class VideoConfigParams {

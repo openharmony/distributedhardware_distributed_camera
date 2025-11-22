@@ -772,6 +772,75 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_030, TestSize.Level
     testScaleConvertProcess_->processedConfig_.SetVideoformat(Videoformat::RGBA_8888);
     ret = testScaleConvertProcess_->ScaleConvert(srcImgInfo, dstImgInfo);
     EXPECT_EQ(ret, DCAMERA_BAD_VALUE);
+
+    testScaleConvertProcess_->targetConfig_.SetVideoformat(Videoformat::P010);
+    ret = testScaleConvertProcess_->ScaleConvert(srcImgInfo, dstImgInfo);
+    EXPECT_EQ(ret, DCAMERA_BAD_VALUE);
+}
+
+/**
+ * @tc.name: scale_convert_process_test_031
+ * @tc.desc: Verify ScaleConvert.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_031, TestSize.Level1)
+{
+    DHLOGI("ScaleConvertProcessTest scale_convert_process_test_031.");
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
+    SRC_PARAMS1.SetVideoformat(Videoformat::YUVI420);
+    DEST_PARAMS2.SetVideoformat(Videoformat::P010);
+    int32_t ret = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS2, PROC_CONFIG);
+    EXPECT_EQ(ret, DCAMERA_OK);
+
+    ImageUnitInfo srcImgInfo{ Videoformat::YUVI420, 0, 0, 0, 0, 0, 0, nullptr };
+    ImageUnitInfo dstImgInfo{ Videoformat::YUVI420, 0, 0, 0, 0, 0, 0, nullptr };
+    srcImgInfo.imgData = std::make_shared<DataBuffer>(1);
+    dstImgInfo.imgData = std::make_shared<DataBuffer>(1);
+    srcImgInfo.colorFormat = Videoformat::YUVI420;
+    dstImgInfo.colorFormat = Videoformat::P010;
+    ret = testScaleConvertProcess_->ScaleConvert(srcImgInfo, dstImgInfo);
+    EXPECT_EQ(ret, DCAMERA_MEMORY_OPT_ERROR);
+
+    ImageUnitInfo srcImg{ Videoformat::YUVI420, 1280, 720, 1280, 720, 1280 * 720, 1280 * 720 * 3 / 2, nullptr };
+    ImageUnitInfo dstImg{ Videoformat::YUVI420, 1280, 720, 1280, 720, 1280 * 720, 1280 * 720 * 3 / 2, nullptr };
+    srcImg.imgData = std::make_shared<DataBuffer>(1);
+    dstImg.imgData = std::make_shared<DataBuffer>(1);
+    srcImg.colorFormat = Videoformat::YUVI420;
+    dstImg.colorFormat = Videoformat::P010;
+    ret = testScaleConvertProcess_->ScaleConvert(srcImg, dstImg);
+    EXPECT_EQ(ret, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: scale_convert_process_test_032
+ * @tc.desc: Verify ScaleConvert.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_032, TestSize.Level1)
+{
+    DHLOGI("ScaleConvertProcessTest scale_convert_process_test_032.");
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
+    Videoformat format = Videoformat::NV12;
+    auto ret = testScaleConvertProcess_->GetAVPixelFormat(format);
+    EXPECT_EQ(ret, AVPixelFormat::AV_PIX_FMT_NV12);
+
+    format = Videoformat::NV21;
+    ret = testScaleConvertProcess_->GetAVPixelFormat(format);
+    EXPECT_EQ(ret, AVPixelFormat::AV_PIX_FMT_NV21);
+
+    format = Videoformat::RGBA_8888;
+    ret = testScaleConvertProcess_->GetAVPixelFormat(format);
+    EXPECT_EQ(ret, AVPixelFormat::AV_PIX_FMT_RGBA);
+
+    format = Videoformat::P010;
+    ret = testScaleConvertProcess_->GetAVPixelFormat(format);
+    EXPECT_EQ(ret, AVPixelFormat::AV_PIX_FMT_P010LE);
+
+    format = Videoformat::YUVI420;
+    ret = testScaleConvertProcess_->GetAVPixelFormat(format);
+    EXPECT_EQ(ret, AVPixelFormat::AV_PIX_FMT_YUV420P);
 }
 #endif
 } // namespace DistributedHardware

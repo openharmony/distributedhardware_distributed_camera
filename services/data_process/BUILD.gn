@@ -93,9 +93,9 @@ ohos_shared_library("distributed_camera_data_process") {
       "src/pipeline_node/multimedia_codec/decoder/decode_data_process_common.cpp",
       "src/pipeline_node/scale_conversion/scale_convert_process_common.cpp",
     ]
-    external_deps += [ "ffmpeg:libohosffmpeg" ]
   }
-
+  
+  external_deps += [ "ffmpeg:libohosffmpeg" ]
   cflags = [
     "-fPIC",
     "-Wall",
