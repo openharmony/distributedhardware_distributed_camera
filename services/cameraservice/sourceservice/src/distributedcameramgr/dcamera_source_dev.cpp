@@ -252,8 +252,8 @@ int32_t DCameraSourceDev::ProcessHDFEvent(const DCameraHDFEvent& event)
     DHLOGI("DCameraSourceDev ProcessHDFEvent devId %{public}s dhId %{public}s event_type %{public}d",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), event.type_);
     if (event.type_ == EVENT_DCAMERA_FORCE_SWITCH) {
-        isForceSwitch_ = true;
-        DHLOGI("recv force switch event from hdf");
+        DCameraSystemSwitchInfo::GetInstance().SetSystemSwitchFlagAndRotation(devId_, true, event.result_);
+        DHLOGI("recv force switch event from hdf, result: %{public}d", event.result_);
         return DCAMERA_OK;
     }
     std::shared_ptr<DCameraSourceEvent> eventParam = std::make_shared<DCameraSourceEvent>(DCAMERA_EVENT_GET_FULLCAPS);
@@ -537,7 +537,7 @@ int32_t DCameraSourceDev::CloseCamera()
     }
     CHECK_AND_RETURN_RET_LOG(stateListener_ == nullptr, DCAMERA_BAD_VALUE, "stateListener_ is nullptr.");
     stateListener_->OnHardwareStateChanged(devId_, dhId_, DcameraBusinessState::IDLE);
-    isForceSwitch_ = false;
+    DCameraSystemSwitchInfo::GetInstance().SetSystemSwitchFlagAndRotation(devId_, false, 0);
     return DCAMERA_OK;
 }
 
@@ -897,11 +897,6 @@ int32_t DCameraSourceDev::UpdateDCameraWorkMode(const WorkModeParam& param)
     int32_t ret = input_->UpdateWorkMode(param);
     DHLOGI("update dcamera workmode by input_ done, ret %{public}d", ret);
     return ret;
-}
-
-bool DCameraSourceDev::GetForceSwitchFlag()
-{
-    return isForceSwitch_;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

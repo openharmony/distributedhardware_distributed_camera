@@ -31,6 +31,13 @@ typedef enum FilterMode {
     kFilterBox = 3
 } FilterModeEnum;
 
+typedef enum RotationMode {
+    kRotate0 = 0,
+    kRotate90 = 90,
+    kRotate180 = 180,
+    kRotate270 = 270,
+} RotationModeEnum;
+
 struct ImageConverter {
     int32_t (*NV12ToI420)(const uint8_t* src_y, int src_stride_y, const uint8_t* src_uv, int src_stride_uv,
         uint8_t* dst_y, int dst_stride_y, uint8_t* dst_u, int dst_stride_u,
@@ -48,6 +55,14 @@ struct ImageConverter {
         int width, int height);
     int32_t (*ARGBToNV12)(const uint8_t* src_argb, int src_stride_argb, uint8_t* dst_y, int dst_stride_y,
         uint8_t* dst_uv, int dst_stride_uv, int width, int height);
+    int32_t (*NV12ToI420Rotate)(const uint8_t *src_y, int src_stride_y, const uint8_t *src_uv, int src_stride_uv,
+        uint8_t *dst_y, int dst_stride_y, uint8_t *dst_u, int dst_stride_u, uint8_t *dst_v, int dst_stride_v,
+        int width, int height, enum RotationMode mode);
+    int32_t (*I420Rect)(uint8_t* dst_y, int dst_stride_y, uint8_t* dst_u, int dst_stride_u, uint8_t* dst_v,
+        int dst_stride_v, int x, int y, int width, int height, int value_y, int value_u, int value_v);
+    int32_t (*I420Copy)(const uint8_t *src_y, int src_stride_y, const uint8_t *src_u, int src_stride_u,
+        const uint8_t *src_v, int src_stride_v, uint8_t *dst_y, int dst_stride_y, uint8_t *dst_u, int dst_stride_u,
+        uint8_t *dst_v, int dst_stride_v, int width, int height);
 };
 
 struct ImageConverter GetImageConverter(void);

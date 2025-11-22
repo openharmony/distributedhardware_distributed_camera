@@ -64,6 +64,7 @@ const std::string DUMP_DCAMERA_AFTER_ENC_FILENAME = "dump_after_enc_dcamsink.h26
 const std::string DUMP_DCAMERA_BEFORE_DEC_FILENAME = "dump_before_dec_dcamsource.h265";
 const std::string DUMP_DCAMERA_AFTER_DEC_FILENAME = "dump_after_dec_dcamsource.yuv";
 const std::string DUMP_DCAMERA_AFTER_SCALE_FILENAME = "dump_after_scale_dcamsource.yuv";
+const std::string DUMP_DCAMERA_AFTER_ROTATE_FILENAME = "dump_after_rotate_dcamsource.yuv";
 
 class DumpFileUtil {
 public:
@@ -87,6 +88,31 @@ public:
 private:
     bool isSoftbusConnectSource_ = false;
     bool isSoftbusConnectSink_ = false;
+};
+
+class DCameraSystemSwitchItem {
+public:
+    DCameraSystemSwitchItem() : isSystemSwitch_(false), rotation_(0) {}
+    DCameraSystemSwitchItem(bool isSystemSwitch, int32_t rotation)
+        : isSystemSwitch_(isSystemSwitch), rotation_(rotation) {}
+
+    bool IsSystemSwitch();
+    int32_t GetRotate();
+private:
+    bool isSystemSwitch_ = false;
+    int32_t rotation_ = 0;
+};
+
+class DCameraSystemSwitchInfo {
+DECLARE_SINGLE_INSTANCE(DCameraSystemSwitchInfo);
+
+public:
+    int32_t SetSystemSwitchFlagAndRotation(std::string devId, bool isSystemSwitch, int32_t rotation);
+    bool GetSystemSwitchFlag(std::string devId);
+    int32_t GetSystemSwitchRotation(std::string devId);
+private:
+    std::map<std::string, DCameraSystemSwitchItem> map_ = {};
+    std::mutex mtxLock_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

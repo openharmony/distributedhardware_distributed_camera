@@ -269,5 +269,27 @@ HWTEST_F(DcameraUtilsToolsTest, OpenDumpFile_001, TestSize.Level1)
     DumpFileUtil::CloseDumpFile(&dumpFile);
     EXPECT_EQ(true, dumpFile == nullptr);
 }
+
+/**
+ * @tc.name: DCameraSystemSwitch_001
+ * @tc.desc: Verify the DCameraSystemSwitchInfo.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DcameraUtilsToolsTest, DCameraSystemSwitch_001, TestSize.Level1)
+{
+    int32_t res = DCameraSystemSwitchInfo::GetInstance().SetSystemSwitchFlagAndRotation("1", true, 90);
+    EXPECT_EQ(res, DCAMERA_OK);
+    bool ret = DCameraSystemSwitchInfo::GetInstance().GetSystemSwitchFlag("1");
+    EXPECT_EQ(ret, true);
+    ret = DCameraSystemSwitchInfo::GetInstance().GetSystemSwitchFlag("2");
+    EXPECT_EQ(ret, false);
+    int32_t rotate = DCameraSystemSwitchInfo::GetInstance().GetSystemSwitchRotation("1");
+    EXPECT_EQ(rotate, 90);
+    rotate = DCameraSystemSwitchInfo::GetInstance().GetSystemSwitchRotation("2");
+    EXPECT_EQ(rotate, 0);
+    res = DCameraSystemSwitchInfo::GetInstance().SetSystemSwitchFlagAndRotation("1", false, 0);
+    EXPECT_EQ(res, DCAMERA_OK);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

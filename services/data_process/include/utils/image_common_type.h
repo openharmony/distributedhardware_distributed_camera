@@ -56,11 +56,14 @@ public:
     void SetVideoformat(Videoformat pixelFormat);
     void SetFrameRate(int32_t frameRate);
     void SetWidthAndHeight(int32_t width, int32_t height);
+    void SetSystemSwitchFlagAndRotation(bool flag, int32_t rotation);
     VideoCodecType GetVideoCodecType() const;
     Videoformat GetVideoformat() const;
     int32_t GetFrameRate() const;
     int32_t GetWidth() const;
     int32_t GetHeight() const;
+    bool GetIsSystemSwitch() const;
+    int32_t GetRotation() const;
 
 private:
     VideoCodecType videoCodec_;
@@ -68,6 +71,8 @@ private:
     int32_t frameRate_;
     int32_t width_;
     int32_t height_;
+    bool isSystemSwitch_ = false;
+    int32_t rotation_ = 0;
 };
 
 struct ImageUnitInfo {

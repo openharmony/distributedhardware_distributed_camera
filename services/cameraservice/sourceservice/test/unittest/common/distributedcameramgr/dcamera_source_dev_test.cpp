@@ -772,5 +772,24 @@ HWTEST_F(DCameraSourceDevTest, PostHicollieEvent_001, TestSize.Level1)
     camDev1_->InitDCameraSourceDev();
     EXPECT_EQ(DCAMERA_OK, camDev1_->PostHicollieEvent());
 }
+
+/**
+ * @tc.name: processHDFEvent_001
+ * @tc.desc: Verify source dev processHDFEvent.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceDevTest, processHDFEvent_001, TestSize.Level1) {
+    DCameraHDFEvent event;
+    event.type_ = EVENT_DCAMERA_FORCE_SWITCH;
+    event.result_ = 90;
+    DHLOGI("DCameraSourceDevTest processHDFEvent_001");
+    int32_t result = camDev_->ProcessHDFEvent(event);
+    bool flag = DCameraSystemSwitchInfo::GetInstance().GetSystemSwitchFlag(TEST_DEVICE_ID);
+    EXPECT_TRUE(flag);
+    EXPECT_EQ(result, DCAMERA_OK);
+    int32_t rotate = DCameraSystemSwitchInfo::GetInstance().GetSystemSwitchRotation(TEST_DEVICE_ID);
+    EXPECT_EQ(rotate, 90);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

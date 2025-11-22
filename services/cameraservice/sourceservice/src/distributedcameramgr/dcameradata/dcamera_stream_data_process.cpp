@@ -19,6 +19,7 @@
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
+#include "dcamera_utils_tools.h"
 
 #include "dcamera_pipeline_source.h"
 #include "dcamera_stream_data_process_pipeline_listener.h"
@@ -256,6 +257,11 @@ void DCameraStreamDataProcess::CreatePipeline()
         DCAMERA_PRODUCER_FPS_DEFAULT, srcConfig_->width_, srcConfig_->height_);
     VideoConfigParams dstParams(GetPipelineCodecType(dstConfig_->encodeType_), GetPipelineFormat(dstConfig_->format_),
         DCAMERA_PRODUCER_FPS_DEFAULT, dstConfig_->width_, dstConfig_->height_);
+    bool isSystemSwitch = DCameraSystemSwitchInfo::GetInstance().GetSystemSwitchFlag(devId_);
+    if (isSystemSwitch) {
+        int32_t rotation = DCameraSystemSwitchInfo::GetInstance().GetSystemSwitchRotation(devId_);
+        dstParams.SetSystemSwitchFlagAndRotation(isSystemSwitch, rotation);
+    }
     int32_t ret = pipeline_->CreateDataProcessPipeline(PipelineType::VIDEO, srcParams, dstParams, listener_);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraStreamDataProcess CreateDataProcessPipeline type: %{public}d failed, ret: %{public}d",
