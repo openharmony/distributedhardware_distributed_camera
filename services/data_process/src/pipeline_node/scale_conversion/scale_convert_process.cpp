@@ -58,6 +58,8 @@ int32_t ScaleConvertProcess::InitNode(const VideoConfigParams& sourceConfig, con
         swsContext_ = sws_getContext(sourceConfig_.GetWidth(), sourceConfig_.GetHeight(), sourceFmt,
             processedConfig_.GetWidth(), processedConfig_.GetHeight(), targetFmt,
             SWS_FAST_BILINEAR | SWS_FULL_CHR_H_INT, nullptr, nullptr, nullptr);
+        CHECK_AND_RETURN_RET_LOG(swsContext_ == nullptr, DCAMERA_MEMORY_OPT_ERROR, 
+            "Failed to create sws context for P010 conversion");
     }
     isScaleConvert_.store(true);
     return DCAMERA_OK;
@@ -355,7 +357,7 @@ int32_t ScaleConvertProcess::ScaleConvert(ImageUnitInfo& srcImgInfo, ImageUnitIn
     } else if (processedConfig_.GetVideoformat() == Videoformat::RGBA_8888) {
         ret = ConvertFormatToRGBA(srcImgInfo, dstImgInfo, dstBuf);
     } else if (targetConfig_.GetVideoformat() == Videoformat::P010) {
-        ret = ConvertFormatToP010(srcImgInfo, dstImgInfo, dstBuf);
+        ret = ConvertFormatToP010(srcImgInfo, dstImgInfo);
     }
     if (ret != DCAMERA_OK) {
         DHLOGE("Convert I420 to format: %{public}d failed.", processedConfig_.GetVideoformat());
@@ -498,8 +500,7 @@ int32_t ScaleConvertProcess::ConvertFormatToRGBA(ImageUnitInfo& srcImgInfo, Imag
     return DCAMERA_OK;
 }
 
-int32_t ScaleConvertProcess::ConvertFormatToP010(ImageUnitInfo& srcImgInfo, ImageUnitInfo& dstImgInfo,
-    std::shared_ptr<DataBuffer>& dstBuf)
+int32_t ScaleConvertProcess::ConvertFormatToP010(ImageUnitInfo& srcImgInfo, ImageUnitInfo& dstImgInfo)
 {
     CHECK_AND_RETURN_RET_LOG((srcImgInfo.imgData == nullptr), DCAMERA_BAD_VALUE, "Data buffer exists null data");
     int32_t srcSizeY = srcImgInfo.width * srcImgInfo.height;
