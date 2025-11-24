@@ -689,6 +689,7 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_021, TestSize.Level1)
     EXPECT_EQ(rc, DCAMERA_OK);
 }
 
+#ifndef DCAMERA_SUPPORT_FFMPEG
 /**
  * @tc.name: decode_data_process_test_022
  * @tc.desc: Verify CopyDecodedImage func.
@@ -710,7 +711,6 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_022, TestSize.Level1)
                                  DCAMERA_PRODUCER_FPS_DEFAULT,
                                  TEST_WIDTH2,
                                  TEST_HEIGTH2);
-    destParams.SetSystemSwitchFlagAndRotation(true, 90);
     VideoConfigParams procConfig;
     int32_t rc = testDecodeDataProcess_->InitNode(srcParams, destParams, procConfig);
     EXPECT_EQ(rc, DCAMERA_OK);
@@ -822,5 +822,193 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_024, TestSize.Level1)
     free(dstU);
     free(dstV);
 }
+
+/**
+ * @tc.name: decode_data_process_test_025
+ * @tc.desc: Verify InitNode func.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DecodeDataProcessTest, decode_data_process_test_025, TestSize.Level1)
+{
+    DHLOGI("DecodeDataProcessTest decode_data_process_test_025");
+    EXPECT_EQ(false, testDecodeDataProcess_ == nullptr);
+
+    VideoConfigParams srcParams(VideoCodecType::CODEC_H264,
+                                Videoformat::NV12,
+                                DCAMERA_PRODUCER_FPS_DEFAULT,
+                                TEST_WIDTH2,
+                                TEST_HEIGTH2);
+    VideoConfigParams destParams(VideoCodecType::NO_CODEC,
+                                 Videoformat::NV21,
+                                 DCAMERA_PRODUCER_FPS_DEFAULT,
+                                 TEST_WIDTH2,
+                                 TEST_HEIGTH2);
+    destParams.SetSystemSwitchFlagAndRotation(true, 90);
+    VideoConfigParams procConfig;
+    int32_t rc = testDecodeDataProcess_->InitNode(srcParams, destParams, procConfig);
+    EXPECT_EQ(rc, DCAMERA_OK);
+    testDecodeDataProcess_->ReleaseProcessNode();
+
+    destParams.SetSystemSwitchFlagAndRotation(true, 0);
+    rc = testDecodeDataProcess_->InitNode(srcParams, destParams, procConfig);
+    EXPECT_EQ(rc, DCAMERA_OK);
+    testDecodeDataProcess_->ReleaseProcessNode();
+
+    destParams.SetSystemSwitchFlagAndRotation(false, 0);
+    rc = testDecodeDataProcess_->InitNode(srcParams, destParams, procConfig);
+    EXPECT_EQ(rc, DCAMERA_OK);
+    testDecodeDataProcess_->ReleaseProcessNode();
+}
+
+/**
+ * @tc.name: decode_data_process_test_026
+ * @tc.desc: Verify ParseAngle func.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DecodeDataProcessTest, decode_data_process_test_026, TestSize.Level1)
+{
+    DHLOGI("DecodeDataProcessTest decode_data_process_test_026");
+    EXPECT_EQ(false, testDecodeDataProcess_ == nullptr);
+
+    OpenSourceLibyuv::RotationMode mode = testDecodeDataProcess_->ParseAngle(0);
+    EXPECT_EQ(mode, OpenSourceLibyuv::RotationMode::kRotate0);
+
+    mode = testDecodeDataProcess_->ParseAngle(90);
+    EXPECT_EQ(mode, OpenSourceLibyuv::RotationMode::kRotate90);
+    
+    mode = testDecodeDataProcess_->ParseAngle(180);
+    EXPECT_EQ(mode, OpenSourceLibyuv::RotationMode::kRotate180);
+
+    mode = testDecodeDataProcess_->ParseAngle(270);
+    EXPECT_EQ(mode, OpenSourceLibyuv::RotationMode::kRotate270);
+
+    mode = testDecodeDataProcess_->ParseAngle(360);
+    EXPECT_EQ(mode, OpenSourceLibyuv::RotationMode::kRotate0);
+
+    mode = testDecodeDataProcess_->ParseAngle(1);
+    EXPECT_EQ(mode, OpenSourceLibyuv::RotationMode::kRotate0);
+}
+
+/**
+ * @tc.name: decode_data_process_test_027
+ * @tc.desc: Verify CheckParameters func.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DecodeDataProcessTest, decode_data_process_test_027, TestSize.Level1)
+{
+    DHLOGI("DecodeDataProcessTest decode_data_process_test_027");
+    EXPECT_EQ(false, testDecodeDataProcess_ == nullptr);
+    uint8_t* bytes = (uint8_t *)malloc(1);
+    ImageDataInfo srcInfo = {0};
+    ImageDataInfo dstInfo = {0};
+
+    srcInfo.dataY = nullptr;
+    EXPECT_FALSE(testDecodeDataProcess_->CheckParameters(srcInfo, dstInfo));
+
+    srcInfo.dataY = bytes;
+    srcInfo.dataU = nullptr;
+    EXPECT_FALSE(testDecodeDataProcess_->CheckParameters(srcInfo, dstInfo));
+
+    srcInfo.dataU = bytes;
+    srcInfo.dataV = nullptr;
+    EXPECT_FALSE(testDecodeDataProcess_->CheckParameters(srcInfo, dstInfo));
+
+    srcInfo.dataV = bytes;
+    dstInfo.dataY = nullptr;
+    EXPECT_FALSE(testDecodeDataProcess_->CheckParameters(srcInfo, dstInfo));
+
+    dstInfo.dataY = bytes;
+    dstInfo.dataU = nullptr;
+    EXPECT_FALSE(testDecodeDataProcess_->CheckParameters(srcInfo, dstInfo));
+
+    dstInfo.dataU = bytes;
+    dstInfo.dataV = nullptr;
+    EXPECT_FALSE(testDecodeDataProcess_->CheckParameters(srcInfo, dstInfo));
+
+    dstInfo.dataV = bytes;
+    srcInfo.width = -1;
+    EXPECT_FALSE(testDecodeDataProcess_->CheckParameters(srcInfo, dstInfo));
+
+    srcInfo.width = 1920;
+    srcInfo.height = -1;
+    EXPECT_FALSE(testDecodeDataProcess_->CheckParameters(srcInfo, dstInfo));
+
+    free(bytes);
+}
+
+/**
+ * @tc.name: decode_data_process_test_028
+ * @tc.desc: Verify decode data process func.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DecodeDataProcessTest, decode_data_process_test_028, TestSize.Level1)
+{
+    DHLOGI("DecodeDataProcessTest decode_data_process_test_028");
+    EXPECT_EQ(false, testDecodeDataProcess_ == nullptr);
+
+    VideoConfigParams srcParams(VideoCodecType::CODEC_H264,
+                                Videoformat::NV12,
+                                DCAMERA_PRODUCER_FPS_DEFAULT,
+                                TEST_WIDTH2,
+                                TEST_HEIGTH2);
+    VideoConfigParams destParams(VideoCodecType::NO_CODEC,
+                                 Videoformat::NV21,
+                                 DCAMERA_PRODUCER_FPS_DEFAULT,
+                                 TEST_WIDTH2,
+                                 TEST_HEIGTH2);
+    VideoConfigParams procConfig;
+    int32_t rc = testDecodeDataProcess_->InitNode(srcParams, destParams, procConfig);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    sptr<SurfaceBuffer> surBuf = nullptr;
+    int32_t alignedWidth = TEST_WIDTH;
+    int32_t alignedHeight = TEST_HEIGTH;
+    testDecodeDataProcess_->CopyDecodedImage(surBuf, alignedWidth, alignedHeight);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    destParams.SetSystemSwitchFlagAndRotation(true, 90);
+    testDecodeDataProcess_->CopyDecodedImage(surBuf, alignedWidth, alignedHeight);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    alignedWidth = -1;
+    testDecodeDataProcess_->CopyDecodedImage(surBuf, alignedWidth, alignedHeight);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    destParams.SetSystemSwitchFlagAndRotation(false, 90);
+    testDecodeDataProcess_->CopyDecodedImage(surBuf, alignedWidth, alignedHeight);
+    EXPECT_EQ(rc, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: decode_data_process_test_029
+ * @tc.desc: Verify decode data process func.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DecodeDataProcessTest, decode_data_process_test_029, TestSize.Level1)
+{
+    DHLOGI("DecodeDataProcessTest decode_data_process_test_029");
+    uint8_t* dataY = nullptr;
+    uint8_t* dataU = (uint8_t *)malloc(1);
+    uint8_t* dataV = (uint8_t *)malloc(1);
+    bool rc = testDecodeDataProcess_->FreeYUVBuffer(dataY, dataU, dataU);
+    EXPECT_EQ(rc, true);
+
+    dataY = (uint8_t *)malloc(1);
+    dataU = nullptr;
+    dataV = (uint8_t *)malloc(1);
+    rc = testDecodeDataProcess_->FreeYUVBuffer(dataY, dataU, dataU);
+    EXPECT_EQ(rc, true);
+    dataY = (uint8_t *)malloc(1);
+    dataU = (uint8_t *)malloc(1);;
+    dataV = nullptr;
+    rc = testDecodeDataProcess_->FreeYUVBuffer(dataY, dataU, dataV);
+    EXPECT_EQ(rc, true);
+}
+#endif
 } // namespace DistributedHardware
 } // namespace OHOS

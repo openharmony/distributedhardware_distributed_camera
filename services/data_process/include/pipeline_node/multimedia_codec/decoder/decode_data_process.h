@@ -108,15 +108,17 @@ private:
     int32_t DecodeDone(std::vector<std::shared_ptr<DataBuffer>>& outputBuffers);
     void StartEventHandler();
     bool UniversalRotateCropAndPadNv12ToI420(ImageDataInfo srcInfo, ImageDataInfo dstInfo, int angleDegrees);
-    bool ConverToI420BySystemSwitch(uint8_t *srcDataY, uint8_t *srcDataUV, int32_t alignedWidth,
+    bool ConvertToI420BySystemSwitch(uint8_t *srcDataY, uint8_t *srcDataUV, int32_t alignedWidth,
         int32_t alignedHeight, std::shared_ptr<DataBuffer> bufferOutput);
-    bool ConverToI420(uint8_t *srcDataY, uint8_t *srcDataUV, int32_t alignedWidth,
+    bool ConvertToI420(uint8_t *srcDataY, uint8_t *srcDataUV, int32_t alignedWidth,
         int32_t alignedHeight, std::shared_ptr<DataBuffer> bufferOutput);
     bool NV12ToI420RotateBySystemSwitch(ImageDataInfo dataInfo, std::vector<uint8_t> rotatedBuffer,
         int srcWidth, int srcHeight, OpenSourceLibyuv::RotationMode mode);
     bool I420CopyBySystemSwitch(ImageDataInfo srcInfo, ImageDataInfo dstInfo,
         int srcWidth, int srcHeight, int32_t normalizedAngle);
-    bool CheckParamerters(ImageDataInfo srcInfo, ImageDataInfo dstInfo);
+    bool CheckParameters(ImageDataInfo srcInfo, ImageDataInfo dstInfo);
+    OpenSourceLibyuv::RotationMode ParseAngle(int normalizedAngle);
+    bool FreeYUVBuffer(uint8_t*& dataY, uint8_t*& dataU, uint8_t*& dataV);
 
 private:
     constexpr static int32_t VIDEO_DECODER_QUEUE_MAX = 1000;

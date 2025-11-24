@@ -597,7 +597,7 @@ void DecodeDataProcess::GetDecoderOutputBuffer(const sptr<IConsumerSurface>& sur
     ReduceWaitDecodeCnt();
 }
 
-OpenSourceLibyuv::RotationMode ParseAngle(int normalizedAngle)
+OpenSourceLibyuv::RotationMode DecodeDataProcess::ParseAngle(int normalizedAngle)
 {
     switch (normalizedAngle) {
         case ROTATION_0:   return OpenSourceLibyuv::RotationMode::kRotate0;
@@ -653,7 +653,7 @@ bool DecodeDataProcess::I420CopyBySystemSwitch(ImageDataInfo srcInfo, ImageDataI
         cropWidth, cropHeight) == 0;
 }
 
-bool DecodeDataProcess::CheckParamerters(ImageDataInfo srcInfo, ImageDataInfo dstInfo)
+bool DecodeDataProcess::CheckParameters(ImageDataInfo srcInfo, ImageDataInfo dstInfo)
 {
     if (!srcInfo.dataY || !srcInfo.dataU || !dstInfo.dataY || !dstInfo.dataU || !dstInfo.dataV) {
         return false;
@@ -670,7 +670,7 @@ bool DecodeDataProcess::CheckParamerters(ImageDataInfo srcInfo, ImageDataInfo ds
 bool DecodeDataProcess::UniversalRotateCropAndPadNv12ToI420(ImageDataInfo srcInfo, ImageDataInfo dstInfo,
     int angleDegrees)
 {
-    if (!CheckParamerters(srcInfo, dstInfo)) {
+    if (!CheckParameters(srcInfo, dstInfo)) {
         return false;
     }
     const int normalizedAngle = (angleDegrees % ROTATION_360 + ROTATION_360) % ROTATION_360;
@@ -718,7 +718,24 @@ bool DecodeDataProcess::UniversalRotateCropAndPadNv12ToI420(ImageDataInfo srcInf
     return I420CopyBySystemSwitch(rotateInfo, dstInfo, srcInfo.width, srcInfo.height, normalizedAngle);
 }
 
-bool DecodeDataProcess::ConverToI420BySystemSwitch(uint8_t *srcDataY, uint8_t *srcDataUV, int32_t alignedWidth,
+bool DecodeDataProcess::FreeYUVBuffer(uint8_t*& dataY, uint8_t*& dataU, uint8_t*& dataV)
+{
+    if (dataY != nullptr) {
+        free(dataY);
+        dataY = nullptr;
+    }
+    if (dataU != nullptr) {
+        free(dataU);
+        dataU = nullptr;
+    }
+    if (dataV != nullptr) {
+        free(dataV);
+        dataV = nullptr;
+    }
+    return true;
+}
+
+bool DecodeDataProcess::ConvertToI420BySystemSwitch(uint8_t *srcDataY, uint8_t *srcDataUV, int32_t alignedWidth,
     int32_t alignedHeight, std::shared_ptr<DataBuffer> bufferOutput)
 {
     int dstSizeY = sourceConfig_.GetWidth() * sourceConfig_.GetHeight();
@@ -730,6 +747,7 @@ bool DecodeDataProcess::ConverToI420BySystemSwitch(uint8_t *srcDataY, uint8_t *s
 
     if (dstDataY == nullptr || dstDataU == nullptr || dstDataV == nullptr) {
         DHLOGE("aligned_alloc buffer failed.");
+        FreeYUVBuffer(dstDataY, dstDataU, dstDataV);
         return false;
     }
 
@@ -741,35 +759,31 @@ bool DecodeDataProcess::ConverToI420BySystemSwitch(uint8_t *srcDataY, uint8_t *s
     ImageDataInfo dstInfo = { .dataY = dstDataY, .strideY = dstStrideY, .dataU = dstDataU, .strideU = dstStrideUV,
         .dataV = dstDataV, .strideV = dstStrideUV };
     bool result = UniversalRotateCropAndPadNv12ToI420(srcInfo, dstInfo, rotate_);
-    CHECK_AND_RETURN_RET_LOG(!result, false, "Convert NV12 to I420 failed.");
+    if (!result) {
+        DHLOGE("Convert NV12 to I420 failed.");
+        FreeYUVBuffer(dstDataY, dstDataU, dstDataV);
+        return false;
+    }
     if (memcpy_s(bufferOutput->Data(), dstSizeY, dstDataY, dstSizeY) != EOK) {
         DHLOGE("memcpy_s buffer failed.");
-        free(dstDataY);
-        free(dstDataU);
-        free(dstDataV);
+        FreeYUVBuffer(dstDataY, dstDataU, dstDataV);
         return false;
     }
     if (memcpy_s(bufferOutput->Data() + dstSizeY, dstSizeUV, dstDataU, dstSizeUV) != EOK) {
         DHLOGE("memcpy_s buffer failed.");
-        free(dstDataY);
-        free(dstDataU);
-        free(dstDataV);
+        FreeYUVBuffer(dstDataY, dstDataU, dstDataV);
         return false;
     }
     if (memcpy_s(bufferOutput->Data() + dstSizeY + dstSizeUV, dstSizeUV, dstDataV, dstSizeUV) != EOK) {
         DHLOGE("memcpy_s buffer failed.");
-        free(dstDataY);
-        free(dstDataU);
-        free(dstDataV);
+        FreeYUVBuffer(dstDataY, dstDataU, dstDataV);
         return false;
     }
-    free(dstDataY);
-    free(dstDataU);
-    free(dstDataV);
+    FreeYUVBuffer(dstDataY, dstDataU, dstDataV);
     return true;
 }
 
-bool DecodeDataProcess::ConverToI420(uint8_t *srcDataY, uint8_t *srcDataUV, int32_t alignedWidth,
+bool DecodeDataProcess::ConvertToI420(uint8_t *srcDataY, uint8_t *srcDataUV, int32_t alignedWidth,
     int32_t alignedHeight, std::shared_ptr<DataBuffer> bufferOutput)
 {
     int dstSizeY = sourceConfig_.GetWidth() * sourceConfig_.GetHeight();
@@ -808,12 +822,12 @@ void DecodeDataProcess::CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int3
     std::shared_ptr<DataBuffer> bufferOutput =
         std::make_shared<DataBuffer>(dstSizeY * YUV_BYTES_PER_PIXEL / Y2UV_RATIO);
     if (targetConfig_.GetIsSystemSwitch()) {
-        if (!ConverToI420BySystemSwitch(srcDataY, srcDataUV, alignedWidth, alignedHeight, bufferOutput)) {
+        if (!ConvertToI420BySystemSwitch(srcDataY, srcDataUV, alignedWidth, alignedHeight, bufferOutput)) {
             DHLOGE("Convert NV12 to I420 by systemSwitch failed.");
             return;
         }
     } else {
-        if (!ConverToI420(srcDataY, srcDataUV, alignedWidth, alignedHeight, bufferOutput)) {
+        if (!ConvertToI420(srcDataY, srcDataUV, alignedWidth, alignedHeight, bufferOutput)) {
             return;
         }
     }

@@ -423,7 +423,7 @@ int32_t DCameraSystemSwitchItem::GetRotate()
 }
 
 IMPLEMENT_SINGLE_INSTANCE(DCameraSystemSwitchInfo);
-int32_t DCameraSystemSwitchInfo::SetSystemSwitchFlagAndRotation(std::string devId,
+int32_t DCameraSystemSwitchInfo::SetSystemSwitchFlagAndRotation(const std::string& devId,
     bool isSystemSwitch, int32_t rotation)
 {
     std::lock_guard<std::mutex> lock(mtxLock_);
