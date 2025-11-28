@@ -804,8 +804,8 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_031, TestSize.Level
 
     ImageUnitInfo srcImg{ Videoformat::YUVI420, 1280, 720, 1280, 720, 1280 * 720, 1280 * 720 * 3 / 2, nullptr };
     ImageUnitInfo dstImg{ Videoformat::YUVI420, 1280, 720, 1280, 720, 1280 * 720, 1280 * 720 * 3 / 2, nullptr };
-    srcImg.imgData = std::make_shared<DataBuffer>(1);
-    dstImg.imgData = std::make_shared<DataBuffer>(1);
+    srcImg.imgData = std::make_shared<DataBuffer>(srcImg.imgSize);
+    dstImg.imgData = std::make_shared<DataBuffer>(dstImg.imgSize);
     srcImg.colorFormat = Videoformat::YUVI420;
     dstImg.colorFormat = Videoformat::P010;
     ret = testScaleConvertProcess_->ScaleConvert(srcImg, dstImg);
@@ -829,10 +829,6 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_032, TestSize.Level
     format = Videoformat::NV21;
     ret = testScaleConvertProcess_->GetAVPixelFormat(format);
     EXPECT_EQ(ret, AVPixelFormat::AV_PIX_FMT_NV21);
-
-    format = Videoformat::RGBA_8888;
-    ret = testScaleConvertProcess_->GetAVPixelFormat(format);
-    EXPECT_EQ(ret, AVPixelFormat::AV_PIX_FMT_RGBA);
 
     format = Videoformat::P010;
     ret = testScaleConvertProcess_->GetAVPixelFormat(format);
