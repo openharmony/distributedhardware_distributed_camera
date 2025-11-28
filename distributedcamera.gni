@@ -45,6 +45,7 @@ declare_args() {
   distributed_camera_common = true
   device_security_level_camera = true
   distributed_camera_filter_front = false
+  distributed_camera_wakeup_enabled = false
 
   if (defined(global_parts_info) &&
       !defined(global_parts_info.security_device_security_level)) {

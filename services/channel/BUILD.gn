@@ -66,6 +66,10 @@ ohos_shared_library("distributed_camera_channel") {
     "LOG_DOMAIN=0xD004150",
   ]
 
+  if (distributed_camera_wakeup_enabled) {
+    cflags = [ "-DDCAMERA_WAKEUP" ]
+  }
+
   external_deps = [
     "cJSON:cjson",
     "c_utils:utils",
@@ -78,6 +82,10 @@ ohos_shared_library("distributed_camera_channel") {
     "hilog:libhilog",
     "ipc:ipc_core",
   ]
+
+  if (distributed_camera_wakeup_enabled) {
+    external_deps += [ "dsoftbus_service_ext:dsoftbus_client_plugin" ]
+  }
 
   subsystem_name = "distributedhardware"
 

@@ -30,6 +30,10 @@
 #include "dcamera_event_cmd.h"
 #include "dcamera_protocol.h"
 #include "cJSON.h"
+#ifdef DCAMERA_WAKEUP
+#include "trans_type_enhanced.h"
+#include "inner_socket.h"
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -40,6 +44,19 @@ static QosTV g_qosInfo[] = {
     { .qos = QOS_TYPE_MIN_LATENCY, .value = DCAMERA_QOS_TYPE_MIN_LATENCY}
 };
 static uint32_t g_QosTV_Param_Index = static_cast<uint32_t>(sizeof(g_qosInfo) / sizeof(QosTV));
+#ifdef DCAMERA_WAKEUP
+static TransWakeUpOnParam g_wakeUpParam = {
+    .mode = PERIODIC_WAKE_UP_MODE,
+    .level = HALF_WAKE_UP_LEVEL,
+    .isEnabled = true,
+};
+static TransWakeUpOnParam g_wakeUpDisableParam = {
+    .mode = PERIODIC_WAKE_UP_MODE,
+    .level = HALF_WAKE_UP_LEVEL,
+    .isEnabled = false,
+};
+static std::atomic<uint32_t> g_halfWakeupRef{0};
+#endif
 }
 IMPLEMENT_SINGLE_INSTANCE(DCameraSoftbusAdapter);
 // LCOV_EXCL_START
@@ -618,6 +635,14 @@ int32_t DCameraSoftbusAdapter::SinkOnBind(int32_t socket, PeerSocketInfo info)
             GetAnonyString(session->GetMyDhId()).c_str());
         DCameraAllConnectManager::SetSinkNetWorkId(info.networkId, socket);
     }
+#ifdef DCAMERA_WAKEUP
+    if (g_halfWakeupRef.fetch_add(1) == 0) {
+        ret = SetSocketOpt(socket, OPT_LEVEL_SOFTBUS, static_cast<OptType>(OPT_TYPE_FAST_WAKE_UP), &g_wakeUpParam,
+            sizeof(TransWakeUpOnParam));
+        CHECK_AND_RETURN_RET_LOG(ret != SOFTBUS_OK, ret, "SetSocketOpt failed");
+        DHLOGI("SetSocketOpt success");
+    }
+#endif
     DHLOGI("sink bind socket end, socket: %{public}d", socket);
     return ret;
 }
@@ -681,7 +706,14 @@ void DCameraSoftbusAdapter::SinkOnShutDown(int32_t socket, ShutdownReason reason
             GetAnonyString(session->GetMyDhId()).c_str());
         DCameraAllConnectManager::RemoveSinkNetworkId(socket);
     }
-
+#ifdef DCAMERA_WAKEUP
+    if (g_halfWakeupRef.fetch_sub(1) == 1) {
+        ret = SetSocketOpt(socket, OPT_LEVEL_SOFTBUS, static_cast<OptType>(OPT_TYPE_FAST_WAKE_UP),
+            &g_wakeUpDisableParam, sizeof(TransWakeUpOnParam));
+        CHECK_AND_RETURN_LOG(ret != SOFTBUS_OK, "SetSocketOpt failed");
+        DHLOGI("SetSocketOpt success");
+    }
+#endif
     DHLOGI("sink on shutdown socket end, socket: %{public}d", socket);
     return;
 }
