@@ -317,19 +317,15 @@ HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_010, Tes
         std::make_shared<DCameraStreamConfig>(TEST_WIDTH, TEST_HEIGTH, TEST_FORMAT, TEST_DATASPACE,
         DCEncodeType::ENCODE_TYPE_H264, DCStreamType::SNAPSHOT_FRAME);
 
-    DCameraSystemSwitchInfo::GetInstance().SetSystemSwitchFlagAndRotation(TEST_DEVICE_ID, true, 90);
     std::set<int32_t> streamIds;
     streamIds.insert(1);
-    WorkModeParam param(12, 120, 0, false);
-    std::vector<int32_t> streamId;
-    streamId.push_back(1);
-    int32_t ret = streamProcess->UpdateProducerWorkMode(streamId, param);
-    EXPECT_EQ(DCAMERA_OK, ret);
     streamProcess->ConfigStreams(srcConfig, streamIds);
     streamProcess->StartCapture(srcConfig, streamIds);
-    ret = streamProcess->UpdateProducerWorkMode(streamId, param);
-    EXPECT_EQ(DCAMERA_OK, ret);
-    streamProcess->StopCapture(streamIds);
+    DCameraSystemSwitchInfo::GetInstance().SetSystemSwitchFlagAndRotation(TEST_DEVICE_ID, true, 90);
+    streamProcess->CreatePipeline();
+    int32_t ret = streamProcess->GetProducerSize();
+    streamProcess->DestroyPipeline();
+    EXPECT_EQ(1, ret);
 }
 }
 }

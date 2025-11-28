@@ -107,7 +107,8 @@ class DCameraSystemSwitchInfo {
 DECLARE_SINGLE_INSTANCE(DCameraSystemSwitchInfo);
 
 public:
-    int32_t SetSystemSwitchFlagAndRotation(std::string devId, bool isSystemSwitch, int32_t rotation);
+    int32_t SetSystemSwitchFlagAndRotation(const std::string& devId, bool isSystemSwitch,
+        int32_t rotation);
     bool GetSystemSwitchFlag(std::string devId);
     int32_t GetSystemSwitchRotation(std::string devId);
 private:

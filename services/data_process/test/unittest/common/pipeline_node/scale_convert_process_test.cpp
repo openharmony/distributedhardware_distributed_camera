@@ -204,10 +204,6 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_007, TestSize.Level
     testScaleConvertProcess_->callbackPipelineSource_ = sourcePipeline;
     testScaleConvertProcess_->ProcessData(inputBuffers);
     EXPECT_EQ(rc, DCAMERA_OK);
-
-    DEST_PARAMS2.SetSystemSwitchFlagAndRotation(true, 90);
-    testScaleConvertProcess_->ProcessData(inputBuffers);
-    EXPECT_EQ(rc, DCAMERA_OK);
 }
 
 /**
@@ -841,6 +837,41 @@ HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_032, TestSize.Level
     format = Videoformat::YUVI420;
     ret = testScaleConvertProcess_->GetAVPixelFormat(format);
     EXPECT_EQ(ret, AVPixelFormat::AV_PIX_FMT_YUV420P);
+}
+
+/**
+ * @tc.name: scale_convert_process_test_033
+ * @tc.desc: Verify scale convert process ProcessData normal.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(ScaleConvertProcessTest, scale_convert_process_test_033, TestSize.Level1)
+{
+    DHLOGI("ScaleConvertProcessTest scale_convert_process_test_033.");
+    EXPECT_NE(nullptr, testScaleConvertProcess_);
+    int32_t rc = testScaleConvertProcess_->InitNode(SRC_PARAMS1, DEST_PARAMS2, PROC_CONFIG);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    size_t capacity = 3200000;
+    int64_t timeStamp = 10;
+    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
+    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
+    db->SetInt64("timeUs", timeStamp);
+    db->SetInt32("Videoformat", static_cast<int32_t>(Videoformat::NV12));
+    db->SetInt32("alignedWidth", TEST_WIDTH);
+    db->SetInt32("alignedHeight", TEST_HEIGTH);
+    db->SetInt32("width", TEST_WIDTH);
+    db->SetInt32("height", TEST_HEIGTH);
+    inputBuffers.push_back(db);
+    std::shared_ptr<DCameraPipelineSource> sourcePipeline = std::make_shared<DCameraPipelineSource>();
+    testScaleConvertProcess_->callbackPipelineSource_ = sourcePipeline;
+    DEST_PARAMS2.SetSystemSwitchFlagAndRotation(true, 90);
+    testScaleConvertProcess_->ProcessData(inputBuffers);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    DEST_PARAMS2.SetSystemSwitchFlagAndRotation(false, 90);
+    testScaleConvertProcess_->ProcessData(inputBuffers);
+    EXPECT_EQ(rc, DCAMERA_OK);
 }
 #endif
 } // namespace DistributedHardware
