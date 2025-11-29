@@ -799,8 +799,8 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_024, TestSize.Level1)
 
     int srcWidth = TEST_WIDTH;
     int srcHeight = TEST_HEIGTH;
-    int rotatedWidth = TEST_HEIGTH;
-    int rotatedHeight = TEST_WIDTH;
+    int rotatedWidth = TEST_WIDTH;
+    int rotatedHeight = TEST_HEIGTH;
     int normalizedAngle = 90;
     ImageDataInfo rotateInfo = { .width = rotatedWidth, .height = rotatedHeight, .dataY = rotatedY,
         .strideY = rotatedStrideY, .dataU = rotatedU, .strideU = rotatedStrideU, .dataV = rotatedV,
