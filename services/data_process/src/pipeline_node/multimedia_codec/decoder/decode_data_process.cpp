@@ -636,10 +636,10 @@ bool DecodeDataProcess::I420CopyBySystemSwitch(ImageDataInfo srcInfo, ImageDataI
         cropX = 0;
         cropY = 0;
     }
-    cropX = cropX & ~1;
-    cropY = cropY & ~1;
-    pasteX = pasteX & ~1;
-    pasteY = pasteY & ~1;
+    cropX = static_cast<uint32_t>(cropX) & ~1;
+    cropY = static_cast<uint32_t>(cropY) & ~1;
+    pasteX = static_cast<uint32_t>(pasteX) & ~1;
+    pasteY = static_cast<uint32_t>(pasteY) & ~1;
     uint8_t* srcDataY = srcInfo.dataY + cropY * srcInfo.strideY + cropX;
     uint8_t* srcDataU = srcInfo.dataU + (cropY / Y2UV_RATIO) * srcInfo.strideU + (cropX / Y2UV_RATIO);
     uint8_t* srcDataV = srcInfo.dataV + (cropY / Y2UV_RATIO) * srcInfo.strideV + (cropX / Y2UV_RATIO);
