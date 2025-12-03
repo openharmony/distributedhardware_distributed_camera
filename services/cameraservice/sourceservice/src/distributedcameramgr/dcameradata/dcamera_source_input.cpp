@@ -268,8 +268,8 @@ int32_t DCameraSourceInput::CloseChannel()
     DHLOGI("DCameraSourceInput CloseChannel devId %{public}s dhId %{public}s continue state: %{public}d, "
         "snapshot state: %{public}d", GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(),
         channelState_[CONTINUOUS_FRAME], channelState_[SNAPSHOT_FRAME]);
-    if (channelState_[CONTINUOUS_FRAME] != DCAMERA_CHANNEL_STATE_DISCONNECTED) {
-        int32_t ret = DCAMERA_OK;
+    int32_t ret = DCAMERA_OK;
+    if (channels_[CONTINUOUS_FRAME] != nullptr) {
         ret = channels_[CONTINUOUS_FRAME]->CloseSession();
         if (ret != DCAMERA_OK) {
             DHLOGE("DCameraSourceInput CloseChannel continue stream failed ret: %{public}d, devId: %{public}s, dhId: "
@@ -284,8 +284,7 @@ int32_t DCameraSourceInput::CloseChannel()
         }
     }
 
-    if (channelState_[SNAPSHOT_FRAME] != DCAMERA_CHANNEL_STATE_DISCONNECTED) {
-        int32_t ret = DCAMERA_OK;
+    if (channels_[SNAPSHOT_FRAME] != nullptr) {
         ret = channels_[SNAPSHOT_FRAME]->CloseSession();
         if (ret != DCAMERA_OK) {
             DHLOGE("DCameraSourceInput CloseChannel snapshot stream failed ret: %{public}d, devId: %{public}s, dhId: "
@@ -299,7 +298,7 @@ int32_t DCameraSourceInput::CloseChannel()
                 ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         }
     }
-    return DCAMERA_OK;
+    return ret;
 }
 
 int32_t DCameraSourceInput::Init()
