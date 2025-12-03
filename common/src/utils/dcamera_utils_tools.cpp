@@ -206,7 +206,7 @@ void DumpBufferToFile(const std::string& dumpPath, const std::string& fileName, 
         DHLOGE("The file path is invalid.");
         return;
     }
-    CHECK_AND_RETURN_LOG(path != DUMP_PATH || path != DUMP_PHOTO_PATH, "The file path is invalid.");
+    CHECK_AND_RETURN_LOG(path != DUMP_PATH && path != DUMP_PHOTO_PATH, "The file path is invalid.");
     std::string name = "/" + fileName;
     std::string file = path + name;
     std::ofstream ofs(file.c_str(), std::ios::binary | std::ios::out | std::ios::app);
@@ -230,7 +230,7 @@ int32_t IsUnderDumpMaxSize(const std::string& dumpPath, const std::string& fileN
         DHLOGE("The file path is invalid.");
         return DCAMERA_INIT_ERR;
     }
-    CHECK_AND_RETURN_RET_LOG(path != DUMP_PATH || path != DUMP_PHOTO_PATH,
+    CHECK_AND_RETURN_RET_LOG(path != DUMP_PATH && path != DUMP_PHOTO_PATH,
         DCAMERA_INIT_ERR, "The file path is invalid.");
     std::string name = "/" + fileName;
     std::string file = path + name;
@@ -366,7 +366,7 @@ void DumpFileUtil::CloseDumpFile(FILE **dumpFile)
 void DumpFileUtil::ChangeDumpFileState(std::string para, FILE **dumpFile, std::string filePath)
 {
     CHECK_AND_RETURN_LOG(*dumpFile == nullptr, "Invalid file para");
-    CHECK_AND_RETURN_LOG(g_lastPara[para] != "w" || g_lastPara[para] != "a", "Invalid input para");
+    CHECK_AND_RETURN_LOG(g_lastPara[para] != "w" && g_lastPara[para] != "a", "Invalid input para");
     std::string dumpPara;
     bool res = GetSysPara(para.c_str(), dumpPara);
     if (!res || dumpPara.empty()) {

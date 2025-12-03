@@ -503,11 +503,12 @@ int32_t DCameraClient::ConfigCaptureSessionInner()
                GetAnonyString(cameraId_).c_str(), ret);
     }
 
-    if (fpsRanges_.size() == DCAMERA_FPS_SIZE && fpsRanges_[0] <= DCAMERA_MAX_FPS && fpsRanges_[1] <= DCAMERA_MAX_FPS) {
+    if (previewOutput_ != nullptr && fpsRanges_.size() == DCAMERA_FPS_SIZE && fpsRanges_[0] > 0 && fpsRanges_[1] > 0) {
+        fpsRanges_[0] = (fpsRanges_[0] <= DCAMERA_MAX_FPS) ? fpsRanges_[0] : DCAMERA_MAX_FPS;
+        fpsRanges_[1] = (fpsRanges_[1] <= DCAMERA_MAX_FPS) ? fpsRanges_[1] : DCAMERA_MAX_FPS;
         ret = ((sptr<CameraStandard::PreviewOutput> &)previewOutput_)->SetFrameRate(fpsRanges_[0], fpsRanges_[1]);
         if (ret != DCAMERA_OK) {
-            DHLOGE("ConfigCaptureSession %{public}s set frame rate failed, ret: %{public}d",
-                GetAnonyString(cameraId_).c_str(), ret);
+            DHLOGE("ConfigCaptureSession set frame rate failed, ret: %{public}d", ret);
         }
         DHLOGI("SetFrameRate minfps: %{public}d, maxfps: %{public}d", fpsRanges_[0], fpsRanges_[1]);
     }
