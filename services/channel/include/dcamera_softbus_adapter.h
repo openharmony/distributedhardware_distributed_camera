@@ -91,6 +91,9 @@ private:
     std::map<std::string, uint32_t> sessionTotal_;
     static const uint32_t DCAMERA_LINK_TYPE_MAX = 4;
     static const uint32_t DCAMERA_LINK_TYPE_INDEX_2 = 2;
+    static const uint32_t AVCODEC_BUFFER_FLAG_NONE = 0;
+    static const uint32_t SOFTBUS_VIDEO_I_FRAME = 1;
+    static const uint32_t SOFTBUS_VIDEO_P_FRAME = 2;
 
     int32_t sourceSocketId_ = -1;
     std::map<DCameraSessionMode, TransDataType> sessionModeAndDataTypeMap_;

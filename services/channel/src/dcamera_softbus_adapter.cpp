@@ -343,14 +343,18 @@ int32_t DCameraSoftbusAdapter::SendSofbusStream(int32_t socket, std::shared_ptr<
     sinkFrameInfo.sendT_ = GetNowTimeStampUs();
     sinkFrameInfo.rawTime_ = std::to_string(timeStamp);
     sinkFrameInfo.Marshal(jsonStr);
-    DHLOGD("send videoPts=%{public}s to softbus", sinkFrameInfo.rawTime_.c_str());
+    DHLOGI("send videoPts=%{public}s to softbus,frameType:%{public}d", sinkFrameInfo.rawTime_.c_str(), frameType);
     StreamData ext = { const_cast<char *>(jsonStr.c_str()), jsonStr.length() };
     StreamFrameInfo param = { 0 };
+    param.frameType = (frameType == AVCODEC_BUFFER_FLAG_NONE) ? SOFTBUS_VIDEO_P_FRAME : SOFTBUS_VIDEO_I_FRAME;
+    param.seqNum = index;
     int32_t ret = SendStream(socket, &streamData, &ext, &param);
     if (ret != SOFTBUS_OK) {
         DHLOGD("SendSofbusStream failed, ret is %{public}d", ret);
         return DCAMERA_BAD_VALUE;
     }
+    DHLOGI("send videoPts=%{public}s success,frameType:%{public}d,seqNum:%{public}d",
+        sinkFrameInfo.rawTime_.c_str(), frameType, index);
     return DCAMERA_OK;
 }
 
@@ -521,7 +525,7 @@ int32_t DCameraSoftbusAdapter::HandleSourceStreamExt(std::shared_ptr<DataBuffer>
             frameInfo.rawTime = raw_time_val;
         }
     }
-    DHLOGD("get videoPts=%{public}" PRId64 " from softbus", frameInfo.rawTime);
+    DHLOGI("get videoPts=%{public}" PRId64 " from softbus", frameInfo.rawTime);
     frameInfo.timePonit.startEncode = sinkFrameInfo.startEncodeT_;
     frameInfo.timePonit.finishEncode = sinkFrameInfo.finishEncodeT_;
     frameInfo.timePonit.send = sinkFrameInfo.sendT_;

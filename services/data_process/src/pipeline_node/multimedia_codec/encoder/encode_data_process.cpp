@@ -29,17 +29,17 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-const std::map<int64_t, int32_t> EncodeDataProcess::ENCODER_BITRATE_TABLE = {
-    std::map<int64_t, int32_t>::value_type(WIDTH_320_HEIGHT_240, BITRATE_500000),
-    std::map<int64_t, int32_t>::value_type(WIDTH_480_HEIGHT_360, BITRATE_1110000),
-    std::map<int64_t, int32_t>::value_type(WIDTH_640_HEIGHT_360, BITRATE_1500000),
-    std::map<int64_t, int32_t>::value_type(WIDTH_640_HEIGHT_480, BITRATE_1800000),
-    std::map<int64_t, int32_t>::value_type(WIDTH_720_HEIGHT_540, BITRATE_2100000),
-    std::map<int64_t, int32_t>::value_type(WIDTH_960_HEIGHT_540, BITRATE_2300000),
-    std::map<int64_t, int32_t>::value_type(WIDTH_960_HEIGHT_720, BITRATE_2800000),
-    std::map<int64_t, int32_t>::value_type(WIDTH_1280_HEIGHT_720, BITRATE_3400000),
-    std::map<int64_t, int32_t>::value_type(WIDTH_1440_HEIGHT_1080, BITRATE_5000000),
-    std::map<int64_t, int32_t>::value_type(WIDTH_1920_HEIGHT_1080, BITRATE_6000000),
+const std::map<int64_t, int64_t> EncodeDataProcess::ENCODER_BITRATE_TABLE = {
+    std::map<int64_t, int64_t>::value_type(WIDTH_320_HEIGHT_240, BITRATE_500000),
+    std::map<int64_t, int64_t>::value_type(WIDTH_480_HEIGHT_360, BITRATE_1110000),
+    std::map<int64_t, int64_t>::value_type(WIDTH_640_HEIGHT_360, BITRATE_1500000),
+    std::map<int64_t, int64_t>::value_type(WIDTH_640_HEIGHT_480, BITRATE_1800000),
+    std::map<int64_t, int64_t>::value_type(WIDTH_720_HEIGHT_540, BITRATE_2100000),
+    std::map<int64_t, int64_t>::value_type(WIDTH_960_HEIGHT_540, BITRATE_2300000),
+    std::map<int64_t, int64_t>::value_type(WIDTH_960_HEIGHT_720, BITRATE_2800000),
+    std::map<int64_t, int64_t>::value_type(WIDTH_1280_HEIGHT_720, BITRATE_3400000),
+    std::map<int64_t, int64_t>::value_type(WIDTH_1440_HEIGHT_1080, BITRATE_5000000),
+    std::map<int64_t, int64_t>::value_type(WIDTH_1920_HEIGHT_1080, BITRATE_6000000),
 };
 const std::string ENUM_VIDEOFORMAT_STRINGS[] = {
     "YUVI420", "NV12", "NV21", "RGBA_8888"
@@ -227,7 +227,7 @@ int32_t EncodeDataProcess::InitEncoderBitrateFormat()
     CHECK_AND_RETURN_RET_LOG(ENCODER_BITRATE_TABLE.empty(), DCAMERA_OK, "%{public}s",
         "ENCODER_BITRATE_TABLE is null, use the default bitrate of the encoder.");
     int64_t pixelformat = static_cast<int64_t>(sourceConfig_.GetWidth() * sourceConfig_.GetHeight());
-    int32_t matchedBitrate = BITRATE_6000000;
+    int64_t matchedBitrate = BITRATE_6000000;
     int64_t minPixelformatDiff = WIDTH_1920_HEIGHT_1080 - pixelformat;
     for (auto it = ENCODER_BITRATE_TABLE.begin(); it != ENCODER_BITRATE_TABLE.end(); it++) {
         int64_t pixelformatDiff = abs(pixelformat - it->first);
@@ -240,9 +240,9 @@ int32_t EncodeDataProcess::InitEncoderBitrateFormat()
             matchedBitrate = it->second;
         }
     }
-    DHLOGD("Source config: width : %{public}d, height : %{public}d, matched bitrate %{public}d.",
+    DHLOGD("Source config: width : %{public}d, height : %{public}d, matched bitrate %{public}" PRId64,
         sourceConfig_.GetWidth(), sourceConfig_.GetHeight(), matchedBitrate);
-    metadataFormat_.PutIntValue("bitrate", matchedBitrate);
+    metadataFormat_.PutLongValue("bitrate", matchedBitrate);
     return DCAMERA_OK;
 }
 
@@ -496,7 +496,7 @@ int32_t EncodeDataProcess::GetEncoderOutputBuffer(uint32_t index, MediaAVCodec::
         buffer->GetBase(), outputMemoDataSize);
     CHECK_AND_RETURN_RET_LOG(err != EOK, DCAMERA_MEMORY_OPT_ERROR, "%{public}s", "memcpy_s buffer failed.");
     int64_t timeStamp = info.presentationTimeUs;
-    DHLOGD("get videoPts=%{public}" PRId64" from encoder", timeStamp);
+    DHLOGI("get videoPts=%{public}" PRId64" from encoder", timeStamp);
     struct timespec time = {0, 0};
     clock_gettime(CLOCK_REALTIME, &time);
     int64_t timeNs = static_cast<int64_t>(time.tv_sec) * S2NS + static_cast<int64_t>(time.tv_nsec);
