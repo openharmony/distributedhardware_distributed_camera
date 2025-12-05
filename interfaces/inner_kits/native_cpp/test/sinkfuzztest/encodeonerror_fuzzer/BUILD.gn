@@ -1,0 +1,85 @@
+# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#####################hydra-fuzz###################
+import("//build/config/features.gni")
+import("//build/test.gni")
+import(
+    "//foundation/distributedhardware/distributed_camera/distributedcamera.gni")
+
+##############################fuzztest##########################################
+ohos_fuzztest("EncodeOnErrorFuzzTest") {
+  module_out_path = "${fuzz_test_output_path}/encodeonerror"
+
+  fuzz_config_file = "${innerkits_path}/native_cpp/test/sinkfuzztest/encodeonerror_fuzzer"
+
+  include_dirs = [ "${services_path}/cameraservice/base/include" ]
+
+  include_dirs += [
+    "${services_path}/data_process/include/interfaces",
+    "${services_path}/data_process/include/eventbus",
+    "${services_path}/data_process/include/pipeline",
+    "${services_path}/data_process/include/utils",
+    "${services_path}/data_process/include/pipeline_node/multimedia_codec/decoder",
+    "${services_path}/data_process/include/pipeline_node/multimedia_codec/encoder",
+    "${services_path}/data_process/include/pipeline_node/fpscontroller",
+    "${services_path}/data_process/include/pipeline_node/scale_conversion",
+    "${common_path}/include/constants",
+    "${common_path}/include/utils",
+    "${feeding_smoother_path}/base",
+    "${feeding_smoother_path}/derived",
+    "${feeding_smoother_path}/utils",
+    "${innerkits_path}/native_cpp/camera_source/include",
+  ]
+
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+
+  sources = [ "encodeonerror_fuzzer.cpp" ]
+
+  deps = [
+    "${common_path}:distributed_camera_utils",
+    "${services_path}/data_process:distributed_camera_data_process",
+  ]
+
+  defines = [
+    "HI_LOG_ENABLE",
+    "DH_LOG_TAG=\"EncodeOnErrorFuzzTest\"",
+    "LOG_DOMAIN=0xD004150",
+  ]
+
+  external_deps = [
+    "av_codec:av_codec_client",
+    "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
+    "drivers_interface_display:libdisplay_composer_hdi_impl_1.3",
+    "drivers_interface_display:libdisplay_composer_proxy_1.0",
+    "eventhandler:libeventhandler",
+    "graphic_surface:surface",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "ipc:ipc_single",
+    "media_foundation:media_foundation",
+  ]
+}
+
+###############################################################################
+group("fuzztest") {
+  testonly = true
+  deps = [ ":EncodeOnErrorFuzzTest" ]
+}
+###############################################################################
