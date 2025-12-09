@@ -83,10 +83,6 @@ ohos_shared_library("distributed_camera_channel") {
     "ipc:ipc_core",
   ]
 
-  if (distributed_camera_wakeup_enabled) {
-    external_deps += [ "dsoftbus_service_ext:dsoftbus_client_plugin" ]
-  }
-
   subsystem_name = "distributedhardware"
 
   part_name = "distributed_camera"

@@ -31,7 +31,7 @@
 #include "dcamera_protocol.h"
 #include "cJSON.h"
 #ifdef DCAMERA_WAKEUP
-#include "trans_type_enhanced.h"
+#include "softbus_def.h"
 #include "inner_socket.h"
 #endif
 
@@ -56,6 +56,7 @@ static TransWakeUpOnParam g_wakeUpDisableParam = {
     .isEnabled = false,
 };
 static std::atomic<uint32_t> g_halfWakeupRef{0};
+static const int32_t DCAMERA_OPT_TYPE_FAST_WAKE_UP = 10010;
 #endif
 }
 IMPLEMENT_SINGLE_INSTANCE(DCameraSoftbusAdapter);
@@ -637,8 +638,8 @@ int32_t DCameraSoftbusAdapter::SinkOnBind(int32_t socket, PeerSocketInfo info)
     }
 #ifdef DCAMERA_WAKEUP
     if (g_halfWakeupRef.fetch_add(1) == 0) {
-        ret = SetSocketOpt(socket, OPT_LEVEL_SOFTBUS, static_cast<OptType>(OPT_TYPE_FAST_WAKE_UP), &g_wakeUpParam,
-            sizeof(TransWakeUpOnParam));
+        ret = SetSocketOpt(socket, OPT_LEVEL_SOFTBUS, static_cast<OptType>(DCAMERA_OPT_TYPE_FAST_WAKE_UP),
+            &g_wakeUpParam, sizeof(TransWakeUpOnParam));
         CHECK_AND_RETURN_RET_LOG(ret != SOFTBUS_OK, ret, "SetSocketOpt failed");
         DHLOGI("SetSocketOpt success");
     }
@@ -708,7 +709,7 @@ void DCameraSoftbusAdapter::SinkOnShutDown(int32_t socket, ShutdownReason reason
     }
 #ifdef DCAMERA_WAKEUP
     if (g_halfWakeupRef.fetch_sub(1) == 1) {
-        ret = SetSocketOpt(socket, OPT_LEVEL_SOFTBUS, static_cast<OptType>(OPT_TYPE_FAST_WAKE_UP),
+        ret = SetSocketOpt(socket, OPT_LEVEL_SOFTBUS, static_cast<OptType>(DCAMERA_OPT_TYPE_FAST_WAKE_UP),
             &g_wakeUpDisableParam, sizeof(TransWakeUpOnParam));
         CHECK_AND_RETURN_LOG(ret != SOFTBUS_OK, "SetSocketOpt failed");
         DHLOGI("SetSocketOpt success");
