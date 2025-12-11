@@ -77,7 +77,7 @@ private:
 private:
     constexpr static uint32_t DCAMERA_MAX_METADATA_SIZE = 20;
     constexpr static uint32_t DCAMERA_FPS_SIZE = 2;
-    constexpr static uint32_t DCAMERA_MAX_FPS = 30;
+    constexpr static int32_t DCAMERA_MAX_FPS = 30;
 
     bool isInit_;
     std::string cameraId_;
