@@ -328,8 +328,6 @@ void DCameraStreamDataProcessProducer::WritePtsAndAddBuffer(const std::shared_pt
 
         ret = syncMem_->MapReadAndWriteAshmem();
         CHECK_AND_RETURN_LOG(!ret, "SyncVideoFrame: MapReadAndWriteAshmem failed");
-    } else {
-        DHLOGI("SyncVideoFrame: syncMem_ is already init");
     }
     auto syncData = syncMem_->ReadFromAshmem(workModeParam_.sharedMemLen, 0);
     SyncSharedData *readSyncSharedData = reinterpret_cast<SyncSharedData *>(const_cast<void *>(syncData));
@@ -340,7 +338,7 @@ void DCameraStreamDataProcessProducer::WritePtsAndAddBuffer(const std::shared_pt
         syncData = syncMem_->ReadFromAshmem(workModeParam_.sharedMemLen, 0);
         readSyncSharedData = reinterpret_cast<SyncSharedData *>(const_cast<void *>(syncData));
     }
-    DHLOGI("readSyncSharedData->lock is true");
+
     readSyncSharedData->lock = 0;
     ret = syncMem_->WriteToAshmem(static_cast<void *>(readSyncSharedData), sizeof(SyncSharedData), 0);
     CHECK_AND_RETURN_LOG(!ret, "write sync data failed!");
@@ -391,7 +389,6 @@ void DCameraStreamDataProcessProducer::SyncVideoThread()
         int32_t syncResult = SyncVideoFrame(videoPtsUs);
         if (syncResult == 1) {
             // Synchronization successful, sending video frame
-            DHLOGI("Video frame in sync range, sending...");
             DHBase dhBase;
             dhBase.deviceId_ = devId_;
             dhBase.dhId_ = dhId_;
@@ -401,13 +398,11 @@ void DCameraStreamDataProcessProducer::SyncVideoThread()
                 DHLOGE("FeedStreamToDriver failed, ret: %{public}d, streamId: %{public}d", ret, streamId_);
             } else {
                 // FeedStreamToDriver success video_update_clock
-                DHLOGI("FeedStreamToDriver success, streamId: %{public}d", streamId_);
                 UpdateVideoClock(videoPtsUs);
             }
             nextScheduleTime += FRAME_INTERVAL; // Perform timed scheduling after successful transmission
             std::this_thread::sleep_until(nextScheduleTime);
         } else if (syncResult == 0) {
-            DHLOGI("Video frame too early, rescheduling for next cycle...");
             {
                 std::lock_guard<std::mutex> lock(syncBufferMutex_);
                 syncBufferQueue_.push_front(buffer);
@@ -418,7 +413,6 @@ void DCameraStreamDataProcessProducer::SyncVideoThread()
             std::this_thread::sleep_until(nextScheduleTime);
         } else {
             // Video frame is too late, discard directly and process next frame immediately
-            DHLOGI("Video frame too late, dropped...");
             continue;
         }
     }
@@ -480,10 +474,11 @@ int32_t DCameraStreamDataProcessProducer::SyncVideoFrame(uint64_t videoPtsUs)
            videoPts, estimatedPts, diff);
 
     if (diff > DCAMERA_TIME_DIFF_MAX) {
-        DHLOGI("SyncVideoFrame::late (diff=%{public}" PRId64 "ms, videoPts=%{public}" PRId64 "ms), skip this frame.",
-            diff, videoPts);
+        int32_t queueSize = static_cast<int32_t>(syncBufferQueue_.size());
+        DHLOGI("SyncVideoFrame::late (diff=%{public}" PRId64 "ms, videoPts=%{public}" PRId64
+            "ms, queueSize:%{public}d), skip this frame.", diff, videoPts, queueSize);
         // Drop if there is still data in the queue, play the last frame directly
-        return (syncBufferQueue_.size() > 0) ? -1 : 1;
+        return (queueSize > 0) ? -1 : 1;
     } else if (diff < DCAMERA_TIME_DIFF_MIN) {
         DHLOGI("SyncVideoFrame::early (diff=%{public}" PRId64 "ms, videoPts=%{public}" PRId64 "ms),"
             " wait for next scheduling.", diff, videoPts);

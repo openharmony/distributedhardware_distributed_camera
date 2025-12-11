@@ -93,7 +93,7 @@ private:
     constexpr static int32_t MIN_VIDEO_HEIGHT = 240;
     constexpr static int32_t MAX_VIDEO_WIDTH = 1920;
     constexpr static int32_t MAX_VIDEO_HEIGHT = 1080;
-    constexpr static int32_t IDR_FRAME_INTERVAL_MS = 8000;
+    constexpr static int32_t IDR_FRAME_INTERVAL_MS = 2000;
     constexpr static int32_t FIRST_FRAME_OUTPUT_NUM = 2;
     const int32_t DATABUFF_MAX_SIZE = 100 * 1024 * 1024;
 
@@ -107,17 +107,17 @@ private:
     constexpr static int64_t WIDTH_1280_HEIGHT_720 = 1280 * 720;
     constexpr static int64_t WIDTH_1440_HEIGHT_1080 = 1440 * 1080;
     constexpr static int64_t WIDTH_1920_HEIGHT_1080 = 1920 * 1080;
-    constexpr static int32_t BITRATE_500000 = 500000;
-    constexpr static int32_t BITRATE_1110000 = 1110000;
-    constexpr static int32_t BITRATE_1500000 = 1500000;
-    constexpr static int32_t BITRATE_1800000 = 1800000;
-    constexpr static int32_t BITRATE_2100000 = 2100000;
-    constexpr static int32_t BITRATE_2300000 = 2300000;
-    constexpr static int32_t BITRATE_2800000 = 2800000;
-    constexpr static int32_t BITRATE_3400000 = 3400000;
-    constexpr static int32_t BITRATE_5000000 = 5000000;
-    constexpr static int32_t BITRATE_6000000 = 6000000;
-    const static std::map<std::int64_t, int32_t> ENCODER_BITRATE_TABLE;
+    constexpr static int64_t BITRATE_500000 = 500000;
+    constexpr static int64_t BITRATE_1110000 = 1110000;
+    constexpr static int64_t BITRATE_1500000 = 1500000;
+    constexpr static int64_t BITRATE_1800000 = 1800000;
+    constexpr static int64_t BITRATE_2100000 = 2100000;
+    constexpr static int64_t BITRATE_2300000 = 2300000;
+    constexpr static int64_t BITRATE_2800000 = 2800000;
+    constexpr static int64_t BITRATE_3400000 = 3400000;
+    constexpr static int64_t BITRATE_5000000 = 5000000;
+    constexpr static int64_t BITRATE_6000000 = 6000000;
+    const static std::map<std::int64_t, int64_t> ENCODER_BITRATE_TABLE;
     constexpr static uint64_t S2NS = 1000000000;
     constexpr static uint32_t US2NS = 1000;
     constexpr static std::chrono::seconds TIMEOUT_3_SEC = std::chrono::seconds(3);
