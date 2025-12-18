@@ -64,6 +64,11 @@ void DCameraPhotoCallback::OnOfflineDeliveryFinished(const int32_t captureId) co
     DHLOGI("enter, captureId: %{public}d", captureId);
 }
 
+void DCameraPhotoCallback::OnConstellationDrawingState(const int32_t drawingState) const
+{
+    DHLOGI("enter, drawingState: %{public}d", drawingState);
+}
+
 void DCameraPhotoCallback::OnCaptureError(const int32_t captureId, const int32_t errorCode) const
 {
     DHLOGE("enter, captureId: %{public}d, errorCode: %{public}d", captureId, errorCode);
