@@ -25,7 +25,6 @@
 #include "dcamera_metadata_setting_cmd.h"
 #include "dcamera_protocol.h"
 #include "dcamera_utils_tools.h"
-#include "dcamera_hisysevent_adapter.h"
 
 #include "dcamera_sink_access_control.h"
 #include "dcamera_sink_controller_channel_listener.h"
@@ -746,7 +745,6 @@ int32_t DCameraSinkController::HandleReceivedData(std::shared_ptr<DataBuffer>& d
     }
     std::string command = std::string(comvalue->valuestring);
     cJSON_Delete(rootValue);
-
     if ((!command.empty()) && (command.compare(DCAMERA_PROTOCOL_CMD_CAPTURE) == 0)) {
         DCameraCaptureInfoCmd captureInfoCmd;
         int32_t ret = captureInfoCmd.Unmarshal(jsonStr);
@@ -985,5 +983,6 @@ void DCameraSinkController::HandleCaptureError(int32_t errorCode, const std::str
             break;
     }
 }
+
 } // namespace DistributedHardware
 } // namespace OHOS
