@@ -34,7 +34,6 @@ namespace OHOS {
 namespace DistributedHardware {
 constexpr uint32_t EVENT_FRAME_TRIGGER = 1;
 constexpr uint32_t EVENT_AUTHORIZATION = 2;
-constexpr int32_t HEARTBEAT_TIMEOUT_MS = 5000;
 enum DcameraBusinessState : int32_t {
     UNKNOWN,
     IDLE,
@@ -83,8 +82,6 @@ public:
         private:
             std::weak_ptr<DCameraSinkController> sinkContrWPtr_;
     };
-    void StartHeartbeatMonitor();
-    void StopHeartbeatMonitor();
 
 private:
     int32_t StartCaptureInner(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos);
@@ -100,9 +97,6 @@ private:
     int32_t CreateCtrlSession();
     int32_t CheckSensitive();
     bool CheckAclRight();
-    void MonitorHeartbeatLoop();
-    void HandleHeartbeatTimeout();
-    int32_t HandleHeartbeatCommand(const std::string& dhId);
     class DCameraSurfaceHolder {
     public:
         DCameraSurfaceHolder(int32_t r, sptr<Surface> s) : result(r), surface(s) {}
@@ -156,11 +150,6 @@ private:
     std::mutex captureStateMutex_;
     std::condition_variable captureStateCv_;
     DcameraCaptureState captureState_ {CAPTURE_IDLE};
-    std::atomic<int64_t> lastHeartbeatTime_{0};
-    std::shared_ptr<std::thread> heartbeatMonitorThread_;
-    std::atomic<bool> isHeartbeatMonitoring_{false};
-    std::atomic<bool> isHeartbeatEnabled_{false};
-    std::mutex heartbeatMutex_;
 };
 
 class DeviceInitCallback : public DmInitCallback {
