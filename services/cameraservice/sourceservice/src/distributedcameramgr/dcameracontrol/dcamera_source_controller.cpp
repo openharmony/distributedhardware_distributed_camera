@@ -17,9 +17,6 @@
 
 #include <securec.h>
 #include <cstdlib>
-#include <thread>
-#include <chrono>
-#include "ffrt_inner.h"
 #include "iservice_registry.h"
 #include "iservmgr_hdi.h"
 #include "iproxy_broker.h"
@@ -46,7 +43,6 @@
 #include "ohos_account_kits.h"
 #include "os_account_manager.h"
 #endif
-#include <sys/prctl.h>
 
 namespace OHOS {
 namespace DistributedHardware {

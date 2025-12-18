@@ -14,7 +14,6 @@
  */
 
 #include <gtest/gtest.h>
-#include <gmock/gmock.h>
 #define private public
 #include "dcamera_source_controller.h"
 #undef private
@@ -24,7 +23,6 @@
 #include "dcamera_source_state.h"
 #include "dcamera_utils_tools.h"
 #include "mock_camera_channel.h"
-#include "mock_dcamera_channel_gmock.h"
 #include "distributed_hardware_log.h"
 #include "icamera_state_listener.h"
 #include "dcamera_source_controller_channel_listener.h"
@@ -97,7 +95,6 @@ public:
     std::shared_ptr<DCameraSourceStateMachine> stateMachine_;
     std::shared_ptr<DCameraSourceController> controller_;
     std::vector<DCameraIndex> indexs_;
-    std::shared_ptr<MockCameraChannelGMock> gmockChannel_;
 };
 
 namespace {

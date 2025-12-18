@@ -98,7 +98,6 @@ ohos_unittest("DCameraSourceMgrTest") {
     "hilog:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
-    "googletest:gmock",
   ]
 
   defines = [
