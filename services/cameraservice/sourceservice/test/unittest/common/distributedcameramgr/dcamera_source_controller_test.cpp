@@ -14,6 +14,7 @@
  */
 
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #define private public
 #include "dcamera_source_controller.h"
 #undef private
@@ -23,6 +24,7 @@
 #include "dcamera_source_state.h"
 #include "dcamera_utils_tools.h"
 #include "mock_camera_channel.h"
+#include "mock_dcamera_channel_gmock.h"
 #include "distributed_hardware_log.h"
 #include "icamera_state_listener.h"
 #include "dcamera_source_controller_channel_listener.h"
@@ -95,6 +97,7 @@ public:
     std::shared_ptr<DCameraSourceStateMachine> stateMachine_;
     std::shared_ptr<DCameraSourceController> controller_;
     std::vector<DCameraIndex> indexs_;
+    std::shared_ptr<MockCameraChannelGMock> gmockChannel_;
 };
 
 namespace {
@@ -127,6 +130,7 @@ void DCameraSourceControllerTest::SetUp(void)
     controller_ = std::make_shared<DCameraSourceController>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, stateMachine_,
         camDev_);
     controller_->channel_ = std::make_shared<MockCameraChannel>();
+    gmockChannel_ = std::make_shared<MockCameraChannelGMock>();
     DCameraIndex index;
     index.devId_ = TEST_DEVICE_ID;
     index.dhId_ = TEST_CAMERA_DH_ID_0;
@@ -800,5 +804,52 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_024, TestSi
     result = controller_->ParseValueFromCjson(jsonStr, key);
     EXPECT_EQ(result, DCAMERA_BAD_VALUE);
 }
+/**
+ * @tc.name: dcamera_source_controller_test_025
+ * @tc.desc: Verify source controller DCameraNotify when eventResult is DCAMERA_EVENT_DEVICE_IN_USE
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MV
+ */
+HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_025, TestSize.Level1)
+{
+    std::shared_ptr<DCameraEvent> events = std::make_shared<DCameraEvent>();
+    events->eventType_ = 1;
+    events->eventResult_ = DCAMERA_EVENT_DEVICE_IN_USE;
+    events->eventContent_ = "device in use test";
+    
+    controller_->devId_ = TEST_DEVICE_ID;
+    controller_->dhId_ = TEST_CAMERA_DH_ID_0;
+    
+    int32_t ret = controller_->DCameraNotify(events);
+    
+    EXPECT_EQ(ret, DCAMERA_BAD_OPERATE);
+    
+    controller_->UnInit();
+}
+/**
+ * @tc.name: dcamera_source_controller_test_026
+ * @tc.desc: Verify source controller DCameraNotify with camHdiProvider when eventResult is DCAMERA_EVENT_DEVICE_IN_USE
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MV
+ */
+HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_026, TestSize.Level1)
+{
+    std::shared_ptr<DCameraEvent> events = std::make_shared<DCameraEvent>();
+    events->eventType_ = 1;
+    events->eventResult_ = DCAMERA_EVENT_DEVICE_IN_USE;
+    events->eventContent_ = "device in use test with provider";
+    
+    controller_->devId_ = TEST_DEVICE_ID;
+    controller_->dhId_ = TEST_CAMERA_DH_ID_0;
+    
+    controller_->camHdiProvider_ = IDCameraProvider::Get(HDF_DCAMERA_EXT_SERVICE);
+    
+    int32_t ret = controller_->DCameraNotify(events);
+    
+    EXPECT_TRUE(ret == DCAMERA_OK || ret == DCAMERA_BAD_OPERATE);
+    
+    controller_->UnInit();
+}
+
 }
 }
