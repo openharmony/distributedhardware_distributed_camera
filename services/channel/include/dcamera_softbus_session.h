@@ -46,9 +46,12 @@ public:
     std::string GetMySessionName();
     std::string GetMyDhId();
     int32_t GetSessionId();
+    void SetSessionId(int32_t sessionId);
     int32_t CreateSocketServer();
     int32_t BindSocketServer();
     void ReleaseSession();
+    void SetConflict(bool isConflict);
+    int32_t NotifyError(int32_t eventType, int32_t eventReason, const std::string& detail);
 
 private:
     struct SessionDataHeader {
@@ -122,6 +125,7 @@ private:
     DCameraSessionMode mode_;
     std::map<DCameraSessionMode, DCameraSendFuc> sendFuncMap_;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_;
+    bool isConflict_ = false;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

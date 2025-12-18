@@ -43,6 +43,7 @@ ohos_shared_library("distributed_camera_channel") {
   sources = [
     "${services_path}/cameraservice/base/src/dcamera_info_cmd.cpp",
     "${services_path}/cameraservice/base/src/dcamera_sink_frame_info.cpp",
+    "${services_path}/cameraservice/base/src/dcamera_event_cmd.cpp",
     "src/allconnect/distributed_camera_allconnect_manager.cpp",
     "src/dcamera_channel_sink_impl.cpp",
     "src/dcamera_channel_source_impl.cpp",
@@ -71,6 +72,8 @@ ohos_shared_library("distributed_camera_channel") {
   }
 
   external_deps = [
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
     "cJSON:cjson",
     "c_utils:utils",
     "device_manager:devicemanagersdk",
@@ -81,6 +84,8 @@ ohos_shared_library("distributed_camera_channel") {
     "eventhandler:libeventhandler",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "ipc:ipc_single",
+    "ffrt:libffrt",
   ]
 
   subsystem_name = "distributedhardware"

@@ -31,6 +31,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+constexpr int32_t HEARTBEAT_INTERVAL_MS = 500;
+constexpr int32_t HEARTBEAT_TIMEOUT_MS = 5000;
 class DCameraSourceController : public ICameraController,
     public std::enable_shared_from_this<DCameraSourceController> {
 public:
@@ -56,6 +58,10 @@ public:
     void OnSessionError(int32_t eventType, int32_t eventReason, std::string detail);
     void OnDataReceived(std::vector<std::shared_ptr<DataBuffer>>& buffers);
 
+    int32_t StartHeartbeatSend();
+    void StopHeartbeatSend();
+    void StartHeartbeatMonitor();
+    void StopHeartbeatMonitor();
 private:
     void HandleMetaDataResult(std::string& jsonStr);
     void PostChannelDisconnectedEvent();
@@ -66,6 +72,9 @@ private:
     int32_t CheckOsType(const std::string &networkId, bool &isInvalid);
     int32_t ParseValueFromCjson(std::string args, std::string key);
     int32_t AddCameraServiceDeathRecipient();
+    int32_t SendHeartbeatRequest();
+    void MonitorSourceHeartbeatLoop();
+    void HandleSourceHeartbeatTimeout();
     class DCameraHdiRecipient : public IRemoteObject::DeathRecipient {
     public:
         void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
@@ -108,6 +117,15 @@ private:
     int32_t userId_ = -1;
     std::string srcDevId_ = "";
     uint64_t tokenId_ = 0;
+    
+    std::shared_ptr<std::thread> heartbeatSendThread_;
+    std::atomic<bool> isHeartbeatSending_{false};
+    std::atomic<bool> isHeartbeatEnabled_{false};
+    std::atomic<int64_t> lastHeartbeatResponseTime_{0};
+    std::shared_ptr<std::thread> heartbeatMonitorThread_;
+    std::atomic<bool> isHeartbeatMonitoring_{false};
+    std::mutex heartbeatMonMutex_;
+    std::mutex heartbeatSendMutex_;
 };
 
 class DeviceInitCallback : public DmInitCallback {

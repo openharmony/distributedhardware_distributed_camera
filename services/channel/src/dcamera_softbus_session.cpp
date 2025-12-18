@@ -23,7 +23,8 @@
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
-
+#include "dcamera_event_cmd.h"
+#include "dcamera_protocol.h"
 namespace OHOS {
 namespace DistributedHardware {
 DCameraSoftbusSession::DCameraSoftbusSession()
@@ -90,6 +91,10 @@ int32_t DCameraSoftbusSession::OnSessionOpened(int32_t socket, std::string netwo
     sessionId_ = socket;
     state_ = DCAMERA_SOFTBUS_STATE_OPENED;
     CHECK_AND_RETURN_RET_LOG(listener_ == nullptr, DCAMERA_BAD_VALUE, "listener_ is null.");
+    if (isConflict_) {
+        DHLOGI("OnSessionOpened session is in conflict state, not notify connected event, socket: %{public}d", socket);
+        return DCAMERA_OK;
+    }
     listener_->OnSessionState(DCAMERA_CHANNEL_STATE_CONNECTED, networkId);
     DHLOGI("open current session end, socket: %{public}d", socket);
     return DCAMERA_OK;
@@ -102,6 +107,10 @@ int32_t DCameraSoftbusSession::OnSessionClose(int32_t sessionId)
     sessionId_ = -1;
     state_ = DCAMERA_SOFTBUS_STATE_CLOSED;
     CHECK_AND_RETURN_RET_LOG(listener_ == nullptr, DCAMERA_BAD_VALUE, "listener_ is null.");
+    if (isConflict_) {
+        DHLOGI("OnSessionClose session is in conflict state,socket: %{public}d", sessionId);
+        return DCAMERA_OK;
+    }
     listener_->OnSessionState(DCAMERA_CHANNEL_STATE_DISCONNECTED, "");
     return DCAMERA_OK;
 }
@@ -353,6 +362,7 @@ int32_t DCameraSoftbusSession::BindSocketServer()
 void DCameraSoftbusSession::ReleaseSession()
 {
     DCameraSoftbusAdapter::GetInstance().DestroySoftbusSessionServer(mySessionName_);
+    DCameraSoftbusAdapter::GetInstance().CloseSoftbusSession(sessionId_);
 }
 
 int32_t DCameraSoftbusSession::UnPackSendData(std::shared_ptr<DataBuffer>& buffer, DCameraSendFuc memberFunc)
@@ -508,10 +518,55 @@ int32_t DCameraSoftbusSession::GetSessionId()
     return sessionId_;
 }
 
+void DCameraSoftbusSession::SetSessionId(int32_t sessionId)
+{
+    sessionId_ = sessionId;
+}
+
 std::string DCameraSoftbusSession::GetMyDhId()
 {
     return myDhId_;
 }
 
+void DCameraSoftbusSession::SetConflict(bool isConflict)
+{
+    isConflict_ = isConflict;
+}
+
+int32_t DCameraSoftbusSession::NotifyError(int32_t eventType, int32_t eventReason, const std::string& detail)
+{
+    DHLOGI("NotifyError eventType: %{public}d, eventReason: %{public}d", eventType, eventReason);
+    std::shared_ptr<DCameraEvent> event = std::make_shared<DCameraEvent>();
+    event->eventType_ = eventType;
+    event->eventResult_ = eventReason;
+    event->eventContent_ = detail;
+      
+    DCameraEventCmd errorCmd;
+    errorCmd.type_ = DCAMERA_PROTOCOL_TYPE_MESSAGE;
+    errorCmd.dhId_ = myDhId_;
+    errorCmd.command_ = DCAMERA_PROTOCOL_CMD_STATE_NOTIFY;
+    errorCmd.value_ = event;
+       
+    std::string jsonStr = "";
+    int32_t ret = errorCmd.Marshal(jsonStr);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("NotifyError Marshal failed,dhId: %{public}s, ret: %{public}d",
+               GetAnonyString(myDhId_).c_str(), ret);
+        return ret;
+    }
+      
+    std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(jsonStr.length() + 1);
+    ret = memcpy_s(buffer->Data(), buffer->Capacity(),
+        reinterpret_cast<uint8_t *>(const_cast<char *>(jsonStr.c_str())), jsonStr.length() + 1);
+    CHECK_AND_RETURN_RET_LOG(ret != EOK, DCAMERA_BAD_VALUE, "NotifyError memcpy_s failed, ret: %{public}d", ret);
+    ret =SendData(DCAMERA_SESSION_MODE_CTRL, buffer);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("NotifyError SendData failed, dhId: %{public}s, ret: %{public}d",
+               GetAnonyString(myDhId_).c_str(), ret);
+        return ret;
+    }
+    DHLOGI("NotifyError SendData success, dhId: %{public}s", GetAnonyString(myDhId_).c_str());
+    return DCAMERA_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

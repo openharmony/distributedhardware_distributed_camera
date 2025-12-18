@@ -17,6 +17,9 @@
 
 #include <securec.h>
 #include <cstdlib>
+#include <thread>
+#include <chrono>
+#include "ffrt_inner.h"
 #include "iservice_registry.h"
 #include "iservmgr_hdi.h"
 #include "iproxy_broker.h"
@@ -32,6 +35,7 @@
 #include "dcamera_source_controller_channel_listener.h"
 #include "dcamera_source_service_ipc.h"
 #include "dcamera_utils_tools.h"
+#include "dcamera_hisysevent_adapter.h"
 
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
@@ -42,6 +46,7 @@
 #include "ohos_account_kits.h"
 #include "os_account_manager.h"
 #endif
+#include <sys/prctl.h>
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -64,6 +69,8 @@ DCameraSourceController::~DCameraSourceController()
         UnInit();
     }
     camHdiProvider_ = nullptr;
+    StopHeartbeatMonitor();
+    StopHeartbeatSend();
 }
 
 int32_t DCameraSourceController::StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos,
@@ -223,6 +230,10 @@ int32_t DCameraSourceController::DCameraNotify(std::shared_ptr<DCameraEvent>& ev
     if (events->eventResult_ == DCAMERA_EVENT_CAMERA_ERROR) {
         DcameraFinishAsyncTrace(DCAMERA_CONTINUE_FIRST_FRAME, DCAMERA_CONTINUE_FIRST_FRAME_TASKID);
         DcameraFinishAsyncTrace(DCAMERA_SNAPSHOT_FIRST_FRAME, DCAMERA_SNAPSHOT_FIRST_FRAME_TASKID);
+    }
+    if (events->eventResult_ == DCAMERA_EVENT_DEVICE_IN_USE) {
+        ReportCameraOperaterEvent(DCAMERA_CONFLICT_RECEIVE_EVENT, GetAnonyString(devId_),
+            dhId_, "Source notify device in use event");
     }
     if (camHdiProvider_ == nullptr) {
         DHLOGI("DCameraNotify camHdiProvider is nullptr devId: %{public}s dhId: %{public}s",
@@ -470,6 +481,8 @@ int32_t DCameraSourceController::CloseChannel()
     if (cameraServiceProxy_ != nullptr && cameraServiceProxy_->AsObject() != nullptr) {
         (void)cameraServiceProxy_->AsObject()->RemoveDeathRecipient(cameraServiceRecipient_);
     }
+    StopHeartbeatSend();
+    StopHeartbeatMonitor();
     cameraServiceRecipient_ = nullptr;
     DCameraLowLatency::GetInstance().DisableLowLatency();
     DCameraSoftbusLatency::GetInstance().StopSoftbusTimeSync(devId_);
@@ -559,6 +572,7 @@ void DCameraSourceController::OnSessionState(int32_t state, std::string networkI
                 break;
             }
             camDev->OnChannelConnectedEvent();
+            StartHeartbeatSend();
             break;
         }
         case DCAMERA_CHANNEL_STATE_DISCONNECTED: {
@@ -622,7 +636,21 @@ void DCameraSourceController::HandleReceivedData(std::shared_ptr<DataBuffer>& da
                 "dhId: %{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
             return;
         }
-        DCameraNotify(cmd.value_);
+        if (cmd.value_->eventResult_ == DCAMERA_EVENT_HEARTBEAT_RESPONSE) {
+            ReportCameraOperaterEvent(DCAMERA_SOURCE_HEARTBEAT_RECEIVED_EVENT, devId_, dhId_,
+                "heartbeat response received");
+            if (!isHeartbeatEnabled_.load()) {
+                DHLOGI("First heartbeat response received, enabling timeout monitoring");
+                isHeartbeatEnabled_.store(true);
+                StartHeartbeatMonitor();
+            }
+
+            lastHeartbeatResponseTime_.store(GetNowTimeStampMs());
+            DHLOGD("Received heartbeat response from sink");
+            return;
+        } else {
+            DCameraNotify(cmd.value_);
+        }
     }
 }
 
@@ -736,6 +764,165 @@ void DCameraSourceController::SetTokenId(uint64_t token)
 void DeviceInitCallback::OnRemoteDied()
 {
     DHLOGI("DeviceInitCallback OnRemoteDied");
+}
+
+int32_t DCameraSourceController::StartHeartbeatSend()
+{
+    std::lock_guard<std::mutex> lock(heartbeatSendMutex_);
+    if (isHeartbeatSending_.load()) {
+        DHLOGW("Heartbeat send already running");
+        return DCAMERA_OK;
+    }
+      
+    DHLOGI("Starting heartbeat send, devId: %{public}s, dhId: %{public}s",
+           GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+    isHeartbeatSending_.store(true);
+      
+    heartbeatSendThread_ = std::make_shared<std::thread>([this]() {
+        prctl(PR_SET_NAME, "DCamHeartbeatSend");
+        while (isHeartbeatSending_.load()) {
+            int32_t ret = SendHeartbeatRequest();
+            if (ret != DCAMERA_OK) {
+                DHLOGE("Failed to send heartbeat request, ret: %{public}d", ret);
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(HEARTBEAT_INTERVAL_MS));
+        }
+        DHLOGI("Heartbeat send thread exiting");
+    });
+    return DCAMERA_OK;
+}
+  
+int32_t DCameraSourceController::SendHeartbeatRequest()
+{
+    std::shared_ptr<DCameraEvent> event = std::make_shared<DCameraEvent>();
+    event->eventType_ = DCAMERA_MESSAGE;
+    event->eventResult_ = DCAMERA_EVENT_HEARTBEAT_REQUEST;
+    event->eventContent_ = std::string("heartbeat request");
+    
+    DCameraEventCmd cmd;
+    cmd.type_ = DCAMERA_PROTOCOL_TYPE_MESSAGE;
+    cmd.dhId_ = dhId_;
+    cmd.command_ = DCAMERA_PROTOCOL_CMD_HEARTBEAT;
+    cmd.value_ = event;
+    
+    std::string jsonStr;
+    int32_t ret = cmd.Marshal(jsonStr);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("Marshal failed %{public}d, devId: %{public}s, dhId: %{public}s", ret,
+            GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        return ret;
+    }
+    
+    std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(jsonStr.length() + 1);
+    ret = memcpy_s(buffer->Data(), buffer->Capacity(),
+        reinterpret_cast<uint8_t *>(const_cast<char *>(jsonStr.c_str())), jsonStr.length() + 1);
+    if (ret != EOK) {
+        DHLOGE("memcpy_s failed %{public}d", ret);
+        return ret;
+    }
+    
+    if (channel_ != nullptr) {
+        int32_t sendRet = channel_->SendData(buffer);
+        if (sendRet != DCAMERA_OK) {
+            ReportCameraOperaterEvent(DCAMERA_SOURCE_HEARTBEAT_SEND_FAIL, devId_, dhId_,
+                "Failed to send heartbeat request");
+            DHLOGE("Failed to send heartbeat, ret: %{public}d", sendRet);
+            return sendRet;
+        } else {
+            ReportCameraOperaterEvent(DCAMERA_SOURCE_HEARTBEAT_SENT_EVENT, devId_, dhId_,
+                "Heartbeat request sent successfully");
+            DHLOGD("Sent heartbeat to sink");
+        }
+    } else {
+        DHLOGE("Channel is null, cannot send heartbeat");
+        return DCAMERA_BAD_VALUE;
+    }
+    
+    return DCAMERA_OK;
+}
+
+void DCameraSourceController::StopHeartbeatSend()
+{
+    std::lock_guard<std::mutex> lock(heartbeatSendMutex_);
+    DHLOGI("Stopping heartbeat send");
+    isHeartbeatSending_.store(false);
+    if (heartbeatSendThread_ && heartbeatSendThread_->joinable()) {
+        heartbeatSendThread_->join();
+    }
+    heartbeatSendThread_ = nullptr;
+}
+
+void DCameraSourceController::StartHeartbeatMonitor()
+{
+    std::lock_guard<std::mutex> lock(heartbeatMonMutex_);
+    if (isHeartbeatMonitoring_.load()) {
+        DHLOGW("Heartbeat monitor already running");
+        return;
+    }
+      
+    DHLOGI("Starting heartbeat timeout monitor, devId: %{public}s, dhId: %{public}s",
+           GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+    isHeartbeatMonitoring_.store(true);
+    lastHeartbeatResponseTime_.store(GetNowTimeStampMs());
+      
+    heartbeatMonitorThread_ = std::make_shared<std::thread>([this]() {
+        prctl(PR_SET_NAME, "DCamHeartbeatMon");
+        MonitorSourceHeartbeatLoop();
+    });
+}
+
+void DCameraSourceController::MonitorSourceHeartbeatLoop()
+{
+    while (isHeartbeatMonitoring_.load()) {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+          
+        auto now = GetNowTimeStampMs();
+        auto lastTime = lastHeartbeatResponseTime_.load();
+        auto elapsed = now - lastTime;
+        int64_t doubleElapsed = elapsed * 2;
+        if (elapsed < 0 || doubleElapsed > INT64_MAX) {
+            lastHeartbeatResponseTime_.store(now);
+            continue;
+        }
+        if (elapsed > HEARTBEAT_TIMEOUT_MS) {
+            DHLOGE("Heartbeat response timeout! Elapsed: %{public}lld ms, devId: %{public}s, dhId: %{public}s",
+                   static_cast<long long>(elapsed), GetAnonyString(devId_).c_str(),
+                   GetAnonyString(dhId_).c_str());
+            HandleSourceHeartbeatTimeout();
+            break;
+        }
+    }
+    DHLOGI("Heartbeat monitor thread exiting");
+}
+
+void DCameraSourceController::HandleSourceHeartbeatTimeout()
+{
+    ffrt::submit([this]() {
+        DHLOGI("Heartbeat timeout: closing channel, devId: %{public}s, dhId: %{public}s",
+               GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        ReportCameraOperaterEvent(DCAMERA_SOURCE_HEARTBEAT_TIMEOUT, devId_, dhId_,
+            "Heartbeat timeout detected, closing channel");
+        int32_t ret = CloseChannel();
+        if (ret != DCAMERA_OK) {
+            DHLOGE("Heartbeat timeout: close channel failed, ret: %{public}d", ret);
+        }
+        ret = StopCapture();
+        if (ret != DCAMERA_OK) {
+            DHLOGE("Heartbeat timeout: stop capture failed, ret: %{public}d", ret);
+        }
+        }, {}, {}, ffrt::task_attr().name("DCamSrcHeartbeatTimeout").qos(ffrt::qos_user_initiated));
+}
+
+void DCameraSourceController::StopHeartbeatMonitor()
+{
+    std::lock_guard<std::mutex> lock(heartbeatMonMutex_);
+    DHLOGI("Stopping heartbeat monitor");
+    isHeartbeatMonitoring_.store(false);
+    isHeartbeatEnabled_.store(false);
+    if (heartbeatMonitorThread_ && heartbeatMonitorThread_->joinable()) {
+        heartbeatMonitorThread_->join();
+    }
+    heartbeatMonitorThread_ = nullptr;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

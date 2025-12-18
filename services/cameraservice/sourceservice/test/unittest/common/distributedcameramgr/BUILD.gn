@@ -85,6 +85,9 @@ ohos_unittest("DCameraSourceMgrTest") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken_shared",
     "access_token:libtokensetproc_shared",
+    "access_token:libtokenid_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
     "cJSON:cjson",
     "c_utils:utils",
     "camera_framework:camera_framework",
@@ -97,7 +100,9 @@ ohos_unittest("DCameraSourceMgrTest") {
     "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "ipc:ipc_single",
     "samgr:samgr_proxy",
+    "googletest:gmock",
   ]
 
   defines = [
