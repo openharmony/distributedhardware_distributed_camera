@@ -127,7 +127,6 @@ void DCameraSourceControllerTest::SetUp(void)
     controller_ = std::make_shared<DCameraSourceController>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, stateMachine_,
         camDev_);
     controller_->channel_ = std::make_shared<MockCameraChannel>();
-    gmockChannel_ = std::make_shared<MockCameraChannelGMock>();
     DCameraIndex index;
     index.devId_ = TEST_DEVICE_ID;
     index.dhId_ = TEST_CAMERA_DH_ID_0;
