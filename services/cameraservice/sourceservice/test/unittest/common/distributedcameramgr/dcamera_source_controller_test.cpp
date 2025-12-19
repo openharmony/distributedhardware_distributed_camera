@@ -800,6 +800,7 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_024, TestSi
     result = controller_->ParseValueFromCjson(jsonStr, key);
     EXPECT_EQ(result, DCAMERA_BAD_VALUE);
 }
+
 /**
  * @tc.name: dcamera_source_controller_test_025
  * @tc.desc: Verify source controller DCameraNotify when eventResult is DCAMERA_EVENT_DEVICE_IN_USE
@@ -812,16 +813,13 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_025, TestSi
     events->eventType_ = 1;
     events->eventResult_ = DCAMERA_EVENT_DEVICE_IN_USE;
     events->eventContent_ = "device in use test";
-    
     controller_->devId_ = TEST_DEVICE_ID;
     controller_->dhId_ = TEST_CAMERA_DH_ID_0;
-    
     int32_t ret = controller_->DCameraNotify(events);
-    
     EXPECT_EQ(ret, DCAMERA_BAD_OPERATE);
-    
     controller_->UnInit();
 }
+
 /**
  * @tc.name: dcamera_source_controller_test_026
  * @tc.desc: Verify source controller DCameraNotify with camHdiProvider when eventResult is DCAMERA_EVENT_DEVICE_IN_USE
@@ -834,16 +832,11 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_026, TestSi
     events->eventType_ = 1;
     events->eventResult_ = DCAMERA_EVENT_DEVICE_IN_USE;
     events->eventContent_ = "device in use test with provider";
-    
     controller_->devId_ = TEST_DEVICE_ID;
     controller_->dhId_ = TEST_CAMERA_DH_ID_0;
-    
     controller_->camHdiProvider_ = IDCameraProvider::Get(HDF_DCAMERA_EXT_SERVICE);
-    
     int32_t ret = controller_->DCameraNotify(events);
-    
     EXPECT_TRUE(ret == DCAMERA_OK || ret == DCAMERA_BAD_OPERATE);
-    
     controller_->UnInit();
 }
 

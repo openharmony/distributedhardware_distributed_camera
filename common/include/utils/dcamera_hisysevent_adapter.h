@@ -23,6 +23,7 @@ namespace DistributedHardware {
 const std::string DCAMERA_INIT_FAIL = "DCAMERA_INIT_FAIL";
 const std::string DCAMERA_REGISTER_FAIL = "DCAMERA_REGISTER_FAIL";
 const std::string DCAMERA_OPT_FAIL = "DCAMERA_OPT_FAIL";
+
 const std::string INIT_SA_EVENT = "DCAMERA_INIT";
 const std::string RELEASE_SA_EVENT = "DCAMERA_EXIT";
 const std::string REGIST_CAMERA_EVENT = "DCAMERA_REGISTER";
