@@ -20,6 +20,7 @@
 
 #define private public
 #include "dcamera_sink_controller.h"
+#include "dcamera_utils_tools.h"
 #undef private
 
 #include "accesstoken_kit.h"
@@ -34,7 +35,6 @@
 #include "dcamera_metadata_setting_cmd.h"
 #include "dcamera_sink_access_control.h"
 #include "dcamera_sink_dev.h"
-#include "dcamera_utils_tools.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
 
@@ -865,6 +865,30 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_037, TestSize.L
     EXPECT_TRUE(controller_->CheckAclRight());
     controller_->userId_ = 100;
     EXPECT_FALSE(controller_->CheckAclRight());
+}
+/**
+ * @tc.name: dcamera_sink_controller_test_038
+ * @tc.desc: Verify function.
+ * @tc.type: FUNC
+ * @tc.require: DTS
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_038, TestSize.Level1)
+{
+    controller_->isEncoderReady_ = true;
+    controller_->isCameraReady_ = true;
+    std::string networkId = "networkId";
+    std::string networkIdNull = "";
+    DCameraAccessConfigManager::GetInstance().SetCurrentNetworkId(networkId);
+    int32_t timeOutMs = 3000;
+    EXPECT_NO_FATAL_FAILURE(controller_->CheckAndCommitCapture());
+    std::this_thread::sleep_for(std::chrono::milliseconds(timeOutMs));
+    EXPECT_NO_FATAL_FAILURE(controller_->CheckAndCommitCapture());
+    DCameraAccessConfigManager::GetInstance().SetAuthorizationGranted(networkId, false);
+    EXPECT_NO_FATAL_FAILURE(controller_->CheckAndCommitCapture());
+    DCameraAccessConfigManager::GetInstance().SetAuthorizationGranted(networkId, true);
+    EXPECT_NO_FATAL_FAILURE(controller_->CheckAndCommitCapture());
+    DCameraAccessConfigManager::GetInstance().SetCurrentNetworkId(networkIdNull);
+    EXPECT_NO_FATAL_FAILURE(controller_->CheckAndCommitCapture());
 }
 } // namespace DistributedHardware
 } // namespace OHOS

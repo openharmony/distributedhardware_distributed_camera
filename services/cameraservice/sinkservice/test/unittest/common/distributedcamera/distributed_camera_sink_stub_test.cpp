@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "accesstoken_kit.h"
+#include "accesstoken_kit_mock.h"
 #include "nativetoken_kit.h"
 #include "token_setproc.h"
 #include "softbus_common.h"
@@ -23,8 +24,11 @@
 #include "distributed_camera_sink_proxy.h"
 #include "distributed_camera_sink_stub.h"
 #include "distributed_hardware_log.h"
+#include "iaccess_listener.h"
 #include "mock_distributed_camera_sink_stub.h"
 
+using namespace OHOS::Security::AccessToken;
+using namespace testing;
 using namespace testing::ext;
 
 namespace OHOS {
@@ -34,12 +38,29 @@ static int32_t OHOS_PERMISSION_ENABLE_DISTRIBUTED_HARDWARE_INDEX = 0;
 static int32_t OHOS_PERMISSION_DISTRIBUTED_DATASYNC_INDEX = 1;
 static int32_t OHOS_PERMISSION_ACCESS_DISTRIBUTED_HARDWARE_INDEX = 2;
 }
+class TestAccessListener : public IAccessListener {
+    sptr<IRemoteObject> AsObject()
+    {
+        return nullptr;
+    }
+
+    void OnRequestHardwareAccess(const std::string &requestId, AuthDeviceInfo info, const DHType dhType,
+        const std::string &pkgName)
+    {
+        (void)requestId;
+        (void)info;
+        (void)dhType;
+        (void)pkgName;
+    }
+};
+
 class DcameraSinkStubTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
+    std::shared_ptr<AccessTokenKitMock> token_ = nullptr;
 };
 
 void DcameraSinkStubTest::SetUpTestCase(void)
@@ -74,11 +95,16 @@ void DcameraSinkStubTest::SetUp(void)
     tokenId = GetAccessTokenId(&infoInstance);
     SetSelfTokenID(tokenId);
     OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
+    auto token = AccessTokenKitInterface::GetOrCreateAccessTokenKit();
+    token_ = std::static_pointer_cast<AccessTokenKitMock>(token);
+    ASSERT_TRUE(token_ != nullptr);
 }
 
 void DcameraSinkStubTest::TearDown(void)
 {
     DHLOGI("enter");
+    AccessTokenKitInterface::ReleaseAccessTokenKit();
+    token_ = nullptr;
 }
 
 /**
@@ -275,6 +301,145 @@ HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_012, TestSize.Level1)
     std::string networkId = "test12";
     int32_t ret = sinkProxy.StopDistributedHardware(networkId);
     EXPECT_NE(ERR_DH_CAMERA_BASE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_stub_test_013
+ * @tc.desc: Verify the function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_013, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_stub_test_013");
+    sptr<IRemoteObject> sinkStubPtr(new MockDistributedCameraSinkStub());
+    DistributedCameraSinkProxy sinkProxy(sinkStubPtr);
+    DistributedCameraSinkProxy sinkProxyNull(nullptr);
+    sptr<IAccessListener> listenerNull = nullptr;
+    int32_t timeOut = 0;
+    std::string pkgName = "pkgName";
+    sptr<IAccessListener> listener(new TestAccessListener());
+    std::string pkgNameNull = "";
+    int32_t ret = sinkProxyNull.SetAccessListener(listener, timeOut, pkgName);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = sinkProxy.SetAccessListener(listenerNull, timeOut, pkgName);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = sinkProxy.SetAccessListener(listener, timeOut, pkgNameNull);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = sinkProxy.SetAccessListener(listener, timeOut, pkgName);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_stub_test_014
+ * @tc.desc: Verify the function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_014, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_stub_test_014");
+    sptr<IRemoteObject> sinkStubPtr(new MockDistributedCameraSinkStub());
+    DistributedCameraSinkProxy sinkProxy(sinkStubPtr);
+    DistributedCameraSinkProxy sinkProxyNull(nullptr);
+    std::string pkgName = "pkgName";
+    std::string pkgNameNull = "";
+    int32_t ret = sinkProxyNull.RemoveAccessListener(pkgName);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = sinkProxy.RemoveAccessListener(pkgNameNull);
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    ret = sinkProxy.RemoveAccessListener(pkgName);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_stub_test_015
+ * @tc.desc: Verify the function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_015, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_stub_test_015");
+    sptr<IRemoteObject> sinkStubPtr(new MockDistributedCameraSinkStub());
+    DistributedCameraSinkProxy sinkProxy(sinkStubPtr);
+    DistributedCameraSinkProxy sinkProxyNull(nullptr);
+    std::string requestId = "pkgName";
+    std::string requestIdNull = "";
+    bool granted = true;
+    int32_t ret = sinkProxyNull.SetAuthorizationResult(requestId, granted);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = sinkProxy.SetAuthorizationResult(requestIdNull, granted);
+    EXPECT_EQ(DCAMERA_OK, ret);
+
+    ret = sinkProxy.SetAuthorizationResult(requestId, granted);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_stub_test_016
+ * @tc.desc: Verify the function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_016, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_stub_test_016");
+    ASSERT_TRUE(token_ != nullptr);
+    sptr<DistributedCameraSinkStub> sinkStubPtr(new MockDistributedCameraSinkStub());
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_CALL(*token_, VerifyAccessToken(_, _)).WillOnce(Return(DCAMERA_BAD_VALUE));
+    EXPECT_EQ(DCAMERA_OK, sinkStubPtr->SetAccessListenerInner(data, reply));
+    EXPECT_CALL(*token_, VerifyAccessToken(_, _)).WillOnce(Return(Security::AccessToken::PERMISSION_GRANTED));
+    EXPECT_EQ(DCAMERA_OK, sinkStubPtr->SetAccessListenerInner(data, reply));
+
+    sptr<IAccessListener> listener(new TestAccessListener());
+    data.WriteRemoteObject(listener->AsObject());
+    EXPECT_CALL(*token_, VerifyAccessToken(_, _)).WillOnce(Return(Security::AccessToken::PERMISSION_GRANTED));
+    EXPECT_EQ(DCAMERA_OK, sinkStubPtr->SetAccessListenerInner(data, reply));
+}
+
+/**
+ * @tc.name: dcamera_sink_stub_test_017
+ * @tc.desc: Verify the function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_017, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_stub_test_017");
+    sptr<DistributedCameraSinkStub> sinkStubPtr(new MockDistributedCameraSinkStub());
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_CALL(*token_, VerifyAccessToken(_, _)).WillOnce(Return(DCAMERA_BAD_VALUE));
+    EXPECT_EQ(DCAMERA_OK, sinkStubPtr->RemoveAccessListenerInner(data, reply));
+    EXPECT_CALL(*token_, VerifyAccessToken(_, _)).WillOnce(Return(Security::AccessToken::PERMISSION_GRANTED));
+    EXPECT_EQ(DCAMERA_OK, sinkStubPtr->RemoveAccessListenerInner(data, reply));
+}
+
+/**
+ * @tc.name: dcamera_sink_stub_test_018
+ * @tc.desc: Verify the function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_018, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_stub_test_018");
+    sptr<DistributedCameraSinkStub> sinkStubPtr(new MockDistributedCameraSinkStub());
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_CALL(*token_, VerifyAccessToken(_, _)).WillOnce(Return(DCAMERA_BAD_VALUE));
+    EXPECT_EQ(DCAMERA_OK, sinkStubPtr->SetAuthorizationResultInner(data, reply));
+    EXPECT_CALL(*token_, VerifyAccessToken(_, _)).WillOnce(Return(Security::AccessToken::PERMISSION_GRANTED));
+    EXPECT_EQ(DCAMERA_OK, sinkStubPtr->SetAuthorizationResultInner(data, reply));
 }
 } // namespace DistributedHardware
 } // namespace OHOS

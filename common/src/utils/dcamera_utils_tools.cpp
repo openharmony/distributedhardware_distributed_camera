@@ -453,5 +453,160 @@ int32_t DCameraSystemSwitchInfo::GetSystemSwitchRotation(std::string devId)
     }
     return map_[devId].GetRotate();
 }
+
+IMPLEMENT_SINGLE_INSTANCE(DCameraAccessConfigManager);
+
+int32_t DCameraAccessConfigManager::SetAccessConfig(const sptr<IAccessListener>& listener,
+    int32_t timeOut, const std::string& pkgName)
+{
+    DHLOGI("SetAccessConfig, timeOut: %{public}d, pkgName: %{public}s", timeOut, pkgName.c_str());
+
+    if (listener == nullptr) {
+        DHLOGE("listener is nullptr");
+        return DCAMERA_BAD_VALUE;
+    }
+    if (pkgName.empty()) {
+        DHLOGE("pkgName is empty");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    std::lock_guard<std::mutex> lock(mtxLock_);
+    listener_ = listener;
+    timeOut_ = timeOut;
+    pkgName_ = pkgName;
+
+    DHLOGI("SetAccessConfig success");
+    return DCAMERA_OK;
+}
+
+sptr<IAccessListener> DCameraAccessConfigManager::GetAccessListener()
+{
+    std::lock_guard<std::mutex> lock(mtxLock_);
+    return listener_;
+}
+
+int32_t DCameraAccessConfigManager::GetAccessTimeOut()
+{
+    std::lock_guard<std::mutex> lock(mtxLock_);
+    return timeOut_;
+}
+
+std::string DCameraAccessConfigManager::GetAccessPkgName()
+{
+    std::lock_guard<std::mutex> lock(mtxLock_);
+    return pkgName_;
+}
+
+void DCameraAccessConfigManager::ClearAccessConfig()
+{
+    DHLOGI("ClearAccessConfig");
+    std::lock_guard<std::mutex> lock(mtxLock_);
+    listener_ = nullptr;
+    timeOut_ = 0;
+    pkgName_ = "";
+    authorizationResults_.clear();
+    DHLOGI("ClearAccessConfig success");
+}
+
+void DCameraAccessConfigManager::SetAuthorizationGranted(const std::string& networkId, bool granted)
+{
+    DHLOGI("SetAuthorizationGranted, granted: %{public}d", granted);
+
+    {
+        std::lock_guard<std::mutex> lock(mtxLock_);
+        authorizationResults_[networkId] = granted;
+    }
+
+    authCondVar_.notify_all();
+}
+
+bool DCameraAccessConfigManager::IsAuthorizationGranted(const std::string& networkId)
+{
+    std::lock_guard<std::mutex> lock(mtxLock_);
+    auto it = authorizationResults_.find(networkId);
+    if (it == authorizationResults_.end()) {
+        DHLOGI("No authorization decision");
+        return false;
+    }
+    return it->second;
+}
+
+bool DCameraAccessConfigManager::HasAuthorizationDecision(const std::string& networkId)
+{
+    std::lock_guard<std::mutex> lock(mtxLock_);
+    return authorizationResults_.find(networkId) != authorizationResults_.end();
+}
+
+void DCameraAccessConfigManager::ClearAuthorizationResult(const std::string& networkId)
+{
+    DHLOGI("ClearAuthorizationResult");
+
+    std::lock_guard<std::mutex> lock(mtxLock_);
+    auto it = authorizationResults_.find(networkId);
+    if (it != authorizationResults_.end()) {
+        authorizationResults_.erase(it);
+    }
+}
+
+void DCameraAccessConfigManager::SetCurrentNetworkId(const std::string& networkId)
+{
+    DHLOGI("SetCurrentNetworkId");
+
+    std::lock_guard<std::mutex> lock(mtxLock_);
+    currentNetworkId_ = networkId;
+}
+
+std::string DCameraAccessConfigManager::GetCurrentNetworkId()
+{
+    std::lock_guard<std::mutex> lock(mtxLock_);
+    return currentNetworkId_;
+}
+
+bool DCameraAccessConfigManager::WaitForAuthorizationResult(const std::string& networkId, int32_t timeoutSeconds)
+{
+    DHLOGI("WaitForAuthorizationResult");
+
+    if (HasAuthorizationDecision(networkId)) {
+        DHLOGI("Authorization decision already exists");
+        return true;
+    }
+
+    std::unique_lock<std::mutex> lock(mtxLock_);
+    bool gotResult = authCondVar_.wait_for(
+        lock,
+        std::chrono::seconds(timeoutSeconds),
+        [this, &networkId]() {
+            return authorizationResults_.find(networkId) != authorizationResults_.end();
+        }
+    );
+
+    return gotResult;
+}
+
+void DCameraAccessConfigManager::ClearAccessConfigByPkgName(const std::string& pkgName)
+{
+    DHLOGI("ClearAccessConfigByPkgName, pkgName: %{public}s", pkgName.c_str());
+
+    if (pkgName.empty()) {
+        DHLOGI("Input pkgName is empty, skip clear");
+        return;
+    }
+
+    std::lock_guard<std::mutex> lock(mtxLock_);
+    if (pkgName_ == pkgName) {
+        DHLOGI("Current pkgName matches, clearing access config");
+        listener_ = nullptr;
+        timeOut_ = 0;
+        pkgName_ = "";
+        currentNetworkId_ = "";
+    }
+
+    if (!authorizationResults_.empty()) {
+        size_t clearedCount = authorizationResults_.size();
+        authorizationResults_.clear();
+    }
+
+    authCondVar_.notify_all();
+}
 } // namespace DistributedHardware
 } // namespace OHOS

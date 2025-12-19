@@ -195,6 +195,62 @@ int32_t DCameraSinkHandler::StopDistributedHardware(const std::string &networkId
     return dCameraSinkSrv->StopDistributedHardware(networkId);
 }
 
+int32_t DCameraSinkHandler::SetAccessListener(sptr<IAccessListener> listener, int32_t &timeOut,
+    const std::string &pkgName)
+{
+    DHLOGI("Set access listener");
+    if (listener == nullptr) {
+        DHLOGE("listener is nullptr");
+        return DCAMERA_BAD_VALUE;
+    }
+    if (pkgName.empty()) {
+        DHLOGE("pkgName is empty");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    sptr<IDistributedCameraSink> dCameraSinkSrv = DCameraSinkHandlerIpc::GetInstance().GetSinkLocalCamSrv();
+    if (dCameraSinkSrv == nullptr) {
+        DHLOGE("get Service failed");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    return dCameraSinkSrv->SetAccessListener(listener, timeOut, pkgName);
+}
+
+int32_t DCameraSinkHandler::RemoveAccessListener(const std::string &pkgName)
+{
+    DHLOGI("Remove access listener");
+    if (pkgName.empty()) {
+        DHLOGE("pkgName is empty");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    sptr<IDistributedCameraSink> dCameraSinkSrv = DCameraSinkHandlerIpc::GetInstance().GetSinkLocalCamSrv();
+    if (dCameraSinkSrv == nullptr) {
+        DHLOGE("get Service failed");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    return dCameraSinkSrv->RemoveAccessListener(pkgName);
+}
+
+int32_t DCameraSinkHandler::SetAuthorizationResult(const std::string &requestId, bool granted)
+{
+    DHLOGI("Set authorization result");
+    if (requestId.empty()) {
+        DHLOGE("requestId is empty");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    sptr<IDistributedCameraSink> dCameraSinkSrv = DCameraSinkHandlerIpc::GetInstance().GetSinkLocalCamSrv();
+    if (dCameraSinkSrv == nullptr) {
+        DHLOGE("get Service failed");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    return dCameraSinkSrv->SetAuthorizationResult(requestId, granted);
+}
+
 void DCameraSinkHandler::RegisterDistributedHardwareSinkStateListener(
     std::shared_ptr<DistributedHardwareSinkStateListener> listener)
 {

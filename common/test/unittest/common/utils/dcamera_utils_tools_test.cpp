@@ -24,6 +24,7 @@
 #include "dcamera_utils_tools.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
+#include "iaccess_listener.h"
 #include "nativetoken_kit.h"
 #include "token_setproc.h"
 
@@ -31,6 +32,22 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace DistributedHardware {
+class TestAccessListener : public IAccessListener {
+    sptr<IRemoteObject> AsObject()
+    {
+        return nullptr;
+    }
+
+    void OnRequestHardwareAccess(const std::string &requestId, AuthDeviceInfo info, const DHType dhType,
+        const std::string &pkgName)
+    {
+        (void)requestId;
+        (void)info;
+        (void)dhType;
+        (void)pkgName;
+    }
+};
+
 class DcameraUtilsToolsTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -290,6 +307,89 @@ HWTEST_F(DcameraUtilsToolsTest, DCameraSystemSwitch_001, TestSize.Level1)
     EXPECT_EQ(rotate, 0);
     res = DCameraSystemSwitchInfo::GetInstance().SetSystemSwitchFlagAndRotation("1", false, 0);
     EXPECT_EQ(res, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: SetAccessConfig_001
+ * @tc.desc: Verify the SetAccessConfig.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DcameraUtilsToolsTest, SetAccessConfig_001, TestSize.Level1)
+{
+    DCameraAccessConfigManager::GetInstance().ClearAccessConfig();
+    sptr<IAccessListener> listenerNull = nullptr;
+    int32_t timeOut = 0;
+    std::string pkgName = "pkgName";
+    int32_t ret = DCameraAccessConfigManager::GetInstance().SetAccessConfig(listenerNull, timeOut, pkgName);
+    EXPECT_EQ(ret, DCAMERA_BAD_VALUE);
+    sptr<IAccessListener> listener(new TestAccessListener());
+    std::string pkgNameNull = "";
+    ret = DCameraAccessConfigManager::GetInstance().SetAccessConfig(listener, timeOut, pkgNameNull);
+    EXPECT_EQ(ret, DCAMERA_BAD_VALUE);
+    ret = DCameraAccessConfigManager::GetInstance().SetAccessConfig(listener, timeOut, pkgName);
+    EXPECT_EQ(ret, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: IsAuthorizationGranted_001
+ * @tc.desc: Verify the IsAuthorizationGranted.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DcameraUtilsToolsTest, IsAuthorizationGranted_001, TestSize.Level1)
+{
+    DCameraAccessConfigManager::GetInstance().ClearAccessConfig();
+    std::string networkId = "0";
+    std::string networkIdDiff = "1";
+    bool ret = DCameraAccessConfigManager::GetInstance().IsAuthorizationGranted(networkId);
+    EXPECT_EQ(ret, false);
+
+    DCameraAccessConfigManager::GetInstance().SetAuthorizationGranted(networkId, true);
+    ret = DCameraAccessConfigManager::GetInstance().IsAuthorizationGranted(networkId);
+    EXPECT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: ClearAuthorizationResult_001
+ * @tc.desc: Verify the ClearAuthorizationResult.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DcameraUtilsToolsTest, ClearAuthorizationResult_001, TestSize.Level1)
+{
+    DCameraAccessConfigManager::GetInstance().ClearAccessConfig();
+    std::string networkId = "0";
+    DCameraAccessConfigManager::GetInstance().ClearAuthorizationResult(networkId);
+    DCameraAccessConfigManager::GetInstance().SetAuthorizationGranted(networkId, true);
+    DCameraAccessConfigManager::GetInstance().ClearAuthorizationResult(networkId);
+    bool ret = DCameraAccessConfigManager::GetInstance().HasAuthorizationDecision(networkId);
+    EXPECT_EQ(ret, false);
+}
+
+HWTEST_F(DcameraUtilsToolsTest, WaitForAuthorizationResult_001, TestSize.Level1)
+{
+    DCameraAccessConfigManager::GetInstance().ClearAccessConfig();
+    std::string networkId = "0";
+    bool ret = DCameraAccessConfigManager::GetInstance().WaitForAuthorizationResult(networkId);
+    DCameraAccessConfigManager::GetInstance().SetAuthorizationGranted(networkId, true);
+    ret = DCameraAccessConfigManager::GetInstance().WaitForAuthorizationResult(networkId);
+    EXPECT_EQ(ret, true);
+}
+
+HWTEST_F(DcameraUtilsToolsTest, ClearAccessConfigByPkgName_001, TestSize.Level1)
+{
+    DCameraAccessConfigManager::GetInstance().ClearAccessConfig();
+    std::string pkgNameNull = "";
+    std::string networkId = "0";
+    DCameraAccessConfigManager::GetInstance().ClearAccessConfigByPkgName(pkgNameNull);
+    std::string pkgName = "pkgName";
+    DCameraAccessConfigManager::GetInstance().ClearAccessConfigByPkgName(pkgName);
+    DCameraAccessConfigManager::GetInstance().pkgName_ = pkgName;
+    DCameraAccessConfigManager::GetInstance().SetAuthorizationGranted(networkId, true);
+    DCameraAccessConfigManager::GetInstance().ClearAccessConfigByPkgName(pkgName);
+    bool ret = DCameraAccessConfigManager::GetInstance().HasAuthorizationDecision(networkId);
+    EXPECT_EQ(ret, false);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

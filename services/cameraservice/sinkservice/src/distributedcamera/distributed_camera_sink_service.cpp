@@ -27,6 +27,8 @@
 #include "dcamera_handler.h"
 #include "dcamera_hisysevent_adapter.h"
 #include "dcamera_sink_service_ipc.h"
+#include "dcamera_softbus_adapter.h"
+#include "dcamera_utils_tools.h"
 #include "distributed_camera_allconnect_manager.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -421,6 +423,56 @@ int32_t DistributedCameraSinkService::StopDistributedHardware(const std::string 
     int32_t ret = sinkDevice->StopDistributedHardware(networkId);
     CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "StopDistributedHardware failed, ret: %{public}d", ret);
     DHLOGI("StopDistributedHardware success");
+    return DCAMERA_OK;
+}
+
+int32_t DistributedCameraSinkService::SetAccessListener(const sptr<IAccessListener> &listener,
+    int32_t timeOut, const std::string &pkgName)
+{
+    DHLOGI("SetAccessListener, pkgName: %{public}s, timeOut: %{public}d", pkgName.c_str(), timeOut);
+    if (listener == nullptr) {
+        DHLOGE("listener is nullptr");
+        return DCAMERA_BAD_VALUE;
+    }
+    if (pkgName.empty()) {
+        DHLOGE("pkgName is empty");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    int32_t ret = DCameraAccessConfigManager::GetInstance().SetAccessConfig(listener, timeOut, pkgName);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("SetAccessConfig failed, ret: %{public}d", ret);
+        return ret;
+    }
+
+    DHLOGI("SetAccessListener success");
+    return DCAMERA_OK;
+}
+
+int32_t DistributedCameraSinkService::RemoveAccessListener(const std::string &pkgName)
+{
+    DHLOGI("RemoveAccessListener, pkgName: %{public}s", pkgName.c_str());
+    if (pkgName.empty()) {
+        DHLOGE("pkgName is empty");
+        return DCAMERA_BAD_VALUE;
+    }
+    DCameraAccessConfigManager::GetInstance().ClearAccessConfigByPkgName(pkgName);
+
+    DHLOGI("RemoveAccessListener success");
+    return DCAMERA_OK;
+}
+
+int32_t DistributedCameraSinkService::SetAuthorizationResult(const std::string &requestId, bool granted)
+{
+    DHLOGI("SetAuthorizationResult, requestId: %{public}s, granted: %{public}d",
+        GetAnonyString(requestId).c_str(), granted);
+    if (requestId.empty()) {
+        DHLOGE("requestId is empty");
+        return DCAMERA_BAD_VALUE;
+    }
+    DCameraSoftbusAdapter::GetInstance().ProcessAuthorizationResult(requestId, granted);
+
+    DHLOGI("SetAuthorizationResult success");
     return DCAMERA_OK;
 }
 } // namespace DistributedHardware

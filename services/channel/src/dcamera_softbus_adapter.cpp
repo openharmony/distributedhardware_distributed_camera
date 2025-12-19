@@ -30,6 +30,10 @@
 #include "dcamera_event_cmd.h"
 #include "dcamera_protocol.h"
 #include "cJSON.h"
+#include "dcamera_utils_tools.h"
+#include <random>
+#include <sstream>
+#include <iomanip>
 #ifdef DCAMERA_WAKEUP
 #include "softbus_def.h"
 #include "inner_socket.h"
@@ -58,6 +62,9 @@ static TransWakeUpOnParam g_wakeUpDisableParam = {
 static std::atomic<uint32_t> g_halfWakeupRef{0};
 static const int32_t DCAMERA_OPT_TYPE_FAST_WAKE_UP = 10010;
 #endif
+static const int32_t HEX_WIDTH = 16;
+static const int32_t SECONDS_TO_MS = 1000;
+static const int32_t DEFAULT_TIMEOUT_MS = 30000;
 }
 IMPLEMENT_SINGLE_INSTANCE(DCameraSoftbusAdapter);
 // LCOV_EXCL_START
@@ -626,6 +633,13 @@ int32_t DCameraSoftbusAdapter::SinkOnBind(int32_t socket, PeerSocketInfo info)
     bool isInvalid = false;
     CHECK_AND_RETURN_RET_LOG(CheckOsType(peerNetworkId, isInvalid) != DCAMERA_OK && isInvalid, DCAMERA_BAD_VALUE,
         "CheckOsType failed or invalid osType");
+
+    DCameraAccessConfigManager::GetInstance().SetCurrentNetworkId(peerNetworkId);
+    if (session->GetPeerSessionName().find("_control") != std::string::npos) {
+        DHLOGI("Control channel detected, triggering access authorization");
+        RequestAndWaitForAuthorization(peerNetworkId);
+    }
+
     ret = session->OnSessionOpened(socket, info.networkId);
     if (ret != DCAMERA_OK) {
         DHLOGE("sink bind socket error, not find socket %{public}d", socket);
@@ -830,6 +844,166 @@ void DCameraSoftbusAdapter::CloseSessionWithNetWorkId(const std::string &network
         DHLOGI("DCamera allconnect close session publish scm idle success, dhId: %{public}s",
             GetAnonyString(session->GetMyDhId()).c_str());
     }
+}
+
+std::string DCameraSoftbusAdapter::GenerateRequestId()
+{
+    std::random_device rd;
+    std::mt19937_64 gen(rd());
+    std::uniform_int_distribution<uint64_t> dis;
+
+    uint64_t randomNum = dis(gen);
+    auto now = std::chrono::system_clock::now();
+    auto timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+
+    std::stringstream ss;
+    ss << "req_" << std::hex << std::setfill('0') << std::setw(HEX_WIDTH) << timestamp
+       << "_" << std::setw(HEX_WIDTH) << randomNum;
+
+    std::string requestId = ss.str();
+    DHLOGI("Generated requestId: %{public}s", GetAnonyString(requestId).c_str());
+    return requestId;
+}
+
+void DCameraSoftbusAdapter::StartAuthorizationTimer(const std::string &requestId, int32_t timeOutMs)
+{
+    DHLOGI("Start authorization timer, requestId: %{public}s, timeout: %{public}d ms",
+        GetAnonyString(requestId).c_str(), timeOutMs);
+
+    CancelAuthorizationTimer(requestId);
+    std::lock_guard<std::mutex> lock(authRequestMutex_);
+    authTimerCancelFlags_[requestId] = false;
+
+    auto timerThread = std::make_shared<std::thread>([this, requestId, timeOutMs]() {
+        std::this_thread::sleep_for(std::chrono::milliseconds(timeOutMs));
+
+        bool shouldTimeout = false;
+        {
+            std::lock_guard<std::mutex> lock(authRequestMutex_);
+            auto flagIt = authTimerCancelFlags_.find(requestId);
+            if (flagIt != authTimerCancelFlags_.end() && !flagIt->second) {
+                shouldTimeout = true;
+            }
+            authTimerCancelFlags_.erase(requestId);
+        }
+
+        if (shouldTimeout) {
+            DHLOGI("Authorization timeout for requestId: %{public}s", GetAnonyString(requestId).c_str());
+            HandleAuthorizationTimeout(requestId);
+        }
+
+        {
+            std::lock_guard<std::mutex> lock(authRequestMutex_);
+            authTimerThreads_.erase(requestId);
+        }
+    });
+
+    authTimerThreads_[requestId] = timerThread;
+    timerThread->detach();
+}
+
+void DCameraSoftbusAdapter::CancelAuthorizationTimer(const std::string &requestId)
+{
+    DHLOGI("Cancel authorization timer, requestId: %{public}s", GetAnonyString(requestId).c_str());
+
+    std::lock_guard<std::mutex> lock(authRequestMutex_);
+
+    auto flagIt = authTimerCancelFlags_.find(requestId);
+    if (flagIt != authTimerCancelFlags_.end()) {
+        flagIt->second = true;
+    }
+}
+
+void DCameraSoftbusAdapter::HandleAuthorizationTimeout(const std::string &requestId)
+{
+    DHLOGE("Authorization timeout, requestId: %{public}s", GetAnonyString(requestId).c_str());
+
+    std::string networkId;
+    {
+        std::lock_guard<std::mutex> lock(authRequestMutex_);
+        auto it = pendingAuthRequests_.find(requestId);
+        if (it != pendingAuthRequests_.end()) {
+            networkId = it->second;
+            pendingAuthRequests_.erase(it);
+        }
+    }
+
+    if (networkId.empty()) {
+        DHLOGW("Authorization request not found for timeout, requestId: %{public}s",
+            GetAnonyString(requestId).c_str());
+        return;
+    }
+
+    if (DCameraAccessConfigManager::GetInstance().HasAuthorizationDecision(networkId)) {
+        DHLOGI("Authorization result already exists for device: %{public}s, cover last result",
+            GetAnonyString(networkId).c_str());
+    }
+
+    DCameraAccessConfigManager::GetInstance().SetAuthorizationGranted(networkId, false);
+}
+
+void DCameraSoftbusAdapter::ProcessAuthorizationResult(const std::string &requestId, bool granted)
+{
+    DHLOGI("Process authorization result");
+    CancelAuthorizationTimer(requestId);
+
+    std::string networkId;
+    {
+        std::lock_guard<std::mutex> lock(authRequestMutex_);
+        auto it = pendingAuthRequests_.find(requestId);
+        if (it != pendingAuthRequests_.end()) {
+            networkId = it->second;
+            pendingAuthRequests_.erase(it);
+        }
+    }
+
+    if (networkId.empty()) {
+        DHLOGE("Authorization request not found or already processed: %{public}s",
+            GetAnonyString(requestId).c_str());
+        return;
+    }
+
+    if (DCameraAccessConfigManager::GetInstance().HasAuthorizationDecision(networkId)) {
+        DHLOGW("Authorization result already exists for device: %{public}s, cover last result",
+            GetAnonyString(networkId).c_str());
+    }
+
+    DCameraAccessConfigManager::GetInstance().SetAuthorizationGranted(networkId, granted);
+}
+
+int32_t DCameraSoftbusAdapter::RequestAndWaitForAuthorization(const std::string &peerNetworkId)
+{
+    DHLOGI("Request authorization, networkId: %{public}s", GetAnonyString(peerNetworkId).c_str());
+
+    sptr<IAccessListener> listener = DCameraAccessConfigManager::GetInstance().GetAccessListener();
+    if (listener == nullptr) {
+        DCameraAccessConfigManager::GetInstance().SetAuthorizationGranted(peerNetworkId, true);
+        DHLOGI("listener is null, no authorization config, allow by default");
+        return DCAMERA_OK;
+    }
+    int32_t timeOut = DCameraAccessConfigManager::GetInstance().GetAccessTimeOut();
+    std::string pkgName = DCameraAccessConfigManager::GetInstance().GetAccessPkgName();
+    if (pkgName.empty()) {
+        DCameraAccessConfigManager::GetInstance().SetAuthorizationGranted(peerNetworkId, true);
+        DHLOGI("package name is null, no authorization config, allow by default");
+        return DCAMERA_OK;
+    }
+
+    std::string requestId = GenerateRequestId();
+    {
+        std::lock_guard<std::mutex> lock(authRequestMutex_);
+        pendingAuthRequests_[requestId] = peerNetworkId;
+    }
+
+    int32_t timeOutMs = (timeOut > 0) ? timeOut * SECONDS_TO_MS : DEFAULT_TIMEOUT_MS;
+    StartAuthorizationTimer(requestId, timeOutMs);
+    AuthDeviceInfo remoteDevInfo;
+    remoteDevInfo.networkId = peerNetworkId;
+    remoteDevInfo.deviceName = "Remote Device";
+    remoteDevInfo.deviceType = 0;
+    listener->OnRequestHardwareAccess(requestId, remoteDevInfo, DHType::CAMERA, pkgName);
+    DHLOGI("Authorization request sent");
+    return DCAMERA_OK;
 }
 
 void DeviceInitCallback::OnRemoteDied()

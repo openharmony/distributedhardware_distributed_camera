@@ -22,12 +22,29 @@
 #include "dcamera_sink_callback.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
+#include "iaccess_listener.h"
 #include "idistributed_camera_sink.h"
 
 using namespace testing::ext;
 
 namespace OHOS {
 namespace DistributedHardware {
+class TestAccessListener : public IAccessListener {
+    sptr<IRemoteObject> AsObject()
+    {
+        return nullptr;
+    }
+
+    void OnRequestHardwareAccess(const std::string &requestId, AuthDeviceInfo info, const DHType dhType,
+        const std::string &pkgName)
+    {
+        (void)requestId;
+        (void)info;
+        (void)dhType;
+        (void)pkgName;
+    }
+};
+
 class DistributedCameraSinkServiceTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -346,6 +363,70 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_017, TestSi
 
     int32_t ret = sinkService_->StopDistributedHardware(g_networkId);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_service_test_018
+ * @tc.desc: Verify the function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_018, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_service_test_018");
+    EXPECT_EQ(sinkService_ == nullptr, false);
+
+    sptr<IAccessListener> listenerNull = nullptr;
+    int32_t timeOut = 0;
+    std::string pkgName = "pkgName";
+    sptr<IAccessListener> listener(new TestAccessListener());
+    std::string pkgNameNull = "";
+    int32_t ret = sinkService_->SetAccessListener(listenerNull, timeOut, pkgName);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = sinkService_->SetAccessListener(listener, timeOut, pkgNameNull);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = sinkService_->SetAccessListener(listener, timeOut, pkgName);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_service_test_019
+ * @tc.desc: Verify the function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_019, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_service_test_019");
+    EXPECT_EQ(sinkService_ == nullptr, false);
+
+    std::string pkgName = "pkgName";
+    std::string pkgNameNull = "";
+    int32_t ret = sinkService_->RemoveAccessListener(pkgNameNull);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = sinkService_->RemoveAccessListener(pkgName);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_service_test_020
+ * @tc.desc: Verify the function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_020, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_service_test_020");
+    EXPECT_EQ(sinkService_ == nullptr, false);
+
+    std::string requestId = "requestId";
+    std::string requestIdNull = "";
+    bool granted = true;
+    int32_t ret = sinkService_->SetAuthorizationResult(requestIdNull, granted);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = sinkService_->SetAuthorizationResult(requestId, granted);
+    EXPECT_EQ(DCAMERA_OK, ret);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

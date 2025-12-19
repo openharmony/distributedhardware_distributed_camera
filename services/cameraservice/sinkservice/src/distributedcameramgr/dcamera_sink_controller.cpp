@@ -492,10 +492,39 @@ void DCameraSinkController::DCameraSinkContrEventHandler::ProcessEvent(const App
     }
 }
 
+static bool WaitForAuthorization()
+{
+    std::string networkId = DCameraAccessConfigManager::GetInstance().GetCurrentNetworkId();
+    if (!networkId.empty()) {
+        if (!DCameraAccessConfigManager::GetInstance().HasAuthorizationDecision(networkId)) {
+            int32_t timeOut = DCameraAccessConfigManager::GetInstance().GetAccessTimeOut();
+            bool gotResult = DCameraAccessConfigManager::GetInstance().WaitForAuthorizationResult(networkId, timeOut);
+            if (!gotResult) {
+                DHLOGE("Authorization timeout, cannot start encoder");
+                return false;
+            }
+        }
+
+        if (!DCameraAccessConfigManager::GetInstance().IsAuthorizationGranted(networkId)) {
+            DHLOGE("Authorization denied, cannot start encoder");
+            return false;
+        }
+    }
+    return true;
+}
+
 void DCameraSinkController::CheckAndCommitCapture()
 {
     if (!isEncoderReady_ || !isCameraReady_) {
         DHLOGI("Waiting... EncoderReady: %d, CameraReady: %d", isEncoderReady_.load(), isCameraReady_.load());
+        return;
+    }
+
+    bool result = WaitForAuthorization();
+    if (!result) {
+        captureState_ = CAPTURE_IDLE;
+        captureStateCv_.notify_all();
+        HandleCaptureError(DCAMERA_ALLOC_ERROR, "commit capture no permission.");
         return;
     }
 

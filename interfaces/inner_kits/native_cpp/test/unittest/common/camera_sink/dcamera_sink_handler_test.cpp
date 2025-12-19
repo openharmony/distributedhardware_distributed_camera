@@ -30,6 +30,7 @@
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
+#include "iaccess_listener.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "idistributed_camera_sink.h"
@@ -45,6 +46,22 @@ static int32_t OHOS_PERMISSION_ENABLE_DISTRIBUTED_HARDWARE_INDEX = 0;
 static int32_t OHOS_PERMISSION_DISTRIBUTED_DATASYNC_INDEX = 1;
 static int32_t OHOS_PERMISSION_ACCESS_DISTRIBUTED_HARDWARE_INDEX = 2;
 }
+class TestAccessListener : public IAccessListener {
+    sptr<IRemoteObject> AsObject()
+    {
+        return nullptr;
+    }
+
+    void OnRequestHardwareAccess(const std::string &requestId, AuthDeviceInfo info, const DHType dhType,
+        const std::string &pkgName)
+    {
+        (void)requestId;
+        (void)info;
+        (void)dhType;
+        (void)pkgName;
+    }
+};
+
 class DCameraSinkHandlerTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -266,6 +283,60 @@ HWTEST_F(DCameraSinkHandlerTest, dcamera_sink_handler_test_010, TestSize.Level1)
 
     ret = DCameraSinkHandler::GetInstance().StopDistributedHardware(params);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_handler_test_011
+ * @tc.desc: Verify the function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraSinkHandlerTest, dcamera_sink_handler_test_011, TestSize.Level1)
+{
+    sptr<IAccessListener> listenerNull = nullptr;
+    int32_t timeOut = 0;
+    std::string pkgName = "pkgName";
+    int32_t ret = DCameraSinkHandler::GetInstance().SetAccessListener(listenerNull, timeOut, pkgName);
+    EXPECT_EQ(ret, DCAMERA_BAD_VALUE);
+    sptr<IAccessListener> listener(new TestAccessListener());
+    std::string pkgNameNull = "";
+    ret = DCameraSinkHandler::GetInstance().SetAccessListener(listener, timeOut, pkgNameNull);
+    EXPECT_EQ(ret, DCAMERA_BAD_VALUE);
+    ret = DCameraSinkHandler::GetInstance().SetAccessListener(listener, timeOut, pkgName);
+    EXPECT_EQ(ret, DCAMERA_BAD_VALUE);
+}
+
+/**
+ * @tc.name: dcamera_sink_handler_test_012
+ * @tc.desc: Verify the function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraSinkHandlerTest, dcamera_sink_handler_test_012, TestSize.Level1)
+{
+    std::string pkgName = "pkgName";
+    std::string pkgNameNull = "";
+    int32_t ret = DCameraSinkHandler::GetInstance().RemoveAccessListener(pkgNameNull);
+    EXPECT_EQ(ret, DCAMERA_BAD_VALUE);
+    ret = DCameraSinkHandler::GetInstance().RemoveAccessListener(pkgName);
+    EXPECT_EQ(ret, DCAMERA_BAD_VALUE);
+}
+
+/**
+ * @tc.name: dcamera_sink_handler_test_013
+ * @tc.desc: Verify the function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraSinkHandlerTest, dcamera_sink_handler_test_013, TestSize.Level1)
+{
+    std::string requestId = "requestId";
+    std::string requestIdNull = "";
+    bool granted = true;
+    int32_t ret = DCameraSinkHandler::GetInstance().SetAuthorizationResult(requestIdNull, granted);
+    EXPECT_EQ(ret, DCAMERA_BAD_VALUE);
+    ret = DCameraSinkHandler::GetInstance().SetAuthorizationResult(requestId, granted);
+    EXPECT_EQ(ret, DCAMERA_BAD_VALUE);
 }
 }
 }

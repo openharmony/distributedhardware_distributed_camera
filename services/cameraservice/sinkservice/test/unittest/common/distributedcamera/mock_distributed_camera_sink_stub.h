@@ -100,6 +100,25 @@ public:
         (void)networkId;
         return DCAMERA_OK;
     }
+
+    int32_t SetAccessListener(const sptr<IAccessListener> &listener, int32_t timeOut, const std::string &pkgName)
+    {
+        (void)listener;
+        (void)timeOut;
+        (void)pkgName;
+        return DCAMERA_OK;
+    }
+    int32_t RemoveAccessListener(const std::string &pkgName)
+    {
+        (void)pkgName;
+        return DCAMERA_OK;
+    }
+    int32_t SetAuthorizationResult(const std::string &requestId, bool granted)
+    {
+        (void)requestId;
+        (void)granted;
+        return DCAMERA_OK;
+    }
 };
 } // namespace DistributedHardware
 } // namespace OHOS
