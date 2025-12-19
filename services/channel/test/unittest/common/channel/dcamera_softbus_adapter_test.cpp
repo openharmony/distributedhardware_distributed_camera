@@ -1522,5 +1522,32 @@ HWTEST_F(DCameraSoftbusAdapterTest, DCameraSoftbusAdapterTest_054, TestSize.Leve
               DCameraSoftbusAdapter::GetInstance().sinkSocketSessionMap_.end());
 }
 
+HWTEST_F(DCameraSoftbusAdapterTest, DCameraSoftbusAdapterTest_055, TestSize.Level1)
+{
+    std::string sessionName = "test_session";
+    std::string peerSessionName = "dh_video_0";
+    std::string peerDevId = TEST_DEVICE_ID;
+    std::string myDevId = "testDevId";
+    std::string myDhId = "camera_0";
+    int32_t socketId = 123;
+
+    auto listener = std::make_shared<DCameraChannelListenerMock>();
+    std::shared_ptr<DCameraSoftbusSession> session = std::make_shared<DCameraSoftbusSession>(
+        myDhId, myDevId, sessionName, peerDevId, peerSessionName, listener,
+        DCameraSessionMode::DCAMERA_SESSION_MODE_VIDEO);
+
+    session->SetSessionId(socketId);
+
+    DCameraSoftbusAdapter::GetInstance().sinkSocketSessionMap_[socketId] = session;
+    DCameraSoftbusAdapter::GetInstance().trustSessionId_.controlSessionId_ = -1;
+    DCameraSoftbusAdapter::GetInstance().trustSessionId_.dataContinueSessionId_ = 123;
+    DCameraSoftbusAdapter::GetInstance().trustSessionId_.dataSnapshotSessionId_ = 123;
+
+    DCameraSoftbusAdapter::GetInstance().SinkOnShutDown(socketId, ShutdownReason::SHUTDOWN_REASON_LOCAL);
+
+    EXPECT_EQ(DCameraSoftbusAdapter::GetInstance().sinkSocketSessionMap_.find(socketId),
+              DCameraSoftbusAdapter::GetInstance().sinkSocketSessionMap_.end());
+}
+
 }
 }
