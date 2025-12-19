@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -411,5 +411,254 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_015, TestSize.L
     int32_t ret = softbusSession_->OnSessionClose(sessionId);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
+
+/**
+ * @tc.name: dcamera_softbus_session_test_016
+ * @tc.desc: Verify the OnSessionOpened function when isConflict_ is true.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_016, TestSize.Level1)
+{
+    EXPECT_NE(nullptr, softbusSession_);
+    softbusSession_->SetConflict(true);
+    EXPECT_TRUE(softbusSession_->isConflict_);
+    int32_t sessionId = 1;
+    std::string networkId = "test_network_id";
+    int32_t ret = softbusSession_->OnSessionOpened(sessionId, networkId);
+    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(sessionId, softbusSession_->sessionId_);
+    EXPECT_EQ(DCAMERA_SOFTBUS_STATE_OPENED, softbusSession_->state_);
+}
+
+/**
+ * @tc.name: dcamera_softbus_session_test_017
+ * @tc.desc: Verify the OnSessionClose function when isConflict_ is true.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_017, TestSize.Level1)
+{
+    EXPECT_NE(nullptr, softbusSession_);
+    softbusSession_->SetConflict(true);
+    EXPECT_TRUE(softbusSession_->isConflict_);
+    int32_t sessionId = 1;
+    int32_t ret = softbusSession_->OnSessionClose(sessionId);
+    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(-1, softbusSession_->sessionId_);
+    EXPECT_EQ(DCAMERA_SOFTBUS_STATE_CLOSED, softbusSession_->state_);
+}
+
+/**
+ * @tc.name: dcamera_softbus_session_test_018
+ * @tc.desc: Verify the ReleaseSession function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_018, TestSize.Level1)
+{
+    EXPECT_NE(nullptr, softbusSession_);
+    int32_t testSessionId = 5;
+    softbusSession_->sessionId_ = testSessionId;
+    softbusSession_->ReleaseSession();
+    EXPECT_NE(nullptr, softbusSession_);
+}
+
+/**
+ * @tc.name: dcamera_softbus_session_test_019
+ * @tc.desc: Verify the SetConflict function - set to true.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_019, TestSize.Level1)
+{
+    EXPECT_NE(nullptr, softbusSession_);
+    EXPECT_FALSE(softbusSession_->isConflict_);
+    softbusSession_->SetConflict(true);
+    EXPECT_TRUE(softbusSession_->isConflict_);
+}
+
+/**
+ * @tc.name: dcamera_softbus_session_test_020
+ * @tc.desc: Verify the SetConflict function - set to false.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_020, TestSize.Level1)
+{
+    EXPECT_NE(nullptr, softbusSession_);
+    softbusSession_->SetConflict(true);
+    EXPECT_TRUE(softbusSession_->isConflict_);
+    softbusSession_->SetConflict(false);
+    EXPECT_FALSE(softbusSession_->isConflict_);
+}
+
+/**
+ * @tc.name: dcamera_softbus_session_test_021
+ * @tc.desc: Verify the SetConflict function - affects OnSessionOpened behavior.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_021, TestSize.Level1)
+{
+    EXPECT_NE(nullptr, softbusSession_);
+    softbusSession_->SetConflict(true);
+    EXPECT_TRUE(softbusSession_->isConflict_);
+    int32_t sessionId = 1;
+    std::string networkId = "test_network_id";
+    int32_t ret = softbusSession_->OnSessionOpened(sessionId, networkId);
+    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(sessionId, softbusSession_->sessionId_);
+    EXPECT_EQ(DCAMERA_SOFTBUS_STATE_OPENED, softbusSession_->state_);
+    softbusSession_->SetConflict(false);
+    EXPECT_FALSE(softbusSession_->isConflict_);
+    ret = softbusSession_->OnSessionOpened(sessionId, networkId);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_softbus_session_test_022
+ * @tc.desc: Verify the SetConflict function - affects OnSessionClose behavior.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_022, TestSize.Level1)
+{
+    EXPECT_NE(nullptr, softbusSession_);
+    softbusSession_->SetConflict(true);
+    EXPECT_TRUE(softbusSession_->isConflict_);
+    int32_t sessionId = 1;
+    int32_t ret = softbusSession_->OnSessionClose(sessionId);
+    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(-1, softbusSession_->sessionId_);
+    EXPECT_EQ(DCAMERA_SOFTBUS_STATE_CLOSED, softbusSession_->state_);
+    softbusSession_->SetConflict(false);
+    EXPECT_FALSE(softbusSession_->isConflict_);
+    ret = softbusSession_->OnSessionClose(sessionId);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_softbus_session_test_023
+ * @tc.desc: Verify the NotifyError function with normal parameters.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_023, TestSize.Level1)
+{
+    EXPECT_NE(nullptr, softbusSession_);
+    softbusSession_->state_ = DCAMERA_SOFTBUS_STATE_OPENED;
+    int32_t eventType = 1;
+    int32_t eventReason = 2;
+    std::string detail = "Test error detail";
+    int32_t ret = softbusSession_->NotifyError(eventType, eventReason, detail);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_softbus_session_test_024
+ * @tc.desc: Verify the NotifyError function with empty detail string.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_024, TestSize.Level1)
+{
+    EXPECT_NE(nullptr, softbusSession_);
+    softbusSession_->state_ = DCAMERA_SOFTBUS_STATE_OPENED;
+    int32_t eventType = 1;
+    int32_t eventReason = 2;
+    std::string detail = "";
+    int32_t ret = softbusSession_->NotifyError(eventType, eventReason, detail);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_softbus_session_test_025
+ * @tc.desc: Verify the NotifyError function with long detail string.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_025, TestSize.Level1)
+{
+    EXPECT_NE(nullptr, softbusSession_);
+    softbusSession_->state_ = DCAMERA_SOFTBUS_STATE_OPENED;
+    int32_t eventType = 1;
+    int32_t eventReason = 2;
+    std::string detail = "This is a very long error detail string that contains many characters "
+        "and should test how the NotifyError function handles longer strings without issues "
+        "and still properly marshals and sends the data correctly.";
+    
+    int32_t ret = softbusSession_->NotifyError(eventType, eventReason, detail);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_softbus_session_test_026
+ * @tc.desc: Verify the NotifyError function with negative parameters.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_026, TestSize.Level1)
+{
+    EXPECT_NE(nullptr, softbusSession_);
+    softbusSession_->state_ = DCAMERA_SOFTBUS_STATE_OPENED;
+    int32_t eventType = -1;
+    int32_t eventReason = -1;
+    std::string detail = "Test error with negative values";
+    int32_t ret = softbusSession_->NotifyError(eventType, eventReason, detail);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_softbus_session_test_027
+ * @tc.desc: Verify the NotifyError function with special characters in detail.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_027, TestSize.Level1)
+{
+    EXPECT_NE(nullptr, softbusSession_);
+    softbusSession_->state_ = DCAMERA_SOFTBUS_STATE_OPENED;
+    int32_t eventType = 1;
+    int32_t eventReason = 2;
+    std::string detail = "Test error with special characters: !@#$%^&*()_+-={}[]|\\:;\"'<>,.?/";
+    int32_t ret = softbusSession_->NotifyError(eventType, eventReason, detail);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_softbus_session_test_028
+ * @tc.desc: Verify the NotifyError function with zero parameters.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_028, TestSize.Level1)
+{
+    EXPECT_NE(nullptr, softbusSession_);
+    softbusSession_->state_ = DCAMERA_SOFTBUS_STATE_OPENED;
+    int32_t eventType = 0;
+    int32_t eventReason = 0;
+    std::string detail = "Test error with zero values";
+    int32_t ret = softbusSession_->NotifyError(eventType, eventReason, detail);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_softbus_session_test_029
+ * @tc.desc: Verify the NotifyError function with maximum integer values.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_029, TestSize.Level1)
+{
+    EXPECT_NE(nullptr, softbusSession_);
+    softbusSession_->state_ = DCAMERA_SOFTBUS_STATE_OPENED;
+    int32_t eventType = INT_MAX;
+    int32_t eventReason = INT_MAX;
+    std::string detail = "Test error with maximum integer values";
+    int32_t ret = softbusSession_->NotifyError(eventType, eventReason, detail);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
 }
 }

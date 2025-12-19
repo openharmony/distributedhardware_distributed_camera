@@ -32,6 +32,7 @@
 #include "dcamera_source_controller_channel_listener.h"
 #include "dcamera_source_service_ipc.h"
 #include "dcamera_utils_tools.h"
+#include "dcamera_hisysevent_adapter.h"
 
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
@@ -223,6 +224,10 @@ int32_t DCameraSourceController::DCameraNotify(std::shared_ptr<DCameraEvent>& ev
     if (events->eventResult_ == DCAMERA_EVENT_CAMERA_ERROR) {
         DcameraFinishAsyncTrace(DCAMERA_CONTINUE_FIRST_FRAME, DCAMERA_CONTINUE_FIRST_FRAME_TASKID);
         DcameraFinishAsyncTrace(DCAMERA_SNAPSHOT_FIRST_FRAME, DCAMERA_SNAPSHOT_FIRST_FRAME_TASKID);
+    }
+    if (events->eventResult_ == DCAMERA_EVENT_DEVICE_IN_USE) {
+        ReportCameraOperaterEvent(DCAMERA_CONFLICT_RECEIVE_EVENT, GetAnonyString(devId_),
+            dhId_, "Source notify device in use event");
     }
     if (camHdiProvider_ == nullptr) {
         DHLOGI("DCameraNotify camHdiProvider is nullptr devId: %{public}s dhId: %{public}s",

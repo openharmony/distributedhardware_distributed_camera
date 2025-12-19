@@ -30,6 +30,8 @@
 #include "dcamera_event_cmd.h"
 #include "dcamera_protocol.h"
 #include "cJSON.h"
+#include "ffrt_inner.h"
+#include <sys/prctl.h>
 #ifdef DCAMERA_WAKEUP
 #include "softbus_def.h"
 #include "inner_socket.h"
@@ -626,6 +628,12 @@ int32_t DCameraSoftbusAdapter::SinkOnBind(int32_t socket, PeerSocketInfo info)
     bool isInvalid = false;
     CHECK_AND_RETURN_RET_LOG(CheckOsType(peerNetworkId, isInvalid) != DCAMERA_OK && isInvalid, DCAMERA_BAD_VALUE,
         "CheckOsType failed or invalid osType");
+        
+    ret = HandleConflictSession(socket, session, info.networkId);
+    if (ret != DCAMERA_OK) {
+        return ret;
+    }
+     
     ret = session->OnSessionOpened(socket, info.networkId);
     if (ret != DCAMERA_OK) {
         DHLOGE("sink bind socket error, not find socket %{public}d", socket);
@@ -650,6 +658,69 @@ int32_t DCameraSoftbusAdapter::SinkOnBind(int32_t socket, PeerSocketInfo info)
 #endif
     DHLOGI("sink bind socket end, socket: %{public}d", socket);
     return ret;
+}
+
+int32_t DCameraSoftbusAdapter::HandleConflictSession(int32_t socket,
+    std::shared_ptr<DCameraSoftbusSession> session, const std::string& networkId)
+{
+    DHLOGI("Starting conflict detection for socket: %{public}d, dhId: %{public}s",
+           socket, GetAnonyString(session->GetMyDhId()).c_str());
+    auto peerSessionName = session->GetPeerSessionName();
+    if (peerSessionName.find("_control") != std::string::npos && trustSessionId_.controlSessionId_ != -1) {
+        session->SetConflict(true);
+        int32_t ret = session->OnSessionOpened(socket, networkId);
+        if (ret != DCAMERA_OK) {
+            DHLOGE("sink bind socket error, not find socket %{public}d", socket);
+        }
+        ExecuteConflictCleanupAsync(socket, session);
+        return DCAMERA_DEVICE_BUSY;
+    }
+    
+    if ((peerSessionName.find("_dataContinue") != std::string::npos && trustSessionId_.dataContinueSessionId_ != -1) ||
+        (peerSessionName.find("_dataSnapshot") != std::string::npos && trustSessionId_.dataSnapshotSessionId_ != -1)) {
+        {
+            std::lock_guard<std::mutex> autoLock(sinkSocketLock_);
+            sinkSocketSessionMap_.erase(socket);
+        }
+        return DCAMERA_DEVICE_BUSY;
+    }
+    
+    {
+        std::lock_guard<std::mutex> autoLock(trustSessionIdLock_);
+        if (peerSessionName.find("_control") != std::string::npos) {
+            trustSessionId_.controlSessionId_ = socket;
+            session->SetConflict(false);
+        } else if (peerSessionName.find("_dataContinue") != std::string::npos) {
+            trustSessionId_.dataContinueSessionId_ = socket;
+        } else if (peerSessionName.find("_dataSnapshot") != std::string::npos) {
+            trustSessionId_.dataSnapshotSessionId_ = socket;
+        }
+    }
+    
+    return DCAMERA_OK;
+}
+
+void DCameraSoftbusAdapter::ExecuteConflictCleanupAsync(int32_t socket,
+    std::shared_ptr<DCameraSoftbusSession> session)
+{
+    DHLOGI("Submitting async cleanup task for socket: %{public}d", socket);
+    
+    ffrt::submit([this, socket, session]() {
+        DHLOGI("Async cleanup: sending error notification for socket: %{public}d", socket);
+        prctl(PR_SET_NAME, "DCamConflictCleanup");
+        ReportCameraOperaterEvent(DCAMERA_CONFLICT_SEND_EVENT, GetAnonyString(session->GetPeerDevId()).c_str(),
+            GetAnonyString(session->GetMyDhId()).c_str(), "operator start capture in used.");
+        session->NotifyError(DCAMERA_MESSAGE,  DCAMERA_EVENT_DEVICE_IN_USE,
+            std::string("operator start capture in used."));
+        {
+            std::lock_guard<std::mutex> autoLock(sinkSocketLock_);
+            sinkSocketSessionMap_.erase(socket);
+        }
+        {
+            std::lock_guard<std::mutex> autoLock(trustSessionIdLock_);
+            session->SetSessionId(trustSessionId_.controlSessionId_);
+        }
+        }, {}, {}, ffrt::task_attr().name("DCamConflictCleanup").qos(ffrt::qos_user_initiated));
 }
 
 int32_t DCameraSoftbusAdapter::ParseValueFromCjson(std::string args, std::string key)
@@ -697,6 +768,19 @@ void DCameraSoftbusAdapter::SinkOnShutDown(int32_t socket, ShutdownReason reason
         DHLOGE("sink on shutdown socket can not find socket %{public}d", socket);
         return;
     }
+    {
+        std::lock_guard<std::mutex> autoLock(trustSessionIdLock_);
+        if (trustSessionId_.controlSessionId_ == socket) {
+            trustSessionId_.controlSessionId_ = -1;
+            session->SetConflict(false);
+        } else if (trustSessionId_.dataContinueSessionId_ == socket) {
+            trustSessionId_.dataContinueSessionId_ = -1;
+            session->SetConflict(false);
+        } else if (trustSessionId_.dataSnapshotSessionId_ == socket) {
+            trustSessionId_.dataSnapshotSessionId_ = -1;
+            session->SetConflict(false);
+        }
+    }
     session->OnSessionClose(socket);
     if (session->GetPeerSessionName().find("_control") != std::string::npos && DCameraAllConnectManager::IsInited()) {
         std::string devId = DCameraAllConnectManager::GetSinkDevIdBySocket(socket);
@@ -710,6 +794,10 @@ void DCameraSoftbusAdapter::SinkOnShutDown(int32_t socket, ShutdownReason reason
         DHLOGI("DCamera allconnect sinkdown publish scm idle success, dhId: %{public}s",
             GetAnonyString(session->GetMyDhId()).c_str());
         DCameraAllConnectManager::RemoveSinkNetworkId(socket);
+    }
+    {
+        std::lock_guard<std::mutex> autoLock(sinkSocketLock_);
+        sinkSocketSessionMap_.erase(socket);
     }
 #ifdef DCAMERA_WAKEUP
     if (g_halfWakeupRef.fetch_sub(1) == 1) {
