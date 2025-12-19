@@ -700,7 +700,6 @@ int32_t DCameraSoftbusAdapter::HandleConflictSession(int32_t socket,
     return DCAMERA_OK;
 }
 
-
 void DCameraSoftbusAdapter::ExecuteConflictCleanupAsync(int32_t socket,
     std::shared_ptr<DCameraSoftbusSession> session)
 {
