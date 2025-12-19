@@ -319,7 +319,7 @@ HWTEST_F(DCameraSinkHandlerTest, dcamera_sink_handler_test_012, TestSize.Level1)
     int32_t ret = DCameraSinkHandler::GetInstance().RemoveAccessListener(pkgNameNull);
     EXPECT_EQ(ret, DCAMERA_BAD_VALUE);
     ret = DCameraSinkHandler::GetInstance().RemoveAccessListener(pkgName);
-    EXPECT_EQ(ret, DCAMERA_BAD_VALUE);
+    EXPECT_EQ(ret, DCAMERA_OK);
 }
 
 /**
@@ -336,7 +336,7 @@ HWTEST_F(DCameraSinkHandlerTest, dcamera_sink_handler_test_013, TestSize.Level1)
     int32_t ret = DCameraSinkHandler::GetInstance().SetAuthorizationResult(requestIdNull, granted);
     EXPECT_EQ(ret, DCAMERA_BAD_VALUE);
     ret = DCameraSinkHandler::GetInstance().SetAuthorizationResult(requestId, granted);
-    EXPECT_EQ(ret, DCAMERA_BAD_VALUE);
+    EXPECT_EQ(ret, DCAMERA_OK);
 }
 }
 }

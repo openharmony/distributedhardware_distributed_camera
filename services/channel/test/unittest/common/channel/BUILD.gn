@@ -96,6 +96,7 @@ ohos_unittest("DCameraChannelTest") {
     "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "ffrt:libffrt",
   ]
 
   defines = [

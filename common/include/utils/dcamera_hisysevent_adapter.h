@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,7 +31,8 @@ const std::string UNREGIST_CAMERA_EVENT = "DCAMERA_UNREGISTER";
 const std::string OPEN_CAMERA_EVENT = "DCAMERA_OPEN";
 const std::string CLOSE_CAMERA_EVENT = "DCAMERA_CLOSE";
 const std::string START_CAPTURE_EVENT = "DCAMERA_CAPTURE";
-
+const std::string DCAMERA_CONFLICT_SEND_EVENT = "DCAMERA_CONFLICT_SEND";
+const std::string DCAMERA_CONFLICT_RECEIVE_EVENT = "DCAMERA_CONFLICT_RECEIVE";
 enum DcameraHisyseventErrno : int32_t  {
     DCAMERA_SA_ERROR = 0,
     DCAMERA_HDF_ERROR = 1,

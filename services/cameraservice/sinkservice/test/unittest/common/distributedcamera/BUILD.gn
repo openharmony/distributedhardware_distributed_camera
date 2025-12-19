@@ -47,7 +47,6 @@ ohos_unittest("DistributedCameraSinkServiceTest") {
   module_out_path = module_out_path
 
   sources = [
-    "accesstoken_kit_mock.cpp",
     "dcamera_sink_callback_proxy_test.cpp",
     "dcamera_sink_hidumper_test.cpp",
     "distributed_camera_sink_service_test.cpp",
@@ -77,8 +76,6 @@ ohos_unittest("DistributedCameraSinkServiceTest") {
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.1",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
-    "googletest:gmock",
-    "googletest:gmock_main",
     "graphic_surface:surface",
     "hilog:libhilog",
     "ipc:ipc_core",

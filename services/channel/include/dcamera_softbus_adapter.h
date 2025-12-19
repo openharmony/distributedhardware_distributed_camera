@@ -88,14 +88,14 @@ private:
     void ReplaceSuffix(std::string &mySessNmRep, const std::string &suffix, const std::string &replacement);
     int32_t CheckOsType(const std::string &networkId, bool &isInvalid);
     int32_t ParseValueFromCjson(std::string args, std::string key);
-
-    // Authorization mechanism helper functions
     std::string GenerateRequestId();
     void StartAuthorizationTimer(const std::string &requestId, int32_t timeOutMs);
     void CancelAuthorizationTimer(const std::string &requestId);
     void HandleAuthorizationTimeout(const std::string &requestId);
     int32_t RequestAndWaitForAuthorization(const std::string &peerNetworkId);
-
+    int32_t HandleConflictSession(int32_t socket, std::shared_ptr<DCameraSoftbusSession> session,
+        const std::string& networkId);
+    void ExecuteConflictCleanupAsync(int32_t socket, std::shared_ptr<DCameraSoftbusSession> session);
 private:
     std::mutex optLock_;
     const std::string PKG_NAME = "ohos.dhardware.dcamera";
@@ -109,6 +109,13 @@ private:
     static const uint32_t SOFTBUS_VIDEO_P_FRAME = 2;
 
     int32_t sourceSocketId_ = -1;
+    std::mutex trustSessionIdLock_;
+    struct TrustSessionId {
+        int32_t controlSessionId_ = -1;
+        int32_t dataContinueSessionId_ = -1;
+        int32_t dataSnapshotSessionId_ = -1;
+    };
+    TrustSessionId trustSessionId_;
     std::map<DCameraSessionMode, TransDataType> sessionModeAndDataTypeMap_;
     std::mutex mySessionNamePeerDevIdLock_;
     std::map<std::string, std::string> peerDevIdMySessionNameMap_;
