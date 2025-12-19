@@ -559,7 +559,7 @@ int32_t DCameraSoftbusSession::NotifyError(int32_t eventType, int32_t eventReaso
     ret = memcpy_s(buffer->Data(), buffer->Capacity(),
         reinterpret_cast<uint8_t *>(const_cast<char *>(jsonStr.c_str())), jsonStr.length() + 1);
     CHECK_AND_RETURN_RET_LOG(ret != EOK, DCAMERA_BAD_VALUE, "NotifyError memcpy_s failed, ret: %{public}d", ret);
-    ret =SendData(DCAMERA_SESSION_MODE_CTRL, buffer);
+    ret = SendData(DCAMERA_SESSION_MODE_CTRL, buffer);
     if (ret != DCAMERA_OK) {
         DHLOGE("NotifyError SendData failed, dhId: %{public}s, ret: %{public}d",
                GetAnonyString(myDhId_).c_str(), ret);
