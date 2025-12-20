@@ -20,6 +20,9 @@
 #include <map>
 #include <set>
 #include <unistd.h>
+#include <chrono>
+#include <thread>
+#include <condition_variable>
 
 #include "dcamera_softbus_session.h"
 #include "icamera_channel.h"
@@ -27,6 +30,8 @@
 #include "socket.h"
 #include "trans_type.h"
 #include "device_manager.h"
+#include "device_type.h"
+#include "iaccess_listener.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -68,6 +73,7 @@ public:
     void RecordSourceSocketSession(int32_t socket, std::shared_ptr<DCameraSoftbusSession> session);
 
     void CloseSessionWithNetWorkId(const std::string &networkId);
+    void ProcessAuthorizationResult(const std::string &requestId, bool granted);
 public:
     std::map<std::string, std::shared_ptr<DCameraSoftbusSession>> sinkSessions_;
 
@@ -82,6 +88,11 @@ private:
     void ReplaceSuffix(std::string &mySessNmRep, const std::string &suffix, const std::string &replacement);
     int32_t CheckOsType(const std::string &networkId, bool &isInvalid);
     int32_t ParseValueFromCjson(std::string args, std::string key);
+    std::string GenerateRequestId();
+    void StartAuthorizationTimer(const std::string &requestId, int32_t timeOutMs);
+    void CancelAuthorizationTimer(const std::string &requestId);
+    void HandleAuthorizationTimeout(const std::string &requestId);
+    int32_t RequestAndWaitForAuthorization(const std::string &peerNetworkId);
     int32_t HandleConflictSession(int32_t socket, std::shared_ptr<DCameraSoftbusSession> session,
         const std::string& networkId);
     void ExecuteConflictCleanupAsync(int32_t socket, std::shared_ptr<DCameraSoftbusSession> session);
@@ -116,6 +127,12 @@ private:
     std::map<int32_t, std::shared_ptr<DCameraSoftbusSession>> sinkSocketSessionMap_;
     std::mutex sourceSocketLock_;
     std::map<int32_t, std::shared_ptr<DCameraSoftbusSession>> sourceSocketSessionMap_;
+
+    // Authorization mechanism members
+    std::mutex authRequestMutex_;
+    std::map<std::string, std::shared_ptr<std::thread>> authTimerThreads_;
+    std::map<std::string, bool> authTimerCancelFlags_;
+    std::map<std::string, std::string> pendingAuthRequests_;  // requestId -> networkId mapping
 };
 
 class DeviceInitCallback : public DmInitCallback {

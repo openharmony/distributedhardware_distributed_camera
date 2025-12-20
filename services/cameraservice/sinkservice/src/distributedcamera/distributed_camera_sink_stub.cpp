@@ -50,6 +50,12 @@ DistributedCameraSinkStub::DistributedCameraSinkStub() : IRemoteStub(true)
         &DistributedCameraSinkStub::ResumeDistributedHardwareInner;
     memberFuncMap_[static_cast<uint32_t>(IDCameraSinkInterfaceCode::STOP_DISTRIBUTED_HARDWARE)] =
         &DistributedCameraSinkStub::StopDistributedHardwareInner;
+    memberFuncMap_[static_cast<uint32_t>(IDCameraSinkInterfaceCode::SET_ACCESS_LISTENER)] =
+        &DistributedCameraSinkStub::SetAccessListenerInner;
+    memberFuncMap_[static_cast<uint32_t>(IDCameraSinkInterfaceCode::REMOVE_ACCESS_LISTENER)] =
+        &DistributedCameraSinkStub::RemoveAccessListenerInner;
+    memberFuncMap_[static_cast<uint32_t>(IDCameraSinkInterfaceCode::SET_AUTHORIZATION_RESULT)] =
+        &DistributedCameraSinkStub::SetAuthorizationResultInner;
 }
 
 DistributedCameraSinkStub::~DistributedCameraSinkStub()
@@ -100,6 +106,12 @@ int32_t DistributedCameraSinkStub::OnRemoteRequest(uint32_t code, MessageParcel 
             return ResumeDistributedHardwareInner(data, reply);
         case static_cast<uint32_t>(IDCameraSinkInterfaceCode::STOP_DISTRIBUTED_HARDWARE):
             return StopDistributedHardwareInner(data, reply);
+        case static_cast<uint32_t>(IDCameraSinkInterfaceCode::SET_ACCESS_LISTENER):
+            return SetAccessListenerInner(data, reply);
+        case static_cast<uint32_t>(IDCameraSinkInterfaceCode::REMOVE_ACCESS_LISTENER):
+            return RemoveAccessListenerInner(data, reply);
+        case static_cast<uint32_t>(IDCameraSinkInterfaceCode::SET_AUTHORIZATION_RESULT):
+            return SetAuthorizationResultInner(data, reply);
         default:
             DHLOGE("Invalid OnRemoteRequest code=%{public}d", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -351,6 +363,71 @@ int32_t DistributedCameraSinkStub::StopDistributedHardwareInner(MessageParcel &d
         }
         ret = StopDistributedHardware(networkId);
     } while (0);
+    reply.WriteInt32(ret);
+    return DCAMERA_OK;
+}
+
+int32_t DistributedCameraSinkStub::SetAccessListenerInner(MessageParcel &data, MessageParcel &reply)
+{
+    DHLOGD("SetAccessListenerInner enter");
+    int32_t ret = DCAMERA_OK;
+    do {
+        if (!HasAccessDHPermission()) {
+            DHLOGE("The caller has no ACCESS_DISTRIBUTED_HARDWARE permission.");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
+
+        sptr<IRemoteObject> remoteObj = data.ReadRemoteObject();
+        if (remoteObj == nullptr) {
+            DHLOGE("Read remote listener object failed");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
+        sptr<IAccessListener> listener = iface_cast<IAccessListener>(remoteObj);
+        int32_t timeOut = data.ReadInt32();
+        std::string pkgName = data.ReadString();
+        ret = SetAccessListener(listener, timeOut, pkgName);
+    } while (0);
+
+    reply.WriteInt32(ret);
+    return DCAMERA_OK;
+}
+
+int32_t DistributedCameraSinkStub::RemoveAccessListenerInner(MessageParcel &data, MessageParcel &reply)
+{
+    DHLOGD("RemoveAccessListenerInner enter");
+    int32_t ret = DCAMERA_OK;
+    do {
+        if (!HasAccessDHPermission()) {
+            DHLOGE("The caller has no ACCESS_DISTRIBUTED_HARDWARE permission.");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
+        std::string pkgName = data.ReadString();
+        ret = RemoveAccessListener(pkgName);
+    } while (0);
+
+    reply.WriteInt32(ret);
+    return DCAMERA_OK;
+}
+
+int32_t DistributedCameraSinkStub::SetAuthorizationResultInner(MessageParcel &data, MessageParcel &reply)
+{
+    DHLOGD("SetAuthorizationResultInner enter");
+    int32_t ret = DCAMERA_OK;
+    do {
+        if (!HasAccessDHPermission()) {
+            DHLOGE("The caller has no ACCESS_DISTRIBUTED_HARDWARE permission.");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
+
+        std::string requestId = data.ReadString();
+        bool granted = data.ReadBool();
+        ret = SetAuthorizationResult(requestId, granted);
+    } while (0);
+
     reply.WriteInt32(ret);
     return DCAMERA_OK;
 }

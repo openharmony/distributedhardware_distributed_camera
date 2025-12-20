@@ -44,6 +44,9 @@ enum class IDCameraSinkInterfaceCode : uint32_t {
     PAUSE_DISTRIBUTED_HARDWARE = 9,
     RESUME_DISTRIBUTED_HARDWARE = 10,
     STOP_DISTRIBUTED_HARDWARE = 11,
+    SET_ACCESS_LISTENER = 12,
+    REMOVE_ACCESS_LISTENER = 13,
+    SET_AUTHORIZATION_RESULT = 14,
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -20,6 +20,7 @@
 
 #define private public
 #include "dcamera_sink_controller.h"
+#include "dcamera_utils_tools.h"
 #undef private
 
 #include "accesstoken_kit.h"
@@ -34,7 +35,6 @@
 #include "dcamera_metadata_setting_cmd.h"
 #include "dcamera_sink_access_control.h"
 #include "dcamera_sink_dev.h"
-#include "dcamera_utils_tools.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
 

@@ -18,8 +18,11 @@
 #include <chrono>
 
 #include <securec.h>
+#include <chrono>
+#include <thread>
 #define private public
 #include "dcamera_softbus_adapter.h"
+#include "dcamera_utils_tools.h"
 #undef private
 
 #include "data_buffer.h"
@@ -27,9 +30,9 @@
 #include "dcamera_channel_listener_mock.h"
 #include "dcamera_softbus_session.h"
 #include "dcamera_hisysevent_adapter.h"
-#include "dcamera_utils_tools.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
+#include "iaccess_listener.h"
 #include "session_bus_center.h"
 
 using namespace testing::ext;
@@ -43,6 +46,22 @@ using ::testing::SetArgReferee;
 
 namespace OHOS {
 namespace DistributedHardware {
+class TestAccessListener : public IAccessListener {
+    sptr<IRemoteObject> AsObject()
+    {
+        return nullptr;
+    }
+
+    void OnRequestHardwareAccess(const std::string &requestId, AuthDeviceInfo info, const DHType dhType,
+        const std::string &pkgName)
+    {
+        (void)requestId;
+        (void)info;
+        (void)dhType;
+        (void)pkgName;
+    }
+};
+
 class DCameraSoftbusAdapterTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -1471,5 +1490,61 @@ HWTEST_F(DCameraSoftbusAdapterTest, DCameraSoftbusAdapterTest_055, TestSize.Leve
               DCameraSoftbusAdapter::GetInstance().sinkSocketSessionMap_.end());
 }
 
+HWTEST_F(DCameraSoftbusAdapterTest, DCameraSoftbusAdapterTest_056, TestSize.Level1)
+{
+    DCameraAccessConfigManager::GetInstance().ClearAccessConfig();
+    std::string requestId = "0";
+    std::string requestIdDiff = "1";
+    int32_t timeOutMs = 1000;
+    DCameraSoftbusAdapter::GetInstance().StartAuthorizationTimer(requestId, timeOutMs);
+    DCameraSoftbusAdapter::GetInstance().ProcessAuthorizationResult(requestId, true);
+    std::this_thread::sleep_for(std::chrono::milliseconds(timeOutMs));
+    DCameraSoftbusAdapter::GetInstance().StartAuthorizationTimer(requestIdDiff, timeOutMs);
+    std::this_thread::sleep_for(std::chrono::milliseconds(timeOutMs * 2));
+    EXPECT_EQ(DCameraSoftbusAdapter::GetInstance().authTimerCancelFlags_[requestId], false);
+}
+
+HWTEST_F(DCameraSoftbusAdapterTest, DCameraSoftbusAdapterTest_057, TestSize.Level1)
+{
+    DCameraAccessConfigManager::GetInstance().ClearAccessConfig();
+    std::string requestId = "2";
+    DCameraSoftbusAdapter::GetInstance().CancelAuthorizationTimer(requestId);
+    DCameraSoftbusAdapter::GetInstance().authTimerCancelFlags_[requestId] = false;
+    EXPECT_EQ(DCameraSoftbusAdapter::GetInstance().authTimerCancelFlags_[requestId], false);
+}
+
+HWTEST_F(DCameraSoftbusAdapterTest, DCameraSoftbusAdapterTest_058, TestSize.Level1)
+{
+    DCameraAccessConfigManager::GetInstance().ClearAccessConfig();
+    std::string requestId = "3";
+    std::string networkId = "networkId";
+    DCameraSoftbusAdapter::GetInstance().HandleAuthorizationTimeout(requestId);
+    DCameraSoftbusAdapter::GetInstance().pendingAuthRequests_[requestId] = "";
+    DCameraSoftbusAdapter::GetInstance().HandleAuthorizationTimeout(requestId);
+    DCameraSoftbusAdapter::GetInstance().pendingAuthRequests_[requestId] = networkId;
+    DCameraAccessConfigManager::GetInstance().SetAuthorizationGranted(networkId, true);
+    DCameraSoftbusAdapter::GetInstance().HandleAuthorizationTimeout(requestId);
+    DCameraSoftbusAdapter::GetInstance().pendingAuthRequests_[requestId] = networkId;
+    DCameraAccessConfigManager::GetInstance().ClearAuthorizationResult(networkId);
+    DCameraSoftbusAdapter::GetInstance().HandleAuthorizationTimeout(requestId);
+    EXPECT_EQ(DCameraAccessConfigManager::GetInstance().authorizationResults_[networkId], false);
+}
+
+HWTEST_F(DCameraSoftbusAdapterTest, DCameraSoftbusAdapterTest_059, TestSize.Level1)
+{
+    DCameraAccessConfigManager::GetInstance().ClearAccessConfig();
+    std::string requestId = "4";
+    std::string networkId = "networkId";
+    DCameraSoftbusAdapter::GetInstance().ProcessAuthorizationResult(requestId, false);
+    DCameraSoftbusAdapter::GetInstance().pendingAuthRequests_[requestId] = "";
+    DCameraSoftbusAdapter::GetInstance().ProcessAuthorizationResult(requestId, false);
+    DCameraSoftbusAdapter::GetInstance().pendingAuthRequests_[requestId] = networkId;
+    DCameraAccessConfigManager::GetInstance().SetAuthorizationGranted(networkId, true);
+    DCameraSoftbusAdapter::GetInstance().ProcessAuthorizationResult(requestId, false);
+    DCameraSoftbusAdapter::GetInstance().pendingAuthRequests_[requestId] = networkId;
+    DCameraAccessConfigManager::GetInstance().ClearAuthorizationResult(networkId);
+    DCameraSoftbusAdapter::GetInstance().ProcessAuthorizationResult(requestId, false);
+    EXPECT_EQ(DCameraAccessConfigManager::GetInstance().authorizationResults_[networkId], false);
+}
 }
 }

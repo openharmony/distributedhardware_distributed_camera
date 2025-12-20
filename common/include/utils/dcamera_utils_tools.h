@@ -21,7 +21,10 @@
 #include <string>
 #include <fstream>
 #include <map>
+#include <memory>
+#include <functional>
 #include "single_instance.h"
+#include "iaccess_listener.h"
 
 #ifdef DCAMERA_MMAP_RESERVE
 #include "image_converter.h"
@@ -114,6 +117,36 @@ public:
 private:
     std::map<std::string, DCameraSystemSwitchItem> map_ = {};
     std::mutex mtxLock_;
+};
+
+class DCameraAccessConfigManager {
+DECLARE_SINGLE_INSTANCE(DCameraAccessConfigManager);
+
+public:
+    int32_t SetAccessConfig(const sptr<IAccessListener>& listener, int32_t timeOut,
+        const std::string& pkgName);
+    sptr<IAccessListener> GetAccessListener();
+    int32_t GetAccessTimeOut();
+    std::string GetAccessPkgName();
+    void ClearAccessConfig();
+    void SetAuthorizationGranted(const std::string& networkId, bool granted);
+    bool IsAuthorizationGranted(const std::string& networkId);
+    bool HasAuthorizationDecision(const std::string& networkId);
+    void ClearAuthorizationResult(const std::string& networkId);
+    void SetCurrentNetworkId(const std::string& networkId);
+    std::string GetCurrentNetworkId();
+    bool WaitForAuthorizationResult(const std::string& networkId, int32_t timeoutSeconds = 3);
+    void ClearAccessConfigByPkgName(const std::string& pkgName);
+
+private:
+    std::mutex mtxLock_;
+    std::condition_variable authCondVar_;
+    sptr<IAccessListener> listener_ = nullptr;
+    int32_t timeOut_ = 0;
+    std::string pkgName_ = "";
+    std::string currentNetworkId_ = "";
+
+    std::map<std::string, bool> authorizationResults_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

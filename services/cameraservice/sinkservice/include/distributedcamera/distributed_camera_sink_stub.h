@@ -43,6 +43,9 @@ private:
     int32_t PauseDistributedHardwareInner(MessageParcel &data, MessageParcel &reply);
     int32_t ResumeDistributedHardwareInner(MessageParcel &data, MessageParcel &reply);
     int32_t StopDistributedHardwareInner(MessageParcel &data, MessageParcel &reply);
+    int32_t SetAccessListenerInner(MessageParcel &data, MessageParcel &reply);
+    int32_t RemoveAccessListenerInner(MessageParcel &data, MessageParcel &reply);
+    int32_t SetAuthorizationResultInner(MessageParcel &data, MessageParcel &reply);
     bool HasAccessDHPermission();
 
     using DCameraFunc = int32_t (DistributedCameraSinkStub::*)(MessageParcel &data, MessageParcel &reply);

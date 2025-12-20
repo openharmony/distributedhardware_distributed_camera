@@ -65,6 +65,9 @@ ohos_fuzztest("SoftbusAdapterFuzzTest") {
     "distributed_hardware_fwk:libdhfwk_sdk",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
   ]
 }
 

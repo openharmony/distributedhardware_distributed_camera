@@ -450,5 +450,138 @@ int32_t DistributedCameraSinkProxy::StopDistributedHardware(const std::string &n
     }
     return result;
 }
+
+int32_t DistributedCameraSinkProxy::SetAccessListener(const sptr<IAccessListener> &listener,
+    int32_t timeOut, const std::string &pkgName)
+{
+    DHLOGI("SetAccessListener start, pkgName: %{public}s, timeOut: %{public}d", pkgName.c_str(), timeOut);
+    if (listener == nullptr) {
+        DHLOGE("listener is nullptr");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    sptr<IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        DHLOGE("remote service is null");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(DistributedCameraSinkProxy::GetDescriptor())) {
+        DHLOGE("write token failed");
+        return DCAMERA_BAD_VALUE;
+    }
+    if (!data.WriteRemoteObject(listener->AsObject())) {
+        DHLOGE("write listener failed");
+        return DCAMERA_BAD_VALUE;
+    }
+    if (!data.WriteInt32(timeOut)) {
+        DHLOGE("write timeOut failed");
+        return DCAMERA_BAD_VALUE;
+    }
+    if (!data.WriteString(pkgName)) {
+        DHLOGE("write pkgName failed");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    int32_t ipcResult = remote->SendRequest(
+        static_cast<uint32_t>(IDCameraSinkInterfaceCode::SET_ACCESS_LISTENER), data, reply, option);
+    if (ipcResult != DCAMERA_OK) {
+        DHLOGE("SendRequest for SET_ACCESS_LISTENER failed, ipcResult: %{public}d", ipcResult);
+        return DCAMERA_BAD_VALUE;
+    }
+
+    int32_t result;
+    if (!reply.ReadInt32(result)) {
+        DHLOGE("read reply failed");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    DHLOGI("SetAccessListener end, result: %{public}d", result);
+    return result;
+}
+
+int32_t DistributedCameraSinkProxy::RemoveAccessListener(const std::string &pkgName)
+{
+    DHLOGI("RemoveAccessListener start, pkgName: %{public}s", pkgName.c_str());
+    sptr<IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        DHLOGE("remote service is null");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(DistributedCameraSinkProxy::GetDescriptor())) {
+        DHLOGE("write token failed");
+        return DCAMERA_BAD_VALUE;
+    }
+    if (!data.WriteString(pkgName)) {
+        DHLOGE("write pkgName failed");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    int32_t ipcResult = remote->SendRequest(
+        static_cast<uint32_t>(IDCameraSinkInterfaceCode::REMOVE_ACCESS_LISTENER), data, reply, option);
+    if (ipcResult != DCAMERA_OK) {
+        DHLOGE("SendRequest for SET_ACCESS_LISTENER failed, ipcResult: %{public}d", ipcResult);
+        return DCAMERA_BAD_VALUE;
+    }
+
+    int32_t result;
+    if (!reply.ReadInt32(result)) {
+        DHLOGE("read reply failed");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    DHLOGI("RemoveAccessListener end, result: %{public}d", result);
+    return result;
+}
+
+int32_t DistributedCameraSinkProxy::SetAuthorizationResult(const std::string &requestId, bool granted)
+{
+    DHLOGI("SetAuthorizationResult start, requestId: %{public}s, granted: %{public}d",
+        GetAnonyString(requestId).c_str(), granted);
+    sptr<IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        DHLOGE("remote service is null");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(DistributedCameraSinkProxy::GetDescriptor())) {
+        DHLOGE("write token failed");
+        return DCAMERA_BAD_VALUE;
+    }
+    if (!data.WriteString(requestId)) {
+        DHLOGE("write requestId failed");
+        return DCAMERA_BAD_VALUE;
+    }
+    if (!data.WriteBool(granted)) {
+        DHLOGE("write granted failed");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    int32_t ipcResult = remote->SendRequest(
+        static_cast<uint32_t>(IDCameraSinkInterfaceCode::SET_AUTHORIZATION_RESULT), data, reply, option);
+    if (ipcResult != DCAMERA_OK) {
+        DHLOGE("SendRequest for SET_AUTHORIZATION_RESULT failed, ipcResult: %{public}d", ipcResult);
+        return DCAMERA_BAD_VALUE;
+    }
+
+    int32_t result;
+    if (!reply.ReadInt32(result)) {
+        DHLOGE("read reply failed");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    DHLOGI("SetAuthorizationResult end, result: %{public}d", result);
+    return result;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
