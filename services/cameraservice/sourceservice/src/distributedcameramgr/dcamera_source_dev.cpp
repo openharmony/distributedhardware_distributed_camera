@@ -192,6 +192,8 @@ int32_t DCameraSourceDev::ConfigCameraStreams(const std::vector<std::shared_ptr<
     AppExecFwk::InnerEvent::Pointer msgEvent =
         AppExecFwk::InnerEvent::Get(EVENT_SOURCE_DEV_PROCESS, eventParam, 0);
     srcDevEventHandler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE);
+    CHECK_AND_RETURN_RET_LOG(stateListener_ == nullptr, DCAMERA_BAD_VALUE, "stateListener_ is nullptr.");
+    stateListener_->OnHardwareStateChanged(devId_, dhId_, DcameraBusinessState::RUNNING);
     return DCAMERA_OK;
 }
 
@@ -664,7 +666,6 @@ int32_t DCameraSourceDev::StartCapture(std::vector<std::shared_ptr<DCCaptureInfo
         DcameraFinishAsyncTrace(DCAMERA_CONTINUE_FIRST_FRAME, DCAMERA_CONTINUE_FIRST_FRAME_TASKID);
         DcameraFinishAsyncTrace(DCAMERA_SNAPSHOT_FIRST_FRAME, DCAMERA_SNAPSHOT_FIRST_FRAME_TASKID);
     }
-    stateListener_->OnHardwareStateChanged(devId_, dhId_, DcameraBusinessState::RUNNING);
     return ret;
 }
 
