@@ -53,5 +53,15 @@ void DCameraPreviewCallback::OnSketchStatusDataChanged(const CameraStandard::Ske
 {
     DHLOGI("enter");
 }
+
+void DCameraPreviewCallback::OnFramePaused() const
+{
+    DHLOGI("enter");
+}
+
+void DCameraPreviewCallback::OnFrameResumed() const
+{
+    DHLOGI("enter");
+}
 } // namespace DistributedHardware
 } // namespace OHOS

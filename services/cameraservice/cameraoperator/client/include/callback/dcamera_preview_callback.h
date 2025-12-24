@@ -31,6 +31,8 @@ public:
     void OnFrameEnded(const int32_t frameCount) const override;
     void OnError(const int32_t errorCode) const override;
     void OnSketchStatusDataChanged(const CameraStandard::SketchStatusData& statusData) const override;
+    void OnFramePaused() const override;
+    void OnFrameResumed() const override;
 
 private:
     std::shared_ptr<StateCallback> callback_;

@@ -34,6 +34,7 @@ public:
     void OnCaptureError(const int32_t captureId, const int32_t errorCode) const override;
     void OnEstimatedCaptureDuration(const int32_t duration) const override;
     void OnOfflineDeliveryFinished(const int32_t captureId) const override;
+    void OnConstellationDrawingState(const int32_t drawingState) const override;
 
 private:
     std::shared_ptr<StateCallback> callback_;
