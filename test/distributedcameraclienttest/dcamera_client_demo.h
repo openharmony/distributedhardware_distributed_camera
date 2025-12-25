@@ -244,6 +244,11 @@ public:
         DHLOGI("DemoDCameraPhotoCallback::OnCaptureError captureID: %{public}d errorCode: %{public}d",
             captureId, errorCode);
     }
+
+    void OnConstellationDrawingState(const int32_t drawingState) const
+    {
+        DHLOGI("enter, drawingState: %{public}d", drawingState);
+    }
 };
 
 class DemoDCameraPreviewCallback : public CameraStandard::PreviewStateCallback {
@@ -266,6 +271,16 @@ public:
     void OnSketchStatusDataChanged(const CameraStandard::SketchStatusData& statusData) const
     {
         DHLOGI("DemoDCameraPreviewCallback::OnSketchStatusDataChanged.");
+    }
+
+    void OnFramePaused() const
+    {
+        DHLOGI("enter");
+    }
+
+    void OnFrameResumed() const
+    {
+        DHLOGI("enter");
     }
 };
 
