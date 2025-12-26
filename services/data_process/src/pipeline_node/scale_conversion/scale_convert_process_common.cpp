@@ -430,5 +430,10 @@ int32_t ScaleConvertProcess::GetProperty(const std::string& propertyName, Proper
 {
     return DCAMERA_OK;
 }
+
+int32_t ScaleConvertProcess::UpdateSettings(const std::shared_ptr<Camera::CameraMetadata> settings)
+{
+    return DCAMERA_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

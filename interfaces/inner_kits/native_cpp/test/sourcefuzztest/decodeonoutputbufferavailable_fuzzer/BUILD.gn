@@ -72,6 +72,7 @@ ohos_fuzztest("DecodeOnOutputBufferAvailableFuzzTest") {
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
     "media_foundation:media_foundation",
+    "drivers_interface_camera:metadata",
   ]
 }
 

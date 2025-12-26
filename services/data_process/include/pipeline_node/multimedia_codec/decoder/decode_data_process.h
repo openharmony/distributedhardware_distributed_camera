@@ -84,6 +84,8 @@ public:
 
     int32_t GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier) override;
 
+    int32_t UpdateSettings(const std::shared_ptr<Camera::CameraMetadata> settings) override;
+
 private:
     bool IsInDecoderRange(const VideoConfigParams& curConfig);
     bool IsConvertible(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig);
@@ -117,7 +119,7 @@ private:
     bool I420CopyBySystemSwitch(ImageDataInfo srcInfo, ImageDataInfo dstInfo,
         int srcWidth, int srcHeight, int32_t normalizedAngle);
     bool CheckParameters(ImageDataInfo srcInfo, ImageDataInfo dstInfo);
-    OpenSourceLibyuv::RotationMode ParseAngle(int normalizedAngle);
+    OpenSourceLibyuv::RotationMode ParseAngle(int angleDegrees);
     bool FreeYUVBuffer(uint8_t*& dataY, uint8_t*& dataU, uint8_t*& dataV);
 
 private:

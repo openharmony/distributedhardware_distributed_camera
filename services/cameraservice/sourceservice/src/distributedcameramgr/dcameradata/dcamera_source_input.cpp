@@ -346,7 +346,11 @@ int32_t DCameraSourceInput::UnInit()
 
 int32_t DCameraSourceInput::UpdateSettings(std::vector<std::shared_ptr<DCameraSettings>>& settings)
 {
-    return DCAMERA_OK;
+    if (dataProcess_.find(CONTINUOUS_FRAME) == dataProcess_.end()) {
+        DHLOGE("UpdateSettings fail, dataProcess is null");
+        return DCAMERA_WRONG_STATE;
+    }
+    return dataProcess_[CONTINUOUS_FRAME]->UpdateSettings(settings);
 }
 
 void DCameraSourceInput::OnSessionState(DCStreamType streamType, int32_t state)

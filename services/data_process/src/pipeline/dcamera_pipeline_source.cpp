@@ -259,5 +259,15 @@ int32_t DCameraPipelineSource::GetProperty(const std::string& propertyName, Prop
 {
     return DCAMERA_OK;
 }
+
+int32_t DCameraPipelineSource::UpdateSettings(const std::shared_ptr<Camera::CameraMetadata> settings)
+{
+    DHLOGI("DCameraPipelineSource::UpdateSettings");
+    for (size_t i = 0; i < pipNodeRanks_.size(); i++) {
+        CHECK_AND_RETURN_RET_LOG((pipNodeRanks_[i] == nullptr), DCAMERA_BAD_VALUE, "Node is null.");
+        pipNodeRanks_[i]->UpdateSettings(settings);
+    }
+    return DCAMERA_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -44,6 +44,8 @@ public:
 
     int32_t GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier) override;
 
+    int32_t UpdateSettings(const std::shared_ptr<Camera::CameraMetadata> settings) override;
+
 private:
     bool IsInRange(const VideoConfigParams& curConfig);
     int32_t InitDCameraPipNodes(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig);

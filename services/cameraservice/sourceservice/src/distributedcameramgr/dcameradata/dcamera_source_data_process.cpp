@@ -231,5 +231,14 @@ int32_t DCameraSourceDataProcess::UpdateProducerWorkMode(std::vector<int32_t>& s
     }
     return ret;
 }
+
+int32_t DCameraSourceDataProcess::UpdateSettings(const std::vector<std::shared_ptr<DCameraSettings>>& settings)
+{
+    DHLOGI("DCameraSourceDataProcess UpdateSettings");
+    for (auto iter = streamProcess_.begin(); iter !=  streamProcess_.end(); iter++) {
+        (*iter)->UpdateSettings(settings);
+    }
+    return DCAMERA_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

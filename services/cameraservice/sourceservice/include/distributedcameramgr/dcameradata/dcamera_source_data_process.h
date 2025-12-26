@@ -41,6 +41,7 @@ public:
     int32_t GetProducerSize() override;
     void GetAllStreamIds(std::vector<int32_t>& streamIds) override;
     int32_t UpdateProducerWorkMode(std::vector<int32_t>& streamIds, const WorkModeParam& param) override;
+    int32_t UpdateSettings(const std::vector<std::shared_ptr<DCameraSettings>>& settings) override;
 
 private:
     void DestroyPipeline();

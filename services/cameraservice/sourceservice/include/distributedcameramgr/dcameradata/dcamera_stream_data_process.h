@@ -46,6 +46,7 @@ public:
     void OnError(const DataProcessErrorType errorType);
     void DestroyPipeline();
     int32_t UpdateProducerWorkMode(std::vector<int32_t>& streamIds, const WorkModeParam& param);
+    int32_t UpdateSettings(const std::vector<std::shared_ptr<DCameraSettings>>& settings);
 
 private:
     void FeedStreamToSnapShot(const std::shared_ptr<DataBuffer>& buffer);

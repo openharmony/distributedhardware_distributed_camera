@@ -1009,6 +1009,41 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_029, TestSize.Level1)
     rc = testDecodeDataProcess_->FreeYUVBuffer(dataY, dataU, dataV);
     EXPECT_EQ(rc, true);
 }
+
+/**
+ * @tc.name: decode_data_process_test_030
+ * @tc.desc: Verify decode UpdateSettings func.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DecodeDataProcessTest, decode_data_process_test_030, TestSize.Level1)
+{
+    DHLOGI("DecodeDataProcessTest decode_data_process_test_030");
+    int32_t rc = testDecodeDataProcess_->UpdateSettings(nullptr);
+    EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
+
+    auto metaData = std::make_shared<OHOS::Camera::CameraMetadata>(100, 200);
+
+    rc = testDecodeDataProcess_->UpdateSettings(metaData);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    VideoConfigParams srcParams(VideoCodecType::CODEC_H264, Videoformat::NV12, DCAMERA_PRODUCER_FPS_DEFAULT,
+        TEST_WIDTH2, TEST_HEIGTH2);
+    VideoConfigParams destParams(VideoCodecType::NO_CODEC, Videoformat::NV21, DCAMERA_PRODUCER_FPS_DEFAULT,
+        TEST_WIDTH2, TEST_HEIGTH2);
+    destParams.SetSystemSwitchFlagAndRotation(true, 90);
+    VideoConfigParams procConfig;
+    rc = testDecodeDataProcess_->InitNode(srcParams, destParams, procConfig);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    rc = testDecodeDataProcess_->UpdateSettings(metaData);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    int32_t rotate[2] = {90, 0};
+    metaData->addEntry(OHOS_CONTROL_CAMERA_SWITCH_INFOS, rotate, 2);
+    rc = testDecodeDataProcess_->UpdateSettings(metaData);
+    EXPECT_EQ(rc, DCAMERA_OK);
+}
 #endif
 } // namespace DistributedHardware
 } // namespace OHOS

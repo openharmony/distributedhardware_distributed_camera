@@ -17,6 +17,8 @@
 
 #include "dcamera_source_data_process.h"
 #include "distributed_camera_errno.h"
+#include "metadata_utils.h"
+#include "dcamera_utils_tools.h"
 
 using namespace testing::ext;
 
@@ -241,6 +243,30 @@ HWTEST_F(DCameraSourceDataProcessTest, dcamera_source_data_process_test_007, Tes
     streamIds.push_back(1);
     WorkModeParam param(12, 120, 0, false);
     rc = testSrcDataProcess_->UpdateProducerWorkMode(streamIds, param);
+    EXPECT_EQ(rc, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: dcamera_source_data_process_test_008
+ * @tc.desc: Verify UpdateSettings.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceDataProcessTest, dcamera_source_data_process_test_008, TestSize.Level1)
+{
+    auto metaData = std::make_shared<OHOS::Camera::CameraMetadata>(100, 200);
+    std::vector<std::shared_ptr<DCameraSettings>> settingVectors;
+    std::string settinStr = Camera::MetadataUtils::EncodeToString(metaData);
+    std::shared_ptr<DCameraSettings> dCameraSettings = std::make_shared<DCameraSettings>();
+    dCameraSettings->type_ = UPDATE_METADATA;
+    dCameraSettings->value_ = Base64Encode(reinterpret_cast<const unsigned char *>(settinStr.c_str()),
+        settinStr.length());
+    settingVectors.push_back(dCameraSettings);
+
+    int32_t rc = testSrcDataProcess_->ConfigStreams(g_streamInfos);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    rc = testSrcDataProcess_->UpdateSettings(settingVectors);
     EXPECT_EQ(rc, DCAMERA_OK);
 }
 } // namespace DistributedHardware

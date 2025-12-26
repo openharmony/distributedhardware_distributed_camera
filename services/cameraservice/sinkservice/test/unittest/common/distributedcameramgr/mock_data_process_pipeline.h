@@ -54,6 +54,11 @@ public:
     {
         return DCAMERA_OK;
     }
+
+    int32_t UpdateSettings(const std::shared_ptr<Camera::CameraMetadata> settings)
+    {
+        return DCAMERA_OK;
+    }
 };
 } // namespace DistributedHardware
 } // namespace OHOS
