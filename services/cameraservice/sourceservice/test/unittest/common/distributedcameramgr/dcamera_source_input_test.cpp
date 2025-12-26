@@ -20,6 +20,8 @@
 #include "distributed_camera_errno.h"
 #include "mock_dcamera_source_state_listener.h"
 #include "dcamera_source_input_channel_listener.h"
+#include "metadata_utils.h"
+#include "dcamera_utils_tools.h"
 
 using namespace testing::ext;
 
@@ -477,6 +479,36 @@ HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_015, TestSize.Level1)
     EXPECT_EQ(rc, DCAMERA_OK);
 
     rc = testInput_->UnInit();
+    EXPECT_EQ(rc, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: dcamera_source_input_test_016
+ * @tc.desc: Verify source inptut UpdateSettings.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_016, TestSize.Level1)
+{
+    auto metaData = std::make_shared<OHOS::Camera::CameraMetadata>(100, 200);
+    std::vector<std::shared_ptr<DCameraSettings>> settingVectors;
+    std::string settinStr = Camera::MetadataUtils::EncodeToString(metaData);
+    std::shared_ptr<DCameraSettings> dCameraSettings = std::make_shared<DCameraSettings>();
+    dCameraSettings->type_ = UPDATE_METADATA;
+    dCameraSettings->value_ = Base64Encode(reinterpret_cast<const unsigned char *>(settinStr.c_str()),
+        settinStr.length());
+    settingVectors.push_back(dCameraSettings);
+
+    int32_t rc = testInput_->UpdateSettings(settingVectors);
+    EXPECT_EQ(rc, DCAMERA_WRONG_STATE);
+
+    rc = testInput_->Init();
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    rc = testInput_->StartCapture(g_captureInfos);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    rc = testInput_->UpdateSettings(settingVectors);
     EXPECT_EQ(rc, DCAMERA_OK);
 }
 

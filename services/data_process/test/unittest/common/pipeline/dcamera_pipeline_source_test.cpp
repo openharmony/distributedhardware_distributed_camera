@@ -253,5 +253,40 @@ HWTEST_F(DCameraPipelineSourceTest, dcamera_pipeline_source_test_008, TestSize.L
     testPipelineSource_->OnProcessedVideoBuffer(videoResult);
     EXPECT_TRUE(true);
 }
+
+/**
+ * @tc.name: dcamera_pipeline_source_test_009
+ * @tc.desc: Verify pipeline source OnProcessedVideoBuffer abnormal.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraPipelineSourceTest, dcamera_pipeline_source_test_009, TestSize.Level1)
+{
+    EXPECT_EQ(false, testPipelineSource_ == nullptr);
+    std::shared_ptr<DataProcessListener> listener = std::make_shared<MockDCameraDataProcessListener>();
+    VideoConfigParams srcParams(VideoCodecType::NO_CODEC,
+                                Videoformat::NV21,
+                                DCAMERA_PRODUCER_FPS_DEFAULT,
+                                TEST_WIDTH,
+                                TEST_HEIGTH);
+    VideoConfigParams destParams(VideoCodecType::NO_CODEC,
+                                 Videoformat::NV21,
+                                 DCAMERA_PRODUCER_FPS_DEFAULT,
+                                 TEST_WIDTH,
+                                 TEST_HEIGTH);
+    int32_t rc = testSourcePipeline_->CreateDataProcessPipeline(PipelineType::VIDEO, srcParams, destParams, listener);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    rc = testSourcePipeline_->UpdateSettings(nullptr);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    auto metaData = std::make_shared<OHOS::Camera::CameraMetadata>(100, 200);
+    bool switchFlag[] = {true};
+    metaData->addEntry(OHOS_CONTROL_REQUEST_CAMERA_SWITCH, switchFlag, 1);
+    int32_t rotate[2] = {90, 0};
+    metaData->addEntry(OHOS_CONTROL_CAMERA_SWITCH_INFOS, rotate, 2);
+    rc = testSourcePipeline_->UpdateSettings(metaData);
+    EXPECT_EQ(rc, DCAMERA_OK);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

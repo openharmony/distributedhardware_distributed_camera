@@ -72,6 +72,7 @@ ohos_unittest("DCameraDataProcessPipelineTest") {
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
+    "drivers_interface_camera:metadata",
   ]
 
   defines = [

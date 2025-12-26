@@ -27,6 +27,7 @@
 #include "dcamera_pipeline_source.h"
 #include "dcamera_stream_data_process_pipeline_listener.h"
 #include "dcamera_utils_tools.h"
+#include "metadata_utils.h"
 
 using namespace testing::ext;
 
@@ -326,6 +327,41 @@ HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_010, Tes
     int32_t ret = streamProcess->GetProducerSize();
     streamProcess->DestroyPipeline();
     EXPECT_EQ(1, ret);
+}
+
+/**
+ * @tc.name: dcamera_stream_data_process_test_011
+ * @tc.desc: Verify UpdateSettings func.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraStreamDataProcessTest, dcamera_stream_data_process_test_011, TestSize.Level1)
+{
+    DHLOGI("DCameraStreamDataProcessTest::dcamera_stream_data_process_test_011");
+    std::shared_ptr<DCameraStreamDataProcess> streamProcess =
+        std::make_shared<DCameraStreamDataProcess>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, DCStreamType::CONTINUOUS_FRAME);
+    std::shared_ptr<DCameraStreamConfig> srcConfig =
+        std::make_shared<DCameraStreamConfig>(TEST_WIDTH, TEST_HEIGTH, TEST_FORMAT, TEST_DATASPACE,
+        DCEncodeType::ENCODE_TYPE_H264, DCStreamType::CONTINUOUS_FRAME);
+    
+
+    auto metaData = std::make_shared<OHOS::Camera::CameraMetadata>(100, 200);
+    std::vector<std::shared_ptr<DCameraSettings>> settingVectors;
+    std::string settinStr = Camera::MetadataUtils::EncodeToString(metaData);
+    std::shared_ptr<DCameraSettings> dCameraSettings = std::make_shared<DCameraSettings>();
+    dCameraSettings->type_ = UPDATE_METADATA;
+    dCameraSettings->value_ = Base64Encode(reinterpret_cast<const unsigned char *>(settinStr.c_str()),
+        settinStr.length());
+    settingVectors.push_back(dCameraSettings);
+    int32_t ret = streamProcess->UpdateSettings(settingVectors);
+    EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
+
+    std::set<int32_t> streamIds;
+    streamIds.insert(1);
+    streamProcess->ConfigStreams(srcConfig, streamIds);
+    streamProcess->StartCapture(srcConfig, streamIds);
+    ret = streamProcess->UpdateSettings(settingVectors);
+    EXPECT_EQ(DCAMERA_OK, ret);
 }
 }
 }

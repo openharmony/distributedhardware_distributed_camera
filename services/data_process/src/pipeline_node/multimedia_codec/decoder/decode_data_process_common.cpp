@@ -816,5 +816,10 @@ void DecodeDataProcess::AlignFirstFrameTime()
     frameInfo.timePonit.finishEncode = front.timePonit.finishEncode;
     frameInfoDeque_.emplace(frameInfoDeque_.erase(frameInfoDeque_.begin()), frameInfo);
 }
+
+int32_t DecodeDataProcess::UpdateSettings(const std::shared_ptr<Camera::CameraMetadata> settings)
+{
+    return DCAMERA_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

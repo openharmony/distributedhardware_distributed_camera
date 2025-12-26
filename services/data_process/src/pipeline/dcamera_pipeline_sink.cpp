@@ -202,5 +202,10 @@ int32_t DCameraPipelineSink::GetProperty(const std::string& propertyName, Proper
     }
     return DCAMERA_OK;
 }
+
+int32_t DCameraPipelineSink::UpdateSettings(const std::shared_ptr<Camera::CameraMetadata> settings)
+{
+    return DCAMERA_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

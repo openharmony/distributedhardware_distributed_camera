@@ -353,5 +353,10 @@ int32_t FpsControllerProcess::GetProperty(const std::string& propertyName, Prope
 {
     return DCAMERA_OK;
 }
+
+int32_t FpsControllerProcess::UpdateSettings(const std::shared_ptr<Camera::CameraMetadata> settings)
+{
+    return DCAMERA_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

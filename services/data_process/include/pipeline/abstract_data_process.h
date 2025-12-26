@@ -22,7 +22,7 @@
 #include "data_buffer.h"
 #include "image_common_type.h"
 #include "distributed_camera_errno.h"
-
+#include "camera_metadata_info.h"
 #include "property_carrier.h"
 
 namespace OHOS {
@@ -38,6 +38,7 @@ public:
     virtual int32_t ProcessData(std::vector<std::shared_ptr<DataBuffer>>& inputBuffers) = 0;
     virtual void ReleaseProcessNode() = 0;
     virtual int32_t GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier) = 0;
+    virtual int32_t UpdateSettings(const std::shared_ptr<Camera::CameraMetadata> settings) = 0;
 
 public:
     std::shared_ptr<AbstractDataProcess> nextDataProcess_ = nullptr;

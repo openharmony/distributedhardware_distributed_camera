@@ -20,6 +20,7 @@
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
 #include "dcamera_utils_tools.h"
+#include "metadata_utils.h"
 
 #include "dcamera_pipeline_source.h"
 #include "dcamera_stream_data_process_pipeline_listener.h"
@@ -335,6 +336,30 @@ int32_t DCameraStreamDataProcess::UpdateProducerWorkMode(std::vector<int32_t>& s
                 return DCAMERA_BAD_OPERATE;
             }
             producerIter->second->UpdateProducerWorkMode(param);
+        }
+    }
+    return DCAMERA_OK;
+}
+
+int32_t DCameraStreamDataProcess::UpdateSettings(const std::vector<std::shared_ptr<DCameraSettings>>& settings)
+{
+    if (pipeline_ == nullptr) {
+        DHLOGE("pipeline is null");
+        return DCAMERA_BAD_OPERATE;
+    }
+    for (auto& setting : settings) {
+        switch (setting->type_) {
+            case UPDATE_METADATA: {
+                std::string dcSettingValue = setting->value_;
+                std::string metadataStr = Base64Decode(dcSettingValue);
+                std::shared_ptr<Camera::CameraMetadata> cameraMetadata =
+                    Camera::MetadataUtils::DecodeFromString(metadataStr);
+                pipeline_->UpdateSettings(cameraMetadata);
+                break;
+            }
+            default: {
+                break;
+            }
         }
     }
     return DCAMERA_OK;

@@ -597,8 +597,9 @@ void DecodeDataProcess::GetDecoderOutputBuffer(const sptr<IConsumerSurface>& sur
     ReduceWaitDecodeCnt();
 }
 
-OpenSourceLibyuv::RotationMode DecodeDataProcess::ParseAngle(int normalizedAngle)
+OpenSourceLibyuv::RotationMode DecodeDataProcess::ParseAngle(int angleDegrees)
 {
+    const int normalizedAngle = (angleDegrees % ROTATION_360 + ROTATION_360) % ROTATION_360;
     switch (normalizedAngle) {
         case ROTATION_0:   return OpenSourceLibyuv::RotationMode::kRotate0;
         case ROTATION_90:  return OpenSourceLibyuv::RotationMode::kRotate90;
@@ -1026,6 +1027,42 @@ void DecodeDataProcess::AlignFirstFrameTime()
     frameInfo.ver = front.ver;
     frameInfo.timePonit.finishEncode = front.timePonit.finishEncode;
     frameInfoDeque_.emplace(frameInfoDeque_.erase(frameInfoDeque_.begin()), frameInfo);
+}
+
+int32_t DecodeDataProcess::UpdateSettings(const std::shared_ptr<Camera::CameraMetadata> settings)
+{
+    if (settings == nullptr) {
+        DHLOGE("settings is null");
+        return DCAMERA_BAD_VALUE;
+    }
+    if (!targetConfig_.GetIsSystemSwitch()) {
+        return DCAMERA_OK;
+    }
+    camera_metadata_item_t switchInfoItem;
+    int32_t result = OHOS::Camera::FindCameraMetadataItem(settings->get(),
+        OHOS_CONTROL_CAMERA_SWITCH_INFOS, &switchInfoItem);
+    if (result != CAM_META_SUCCESS || switchInfoItem.count == 0) {
+        DHLOGI("UpdateSettings get system switch setting fail");
+        return DCAMERA_OK;
+    }
+    int32_t cameraRotation = switchInfoItem.data.i32[0];
+    int32_t screenOrient = 0;
+    if (switchInfoItem.count > 1) {
+        screenOrient = switchInfoItem.data.i32[1];
+    }
+    
+    if (cameraRotation == ROTATION_90) {
+        if (screenOrient == ROTATION_180 || screenOrient == ROTATION_0) {
+            rotate_ = (screenOrient - cameraRotation + ROTATION_360) % ROTATION_360;
+        } else {
+            rotate_ = (screenOrient - cameraRotation + ROTATION_180) % ROTATION_360;
+        }
+    } else {
+        rotate_ = (screenOrient - cameraRotation + ROTATION_360) % ROTATION_360;
+    }
+    DHLOGI("UpdateSettings sensorRotation: %{public}d, screenOrient: %{public}d, img rotate: %{public}d",
+        cameraRotation, screenOrient, rotate_);
+    return DCAMERA_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -65,6 +65,7 @@ public:
     virtual int32_t GetProducerSize() = 0;
     virtual void GetAllStreamIds(std::vector<int32_t>& streamIds) = 0;
     virtual int32_t UpdateProducerWorkMode(std::vector<int32_t>& streamIds, const WorkModeParam& param) = 0;
+    virtual int32_t UpdateSettings(const std::vector<std::shared_ptr<DCameraSettings>>& settings) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

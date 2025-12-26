@@ -611,5 +611,10 @@ int32_t EncodeDataProcess::GetProperty(const std::string& propertyName, Property
     encodeProducerSurface_->SetDefaultUsage(encodeProducerSurface_->GetDefaultUsage() & (~BUFFER_USAGE_VIDEO_ENCODER));
     return propertyCarrier.CarrySurfaceProperty(encodeProducerSurface_);
 }
+
+int32_t EncodeDataProcess::UpdateSettings(const std::shared_ptr<Camera::CameraMetadata> settings)
+{
+    return DCAMERA_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

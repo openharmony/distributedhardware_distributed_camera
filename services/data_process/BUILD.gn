@@ -82,6 +82,7 @@ ohos_shared_library("distributed_camera_data_process") {
     "media_foundation:media_foundation",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "drivers_interface_camera:metadata",
   ]
 
   if (!distributed_camera_common) {
