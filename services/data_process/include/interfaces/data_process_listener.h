@@ -30,7 +30,7 @@ enum DataProcessErrorType : int32_t {
 class DataProcessListener {
 public:
     virtual ~DataProcessListener() = default;
-    virtual void OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult) = 0;
+    virtual int32_t OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult) = 0;
     virtual void OnError(DataProcessErrorType errorType) = 0;
 };
 } // namespace DistributedHardware

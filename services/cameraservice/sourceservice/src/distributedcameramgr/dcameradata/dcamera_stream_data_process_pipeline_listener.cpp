@@ -32,14 +32,15 @@ DCameraStreamDataProcessPipelineListener::~DCameraStreamDataProcessPipelineListe
 {
 }
 
-void DCameraStreamDataProcessPipelineListener::OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult)
+int32_t DCameraStreamDataProcessPipelineListener::OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult)
 {
     std::shared_ptr<DCameraStreamDataProcess> process = process_.lock();
     if (process == nullptr) {
         DHLOGE("DCameraStreamDataProcessPipelineListener OnProcessedVideoBuffer not found process");
-        return;
+        return DCAMERA_BAD_VALUE;
     }
     process->OnProcessedVideoBuffer(videoResult);
+    return DCAMERA_OK;
 }
 
 void DCameraStreamDataProcessPipelineListener::OnError(DataProcessErrorType errorType)

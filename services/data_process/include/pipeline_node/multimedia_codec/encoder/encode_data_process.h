@@ -84,6 +84,14 @@ private:
     int32_t GetEncoderOutputBuffer(uint32_t index, MediaAVCodec::AVCodecBufferInfo info,
         MediaAVCodec::AVCodecBufferFlag flag, std::shared_ptr<Media::AVSharedMemory>& buffer);
     int32_t EncodeDone(std::vector<std::shared_ptr<DataBuffer>>& outputBuffers);
+    int32_t AdjustBitrateBasedOnNetworkConditions(bool isUp);
+    void SyncEncodeBufferThread();
+    bool IsKeyFrame(const std::shared_ptr<DataBuffer>& inputBuffer);
+    int64_t RoundBitrates(int64_t tempBitrate);
+    int32_t OnProcessedEncodeVideoBuffer(std::shared_ptr<DataBuffer>& encodeBuffer, bool isKeyFrame);
+    void SyncVideoFrameSuccess(bool isKeyFrame);
+    void SyncVideoFrameFailure(std::shared_ptr<DataBuffer>& encodeBuffer);
+    int32_t CreateSyncEncodeBufferThread();
 
 private:
     constexpr static int32_t ENCODER_STRIDE_ALIGNMENT = 8;
@@ -119,9 +127,17 @@ private:
     constexpr static int64_t BITRATE_3400000 = 3400000;
     constexpr static int64_t BITRATE_5000000 = 5000000;
     constexpr static int64_t BITRATE_6000000 = 6000000;
+    constexpr static int64_t DEFAULT_VIDEO_DYNAMIC_BITRATE = 500000;
+    constexpr static float MINIMUM_UNIT_OF_BITRATE = 0.75;
+    constexpr static float RETRY_TIME_INTERVAL_FACTOR = 0.3;
+    constexpr static int32_t MINIMUM_BITRATE_FACTOR = 3;
     const static std::map<std::int64_t, int64_t> ENCODER_BITRATE_TABLE;
     constexpr static uint64_t S2NS = 1000000000;
     constexpr static uint32_t US2NS = 1000;
+    const uint32_t DCAMERA_SYNC_TIME_CONSTANTS_MS = 1000;
+    const uint32_t BITRATE_INCREASE_STANDARD = 5;
+    const int32_t SYNCQUEUE_DIVIDE_TWO = 2;
+    const int32_t SYNCQUEUE_DIVIDE_FOUR = 4;
     constexpr static std::chrono::seconds TIMEOUT_3_SEC = std::chrono::seconds(3);
 
     std::weak_ptr<DCameraPipelineSink> callbackPipelineSink_;
@@ -135,8 +151,17 @@ private:
     sptr<Surface> encodeProducerSurface_ = nullptr;
 
     std::atomic<bool> isEncoderProcess_ = false;
+    std::atomic<bool> isMinBitrate_ = false;
+    std::atomic<bool> isMaxBitrate_ = false;
+    std::atomic<bool> isSkipState_ = false;
+    std::atomic<int32_t> lastKeyFrameIndex_ = 0;
+    std::atomic<int32_t> curKeyFrameIndex_ = 0;
     std::mutex isEncoderProcessMtx_;
     std::condition_variable isEncoderProcessCond_;
+    std::thread syncThread_;
+    std::mutex encodeBuffersMutex_;
+    std::condition_variable encodeBuffersCond_;
+    std::deque<std::shared_ptr<DataBuffer>> encodeBuffers_;
 
     int32_t waitEncoderOutputCount_ = 0;
     int64_t lastFeedEncoderInputBufferTimeUs_ = 0;
@@ -146,6 +171,13 @@ private:
     Media::Format encodeOutputFormat_;
     std::string surfaceStr_ = "surface";
     int32_t index_ = FRAME_HEAD;
+    int32_t maxFrameRate_ = DCAMERA_PRODUCER_FPS_DEFAULT;
+    uint32_t syncKeyFrameSuccNum_ = 0;
+    int64_t currentBitrate_ = BITRATE_3400000;
+    int64_t maxBitrate_ = BITRATE_3400000;
+    int64_t minBitrate_ = BITRATE_3400000;
+    int64_t dynamicBitrateStep_ = 0;
+    std::mutex bitrateMutex_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

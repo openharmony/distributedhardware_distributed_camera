@@ -175,14 +175,14 @@ void DCameraPipelineSink::OnError(DataProcessErrorType errorType)
     processListener_->OnError(errorType);
 }
 
-void DCameraPipelineSink::OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult)
+int32_t DCameraPipelineSink::OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult)
 {
     DHLOGD("Sink pipeline output the processed video buffer.");
     if (processListener_ == nullptr) {
         DHLOGE("The process listener of sink pipeline is empty.");
-        return;
+        return DCAMERA_BAD_VALUE;
     }
-    processListener_->OnProcessedVideoBuffer(videoResult);
+    return processListener_->OnProcessedVideoBuffer(videoResult);
 }
 
 int32_t DCameraPipelineSink::GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier)

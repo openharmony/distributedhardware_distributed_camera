@@ -40,7 +40,7 @@ public:
     void DestroyDataProcessPipeline() override;
 
     void OnError(DataProcessErrorType errorType);
-    void OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult);
+    int32_t OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult);
 
     int32_t GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier) override;
 

@@ -69,6 +69,8 @@ int32_t EncodeDataProcess::InitNode(const VideoConfigParams& sourceConfig, const
 
     sourceConfig_ = sourceConfig;
     targetConfig_ = targetConfig;
+    int32_t tempFrameRate = sourceConfig_.GetFrameRate();
+    maxFrameRate_ = tempFrameRate == 0 ? DCAMERA_PRODUCER_FPS_DEFAULT : tempFrameRate;
     if (sourceConfig_.GetVideoCodecType() == targetConfig_.GetVideoCodecType()) {
         DHLOGD("Disable EncodeNode. The target VideoCodecType %{public}d is the same as the source VideoCodecType "
             "%{public}d.", sourceConfig_.GetVideoCodecType(), targetConfig_.GetVideoCodecType());
@@ -79,7 +81,7 @@ int32_t EncodeDataProcess::InitNode(const VideoConfigParams& sourceConfig, const
             isEncoderProcess_.store(true);
         }
         isEncoderProcessCond_.notify_one();
-        return DCAMERA_OK;
+        return CreateSyncEncodeBufferThread();
     }
 
     int32_t err = InitEncoder();
@@ -94,7 +96,21 @@ int32_t EncodeDataProcess::InitNode(const VideoConfigParams& sourceConfig, const
         isEncoderProcess_.store(true);
     }
     isEncoderProcessCond_.notify_one();
-    return DCAMERA_OK;
+    return CreateSyncEncodeBufferThread();
+}
+
+int32_t EncodeDataProcess::CreateSyncEncodeBufferThread()
+{
+    if (!syncThread_.joinable()) {
+        syncThread_ = std::thread([this]() { this->SyncEncodeBufferThread(); });
+    }
+    if (!syncThread_.joinable()) {
+        DHLOGE("Create syncThread_ failed.");
+        return DCAMERA_BAD_OPERATE;
+    } else {
+        DHLOGI("Create syncThread_ success.");
+        return DCAMERA_OK;
+    }
 }
 
 bool EncodeDataProcess::IsInEncoderRange(const VideoConfigParams& curConfig)
@@ -242,7 +258,11 @@ int32_t EncodeDataProcess::InitEncoderBitrateFormat()
     }
     DHLOGD("Source config: width : %{public}d, height : %{public}d, matched bitrate %{public}" PRId64,
         sourceConfig_.GetWidth(), sourceConfig_.GetHeight(), matchedBitrate);
-    metadataFormat_.PutLongValue("bitrate", matchedBitrate);
+    maxBitrate_ = matchedBitrate;
+    minBitrate_ = static_cast<int64_t> (matchedBitrate / MINIMUM_BITRATE_FACTOR);
+    currentBitrate_ = matchedBitrate - minBitrate_;
+    dynamicBitrateStep_ = maxBitrate_ - minBitrate_;
+    metadataFormat_.PutLongValue("bitrate", currentBitrate_);
     return DCAMERA_OK;
 }
 
@@ -313,6 +333,17 @@ void EncodeDataProcess::ReleaseProcessNode()
     DHLOGD("Start release [%{public}zu] node : EncodeNode.", nodeRank_);
     isEncoderProcess_.store(false);
     ReleaseVideoEncoder();
+    {
+        std::unique_lock<std::mutex> lock(encodeBuffersMutex_);
+        std::deque<std::shared_ptr<DataBuffer>> dq;
+        encodeBuffers_.swap(dq);
+    }
+    encodeBuffersCond_.notify_all();
+    if (syncThread_.joinable()) {
+        DHLOGI("Start join syncThread");
+        syncThread_.join();
+        DHLOGI("join syncThread success");
+    }
 
     {
         std::lock_guard<std::mutex> lck(mtxHoldCount_);
@@ -534,7 +565,11 @@ int32_t EncodeDataProcess::EncodeDone(std::vector<std::shared_ptr<DataBuffer>>& 
         DHLOGE("callbackPipelineSink_ is nullptr.");
         return DCAMERA_BAD_VALUE;
     }
-    targetPipelineSink->OnProcessedVideoBuffer(outputBuffers[0]);
+    {
+        std::unique_lock<std::mutex> lock(encodeBuffersMutex_);
+        encodeBuffers_.push_back(outputBuffers[0]);
+    }
+    encodeBuffersCond_.notify_one();
     return DCAMERA_OK;
 }
 
@@ -545,6 +580,17 @@ void EncodeDataProcess::OnError()
     if (videoEncoder_ != nullptr) {
         videoEncoder_->Flush();
         videoEncoder_->Stop();
+    }
+    {
+        std::unique_lock<std::mutex> lock(encodeBuffersMutex_);
+        std::deque<std::shared_ptr<DataBuffer>> dq;
+        encodeBuffers_.swap(dq);
+    }
+    encodeBuffersCond_.notify_all();
+    if (syncThread_.joinable()) {
+        DHLOGI("Start join syncThread");
+        syncThread_.join();
+        DHLOGI("join syncThread success");
     }
     std::shared_ptr<DCameraPipelineSink> targetPipelineSink = callbackPipelineSink_.lock();
     CHECK_AND_RETURN_LOG(targetPipelineSink == nullptr, "%{public}s", "callbackPipelineSink_ is nullptr.");
@@ -610,6 +656,187 @@ int32_t EncodeDataProcess::GetProperty(const std::string& propertyName, Property
         "EncodeDataProcess::GetProperty: encode dataProcess get property fail, encode surface is nullptr.");
     encodeProducerSurface_->SetDefaultUsage(encodeProducerSurface_->GetDefaultUsage() & (~BUFFER_USAGE_VIDEO_ENCODER));
     return propertyCarrier.CarrySurfaceProperty(encodeProducerSurface_);
+}
+
+int32_t EncodeDataProcess::AdjustBitrateBasedOnNetworkConditions(bool isUp)
+{
+    DHLOGI("adjust bitrate enter,current bitrate: %{public}" PRId64, currentBitrate_);
+    int64_t newBitrate = 0;
+    if (isUp) {
+        newBitrate = std::min(currentBitrate_ + dynamicBitrateStep_, maxBitrate_);
+        DHLOGI("increasing bitrate, new bitrate: %{public}" PRId64, newBitrate);
+    } else {
+        newBitrate = std::min(static_cast<int64_t>(currentBitrate_ * MINIMUM_UNIT_OF_BITRATE), maxBitrate_);
+        dynamicBitrateStep_ = DEFAULT_VIDEO_DYNAMIC_BITRATE;
+        DHLOGI("reducing bitrate, new bitrate: %{public}" PRId64, newBitrate);
+    }
+    int64_t finalBitrate = RoundBitrates(newBitrate);
+    if (currentBitrate_ == maxBitrate_ && finalBitrate == maxBitrate_) {
+        isMaxBitrate_.store(true);
+        isMinBitrate_.store(false);
+        DHLOGI("currentBitrate_ equal to maxBitrate_, no need to adjust");
+        return DCAMERA_OK;
+    } else if (currentBitrate_ == minBitrate_ && finalBitrate == minBitrate_) {
+        isMaxBitrate_.store(false);
+        isMinBitrate_.store(true);
+        DHLOGI("currentBitrate_ equal to minBitrate_, no need to adjust");
+        return DCAMERA_OK;
+    }
+    isMaxBitrate_.store(false);
+    isMinBitrate_.store(false);
+    Media::Format format{};
+    format.PutLongValue("bitrate", finalBitrate);
+    if (videoEncoder_ != nullptr) {
+        int32_t ret = videoEncoder_->SetParameter(format);
+        if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
+            DHLOGE("Failed to reconfigure video encoder with new bitrate. Error code: %{public}d", ret);
+            return DCAMERA_BAD_OPERATE;
+        }
+        currentBitrate_ = finalBitrate;
+        DHLOGI("Successfully reconfigured video encoder with new bitrate: %{public}" PRId64, finalBitrate);
+    }
+    return DCAMERA_OK;
+}
+
+void EncodeDataProcess::SyncEncodeBufferThread()
+{
+    DHLOGI("SyncEncodeBufferThread started ");
+    int32_t retryInterval = DCAMERA_SYNC_TIME_CONSTANTS_MS * RETRY_TIME_INTERVAL_FACTOR / maxFrameRate_;
+    const std::chrono::milliseconds BASE_FRAME_RETRY_INTERVAL(retryInterval);
+
+    while (isEncoderProcess_.load()) {
+        std::shared_ptr<DataBuffer> buffer = nullptr;
+        {
+            std::unique_lock<std::mutex> lock(encodeBuffersMutex_);
+            encodeBuffersCond_.wait(lock, [this] { return !encodeBuffers_.empty() || !isEncoderProcess_.load(); });
+            if (!isEncoderProcess_.load()) {
+                DHLOGI("encodeprocess exit.");
+                break;
+            }
+            if (encodeBuffers_.empty()) {
+                DHLOGI("empty encodeBuffers_.");
+                continue;
+            }
+            buffer = encodeBuffers_.front();
+            encodeBuffers_.pop_front();
+        }
+        if (buffer == nullptr) {
+            continue;
+        }
+        bool isKeyFrame = IsKeyFrame(buffer);
+        if (!isKeyFrame && isSkipState_.load()) {
+            continue;
+        } else if (isKeyFrame && isSkipState_.load() && lastKeyFrameIndex_.load() != curKeyFrameIndex_.load()) {
+            isSkipState_.store(false);
+        }
+        int32_t ret = OnProcessedEncodeVideoBuffer(buffer, isKeyFrame);
+        if (ret == DCAMERA_OK) {
+            std::unique_lock<std::mutex> lock(encodeBuffersMutex_);
+            int32_t currentSize = static_cast<int32_t>(encodeBuffers_.size());
+            if (currentSize >= (maxFrameRate_ / SYNCQUEUE_DIVIDE_FOUR)) {
+                DHLOGI("current encodebuffer size %{public}d.", currentSize);
+                std::this_thread::sleep_for(BASE_FRAME_RETRY_INTERVAL);
+            }
+            continue;
+        } else if (ret == DCAMERA_TRANS_BUSY) {
+            std::this_thread::sleep_for(BASE_FRAME_RETRY_INTERVAL);
+        } else {
+            DHLOGE("encode buffer process failed, ret:%{public}d", ret);
+            break;
+        }
+    }
+    DHLOGI("SyncEncodeBufferThread exited");
+}
+
+bool EncodeDataProcess::IsKeyFrame(const std::shared_ptr<DataBuffer>& inputBuffer)
+{
+    int32_t frameType = MediaAVCodec::AVCODEC_BUFFER_FLAG_SYNC_FRAME;
+    int32_t frameIndex = 0;
+    if (!inputBuffer->FindInt32(FRAME_TYPE, frameType)) {
+        DHLOGE("key frame find %{public}s failed.", FRAME_TYPE.c_str());
+    }
+    if (!inputBuffer->FindInt32(INDEX, frameIndex)) {
+        DHLOGE("frame index find %{public}s failed.", INDEX.c_str());
+    }
+    if (frameType == MediaAVCodec::AVCODEC_BUFFER_FLAG_NONE) {
+        return false;
+    } else {
+        curKeyFrameIndex_.store(frameIndex);
+        return true;
+    }
+}
+
+int32_t EncodeDataProcess::OnProcessedEncodeVideoBuffer(std::shared_ptr<DataBuffer>& encodeBuffer, bool isKeyFrame)
+{
+    std::shared_ptr<DCameraPipelineSink> targetPipelineSink = callbackPipelineSink_.lock();
+    if (targetPipelineSink == nullptr) {
+        DHLOGE("targetPipelineSink is nullptr");
+        return DCAMERA_BAD_OPERATE;
+    }
+    int32_t ret = targetPipelineSink->OnProcessedVideoBuffer(encodeBuffer);
+    if (ret == DCAMERA_OK) {
+        SyncVideoFrameSuccess(isKeyFrame);
+    } else if (ret == DCAMERA_TRANS_BUSY) {
+        SyncVideoFrameFailure(encodeBuffer);
+    }
+    return ret;
+}
+
+void EncodeDataProcess::SyncVideoFrameSuccess(bool isKeyFrame)
+{
+    if (isKeyFrame) {
+        syncKeyFrameSuccNum_++;
+        DHLOGI("sync keyFrame num_ %{public}d.", syncKeyFrameSuccNum_);
+    }
+    if (syncKeyFrameSuccNum_ >= BITRATE_INCREASE_STANDARD) {
+        if (!isMaxBitrate_.load()) {
+            AdjustBitrateBasedOnNetworkConditions(true);
+        }
+        syncKeyFrameSuccNum_ = 0;
+    }
+}
+
+void EncodeDataProcess::SyncVideoFrameFailure(std::shared_ptr<DataBuffer>& encodeBuffer)
+{
+    syncKeyFrameSuccNum_ = 0;
+    int32_t currentSize = 0;
+    {
+        std::unique_lock<std::mutex> lock(encodeBuffersMutex_);
+        encodeBuffers_.push_front(encodeBuffer);
+        currentSize = static_cast<int32_t>(encodeBuffers_.size());
+        DHLOGI("current encodebuffer size %{public}d.", currentSize);
+        if (currentSize < (maxFrameRate_ / SYNCQUEUE_DIVIDE_TWO)) {
+            return;
+        }
+    }
+
+    if (!isMinBitrate_.load()) {
+        AdjustBitrateBasedOnNetworkConditions(false);
+    }
+
+    {
+        std::unique_lock<std::mutex> lock(encodeBuffersMutex_);
+        std::deque<std::shared_ptr<DataBuffer>> tempQueue;
+        for (const auto& dataBuffer : encodeBuffers_) {
+            if (dataBuffer && IsKeyFrame(dataBuffer)) {
+                tempQueue.push_back(dataBuffer);
+                lastKeyFrameIndex_.store(curKeyFrameIndex_.load());
+            }
+        }
+        encodeBuffers_ = std::move(tempQueue);
+        isSkipState_.store(true);
+    }
+}
+
+int64_t EncodeDataProcess::RoundBitrates(int64_t tempBitrate)
+{
+    if (tempBitrate < minBitrate_) {
+        return minBitrate_;
+    } else if (tempBitrate > maxBitrate_) {
+        return maxBitrate_;
+    } else {
+        return tempBitrate;
+    }
 }
 
 int32_t EncodeDataProcess::UpdateSettings(const std::shared_ptr<Camera::CameraMetadata> settings)

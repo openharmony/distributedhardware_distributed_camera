@@ -40,6 +40,7 @@ namespace DistributedHardware {
         DCAMERA_ERR_DLOPEN = ERR_DH_CAMERA_BASE + 17,
         DCAMERA_ERR_PUBLISH_STATE = ERR_DH_CAMERA_BASE + 18,
         DCAMERA_ERR_ALLCONNECT = ERR_DH_CAMERA_BASE + 19,
+        DCAMERA_TRANS_BUSY = ERR_DH_CAMERA_BASE + 20
     };
 } // namespace DistributedHardware
 } // namespace OHOS
