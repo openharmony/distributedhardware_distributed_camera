@@ -201,10 +201,12 @@ HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_007, TestSize.Lev
     WorkModeParam param(-1, 0, 0, false);
     int32_t ret = DCameraSourceHandler::GetInstance().UpdateDistributedHardwareWorkMode(devId, dhId, param);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+#ifdef UT_COVER_SPECIAL
     param.fd = 12;
     param.sharedMemLen = 120;
     ret = DCameraSourceHandler::GetInstance().UpdateDistributedHardwareWorkMode(devId, dhId, param);
     EXPECT_NE(DCAMERA_OK, ret);
+#endif
 }
 }
 }

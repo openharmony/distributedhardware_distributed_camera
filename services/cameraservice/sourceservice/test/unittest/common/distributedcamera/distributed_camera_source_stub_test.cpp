@@ -302,11 +302,12 @@ HWTEST_F(DcameraSourceStubTest, dcamera_source_stub_test_009, TestSize.Level1)
     param.sharedMemLen = 120;
     ret = sourceProxy.UpdateDistributedHardwareWorkMode(devId, dhId, param);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
-
+#ifdef UT_COVER_SPECIAL
     param.fd = 12;
     param.sharedMemLen = 0;
     ret = sourceProxy.UpdateDistributedHardwareWorkMode(devId, dhId, param);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+#endif
 }
 
 /**

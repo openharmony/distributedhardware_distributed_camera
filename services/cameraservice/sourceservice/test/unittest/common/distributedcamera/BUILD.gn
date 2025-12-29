@@ -103,6 +103,10 @@ ohos_unittest("DCameraSourceTest") {
     "DH_LOG_TAG=\"DCameraSourceTest\"",
     "LOG_DOMAIN=0xD004150",
   ]
+
+  if (!distributed_camera_common) {
+    defines += [ "UT_COVER_SPECIAL" ]
+  }
 }
 
 group("dcamera_source_test") {
