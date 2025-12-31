@@ -23,6 +23,7 @@
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
+#include "metadata_utils.h"
 #include <sys/prctl.h>
 
 namespace OHOS {
@@ -86,14 +87,15 @@ int32_t DCameraSinkDataProcess::StartCapture(std::shared_ptr<DCameraCaptureInfo>
         pipeline_ = std::make_shared<DCameraPipelineSink>();
         auto dataProcess = std::shared_ptr<DCameraSinkDataProcess>(shared_from_this());
         std::shared_ptr<DataProcessListener> listener = std::make_shared<DCameraSinkDataProcessListener>(dataProcess);
+        int32_t maxFps = GetMaxFrameRate(captureInfo);
         VideoConfigParams srcParams(VideoCodecType::NO_CODEC,
                                     GetPipelineFormat(captureInfo->format_),
-                                    DCAMERA_PRODUCER_FPS_DEFAULT,
+                                    maxFps,
                                     captureInfo->width_,
                                     captureInfo->height_);
         VideoConfigParams destParams(GetPipelineCodecType(captureInfo->encodeType_),
                                      GetPipelineFormat(captureInfo->format_),
-                                     DCAMERA_PRODUCER_FPS_DEFAULT,
+                                     maxFps,
                                      captureInfo->width_,
                                      captureInfo->height_);
         int32_t ret = pipeline_->CreateDataProcessPipeline(PipelineType::VIDEO, srcParams, destParams, listener);
@@ -161,7 +163,7 @@ void DCameraSinkDataProcess::SendDataAsync(const std::shared_ptr<DataBuffer>& bu
     }
 }
 
-void DCameraSinkDataProcess::OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult)
+int32_t DCameraSinkDataProcess::OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult)
 {
 #ifdef DUMP_DCAMERA_FILE
     if (DcameraHidumper::GetInstance().GetDumpFlag() && (IsUnderDumpMaxSize(DUMP_PATH, AFTER_ENCODE) == DCAMERA_OK)) {
@@ -169,7 +171,16 @@ void DCameraSinkDataProcess::OnProcessedVideoBuffer(const std::shared_ptr<DataBu
     }
 #endif
     DumpFileUtil::WriteDumpFile(dumpFile_, static_cast<void *>(videoResult->Data()), videoResult->Size());
-    SendDataAsync(videoResult);
+    if (eventHandler_ == nullptr) {
+        DHLOGE("eventHandler_ is uninit");
+        return DCAMERA_TRANS_BUSY;
+    }
+    if (eventHandler_->IsIdle()) {
+        SendDataAsync(videoResult);
+        return DCAMERA_OK;
+    } else {
+        return DCAMERA_TRANS_BUSY;
+    }
 }
 
 void DCameraSinkDataProcess::OnError(DataProcessErrorType errorType)
@@ -232,6 +243,55 @@ int32_t DCameraSinkDataProcess::GetProperty(const std::string& propertyName, Pro
         return DCAMERA_BAD_VALUE;
     }
     return pipeline_->GetProperty(propertyName, propertyCarrier);
+}
+
+int32_t DCameraSinkDataProcess::GetMaxFrameRate(std::shared_ptr<DCameraCaptureInfo>& captureInfo)
+{
+    int32_t maxFps = 0;
+    if (captureInfo == nullptr || captureInfo->streamType_ != CONTINUOUS_FRAME) {
+        return DCAMERA_PRODUCER_FPS_DEFAULT;
+    }
+    std::vector<std::shared_ptr<DCameraSettings>> captureSettings = captureInfo->captureSettings_;
+    std::string metadataSetting;
+    for (const auto& setting : captureSettings) {
+        if (setting != nullptr && setting->type_ == UPDATE_METADATA) {
+            DHLOGI("update metadata settings");
+            metadataSetting = setting->value_;
+        }
+    }
+
+    if (metadataSetting.empty()) {
+        DHLOGE("no metadata settings to update");
+        return DCAMERA_PRODUCER_FPS_DEFAULT;
+    }
+
+    std::string metadataStr = Base64Decode(metadataSetting);
+    std::shared_ptr<Camera::CameraMetadata> cameraMetadata = Camera::MetadataUtils::DecodeFromString(metadataStr);
+    if (cameraMetadata == nullptr) {
+        DHLOGE("invalid cameraMetadata");
+        return DCAMERA_PRODUCER_FPS_DEFAULT;
+    }
+    camera_metadata_item_t fpsItem;
+    int32_t val = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_CONTROL_FPS_RANGES, &fpsItem);
+    if (val == CAM_META_SUCCESS) {
+        uint32_t fpscount = fpsItem.count;
+        DHLOGI("find fps ranges fpscount %{public}d", fpscount);
+        if (fpscount != DCAMERA_FPS_SIZE) {
+            DHLOGI("find fps ranges fpscount: %{public}u is not DCAMERA_FPS_SIZE.", fpscount);
+            return DCAMERA_PRODUCER_FPS_DEFAULT;
+        }
+        for (uint32_t i = 0; i < fpscount; i++) {
+            maxFps = std::max(maxFps, fpsItem.data.i32[i]);
+        }
+        DHLOGI("get maxFps success, maxFps: %{public}d", maxFps);
+        if (maxFps == 0) {
+            return DCAMERA_PRODUCER_FPS_DEFAULT;
+        }
+        return maxFps;
+    } else {
+        DHLOGE("get maxFps failed, ret: %{public}d", val);
+    }
+    return DCAMERA_PRODUCER_FPS_DEFAULT;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

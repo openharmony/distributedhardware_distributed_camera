@@ -564,5 +564,27 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_018, TestSize.Level1)
     rc = testEncodeDataProcess_->ProcessData(inputBuffers);
     EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
 }
+
+/**
+ * @tc.name: encode_data_process_test_019
+ * @tc.desc: Verify encode data process func.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(EncodeDataProcessTest, encode_data_process_test_019, TestSize.Level1)
+{
+    ASSERT_NE(testEncodeDataProcess_, nullptr);
+    testEncodeDataProcess_->currentBitrate_ = 3400000;
+    testEncodeDataProcess_->maxBitrate_ = 3400000;
+    testEncodeDataProcess_->AdjustBitrateBasedOnNetworkConditions(true);
+    EXPECT_EQ(testEncodeDataProcess_->currentBitrate_, testEncodeDataProcess_->maxBitrate_);
+    testEncodeDataProcess_->currentBitrate_ = 1500000;
+    testEncodeDataProcess_->minBitrate_ = 1500000;
+    testEncodeDataProcess_->AdjustBitrateBasedOnNetworkConditions(false);
+    EXPECT_EQ(testEncodeDataProcess_->currentBitrate_, testEncodeDataProcess_->minBitrate_);
+    testEncodeDataProcess_->currentBitrate_ = 1800000;
+    testEncodeDataProcess_->AdjustBitrateBasedOnNetworkConditions(true);
+    EXPECT_EQ(testEncodeDataProcess_->currentBitrate_, 1800000);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

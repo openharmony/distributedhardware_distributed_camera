@@ -25,9 +25,10 @@ public:
     MockDCameraDataProcessListener() = default;
     ~MockDCameraDataProcessListener() = default;
 
-    void OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult) override
+    int32_t OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult) override
     {
         (void)videoResult;
+        return 0;
     }
 
     void OnError(DataProcessErrorType errorType) override

@@ -29,7 +29,7 @@ public:
     explicit DCameraStreamDataProcessPipelineListener(std::shared_ptr<DCameraStreamDataProcess>& process);
     ~DCameraStreamDataProcessPipelineListener() override;
 
-    void OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult) override;
+    int32_t OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult) override;
     void OnError(DataProcessErrorType errorType) override;
 
 private:

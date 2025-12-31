@@ -40,7 +40,7 @@ public:
     int32_t FeedStream(std::shared_ptr<DataBuffer>& dataBuffer) override;
     void Init() override;
 
-    void OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult);
+    int32_t OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult);
     void OnError(DataProcessErrorType errorType);
 
     int32_t GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier) override;
@@ -51,6 +51,9 @@ private:
     Videoformat GetPipelineFormat(int32_t format);
     void StartEventHandler();
     void SendDataAsync(const std::shared_ptr<DataBuffer>& buffer);
+    int32_t GetMaxFrameRate(std::shared_ptr<DCameraCaptureInfo>& captureInfo);
+
+    const uint32_t DCAMERA_FPS_SIZE = 2;
 
     std::string dhId_;
     std::shared_ptr<DCameraCaptureInfo> captureInfo_;

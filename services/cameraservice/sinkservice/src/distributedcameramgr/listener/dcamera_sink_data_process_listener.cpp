@@ -24,14 +24,14 @@ DCameraSinkDataProcessListener::DCameraSinkDataProcessListener(
 {
 }
 
-void DCameraSinkDataProcessListener::OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult)
+int32_t DCameraSinkDataProcessListener::OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult)
 {
     std::shared_ptr<DCameraSinkDataProcess> dataProcess = dataProcess_.lock();
     if (dataProcess == nullptr) {
         DHLOGE("DCameraSinkDataProcessListener::OnProcessedVideoBuffer dataProcess is null");
-        return;
+        return DCAMERA_BAD_VALUE;
     }
-    dataProcess->OnProcessedVideoBuffer(videoResult);
+    return dataProcess->OnProcessedVideoBuffer(videoResult);
 }
 
 void DCameraSinkDataProcessListener::OnError(DataProcessErrorType errorType)

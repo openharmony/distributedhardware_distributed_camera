@@ -27,7 +27,7 @@ public:
     explicit DCameraSinkDataProcessListener(std::shared_ptr<DCameraSinkDataProcess>& dataProcess);
     ~DCameraSinkDataProcessListener() override = default;
 
-    void OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult) override;
+    int32_t OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult) override;
     void OnError(DataProcessErrorType errorType) override;
 
 private:
