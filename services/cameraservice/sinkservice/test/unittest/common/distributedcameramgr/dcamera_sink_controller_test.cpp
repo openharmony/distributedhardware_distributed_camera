@@ -865,6 +865,10 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_037, TestSize.L
     EXPECT_TRUE(controller_->CheckAclRight());
     controller_->userId_ = 100;
     EXPECT_FALSE(controller_->CheckAclRight());
+    std::string networkId = "";
+    EXPECT_EQ(false, controller_->IsIdenticalAccount(networkId));
+    networkId = "networkId";
+    EXPECT_EQ(false, controller_->IsIdenticalAccount(networkId));
 }
 } // namespace DistributedHardware
 } // namespace OHOS
