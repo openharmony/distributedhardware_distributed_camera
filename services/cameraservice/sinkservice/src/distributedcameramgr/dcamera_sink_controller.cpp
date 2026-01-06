@@ -52,6 +52,9 @@
 namespace OHOS {
 namespace DistributedHardware {
 const int DEFAULT_DEVICE_SECURITY_LEVEL = -1;
+#ifdef SECURITY_LEVEL_CHECK_ENABLE
+constexpr int32_t MINIMUM_SECURITY_LEVEL = 3;
+#endif
 const std::string PAGE_SUBTYPE = "camera";
 
 DCameraSinkController::DCameraSinkController(std::shared_ptr<ICameraSinkAccessControl>& accessControl,
@@ -76,6 +79,19 @@ int32_t DCameraSinkController::StartCapture(std::vector<std::shared_ptr<DCameraC
     CHECK_AND_RETURN_RET_LOG(accessControl_ == nullptr, DCAMERA_BAD_VALUE, "accessControl_ is null.");
     if ((accessControl_->IsSensitiveSrcAccess(SRC_TYPE)) &&
         (accessControl_->GetAccessControlType(accessType) == DCAMERA_SAME_ACCOUNT)) {
+#ifdef SECURITY_LEVEL_CHECK_ENABLE
+        std::string sourceUdid = GetUdidByNetworkId(srcDevId_);
+        if (sourceUdid.empty()) {
+            DHLOGE("source udid is empty");
+            return DCAMERA_BAD_VALUE;
+        }
+        int32_t sourceSecurityLevel = GetDeviceSecurityLevel(sourceUdid);
+        DHLOGI("sourceSecurityLevel: %{public}d", sourceSecurityLevel);
+        if (sourceSecurityLevel < MINIMUM_SECURITY_LEVEL) {
+            return DCameraNotifyInner(DCAMERA_SINK_STOP, DCAMERA_EVENT_NO_PERMISSION,
+                std::string("source stop dcamera security less than three"));
+        }
+#endif
         int32_t ret = StartCaptureInner(captureInfos);
         if (ret == DCAMERA_OK) {
             accessControl_->NotifySensitiveSrc(SRC_TYPE);
