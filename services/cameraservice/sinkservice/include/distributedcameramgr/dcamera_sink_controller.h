@@ -97,6 +97,7 @@ private:
     int32_t CreateCtrlSession();
     int32_t CheckSensitive();
     bool CheckAclRight();
+    bool IsIdenticalAccount(const std::string &networkId);
     class DCameraSurfaceHolder {
     public:
         DCameraSurfaceHolder(int32_t r, sptr<Surface> s) : result(r), surface(s) {}
@@ -141,6 +142,8 @@ private:
     const std::string SESSION_FLAG = "control";
     const std::string SRC_TYPE = "camera";
     const size_t DATABUFF_MAX_SIZE = 100 * 1024 * 1024;
+    const uint32_t MAX_ID_LENGTH = 256;
+    const uint32_t MAX_ONLINE_DEVICE_SIZE = 1024;
     enum DcameraCaptureState : int32_t {
         CAPTURE_IDLE,
         CAPTURE_STARTING,

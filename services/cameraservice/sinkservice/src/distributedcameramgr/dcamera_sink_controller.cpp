@@ -221,6 +221,24 @@ int32_t DCameraSinkController::GetCameraInfo(std::shared_ptr<DCameraInfo>& camIn
     return DCAMERA_OK;
 }
 
+bool DCameraSinkController::IsIdenticalAccount(const std::string &networkId)
+{
+    CHECK_AND_RETURN_RET_LOG(networkId.empty() || networkId.length() > MAX_ID_LENGTH, false, "networkId is invalid.");
+    DmAuthForm authForm = DmAuthForm::INVALID_TYPE;
+    std::vector<DmDeviceInfo> deviceList;
+    DeviceManager::GetInstance().GetTrustedDeviceList(DCAMERA_PKG_NAME, "", deviceList);
+    CHECK_AND_RETURN_RET_LOG(deviceList.size() == 0 || deviceList.size() > MAX_ONLINE_DEVICE_SIZE,
+        false, "DeviceList size is invalid!");
+    for (const auto &deviceInfo : deviceList) {
+        if (std::string(deviceInfo.networkId) == networkId) {
+            authForm = deviceInfo.authForm;
+            break;
+        }
+    }
+    CHECK_AND_RETURN_RET_LOG(authForm == DmAuthForm::IDENTICAL_ACCOUNT, true, "account check success.");
+    return false;
+}
+
 int32_t DCameraSinkController::CheckSensitive()
 {
     if (sinkCallback_ == nullptr) {
@@ -790,6 +808,9 @@ int32_t DCameraSinkController::HandleReceivedData(std::shared_ptr<DataBuffer>& d
             DHLOGE("ACL check failed.");
             return DCAMERA_BAD_VALUE;
         }
+#ifdef DCAMERA_OPEN_STABILE
+        CHECK_AND_RETURN_RET_LOG(!IsIdenticalAccount(srcDevId_), DCAMERA_BAD_VALUE, "Account check failed.");
+#endif
         return StartCapture(captureInfoCmd.value_, sceneMode_);
     } else if ((!command.empty()) && (command.compare(DCAMERA_PROTOCOL_CMD_UPDATE_METADATA) == 0)) {
         DCameraMetadataSettingCmd metadataSettingCmd;
