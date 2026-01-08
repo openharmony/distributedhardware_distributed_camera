@@ -26,10 +26,12 @@
 #undef private
 
 #include "data_buffer.h"
+#include "dcamera_access_listener_mock.h"
 #include "dcamera_allconnect_manager_test.h"
 #include "dcamera_channel_listener_mock.h"
 #include "dcamera_softbus_session.h"
 #include "dcamera_hisysevent_adapter.h"
+#include "dcamera_utils_tools.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "iaccess_listener.h"
@@ -46,6 +48,26 @@ using ::testing::SetArgReferee;
 
 namespace OHOS {
 namespace DistributedHardware {
+static bool g_sinkConnect;
+
+bool ManageSelectChannel::GetSinkConnect()
+{
+    return g_sinkConnect;
+}
+
+static sptr<IAccessListener> g_accessListener;
+
+sptr<IAccessListener> DCameraAccessConfigManager::GetAccessListener()
+{
+    return g_accessListener;
+}
+
+static std::string g_pkgName;
+
+std::string DCameraAccessConfigManager::GetAccessPkgName()
+{
+    return g_pkgName;
+}
 class TestAccessListener : public IAccessListener {
     sptr<IRemoteObject> AsObject()
     {
@@ -107,6 +129,7 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_001, TestSize.L
     std::string peerDevId = "abcd";
     DCAMERA_CHANNEL_ROLE role = DCAMERA_CHANNLE_ROLE_SOURCE;
     DCameraSessionMode sessionMode = DCameraSessionMode::DCAMERA_SESSION_MODE_CTRL;
+    g_sinkConnect = false;
     int32_t ret = DCameraSoftbusAdapter::GetInstance().CreatSoftBusSinkSocketServer(sessionName, role,
         sessionMode, peerDevId, peerSessionName);
     EXPECT_EQ(DCAMERA_OK, ret);
@@ -125,6 +148,7 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_002, TestSize.L
     std::string peerDevId = "abcd";
     DCAMERA_CHANNEL_ROLE role = DCAMERA_CHANNLE_ROLE_SOURCE;
     DCameraSessionMode sessionMode = DCameraSessionMode::DCAMERA_SESSION_MODE_CTRL;
+    g_sinkConnect = false;
     int32_t ret = DCameraSoftbusAdapter::GetInstance().CreatSoftBusSinkSocketServer(sessionName, role,
         sessionMode, peerDevId, peerSessionName);
     ret = DCameraSoftbusAdapter::GetInstance().DestroySoftbusSessionServer(sessionName);
@@ -145,6 +169,7 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_003, TestSize.L
     std::string peerSessName = "sinktest02";
     DCameraSessionMode sessionMode = DCameraSessionMode::DCAMERA_SESSION_MODE_CTRL;
     std::string peerDevId = TEST_DEVICE_ID;
+    g_sinkConnect = false;
     int32_t ret = DCameraSoftbusAdapter::GetInstance().CreatSoftBusSinkSocketServer(mySessName, role,
         sessionMode, peerDevId, peerSessName);
     DCameraSoftbusAdapter::GetInstance().DestroySoftbusSessionServer(sessionName);
@@ -166,6 +191,7 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_004, TestSize.L
     std::string peerSessName = "sinktest02";
     DCameraSessionMode sessionMode = DCameraSessionMode::DCAMERA_SESSION_MODE_CTRL;
     std::string peerDevId = TEST_DEVICE_ID;
+    g_sinkConnect = false;
     int32_t ret = DCameraSoftbusAdapter::GetInstance().CreatSoftBusSinkSocketServer(mySessName, role,
         sessionMode, peerDevId, peerSessName);
     int32_t sessionId = 1;
@@ -1022,6 +1048,7 @@ HWTEST_F(DCameraSoftbusAdapterTest, DCameraSoftbusAdapterTest_038, TestSize.Leve
     std::string dhId = "dhId";
     DCameraSoftbusAdapter::GetInstance().mySocketSet_.clear();
     ManageSelectChannel::GetInstance().SetSinkConnect(false);
+    g_sinkConnect = false;
     DCameraSoftbusAdapter::GetInstance().CreatSoftBusSinkSocketServer(
         mySessionName, role, sessionMode, peerDevId, peerSessionName);
     auto listener = std::make_shared<DCameraChannelListenerMock>();
@@ -1545,6 +1572,762 @@ HWTEST_F(DCameraSoftbusAdapterTest, DCameraSoftbusAdapterTest_059, TestSize.Leve
     DCameraAccessConfigManager::GetInstance().ClearAuthorizationResult(networkId);
     DCameraSoftbusAdapter::GetInstance().ProcessAuthorizationResult(requestId, false);
     EXPECT_EQ(DCameraAccessConfigManager::GetInstance().authorizationResults_[networkId], false);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_060
+ * @tc.desc: Verify the ReplaceSuffix function when suffix matches exactly.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_060, TestSize.Level1)
+{
+    std::string mySessNmRep = "session_suffix";
+    const std::string suffix = "_suffix";
+    const std::string replacement = "_new";
+    
+    DCameraSoftbusAdapter::GetInstance().ReplaceSuffix(mySessNmRep, suffix, replacement);
+    
+    EXPECT_EQ("session_new", mySessNmRep);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_061
+ * @tc.desc: Verify the ReplaceSuffix function when suffix doesn't match.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_061, TestSize.Level1)
+{
+    std::string mySessNmRep = "session_test";
+    const std::string suffix = "_suffix";
+    const std::string replacement = "_new";
+    std::string original = mySessNmRep;
+    
+    DCameraSoftbusAdapter::GetInstance().ReplaceSuffix(mySessNmRep, suffix, replacement);
+    
+    EXPECT_EQ(original, mySessNmRep);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_062
+ * @tc.desc: Verify the ReplaceSuffix function when string is shorter than suffix.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_062, TestSize.Level1)
+{
+    std::string mySessNmRep = "short";
+    const std::string suffix = "_longsuffix";
+    const std::string replacement = "_new";
+    std::string original = mySessNmRep;
+    
+    DCameraSoftbusAdapter::GetInstance().ReplaceSuffix(mySessNmRep, suffix, replacement);
+    
+    EXPECT_EQ(original, mySessNmRep);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_063
+ * @tc.desc: Verify the ReplaceSuffix function when suffix is empty.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_063, TestSize.Level1)
+{
+    std::string mySessNmRep = "session_test";
+    const std::string suffix = "";
+    const std::string replacement = "_new";
+    
+    DCameraSoftbusAdapter::GetInstance().ReplaceSuffix(mySessNmRep, suffix, replacement);
+    
+    EXPECT_EQ("session_test_new", mySessNmRep);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_064
+ * @tc.desc: Verify the ReplaceSuffix function when replacement is empty.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_064, TestSize.Level1)
+{
+    std::string mySessNmRep = "session_suffix";
+    const std::string suffix = "_suffix";
+    const std::string replacement = "";
+    
+    DCameraSoftbusAdapter::GetInstance().ReplaceSuffix(mySessNmRep, suffix, replacement);
+    
+    EXPECT_EQ("session", mySessNmRep);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_065
+ * @tc.desc: Verify the ReplaceSuffix function when string exactly equals suffix.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_065, TestSize.Level1)
+{
+    std::string mySessNmRep = "_suffix";
+    const std::string suffix = "_suffix";
+    const std::string replacement = "_new";
+    
+    DCameraSoftbusAdapter::GetInstance().ReplaceSuffix(mySessNmRep, suffix, replacement);
+    
+    EXPECT_EQ("_new", mySessNmRep);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_066
+ * @tc.desc: Verify the ReplaceSuffix function with partial suffix match.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_066, TestSize.Level1)
+{
+    std::string mySessNmRep = "session_suffixx";
+    const std::string suffix = "_suffix";
+    const std::string replacement = "_new";
+    std::string original = mySessNmRep;
+    
+    DCameraSoftbusAdapter::GetInstance().ReplaceSuffix(mySessNmRep, suffix, replacement);
+    
+    EXPECT_EQ(original, mySessNmRep);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_067
+ * @tc.desc: Verify the ReplaceSuffix function with special characters in suffix.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_067, TestSize.Level1)
+{
+    std::string mySessNmRep = "session_123";
+    const std::string suffix = "_123";
+    const std::string replacement = "_456";
+    
+    DCameraSoftbusAdapter::GetInstance().ReplaceSuffix(mySessNmRep, suffix, replacement);
+    
+    EXPECT_EQ("session_456", mySessNmRep);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_068
+ * @tc.desc: Verify the CreateSoftbusSessionServer function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_068, TestSize.Level1)
+{
+    std::string sessionName = "sourcetest01";
+    std::string peerSessionName = "dh_control_0";
+    std::string peerDevId = "abcd";
+    DCAMERA_CHANNEL_ROLE role = DCAMERA_CHANNLE_ROLE_SOURCE;
+    DCameraSessionMode sessionMode = DCameraSessionMode::DCAMERA_SESSION_MODE_CTRL;
+    g_sinkConnect = true;
+    int32_t ret = DCameraSoftbusAdapter::GetInstance().CreatSoftBusSinkSocketServer(sessionName, role,
+        sessionMode, peerDevId, peerSessionName);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_069
+ * @tc.desc: Verify the DestroySoftbusSessionServer function when sessionName does not exist.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_069, TestSize.Level1)
+{
+    std::string sessionName = "nonexistent_session";
+    
+    int32_t ret = DCameraSoftbusAdapter::GetInstance().DestroySoftbusSessionServer(sessionName);
+    
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_070
+ * @tc.desc: Verify the DestroySoftbusSessionServer function when sessionTotal_[sessionName] is 1.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_070, TestSize.Level1)
+{
+    std::string sessionName = "session_to_destroy";
+    std::string peerSessionName = "dh_control_0";
+    std::string peerDevId = "abcd";
+    DCAMERA_CHANNEL_ROLE role = DCAMERA_CHANNLE_ROLE_SOURCE;
+    DCameraSessionMode sessionMode = DCameraSessionMode::DCAMERA_SESSION_MODE_CTRL;
+    
+    int32_t ret = DCameraSoftbusAdapter::GetInstance().CreatSoftBusSinkSocketServer(sessionName, role,
+        sessionMode, peerDevId, peerSessionName);
+    ASSERT_EQ(DCAMERA_OK, ret);
+    
+    ret = DCameraSoftbusAdapter::GetInstance().DestroySoftbusSessionServer(sessionName);
+    EXPECT_EQ(DCAMERA_OK, ret);
+    ret = DCameraSoftbusAdapter::GetInstance().DestroySoftbusSessionServer(sessionName);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_071
+ * @tc.desc: Verify the DestroySoftbusSessionServer function when sessionTotal_[sessionName] > 1.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_071, TestSize.Level1)
+{
+    std::string sessionName = "multi_ref_session";
+    std::string peerSessionName = "dh_control_0";
+    std::string peerDevId = "abcd";
+    DCAMERA_CHANNEL_ROLE role = DCAMERA_CHANNLE_ROLE_SOURCE;
+    DCameraSessionMode sessionMode = DCameraSessionMode::DCAMERA_SESSION_MODE_CTRL;
+    
+    int32_t ret = DCameraSoftbusAdapter::GetInstance().CreatSoftBusSinkSocketServer(sessionName, role,
+        sessionMode, peerDevId, peerSessionName);
+    ASSERT_EQ(DCAMERA_OK, ret);
+    
+    ret = DCameraSoftbusAdapter::GetInstance().CreatSoftBusSinkSocketServer(sessionName, role,
+        sessionMode, peerDevId, peerSessionName);
+    ASSERT_EQ(DCAMERA_OK, ret);
+    
+    ret = DCameraSoftbusAdapter::GetInstance().DestroySoftbusSessionServer(sessionName);
+    EXPECT_EQ(DCAMERA_OK, ret);
+    ret = DCameraSoftbusAdapter::GetInstance().DestroySoftbusSessionServer(sessionName);
+    EXPECT_EQ(DCAMERA_OK, ret);
+    
+    ret = DCameraSoftbusAdapter::GetInstance().DestroySoftbusSessionServer(sessionName);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_072
+ * @tc.desc: Verify the DestroySoftbusSessionServer function with empty sessionName.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_072, TestSize.Level1)
+{
+    std::string sessionName = "";
+    
+    int32_t ret = DCameraSoftbusAdapter::GetInstance().DestroySoftbusSessionServer(sessionName);
+    
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_073
+ * @tc.desc: Verify the DestroySoftbusSessionServer function with special characters in sessionName.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_073, TestSize.Level1)
+{
+    std::string sessionName = "session@123#test";
+    std::string peerSessionName = "dh_control_0";
+    std::string peerDevId = "abcd";
+    DCAMERA_CHANNEL_ROLE role = DCAMERA_CHANNLE_ROLE_SOURCE;
+    DCameraSessionMode sessionMode = DCameraSessionMode::DCAMERA_SESSION_MODE_CTRL;
+    
+    int32_t ret = DCameraSoftbusAdapter::GetInstance().CreatSoftBusSinkSocketServer(sessionName, role,
+        sessionMode, peerDevId, peerSessionName);
+    ASSERT_EQ(DCAMERA_OK, ret);
+    
+    ret = DCameraSoftbusAdapter::GetInstance().DestroySoftbusSessionServer(sessionName);
+    
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_074
+ * @tc.desc: Verify the OnSourceSessionOpened function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_074, TestSize.Level1)
+{
+    std::string sessionName = "sourcetest03";
+    DCAMERA_CHANNEL_ROLE role = DCAMERA_CHANNLE_ROLE_SOURCE;
+    std::string mySessName = "sourcetest03";
+    std::string peerSessName = "sinktest02";
+    DCameraSessionMode sessionMode = DCameraSessionMode::DCAMERA_SESSION_MODE_VIDEO;
+    std::string peerDevId = TEST_DEVICE_ID;
+    std::string myDevId = "abcde";
+    std::string myDhId = "mydhid";
+    int32_t ret = DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDhId, myDevId,
+        peerSessName, peerDevId, sessionMode, role);
+    int32_t sessionId = 2;
+    PeerSocketInfo info = {
+        .name = const_cast<char*>(peerSessName.c_str()),
+        .pkgName = const_cast<char*>(DCAMERA_PKG_NAME.c_str()),
+        .networkId = const_cast<char*>(peerDevId.c_str()),
+        .dataType = TransDataType::DATA_TYPE_VIDEO_STREAM,
+    };
+    std::shared_ptr<DCameraSoftbusSession> session = std::make_shared<DCameraSoftbusSession>();
+    ret = DCameraSoftbusAdapter::GetInstance().SourceOnBind(sessionId, info);
+    EXPECT_NE(DCAMERA_OK, ret);
+    DCameraSoftbusAdapter::GetInstance().DestroySoftbusSessionServer(sessionName);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_075
+ * @tc.desc: Verify the SourceOnBytes function when dataLen is 0.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_075, TestSize.Level1)
+{
+    int32_t socket = 1001;
+    uint32_t dataLen = 0;
+    const void* data = nullptr;
+    
+    EXPECT_NO_FATAL_FAILURE(DCameraSoftbusAdapter::GetInstance().SourceOnBytes(socket, data, dataLen));
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_077
+ * @tc.desc: Verify the SourceOnBytes function when data is nullptr.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_077, TestSize.Level1)
+{
+    int32_t socket = 1003;
+    uint32_t dataLen = 1024;
+    const void* data = nullptr;
+    
+    EXPECT_NO_FATAL_FAILURE(DCameraSoftbusAdapter::GetInstance().SourceOnBytes(socket, data, dataLen));
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_078
+ * @tc.desc: Verify the SourceOnBytes function when DCameraSoftbusSourceGetSession returns error.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_078, TestSize.Level1)
+{
+    int32_t socket = -1;
+    uint32_t dataLen = 1024;
+    char buffer[1024];
+    const void* data = buffer;
+    
+    EXPECT_NO_FATAL_FAILURE(DCameraSoftbusAdapter::GetInstance().SourceOnBytes(socket, data, dataLen));
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_079
+ * @tc.desc: Verify the SourceOnBytes function when DCameraSoftbusSourceGetSession returns null session.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_079, TestSize.Level1)
+{
+    int32_t socket = 1005;
+    uint32_t dataLen = 1024;
+    char buffer[1024];
+    const void* data = buffer;
+    DCameraSoftbusAdapter::GetInstance().sourceSocketSessionMap_.emplace(1005, nullptr);
+    
+    EXPECT_NO_FATAL_FAILURE(DCameraSoftbusAdapter::GetInstance().SourceOnBytes(socket, data, dataLen));
+    DCameraSoftbusAdapter::GetInstance().sourceSocketSessionMap_.clear();
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_080
+ * @tc.desc: Verify the SourceOnBytes function when memcpy_s fails.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_080, TestSize.Level1)
+{
+    int32_t socket = 1006;
+    uint32_t dataLen = 1024;
+    char buffer[1024];
+    const void* data = buffer;
+
+    std::shared_ptr<DCameraSoftbusSession> session = std::make_shared<DCameraSoftbusSession>();
+    DCameraSoftbusAdapter::GetInstance().sourceSocketSessionMap_.emplace(1006, session);
+
+    EXPECT_NO_FATAL_FAILURE(DCameraSoftbusAdapter::GetInstance().SourceOnBytes(socket, data, dataLen));
+    DCameraSoftbusAdapter::GetInstance().sourceSocketSessionMap_.clear();
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_081
+ * @tc.desc: Verify the SourceOnBytes function with normal flow.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_081, TestSize.Level1)
+{
+    int32_t socket = 1007;
+    uint32_t dataLen = 1024;
+    char buffer[1024];
+    memset_s(buffer, dataLen, 'A', dataLen);
+    const void* data = buffer;
+    
+    std::shared_ptr<DCameraSoftbusSession> session = std::make_shared<DCameraSoftbusSession>();
+    DCameraSoftbusAdapter::GetInstance().sourceSocketSessionMap_.emplace(1007, session);
+    
+    EXPECT_NO_FATAL_FAILURE(DCameraSoftbusAdapter::GetInstance().SourceOnBytes(socket, data, dataLen));
+    DCameraSoftbusAdapter::GetInstance().sourceSocketSessionMap_.clear();
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_082
+ * @tc.desc: Verify the SourceOnBytes function with minimum valid dataLen (1 byte).
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_082, TestSize.Level1)
+{
+    int32_t socket = 1008;
+    uint32_t dataLen = 1;
+    char buffer[1] = {'X'};
+    const void* data = buffer;
+    
+    std::shared_ptr<DCameraSoftbusSession> session = std::make_shared<DCameraSoftbusSession>();
+    DCameraSoftbusAdapter::GetInstance().sourceSocketSessionMap_.emplace(1008, session);
+    
+    EXPECT_NO_FATAL_FAILURE(DCameraSoftbusAdapter::GetInstance().SourceOnBytes(socket, data, dataLen));
+    DCameraSoftbusAdapter::GetInstance().sourceSocketSessionMap_.clear();
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_083
+ * @tc.desc: Verify the SourceOnBytes function with maximum valid dataLen (DCAMERA_MAX_RECV_DATA_LEN).
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_083, TestSize.Level1)
+{
+    int32_t socket = 1009;
+    uint32_t dataLen = DCAMERA_MAX_RECV_DATA_LEN;
+    char* buffer = new char[dataLen];
+    memset_s(buffer, dataLen, 'B', dataLen);
+    const void* data = buffer;
+    
+    std::shared_ptr<DCameraSoftbusSession> session = std::make_shared<DCameraSoftbusSession>();
+    DCameraSoftbusAdapter::GetInstance().sourceSocketSessionMap_.emplace(1009, session);
+    
+    EXPECT_NO_FATAL_FAILURE(DCameraSoftbusAdapter::GetInstance().SourceOnBytes(socket, data, dataLen));
+    DCameraSoftbusAdapter::GetInstance().sourceSocketSessionMap_.clear();
+    
+    delete[] buffer;
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_084
+ * @tc.desc: Verify the SourceOnStream function when data is nullptr.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_084, TestSize.Level1)
+{
+    int32_t socket = 2001;
+    StreamData* data = nullptr;
+    StreamData* ext = nullptr;
+    StreamFrameInfo* param = nullptr;
+    
+    EXPECT_NO_FATAL_FAILURE(DCameraSoftbusAdapter::GetInstance().SourceOnStream(socket, data, ext, param));
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_085
+ * @tc.desc: Verify the SourceOnStream function when data->bufLen <= 0.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_085, TestSize.Level1)
+{
+    int32_t socket = 2002;
+    StreamData streamData;
+    streamData.buf = new char[100];
+    streamData.bufLen = 0;
+    StreamData* ext = nullptr;
+    StreamFrameInfo* param = nullptr;
+    
+    EXPECT_NO_FATAL_FAILURE(DCameraSoftbusAdapter::GetInstance().SourceOnStream(socket, &streamData, ext, param));
+    
+    delete[] reinterpret_cast<char*>(streamData.buf);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_086
+ * @tc.desc: Verify the SourceOnStream function when data->bufLen > DCAMERA_MAX_RECV_DATA_LEN.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_086, TestSize.Level1)
+{
+    int32_t socket = 2003;
+    StreamData streamData;
+    streamData.buf = new char[DCAMERA_MAX_RECV_DATA_LEN + 1];
+    streamData.bufLen = DCAMERA_MAX_RECV_DATA_LEN + 1;
+    StreamData* ext = nullptr;
+    StreamFrameInfo* param = nullptr;
+    
+    EXPECT_NO_FATAL_FAILURE(DCameraSoftbusAdapter::GetInstance().SourceOnStream(socket, &streamData, ext, param));
+    
+    delete[] reinterpret_cast<char*>(streamData.buf);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_087
+ * @tc.desc: Verify the SourceOnStream function when DCameraSoftbusSourceGetSession returns error.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_087, TestSize.Level1)
+{
+    int32_t socket = -1;
+    StreamData streamData;
+    streamData.buf = new char[1024];
+    streamData.bufLen = 1024;
+    StreamData* ext = nullptr;
+    StreamFrameInfo* param = nullptr;
+
+    EXPECT_NO_FATAL_FAILURE(DCameraSoftbusAdapter::GetInstance().SourceOnStream(socket, &streamData, ext, param));
+    
+    delete[] reinterpret_cast<char*>(streamData.buf);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_088
+ * @tc.desc: Verify the SourceOnStream function when DCameraSoftbusSourceGetSession returns null session.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_088, TestSize.Level1)
+{
+    int32_t socket = 2005;
+    StreamData streamData;
+    streamData.buf = new char[1024];
+    streamData.bufLen = 1024;
+    StreamData* ext = nullptr;
+    StreamFrameInfo* param = nullptr;
+    
+    DCameraSoftbusAdapter::GetInstance().sourceSocketSessionMap_.emplace(2005, nullptr);
+    
+    EXPECT_NO_FATAL_FAILURE(DCameraSoftbusAdapter::GetInstance().SourceOnStream(socket, &streamData, ext, param));
+    DCameraSoftbusAdapter::GetInstance().sourceSocketSessionMap_.clear();
+    
+    delete[] reinterpret_cast<char*>(streamData.buf);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_089
+ * @tc.desc: Verify the SourceOnStream function when memcpy_s fails.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_089, TestSize.Level1)
+{
+    int32_t socket = 2006;
+    StreamData streamData;
+    streamData.buf = new char[1024];
+    streamData.bufLen = 1024;
+    StreamData* ext = nullptr;
+    StreamFrameInfo* param = nullptr;
+    
+    std::shared_ptr<DCameraSoftbusSession> session = std::make_shared<DCameraSoftbusSession>();
+    DCameraSoftbusAdapter::GetInstance().sourceSocketSessionMap_.emplace(2006, session);
+    
+    EXPECT_NO_FATAL_FAILURE(DCameraSoftbusAdapter::GetInstance().SourceOnStream(socket, &streamData, ext, param));
+    DCameraSoftbusAdapter::GetInstance().sourceSocketSessionMap_.clear();
+    
+    delete[] reinterpret_cast<char*>(streamData.buf);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_090
+ * @tc.desc: Verify the SourceOnStream function when HandleSourceStreamExt returns error.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_090, TestSize.Level1)
+{
+    int32_t socket = 2007;
+    StreamData streamData;
+    streamData.buf = new char[1024];
+    streamData.bufLen = 1024;
+    StreamData streamExt;
+    streamExt.buf = new char[100];
+    streamExt.bufLen = 100;
+    StreamFrameInfo* param = nullptr;
+    
+    std::shared_ptr<DCameraSoftbusSession> session = std::make_shared<DCameraSoftbusSession>();
+    DCameraSoftbusAdapter::GetInstance().sourceSocketSessionMap_.emplace(2007, session);
+
+    EXPECT_NO_FATAL_FAILURE(DCameraSoftbusAdapter::GetInstance().SourceOnStream(socket, &streamData,
+        &streamExt, param));
+    DCameraSoftbusAdapter::GetInstance().sourceSocketSessionMap_.clear();
+    
+    delete[] reinterpret_cast<char*>(streamData.buf);
+    delete[] reinterpret_cast<char*>(streamExt.buf);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_091
+ * @tc.desc: Verify the SourceOnStream function with normal flow (ext is nullptr).
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_091, TestSize.Level1)
+{
+    int32_t socket = 2008;
+    StreamData streamData;
+    streamData.buf = new char[1024];
+    memset_s(streamData.buf, 1024, 'C', 1024);
+    streamData.bufLen = 1024;
+    StreamData* ext = nullptr;
+    StreamFrameInfo* param = nullptr;
+    
+    std::shared_ptr<DCameraSoftbusSession> session = std::make_shared<DCameraSoftbusSession>();
+    DCameraSoftbusAdapter::GetInstance().sourceSocketSessionMap_.emplace(2008, session);
+    
+    EXPECT_NO_FATAL_FAILURE(DCameraSoftbusAdapter::GetInstance().SourceOnStream(socket, &streamData, ext, param));
+    DCameraSoftbusAdapter::GetInstance().sourceSocketSessionMap_.clear();
+    
+    delete[] reinterpret_cast<char*>(streamData.buf);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_092
+ * @tc.desc: Verify the SourceOnStream function with normal flow.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_092, TestSize.Level1)
+{
+    int32_t socket = 2009;
+    StreamData streamData;
+    streamData.buf = new char[1024];
+    memset_s(streamData.buf, 1024, 'D', 1024);
+    streamData.bufLen = 1024;
+    StreamData streamExt;
+    streamExt.buf = new char[50];
+    memset_s(streamExt.buf, 50, 'E', 50);
+    streamExt.bufLen = 50;
+    StreamFrameInfo* param = nullptr;
+    
+    std::shared_ptr<DCameraSoftbusSession> session = std::make_shared<DCameraSoftbusSession>();
+    DCameraSoftbusAdapter::GetInstance().sourceSocketSessionMap_.emplace(2009, session);
+    
+    EXPECT_NO_FATAL_FAILURE(DCameraSoftbusAdapter::GetInstance().SourceOnStream(socket, &streamData,
+        &streamExt, param));
+    DCameraSoftbusAdapter::GetInstance().sourceSocketSessionMap_.clear();
+    
+    delete[] reinterpret_cast<char*>(streamData.buf);
+    delete[] reinterpret_cast<char*>(streamExt.buf);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_093
+ * @tc.desc: Verify the SourceOnStream function with minimum valid dataLen (1 byte).
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_093, TestSize.Level1)
+{
+    int32_t socket = 2010;
+    StreamData streamData;
+    streamData.buf = new char[1];
+    streamData.buf[0] = 'F';
+    streamData.bufLen = 1;
+    StreamData* ext = nullptr;
+    StreamFrameInfo* param = nullptr;
+    
+    std::shared_ptr<DCameraSoftbusSession> session = std::make_shared<DCameraSoftbusSession>();
+    DCameraSoftbusAdapter::GetInstance().sourceSocketSessionMap_.emplace(2010, session);
+    
+    EXPECT_NO_FATAL_FAILURE(DCameraSoftbusAdapter::GetInstance().SourceOnStream(socket, &streamData, ext, param));
+    DCameraSoftbusAdapter::GetInstance().sourceSocketSessionMap_.clear();
+    
+    delete[] reinterpret_cast<char*>(streamData.buf);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_094
+ * @tc.desc: Verify the SourceOnStream function with maximum valid dataLen (DCAMERA_MAX_RECV_DATA_LEN).
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_094, TestSize.Level1)
+{
+    int32_t socket = 2011;
+    StreamData streamData;
+    streamData.buf = new char[DCAMERA_MAX_RECV_DATA_LEN];
+    memset_s(streamData.buf, DCAMERA_MAX_RECV_DATA_LEN, 'G', DCAMERA_MAX_RECV_DATA_LEN);
+    streamData.bufLen = DCAMERA_MAX_RECV_DATA_LEN;
+    StreamData* ext = nullptr;
+    StreamFrameInfo* param = nullptr;
+    
+    std::shared_ptr<DCameraSoftbusSession> session = std::make_shared<DCameraSoftbusSession>();
+    DCameraSoftbusAdapter::GetInstance().sourceSocketSessionMap_.emplace(2011, session);
+    
+    EXPECT_NO_FATAL_FAILURE(DCameraSoftbusAdapter::GetInstance().SourceOnStream(socket, &streamData, ext, param));
+    DCameraSoftbusAdapter::GetInstance().sourceSocketSessionMap_.clear();
+    
+    delete[] reinterpret_cast<char*>(streamData.buf);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_099
+ * @tc.desc: Verify the RequestAndWaitForAuthorization function when listener is nullptr.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_099, TestSize.Level1)
+{
+    std::string peerNetworkId = "test_network_001";
+
+    g_accessListener = nullptr;
+    
+    int32_t ret = DCameraSoftbusAdapter::GetInstance().RequestAndWaitForAuthorization(peerNetworkId);
+    
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_100
+ * @tc.desc: Verify the RequestAndWaitForAuthorization function when pkgName is empty.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_100, TestSize.Level1)
+{
+    std::string peerNetworkId = "test_network_002";
+    
+    sptr<IAccessListener> listener(new DCameraAccessListenerMock());
+    g_accessListener = listener;
+    g_pkgName = "";
+    
+    int32_t ret = DCameraSoftbusAdapter::GetInstance().RequestAndWaitForAuthorization(peerNetworkId);
+    
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_softbus_adapter_test_101
+ * @tc.desc: Verify the RequestAndWaitForAuthorization function when pkgName is not empty and timeOut > 0.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_101, TestSize.Level1)
+{
+    std::string peerNetworkId = "test_network_003";
+    
+    sptr<IAccessListener> listener(new DCameraAccessListenerMock());
+    g_accessListener = listener;
+    g_pkgName = "com.example.camera";
+    
+    int32_t ret = DCameraSoftbusAdapter::GetInstance().RequestAndWaitForAuthorization(peerNetworkId);
+    
+    EXPECT_EQ(DCAMERA_OK, ret);
 }
 }
 }

@@ -68,6 +68,7 @@ ohos_unittest("DCameraChannelTest") {
     "dcamera_softbus_latency_test.cpp",
     "dcamera_softbus_session_test.cpp",
     "mock/dcamera_collaboration_mock.cpp",
+    "mock/dcamera_access_listener_mock.cpp",
     "mock/lib_function_mock.cpp",
     "session_bus_center.cpp",
     "session_mock.cpp",
