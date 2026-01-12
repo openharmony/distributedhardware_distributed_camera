@@ -55,6 +55,9 @@ public:
 
     int32_t StopCapture() override
     {
+        if (g_outputStr == "test_stop_capture_failed") {
+            return DCAMERA_ALLOC_ERROR;
+        }
         return DCAMERA_OK;
     }
 

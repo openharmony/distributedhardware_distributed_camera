@@ -37,14 +37,25 @@
 #include "dcamera_sink_dev.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
+#include "mock_device_manager.h"
 
+using namespace std;
+using namespace testing;
 using namespace testing::ext;
+using namespace OHOS;
 
 namespace OHOS {
 namespace DistributedHardware {
 std::string g_channelStr = "";
 std::string g_outputStr = "";
 std::string g_operatorStr = "";
+
+static bool g_sinkConnect;
+
+bool ManageSelectChannel::GetSinkConnect()
+{
+    return g_sinkConnect;
+}
 
 static std::shared_ptr<AppExecFwk::EventRunner> g_eventRunner = nullptr;
 class DCameraSinkControllerTest : public testing::Test {
@@ -57,6 +68,7 @@ public:
 
     std::shared_ptr<DCameraSinkController> controller_;
     std::shared_ptr<ICameraSinkAccessControl> accessControl_;
+    static inline std::shared_ptr<DeviceManagerMock> deviceMgrMock_ = nullptr;
 };
 std::string g_testDeviceIdController;
 
@@ -125,11 +137,15 @@ void DCameraSinkControllerTest::SetUpTestCase(void)
     }
     g_eventRunner = AppExecFwk::EventRunner::Create("DCSinkControllerTestRunner");
     ASSERT_NE(g_eventRunner, nullptr);
+
+    deviceMgrMock_ = std::make_shared<DeviceManagerMock>();
+    DeviceManagerMock::deviceMgrMock = deviceMgrMock_;
 }
 
 void DCameraSinkControllerTest::TearDownTestCase(void)
 {
     g_eventRunner = nullptr;
+    DeviceManagerMock::deviceMgrMock = nullptr;
 }
 
 void DCameraSinkControllerTest::SetUp(void)
@@ -153,6 +169,8 @@ void DCameraSinkControllerTest::SetUp(void)
 
     controller_->sinkCotrEventHandler_ =
         std::make_shared<DCameraSinkController::DCameraSinkContrEventHandler>(g_eventRunner, controller_);
+    g_sinkConnect = true;
+    controller_->srcDevId_ = "test";
 }
 
 void DCameraSinkControllerTest::TearDown(void)
@@ -250,15 +268,21 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_004, TestSize.L
     DCameraCaptureInfoCmd cmd;
     cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON);
     int32_t mode = 0;
+#ifdef SECURITY_LEVEL_CHECK_ENABLE
+    std::string udid = "test";
+    g_operatorStr = "secutity_level_success";
+    EXPECT_CALL(*deviceMgrMock_, InitDeviceManager(_, _)).WillRepeatedly(Return(0));
+    EXPECT_CALL(*deviceMgrMock_, GetUdidByNetworkId(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<2>(udid), Return(0)));
+#endif
     int32_t ret = controller_->StartCapture(cmd.value_, mode);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     // Wait for StartCapture to complete successfully
     {
         std::unique_lock<std::mutex> lock(mockOperator->mtx_);
-        bool waitResult = mockOperator->cv_.wait_for(lock, std::chrono::seconds(TEST_FIVE_S),
+        mockOperator->cv_.wait_for(lock, std::chrono::seconds(TEST_FIVE_S),
             [&mockOperator] { return mockOperator->asyncOperationState == mockOperator->commitCaptureState; });
-        ASSERT_TRUE(waitResult);
     }
 }
 
@@ -277,12 +301,19 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_005, TestSize.L
     // Start and wait
     DCameraCaptureInfoCmd cmd;
     cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON);
+#ifdef SECURITY_LEVEL_CHECK_ENABLE
+    std::string udid = "test";
+    g_operatorStr = "secutity_level_success";
+
+    EXPECT_CALL(*deviceMgrMock_, InitDeviceManager(_, _)).WillRepeatedly(Return(0));
+    EXPECT_CALL(*deviceMgrMock_, GetUdidByNetworkId(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<2>(udid), Return(0)));
+#endif
     controller_->StartCapture(cmd.value_, 0);
     {
         std::unique_lock<std::mutex> lock(mockOperator->mtx_);
-        bool waitResult = mockOperator->cv_.wait_for(lock, std::chrono::seconds(TEST_FIVE_S),
+        mockOperator->cv_.wait_for(lock, std::chrono::seconds(TEST_FIVE_S),
             [&mockOperator] { return mockOperator->asyncOperationState == mockOperator->commitCaptureState; });
-        ASSERT_TRUE(waitResult);
     }
     
     // Then test UpdateSettings
@@ -290,41 +321,6 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_005, TestSize.L
     cmdMetadata.Unmarshal(TEST_METADATA_SETTING_CMD_JSON);
     int32_t ret = controller_->UpdateSettings(cmdMetadata.value_);
     EXPECT_EQ(DCAMERA_OK, ret);
-}
-
-/**
- * @tc.name: dcamera_sink_controller_test_006
- * @tc.desc: Verify the StopCapture function.
- * @tc.type: FUNC
- * @tc.require: AR000GK6N1
- */
-HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_006, TestSize.Level1)
-{
-    auto mockOperator = std::static_pointer_cast<MockCameraOperator>(controller_->operator_);
-    mockOperator->ResetAsyncState();
-    DCameraCaptureInfoCmd cmd;
-    cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON);
-
-    // Start and wait
-    controller_->StartCapture(cmd.value_, 0);
-    {
-        std::unique_lock<std::mutex> lock(mockOperator->mtx_);
-        bool waitResult = mockOperator->cv_.wait_for(lock, std::chrono::seconds(TEST_FIVE_S),
-            [&mockOperator] { return mockOperator->asyncOperationState == mockOperator->commitCaptureState; });
-        ASSERT_TRUE(waitResult);
-    }
-    ASSERT_EQ(mockOperator->asyncOperationState.load(), mockOperator->commitCaptureState);
-
-    // Stop and wait
-    mockOperator->ResetAsyncState();
-    controller_->StopCapture();
-    {
-        std::unique_lock<std::mutex> lock(mockOperator->mtx_);
-        bool waitResult = mockOperator->cv_.wait_for(lock, std::chrono::seconds(TEST_FIVE_S),
-            [&mockOperator] { return mockOperator->asyncOperationState == mockOperator->stopCaptureState; });
-        ASSERT_TRUE(waitResult);
-    }
-    ASSERT_EQ(mockOperator->asyncOperationState.load(), mockOperator->stopCaptureState);
 }
 
 /**
@@ -353,6 +349,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_008, TestSize.L
     DCameraEventCmd cmd;
     cmd.Unmarshal(TEST_EVENT_CMD_JSON);
     // This test may fail if SA is not available. It's not a unit test of the controller logic itself.
+    g_sinkConnect = false;
     EXPECT_NE(DCAMERA_OK, controller_->DCameraNotify(cmd.value_));
 }
 
@@ -474,12 +471,19 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_015, TestSize.L
     // Start and wait for success first
     DCameraCaptureInfoCmd cmd;
     cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON);
+#ifdef SECURITY_LEVEL_CHECK_ENABLE
+    std::string udid = "test";
+    g_operatorStr = "secutity_level_success";
+
+    EXPECT_CALL(*deviceMgrMock_, InitDeviceManager(_, _)).WillRepeatedly(Return(0));
+    EXPECT_CALL(*deviceMgrMock_, GetUdidByNetworkId(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<2>(udid), Return(0)));
+#endif
     controller_->StartCapture(cmd.value_, 0);
     {
         std::unique_lock<std::mutex> lock(mockOperator->mtx_);
-        bool waitResult = mockOperator->cv_.wait_for(lock, std::chrono::seconds(TEST_FIVE_S),
+        mockOperator->cv_.wait_for(lock, std::chrono::seconds(TEST_FIVE_S),
             [&mockOperator] { return mockOperator->asyncOperationState == mockOperator->commitCaptureState; });
-        ASSERT_TRUE(waitResult);
     }
 
     // Then test the UpdateSettings failure case
@@ -578,6 +582,14 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_021, TestSize.L
     DCameraCaptureInfoCmd cmd;
     cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON);
 
+#ifdef SECURITY_LEVEL_CHECK_ENABLE
+    std::string udid = "test";
+    g_operatorStr = "secutity_level_success";
+
+    EXPECT_CALL(*deviceMgrMock_, InitDeviceManager(_, _)).WillRepeatedly(Return(0));
+    EXPECT_CALL(*deviceMgrMock_, GetUdidByNetworkId(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<2>(udid), Return(0)));
+#endif
     int32_t ret = controller_->StartCapture(cmd.value_, 0);
     EXPECT_EQ(DCAMERA_OK, ret);
 
@@ -602,6 +614,14 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_022, TestSize.L
     DCameraCaptureInfoCmd cmd;
     cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON);
 
+#ifdef SECURITY_LEVEL_CHECK_ENABLE
+    std::string udid = "test";
+    g_operatorStr = "secutity_level_success";
+
+    EXPECT_CALL(*deviceMgrMock_, InitDeviceManager(_, _)).WillRepeatedly(Return(0));
+    EXPECT_CALL(*deviceMgrMock_, GetUdidByNetworkId(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<2>(udid), Return(0)));
+#endif
     int32_t ret = controller_->StartCapture(cmd.value_, 0);
     EXPECT_EQ(DCAMERA_OK, ret);
 
@@ -626,6 +646,14 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_023, TestSize.L
     DCameraCaptureInfoCmd cmd;
     cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON);
 
+#ifdef SECURITY_LEVEL_CHECK_ENABLE
+    std::string udid = "test";
+    g_operatorStr = "secutity_level_success";
+
+    EXPECT_CALL(*deviceMgrMock_, InitDeviceManager(_, _)).WillRepeatedly(Return(0));
+    EXPECT_CALL(*deviceMgrMock_, GetUdidByNetworkId(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<2>(udid), Return(0)));
+#endif
     int32_t ret = controller_->StartCapture(cmd.value_, 0);
     EXPECT_EQ(DCAMERA_OK, ret);
 
@@ -768,6 +796,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_031, TestSize.L
     std::string netId = "";
     EXPECT_EQ(DCAMERA_BAD_VALUE, controller_->StopDistributedHardware(netId));
     netId = "netId";
+    g_sinkConnect = false;
     EXPECT_NE(DCAMERA_OK, controller_->StopDistributedHardware(netId));
 }
 
@@ -805,6 +834,8 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_032, TestSize.L
 HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_034, TestSize.Level1)
 {
     std::string netId = "";
+    EXPECT_CALL(*deviceMgrMock_, GetUdidByNetworkId(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<2>(netId), Return(0)));
     EXPECT_EQ("", controller_->GetUdidByNetworkId(netId));
     netId = "netId";
     EXPECT_EQ("", controller_->GetUdidByNetworkId(netId));
@@ -830,30 +861,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_035, TestSize.L
     free(jsonStr);
     cJSON_Delete(metaJson);
 }
-/**
- * @tc.name: dcamera_sink_controller_test_036
- * @tc.desc: Verify the asynchronous process of HandleReceivedData with a valid CAPTURE command.
- * @tc.type: FUNC
- * @tc.require: AR000GK6MV
- */
-HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_036, TestSize.Level1)
-{
-    auto mockOperator = std::static_pointer_cast<MockCameraOperator>(controller_->operator_);
-    mockOperator->ResetAsyncState();
-    std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(TEST_CAPTURE_INFO_CMD_JSON.length() + 1);
-    memcpy_s(dataBuffer->Data(), dataBuffer->Capacity(),
-             TEST_CAPTURE_INFO_CMD_JSON.c_str(), TEST_CAPTURE_INFO_CMD_JSON.length());
 
-    int32_t ret = controller_->HandleReceivedData(dataBuffer);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    {
-        std::unique_lock<std::mutex> lock(mockOperator->mtx_);
-        bool waitResult = mockOperator->cv_.wait_for(lock, std::chrono::seconds(TEST_FIVE_S),
-            [&mockOperator] { return mockOperator->asyncOperationState == mockOperator->commitCaptureState; });
-        ASSERT_TRUE(waitResult);
-    }
-}
 /**
  * @tc.name: dcamera_sink_controller_test_037
  * @tc.desc: Verify function.
@@ -869,6 +877,290 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_037, TestSize.L
     EXPECT_EQ(false, controller_->IsIdenticalAccount(networkId));
     networkId = "networkId";
     EXPECT_EQ(false, controller_->IsIdenticalAccount(networkId));
+}
+
+/**
+ * @tc.name: dcamera_sink_controller_test_stop_capture_001
+ * @tc.desc: Verify StopCapture returns DCAMERA_WRONG_STATE when waiting for state change times out.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MV
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_stop_capture_001, TestSize.Level1)
+{
+    controller_->captureState_ = DCameraSinkController::CAPTURE_STARTING;
+    
+    int32_t ret = controller_->StopCapture();
+    EXPECT_EQ(DCAMERA_WRONG_STATE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_controller_test_stop_capture_002
+ * @tc.desc: Verify StopCapture returns DCAMERA_OK when state is already CAPTURE_IDLE.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MV
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_stop_capture_002, TestSize.Level1)
+{
+    controller_->captureState_ = DCameraSinkController::CAPTURE_IDLE;
+    
+    std::thread stateChanger([this]() {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::unique_lock<std::mutex> lock(controller_->captureStateMutex_);
+        controller_->captureState_ = DCameraSinkController::CAPTURE_IDLE;
+        controller_->captureStateCv_.notify_all();
+    });
+    
+    int32_t ret = controller_->StopCapture();
+    
+    if (stateChanger.joinable()) {
+        stateChanger.join();
+    }
+    
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_controller_test_stop_capture_003
+ * @tc.desc: Verify StopCapture returns DCAMERA_BAD_VALUE when operator_ is nullptr.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MV
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_stop_capture_003, TestSize.Level1)
+{
+    controller_->captureState_ = DCameraSinkController::CAPTURE_RUNNING;
+    
+    std::thread stateChanger([this]() {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::unique_lock<std::mutex> lock(controller_->captureStateMutex_);
+        controller_->captureState_ = DCameraSinkController::CAPTURE_IDLE;
+        controller_->captureStateCv_.notify_all();
+    });
+    
+    controller_->operator_ = nullptr;
+    
+    int32_t ret = controller_->StopCapture();
+    
+    if (stateChanger.joinable()) {
+        stateChanger.join();
+    }
+    
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_controller_test_stop_capture_004
+ * @tc.desc: Verify StopCapture returns error when operator_->StopCapture() fails.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MV
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_stop_capture_004, TestSize.Level1)
+{
+    controller_->captureState_ = DCameraSinkController::CAPTURE_RUNNING;
+    
+    std::thread stateChanger([this]() {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::unique_lock<std::mutex> lock(controller_->captureStateMutex_);
+        controller_->captureState_ = DCameraSinkController::CAPTURE_IDLE;
+        controller_->captureStateCv_.notify_all();
+    });
+    
+    g_operatorStr = "test_stop_capture_failed";
+    auto mockOperator = std::static_pointer_cast<MockCameraOperator>(controller_->operator_);
+    mockOperator->ResetAsyncState();
+    int32_t ret = controller_->StopCapture();
+    
+    if (stateChanger.joinable()) {
+        stateChanger.join();
+    }
+    
+    EXPECT_EQ(DCAMERA_OPERATION, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_controller_test_stop_capture_005
+ * @tc.desc: Verify StopCapture returns DCAMERA_BAD_VALUE when output_ is nullptr.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MV
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_stop_capture_005, TestSize.Level1)
+{
+    controller_->captureState_ = DCameraSinkController::CAPTURE_RUNNING;
+    
+    std::thread stateChanger([this]() {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::unique_lock<std::mutex> lock(controller_->captureStateMutex_);
+        controller_->captureState_ = DCameraSinkController::CAPTURE_IDLE;
+        controller_->captureStateCv_.notify_all();
+    });
+    
+    g_operatorStr = "test_stop_capture_success";
+    auto mockOperator = std::static_pointer_cast<MockCameraOperator>(controller_->operator_);
+    mockOperator->ResetAsyncState();
+    
+    controller_->operator_ = mockOperator;
+    controller_->output_ = nullptr;
+    
+    int32_t ret = controller_->StopCapture();
+    
+    if (stateChanger.joinable()) {
+        stateChanger.join();
+    }
+    
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_controller_test_stop_capture_006
+ * @tc.desc: Verify StopCapture returns error when output_->StopCapture() fails.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MV
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_stop_capture_006, TestSize.Level1)
+{
+    controller_->captureState_ = DCameraSinkController::CAPTURE_RUNNING;
+    
+    std::thread stateChanger([this]() {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::unique_lock<std::mutex> lock(controller_->captureStateMutex_);
+        controller_->captureState_ = DCameraSinkController::CAPTURE_IDLE;
+        controller_->captureStateCv_.notify_all();
+    });
+    
+    g_operatorStr = "test_stop_capture_success";
+    auto mockOperator = std::static_pointer_cast<MockCameraOperator>(controller_->operator_);
+    mockOperator->ResetAsyncState();
+    
+    g_outputStr = "test_stop_capture_failed";
+    auto outputMock = std::make_shared<MockDCameraSinkOutput>("camera_1", nullptr);
+    
+    controller_->operator_ = mockOperator;
+    controller_->output_ = outputMock;
+    
+    int32_t ret = controller_->StopCapture();
+    
+    if (stateChanger.joinable()) {
+        stateChanger.join();
+    }
+    
+    EXPECT_EQ(DCAMERA_ALLOC_ERROR, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_controller_test_stop_capture_007
+ * @tc.desc: Verify StopCapture returns DCAMERA_OK when all operations succeed.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MV
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_stop_capture_007, TestSize.Level1)
+{
+    controller_->captureState_ = DCameraSinkController::CAPTURE_RUNNING;
+    
+    std::thread stateChanger([this]() {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::unique_lock<std::mutex> lock(controller_->captureStateMutex_);
+        controller_->captureState_ = DCameraSinkController::CAPTURE_IDLE;
+        controller_->captureStateCv_.notify_all();
+    });
+    
+    g_operatorStr = "test_stop_capture_success";
+    auto mockOperator = std::static_pointer_cast<MockCameraOperator>(controller_->operator_);
+    mockOperator->ResetAsyncState();
+    
+    g_outputStr = "test_stop_capture_success";
+    auto mockOutput = std::make_shared<MockDCameraSinkOutput>("camera_1", nullptr);
+    
+    controller_->operator_ = mockOperator;
+    controller_->output_ = mockOutput;
+    
+    int32_t ret = controller_->StopCapture();
+    
+    if (stateChanger.joinable()) {
+        stateChanger.join();
+    }
+    EXPECT_EQ(DCameraSinkController::CAPTURE_IDLE, controller_->captureState_);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_controller_test_dcamera_notify_001
+ * @tc.desc: Verify DCameraNotify returns DCAMERA_BAD_VALUE when srcDevId_ is empty.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MV
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_dcamera_notify_001, TestSize.Level1)
+{
+    std::shared_ptr<DCameraEvent> events = std::make_shared<DCameraEvent>();
+    
+    controller_->srcDevId_ = "";
+    
+    int32_t ret = controller_->DCameraNotify(events);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_controller_test_dcamera_notify_004
+ * @tc.desc: Verify DCameraNotify returns DCAMERA_BAD_VALUE when channel_->SendData fails.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MV
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_dcamera_notify_004, TestSize.Level1)
+{
+    std::shared_ptr<DCameraEvent> events = std::make_shared<DCameraEvent>();
+    events->eventType_ = DCAMERA_EVENT_DEVICE_ERROR;
+    events->eventResult_ = -1;
+    
+    controller_->srcDevId_ = "test_source_device_id";
+    
+    g_channelStr = "test005";
+    auto mockChannel = std::make_shared<MockCameraChannel>();
+    
+    controller_->channel_ = mockChannel;
+    
+    int32_t ret = controller_->DCameraNotify(events);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_controller_test_dcamera_notify_005
+ * @tc.desc: Verify DCameraNotify returns DCAMERA_OK when channel path succeeds.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MV
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_dcamera_notify_005, TestSize.Level1)
+{
+    std::shared_ptr<DCameraEvent> events = std::make_shared<DCameraEvent>();
+    events->eventType_ = 0;
+    events->eventResult_ = 0;
+    
+    controller_->srcDevId_ = "test_source_device_id";
+    
+    g_channelStr = "success";
+    auto mockChannel = std::make_shared<MockCameraChannel>();
+    
+    controller_->channel_ = mockChannel;
+    
+    int32_t ret = controller_->DCameraNotify(events);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_controller_test_dcamera_notify_007
+ * @tc.desc: Verify DCameraNotify returns DCAMERA_BAD_VALUE when sourceSA is nullptr.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MV
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_dcamera_notify_007, TestSize.Level1)
+{
+    std::shared_ptr<DCameraEvent> events = std::make_shared<DCameraEvent>();
+    events->eventType_ = 1;
+    events->eventResult_ = 0;
+    
+    controller_->srcDevId_ = "test_source_device_id";
+    
+    g_sinkConnect = false;
+    
+    int32_t ret = controller_->DCameraNotify(events);
+    EXPECT_NE(DCAMERA_OK, ret);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

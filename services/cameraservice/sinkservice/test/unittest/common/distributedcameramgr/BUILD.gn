@@ -61,6 +61,7 @@ ohos_unittest("DCameraSinkMgrTest") {
     "dcamera_sink_dev_test.cpp",
     "dcamera_sink_output_test.cpp",
     "dcamera_sink_service_ipc_test.cpp",
+    "mock_device_manager.cpp",
   ]
 
   cflags = [
@@ -94,6 +95,7 @@ ohos_unittest("DCameraSinkMgrTest") {
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
     "graphic_surface:surface",
+    "googletest:gmock",
     "hilog:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
@@ -104,6 +106,11 @@ ohos_unittest("DCameraSinkMgrTest") {
     "DH_LOG_TAG=\"DCameraSinkMgrTest\"",
     "LOG_DOMAIN=0xD004150",
   ]
+
+  if (!distributed_camera_common) {
+    defines += [ "SECURITY_LEVEL_CHECK_ENABLE" ]
+  }
+
 }
 
 group("dcamera_sink_mgr_test") {
