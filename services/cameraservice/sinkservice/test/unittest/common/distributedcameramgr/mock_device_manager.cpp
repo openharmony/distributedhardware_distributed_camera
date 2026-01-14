@@ -45,3 +45,11 @@ int32_t DeviceManagerImpl::GetUdidByNetworkId(const std::string &pkgName, const 
     }
     return IDeviceManager::deviceMgrMock->GetUdidByNetworkId(pkgName, nextworkId, udid);
 }
+
+bool DeviceManagerImpl::CheckSrcAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee)
+{
+    if (IDeviceManager::deviceMgrMock == nullptr) {
+        return 0;
+    }
+    return IDeviceManager::deviceMgrMock->CheckSrcAccessControl(caller, callee);
+}
