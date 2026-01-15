@@ -81,7 +81,7 @@ private:
     const uint32_t DCAMERA_NS_TO_MS = 1000000;
     const uint32_t DCAMERA_US_TO_MS = 1000;
     const uint32_t DCAMERA_TIME_DIFF_MAX = 5;
-    const int32_t DCAMERA_TIME_DIFF_MIN = -80;
+    const int32_t DCAMERA_TIME_DIFF_MIN = -100;
 
 private:
     std::string devId_;
