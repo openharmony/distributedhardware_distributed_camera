@@ -94,6 +94,8 @@ public:
 
     int32_t PrepareCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos, int32_t sceneMode)
     {
+        (void)captureInfos;
+        (void)sceneMode;
         if (g_operatorStr == "test_prepare_fail") {
             return DCAMERA_BAD_VALUE;
         }
@@ -152,6 +154,7 @@ public:
 
     int32_t GetDeviceSecurityLevel(const std::string &udid)
     {
+        (void)udid;
         if (g_operatorStr == "secutity_level_failed") {
             return 1;
         }

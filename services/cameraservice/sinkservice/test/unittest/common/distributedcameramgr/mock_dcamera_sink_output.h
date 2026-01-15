@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,7 +26,8 @@ namespace DistributedHardware {
 extern std::string g_outputStr;
 class MockDCameraSinkOutput : public ICameraSinkOutput {
 public:
-    explicit MockDCameraSinkOutput(const std::string& dhId, const std::shared_ptr<ICameraOperator>& cameraOperator) {}
+    explicit MockDCameraSinkOutput(const std::string& dhId, const std::shared_ptr<ICameraOperator>& cameraOperator)
+        : dhId_(dhId), operator_(cameraOperator) {}
     ~MockDCameraSinkOutput() override = default;
 
     int32_t Init() override
@@ -88,6 +89,9 @@ public:
         
         return DCAMERA_OK;
     }
+
+    std::string dhId_;
+    std::shared_ptr<ICameraOperator> operator_;
 };
 }
 }

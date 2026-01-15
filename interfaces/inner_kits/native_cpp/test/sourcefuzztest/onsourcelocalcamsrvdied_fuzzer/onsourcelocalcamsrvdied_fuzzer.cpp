@@ -35,6 +35,10 @@ public:
     int OnRemoteRequest(uint32_t code, OHOS::MessageParcel& data,
                         OHOS::MessageParcel& reply, OHOS::MessageOption& option) override
     {
+        (void)code;
+        (void)data;
+        (void)reply;
+        (void)option;
         return 0;
     }
 };
