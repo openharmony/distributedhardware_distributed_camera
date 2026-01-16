@@ -46,7 +46,6 @@
                 "c_utils",
                 "cJSON",
                 "dsoftbus",
-                "dsoftbus_service_ext",
                 "ffrt",
                 "ffmpeg",
                 "hicollie",

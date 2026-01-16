@@ -72,6 +72,8 @@ IMPLEMENT_SINGLE_INSTANCE(DCameraSoftbusAdapter);
 // LCOV_EXCL_START
 static void DCameraSourceOnBind(int32_t socket, PeerSocketInfo info)
 {
+    (void)socket;
+    (void)info;
     return;
 }
 
