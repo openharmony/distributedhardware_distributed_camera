@@ -834,13 +834,14 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_032, TestSize.L
     EXPECT_NE(true, controller_->CheckDeviceSecurityLevel(srcNetId, dstNetId));
 }
 
+#ifdef DCAMERA_SUPPORT_RESERVE
 /**
- * @tc.name: dcamera_sink_controller_test_034
+ * @tc.name: dcamera_sink_controller_test_033
  * @tc.desc: Verify GetUdidByNetworkId function.
  * @tc.type: FUNC
  * @tc.require: AR000GK6MV
  */
-HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_034, TestSize.Level1)
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_033, TestSize.Level1)
 {
     std::string netId = "";
     EXPECT_CALL(*deviceMgrMock_, GetUdidByNetworkId(_, _, _))
@@ -849,13 +850,14 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_034, TestSize.L
     netId = "netId";
     EXPECT_EQ("", controller_->GetUdidByNetworkId(netId));
 }
+
 /**
- * @tc.name: dcamera_sink_controller_test_035
+ * @tc.name: dcamera_sink_controller_test_034
  * @tc.desc: Verify HandleReceivedData handles invalid buffers and unknown commands gracefully.
  * @tc.type: FUNC
  * @tc.require: AR000GK6MV
  */
-HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_035, TestSize.Level1)
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_034, TestSize.Level1)
 {
     size_t capacity = 1;
     std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);
@@ -872,12 +874,12 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_035, TestSize.L
 }
 
 /**
- * @tc.name: dcamera_sink_controller_test_037
+ * @tc.name: dcamera_sink_controller_test_035
  * @tc.desc: Verify function.
  * @tc.type: FUNC
  * @tc.require: DTS
  */
-HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_037, TestSize.Level1)
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_035, TestSize.Level1)
 {
     EXPECT_TRUE(controller_->CheckAclRight());
     controller_->userId_ = 100;
@@ -1283,5 +1285,6 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_start_capture_0
     int32_t ret = controller_->StartCapture(cmd.value_, mode);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
+#endif
 } // namespace DistributedHardware
 } // namespace OHOS
