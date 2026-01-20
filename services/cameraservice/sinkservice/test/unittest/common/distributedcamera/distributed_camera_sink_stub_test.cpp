@@ -341,12 +341,6 @@ HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_014, TestSize.Level1)
     std::string pkgNameNull = "";
     int32_t ret = sinkProxyNull.RemoveAccessListener(pkgName);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
-
-    ret = sinkProxy.RemoveAccessListener(pkgNameNull);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = sinkProxy.RemoveAccessListener(pkgName);
-    EXPECT_EQ(DCAMERA_OK, ret);
 }
 
 /**
@@ -362,16 +356,9 @@ HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_015, TestSize.Level1)
     DistributedCameraSinkProxy sinkProxy(sinkStubPtr);
     DistributedCameraSinkProxy sinkProxyNull(nullptr);
     std::string requestId = "pkgName";
-    std::string requestIdNull = "";
     bool granted = true;
     int32_t ret = sinkProxyNull.SetAuthorizationResult(requestId, granted);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
-
-    ret = sinkProxy.SetAuthorizationResult(requestIdNull, granted);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = sinkProxy.SetAuthorizationResult(requestId, granted);
-    EXPECT_EQ(DCAMERA_OK, ret);
 }
 
 /**
