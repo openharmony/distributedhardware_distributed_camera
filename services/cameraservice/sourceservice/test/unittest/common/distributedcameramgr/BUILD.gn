@@ -27,6 +27,7 @@ config("module_private_config") {
     "${services_path}/cameraservice/sourceservice/include/distributedcameramgr/dcamerahdf",
     "${services_path}/cameraservice/sourceservice/include/distributedcameramgr/dcamerainterface",
     "${services_path}/cameraservice/sourceservice/include/distributedcameramgr/dcamerastate",
+    "${services_path}/cameraservice/sinkservice/test/unittest/common/distributedcameramgr",
     "${services_path}/cameraservice/cameraoperator/client/include",
     "${services_path}/cameraservice/base/include",
     "${services_path}/channel/include",
@@ -69,7 +70,8 @@ ohos_unittest("DCameraSourceMgrTest") {
     "dcamera_source_service_ipc_test.cpp",
     "dcamera_source_state_machine_test.cpp",
     "dcamera_stream_data_process_producer_test.cpp",
-    "dcamera_stream_data_process_test.cpp",
+    "dcamera_stream_data_process_test.cpp",    
+    "${services_path}/cameraservice/sinkservice/test/unittest/common/distributedcameramgr/mock_device_manager.cpp",
   ]
 
   configs = [ ":module_private_config" ]
@@ -94,6 +96,7 @@ ohos_unittest("DCameraSourceMgrTest") {
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
     "graphic_surface:surface",
+    "googletest:gmock",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_core",
@@ -105,6 +108,10 @@ ohos_unittest("DCameraSourceMgrTest") {
     "DH_LOG_TAG=\"DCameraSourceMgrTest\"",
     "LOG_DOMAIN=0xD004150",
   ]
+
+  if (os_account_camera) {
+    defines += [ "OS_ACCOUNT_ENABLE" ]
+  }
 }
 
 group("dcamera_source_mgr_test") {
