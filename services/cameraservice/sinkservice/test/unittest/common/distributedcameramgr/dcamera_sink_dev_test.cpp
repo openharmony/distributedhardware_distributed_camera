@@ -36,6 +36,7 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace DistributedHardware {
+#ifdef DCAMERA_SUPPORT_RESERVE
 class DCameraSinkDevTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -286,5 +287,6 @@ HWTEST_F(DCameraSinkDevTest, dcamera_sink_dev_test_014, TestSize.Level1)
     ret = dev_->StopDistributedHardware(devId);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
+#endif
 } // namespace DistributedHardware
 } // namespace OHOS

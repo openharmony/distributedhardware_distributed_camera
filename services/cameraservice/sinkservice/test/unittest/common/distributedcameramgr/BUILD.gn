@@ -71,6 +71,10 @@ ohos_unittest("DCameraSinkMgrTest") {
 
   configs = [ ":module_private_config" ]
 
+  if (!distributed_camera_common) {
+    cflags += [ "-DDCAMERA_SUPPORT_RESERVE" ]
+  }
+
   deps = [
     "${common_path}:distributed_camera_utils",
     "${innerkits_path}/native_cpp/camera_sink:distributed_camera_sink_sdk",

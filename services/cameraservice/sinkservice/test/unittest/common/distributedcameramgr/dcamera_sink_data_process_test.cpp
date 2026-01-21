@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,6 +34,7 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace DistributedHardware {
+#ifdef DCAMERA_SUPPORT_RESERVE
 class DCameraSinkDataProcessTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -252,5 +253,6 @@ HWTEST_F(DCameraSinkDataProcessTest, dcamera_sink_data_process_test_010, TestSiz
     int32_t ret = dataProcess_->GetProperty(propertyName, propertyCarrier);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
+#endif
 } // namespace DistributedHardware
 } // namespace OHOS
