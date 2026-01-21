@@ -22,12 +22,12 @@
 
 #include "idistributed_hardware_sink.h"
 #include "dcamera_sink_callback.h"
-#include "single_instance.h"
+#include "dhfwk_single_instance.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 class DCameraSinkHandler : public IDistributedHardwareSink {
-DECLARE_SINGLE_INSTANCE_BASE(DCameraSinkHandler);
+FWK_DECLARE_SINGLE_INSTANCE_BASE(DCameraSinkHandler);
 public:
     int32_t InitSink(const std::string& params) override;
     int32_t ReleaseSink() override;

@@ -20,13 +20,13 @@
 #include <string>
 #include <vector>
 
-#include "single_instance.h"
+#include "dhfwk_single_instance.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 
 class DcameraHidumper {
-DECLARE_SINGLE_INSTANCE_BASE(DcameraHidumper);
+FWK_DECLARE_SINGLE_INSTANCE_BASE(DcameraHidumper);
 
 public:
     int32_t StartDump();

@@ -28,7 +28,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(DCameraHdfOperate);
+FWK_IMPLEMENT_SINGLE_INSTANCE(DCameraHdfOperate);
 int32_t DCameraHdfOperate::LoadDcameraHDFImpl(std::shared_ptr<HdfDeathCallback> callback)
 {
     DHLOGI("Load camera hdf impl begin!");

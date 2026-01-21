@@ -36,7 +36,7 @@ DCameraSourceServiceIpc::~DCameraSourceServiceIpc()
     UnInit();
 }
 
-IMPLEMENT_SINGLE_INSTANCE(DCameraSourceServiceIpc);
+FWK_IMPLEMENT_SINGLE_INSTANCE(DCameraSourceServiceIpc);
 
 void DCameraSourceServiceIpc::Init()
 {

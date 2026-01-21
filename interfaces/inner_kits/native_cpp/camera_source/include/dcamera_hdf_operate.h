@@ -24,7 +24,7 @@
 #include "iservstat_listener_hdi.h"
 #include "idevmgr_hdi.h"
 #include "iservmgr_hdi.h"
-#include "single_instance.h"
+#include "dhfwk_single_instance.h"
 #include "v1_1/id_camera_provider.h"
 
 namespace OHOS {
@@ -49,7 +49,7 @@ public:
     void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
 };
 class DCameraHdfOperate {
-DECLARE_SINGLE_INSTANCE(DCameraHdfOperate);
+FWK_DECLARE_SINGLE_INSTANCE(DCameraHdfOperate);
 
 public:
     int32_t LoadDcameraHDFImpl(std::shared_ptr<HdfDeathCallback> callback);

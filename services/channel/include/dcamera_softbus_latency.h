@@ -20,12 +20,12 @@
 #include <map>
 #include <mutex>
 
-#include "single_instance.h"
+#include "dhfwk_single_instance.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 class DCameraSoftbusLatency {
-DECLARE_SINGLE_INSTANCE_BASE(DCameraSoftbusLatency);
+FWK_DECLARE_SINGLE_INSTANCE_BASE(DCameraSoftbusLatency);
 public:
     int32_t StartSoftbusTimeSync(const std::string& devId);
     int32_t StopSoftbusTimeSync(const std::string& devId);

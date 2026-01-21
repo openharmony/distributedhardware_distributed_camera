@@ -18,7 +18,7 @@
 
 #include <mutex>
 
-#include "single_instance.h"
+#include "dhfwk_single_instance.h"
 #include "iremote_object.h"
 #include "refbase.h"
 #include "idistributed_camera_sink.h"
@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 class DCameraSinkHandlerIpc {
-DECLARE_SINGLE_INSTANCE_BASE(DCameraSinkHandlerIpc);
+FWK_DECLARE_SINGLE_INSTANCE_BASE(DCameraSinkHandlerIpc);
 
 public:
     void Init();

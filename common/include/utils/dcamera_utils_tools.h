@@ -23,7 +23,7 @@
 #include <map>
 #include <memory>
 #include <functional>
-#include "single_instance.h"
+#include "dhfwk_single_instance.h"
 #include "iaccess_listener.h"
 
 #ifdef DCAMERA_MMAP_RESERVE
@@ -46,7 +46,7 @@ int32_t IsUnderDumpMaxSize(const std::string& dumpPath, const std::string& fileN
 
 #ifdef DCAMERA_MMAP_RESERVE
 class ConverterHandle {
-    DECLARE_SINGLE_INSTANCE(ConverterHandle);
+    FWK_DECLARE_SINGLE_INSTANCE(ConverterHandle);
 
 public:
     void InitConverter();
@@ -81,7 +81,7 @@ private:
 };
 
 class ManageSelectChannel {
-DECLARE_SINGLE_INSTANCE(ManageSelectChannel);
+FWK_DECLARE_SINGLE_INSTANCE(ManageSelectChannel);
 
 public:
     void SetSrcConnect(bool isSoftbusConnect);
@@ -107,7 +107,7 @@ private:
 };
 
 class DCameraSystemSwitchInfo {
-DECLARE_SINGLE_INSTANCE(DCameraSystemSwitchInfo);
+FWK_DECLARE_SINGLE_INSTANCE(DCameraSystemSwitchInfo);
 
 public:
     int32_t SetSystemSwitchFlagAndRotation(const std::string& devId, bool isSystemSwitch,
@@ -120,7 +120,7 @@ private:
 };
 
 class DCameraAccessConfigManager {
-DECLARE_SINGLE_INSTANCE(DCameraAccessConfigManager);
+FWK_DECLARE_SINGLE_INSTANCE(DCameraAccessConfigManager);
 
 public:
     int32_t SetAccessConfig(const sptr<IAccessListener>& listener, int32_t timeOut,

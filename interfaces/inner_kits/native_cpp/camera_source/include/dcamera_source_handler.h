@@ -25,12 +25,12 @@
 
 #include "dcamera_source_callback.h"
 #include "idistributed_hardware_source.h"
-#include "single_instance.h"
+#include "dhfwk_single_instance.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 class DCameraSourceHandler : public IDistributedHardwareSource {
-DECLARE_SINGLE_INSTANCE_BASE(DCameraSourceHandler);
+FWK_DECLARE_SINGLE_INSTANCE_BASE(DCameraSourceHandler);
 public:
     int32_t InitSource(const std::string& params) override;
     int32_t ReleaseSource() override;

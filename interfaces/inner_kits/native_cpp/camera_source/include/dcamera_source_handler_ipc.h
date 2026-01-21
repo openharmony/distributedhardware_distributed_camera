@@ -21,12 +21,12 @@
 #include "idistributed_camera_source.h"
 #include "iremote_object.h"
 #include "refbase.h"
-#include "single_instance.h"
+#include "dhfwk_single_instance.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 class DCameraSourceHandlerIpc {
-DECLARE_SINGLE_INSTANCE_BASE(DCameraSourceHandlerIpc);
+FWK_DECLARE_SINGLE_INSTANCE_BASE(DCameraSourceHandlerIpc);
 
 public:
     void Init();

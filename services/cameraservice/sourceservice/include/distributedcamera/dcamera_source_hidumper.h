@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 
-#include "single_instance.h"
+#include "dhfwk_single_instance.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -50,7 +50,7 @@ struct CameraDumpInfo {
 };
 
 class DcameraSourceHidumper {
-DECLARE_SINGLE_INSTANCE_BASE(DcameraSourceHidumper);
+FWK_DECLARE_SINGLE_INSTANCE_BASE(DcameraSourceHidumper);
 
 public:
     bool Dump(const std::vector<std::string>& args, std::string& result);

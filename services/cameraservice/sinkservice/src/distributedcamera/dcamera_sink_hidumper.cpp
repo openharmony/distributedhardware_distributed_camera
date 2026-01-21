@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(DcameraSinkHidumper);
+FWK_IMPLEMENT_SINGLE_INSTANCE(DcameraSinkHidumper);
 
 namespace {
 const std::string ARGS_HELP = "-h";

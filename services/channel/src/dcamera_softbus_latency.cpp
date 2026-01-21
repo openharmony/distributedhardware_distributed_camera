@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(DCameraSoftbusLatency);
+FWK_IMPLEMENT_SINGLE_INSTANCE(DCameraSoftbusLatency);
 
 constexpr static int32_t MICROSECONDS = 1000;
 

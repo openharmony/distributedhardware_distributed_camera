@@ -26,7 +26,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(DCameraSourceStateFactory);
+FWK_IMPLEMENT_SINGLE_INSTANCE(DCameraSourceStateFactory);
 
 std::shared_ptr<DCameraSourceState> DCameraSourceStateFactory::CreateState(DCameraStateType stateType,
     std::shared_ptr<DCameraSourceStateMachine>& stateMachine)

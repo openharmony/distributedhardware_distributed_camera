@@ -20,7 +20,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(DcameraHidumper);
+FWK_IMPLEMENT_SINGLE_INSTANCE(DcameraHidumper);
   
 int32_t DcameraHidumper::StartDump()
 {

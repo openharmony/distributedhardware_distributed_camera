@@ -26,7 +26,7 @@
 
 #include "dcamera_softbus_session.h"
 #include "icamera_channel.h"
-#include "single_instance.h"
+#include "dhfwk_single_instance.h"
 #include "socket.h"
 #include "trans_type.h"
 #include "device_manager.h"
@@ -41,7 +41,7 @@ typedef enum {
 } DCAMERA_CHANNEL_ROLE;
 
 class DCameraSoftbusAdapter {
-DECLARE_SINGLE_INSTANCE_BASE(DCameraSoftbusAdapter);
+FWK_DECLARE_SINGLE_INSTANCE_BASE(DCameraSoftbusAdapter);
 
 public:
     int32_t CreatSoftBusSinkSocketServer(std::string mySessionName, DCAMERA_CHANNEL_ROLE role,
