@@ -238,7 +238,7 @@ void DCameraSoftbusAdapterExecuteConflictCleanupAsyncFuzzTest(const uint8_t* dat
     int32_t socket = fuzzedData.ConsumeIntegral<int32_t>();
     auto session = std::make_shared<DCameraSoftbusSession>();
 
-    DCameraSoftbusAdapter::GetInstance().ExecuteConflictCleanupAsync(socket, session, networkId);
+    DCameraSoftbusAdapter::GetInstance().ExecuteConflictCleanupAsync(socket, session);
 }
 
 }
