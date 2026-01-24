@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,8 @@
 
 #include "callbacksinkonremoterequest_fuzzer.h"
 
+#include <fuzzer/FuzzedDataProvider.h>
+
 #include "dcamera_sink_callback.h"
 #include "dcamera_sink_callback_stub.h"
 #include "distributed_camera_constants.h"
@@ -24,7 +26,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-const uint32_t DC_RESOURCE_VALUE = 2;
 const uint32_t DC_RESOURCE_SIZE = 3;
 const ResourceEventType resourceEventType[DC_RESOURCE_SIZE] {
     ResourceEventType::EVENT_TYPE_QUERY_RESOURCE,
@@ -34,19 +35,17 @@ const ResourceEventType resourceEventType[DC_RESOURCE_SIZE] {
 
 void CallbackSinkOnRemoteRequestFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
     MessageParcel pdata;
     MessageParcel reply;
     MessageOption option;
+    FuzzedDataProvider fdp(data, size);
     uint32_t code = 0;
-    int32_t resType = static_cast<int32_t>(resourceEventType[data[0] % DC_RESOURCE_SIZE]);
-    std::string subtype(reinterpret_cast<const char*>(data), size);
-    std::string networkId(reinterpret_cast<const char*>(data), size);
-    bool isSensitive = data[0] % DC_RESOURCE_VALUE;
-    bool isSameAccout = data[0] % DC_RESOURCE_VALUE;
-    pdata.WriteInt32(resType);
+    ResourceEventType resType = fdp.PickValueInArray(resourceEventType);
+    std::string subtype = fdp.ConsumeRandomLengthString(64);
+    std::string networkId = fdp.ConsumeRandomLengthString(64);
+    bool isSensitive = fdp.ConsumeBool();
+    bool isSameAccout = fdp.ConsumeBool();
+    pdata.WriteInt32(static_cast<int32_t>(resType));
     pdata.WriteString(subtype);
     pdata.WriteString(networkId);
     pdata.ReadBool(isSensitive);
@@ -62,17 +61,15 @@ void CallbackSinkOnRemoteRequestFuzzTest(const uint8_t* data, size_t size)
 
 void CallbackSinkOnNotifyResourceInfoInnerFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
     MessageParcel pdata;
     MessageParcel reply;
-    int32_t resType = static_cast<int32_t>(resourceEventType[data[0] % DC_RESOURCE_SIZE]);
-    std::string subtype(reinterpret_cast<const char*>(data), size);
-    std::string networkId(reinterpret_cast<const char*>(data), size);
-    bool isSensitive = data[0] % DC_RESOURCE_VALUE;
-    bool isSameAccout = data[0] % DC_RESOURCE_VALUE;
-    pdata.WriteInt32(resType);
+    FuzzedDataProvider fdp(data, size);
+    ResourceEventType resType = fdp.PickValueInArray(resourceEventType);
+    std::string subtype = fdp.ConsumeRandomLengthString();
+    std::string networkId = fdp.ConsumeRandomLengthString();
+    bool isSensitive = fdp.ConsumeBool();
+    bool isSameAccout = fdp.ConsumeBool();
+    pdata.WriteInt32(static_cast<int32_t>(resType));
     pdata.WriteString(subtype);
     pdata.WriteString(networkId);
     pdata.ReadBool(isSensitive);
