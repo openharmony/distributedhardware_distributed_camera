@@ -213,6 +213,34 @@ void DCameraSoftbusAdapterParseValueFromCjsonFuzzTest(const uint8_t* data, size_
 
     DCameraSoftbusAdapter::GetInstance().ParseValueFromCjson(jsonStr, key);
 }
+
+void DCameraSoftbusAdapterHandleConflictSessionFuzzTest(const uint8_t* data, size_t size)
+{
+    if (data == nullptr || size == 0) {
+        return;
+    }
+    int32_t tempStrLen = 64;
+    FuzzedDataProvider fuzzedData(data, size);
+    std::string networkId = fuzzedData.ConsumeRandomLengthString(tempStrLen);
+    int32_t socket = fuzzedData.ConsumeIntegral<int32_t>();
+    auto session = std::make_shared<DCameraSoftbusSession>();
+
+    DCameraSoftbusAdapter::GetInstance().HandleConflictSession(socket, session, networkId);
+}
+
+void DCameraSoftbusAdapterExecuteConflictCleanupAsyncFuzzTest(const uint8_t* data, size_t size)
+{
+    if (data == nullptr || size == 0) {
+        return;
+    }
+
+    FuzzedDataProvider fuzzedData(data, size);
+    int32_t socket = fuzzedData.ConsumeIntegral<int32_t>();
+    auto session = std::make_shared<DCameraSoftbusSession>();
+
+    DCameraSoftbusAdapter::GetInstance().ExecuteConflictCleanupAsync(socket, session);
+}
+
 }
 }
 
@@ -232,5 +260,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DistributedHardware::FuzzCloseSessionWithNetWorkId(data, size);
     OHOS::DistributedHardware::DCameraSoftbusAdapterCheckOsTypeFuzzTest(data, size);
     OHOS::DistributedHardware::DCameraSoftbusAdapterParseValueFromCjsonFuzzTest(data, size);
+    OHOS::DistributedHardware::DCameraSoftbusAdapterHandleConflictSessionFuzzTest(data, size);
+    OHOS::DistributedHardware::DCameraSoftbusAdapterExecuteConflictCleanupAsyncFuzzTest(data, size);
     return 0;
 }
