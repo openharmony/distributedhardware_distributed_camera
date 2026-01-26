@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,8 @@
 
 #include "sourceproxyregisterdistributedhardware_fuzzer.h"
 
+#include <fuzzer/FuzzedDataProvider.h>
+
 #include "dcamera_source_callback.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_source_proxy.h"
@@ -25,17 +27,14 @@ namespace OHOS {
 namespace DistributedHardware {
 void SourceProxyRegisterDistributedHardwareFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
-        return;
-    }
-
-    std::string dhId(reinterpret_cast<const char*>(data), size);
-    std::string devId(reinterpret_cast<const char*>(data), size);
-    std::string reqId(reinterpret_cast<const char*>(data), size);
-    std::string sourceVersion(reinterpret_cast<const char*>(data), size);
-    std::string sourceAttrs(reinterpret_cast<const char*>(data), size);
-    std::string sinkVersion(reinterpret_cast<const char*>(data), size);
-    std::string sinkAttrs(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    std::string dhId = fdp.ConsumeRandomLengthString(64);
+    std::string devId = fdp.ConsumeRandomLengthString(64);
+    std::string reqId = fdp.ConsumeRandomLengthString(64);
+    std::string sourceVersion = fdp.ConsumeRandomLengthString(64);
+    std::string sourceAttrs = fdp.ConsumeRandomLengthString(64);
+    std::string sinkVersion = fdp.ConsumeRandomLengthString(64);
+    std::string sinkAttrs = fdp.ConsumeRandomLengthString(64);
     EnableParam param;
     param.sourceVersion = sourceVersion;
     param.sourceAttrs = sourceAttrs;

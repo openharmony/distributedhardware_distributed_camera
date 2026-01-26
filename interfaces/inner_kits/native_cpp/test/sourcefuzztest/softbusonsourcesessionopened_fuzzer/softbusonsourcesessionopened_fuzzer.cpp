@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,19 +15,17 @@
 
 #include "softbusonsourcesessionopened_fuzzer.h"
 
-#include "dcamera_softbus_adapter.h"
 #include <fuzzer/FuzzedDataProvider.h>
+
+#include "dcamera_softbus_adapter.h"
 namespace OHOS {
 namespace DistributedHardware {
 void SoftbusOnSourceSessionOpenedFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-
-    int32_t sessionId = *(reinterpret_cast<const int32_t*>(data));
-    std::string peerSessionName(reinterpret_cast<const char*>(data), size);
-    std::string peerDevId(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    int32_t sessionId = fdp.ConsumeIntegral<int32_t>();
+    std::string peerSessionName = fdp.ConsumeRandomLengthString(64);
+    std::string peerDevId = fdp.ConsumeRandomLengthString(64);
     std::string pkgName = "ohos.dhardware.dcamera";
     PeerSocketInfo socketInfo = {
         .name = const_cast<char*>(peerSessionName.c_str()),
@@ -38,7 +36,6 @@ void SoftbusOnSourceSessionOpenedFuzzTest(const uint8_t* data, size_t size)
     DCameraSoftbusAdapter::GetInstance().SourceOnBind(sessionId, socketInfo);
     DCameraSoftbusAdapter::GetInstance().SinkOnBind(sessionId, socketInfo);
 
-    FuzzedDataProvider fdp(data, size);
     int32_t socket = fdp.ConsumeIntegral<int32_t>();
     std::shared_ptr<DCameraSoftbusSession> session = nullptr;
     DCameraSoftbusAdapter::GetInstance().SinkOnBind(socket, socketInfo);
