@@ -65,10 +65,12 @@ void DCameraStreamDataProcessProducer::Start()
     state_ = DCAMERA_PRODUCER_STATE_START;
     if (streamType_ == CONTINUOUS_FRAME) {
         eventThread_ = std::thread([this]() { this->StartEvent(); });
-        std::unique_lock<std::mutex> lock(eventMutex_);
-        eventCon_.wait(lock, [this] {
-            return eventHandler_ != nullptr;
-        });
+        {
+            std::unique_lock<std::mutex> lock(eventMutex_);
+            eventCon_.wait(lock, [this] {
+                return eventHandler_ != nullptr;
+            });
+        }
         smoother_ = std::make_unique<DCameraFeedingSmoother>();
         smootherListener_ = std::make_shared<FeedingSmootherListener>(shared_from_this());
         smoother_->RegisterListener(smootherListener_);
@@ -102,7 +104,9 @@ void DCameraStreamDataProcessProducer::Stop()
             if ((eventHandler_ != nullptr) && (eventHandler_->GetEventRunner() != nullptr)) {
                 eventHandler_->GetEventRunner()->Stop();
             }
-            eventThread_.join();
+            if (eventThread_.joinable()) {
+                eventThread_.join();
+            }
             eventHandler_ = nullptr;
         }
         // Stop the audio and video synchronization thread
