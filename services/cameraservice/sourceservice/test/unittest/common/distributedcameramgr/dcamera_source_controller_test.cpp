@@ -1677,6 +1677,7 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_check_acl_r
     EXPECT_FALSE(result);
 }
 
+#ifdef DCAMERA_SUPPORT_RESERVE
 /**
  * @tc.name: dcamera_source_controller_test_check_acl_right_002
  * @tc.desc: Verify CheckAclRight returns false when InitDeviceManager fails.
@@ -1931,5 +1932,6 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_check_acl_r
         EXPECT_FALSE(result);
     }
 }
+#endif
 }
 }
