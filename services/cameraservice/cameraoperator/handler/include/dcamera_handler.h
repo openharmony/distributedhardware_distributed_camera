@@ -24,7 +24,7 @@
 #include "camera_input.h"
 #include "camera_manager.h"
 #include "camera_output_capability.h"
-#include "single_instance.h"
+#include "dhfwk_single_instance.h"
 #include "v1_1/dcamera_types.h"
 #include "cJSON.h"
 
@@ -33,7 +33,7 @@ namespace DistributedHardware {
 using namespace OHOS::HDI::DistributedCamera::V1_1;
 
 class DCameraHandler : public IHardwareHandler {
-DECLARE_SINGLE_INSTANCE_BASE(DCameraHandler);
+FWK_DECLARE_SINGLE_INSTANCE_BASE(DCameraHandler);
 public:
     int32_t Initialize() override;
     std::vector<DHItem> QueryMeta() override;

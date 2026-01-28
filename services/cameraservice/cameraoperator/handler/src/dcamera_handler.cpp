@@ -29,7 +29,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(DCameraHandler);
+FWK_IMPLEMENT_SINGLE_INSTANCE(DCameraHandler);
 
 const int32_t MAXWIDTHSIZE = 65535;
 

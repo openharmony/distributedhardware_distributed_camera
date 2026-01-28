@@ -255,7 +255,7 @@ int32_t IsUnderDumpMaxSize(const std::string& dumpPath, const std::string& fileN
 }
 
 #ifdef DCAMERA_MMAP_RESERVE
-IMPLEMENT_SINGLE_INSTANCE(ConverterHandle);
+FWK_IMPLEMENT_SINGLE_INSTANCE(ConverterHandle);
 void ConverterHandle::InitConverter()
 {
     dlHandler_ = dlopen(YUV_LIB_PATH.c_str(), RTLD_LAZY | RTLD_NODELETE);
@@ -391,7 +391,7 @@ void DumpFileUtil::OpenDumpFile(std::string para, std::string fileName, FILE **f
     }
 }
 
-IMPLEMENT_SINGLE_INSTANCE(ManageSelectChannel);
+FWK_IMPLEMENT_SINGLE_INSTANCE(ManageSelectChannel);
 void ManageSelectChannel::SetSrcConnect(bool isSoftbusConnect)
 {
     isSoftbusConnectSource_ = isSoftbusConnect;
@@ -422,7 +422,7 @@ int32_t DCameraSystemSwitchItem::GetRotate()
     return rotation_;
 }
 
-IMPLEMENT_SINGLE_INSTANCE(DCameraSystemSwitchInfo);
+FWK_IMPLEMENT_SINGLE_INSTANCE(DCameraSystemSwitchInfo);
 int32_t DCameraSystemSwitchInfo::SetSystemSwitchFlagAndRotation(const std::string& devId,
     bool isSystemSwitch, int32_t rotation)
 {
@@ -454,7 +454,7 @@ int32_t DCameraSystemSwitchInfo::GetSystemSwitchRotation(std::string devId)
     return map_[devId].GetRotate();
 }
 
-IMPLEMENT_SINGLE_INSTANCE(DCameraAccessConfigManager);
+FWK_IMPLEMENT_SINGLE_INSTANCE(DCameraAccessConfigManager);
 
 int32_t DCameraAccessConfigManager::SetAccessConfig(const sptr<IAccessListener>& listener,
     int32_t timeOut, const std::string& pkgName)

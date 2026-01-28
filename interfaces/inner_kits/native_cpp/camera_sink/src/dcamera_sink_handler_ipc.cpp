@@ -38,7 +38,7 @@ DCameraSinkHandlerIpc::~DCameraSinkHandlerIpc()
     UnInit();
 }
 
-IMPLEMENT_SINGLE_INSTANCE(DCameraSinkHandlerIpc);
+FWK_IMPLEMENT_SINGLE_INSTANCE(DCameraSinkHandlerIpc);
 
 void DCameraSinkHandlerIpc::Init()
 {

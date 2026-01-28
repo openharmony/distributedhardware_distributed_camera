@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(DcameraRadar);
+FWK_IMPLEMENT_SINGLE_INSTANCE(DcameraRadar);
 
 bool DcameraRadar::ReportDcameraInit(const std::string& func, CameraInit bizStage, BizState bizState, int32_t errCode)
 {

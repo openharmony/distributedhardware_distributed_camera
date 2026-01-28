@@ -20,12 +20,12 @@
 
 #include <map>
 
-#include "single_instance.h"
+#include "dhfwk_single_instance.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 class DCameraSinkServiceIpc {
-DECLARE_SINGLE_INSTANCE_BASE(DCameraSinkServiceIpc);
+FWK_DECLARE_SINGLE_INSTANCE_BASE(DCameraSinkServiceIpc);
 
 public:
     void Init();

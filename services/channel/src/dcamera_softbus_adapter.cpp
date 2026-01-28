@@ -68,7 +68,7 @@ static const int32_t HEX_WIDTH = 16;
 static const int32_t SECONDS_TO_MS = 1000;
 static const int32_t DEFAULT_TIMEOUT_MS = 30000;
 }
-IMPLEMENT_SINGLE_INSTANCE(DCameraSoftbusAdapter);
+FWK_IMPLEMENT_SINGLE_INSTANCE(DCameraSoftbusAdapter);
 // LCOV_EXCL_START
 static void DCameraSourceOnBind(int32_t socket, PeerSocketInfo info)
 {

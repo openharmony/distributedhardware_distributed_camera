@@ -38,7 +38,7 @@ DCameraSourceHandlerIpc::~DCameraSourceHandlerIpc()
     UnInit();
 }
 
-IMPLEMENT_SINGLE_INSTANCE(DCameraSourceHandlerIpc);
+FWK_IMPLEMENT_SINGLE_INSTANCE(DCameraSourceHandlerIpc);
 
 void DCameraSourceHandlerIpc::Init()
 {

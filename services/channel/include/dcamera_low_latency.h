@@ -17,12 +17,12 @@
 #define DCAMERA_LOW_LATENCY_H
 
 #include "distributed_hardware_fwk_kit.h"
-#include "single_instance.h"
+#include "dhfwk_single_instance.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 class DCameraLowLatency {
-DECLARE_SINGLE_INSTANCE_BASE(DCameraLowLatency);
+FWK_DECLARE_SINGLE_INSTANCE_BASE(DCameraLowLatency);
 public:
     int32_t EnableLowLatency();
     int32_t DisableLowLatency();

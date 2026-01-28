@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(DCameraLowLatency);
+FWK_IMPLEMENT_SINGLE_INSTANCE(DCameraLowLatency);
 
 int32_t DCameraLowLatency::EnableLowLatency()
 {

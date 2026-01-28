@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#include "single_instance.h"
+#include "dhfwk_single_instance.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -86,7 +86,7 @@ enum class CameraUnInit : int32_t {
 };
 
 class DcameraRadar {
-    DECLARE_SINGLE_INSTANCE(DcameraRadar);
+    FWK_DECLARE_SINGLE_INSTANCE(DcameraRadar);
 public:
     bool ReportDcameraInit(const std::string& func, CameraInit bizStage, BizState bizState, int32_t errCode);
     bool ReportDcameraInitProgress(const std::string& func, CameraInit bizStage, int32_t errCode);

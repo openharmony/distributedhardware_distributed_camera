@@ -15,13 +15,13 @@
 
 #ifndef OHOS_DCAMERA_SOURCE_STATE_FACTORY_H
 #define OHOS_DCAMERA_SOURCE_STATE_FACTORY_H
-#include "single_instance.h"
+#include "dhfwk_single_instance.h"
 #include "dcamera_source_state.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 class DCameraSourceStateFactory {
-DECLARE_SINGLE_INSTANCE(DCameraSourceStateFactory);
+FWK_DECLARE_SINGLE_INSTANCE(DCameraSourceStateFactory);
 public:
     std::shared_ptr<DCameraSourceState> CreateState(DCameraStateType stateType,
         std::shared_ptr<DCameraSourceStateMachine>& stateMachine);

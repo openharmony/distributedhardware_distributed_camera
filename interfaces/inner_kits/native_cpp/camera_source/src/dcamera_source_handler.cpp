@@ -30,7 +30,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(DCameraSourceHandler);
+FWK_IMPLEMENT_SINGLE_INSTANCE(DCameraSourceHandler);
 
 DCameraSourceHandler::DCameraSourceHandler()
 {
