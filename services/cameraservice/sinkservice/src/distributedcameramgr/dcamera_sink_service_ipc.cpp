@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,7 +40,7 @@ FWK_IMPLEMENT_SINGLE_INSTANCE(DCameraSinkServiceIpc);
 
 void DCameraSinkServiceIpc::Init()
 {
-    std::lock_guard<std::mutex> autoLock(initCamSrvLock_);
+    std::lock_guard<std::mutex> autoLock(camSrvOperationLock_);
     DHLOGI("DCameraSinkServiceIpc Init Start");
     if (isInit_) {
         DHLOGI("DCameraSinkServiceIpc has already init");
@@ -53,7 +53,7 @@ void DCameraSinkServiceIpc::Init()
 
 void DCameraSinkServiceIpc::UnInit()
 {
-    std::lock_guard<std::mutex> autoLock(initCamSrvLock_);
+    std::lock_guard<std::mutex> autoLock(camSrvOperationLock_);
     DHLOGI("DCameraSinkServiceIpc UnInit Start");
     if (!isInit_) {
         DHLOGI("DCameraSinkServiceIpc has already UnInit");
@@ -73,7 +73,7 @@ sptr<IDistributedCameraSource> DCameraSinkServiceIpc::GetSourceRemoteCamSrv(cons
         return nullptr;
     }
     {
-        std::lock_guard<std::mutex> autoLock(sourceRemoteCamSrvLock_);
+        std::lock_guard<std::mutex> autoLock(camSrvOperationLock_);
         auto iter = remoteSources_.find(deviceId);
         if (iter != remoteSources_.end()) {
             auto object = iter->second;
@@ -96,28 +96,29 @@ sptr<IDistributedCameraSource> DCameraSinkServiceIpc::GetSourceRemoteCamSrv(cons
         DHLOGE("GetSourceRemoteCamSrv failed get remote CamSrv %{public}s", GetAnonyString(deviceId).c_str());
         return nullptr;
     }
-    int32_t ret = object->AddDeathRecipient(sourceRemoteRecipient_);
     sptr<IDistributedCameraSource> remoteCamSrvObj = iface_cast<IDistributedCameraSource>(object);
     if (remoteCamSrvObj == nullptr) {
-        DHLOGI("GetSourceRemoteCamSrv failed, remoteCamSrvObj is null ret: %{public}d", ret);
+        DHLOGI("GetSourceRemoteCamSrv failed, remoteCamSrvObj is nullptr");
         return nullptr;
     }
     {
-        std::lock_guard<std::mutex> autoLock(sourceRemoteCamSrvLock_);
+        std::lock_guard<std::mutex> autoLock(camSrvOperationLock_);
+        CHECK_AND_RETURN_RET_LOG(sourceRemoteRecipient_ == nullptr, nullptr, "sourceRemoteRecipient_ is nullptr");
+        int32_t ret = object->AddDeathRecipient(sourceRemoteRecipient_);
         auto iter = remoteSources_.find(deviceId);
         if (iter != remoteSources_.end() && iter->second != nullptr) {
             iter->second->AsObject()->RemoveDeathRecipient(sourceRemoteRecipient_);
         }
         remoteSources_[deviceId] = remoteCamSrvObj;
+        DHLOGI("GetSourceRemoteCamSrv success, AddDeathRecipient ret: %{public}d", ret);
     }
-    DHLOGI("GetSourceRemoteCamSrv success, AddDeathRecipient ret: %{public}d", ret);
     return remoteCamSrvObj;
 }
 
 void DCameraSinkServiceIpc::DeleteSourceRemoteCamSrv(const std::string& deviceId)
 {
     DHLOGI("DeleteSourceRemoteCamSrv devId: %{public}s", GetAnonyString(deviceId).c_str());
-    std::lock_guard<std::mutex> autoLock(sourceRemoteCamSrvLock_);
+    std::lock_guard<std::mutex> autoLock(camSrvOperationLock_);
     auto item = remoteSources_.find(deviceId);
     if (item == remoteSources_.end()) {
         DHLOGI("DeleteSourceRemoteCamSrv not found device: %{public}s", GetAnonyString(deviceId).c_str());
@@ -133,7 +134,7 @@ void DCameraSinkServiceIpc::DeleteSourceRemoteCamSrv(const std::string& deviceId
 void DCameraSinkServiceIpc::ClearSourceRemoteCamSrv()
 {
     DHLOGI("ClearSourceRemoteCamSrv Start");
-    std::lock_guard<std::mutex> autoLock(sourceRemoteCamSrvLock_);
+    std::lock_guard<std::mutex> autoLock(camSrvOperationLock_);
     for (auto iter = remoteSources_.begin(); iter != remoteSources_.end(); iter++) {
         if (iter->second != nullptr) {
             iter->second->AsObject()->RemoveDeathRecipient(sourceRemoteRecipient_);
@@ -152,7 +153,7 @@ void DCameraSinkServiceIpc::SourceRemoteRecipient::OnRemoteDied(const wptr<IRemo
 void DCameraSinkServiceIpc::OnSourceRemoteCamSrvDied(const wptr<IRemoteObject>& remote)
 {
     DHLOGI("OnSourceRemoteCamSrvDied delete diedRemoted");
-    std::lock_guard<std::mutex> autoLock(sourceRemoteCamSrvLock_);
+    std::lock_guard<std::mutex> autoLock(camSrvOperationLock_);
     sptr<IRemoteObject> diedRemoted = remote.promote();
     if (diedRemoted == nullptr) {
         DHLOGE("OnSourceRemoteCamSrvDied promote failed!");
