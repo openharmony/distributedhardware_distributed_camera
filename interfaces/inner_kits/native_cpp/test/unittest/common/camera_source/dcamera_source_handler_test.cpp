@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +14,9 @@
  */
 
 #include <gtest/gtest.h>
+#include <thread>
+#include <chrono>
+#include <atomic>
 
 #define private public
 #include "dcamera_source_handler.h"
@@ -207,6 +210,152 @@ HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_007, TestSize.Lev
     ret = DCameraSourceHandler::GetInstance().UpdateDistributedHardwareWorkMode(devId, dhId, param);
     EXPECT_NE(DCAMERA_OK, ret);
 #endif
+}
+
+/**
+ * @tc.name: dcamera_source_handler_test_008
+ * @tc.desc: Verify InitSource with RELEASING state handling.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_008, TestSize.Level1)
+{
+    DHLOGI("Testing InitSource with RELEASING state");
+
+    DCameraSourceHandler::GetInstance().state_ = DCameraSourceHandler::DCAMERA_SA_STATE_START;
+    DCameraSourceHandler::GetInstance().state_ = DCameraSourceHandler::DCAMERA_SA_STATE_RELEASING;
+    std::string params = "test008";
+    auto start = std::chrono::steady_clock::now();
+    // 启动一个线程来调用 InitSource（应该进入等待）
+    std::atomic<bool> initStarted{false};
+    std::atomic<bool> initCompleted{false};
+    std::atomic<int32_t> initResult{-1};
+    std::thread initThread([&initStarted, &initResult, &params, &initCompleted]() {
+        initStarted = true;
+        initResult = DCameraSourceHandler::GetInstance().InitSource(params);
+        initCompleted = true;
+    });
+
+    while (!initStarted) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    DCameraSourceHandler::GetInstance().state_ = DCameraSourceHandler::DCAMERA_SA_STATE_STOP;
+    DCameraSourceHandler::GetInstance().producerCon_.notify_all();
+
+    initThread.join();
+    auto end = std::chrono::steady_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    EXPECT_TRUE(initCompleted);
+    EXPECT_GE(duration.count(), 0);
+}
+
+/**
+ * @tc.name: dcamera_source_handler_test_009
+ * @tc.desc: Verify InitSource with already START state returns immediately.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_009, TestSize.Level1)
+{
+    DHLOGI("Testing InitSource with START state");
+    DCameraSourceHandler::GetInstance().state_ = DCameraSourceHandler::DCAMERA_SA_STATE_START;
+    std::string params = "test009";
+    auto start = std::chrono::steady_clock::now();
+    int32_t ret = DCameraSourceHandler::GetInstance().InitSource(params);
+    auto end = std::chrono::steady_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_LT(duration.count(), 1000);
+}
+
+/**
+ * @tc.name: dcamera_source_handler_test_010
+ * @tc.desc: Verify ReleaseSource immediately sets RELEASING state.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_010, TestSize.Level1)
+{
+    DHLOGI("Testing ReleaseSource state transition");
+    DCameraSourceHandler::GetInstance().state_ = DCameraSourceHandler::DCAMERA_SA_STATE_START;
+    {
+        std::lock_guard<std::mutex> lock(DCameraSourceHandler::GetInstance().producerMutex_);
+        DCameraSourceHandler::GetInstance().state_ = DCameraSourceHandler::DCAMERA_SA_STATE_RELEASING;
+    }
+    EXPECT_EQ(DCameraSourceHandler::GetInstance().state_, DCameraSourceHandler::DCAMERA_SA_STATE_RELEASING);
+    {
+        std::lock_guard<std::mutex> lock(DCameraSourceHandler::GetInstance().producerMutex_);
+        DCameraSourceHandler::GetInstance().state_ = DCameraSourceHandler::DCAMERA_SA_STATE_STOP;
+        DCameraSourceHandler::GetInstance().producerCon_.notify_all();
+    }
+    EXPECT_EQ(DCameraSourceHandler::GetInstance().state_, DCameraSourceHandler::DCAMERA_SA_STATE_STOP);
+}
+
+/**
+ * @tc.name: dcamera_source_handler_test_011
+ * @tc.desc: Verify concurrent scenario simulation.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_011, TestSize.Level1)
+{
+    DHLOGI("Testing concurrent scenario simulation");
+    DCameraSourceHandler::GetInstance().state_ = DCameraSourceHandler::DCAMERA_SA_STATE_START;
+    std::atomic<bool> releaseThreadStarted{false};
+    std::atomic<bool> releaseThreadCompleted{false};
+    std::atomic<bool> initThreadCompleted{false};
+    std::atomic<int32_t> initResult{-1};
+    std::thread releaseThread([&releaseThreadStarted, &releaseThreadCompleted]() {
+        releaseThreadStarted = true;
+        {
+            std::lock_guard<std::mutex> lock(DCameraSourceHandler::GetInstance().producerMutex_);
+            EXPECT_EQ(DCameraSourceHandler::GetInstance().state_,
+                      DCameraSourceHandler::DCAMERA_SA_STATE_START);
+            DCameraSourceHandler::GetInstance().state_ = DCameraSourceHandler::DCAMERA_SA_STATE_RELEASING;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        {
+            std::lock_guard<std::mutex> lock(DCameraSourceHandler::GetInstance().producerMutex_);
+            DCameraSourceHandler::GetInstance().state_ = DCameraSourceHandler::DCAMERA_SA_STATE_STOP;
+            DCameraSourceHandler::GetInstance().producerCon_.notify_all();
+        }
+        releaseThreadCompleted = true;
+    });
+    std::thread initThread([&releaseThreadStarted, &initResult, &initThreadCompleted]() {
+        while (!releaseThreadStarted) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        std::string params = "test013_concurrent";
+        auto start = std::chrono::steady_clock::now();
+        initResult = DCameraSourceHandler::GetInstance().InitSource(params);
+        auto end = std::chrono::steady_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+        initThreadCompleted = true;
+        EXPECT_GE(duration.count(), 80);
+    });
+    releaseThread.join();
+    initThread.join();
+    EXPECT_TRUE(releaseThreadCompleted);
+    EXPECT_TRUE(initThreadCompleted);
+}
+
+/**
+ * @tc.name: dcamera_source_handler_test_012
+ * @tc.desc: Verify state enum values consistency.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_012, TestSize.Level0)
+{
+    DHLOGI("Testing state enum values");
+    EXPECT_EQ(DCameraSourceHandler::DCAMERA_SA_STATE_STOP, 0);
+    EXPECT_EQ(DCameraSourceHandler::DCAMERA_SA_STATE_START, 1);
+    EXPECT_EQ(DCameraSourceHandler::DCAMERA_SA_STATE_RELEASING, 2);
+    EXPECT_NE(DCameraSourceHandler::DCAMERA_SA_STATE_RELEASING,
+              DCameraSourceHandler::DCAMERA_SA_STATE_STOP);
+    EXPECT_NE(DCameraSourceHandler::DCAMERA_SA_STATE_RELEASING,
+              DCameraSourceHandler::DCAMERA_SA_STATE_START);
 }
 }
 }

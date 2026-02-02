@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -47,16 +47,27 @@ int32_t DCameraSourceHandler::InitSource(const std::string& params)
 {
     DHLOGI("Start");
     {
-        std::lock_guard<std::mutex> autoLock(producerMutex_);
+        std::unique_lock<std::mutex> autoLock(producerMutex_);
         if (state_ == DCAMERA_SA_STATE_START) {
             return DCAMERA_OK;
         }
+
+        uint32_t releaseTime = 5;
+        if (state_ == DCAMERA_SA_STATE_RELEASING) {
+            DHLOGI("Source is releasing, waiting for completion");
+            auto status = producerCon_.wait_for(autoLock, std::chrono::seconds(releaseTime), [this] {
+                return state_ != DCAMERA_SA_STATE_RELEASING;
+            });
+            CHECK_AND_RETURN_RET_LOG(!status, DCAMERA_INIT_ERR, "Timeout waiting for release to complete");
+
+            if (state_ == DCAMERA_SA_STATE_START) {
+                return DCAMERA_OK;
+            }
+            DHLOGI("Release completed, continuing with initialization");
+        }
     }
     sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (sm == nullptr) {
-        DHLOGE("GetSourceLocalCamSrv GetSystemAbilityManager failed");
-        return DCAMERA_INIT_ERR;
-    }
+    CHECK_AND_RETURN_RET_LOG(sm == nullptr, DCAMERA_INIT_ERR, "GetSourceLocalCamSrv GetSystemAbilityManager failed");
     ReportSaEvent(INIT_SA_EVENT, DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, "init source sa event.");
     sptr<DCameraSourceLoadCallback> loadCallback(new DCameraSourceLoadCallback(params));
     int32_t ret = sm->LoadSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, loadCallback);
@@ -109,16 +120,35 @@ void DCameraSourceHandler::FinishStartSAFailed(const int32_t systemAbilityId)
 int32_t DCameraSourceHandler::ReleaseSource()
 {
     DHLOGI("Start");
+    {
+        std::lock_guard<std::mutex> lock(producerMutex_);
+        if (state_ != DCAMERA_SA_STATE_START) {
+            DHLOGW("Source is not in start state, current state: %{public}d", state_);
+            if (state_ == DCAMERA_SA_STATE_STOP) {
+                return DCAMERA_OK;
+            }
+        }
+        state_ = DCAMERA_SA_STATE_RELEASING;
+    }
+
     sptr<IDistributedCameraSource> dCameraSourceSrv = DCameraSourceHandlerIpc::GetInstance().GetSourceLocalCamSrv();
     if (dCameraSourceSrv == nullptr) {
         DHLOGE("get Service failed");
+        {
+            std::lock_guard<std::mutex> lock(producerMutex_);
+            state_ = DCAMERA_SA_STATE_STOP;
+            producerCon_.notify_all();
+        }
         return DCAMERA_INIT_ERR;
     }
     ReportSaEvent(RELEASE_SA_EVENT, DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, "release source sa event.");
     dCameraSourceSrv->ReleaseSource();
     DCameraSourceHandlerIpc::GetInstance().UnInit();
-    std::unique_lock<std::mutex> lock(producerMutex_);
-    state_ = DCAMERA_SA_STATE_STOP;
+    {
+        std::lock_guard<std::mutex> lock(producerMutex_);
+        state_ = DCAMERA_SA_STATE_STOP;
+        producerCon_.notify_all();
+    }
     DHLOGI("end");
     return DCAMERA_OK;
 }
