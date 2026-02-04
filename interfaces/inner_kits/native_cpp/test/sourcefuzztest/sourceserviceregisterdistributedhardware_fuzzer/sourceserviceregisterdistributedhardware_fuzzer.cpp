@@ -47,6 +47,8 @@ void SourceServiceRegisterDistributedHardwareFuzzTest(const uint8_t* data, size_
     }
 
     sourceService->RegisterDistributedHardware(devId, dhId, reqId, param);
+    uint32_t time = 500000;
+    usleep(time);
 }
 }
 }
