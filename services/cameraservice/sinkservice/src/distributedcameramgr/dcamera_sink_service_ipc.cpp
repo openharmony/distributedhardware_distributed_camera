@@ -40,7 +40,7 @@ FWK_IMPLEMENT_SINGLE_INSTANCE(DCameraSinkServiceIpc);
 
 void DCameraSinkServiceIpc::Init()
 {
-    std::lock_guard<std::mutex> autoLock(camSrvOperationLock_);
+    std::lock_guard<std::mutex> autoLock(initCamSrvLock_);
     DHLOGI("DCameraSinkServiceIpc Init Start");
     if (isInit_) {
         DHLOGI("DCameraSinkServiceIpc has already init");
@@ -53,7 +53,7 @@ void DCameraSinkServiceIpc::Init()
 
 void DCameraSinkServiceIpc::UnInit()
 {
-    std::lock_guard<std::mutex> autoLock(camSrvOperationLock_);
+    std::lock_guard<std::mutex> autoLock(initCamSrvLock_);
     DHLOGI("DCameraSinkServiceIpc UnInit Start");
     if (!isInit_) {
         DHLOGI("DCameraSinkServiceIpc has already UnInit");
