@@ -48,6 +48,7 @@ private:
 
     bool isInit_;
     std::mutex camSrvOperationLock_;
+    std::mutex initCamSrvLock_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

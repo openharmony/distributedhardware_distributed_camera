@@ -77,7 +77,7 @@ ohos_unittest("DCameraSourceMgrTest") {
   configs = [ ":module_private_config" ]
 
   if (!distributed_camera_common) {
-    cflags += [ "-DDCAMERA_SUPPORT_RESERVE" ]
+    cflags = [ "-DDCAMERA_SUPPORT_RESERVE" ]
   }
 
   deps = [
