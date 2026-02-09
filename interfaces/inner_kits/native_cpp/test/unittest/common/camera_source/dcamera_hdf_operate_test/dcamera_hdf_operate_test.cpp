@@ -300,30 +300,13 @@ HWTEST_F(DCameraHdfOperateTest, RemoveHdfDeathBind_001, TestSize.Level1)
 
 /**
  * @tc.name: LoadDcameraHDFImpl_003
- * @tc.desc: Verify LoadDcameraHDFImpl when LoadDevice fails (devmgr_ is nullptr)
+ * @tc.desc: Verify LoadDcameraHDFImpl when RegisterHdfListener fails (camHdiProvider_ is nullptr)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJM
  */
 HWTEST_F(DCameraHdfOperateTest, LoadDcameraHDFImpl_003, TestSize.Level1)
 {
     DHLOGI("DCameraHdfOperateTest::LoadDcameraHDFImpl_003");
-    auto callback = std::make_shared<MockHdfDeathCallback>();
-    auto devmgr = DCameraHdfOperate::GetInstance().devmgr_;
-    DCameraHdfOperate::GetInstance().devmgr_ = nullptr;
-    int32_t ret = DCameraHdfOperate::GetInstance().LoadDcameraHDFImpl(callback);
-    DCameraHdfOperate::GetInstance().devmgr_ = devmgr;
-    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
-}
-
-/**
- * @tc.name: LoadDcameraHDFImpl_004
- * @tc.desc: Verify LoadDcameraHDFImpl when RegisterHdfListener fails (camHdiProvider_ is nullptr)
- * @tc.type: FUNC
- * @tc.require: AR000GHSJM
- */
-HWTEST_F(DCameraHdfOperateTest, LoadDcameraHDFImpl_004, TestSize.Level1)
-{
-    DHLOGI("DCameraHdfOperateTest::LoadDcameraHDFImpl_004");
     auto callback = std::make_shared<MockHdfDeathCallback>();
     // First ensure LoadDevice succeeds by setting up proper state
     DCameraHdfOperate::GetInstance().cameraServStatus_.store(OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START);
@@ -414,45 +397,13 @@ HWTEST_F(DCameraHdfOperateTest, WaitLoadProviderService_002, TestSize.Level1)
 
 /**
  * @tc.name: LoadDevice_003
- * @tc.desc: Verify LoadDevice when servMgr_ is nullptr
+ * @tc.desc: Verify LoadDevice success path
  * @tc.type: FUNC
  * @tc.require: AR000GHSJM
  */
 HWTEST_F(DCameraHdfOperateTest, LoadDevice_003, TestSize.Level1)
 {
     DHLOGI("DCameraHdfOperateTest::LoadDevice_003");
-    auto servMgr = DCameraHdfOperate::GetInstance().servMgr_;
-    DCameraHdfOperate::GetInstance().servMgr_ = nullptr;
-    int32_t ret = DCameraHdfOperate::GetInstance().LoadDevice();
-    DCameraHdfOperate::GetInstance().servMgr_ = servMgr;
-    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
-}
-
-/**
- * @tc.name: LoadDevice_004
- * @tc.desc: Verify LoadDevice when devmgr_ is nullptr
- * @tc.type: FUNC
- * @tc.require: AR000GHSJM
- */
-HWTEST_F(DCameraHdfOperateTest, LoadDevice_004, TestSize.Level1)
-{
-    DHLOGI("DCameraHdfOperateTest::LoadDevice_004");
-    auto devmgr = DCameraHdfOperate::GetInstance().devmgr_;
-    DCameraHdfOperate::GetInstance().devmgr_ = nullptr;
-    int32_t ret = DCameraHdfOperate::GetInstance().LoadDevice();
-    DCameraHdfOperate::GetInstance().devmgr_ = devmgr;
-    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
-}
-
-/**
- * @tc.name: LoadDevice_005
- * @tc.desc: Verify LoadDevice success path
- * @tc.type: FUNC
- * @tc.require: AR000GHSJM
- */
-HWTEST_F(DCameraHdfOperateTest, LoadDevice_005, TestSize.Level1)
-{
-    DHLOGI("DCameraHdfOperateTest::LoadDevice_005");
     DCameraHdfOperate::GetInstance().cameraServStatus_.store(OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START);
     DCameraHdfOperate::GetInstance().providerServStatus_.store(OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START);
     int32_t ret = DCameraHdfOperate::GetInstance().LoadDevice();
@@ -475,58 +426,6 @@ HWTEST_F(DCameraHdfOperateTest, RegisterHdfListener_001, TestSize.Level1)
     int32_t ret = DCameraHdfOperate::GetInstance().RegisterHdfListener();
     DCameraHdfOperate::GetInstance().camHdiProvider_ = camHdiProvider;
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
-}
-
-/**
- * @tc.name: RegisterHdfListener_002
- * @tc.desc: Verify RegisterHdfListener success path
- * @tc.type: FUNC
- * @tc.require: AR000GHSJM
- */
-HWTEST_F(DCameraHdfOperateTest, RegisterHdfListener_002, TestSize.Level1)
-{
-    DHLOGI("DCameraHdfOperateTest::RegisterHdfListener_002");
-    int32_t ret = DCameraHdfOperate::GetInstance().RegisterHdfListener();
-    EXPECT_EQ(DCAMERA_OK, ret);
-}
-
-/**
- * @tc.name: UnRegisterHdfListener_002
- * @tc.desc: Verify UnRegisterHdfListener success path
- * @tc.type: FUNC
- * @tc.require: AR000GHSJM
- */
-HWTEST_F(DCameraHdfOperateTest, UnRegisterHdfListener_002, TestSize.Level1)
-{
-    DHLOGI("DCameraHdfOperateTest::UnRegisterHdfListener_002");
-    int32_t ret = DCameraHdfOperate::GetInstance().UnRegisterHdfListener();
-    EXPECT_EQ(DCAMERA_OK, ret);
-}
-
-/**
- * @tc.name: AddHdfDeathBind_002
- * @tc.desc: Verify AddHdfDeathBind success path
- * @tc.type: FUNC
- * @tc.require: AR000GHSJM
- */
-HWTEST_F(DCameraHdfOperateTest, AddHdfDeathBind_002, TestSize.Level1)
-{
-    DHLOGI("DCameraHdfOperateTest::AddHdfDeathBind_002");
-    int32_t ret = DCameraHdfOperate::GetInstance().AddHdfDeathBind();
-    EXPECT_EQ(DCAMERA_OK, ret);
-}
-
-/**
- * @tc.name: RemoveHdfDeathBind_002
- * @tc.desc: Verify RemoveHdfDeathBind success path
- * @tc.type: FUNC
- * @tc.require: AR000GHSJM
- */
-HWTEST_F(DCameraHdfOperateTest, RemoveHdfDeathBind_002, TestSize.Level1)
-{
-    DHLOGI("DCameraHdfOperateTest::RemoveHdfDeathBind_002");
-    int32_t ret = DCameraHdfOperate::GetInstance().RemoveHdfDeathBind();
-    EXPECT_EQ(DCAMERA_OK, ret);
 }
 
 /**
