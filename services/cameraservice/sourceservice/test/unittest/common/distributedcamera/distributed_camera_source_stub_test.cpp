@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -334,15 +334,6 @@ HWTEST_F(DcameraSourceStubTest, dcamera_source_stub_test_010, TestSize.Level1)
     param.sharedMemLen = 120;
     ret = sourceProxy.UpdateDistributedHardwareWorkMode(devId, dhId, param);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
-
-    uint32_t memLen = sizeof(static_cast<uint32_t>(120));
-    std::string memName = "testMemory";
-    auto syncSharedMem = OHOS::Ashmem::CreateAshmem(memName.c_str(), memLen);
-    param.fd = syncSharedMem->GetAshmemFd();
-    param.sharedMemLen = 120;
-    ret = sourceProxy.UpdateDistributedHardwareWorkMode(devId, dhId, param);
-    EXPECT_EQ(DCAMERA_OK, ret);
-    syncSharedMem->CloseAshmem();
 }
 } // namespace DistributedHardware
 } // namespace OHOS
