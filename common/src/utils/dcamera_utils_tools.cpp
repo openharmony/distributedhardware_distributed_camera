@@ -258,6 +258,14 @@ int32_t IsUnderDumpMaxSize(const std::string& dumpPath, const std::string& fileN
 FWK_IMPLEMENT_SINGLE_INSTANCE(ConverterHandle);
 void ConverterHandle::InitConverter()
 {
+    if (isInited_.load()) {
+        DHLOGI("Converter already initialized.");
+        return;
+    }
+    if (dlHandler_ != nullptr) {
+        dlclose(dlHandler_);
+        dlHandler_ = nullptr;
+    }
     dlHandler_ = dlopen(YUV_LIB_PATH.c_str(), RTLD_LAZY | RTLD_NODELETE);
     if (dlHandler_ == nullptr) {
         DHLOGE("Dlopen failed.");
