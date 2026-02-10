@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -53,7 +53,9 @@ private:
     typedef enum {
         DCAMERA_SA_STATE_STOP = 0,
         DCAMERA_SA_STATE_START = 1,
+        DCAMERA_SA_STATE_RELEASING = 2,
     } DCameraSAState;
+
     DCameraSourceHandler();
     ~DCameraSourceHandler();
     void FinishStartSA(const std::string &params);
