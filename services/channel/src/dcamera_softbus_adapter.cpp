@@ -639,7 +639,6 @@ int32_t DCameraSoftbusAdapter::SinkOnBind(int32_t socket, PeerSocketInfo info)
     bool isInvalid = false;
     CHECK_AND_RETURN_RET_LOG(CheckOsType(peerNetworkId, isInvalid) != DCAMERA_OK && isInvalid, DCAMERA_BAD_VALUE,
         "CheckOsType failed or invalid osType");
-  
     ret = HandleConflictSession(socket, session, info.networkId);
     if (ret != DCAMERA_OK) {
         return ret;
@@ -649,7 +648,6 @@ int32_t DCameraSoftbusAdapter::SinkOnBind(int32_t socket, PeerSocketInfo info)
         DHLOGI("Control channel detected, triggering access authorization");
         RequestAndWaitForAuthorization(peerNetworkId);
     }
-
     ret = session->OnSessionOpened(socket, info.networkId);
     if (ret != DCAMERA_OK) {
         DHLOGE("sink bind socket error, not find socket %{public}d", socket);
