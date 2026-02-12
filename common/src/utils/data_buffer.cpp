@@ -16,13 +16,14 @@
 #include "data_buffer.h"
 #include "distributed_camera_errno.h"
 #include "distributed_camera_constants.h"
+#include "distributed_hardware_log.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 DataBuffer::DataBuffer(size_t capacity)
 {
     if (capacity != 0 && capacity <= DCAMERA_MAX_RECV_DATA_LEN) {
-        data_ = new uint8_t[capacity] {0};
+        data_ = new (std::nothrow) uint8_t[capacity]{0};
         if (data_ != nullptr) {
             capacity_ = capacity;
             rangeLength_ = capacity;
@@ -47,6 +48,10 @@ size_t DataBuffer::Offset() const
 
 uint8_t *DataBuffer::Data() const
 {
+    if (data_ == nullptr) {
+        DHLOGE("data is NULL");
+        return nullptr;
+    }
     return data_ + rangeOffset_;
 }
 
