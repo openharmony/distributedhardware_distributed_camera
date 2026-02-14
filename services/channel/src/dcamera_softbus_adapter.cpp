@@ -723,8 +723,6 @@ void DCameraSoftbusAdapter::ExecuteConflictCleanupAsync(int32_t socket,
     ffrt::submit([this, socket, session]() {
         DHLOGI("Async cleanup: sending error notification for socket: %{public}d", socket);
         prctl(PR_SET_NAME, "DCamConflictCleanup");
-        ReportCameraOperaterEvent(DCAMERA_CONFLICT_SEND_EVENT, GetAnonyString(session->GetPeerDevId()).c_str(),
-            GetAnonyString(session->GetMyDhId()).c_str(), "operator start capture in used.");
         session->NotifyError(DCAMERA_MESSAGE,  DCAMERA_EVENT_DEVICE_IN_USE,
             std::string("operator start capture in used."));
         {
