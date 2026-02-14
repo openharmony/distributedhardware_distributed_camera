@@ -110,12 +110,12 @@ ohos_shared_library("distributed_camera_sink") {
     defines += [ "OS_ACCOUNT_ENABLE" ]
   }
 
-  if (!distributed_camera_common) {
-    defines += [ "SECURITY_LEVEL_CHECK_ENABLE" ]
-  }
-
   if (distributed_camera_open_stabile) {
     cflags = [ "-DDCAMERA_OPEN_STABILE" ]
+  }
+
+  if (!distributed_camera_common) {
+    defines += [ "SECURITY_LEVEL_CHECK_ENABLE" ]
   }
 
   external_deps = [
