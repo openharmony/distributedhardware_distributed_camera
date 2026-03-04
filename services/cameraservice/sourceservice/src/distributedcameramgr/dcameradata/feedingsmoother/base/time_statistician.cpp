@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,11 +30,17 @@ void TimeStatistician::CalProcessTime(const std::shared_ptr<IFeedableData>& data
 void TimeStatistician::CalAverFeedInterval(const int64_t feedTime)
 {
     feedTime_ = feedTime;
-    feedInterval_ = feedTime_ - lastFeedTime_;
     if (lastFeedTime_ == 0) {
         lastFeedTime_ = feedTime_;
         return;
     }
+    if (feedTime_ < lastFeedTime_) {
+        DHLOGE("feedTime_ is smaller than lastFeedTime_, potential underflow detected");
+        feedInterval_ = 0;
+        lastFeedTime_ = feedTime_;
+        return;
+    }
+    feedInterval_ = feedTime_ - lastFeedTime_;
     feedIndex_++;
     if (feedIntervalSum_ > INT64_MAX - feedInterval_) {
         DHLOGE("feedIntervalSum_ overflow");
@@ -48,11 +54,17 @@ void TimeStatistician::CalAverFeedInterval(const int64_t feedTime)
 void TimeStatistician::CalAverTimeStampInterval(const int64_t timeStamp)
 {
     timeStamp_ = timeStamp;
-    timeStampInterval_ = timeStamp_ - lastTimeStamp_;
     if (lastTimeStamp_ == 0) {
         lastTimeStamp_ = timeStamp_;
         return;
     }
+    if (timeStamp_ < lastTimeStamp_) {
+        DHLOGE("timeStamp_ is smaller than lastTimeStamp_, potential underflow detected");
+        timeStampInterval_ = 0;
+        lastTimeStamp_ = timeStamp_;
+        return;
+    }
+    timeStampInterval_ = timeStamp_ - lastTimeStamp_;
     timeStampIndex_++;
     if (timeStampIntervalSum_ > INT64_MAX - timeStampInterval_) {
         DHLOGE("timeStampIntervalSum_ overflow");
