@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -132,7 +132,11 @@ void DCameraClientTest::SetUp(void)
     DHLOGI("DCameraClientTest::SetUp");
     DCameraHandler::GetInstance().Initialize();
     std::vector<std::string> cameras = DCameraHandler::GetInstance().GetCameras();
-    client_ = std::make_shared<DCameraClient>(cameras[0]);
+    if (cameras.empty()) {
+        client_ = nullptr;
+    } else {
+        client_ = std::make_shared<DCameraClient>(cameras[0]);
+    }
 
     photoInfo_false_ = std::make_shared<DCameraCaptureInfo>();
     photoInfo_false_->width_ = TEST_WIDTH_PHOTO;
@@ -230,6 +234,7 @@ void DCameraClientTest::SetCaptureInfo(std::shared_ptr<DCameraCaptureInfo>& info
 HWTEST_F(DCameraClientTest, dcamera_client_test_001, TestSize.Level1)
 {
     DHLOGI("DCameraClientTest dcamera_client_test_001: test set state callback");
+    ASSERT_NE(client_, nullptr);
     auto managerCallback = std::make_shared<DCameraManagerCallback>();
     CameraStandard::CameraStatusInfo cameraStatus;
     managerCallback->OnCameraStatusChanged(cameraStatus);
@@ -297,6 +302,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_001, TestSize.Level1)
 HWTEST_F(DCameraClientTest, dcamera_client_test_002, TestSize.Level1)
 {
     DHLOGI("DCameraClientTest dcamera_client_test_002: test set result callback");
+    ASSERT_NE(client_, nullptr);
     auto photoSurfaceListener = std::make_shared<DCameraPhotoSurfaceListener>(nullptr, nullptr);
     photoSurfaceListener->OnBufferAvailable();
 
@@ -321,6 +327,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_002, TestSize.Level1)
 HWTEST_F(DCameraClientTest, dcamera_client_test_003, TestSize.Level1)
 {
     DHLOGI("DCameraClientTest dcamera_client_test_003: test init and release client");
+    ASSERT_NE(client_, nullptr);
     std::shared_ptr<StateCallback> stateCallback = std::make_shared<DCameraClientTestStateCallback>();
     int32_t ret = client_->SetStateCallback(stateCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
@@ -345,6 +352,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_003, TestSize.Level1)
 HWTEST_F(DCameraClientTest, dcamera_client_test_004, TestSize.Level1)
 {
     DHLOGI("DCameraClientTest dcamera_client_test_004: test startCapture and stopCapture");
+    ASSERT_NE(client_, nullptr);
     std::shared_ptr<StateCallback> stateCallback = std::make_shared<DCameraClientTestStateCallback>();
     int32_t ret = client_->SetStateCallback(stateCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
@@ -409,6 +417,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_004, TestSize.Level1)
 HWTEST_F(DCameraClientTest, dcamera_client_test_005, TestSize.Level1)
 {
     DHLOGI("DCameraClientTest dcamera_client_test_005: test startCapture and stopCapture");
+    ASSERT_NE(client_, nullptr);
     std::shared_ptr<StateCallback> stateCallback = std::make_shared<DCameraClientTestStateCallback>();
     int32_t ret = client_->SetStateCallback(stateCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
@@ -470,6 +479,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_005, TestSize.Level1)
 HWTEST_F(DCameraClientTest, dcamera_client_test_006, TestSize.Level1)
 {
     DHLOGI("DCameraClientTest dcamera_client_test_006: test updateSettings");
+    ASSERT_NE(client_, nullptr);
     std::vector<std::shared_ptr<DCameraSettings>> settings;
     auto setting = std::make_shared<DCameraSettings>();
     setting->type_ = ENABLE_METADATA;
@@ -488,6 +498,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_006, TestSize.Level1)
 HWTEST_F(DCameraClientTest, dcamera_client_test_007, TestSize.Level1)
 {
     DHLOGI("DCameraClientTest dcamera_client_test_007: test updateSettings");
+    ASSERT_NE(client_, nullptr);
     auto metaData = std::make_shared<Camera::CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
     uint8_t afMode = OHOS_CAMERA_FOCUS_MODE_AUTO;
     uint8_t aeMode = OHOS_CAMERA_EXPOSURE_MODE_CONTINUOUS_AUTO;
@@ -518,6 +529,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_007, TestSize.Level1)
 HWTEST_F(DCameraClientTest, dcamera_client_test_008, TestSize.Level1)
 {
     DHLOGI("DCameraClientTest dcamera_client_test_008: test updateSettings");
+    ASSERT_NE(client_, nullptr);
     auto metaData = std::make_shared<Camera::CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
     std::string abilityString = Camera::MetadataUtils::EncodeToString(metaData);
     std::vector<std::shared_ptr<DCameraSettings>> settings;
@@ -539,6 +551,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_008, TestSize.Level1)
 HWTEST_F(DCameraClientTest, dcamera_client_test_009, TestSize.Level1)
 {
     DHLOGI("DCameraClientTest dcamera_client_test_009: test cameraServiceErrorType");
+    ASSERT_NE(client_, nullptr);
     int32_t ret = client_->CameraServiceErrorType(CameraStandard::CameraErrorCode::SUCCESS);
     EXPECT_EQ(DCAMERA_OK, ret);
 
@@ -558,6 +571,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_009, TestSize.Level1)
 HWTEST_F(DCameraClientTest, dcamera_client_test_010, TestSize.Level1)
 {
     DHLOGI("DCameraClientTest dcamera_client_test_010: test createCaptureOutput");
+    ASSERT_NE(client_, nullptr);
     std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos;
     int32_t ret = client_->CreateCaptureOutput(captureInfos);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
@@ -579,6 +593,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_010, TestSize.Level1)
 HWTEST_F(DCameraClientTest, dcamera_client_test_011, TestSize.Level1)
 {
     DHLOGI("DCameraClientTest dcamera_client_test_011: test convertToCameraFormat");
+    ASSERT_NE(client_, nullptr);
     CameraStandard::CameraFormat ret = client_->ConvertToCameraFormat(OHOS_CAMERA_FORMAT_INVALID);
     EXPECT_EQ(CameraStandard::CameraFormat::CAMERA_FORMAT_INVALID, ret);
 
@@ -604,6 +619,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_011, TestSize.Level1)
 HWTEST_F(DCameraClientTest, dcamera_client_test_013, TestSize.Level1)
 {
     DHLOGI("DCameraClientTest dcamera_client_test_013: test startPhotoOutput");
+    ASSERT_NE(client_, nullptr);
     std::shared_ptr<StateCallback> stateCallback = std::make_shared<DCameraClientTestStateCallback>();
     int32_t ret = client_->SetStateCallback(stateCallback);
     EXPECT_EQ(DCAMERA_OK, ret);
@@ -658,6 +674,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_013, TestSize.Level1)
 HWTEST_F(DCameraClientTest, dcamera_client_test_014, TestSize.Level1)
 {
     DHLOGI("DCameraClientTest dcamera_client_test_014: test startCapture");
+    ASSERT_NE(client_, nullptr);
     std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos;
     sptr<Surface> surface = nullptr;
     int32_t mode = 0;
@@ -674,6 +691,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_014, TestSize.Level1)
 HWTEST_F(DCameraClientTest, dcamera_client_test_015, TestSize.Level1)
 {
     DHLOGI("DCameraClientTest dcamera_client_test_015: test startCaptureInner");
+    ASSERT_NE(client_, nullptr);
     int32_t invalidParam = 2;
     auto info = std::make_shared<DCameraCaptureInfo>();
     info->streamType_ = static_cast<DCStreamType>(invalidParam);
@@ -690,6 +708,7 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_015, TestSize.Level1)
 HWTEST_F(DCameraClientTest, dcamera_client_test_016, TestSize.Level1)
 {
     DHLOGI("DCameraClientTest dcamera_client_test_016: test PauseCapture");
+    ASSERT_NE(client_, nullptr);
     int32_t ret = client_->PauseCapture();
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 
