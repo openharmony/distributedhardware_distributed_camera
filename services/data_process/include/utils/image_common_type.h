@@ -51,6 +51,15 @@ public:
         int32_t height)
         : videoCodec_(videoCodec), pixelFormat_(pixelFormat), frameRate_(frameRate), width_ (width), height_(height)
         {}
+    VideoConfigParams(VideoCodecType videoCodec, Videoformat pixelFormat, int32_t frameRate, int32_t width,
+        int32_t height, bool eis)
+        : videoCodec_(videoCodec),
+          pixelFormat_(pixelFormat),
+          frameRate_(frameRate),
+          width_ (width),
+          height_(height),
+          eis_(eis)
+        {}
     ~VideoConfigParams() = default;
 
     void SetVideoCodecType(VideoCodecType videoCodec);
@@ -65,6 +74,7 @@ public:
     int32_t GetHeight() const;
     bool GetIsSystemSwitch() const;
     int32_t GetRotation() const;
+    bool GetEis() const;
 
 private:
     VideoCodecType videoCodec_;
@@ -74,6 +84,7 @@ private:
     int32_t height_;
     bool isSystemSwitch_ = false;
     int32_t rotation_ = 0;
+    bool eis_ = false;
 };
 
 struct ImageUnitInfo {

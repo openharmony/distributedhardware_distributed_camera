@@ -25,6 +25,12 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+struct EisInfo {
+    int32_t frameId;
+    int64_t frameTimeStamp;
+    std::string initParams;
+    std::string imuData;
+};
 class DataBuffer : public IFeedableData {
 public:
     explicit DataBuffer(size_t capacity);
@@ -44,6 +50,7 @@ public:
     int64_t GetTimeStamp() override;
     virtual ~DataBuffer();
     DCameraFrameInfo frameInfo_;
+    EisInfo eisInfo_;
 
 private:
     size_t capacity_ = 0;

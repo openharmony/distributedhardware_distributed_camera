@@ -225,6 +225,7 @@ int ScaleConvertProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& i
     dstBuf->SetInt32("alignedHeight", processedConfig_.GetHeight());
     dstBuf->SetInt32("width", processedConfig_.GetWidth());
     dstBuf->SetInt32("height", processedConfig_.GetHeight());
+    dstBuf->eisInfo_ = inputBuffers[0]->eisInfo_;
 
     DumpFileUtil::WriteDumpFile(dumpFile_, static_cast<void *>(dstBuf->Data()), dstBuf->Size());
     std::vector<std::shared_ptr<DataBuffer>> outputBuffers;

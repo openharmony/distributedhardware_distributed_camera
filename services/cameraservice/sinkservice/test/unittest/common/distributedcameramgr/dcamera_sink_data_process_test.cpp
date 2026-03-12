@@ -20,6 +20,7 @@
 
 #define private public
 #include "dcamera_sink_data_process.h"
+#include "dcamera_sink_imu_sensor.h"
 #undef private
 
 #include <gtest/gtest.h>
@@ -253,6 +254,42 @@ HWTEST_F(DCameraSinkDataProcessTest, dcamera_sink_data_process_test_010, TestSiz
     int32_t ret = dataProcess_->GetProperty(propertyName, propertyCarrier);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
+
+#ifdef DCAMERA_OPEN_STABILE
+/**
+ * @tc.name: dcamera_sink_data_process_test_011
+ * @tc.desc: Verify the GyroRegisterSensorListener function.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6N1
+ */
+HWTEST_F(DCameraSinkDataProcessTest, dcamera_sink_data_process_test_011, TestSize.Level1)
+{
+    SensorData accData = {123456789, {1.0f, 2.0f, 3.0f}};
+    SensorData gyroData = {123456790, {4.0f, 5.0f, 6.0f}};
+    DCameraSinkImuSensor::GetInstance().PackedImuData();
+
+    DCameraSinkImuSensor::GetInstance().accInfos.push_back(accData);
+    DCameraSinkImuSensor::GetInstance().PackedImuData();
+
+    DCameraSinkImuSensor::GetInstance().gyroInfos.push_back(gyroData);
+    DCameraSinkImuSensor::GetInstance().PackedImuData();
+
+    dataProcess_->AccRegisterSensorListener();
+    dataProcess_->AccRegisterSensorListener();
+    dataProcess_->GyroRegisterSensorListener();
+    EXPECT_NO_FATAL_FAILURE(dataProcess_->GyroRegisterSensorListener());
+ 
+    dataProcess_->AccSensorCallback(nullptr);
+    EXPECT_NO_FATAL_FAILURE(dataProcess_->GyroSensorCallback(nullptr));
+ 
+    SensorEvent event;
+    uint8_t sampleData[] = {0x01, 0x02, 0x03, 0x04};
+    event.data = new uint8_t[sizeof(sampleData)];
+    dataProcess_->AccSensorCallback(&event);
+    EXPECT_NO_FATAL_FAILURE(dataProcess_->GyroSensorCallback(&event));
+    delete[] event.data;
+}
+#endif
 #endif
 } // namespace DistributedHardware
 } // namespace OHOS

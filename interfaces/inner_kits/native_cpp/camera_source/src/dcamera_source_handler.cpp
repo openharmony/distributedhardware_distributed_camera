@@ -214,7 +214,21 @@ int32_t DCameraSourceHandler::UnregisterDistributedHardware(const std::string& d
 int32_t DCameraSourceHandler::ConfigDistributedHardware(const std::string& devId, const std::string& dhId,
     const std::string& key, const std::string& value)
 {
-    return DCAMERA_OK;
+    DHLOGI("devId: %{public}s dhId: %{public}s", GetAnonyString(devId).c_str(),
+        GetAnonyString(dhId).c_str());
+    sptr<IDistributedCameraSource> dCameraSourceSrv = DCameraSourceHandlerIpc::GetInstance().GetSourceLocalCamSrv();
+    if (dCameraSourceSrv == nullptr) {
+        DHLOGE("get Service failed");
+        return DCAMERA_BAD_VALUE;
+    }
+    std::string reqId = GetRandomID();
+    std::lock_guard<std::mutex> autoLock(optLock_);
+ 
+    int32_t ret = dCameraSourceSrv->ConfigDistributedHardware(devId, dhId, key, value);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("ConfigDistributedHardware failed ret = %{public}d", ret);
+    }
+    return ret;
 }
 
 void DCameraSourceHandler::RegisterDistributedHardwareStateListener(

@@ -35,6 +35,7 @@ private:
     int32_t RegisterDistributedHardwareInner(MessageParcel &data, MessageParcel &reply);
     int32_t UnregisterDistributedHardwareInner(MessageParcel &data, MessageParcel &reply);
     int32_t UpdateDCameraWorkModeInner(MessageParcel &data, MessageParcel &reply);
+    int32_t ConfigDistributedHardwareInner(MessageParcel &data, MessageParcel &reply);
     int32_t DCameraNotifyInner(MessageParcel &data, MessageParcel &reply);
     bool CheckRegParams(const std::string& devId, const std::string& dhId,
         const std::string& reqId, const EnableParam& param);

@@ -70,6 +70,7 @@ ohos_shared_library("distributed_camera_source") {
     "src/distributedcamera/distributed_camera_source_stub.cpp",
     "src/distributedcameramgr/dcamera_source_dev.cpp",
     "src/distributedcameramgr/dcamera_source_event.cpp",
+    "src/distributedcameramgr/dcamera_source_imu_sensor.cpp",
     "src/distributedcameramgr/dcamera_source_service_ipc.cpp",
     "src/distributedcameramgr/dcameracontrol/dcamera_source_controller.cpp",
     "src/distributedcameramgr/dcameracontrol/dcamera_source_controller_channel_listener.cpp",

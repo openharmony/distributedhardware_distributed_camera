@@ -82,6 +82,10 @@ ohos_shared_library("distributed_camera_sink") {
     "src/distributedcameramgr/listener/dcamera_sink_output_channel_listener.cpp",
   ]
 
+  if (distributed_camera_open_stabile) {
+    sources += [ "src/distributedcameramgr/dcamera_sink_imu_sensor.cpp" ]
+  }
+
   ldflags = [
     "-fpie",
     "-Wl,-z,relro",
@@ -139,6 +143,7 @@ ohos_shared_library("distributed_camera_sink") {
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "sensor:sensor_interface_native",
   ]
 
   if (os_account_camera) {

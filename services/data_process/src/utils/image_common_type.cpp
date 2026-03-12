@@ -77,5 +77,10 @@ int32_t VideoConfigParams::GetRotation() const
 {
     return rotation_;
 }
+
+bool VideoConfigParams::GetEis() const
+{
+    return eis_;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

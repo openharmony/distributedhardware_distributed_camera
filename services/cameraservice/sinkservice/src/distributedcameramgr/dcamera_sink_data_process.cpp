@@ -19,6 +19,7 @@
 #include "dcamera_channel_sink_impl.h"
 #include "dcamera_pipeline_sink.h"
 #include "dcamera_sink_data_process_listener.h"
+#include "dcamera_sink_imu_sensor.h"
 #include "dcamera_hidumper.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
@@ -28,6 +29,11 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+constexpr int32_t IMU_X = 0;
+constexpr int32_t IMU_Y = 1;
+constexpr int32_t IMU_Z = 2;
+constexpr int64_t POSTURE_INTERVAL = 2500000; // 2.5ms
+
 DCameraSinkDataProcess::DCameraSinkDataProcess(const std::string& dhId, std::shared_ptr<ICameraChannel>& channel)
     : dhId_(dhId), channel_(channel), eventHandler_(nullptr)
 {
@@ -69,6 +75,83 @@ void DCameraSinkDataProcess::StartEventHandler()
     runner->Run();
 }
 
+#ifdef DCAMERA_OPEN_STABILE
+void DCameraSinkDataProcess::AccRegisterSensorListener()
+{
+    DHLOGI("start");
+    if (accUser.callback != nullptr) {
+        return;
+    }
+    accUser.callback = DCameraSinkDataProcess::AccSensorCallback;
+    int32_t subscribeRet = SubscribeSensor(SENSOR_TYPE_ID_ACCELEROMETER, &accUser);
+    DHLOGI("SENSOR_TYPE_ID_ACCELEROMETER, subscribeRet: %{public}d", subscribeRet);
+    int32_t setBatchRet = SetBatch(SENSOR_TYPE_ID_ACCELEROMETER, &accUser, POSTURE_INTERVAL, 0);
+    DHLOGI("SENSOR_TYPE_ID_ACCELEROMETER, setBatchRet: %{public}d", setBatchRet);
+    int32_t activateRet = ActivateSensor(SENSOR_TYPE_ID_ACCELEROMETER, &accUser);
+    DHLOGI("SENSOR_TYPE_ID_ACCELEROMETER, activateRet: %{public}d", activateRet);
+}
+ 
+void DCameraSinkDataProcess::AccSensorCallback(SensorEvent* event)
+{
+    if (event == nullptr) {
+        DHLOGE("event is nullptr");
+        return;
+    }
+    float* data = reinterpret_cast<float*>(event->data);
+    SensorData accData;
+    accData.timeStamp = event->timestamp;
+    accData.data[IMU_X] = static_cast<double>(data[IMU_X]);
+    accData.data[IMU_Y] = static_cast<double>(data[IMU_Y]);
+    accData.data[IMU_Z] = static_cast<double>(data[IMU_Z]);
+    DCameraSinkImuSensor::GetInstance().SaveAccInfo(accData);
+}
+ 
+void DCameraSinkDataProcess::GyroRegisterSensorListener()
+{
+    DHLOGI("start");
+    if (gyroUser.callback != nullptr) {
+        return;
+    }
+    gyroUser.callback = DCameraSinkDataProcess::GyroSensorCallback;
+    int32_t subscribeRet = SubscribeSensor(SENSOR_TYPE_ID_GYROSCOPE, &gyroUser);
+    DHLOGI("SENSOR_TYPE_ID_GYROSCOPE, subscribeRet: %{public}d", subscribeRet);
+    int32_t setBatchRet = SetBatch(SENSOR_TYPE_ID_GYROSCOPE, &gyroUser, POSTURE_INTERVAL, 0);
+    DHLOGI("SENSOR_TYPE_ID_GYROSCOPE, setBatchRet: %{public}d", setBatchRet);
+    int32_t activateRet = ActivateSensor(SENSOR_TYPE_ID_GYROSCOPE, &gyroUser);
+    DHLOGI("SENSOR_TYPE_ID_GYROSCOPE, activateRet: %{public}d", activateRet);
+}
+ 
+void DCameraSinkDataProcess::GyroSensorCallback(SensorEvent* event)
+{
+    if (event == nullptr) {
+        DHLOGE("event is nullptr");
+        return;
+    }
+    float* data = reinterpret_cast<float*>(event->data);
+    SensorData gyroData;
+    gyroData.timeStamp = event->timestamp;
+    gyroData.data[IMU_X] = static_cast<double>(data[IMU_X]);
+    gyroData.data[IMU_Y] = static_cast<double>(data[IMU_Y]);
+    gyroData.data[IMU_Z] = static_cast<double>(data[IMU_Z]);
+    DCameraSinkImuSensor::GetInstance().SaveGyroInfo(gyroData);
+}
+ 
+void DCameraSinkDataProcess::UnRegisterSensorListener()
+{
+    int32_t activateRet = DeactivateSensor(SENSOR_TYPE_ID_ACCELEROMETER, &accUser);
+    DHLOGI("SENSOR_TYPE_ID_ACCELEROMETER, activateRet: %{public}d", activateRet);
+    int32_t subscribeRet = UnsubscribeSensor(SENSOR_TYPE_ID_ACCELEROMETER, &accUser);
+    DHLOGI("SENSOR_TYPE_ID_ACCELEROMETER, subscribeRet: %{public}d", subscribeRet);
+ 
+    activateRet = DeactivateSensor(SENSOR_TYPE_ID_GYROSCOPE, &gyroUser);
+    DHLOGI("SENSOR_TYPE_ID_GYROSCOPE, activateRet: %{public}d", activateRet);
+    subscribeRet = UnsubscribeSensor(SENSOR_TYPE_ID_GYROSCOPE, &gyroUser);
+    DHLOGI("SENSOR_TYPE_ID_GYROSCOPE, subscribeRet: %{public}d", subscribeRet);
+    accUser.callback = nullptr;
+    gyroUser.callback = nullptr;
+}
+#endif
+
 int32_t DCameraSinkDataProcess::StartCapture(std::shared_ptr<DCameraCaptureInfo>& captureInfo)
 {
     CHECK_AND_RETURN_RET_LOG(captureInfo == nullptr, DCAMERA_BAD_VALUE, "StartCapture captureInfo is null");
@@ -105,6 +188,13 @@ int32_t DCameraSinkDataProcess::StartCapture(std::shared_ptr<DCameraCaptureInfo>
             return ret;
         }
     }
+#ifdef DCAMERA_OPEN_STABILE
+        if (DCameraSinkImuSensor::GetInstance().GetSinkEis() == true) {
+            DHLOGI("Register IMU callback");
+            AccRegisterSensorListener();
+            GyroRegisterSensorListener();
+        }
+#endif
     DHLOGI("StartCapture %{public}s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
 }
@@ -112,6 +202,9 @@ int32_t DCameraSinkDataProcess::StartCapture(std::shared_ptr<DCameraCaptureInfo>
 int32_t DCameraSinkDataProcess::StopCapture()
 {
     DHLOGI("StopCapture dhId: %{public}s", GetAnonyString(dhId_).c_str());
+#ifdef DCAMERA_OPEN_STABILE
+    UnRegisterSensorListener();
+#endif
     if (pipeline_ != nullptr) {
         pipeline_->DestroyDataProcessPipeline();
         pipeline_ = nullptr;
@@ -176,6 +269,9 @@ int32_t DCameraSinkDataProcess::OnProcessedVideoBuffer(const std::shared_ptr<Dat
         return DCAMERA_TRANS_BUSY;
     }
     if (eventHandler_->IsIdle()) {
+#ifdef DCAMERA_OPEN_STABILE
+        videoResult->eisInfo_.imuData = DCameraSinkImuSensor::GetInstance().PackedImuData();
+#endif
         SendDataAsync(videoResult);
         return DCAMERA_OK;
     } else {

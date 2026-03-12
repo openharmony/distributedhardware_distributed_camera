@@ -27,6 +27,9 @@
 #include "image_common_type.h"
 #include "dcamera_utils_tools.h"
 
+#include "sensor_agent.h"
+#include "sensor_agent_type.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 class DCameraSinkDataProcess : public ICameraSinkDataProcess,
@@ -46,6 +49,16 @@ public:
     int32_t GetProperty(const std::string& propertyName, PropertyCarrier& propertyCarrier) override;
 
 private:
+#ifdef DCAMERA_OPEN_STABILE
+    void AccRegisterSensorListener();
+    static void AccSensorCallback(SensorEvent* event);
+    void GyroRegisterSensorListener();
+    static void GyroSensorCallback(SensorEvent* event);
+    void UnRegisterSensorListener();
+    SensorUser accUser = { "", nullptr, nullptr };
+    SensorUser gyroUser = { "", nullptr, nullptr };
+#endif
+
     int32_t FeedStreamInner(std::shared_ptr<DataBuffer>& dataBuffer);
     VideoCodecType GetPipelineCodecType(DCEncodeType encodeType);
     Videoformat GetPipelineFormat(int32_t format);

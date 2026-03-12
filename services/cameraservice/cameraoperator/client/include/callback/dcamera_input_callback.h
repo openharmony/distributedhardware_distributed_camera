@@ -33,6 +33,16 @@ public:
 private:
     std::shared_ptr<StateCallback> callback_;
 };
+
+class CaOnResultCallback : public CameraStandard::ResultCallback {
+public:
+    explicit CaOnResultCallback(const char* Name);
+    virtual ~CaOnResultCallback() = default;
+    void OnResult(const uint64_t timestamp, const std::shared_ptr<OHOS::Camera::CameraMetadata> &result) const;
+ 
+private:
+    const char* Name_;
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DCAMERA_INPUT_CALLBACK_H

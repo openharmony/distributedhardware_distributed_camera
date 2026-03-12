@@ -136,6 +136,11 @@ HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_002, TestSize.Level1)
     param.sourceAttrs = TEST_SRC_ATTRS;
     param.sourceVersion = TEST_VER;
     int32_t ret = camDev_->RegisterDistributedHardware(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, TEST_REQID, param);
+    EXPECT_NE(DCAMERA_OK, ret);
+
+    std::string jsonParam = R"({"EIS": true})";
+    param.sinkAttrs = jsonParam;
+    ret = camDev_->RegisterDistributedHardware(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, TEST_REQID, param);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 

@@ -62,6 +62,7 @@ int32_t DCameraCaptureInfoCmd::Marshal(std::string& jsonStr)
     cJSON_AddNumberToObject(rootValue, "userId", userId_);
     cJSON_AddNumberToObject(rootValue, "tokenId", tokenId_);
     cJSON_AddStringToObject(rootValue, "accountId", accountId_.c_str());
+    cJSON_AddBoolToObject(rootValue, "eis", eis_);
 
     char *data = cJSON_Print(rootValue);
     if (data == nullptr) {
@@ -121,6 +122,10 @@ int32_t DCameraCaptureInfoCmd::Unmarshal(const std::string& jsonStr)
         accountId_ = "";
     } else {
         accountId_ = accountId->valuestring;
+    }
+    cJSON *eis = cJSON_GetObjectItemCaseSensitive(rootValue, "eis");
+    if (eis != nullptr && cJSON_IsBool(eis) && cJSON_IsTrue(eis)) {
+        eis_ = true;
     }
     cJSON_Delete(rootValue);
     return ret;

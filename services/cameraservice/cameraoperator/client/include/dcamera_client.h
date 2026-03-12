@@ -96,6 +96,7 @@ private:
     std::shared_ptr<ResultCallback> resultCallback_;
     std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfosCache_;
     std::vector<int32_t> fpsRanges_ = {};
+    const char* videoOutputCallbackSdk = "camera_video";
 };
 } // namespace DistributedHardware
 } // namespace OHOS

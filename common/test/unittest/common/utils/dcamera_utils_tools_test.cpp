@@ -391,5 +391,16 @@ HWTEST_F(DcameraUtilsToolsTest, ClearAccessConfigByPkgName_001, TestSize.Level1)
     bool ret = DCameraAccessConfigManager::GetInstance().HasAuthorizationDecision(networkId);
     EXPECT_EQ(ret, false);
 }
+
+HWTEST_F(DcameraUtilsToolsTest, GetExpoTime_001, TestSize.Level1)
+{
+    std::queue<uint32_t>().swap(DCameraExpoTime::GetInstance().expoQueue_);
+    uint32_t ret = DCameraExpoTime::GetInstance().GetExpoTime();
+    EXPECT_EQ(ret, 0);
+
+    DCameraExpoTime::GetInstance().expoQueue_.push(1);
+    ret = DCameraExpoTime::GetInstance().GetExpoTime();
+    EXPECT_EQ(ret, 1);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

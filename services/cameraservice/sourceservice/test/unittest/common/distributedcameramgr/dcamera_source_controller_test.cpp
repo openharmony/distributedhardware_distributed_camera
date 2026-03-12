@@ -209,7 +209,7 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_003, TestSi
     index1.dhId_ = TEST_CAMERA_DH_ID_0;
     controller_->indexs_.push_back(index1);
     int32_t mode = 0;
-    ret = controller_->StartCapture(captureInfos, mode);
+    ret = controller_->StartCapture(captureInfos, mode, false);
     controller_->UnInit();
     EXPECT_EQ(ret, DCAMERA_OK);
 }
@@ -240,7 +240,7 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_004, TestSi
     index1.dhId_ = TEST_CAMERA_DH_ID_0;
     controller_->indexs_.push_back(index1);
     int32_t mode = 0;
-    ret = controller_->StartCapture(captureInfos, mode);
+    ret = controller_->StartCapture(captureInfos, mode, false);
 
     ret = controller_->StopCapture();
     controller_->UnInit();
@@ -684,7 +684,7 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_020, TestSi
     int32_t ret = controller_->Init(indexs_);
     EXPECT_EQ(ret, DCAMERA_INIT_ERR);
     int32_t mode = 0;
-    ret = controller_->StartCapture(captureInfos, mode);
+    ret = controller_->StartCapture(captureInfos, mode, false);
     EXPECT_EQ(ret, DCAMERA_BAD_OPERATE);
     ret = controller_->StopCapture();
     EXPECT_EQ(ret, DCAMERA_BAD_OPERATE);
@@ -741,7 +741,7 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_022, TestSi
     index1.dhId_ = TEST_CAMERA_DH_ID_0;
     controller_->indexs_.push_back(index1);
     int32_t mode = 0;
-    ret = controller_->StartCapture(captureInfos, mode);
+    ret = controller_->StartCapture(captureInfos, mode, false);
     bool saved = ManageSelectChannel::GetInstance().GetSrcConnect();
     ManageSelectChannel::GetInstance().SetSrcConnect(true);
     ret = controller_->StopCapture();

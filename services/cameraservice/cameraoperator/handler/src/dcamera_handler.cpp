@@ -242,6 +242,10 @@ int32_t DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraDevice>& info, D
 
     cJSON *root = cJSON_CreateObject();
     CHECK_AND_RETURN_RET_LOG(root == nullptr, DCAMERA_BAD_VALUE, "Create cJSON object failed");
+#ifdef DCAMERA_OPEN_STABILE
+    DHLOGI("Have EIS ability.");
+    cJSON_AddBoolToObject(root, "EIS", true);
+#endif
     cJSON_AddStringToObject(root, CAMERA_PROTOCOL_VERSION_KEY.c_str(), CAMERA_PROTOCOL_VERSION_VALUE.c_str());
     cJSON_AddStringToObject(root, CAMERA_POSITION_KEY.c_str(), GetCameraPosition(info->GetPosition()).c_str());
     int32_t ret = CreateAVCodecList(root);

@@ -54,8 +54,14 @@ ohos_shared_library("distributed_camera_handler") {
     "LOG_DOMAIN=0xD004150",
   ]
 
+  cflags = []
+ 
   if (distributed_camera_filter_front) {
-    cflags = [ "-DDCAMERA_FRONT" ]
+    cflags += [ "-DDCAMERA_FRONT" ]
+  }
+ 
+  if (distributed_camera_open_stabile) {
+    cflags += [ "-DDCAMERA_OPEN_STABILE" ]
   }
 
   external_deps = [

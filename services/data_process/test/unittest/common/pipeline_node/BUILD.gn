@@ -24,6 +24,7 @@ config("module_private_config") {
     "${services_path}/data_process/include/eventbus",
     "${services_path}/data_process/include/pipeline",
     "${services_path}/data_process/include/utils",
+    "${services_path}/data_process/include/pipeline_node/eis",
     "${services_path}/data_process/include/pipeline_node/multimedia_codec/decoder",
     "${services_path}/data_process/include/pipeline_node/multimedia_codec/encoder",
     "${services_path}/data_process/include/pipeline_node/fpscontroller",
@@ -43,6 +44,7 @@ ohos_unittest("DCameraDataProcessPipelineNodeTest") {
   sources = [
     "abstract_data_process_test.cpp",
     "decode_data_process_test.cpp",
+    "eis_data_process_test.cpp",
     "encode_data_process_test.cpp",
     "fps_controller_process_test.cpp",
     "property_carrier_test.cpp",
@@ -54,6 +56,8 @@ ohos_unittest("DCameraDataProcessPipelineNodeTest") {
   cflags = [
     "-fPIC",
     "-Wall",
+    "-Dprivate=public",
+    "-Dprotected=public",
   ]
 
   if (distributed_camera_common) {

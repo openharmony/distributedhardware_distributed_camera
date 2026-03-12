@@ -51,6 +51,8 @@ public:
     int32_t RegisterDistributedHardware(const std::string& devId, const std::string& dhId, const std::string& reqId,
         const EnableParam& param);
     int32_t UnRegisterDistributedHardware(const std::string devId, const std::string dhId, const std::string reqId);
+    int32_t ConfigDistributedHardware(const std::string& devId, const std::string& dhId, const std::string& key,
+        const std::string& value);
     int32_t DCameraNotify(std::string& eventStr);
 
     int32_t OpenSession(DCameraIndex& camIndex);
@@ -124,6 +126,7 @@ private:
     sptr<IDCameraProviderCallback> hdiCallback_;
     int32_t sceneMode_ = 0;
     uint64_t tokenId_ = 0;
+    bool eis_ = false;
 
     std::map<uint32_t, DCameraNotifyFunc> memberFuncMap_;
     std::map<uint32_t, DCameraEventResult> eventResultMap_;

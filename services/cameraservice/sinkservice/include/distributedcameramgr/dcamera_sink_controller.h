@@ -46,7 +46,8 @@ public:
         const sptr<IDCameraSinkCallback> &sinkCallback);
     ~DCameraSinkController() override;
 
-    int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos, int32_t sceneMode) override;
+    int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos, int32_t sceneMode,
+        bool eis) override;
     int32_t StopCapture() override;
     int32_t ChannelNeg(std::shared_ptr<DCameraChannelInfo>& info) override;
     int32_t DCameraNotify(std::shared_ptr<DCameraEvent>& events) override;
@@ -106,6 +107,7 @@ private:
     };
     void HandleCaptureError(int32_t errorCode, const std::string& errorMsg);
     void CheckAndCommitCapture();
+
     std::atomic<bool> isEncoderReady_ {false};
     std::atomic<bool> isCameraReady_ {false};
     int32_t encoderResult_ = DCAMERA_OK;

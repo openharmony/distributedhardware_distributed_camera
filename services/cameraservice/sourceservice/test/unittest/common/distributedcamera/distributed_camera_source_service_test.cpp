@@ -83,6 +83,14 @@ HWTEST_F(DistributedCameraSourceServiceTest, dcamera_source_service_test_001, Te
     EXPECT_EQ(false, testSrcService_ == nullptr);
 
     EnableParam param;
+    std::string jsonStr = R"({
+        "EIS": false,
+        "Type": "MESSAGE",
+        "dhId": "camrea_0",
+        "Command": "STATE_NOTIFY",
+        "Value": {"EventType": 1, "EventResult": 1, "EventContent": "TestContent"}
+    })";
+    param.sinkAttrs = jsonStr;
     int32_t ret = testSrcService_->RegisterDistributedHardware(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, TEST_REQID, param);
     EXPECT_EQ(DCAMERA_OK, ret);
 
@@ -256,6 +264,25 @@ HWTEST_F(DistributedCameraSourceServiceTest, dcamera_source_service_test_010, Te
     WorkModeParam param(12, 120, 0, false);;
     int32_t ret = testSrcService_->UpdateDistributedHardwareWorkMode(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, param);
     EXPECT_EQ(DCAMERA_BAD_OPERATE, ret);
+}
+
+/**
+ * @tc.name: dcamera_source_service_test_011
+ * @tc.desc: Verify the ConfigDistributedHardware function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DistributedCameraSourceServiceTest, dcamera_source_service_test_011, TestSize.Level1)
+{
+    DHLOGI("DistributedCameraSourceServiceTest::dcamera_source_service_test_011");
+    EXPECT_EQ(false, testSrcService_ == nullptr);
+ 
+    std::string devId = "devId";
+    std::string dhId = "dhId";
+    std::string key = "key";
+    std::string value = "vaule";
+    int32_t ret = testSrcService_->ConfigDistributedHardware(devId, dhId, key, value);
+    EXPECT_EQ(DCAMERA_NOT_FOUND, ret);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

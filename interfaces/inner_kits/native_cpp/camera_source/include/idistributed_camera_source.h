@@ -34,6 +34,8 @@ public:
         const std::string& reqId, const EnableParam& param) = 0;
     virtual int32_t UnregisterDistributedHardware(const std::string& devId, const std::string& dhId,
         const std::string& reqId) = 0;
+    virtual int32_t ConfigDistributedHardware(const std::string& devId, const std::string& dhId, const std::string& key,
+        const std::string& value) = 0;
     virtual int32_t DCameraNotify(const std::string& devId, const std::string& dhId, std::string& events) = 0;
     virtual int32_t UpdateDistributedHardwareWorkMode(const std::string& devId, const std::string& dhId,
         const WorkModeParam& param) = 0;

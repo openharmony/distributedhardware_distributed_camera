@@ -19,6 +19,7 @@
 #include "distributed_hardware_log.h"
 #include "distributed_camera_constants.h"
 #include "decode_data_process.h"
+#include "eis_data_process.h"
 #include "fps_controller_process.h"
 #include "scale_convert_process.h"
 #include <sys/prctl.h>
@@ -126,6 +127,9 @@ int32_t DCameraPipelineSource::InitDCameraPipNodes(const VideoConfigParams& sour
 
     pipNodeRanks_.push_back(std::make_shared<DecodeDataProcess>(pipeEventHandler_, shared_from_this()));
     pipNodeRanks_.push_back(std::make_shared<ScaleConvertProcess>(shared_from_this()));
+    if (sourceConfig.GetEis()) {
+        pipNodeRanks_.push_back(std::make_shared<EISDataProcess>(shared_from_this()));
+    }
     if (pipNodeRanks_.size() == 0) {
         DHLOGD("Creating an empty source pipeline.");
         pipelineHead_ = nullptr;
@@ -159,9 +163,8 @@ int32_t DCameraPipelineSource::InitDCameraPipNodes(const VideoConfigParams& sour
             return DCAMERA_INIT_ERR;
         }
     }
-    DHLOGD("All nodes have been linked in source pipeline, Target Config: "
-        "width %{public}d height %{public}d format %{public}d codecType %{public}d frameRate %{public}d",
-        targetConfig.GetWidth(), targetConfig.GetHeight(),
+    DHLOGD("All nodes have been linked in source pipeline, Target Config:width %{public}d height %{public}d"
+        "format %{public}d codecType %{public}d frameRate%{public}d", targetConfig.GetWidth(), targetConfig.GetHeight(),
         targetConfig.GetVideoformat(), targetConfig.GetVideoCodecType(), targetConfig.GetFrameRate());
     pipelineHead_ = pipNodeRanks_[0];
     return DCAMERA_OK;

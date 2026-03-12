@@ -34,6 +34,7 @@ void DCameraSinkFrameInfo::Marshal(std::string& jsonStr)
     cJSON_AddNumberToObject(frameInfo, FRAME_INFO_SENDT.c_str(), sendT_);
     cJSON_AddStringToObject(frameInfo, FRAME_INFO_VERSION.c_str(), ver_.c_str());
     cJSON_AddStringToObject(frameInfo, RAW_TIME.c_str(), rawTime_.c_str());
+    cJSON_AddStringToObject(frameInfo, IMU_INFO.c_str(), imuInfo_.c_str());
 
     char *data = cJSON_Print(frameInfo);
     if (data == nullptr) {
@@ -84,6 +85,11 @@ int32_t DCameraSinkFrameInfo::Unmarshal(const std::string& jsonStr)
     CHECK_AND_FREE_RETURN_RET_LOG((ver == nullptr || !cJSON_IsString(ver)),
         DCAMERA_BAD_VALUE, rootValue, "ver parse fail.");
     ver_ = std::string(ver->valuestring);
+
+    cJSON *imu = cJSON_GetObjectItemCaseSensitive(rootValue, IMU_INFO.c_str());
+    if (imu != nullptr && cJSON_IsString(imu)) {
+        imuInfo_ = std::string(imu->valuestring);
+    }
 
     cJSON *rawTime = cJSON_GetObjectItemCaseSensitive(rootValue, RAW_TIME.c_str());
     if (rawTime == nullptr) {

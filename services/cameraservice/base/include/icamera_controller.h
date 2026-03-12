@@ -31,7 +31,7 @@ public:
     virtual ~ICameraController() = default;
 
     virtual int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos,
-        int32_t sceneMode) = 0;
+        int32_t sceneMode, bool eis) = 0;
     virtual int32_t StopCapture() = 0;
     virtual int32_t ChannelNeg(std::shared_ptr<DCameraChannelInfo>& info) = 0;
     virtual int32_t DCameraNotify(std::shared_ptr<DCameraEvent>& events) = 0;

@@ -131,6 +131,17 @@ static const std::string TEST_SINK_FRAME_INFO_JSON = R"({
     "ver": "test",
 })";
 
+static const std::string TEST_SINK_FRAME_INFO_JSON_IMU = R"({
+    "type": 0,
+    "index": 1,
+    "pts": 1,
+    "startEncodeT": 1,
+    "finishEncodeT": 1,
+    "sendT": 1,
+    "ver": "test",
+    "imuInfo": "imuInfo",
+})";
+
 void DCameraSinkFrameInfoTest::SetUpTestCase(void)
 {
 }
@@ -188,6 +199,9 @@ HWTEST_F(DCameraSinkFrameInfoTest, dcamera_sink_frame_info_test_001, TestSize.Le
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 
     ret = frame.Unmarshal(TEST_SINK_FRAME_INFO_JSON);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = frame.Unmarshal(TEST_SINK_FRAME_INFO_JSON_IMU);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 } // namespace DistributedHardware

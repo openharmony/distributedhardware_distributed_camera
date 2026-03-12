@@ -715,5 +715,19 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_016, TestSize.Level1)
     ret = client_->ResumeCapture();
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
+
+/**
+ * @tc.name: dcamera_client_test_017
+ * @tc.desc: Verify OnResult
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6ML
+ */
+HWTEST_F(DCameraClientTest, dcamera_client_test_017, TestSize.Level1)
+{
+    DHLOGI("DCameraClientTest dcamera_client_test_017: test OnResult");
+    std::shared_ptr<Camera::CameraMetadata> result = std::make_shared<Camera::CameraMetadata>(8, 8);
+    std::shared_ptr<CaOnResultCallback> resultCallback = std::make_shared<CaOnResultCallback>(nullptr);
+    EXPECT_NO_FATAL_FAILURE(resultCallback->OnResult(0, result));
+}
 } // namespace DistributedHardware
 } // namespace OHOS

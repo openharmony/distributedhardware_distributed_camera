@@ -56,6 +56,16 @@ public:
         return DCAMERA_OK;
     }
 
+    int32_t ConfigDistributedHardware(const std::string& devId, const std::string& dhId, const std::string& key,
+        const std::string& value)
+    {
+        (void)devId;
+        (void)dhId;
+        (void)key;
+        (void)value;
+        return DCAMERA_OK;
+    }
+
     int32_t DCameraNotify(const std::string& devId, const std::string& dhId,
         std::string& events)
     {
