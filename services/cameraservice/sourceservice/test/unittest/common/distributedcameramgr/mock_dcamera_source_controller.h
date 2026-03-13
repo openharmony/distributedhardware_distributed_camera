@@ -33,7 +33,7 @@ public:
     {
     }
 
-    int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos, int32_t sceneMode)
+    int32_t StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos, int32_t sceneMode, bool eis)
     {
         return DCAMERA_OK;
     }

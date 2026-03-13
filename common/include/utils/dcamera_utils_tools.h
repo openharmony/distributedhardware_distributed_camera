@@ -23,6 +23,7 @@
 #include <map>
 #include <memory>
 #include <functional>
+#include <queue>
 #include "dhfwk_single_instance.h"
 #include "iaccess_listener.h"
 
@@ -68,7 +69,6 @@ const std::string DUMP_DCAMERA_BEFORE_DEC_FILENAME = "dump_before_dec_dcamsource
 const std::string DUMP_DCAMERA_AFTER_DEC_FILENAME = "dump_after_dec_dcamsource.yuv";
 const std::string DUMP_DCAMERA_AFTER_SCALE_FILENAME = "dump_after_scale_dcamsource.yuv";
 const std::string DUMP_DCAMERA_AFTER_ROTATE_FILENAME = "dump_after_rotate_dcamsource.yuv";
-
 class DumpFileUtil {
 public:
     static void WriteDumpFile(FILE *dumpFile, void *buffer, size_t bufferSize);
@@ -147,6 +147,16 @@ private:
     std::string currentNetworkId_ = "";
 
     std::map<std::string, bool> authorizationResults_;
+};
+
+class DCameraExpoTime {
+FWK_DECLARE_SINGLE_INSTANCE(DCameraExpoTime);
+
+public:
+    void SetExpoTime(uint32_t time);
+    uint32_t GetExpoTime();
+private:
+    std::queue<uint32_t> expoQueue_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

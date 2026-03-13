@@ -345,6 +345,37 @@ static const std::string TEST_CAPTURE_INFO_CMD_JSON_CAPTURESETTINGS_CHECK = R"({
     "accountId": "accountId"
 })";
 
+static const std::string TEST_CAPTURE_INFO_CMD_JSON_CAPTURESETTINGS_CHECK_EIS_TRUE = R"({
+    "Type": "OPERATION",
+    "dhId": "camera_0",
+    "Command": "CAPTURE",
+    "Value": [
+        {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": 1,
+        "IsCapture":true, "EncodeType": 1, "StreamType": 1,
+        "CaptureSettings": [{"SettingType": 1, "SettingValue": 0}]}
+    ],
+    "mode": 1,
+    "userId": 100,
+    "tokenId": 0,
+    "accountId": "accountId",
+    "eis": true
+})";
+ 
+static const std::string TEST_CAPTURE_INFO_CMD_JSON_CAPTURESETTINGS_CHECK_EIS_FALSE = R"({
+    "Type": "OPERATION",
+    "dhId": "camera_0",
+    "Command": "CAPTURE",
+    "Value": [
+        {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": 1,
+        "IsCapture":true, "EncodeType": 1, "StreamType": 1,
+        "CaptureSettings": [{"SettingType": 1, "SettingValue": 0}]}
+    ],
+    "mode": 1,
+    "userId": 100,
+    "tokenId": 0,
+    "accountId": "accountId",
+    "eis": false
+})";
 
 void DCameraCaptureInfoCmdlTest::SetUpTestCase(void)
 {
@@ -480,6 +511,12 @@ HWTEST_F(DCameraCaptureInfoCmdlTest, Unmarshal_003, TestSize.Level1)
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 
     ret = cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON_CAPTURESETTINGS_CHECK);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+
+    ret = cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON_CAPTURESETTINGS_CHECK_EIS_FALSE);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+ 
+    ret = cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON_CAPTURESETTINGS_CHECK_EIS_TRUE);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 

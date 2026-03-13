@@ -165,6 +165,37 @@ int32_t DistributedCameraSourceProxy::UnregisterDistributedHardware(const std::s
     return result;
 }
 
+int32_t DistributedCameraSourceProxy::ConfigDistributedHardware(const std::string& devId, const std::string& dhId,
+    const std::string& key, const std::string& value)
+{
+    if (devId.empty() || dhId.empty() || key.empty() || value.empty()) {
+        DHLOGE("param is invalid");
+        return DCAMERA_BAD_VALUE;
+    }
+    sptr<IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        DHLOGE("DistributedCameraSourceProxy remote service null");
+        return DCAMERA_BAD_VALUE;
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(DistributedCameraSourceProxy::GetDescriptor())) {
+        DHLOGE("write token failed");
+        return DCAMERA_BAD_VALUE;
+    }
+ 
+    if (!data.WriteString(devId) || !data.WriteString(dhId) || !data.WriteString(key) ||
+        !data.WriteString(value)) {
+        DHLOGE("write params failed");
+        return DCAMERA_BAD_VALUE;
+    }
+    remote->SendRequest(static_cast<uint32_t>(IDCameraSourceInterfaceCode::CONFIG_DISTRIBUTED_HARDWARE),
+        data, reply, option);
+    int32_t result = reply.ReadInt32();
+    return result;
+}
+
 bool DistributedCameraSourceProxy::CheckUnregParams(const std::string& devId, const std::string& dhId,
     const std::string& reqId)
 {

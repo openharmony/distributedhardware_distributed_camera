@@ -48,6 +48,8 @@ public:
         const std::string& reqId, const EnableParam& param) override;
     int32_t UnregisterDistributedHardware(const std::string& devId, const std::string& dhId,
         const std::string& reqId) override;
+    int32_t ConfigDistributedHardware(const std::string& devId, const std::string& dhId, const std::string& key,
+        const std::string& value) override;
     int32_t DCameraNotify(const std::string& devId, const std::string& dhId, std::string& events) override;
     int Dump(int32_t fd, const std::vector<std::u16string>& args) override;
     static void GetDumpInfo(CameraDumpInfo& camDump);

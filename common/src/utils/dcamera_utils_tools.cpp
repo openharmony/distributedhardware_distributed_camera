@@ -616,5 +616,21 @@ void DCameraAccessConfigManager::ClearAccessConfigByPkgName(const std::string& p
 
     authCondVar_.notify_all();
 }
+
+FWK_IMPLEMENT_SINGLE_INSTANCE(DCameraExpoTime);
+void DCameraExpoTime::SetExpoTime(uint32_t time)
+{
+    expoQueue_.push(time);
+}
+
+uint32_t DCameraExpoTime::GetExpoTime()
+{
+    if (expoQueue_.empty()) {
+        return 0;
+    }
+    uint32_t expoTime = expoQueue_.front();
+    expoQueue_.pop();
+    return expoTime;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

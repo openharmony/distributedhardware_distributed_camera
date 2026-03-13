@@ -450,7 +450,9 @@ int32_t DCameraClient::ConfigCaptureSession(std::vector<std::shared_ptr<DCameraC
     }
 
     std::shared_ptr<DCameraInputCallback> inputCallback = std::make_shared<DCameraInputCallback>(stateCallback_);
+    std::shared_ptr<CaOnResultCallback> resultCallback = std::make_shared<CaOnResultCallback>(videoOutputCallbackSdk);
     ((sptr<CameraStandard::CameraInput> &)cameraInput_)->SetErrorCallback(inputCallback);
+    ((sptr<CameraStandard::CameraInput> &)cameraInput_)->SetResultCallback(resultCallback);
 
     while (!cameraMetadatas_.empty()) {
         std::string metadataStr = cameraMetadatas_.front();

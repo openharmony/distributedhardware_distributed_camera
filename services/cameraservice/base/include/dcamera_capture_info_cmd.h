@@ -45,6 +45,7 @@ public:
     int32_t userId_;
     uint64_t tokenId_;
     std::string accountId_;
+    bool eis_ = false;
 
 public:
     int32_t Marshal(std::string& jsonStr);

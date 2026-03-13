@@ -356,6 +356,7 @@ void DecodeDataProcess::ReleaseProcessNode()
     std::queue<std::shared_ptr<DataBuffer>>().swap(inputBuffersQueue_);
     std::queue<uint32_t>().swap(availableInputIndexsQueue_);
     std::queue<std::shared_ptr<Media::AVSharedMemory>>().swap(availableInputBufferQueue_);
+    std::queue<EisInfo>().swap(eisInfoQueue_);
     {
         std::lock_guard<std::mutex> lock(mtxDequeLock_);
         std::deque<DCameraFrameInfo>().swap(frameInfoDeque_);
@@ -463,6 +464,9 @@ int32_t DecodeDataProcess::ProcessSingleInputBuffer()
     CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret,
         "Get available decoder buffer failed. ret %{public}d.", ret);
     buffer->frameInfo_.timePonit.startDecode = GetNowTimeStampUs();
+    buffer->eisInfo_.frameId = buffer->frameInfo_.index;
+    buffer->eisInfo_.frameTimeStamp = buffer->frameInfo_.rawTime;
+    eisInfoQueue_.push(buffer->eisInfo_);
     {
         std::lock_guard<std::mutex> lock(mtxDequeLock_);
         frameInfoDeque_.push_back(buffer->frameInfo_);
@@ -836,6 +840,10 @@ void DecodeDataProcess::CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int3
         std::lock_guard<std::mutex> lock(mtxDequeLock_);
         bufferOutput->frameInfo_ = frameInfoDeque_.front();
         frameInfoDeque_.pop_front();
+    }
+    if (!eisInfoQueue_.empty()) {
+        bufferOutput->eisInfo_ = eisInfoQueue_.front();
+        eisInfoQueue_.pop();
     }
     DHLOGD("get videoPts=%{public}" PRId64 " from decoder", bufferOutput->frameInfo_.rawTime);
     bufferOutput->SetInt32("Videoformat", static_cast<int32_t>(Videoformat::YUVI420));

@@ -357,5 +357,22 @@ HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_012, TestSize.Lev
     EXPECT_NE(DCameraSourceHandler::DCAMERA_SA_STATE_RELEASING,
               DCameraSourceHandler::DCAMERA_SA_STATE_START);
 }
+
+/**
+ * @tc.name: dcamera_source_handler_test_013
+ * @tc.desc: ConfigDistributedHardware
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_013, TestSize.Level0)
+{
+    std::string devId = TEST_DEVICE_ID;
+    std::string dhId = TEST_CAMERA_DH_ID_0;
+    std::string key = "key";
+    std::string value = "vaule";
+ 
+    int32_t ret = DCameraSourceHandler::GetInstance().ConfigDistributedHardware(devId, dhId, key, value);
+    EXPECT_NE(DCAMERA_OK, ret);
+}
 }
 }

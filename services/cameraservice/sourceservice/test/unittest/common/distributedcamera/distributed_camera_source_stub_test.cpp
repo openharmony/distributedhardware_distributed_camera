@@ -335,5 +335,62 @@ HWTEST_F(DcameraSourceStubTest, dcamera_source_stub_test_010, TestSize.Level1)
     ret = sourceProxy.UpdateDistributedHardwareWorkMode(devId, dhId, param);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
+
+/**
+ * @tc.name: dcamera_source_stub_test_011
+ * @tc.desc: Verify the ConfigDistributedHardware function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSourceStubTest, dcamera_source_stub_test_011, TestSize.Level1)
+{
+    DHLOGI("DcameraSourceStubTest::dcamera_source_stub_test_011");
+    sptr<IRemoteObject> sourceStubPtr(new MockDistributedCameraSourceStub());
+    DistributedCameraSourceProxy sourceProxy(sourceStubPtr);
+    std::string devId = "devId";
+    std::string dhId = "dhId";
+    std::string key = "key";
+    std::string value = "vaule";
+    int32_t ret = sourceProxy.ConfigDistributedHardware(devId, dhId, key, value);
+    EXPECT_NE(ERR_DH_CAMERA_BASE, ret);
+}
+ 
+/**
+ * @tc.name: dcamera_source_stub_test_012
+ * @tc.desc: Verify the ConfigDistributedHardware function.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSourceStubTest, dcamera_source_stub_test_012, TestSize.Level1)
+{
+    DHLOGI("DcameraSourceStubTest::dcamera_source_stub_test_011");
+    sptr<IRemoteObject> sourceStubPtr(new MockDistributedCameraSourceStub());
+    DistributedCameraSourceProxy sourceProxy(sourceStubPtr);
+    std::string devId = "";
+    std::string dhId = "dhId";
+    std::string key = "key";
+    std::string value = "vaule";
+    int32_t ret = sourceProxy.ConfigDistributedHardware(devId, dhId, key, value);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+ 
+    devId = "devId";
+    dhId = "";
+    ret = sourceProxy.ConfigDistributedHardware(devId, dhId, key, value);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+ 
+    dhId = "dhId";
+    key = "";
+    ret = sourceProxy.ConfigDistributedHardware(devId, dhId, key, value);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+ 
+    key = "key";
+    value = "";
+    ret = sourceProxy.ConfigDistributedHardware(devId, dhId, key, value);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+ 
+    value = "value";
+    ret = sourceProxy.ConfigDistributedHardware(devId, dhId, key, value);
+    EXPECT_NE(ERR_DH_CAMERA_BASE, ret);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

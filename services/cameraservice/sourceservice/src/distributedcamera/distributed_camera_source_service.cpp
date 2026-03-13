@@ -307,6 +307,25 @@ int32_t DistributedCameraSourceService::UnregisterDistributedHardware(const std:
     return ret;
 }
 
+int32_t DistributedCameraSourceService::ConfigDistributedHardware(const std::string& devId, const std::string& dhId,
+    const std::string& key, const std::string& value)
+{
+    DHLOGI("ConfigDistributedHardware devId: %{public}s, dhId: %{public}s",
+        GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
+    DCameraIndex camIndex(devId, dhId);
+    std::shared_ptr<DCameraSourceDev> camDev = GetCamDevByIndex(camIndex);
+    if (camDev == nullptr) {
+        DHLOGE("DistributedCameraSourceService ConfigDistributedHardware not found device");
+        return DCAMERA_NOT_FOUND;
+    }
+ 
+    int32_t ret = camDev->ConfigDistributedHardware(devId, dhId, key, value);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("ConfigDistributedHardware failed, ret: %{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t DistributedCameraSourceService::DCameraNotify(const std::string& devId, const std::string& dhId,
     std::string& events)
 {

@@ -76,6 +76,7 @@ ohos_fuzztest("SinkServiceCloseChannelFuzzTest") {
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "sensor:sensor_interface_native",
   ]
 }
 

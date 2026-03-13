@@ -18,9 +18,12 @@
 #include "camera_util.h"
 #include "distributed_camera_constants.h"
 #include "distributed_hardware_log.h"
+#include "dcamera_utils_tools.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+constexpr uint32_t SECONDS_TO_MICROSECONDS = 1000000;
+
 DCameraInputCallback::DCameraInputCallback(const std::shared_ptr<StateCallback>& callback) : callback_(callback)
 {
 }
@@ -41,6 +44,26 @@ void DCameraInputCallback::OnError(const int32_t errorType, const int32_t errorM
         event->eventResult_ = DCAMERA_EVENT_DEVICE_ERROR;
     }
     callback_->OnStateChanged(event);
+}
+
+CaOnResultCallback::CaOnResultCallback(const char* Name) : Name_(Name)
+{
+}
+ 
+void CaOnResultCallback::OnResult(const uint64_t timestamp,
+    const std::shared_ptr<Camera::CameraMetadata> &result) const
+{
+    DHLOGI("OnResult start for:%{public}s", Name_);
+    auto metaData = result->get();
+    camera_metadata_item item{};
+    auto ret = Camera::FindCameraMetadataItem(metaData, OHOS_STATUS_SENSOR_EXPOSURE_TIME, &item);
+    DHLOGI("Get exp time.replace");
+    if (ret == CAM_META_SUCCESS) {
+        int32_t numerator = item.data.r->numerator;
+        int32_t denominator = item.data.r->denominator;
+        uint32_t value = static_cast<uint32_t>(numerator / (denominator / SECONDS_TO_MICROSECONDS));
+        DCameraExpoTime::GetInstance().SetExpoTime(value);
+    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

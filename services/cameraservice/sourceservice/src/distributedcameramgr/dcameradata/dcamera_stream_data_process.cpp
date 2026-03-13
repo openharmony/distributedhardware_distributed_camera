@@ -21,6 +21,7 @@
 #include "distributed_hardware_log.h"
 #include "dcamera_utils_tools.h"
 #include "metadata_utils.h"
+#include "dcamera_source_imu_sensor.h"
 
 #include "dcamera_pipeline_source.h"
 #include "dcamera_stream_data_process_pipeline_listener.h"
@@ -208,6 +209,7 @@ void DCameraStreamDataProcess::FeedStreamToContinue(const std::shared_ptr<DataBu
     DHLOGD("DCameraStreamDataProcess FeedStreamToContinue devId %{public}s dhId %{public}s streamType %{public}d "
         "streamSize: %{public}" PRIu64, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(),
         streamType_, buffersSize);
+    buffer->eisInfo_.initParams = DCameraSrcImuSensor::GetInstance().GetInitParam();
     std::lock_guard<std::mutex> autoLock(pipelineMutex_);
     std::vector<std::shared_ptr<DataBuffer>> buffers;
     buffers.push_back(buffer);
@@ -251,11 +253,12 @@ void DCameraStreamDataProcess::CreatePipeline()
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return;
     }
+    bool eis = DCameraSrcImuSensor::GetInstance().GetSrcEis();
     pipeline_ = std::make_shared<DCameraPipelineSource>();
     auto process = std::shared_ptr<DCameraStreamDataProcess>(shared_from_this());
     listener_ = std::make_shared<DCameraStreamDataProcessPipelineListener>(process);
     VideoConfigParams srcParams(GetPipelineCodecType(srcConfig_->encodeType_), GetPipelineFormat(srcConfig_->format_),
-        DCAMERA_PRODUCER_FPS_DEFAULT, srcConfig_->width_, srcConfig_->height_);
+        DCAMERA_PRODUCER_FPS_DEFAULT, srcConfig_->width_, srcConfig_->height_, eis);
     VideoConfigParams dstParams(GetPipelineCodecType(dstConfig_->encodeType_), GetPipelineFormat(dstConfig_->format_),
         DCAMERA_PRODUCER_FPS_DEFAULT, dstConfig_->width_, dstConfig_->height_);
     bool isSystemSwitch = DCameraSystemSwitchInfo::GetInstance().GetSystemSwitchFlag(devId_);

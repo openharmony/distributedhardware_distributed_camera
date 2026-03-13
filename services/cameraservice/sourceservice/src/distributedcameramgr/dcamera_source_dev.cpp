@@ -27,6 +27,7 @@
 #include "dcamera_info_cmd.h"
 #include "dcamera_provider_callback_impl.h"
 #include "dcamera_source_controller.h"
+#include "dcamera_source_imu_sensor.h"
 #include "dcamera_source_input.h"
 #include "dcamera_utils_tools.h"
 #include "distributed_camera_allconnect_manager.h"
@@ -106,6 +107,20 @@ int32_t DCameraSourceDev::RegisterDistributedHardware(const std::string& devId, 
     DCameraIndex index(devId, dhId);
     actualDevInfo_.insert(index);
 
+    cJSON* root = cJSON_Parse(param.sinkAttrs.c_str());
+    if (root == nullptr) {
+        return DCAMERA_BAD_VALUE;
+    }
+    if (cJSON_HasObjectItem(root, "EIS")) {
+        cJSON* item = cJSON_GetObjectItemCaseSensitive(root, "EIS");
+        if (cJSON_IsTrue(item)) {
+            eis_ = true;
+            DCameraSrcImuSensor::GetInstance().SetSrcEis(eis_);
+        }
+    }
+    DHLOGI("EIS ability value, eis_ is = %{public}d", eis_);
+    cJSON_Delete(root);
+
     std::shared_ptr<DCameraRegistParam> regParam = std::make_shared<DCameraRegistParam>(devId, dhId, reqId,
         param.sinkAttrs, param.sourceAttrs);
     DCameraSourceEvent event(DCAMERA_EVENT_REGIST, regParam);
@@ -132,6 +147,14 @@ int32_t DCameraSourceDev::UnRegisterDistributedHardware(const std::string devId,
     AppExecFwk::InnerEvent::Pointer msgEvent =
         AppExecFwk::InnerEvent::Get(EVENT_SOURCE_DEV_PROCESS, eventParam, 0);
     srcDevEventHandler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE);
+    return DCAMERA_OK;
+}
+
+int32_t DCameraSourceDev::ConfigDistributedHardware(const std::string& devId, const std::string& dhId,
+    const std::string& key, const std::string& value)
+{
+    DHLOGI("DCameraSourceDev ConfigDistributedHardware value %{public}s", value.c_str());
+    DCameraSrcImuSensor::GetInstance().SetInitParam(value);
     return DCAMERA_OK;
 }
 
@@ -659,7 +682,7 @@ int32_t DCameraSourceDev::StartCapture(std::vector<std::shared_ptr<DCCaptureInfo
     }
 
     DHLOGI("startcapture sceneMode_: %{public}d", sceneMode_);
-    ret = controller_->StartCapture(captures, sceneMode_);
+    ret = controller_->StartCapture(captures, sceneMode_, eis_);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev Execute StartCapture StartCapture failed, ret: %{public}d, devId: %{public}s dhId: "
             "%{public}s", ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());

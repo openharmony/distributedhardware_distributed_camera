@@ -171,6 +171,7 @@ private:
     std::queue<std::shared_ptr<DataBuffer>> inputBuffersQueue_;
     std::queue<std::shared_ptr<Media::AVSharedMemory>> availableInputBufferQueue_;
     std::queue<uint32_t> availableInputIndexsQueue_;
+    std::queue<EisInfo> eisInfoQueue_;
     std::deque<DCameraFrameInfo> frameInfoDeque_;
     FILE *dumpDecBeforeFile_ = nullptr;
     FILE *dumpDecAfterFile_ = nullptr;

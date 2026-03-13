@@ -284,7 +284,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_004, TestSize.L
     EXPECT_CALL(*deviceMgrMock_, GetUdidByNetworkId(_, _, _))
         .WillRepeatedly(DoAll(SetArgReferee<2>(udid), Return(0)));
 #endif
-    int32_t ret = controller_->StartCapture(cmd.value_, mode);
+    int32_t ret = controller_->StartCapture(cmd.value_, mode, false);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     // Wait for StartCapture to complete successfully
@@ -318,7 +318,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_005, TestSize.L
     EXPECT_CALL(*deviceMgrMock_, GetUdidByNetworkId(_, _, _))
         .WillRepeatedly(DoAll(SetArgReferee<2>(udid), Return(0)));
 #endif
-    controller_->StartCapture(cmd.value_, 0);
+    controller_->StartCapture(cmd.value_, 0, false);
     {
         std::unique_lock<std::mutex> lock(mockOperator->mtx_);
         mockOperator->cv_.wait_for(lock, std::chrono::seconds(TEST_FIVE_S),
@@ -488,7 +488,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_015, TestSize.L
     EXPECT_CALL(*deviceMgrMock_, GetUdidByNetworkId(_, _, _))
         .WillRepeatedly(DoAll(SetArgReferee<2>(udid), Return(0)));
 #endif
-    controller_->StartCapture(cmd.value_, 0);
+    controller_->StartCapture(cmd.value_, 0, false);
     {
         std::unique_lock<std::mutex> lock(mockOperator->mtx_);
         mockOperator->cv_.wait_for(lock, std::chrono::seconds(TEST_FIVE_S),
@@ -599,7 +599,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_021, TestSize.L
     EXPECT_CALL(*deviceMgrMock_, GetUdidByNetworkId(_, _, _))
         .WillRepeatedly(DoAll(SetArgReferee<2>(udid), Return(0)));
 #endif
-    int32_t ret = controller_->StartCapture(cmd.value_, 0);
+    int32_t ret = controller_->StartCapture(cmd.value_, 0, false);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     {
@@ -631,7 +631,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_022, TestSize.L
     EXPECT_CALL(*deviceMgrMock_, GetUdidByNetworkId(_, _, _))
         .WillRepeatedly(DoAll(SetArgReferee<2>(udid), Return(0)));
 #endif
-    int32_t ret = controller_->StartCapture(cmd.value_, 0);
+    int32_t ret = controller_->StartCapture(cmd.value_, 0, false);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     {
@@ -663,7 +663,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_023, TestSize.L
     EXPECT_CALL(*deviceMgrMock_, GetUdidByNetworkId(_, _, _))
         .WillRepeatedly(DoAll(SetArgReferee<2>(udid), Return(0)));
 #endif
-    int32_t ret = controller_->StartCapture(cmd.value_, 0);
+    int32_t ret = controller_->StartCapture(cmd.value_, 0, false);
     EXPECT_EQ(DCAMERA_OK, ret);
 
     {
@@ -1192,7 +1192,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_start_capture_0
     g_operatorStr = "secutity_level_success";
     EXPECT_CALL(*deviceMgrMock_, InitDeviceManager(_, _)).WillRepeatedly(Return(1));
 #endif
-    int32_t ret = controller_->StartCapture(cmd.value_, mode);
+    int32_t ret = controller_->StartCapture(cmd.value_, mode, false);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
@@ -1217,7 +1217,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_start_capture_0
     EXPECT_CALL(*deviceMgrMock_, GetUdidByNetworkId(_, _, _))
         .WillRepeatedly(DoAll(SetArgReferee<2>(udid), Return(1)));
 #endif
-    int32_t ret = controller_->StartCapture(cmd.value_, mode);
+    int32_t ret = controller_->StartCapture(cmd.value_, mode, false);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
@@ -1243,7 +1243,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_start_capture_0
         .WillRepeatedly(DoAll(SetArgReferee<2>(udid), Return(0)));
 #endif
     g_sinkConnect = false;
-    int32_t ret = controller_->StartCapture(cmd.value_, mode);
+    int32_t ret = controller_->StartCapture(cmd.value_, mode, false);
     EXPECT_NE(DCAMERA_OK, ret);
 }
 
@@ -1262,7 +1262,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_start_capture_0
     cmd.Unmarshal(TEST_CAPTURE_INFO_CMD_JSON);
     int32_t mode = 0;
     g_controlType = DCAMERA_BAD_VALUE;
-    int32_t ret = controller_->StartCapture(cmd.value_, mode);
+    int32_t ret = controller_->StartCapture(cmd.value_, mode, false);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
@@ -1282,7 +1282,7 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_start_capture_0
     int32_t mode = 0;
     controller_->sinkCotrEventHandler_ = nullptr;
     g_controlType = DCAMERA_BAD_VALUE;
-    int32_t ret = controller_->StartCapture(cmd.value_, mode);
+    int32_t ret = controller_->StartCapture(cmd.value_, mode, false);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 #endif

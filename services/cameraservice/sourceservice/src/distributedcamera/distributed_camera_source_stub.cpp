@@ -39,6 +39,8 @@ DistributedCameraSourceStub::DistributedCameraSourceStub() : IRemoteStub(true)
         &DistributedCameraSourceStub::DCameraNotifyInner;
     memberFuncMap_[static_cast<uint32_t>(IDCameraSourceInterfaceCode::UPDATE_WORKMODE)] =
         &DistributedCameraSourceStub::UpdateDCameraWorkModeInner;
+    memberFuncMap_[static_cast<uint32_t>(IDCameraSourceInterfaceCode::CONFIG_DISTRIBUTED_HARDWARE)] =
+        &DistributedCameraSourceStub::ConfigDistributedHardwareInner;
 }
 
 DistributedCameraSourceStub::~DistributedCameraSourceStub()
@@ -77,6 +79,8 @@ int32_t DistributedCameraSourceStub::OnRemoteRequest(uint32_t code, MessageParce
             return DCameraNotifyInner(data, reply);
         case static_cast<uint32_t>(IDCameraSourceInterfaceCode::UPDATE_WORKMODE):
             return UpdateDCameraWorkModeInner(data, reply);
+        case static_cast<uint32_t>(IDCameraSourceInterfaceCode::CONFIG_DISTRIBUTED_HARDWARE):
+            return ConfigDistributedHardwareInner(data, reply);
         default:
             DHLOGE("Invalid OnRemoteRequest code=%{public}d", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -205,6 +209,27 @@ int32_t DistributedCameraSourceStub::UnregisterDistributedHardwareInner(MessageP
             break;
         }
         ret = UnregisterDistributedHardware(devId, dhId, reqId);
+    } while (0);
+    reply.WriteInt32(ret);
+    return DCAMERA_OK;
+}
+
+int32_t DistributedCameraSourceStub::ConfigDistributedHardwareInner(MessageParcel &data, MessageParcel &reply)
+{
+    DHLOGD("enter");
+    int32_t ret = DCAMERA_OK;
+    do {
+        if (!HasEnableDHPermission()) {
+            DHLOGE("The caller has no ENABLE_DISTRIBUTED_HARDWARE permission.");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
+        std::string devId = data.ReadString();
+        std::string dhId = data.ReadString();
+        std::string key = data.ReadString();
+        std::string value = data.ReadString();
+        ret = ConfigDistributedHardware(devId, dhId, key, value);
+        DHLOGI("DistributedCameraSourceStub ConfigDistributedHardware %{public}d", ret);
     } while (0);
     reply.WriteInt32(ret);
     return DCAMERA_OK;

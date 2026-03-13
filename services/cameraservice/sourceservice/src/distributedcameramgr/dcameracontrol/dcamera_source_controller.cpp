@@ -68,7 +68,7 @@ DCameraSourceController::~DCameraSourceController()
 }
 
 int32_t DCameraSourceController::StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos,
-    int32_t sceneMode)
+    int32_t sceneMode, bool eis)
 {
     if (indexs_.empty() || indexs_.size() > DCAMERA_MAX_NUM) {
         DHLOGE("StartCapture not support operate %{public}zu camera", indexs_.size());
@@ -88,6 +88,7 @@ int32_t DCameraSourceController::StartCapture(std::vector<std::shared_ptr<DCamer
     cmd.userId_ = userId_;
     cmd.tokenId_ = tokenId_;
     cmd.accountId_ = accountId_;
+    cmd.eis_ = eis;
     std::string jsonStr;
     int32_t ret = cmd.Marshal(jsonStr);
     if (ret != DCAMERA_OK) {

@@ -29,6 +29,7 @@
 #include "dcamera_sink_access_control.h"
 #include "dcamera_sink_controller_channel_listener.h"
 #include "dcamera_sink_controller_state_callback.h"
+#include "dcamera_sink_imu_sensor.h"
 #include "dcamera_sink_output.h"
 #include "dcamera_sink_service_ipc.h"
 
@@ -72,10 +73,13 @@ DCameraSinkController::~DCameraSinkController()
 }
 
 int32_t DCameraSinkController::StartCapture(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos,
-    int32_t sceneMode)
+    int32_t sceneMode, bool eis)
 {
     DHLOGI("StartCapture dhId: %{public}s, mode: %{public}d", GetAnonyString(dhId_).c_str(), sceneMode);
     std::string accessType = "";
+#ifdef DCAMERA_OPEN_STABILE
+    DCameraSinkImuSensor::GetInstance().SetSinkEis(eis);
+#endif
     CHECK_AND_RETURN_RET_LOG(accessControl_ == nullptr, DCAMERA_BAD_VALUE, "accessControl_ is null.");
     if ((accessControl_->IsSensitiveSrcAccess(SRC_TYPE)) &&
         (accessControl_->GetAccessControlType(accessType) == DCAMERA_SAME_ACCOUNT)) {
@@ -827,7 +831,7 @@ int32_t DCameraSinkController::HandleReceivedData(std::shared_ptr<DataBuffer>& d
 #ifdef DCAMERA_OPEN_STABILE
         CHECK_AND_RETURN_RET_LOG(!IsIdenticalAccount(srcDevId_), DCAMERA_BAD_VALUE, "Account check failed.");
 #endif
-        return StartCapture(captureInfoCmd.value_, sceneMode_);
+        return StartCapture(captureInfoCmd.value_, sceneMode_, captureInfoCmd.eis_);
     } else if ((!command.empty()) && (command.compare(DCAMERA_PROTOCOL_CMD_UPDATE_METADATA) == 0)) {
         DCameraMetadataSettingCmd metadataSettingCmd;
         int32_t ret = metadataSettingCmd.Unmarshal(jsonStr);
