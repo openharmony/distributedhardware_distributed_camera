@@ -24,7 +24,6 @@ namespace OHOS {
 namespace DistributedHardware {
 IFeedingSmoother::~IFeedingSmoother()
 {
-    std::lock_guard<std::mutex> lock(stateMutex_);
     if (state_ == SMOOTH_START) {
         StopSmooth();
     }
@@ -67,6 +66,7 @@ int32_t IFeedingSmoother::StartSmooth()
 
 void IFeedingSmoother::LooperSmooth()
 {
+    DHLOGI("Smoother start.");
     prctl(PR_SET_NAME, LOOPER_SMOOTH.c_str());
     while (state_ == SMOOTH_START) {
         std::shared_ptr<IFeedableData> data = nullptr;
@@ -182,6 +182,7 @@ void IFeedingSmoother::InitBaseline(const int64_t timeStampBaseline, const int64
 
 int32_t IFeedingSmoother::NotifySmoothFinished(const std::shared_ptr<IFeedableData>& data)
 {
+    DHLOGI("Smooth finished.");
     if (listener_ == nullptr) {
         DHLOGE("Smoother listener is nullptr.");
         return NOTIFY_FAILED;

@@ -307,7 +307,7 @@ void DCameraStreamDataProcessProducer::OnSmoothFinished(const std::shared_ptr<IF
     {
         // Check if audio-video synchronization is enabled
         std::lock_guard<std::mutex> lock(workModeParamMtx_);
-        DHLOGD("OnSmoothFinished rawTime: %{public}" PRIu64 ", isAVsync: %{public}d",
+        DHLOGI("OnSmoothFinished rawTime: %{public}" PRIu64 ", isAVsync: %{public}d",
             buffer->frameInfo_.rawTime, workModeParam_.isAVsync);
         if (workModeParam_.isAVsync) {
             WritePtsAndAddBuffer(buffer);

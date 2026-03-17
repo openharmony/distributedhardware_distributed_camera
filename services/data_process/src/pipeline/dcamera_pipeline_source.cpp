@@ -190,7 +190,7 @@ int32_t DCameraPipelineSource::ProcessData(std::vector<std::shared_ptr<DataBuffe
         return DCAMERA_DISABLE_PROCESS;
     }
 
-    DHLOGD("Send asynchronous event to process data in source pipeline.");
+    DHLOGI("Send asynchronous event to process data in source pipeline.");
     std::shared_ptr<PipelineConfig> pipConfigSource = std::make_shared<PipelineConfig>(piplineType_,
         PIPELINE_OWNER, dataBuffers);
     std::vector<std::shared_ptr<DataBuffer>> inputBuffers = pipConfigSource->GetDataBuffers();
@@ -249,7 +249,7 @@ void DCameraPipelineSource::OnError(DataProcessErrorType errorType)
 
 void DCameraPipelineSource::OnProcessedVideoBuffer(const std::shared_ptr<DataBuffer>& videoResult)
 {
-    DHLOGD("Source pipeline output the processed video buffer.");
+    DHLOGI("Source pipeline output the processed video buffer.");
     std::unique_lock<std::mutex> lock(listenerMutex_);
     if (processListener_ == nullptr) {
         DHLOGE("The process listener of source pipeline is empty.");

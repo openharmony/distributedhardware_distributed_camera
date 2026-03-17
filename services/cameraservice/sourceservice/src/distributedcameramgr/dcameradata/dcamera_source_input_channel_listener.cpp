@@ -55,6 +55,7 @@ void DCameraSourceInputChannelListener::OnSessionError(int32_t eventType, int32_
 
 void DCameraSourceInputChannelListener::OnDataReceived(std::vector<std::shared_ptr<DataBuffer>>& buffers)
 {
+    DHLOGI("DCameraSourceInput OnDataReceived");
     std::shared_ptr<DCameraSourceInput> input = input_.lock();
     if (input == nullptr) {
         DHLOGE("DCameraSourceInput OnDataReceived not found input");

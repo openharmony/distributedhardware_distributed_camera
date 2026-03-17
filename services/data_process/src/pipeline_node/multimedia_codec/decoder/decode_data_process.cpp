@@ -375,7 +375,7 @@ void DecodeDataProcess::ReleaseProcessNode()
 
 int32_t DecodeDataProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& inputBuffers)
 {
-    DHLOGD("Process data in DecodeDataProcess.");
+    DHLOGI("Process data in DecodeDataProcess.");
     if (inputBuffers.empty() || inputBuffers[0] == nullptr) {
         DHLOGE("The input data buffers is empty.");
         return DCAMERA_BAD_VALUE;
@@ -439,7 +439,7 @@ void DecodeDataProcess::BeforeDecodeDump(uint8_t *buffer, size_t bufSize)
 
 int32_t DecodeDataProcess::FeedDecoderInputBuffer()
 {
-    DHLOGD("Feed decoder input buffer.");
+    DHLOGI("Feed decoder input buffer.");
     while ((!inputBuffersQueue_.empty()) && (isDecoderProcess_.load())) {
         int32_t ret = ProcessSingleInputBuffer();
         if (ret != DCAMERA_OK) {
@@ -571,7 +571,7 @@ void DecodeDataProcess::OnSurfaceOutputBufferAvailable(const sptr<IConsumerSurfa
 
 void DecodeDataProcess::GetDecoderOutputBuffer(const sptr<IConsumerSurface>& surface)
 {
-    DHLOGD("Get decoder output buffer.");
+    DHLOGI("Get decoder output buffer.");
     if (surface == nullptr) {
         DHLOGE("Get decode consumer surface failed.");
         return;
