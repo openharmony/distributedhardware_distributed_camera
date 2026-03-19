@@ -24,6 +24,7 @@ FWK_IMPLEMENT_SINGLE_INSTANCE(DCameraSinkImuSensor);
 constexpr int32_t IMU_X = 0;
 constexpr int32_t IMU_Y = 1;
 constexpr int32_t IMU_Z = 2;
+constexpr int32_t MAX_LEN = 150;
 
 DCameraSinkImuSensor::~DCameraSinkImuSensor()
 {}
@@ -31,55 +32,62 @@ DCameraSinkImuSensor::~DCameraSinkImuSensor()
 void DCameraSinkImuSensor::SaveAccInfo(const SensorData data)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    accInfos.push_back(data);
+    if (accInfoQueue.size() >= MAX_LEN) {
+        accInfoQueue.pop();
+    }
+    accInfoQueue.push(data);
 }
 
 void DCameraSinkImuSensor::SaveGyroInfo(const SensorData data)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    gyroInfos.push_back(data);
+    if (gyroInfoQueue.size() >= MAX_LEN) {
+        gyroInfoQueue.pop();
+    }
+    gyroInfoQueue.push(data);
 }
 
 std::string DCameraSinkImuSensor::PackedImuData()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
     std::string jsonStr;
     cJSON *imuInfo = cJSON_CreateObject();
-    if (imuInfo == nullptr) {
-        return "";
-    }
+    CHECK_NULL_RETURN((imuInfo == nullptr), "");
     cJSON_AddNumberToObject(imuInfo, "exposuretime", DCameraExpoTime::GetInstance().GetExpoTime());
     cJSON* accArray = cJSON_CreateArray();
     if (accArray != nullptr) {
-        for (const auto& accData : accInfos) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        while (!accInfoQueue.empty()) {
+            SensorData data = accInfoQueue.front();
             cJSON* accItem = cJSON_CreateObject();
             if (accItem != nullptr) {
-                cJSON_AddNumberToObject(accItem, "timestamp", accData.timeStamp);
-                cJSON_AddNumberToObject(accItem, "x", accData.data[IMU_X]);
-                cJSON_AddNumberToObject(accItem, "y", accData.data[IMU_Y]);
-                cJSON_AddNumberToObject(accItem, "z", accData.data[IMU_Z]);
+                cJSON_AddNumberToObject(accItem, "timestamp", data.timeStamp);
+                cJSON_AddNumberToObject(accItem, "x", data.data[IMU_X]);
+                cJSON_AddNumberToObject(accItem, "y", data.data[IMU_Y]);
+                cJSON_AddNumberToObject(accItem, "z", data.data[IMU_Z]);
                 cJSON_AddItemToArray(accArray, accItem);
             }
+            accInfoQueue.pop();
         }
         cJSON_AddItemToObject(imuInfo, "imuAccData", accArray);
     }
-    accInfos.clear();
 
     cJSON* gyroArray = cJSON_CreateArray();
     if (gyroArray != nullptr) {
-        for (const auto& gyroData : gyroInfos) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        while (!gyroInfoQueue.empty()) {
+            SensorData data = gyroInfoQueue.front();
             cJSON* gyroItem = cJSON_CreateObject();
             if (gyroItem != nullptr) {
-                cJSON_AddNumberToObject(gyroItem, "timestamp", gyroData.timeStamp);
-                cJSON_AddNumberToObject(gyroItem, "x", gyroData.data[IMU_X]);
-                cJSON_AddNumberToObject(gyroItem, "y", gyroData.data[IMU_Y]);
-                cJSON_AddNumberToObject(gyroItem, "z", gyroData.data[IMU_Z]);
+                cJSON_AddNumberToObject(gyroItem, "timestamp", data.timeStamp);
+                cJSON_AddNumberToObject(gyroItem, "x", data.data[IMU_X]);
+                cJSON_AddNumberToObject(gyroItem, "y", data.data[IMU_Y]);
+                cJSON_AddNumberToObject(gyroItem, "z", data.data[IMU_Z]);
                 cJSON_AddItemToArray(gyroArray, gyroItem);
             }
+            gyroInfoQueue.pop();
         }
         cJSON_AddItemToObject(imuInfo, "imuGyroData", gyroArray);
     }
-    gyroInfos.clear();
     char* data = cJSON_Print(imuInfo);
     if (data == nullptr) {
         cJSON_Delete(imuInfo);
