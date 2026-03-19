@@ -18,7 +18,7 @@
  
 #include <string>
 #include <mutex>
-#include <vector>
+#include <queue>
 
 #include "dcamera_utils_tools.h"
 #include "dhfwk_single_instance.h"
@@ -45,10 +45,10 @@ private:
     ~DCameraSinkImuSensor();
 
     std::mutex mutex_;
-    std::vector<SensorData> accInfos;
-    std::vector<SensorData> gyroInfos;
+    std::queue<SensorData> accInfoQueue;
+    std::queue<SensorData> gyroInfoQueue;
     bool eis_ = false;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // DCAMERA_SINK_IMU_SENSOR_H
+#endif // DCAMERA_SINK_IMU_SENSOR_H
