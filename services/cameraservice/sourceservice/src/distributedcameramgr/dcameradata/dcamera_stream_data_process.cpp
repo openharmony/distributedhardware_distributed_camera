@@ -206,7 +206,7 @@ void DCameraStreamDataProcess::FeedStreamToContinue(const std::shared_ptr<DataBu
 {
     CHECK_AND_RETURN_LOG(buffer == nullptr, "buffer is nullptr.");
     uint64_t buffersSize = static_cast<uint64_t>(buffer->Size());
-    DHLOGD("DCameraStreamDataProcess FeedStreamToContinue devId %{public}s dhId %{public}s streamType %{public}d "
+    DHLOGI("DCameraStreamDataProcess FeedStreamToContinue devId %{public}s dhId %{public}s streamType %{public}d "
         "streamSize: %{public}" PRIu64, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(),
         streamType_, buffersSize);
     buffer->eisInfo_.initParams = DCameraSrcImuSensor::GetInstance().GetInitParam();

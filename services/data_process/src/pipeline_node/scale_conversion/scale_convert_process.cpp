@@ -192,7 +192,7 @@ int ScaleConvertProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& i
     DumpFileUtil::OpenDumpFile(DUMP_SERVER_PARA, DUMP_DCAMERA_AFTER_SCALE_FILENAME, &dumpFile_);
 
     if (!IsConvertible(sourceConfig_, processedConfig_)) {
-        DHLOGD("The target resolution: %{public}dx%{public}d format: %{public}d is the same as the source "
+        DHLOGI("The target resolution: %{public}dx%{public}d format: %{public}d is the same as the source "
             "resolution: %{public}dx%{public}d format: %{public}d",
             processedConfig_.GetWidth(), processedConfig_.GetHeight(), processedConfig_.GetVideoformat(),
             sourceConfig_.GetWidth(), sourceConfig_.GetHeight(), sourceConfig_.GetVideoformat());
@@ -434,7 +434,7 @@ int32_t ScaleConvertProcess::ConvertFormatToNV21(ImageUnitInfo& srcImgInfo, Imag
         return DCAMERA_OK;
     }
 
-    DHLOGD("Convert I420 to NV21: format=%{public}d, width=[%{public}d, %{public}d], height=[%{public}d, %{public}d]",
+    DHLOGI("Convert I420 to NV21: format=%{public}d, width=[%{public}d, %{public}d], height=[%{public}d, %{public}d]",
         srcImgInfo.colorFormat, srcImgInfo.width, srcImgInfo.alignedWidth, srcImgInfo.height,
         srcImgInfo.alignedHeight);
     int srcSizeY = srcImgInfo.width * srcImgInfo.height;
@@ -505,6 +505,7 @@ int32_t ScaleConvertProcess::ConvertFormatToRGBA(ImageUnitInfo& srcImgInfo, Imag
 
 int32_t ScaleConvertProcess::ConvertFormatToP010(ImageUnitInfo& srcImgInfo, ImageUnitInfo& dstImgInfo)
 {
+    DHLOGI("Convert I420 to P010: width=[%{public}d, height=[%{public}d", srcImgInfo.width, srcImgInfo.height);
     CHECK_AND_RETURN_RET_LOG((srcImgInfo.imgData == nullptr), DCAMERA_BAD_VALUE, "Data buffer exists null data");
     int32_t srcSizeY = srcImgInfo.width * srcImgInfo.height;
     int32_t srcSizeUV = (static_cast<uint32_t>(srcImgInfo.width) >> MEMORY_RATIO_UV) *
