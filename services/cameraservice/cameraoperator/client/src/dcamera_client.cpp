@@ -438,8 +438,8 @@ int32_t DCameraClient::ConfigCaptureSession(std::vector<std::shared_ptr<DCameraC
         return DCAMERA_BAD_VALUE;
     }
     CHECK_AND_RETURN_RET_LOG(cameraInput_ == nullptr, DCAMERA_BAD_VALUE, "cameraInput is null.");
-
-    int32_t rc = ((sptr<CameraStandard::CameraInput> &)cameraInput_)->Open();
+    CameraStandard::CallerDeviceInfo callerInfo { srcDevId_, cameraId_ };
+    int32_t rc = ((sptr<CameraStandard::CameraInput> &)cameraInput_)->Open(callerInfo);
     if (rc != DCAMERA_OK) {
         DHLOGE("ConfigCaptureSession cameraInput_ Open failed, cameraId: %{public}s, ret: %{public}d",
             GetAnonyString(cameraId_).c_str(), rc);
@@ -793,6 +793,12 @@ int32_t DCameraClient::ResumeCapture()
             GetAnonyString(cameraId_).c_str(), ret);
     }
     return ret;
+}
+
+void DCameraClient::SetSourceDevId(const std::string& srcDevId)
+{
+    DHLOGD("SetSourceDevId srcDevId: %{public}s", GetAnonyString(srcDevId).c_str());
+    srcDevId_ = srcDevId;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
