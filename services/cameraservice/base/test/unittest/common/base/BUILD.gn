@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2026 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -36,6 +36,7 @@ ohos_unittest("DCameraServicesBaseTest") {
   sources = [
     "dcamera_capture_info_cmd_test.cpp",
     "dcamera_channel_info_cmd_test.cpp",
+    "dcamera_control_commands_roundtrip_test.cpp",
     "dcamera_event_cmd_test.cpp",
     "dcamera_info_cmd_test.cpp",
     "dcamera_metadata_setting_cmd_test.cpp",
