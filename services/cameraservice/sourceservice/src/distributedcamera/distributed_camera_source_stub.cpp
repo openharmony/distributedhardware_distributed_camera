@@ -254,6 +254,11 @@ int32_t DistributedCameraSourceStub::DCameraNotifyInner(MessageParcel &data, Mes
 {
     int32_t ret = DCAMERA_OK;
     do {
+        if (!HasEnableDHPermission()) {
+            DHLOGE("The caller has no ENABLE_DISTRIBUTED_HARDWARE permission.");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
         std::string devId = data.ReadString();
         std::string dhId = data.ReadString();
         std::string events = data.ReadString();
@@ -317,7 +322,7 @@ bool DistributedCameraSourceStub::CheckUpdateParams(const std::string& devId, co
 {
     bool ret = devId.empty() || devId.size() > DID_MAX_SIZE || dhId.empty() || dhId.size() > DID_MAX_SIZE;
     CHECK_AND_RETURN_RET_LOG(ret, false, "input params is invalid");
-    ret = param.fd < 0 || param.sharedMemLen < 0;
+    ret = param.fd < 0 || param.sharedMemLen < SHAREDMEM_MIN_SIZE;
     CHECK_AND_RETURN_RET_LOG(ret, false, "workmode param is invalid");
     return true;
 }
