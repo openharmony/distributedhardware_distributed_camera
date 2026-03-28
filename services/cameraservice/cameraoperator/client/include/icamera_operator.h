@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -73,6 +73,7 @@ public:
     virtual int32_t SetResultCallback(std::shared_ptr<ResultCallback>& callback) = 0;
     virtual int32_t PauseCapture() = 0;
     virtual int32_t ResumeCapture() = 0;
+    virtual void SetSourceDevId(const std::string& srcDevId) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

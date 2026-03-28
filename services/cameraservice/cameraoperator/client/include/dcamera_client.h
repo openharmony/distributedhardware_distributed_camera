@@ -51,6 +51,7 @@ public:
     int32_t SetResultCallback(std::shared_ptr<ResultCallback>& callback) override;
     int32_t PauseCapture() override;
     int32_t ResumeCapture() override;
+    void SetSourceDevId(const std::string& srcDevId) override;
 
 private:
     int32_t ConfigCaptureSession(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos, int32_t sceneMode);
@@ -97,6 +98,7 @@ private:
     std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfosCache_;
     std::vector<int32_t> fpsRanges_ = {};
     const char* videoOutputCallbackSdk = "camera_video";
+    std::string srcDevId_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

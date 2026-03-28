@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -81,6 +81,8 @@ int32_t DCameraSinkController::StartCapture(std::vector<std::shared_ptr<DCameraC
     DCameraSinkImuSensor::GetInstance().SetSinkEis(eis);
 #endif
     CHECK_AND_RETURN_RET_LOG(accessControl_ == nullptr, DCAMERA_BAD_VALUE, "accessControl_ is null.");
+    CHECK_AND_RETURN_RET_LOG(operator_ == nullptr, DCAMERA_BAD_VALUE, "operator_ is null.");
+    operator_->SetSourceDevId(srcDevId_);
     if ((accessControl_->IsSensitiveSrcAccess(SRC_TYPE)) &&
         (accessControl_->GetAccessControlType(accessType) == DCAMERA_SAME_ACCOUNT)) {
 #ifdef SECURITY_LEVEL_CHECK_ENABLE
