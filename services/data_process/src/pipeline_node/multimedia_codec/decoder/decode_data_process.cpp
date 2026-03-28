@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -301,20 +301,28 @@ int32_t DecodeDataProcess::StopVideoDecoder()
 void DecodeDataProcess::ReleaseVideoDecoder()
 {
     DHLOGD("Start release videoDecoder.");
-    std::lock_guard<std::mutex> inputLock(mtxDecoderLock_);
-    std::lock_guard<std::mutex> outputLock(mtxDecoderState_);
-    if (videoDecoder_ == nullptr) {
-        DHLOGE("The video decoder does not exist before ReleaseVideoDecoder.");
-        decodeVideoCallback_ = nullptr;
-        return;
+    std::shared_ptr<MediaAVCodec::AVCodecVideoDecoder> videoDecoder = nullptr;
+    {
+        std::lock_guard<std::mutex> inputLock(mtxDecoderLock_);
+        std::lock_guard<std::mutex> outputLock(mtxDecoderState_);
+        videoDecoder = videoDecoder_;
+        if (videoDecoder == nullptr) {
+            DHLOGE("The video decoder does not exist before ReleaseVideoDecoder.");
+            decodeVideoCallback_ = nullptr;
+            return;
+        }
     }
     int32_t ret = StopVideoDecoder();
-    CHECK_AND_LOG(ret != DCAMERA_OK, "%{public}s", "StopVideoDecoder failed.");
-    ret = videoDecoder_->Release();
+    CHECK_AND_LOG(ret != DCAMERA_OK, "Stop video decoder failed. ret %{public}d.", ret);
+    ret = videoDecoder->Release();
     CHECK_AND_LOG(ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK,
         "VideoDecoder release failed. ret %{public}d.", ret);
-    videoDecoder_ = nullptr;
-    decodeVideoCallback_ = nullptr;
+    {
+        std::lock_guard<std::mutex> inputLock(mtxDecoderLock_);
+        std::lock_guard<std::mutex> outputLock(mtxDecoderState_);
+        videoDecoder_ = nullptr;
+        decodeVideoCallback_ = nullptr;
+    }
 }
 
 void DecodeDataProcess::ReleaseDecoderSurface()
@@ -336,7 +344,9 @@ void DecodeDataProcess::ReleaseCodecEvent()
         std::lock_guard<std::mutex> lock(eventMutex_);
         if ((decEventHandler_ != nullptr) && (decEventHandler_->GetEventRunner() != nullptr)) {
             decEventHandler_->GetEventRunner()->Stop();
-            eventThread_.join();
+            if (eventThread_.joinable()) {
+                eventThread_.join();
+            }
         }
         decEventHandler_ = nullptr;
     }
@@ -347,7 +357,7 @@ void DecodeDataProcess::ReleaseCodecEvent()
 void DecodeDataProcess::ReleaseProcessNode()
 {
     DHLOGD("Start release [%{public}zu] node : DecodeNode.", nodeRank_);
-    isDecoderProcess_.store(false);
+    isDecoderProcess_.store(false, std::memory_order_release);
     ReleaseVideoDecoder();
     ReleaseDecoderSurface();
     ReleaseCodecEvent();
@@ -969,7 +979,7 @@ void DecodeDataProcess::OnOutputBufferAvailable(uint32_t index, const MediaAVCod
     const MediaAVCodec::AVCodecBufferFlag& flag, std::shared_ptr<Media::AVSharedMemory> buffer)
 {
     int64_t finishDecodeT = GetNowTimeStampUs();
-    if (!isDecoderProcess_.load()) {
+    if (!isDecoderProcess_.load(std::memory_order_acquire)) {
         DHLOGE("Decoder node occurred error or start release.");
         return;
     }
