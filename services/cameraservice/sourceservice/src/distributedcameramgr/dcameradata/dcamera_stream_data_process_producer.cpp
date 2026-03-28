@@ -326,6 +326,8 @@ void DCameraStreamDataProcessProducer::OnSmoothFinished(const std::shared_ptr<IF
 void DCameraStreamDataProcessProducer::WritePtsAndAddBuffer(const std::shared_ptr<DataBuffer>& buffer)
 {
     bool ret = false;
+    CHECK_AND_RETURN_LOG(workModeParam_.sharedMemLen < static_cast<int32_t>(sizeof(SyncSharedData)),
+        "SyncVideoFrame: sharedMemLen illegl");
     if (syncMem_ == nullptr) {
         syncMem_ = sptr<Ashmem>(new (std::nothrow) Ashmem(workModeParam_.fd, workModeParam_.sharedMemLen));
         CHECK_AND_RETURN_LOG(syncMem_ == nullptr, "SyncVideoFrame: syncMem_ is nullptr");

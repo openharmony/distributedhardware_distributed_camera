@@ -48,6 +48,7 @@ private:
     std::map<uint32_t, DCameraFunc> memberFuncMap_;
     const size_t PARAM_MAX_SIZE = 50 * 1024 * 1024;
     const size_t DID_MAX_SIZE = 256;
+    const int32_t SHAREDMEM_MIN_SIZE = 72;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
