@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -132,7 +132,7 @@ const std::string KEY_OS_TYPE = "OS_TYPE";
 const int32_t RESOLUTION_MAX_WIDTH_SNAPSHOT = 4096;
 const int32_t RESOLUTION_MAX_HEIGHT_SNAPSHOT = 3072;
 const int32_t RESOLUTION_MAX_WIDTH_CONTINUOUS = 1920;
-const int32_t RESOLUTION_MAX_HEIGHT_CONTINUOUS = 1080;
+const int32_t RESOLUTION_MAX_HEIGHT_CONTINUOUS = 1920;
 const int32_t RESOLUTION_MIN_WIDTH = 320;
 const int32_t RESOLUTION_MIN_HEIGHT = 240;
 const int32_t DUMP_FILE_MAX_SIZE = 295 * 1024 *1024;

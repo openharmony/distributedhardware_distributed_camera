@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -95,14 +95,14 @@ private:
 
 private:
     constexpr static int32_t ENCODER_STRIDE_ALIGNMENT = 8;
-    constexpr static int64_t NORM_YUV420_BUFFER_SIZE = 1920 * 1080 * 3 / 2;
-    constexpr static int32_t NORM_RGB32_BUFFER_SIZE = 1920 * 1080 * 4;
+    constexpr static int64_t NORM_YUV420_BUFFER_SIZE = 1920 * 1920 * 3 / 2;
+    constexpr static int32_t NORM_RGB32_BUFFER_SIZE = 1920 * 1920 * 4;
     constexpr static int32_t MIN_FRAME_RATE = 0;
     constexpr static double MAX_FRAME_RATE = 30;
     constexpr static int32_t MIN_VIDEO_WIDTH = 320;
     constexpr static int32_t MIN_VIDEO_HEIGHT = 240;
     constexpr static int32_t MAX_VIDEO_WIDTH = 1920;
-    constexpr static int32_t MAX_VIDEO_HEIGHT = 1080;
+    constexpr static int32_t MAX_VIDEO_HEIGHT = 1920;
     constexpr static int32_t IDR_FRAME_INTERVAL_MS = 2000;
     constexpr static int32_t FIRST_FRAME_OUTPUT_NUM = 2;
     const int32_t DATABUFF_MAX_SIZE = 100 * 1024 * 1024;
@@ -117,6 +117,7 @@ private:
     constexpr static int64_t WIDTH_1280_HEIGHT_720 = 1280 * 720;
     constexpr static int64_t WIDTH_1440_HEIGHT_1080 = 1440 * 1080;
     constexpr static int64_t WIDTH_1920_HEIGHT_1080 = 1920 * 1080;
+    constexpr static int64_t WIDTH_1920_HEIGHT_1920 = 1920 * 1920;
     constexpr static int64_t BITRATE_500000 = 500000;
     constexpr static int64_t BITRATE_1110000 = 1110000;
     constexpr static int64_t BITRATE_1500000 = 1500000;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -306,7 +306,7 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_009, TestSize.Level1)
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
     EXPECT_EQ(rc, DCAMERA_OK);
 
-    constexpr int64_t NORM_YUV420_BUFFER_SIZE = 1920 * 1080 * 3 / 2;
+    constexpr int64_t NORM_YUV420_BUFFER_SIZE = 1920 * 1920 * 3 / 2;
     size_t capacity = NORM_YUV420_BUFFER_SIZE + 5;
     std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
     std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
@@ -319,7 +319,7 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_009, TestSize.Level1)
 
     inputBuffers.clear();
     std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);
-    size_t len = NORM_YUV420_BUFFER_SIZE - 1;
+    size_t len = 1920 * 1080 * 3 / 2 - 1;
     db->SetRange(offset, len);
     inputBuffers.push_back(db);
     rc = testEncodeDataProcess_->ProcessData(inputBuffers);
