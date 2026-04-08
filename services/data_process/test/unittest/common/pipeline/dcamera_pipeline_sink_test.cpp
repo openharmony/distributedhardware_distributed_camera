@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -241,7 +241,7 @@ HWTEST_F(DCameraPipelineSinkTest, dcamera_pipeline_sink_test_006, TestSize.Level
     VideoConfigParams vcParams6(VideoCodecType::NO_CODEC, Videoformat::NV21, DCAMERA_PRODUCER_FPS_DEFAULT,
         TEST_WIDTH, 1100);
     bool vc6 = testPipelineSink_->IsInRange(vcParams6);
-    EXPECT_EQ(false, vc6);
+    EXPECT_EQ(true, vc6);
 }
 
 /**

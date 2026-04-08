@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,6 +40,7 @@ const std::map<int64_t, int64_t> EncodeDataProcess::ENCODER_BITRATE_TABLE = {
     std::map<int64_t, int64_t>::value_type(WIDTH_1280_HEIGHT_720, BITRATE_3400000),
     std::map<int64_t, int64_t>::value_type(WIDTH_1440_HEIGHT_1080, BITRATE_5000000),
     std::map<int64_t, int64_t>::value_type(WIDTH_1920_HEIGHT_1080, BITRATE_6000000),
+    std::map<int64_t, int64_t>::value_type(WIDTH_1920_HEIGHT_1920, BITRATE_6000000),
 };
 const std::string ENUM_VIDEOFORMAT_STRINGS[] = {
     "YUVI420", "NV12", "NV21", "RGBA_8888"
