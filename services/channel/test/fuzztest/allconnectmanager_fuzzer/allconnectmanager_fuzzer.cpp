@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -242,16 +242,8 @@ void DCameraAllConnectManagerGetSourceSocketByNetworkIdFuzzTest(const uint8_t* d
 }
 }
 
-/* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+static void DCameraAllConnectManagerAllTestWrapperP1(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
-    OHOS::DistributedHardware::DCameraAllConnectManagerInitFuzzTest(data, size);
-    OHOS::DistributedHardware::DCameraAllConnectManagerUnInitFuzzTest(data, size);
-    OHOS::DistributedHardware::DCameraAllConnectManagerIsInitedFuzzTest(data, size);
-    OHOS::DistributedHardware::DCameraAllConnectManagerPublishServiceStateFuzzTest(data, size);
-    OHOS::DistributedHardware::DCameraAllConnectManagerApplyAdvancedResourceFuzzTest(data, size);
-    OHOS::DistributedHardware::DCameraAllConnectManagerGetAllConnectSoLoadFuzzTest(data, size);
     OHOS::DistributedHardware::DCameraAllConnectManagerRegisterLifecycleCallbackFuzzTest(data, size);
     OHOS::DistributedHardware::DCameraAllConnectManagerUnRegisterLifecycleCallbackFuzzTest(data, size);
     OHOS::DistributedHardware::DCameraAllConnectManagerOnStopFuzzTest(data, size);
@@ -262,5 +254,27 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DistributedHardware::DCameraAllConnectManagerGetSinkDevIdBySocketFuzzTest(data, size);
     OHOS::DistributedHardware::DCameraAllConnectManagerGetSinkSocketByNetWorkIdFuzzTest(data, size);
     OHOS::DistributedHardware::DCameraAllConnectManagerGetSourceSocketByNetworkIdFuzzTest(data, size);
+}
+
+static void DCameraAllConnectManagerAllTestWrapper(const uint8_t* data, size_t size)
+{
+    OHOS::DistributedHardware::DCameraAllConnectManagerInitFuzzTest(data, size);
+    OHOS::DistributedHardware::DCameraAllConnectManagerUnInitFuzzTest(data, size);
+    OHOS::DistributedHardware::DCameraAllConnectManagerIsInitedFuzzTest(data, size);
+    OHOS::DistributedHardware::DCameraAllConnectManagerPublishServiceStateFuzzTest(data, size);
+    OHOS::DistributedHardware::DCameraAllConnectManagerApplyAdvancedResourceFuzzTest(data, size);
+    OHOS::DistributedHardware::DCameraAllConnectManagerGetAllConnectSoLoadFuzzTest(data, size);
+    DCameraAllConnectManagerAllTestWrapperP1(data, size);
+}
+
+/* Fuzzer entry point */
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+{
+    if (data == nullptr || size == 0) {
+        return 0;
+    }
+
+    DCameraAllConnectManagerAllTestWrapper(data, size);
+
     return 0;
 }

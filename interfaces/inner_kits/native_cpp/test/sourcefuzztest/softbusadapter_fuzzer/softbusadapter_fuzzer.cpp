@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -247,20 +247,41 @@ void DCameraSoftbusAdapterExecuteConflictCleanupAsyncFuzzTest(const uint8_t* dat
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
-    OHOS::DistributedHardware::SoftbusCreatSoftBusSinkSocketServerFuzzTest(data, size);
-    OHOS::DistributedHardware::SoftbusCreateSoftBusSourceSocketClientFuzzTest(data, size);
-    OHOS::DistributedHardware::SoftbusDestroySoftbusSessionServerFuzzTest(data, size);
-    OHOS::DistributedHardware::SoftbusCloseSoftbusSessionFuzzTest(data, size);
-    OHOS::DistributedHardware::SoftbusSendSofbusStreamFuzzTest(data, size);
-    OHOS::DistributedHardware::SoftbusGetLocalNetworkIdFuzzTest(data, size);
-    OHOS::DistributedHardware::FuzzReplaceSuffix(data, size);
-    OHOS::DistributedHardware::FuzzSendSofbusBytes(data, size);
-    OHOS::DistributedHardware::FuzzRecordSourceSocketSession(data, size);
-    OHOS::DistributedHardware::FuzzCloseSessionWithNetWorkId(data, size);
-    OHOS::DistributedHardware::DCameraSoftbusAdapterCheckOsTypeFuzzTest(data, size);
-    OHOS::DistributedHardware::DCameraSoftbusAdapterParseValueFromCjsonFuzzTest(data, size);
-    OHOS::DistributedHardware::DCameraSoftbusAdapterHandleConflictSessionFuzzTest(data, size);
-    OHOS::DistributedHardware::DCameraSoftbusAdapterExecuteConflictCleanupAsyncFuzzTest(data, size);
+    if (data == nullptr || size == 0) {
+        return 0;
+    }
+
+    FuzzedDataProvider fuzzedData(data, size);
+    int32_t testStrLen = 4;
+    uint8_t groupId = fuzzedData.ConsumeIntegralInRange<uint8_t>(0, testStrLen);
+    switch (groupId) {
+        case 0:
+            OHOS::DistributedHardware::SoftbusCreatSoftBusSinkSocketServerFuzzTest(data, size);
+            OHOS::DistributedHardware::SoftbusCreateSoftBusSourceSocketClientFuzzTest(data, size);
+            break;
+        case 1: // testCase1
+            OHOS::DistributedHardware::SoftbusDestroySoftbusSessionServerFuzzTest(data, size);
+            OHOS::DistributedHardware::SoftbusCloseSoftbusSessionFuzzTest(data, size);
+            OHOS::DistributedHardware::SoftbusGetLocalNetworkIdFuzzTest(data, size);
+            break;
+        case 2: // testCase2
+            OHOS::DistributedHardware::SoftbusSendSofbusStreamFuzzTest(data, size);
+            OHOS::DistributedHardware::FuzzSendSofbusBytes(data, size);
+            break;
+        case 3: // testCase3
+            OHOS::DistributedHardware::FuzzReplaceSuffix(data, size);
+            OHOS::DistributedHardware::FuzzRecordSourceSocketSession(data, size);
+            OHOS::DistributedHardware::FuzzCloseSessionWithNetWorkId(data, size);
+            break;
+        case 4: // testCase4
+            OHOS::DistributedHardware::DCameraSoftbusAdapterCheckOsTypeFuzzTest(data, size);
+            OHOS::DistributedHardware::DCameraSoftbusAdapterParseValueFromCjsonFuzzTest(data, size);
+            OHOS::DistributedHardware::DCameraSoftbusAdapterHandleConflictSessionFuzzTest(data, size);
+            OHOS::DistributedHardware::DCameraSoftbusAdapterExecuteConflictCleanupAsyncFuzzTest(data, size);
+            break;
+        default:
+            break;
+    }
+
     return 0;
 }
