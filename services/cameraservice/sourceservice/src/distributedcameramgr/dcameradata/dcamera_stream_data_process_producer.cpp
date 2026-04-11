@@ -27,7 +27,8 @@
 #include "distributed_hardware_log.h"
 #include <sys/prctl.h>
 #include "dcamera_frame_info.h"
-
+#include "v1_1/include/idisplay_buffer.h"
+#include "dcamera_source_imu_sensor.h"
 namespace OHOS {
 namespace DistributedHardware {
 DCameraStreamDataProcessProducer::DCameraStreamDataProcessProducer(std::string devId, std::string dhId,
@@ -221,11 +222,144 @@ void DCameraStreamDataProcessProducer::LooperSnapShot()
         "%{public}d", GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), streamType_, streamId_, state_);
 }
 
-int32_t DCameraStreamDataProcessProducer::FeedStreamToDriver(const DHBase& dhBase,
+bool DCameraStreamDataProcessProducer::UnmarshalIMUData(const std::string& jsonStr, std::vector<uint8_t>& result)
+{
+    cJSON *rootValue = cJSON_Parse(jsonStr.c_str());
+    CHECK_NULL_RETURN((rootValue == nullptr), false);
+
+    cJSON *exposuretimeJson = cJSON_GetObjectItemCaseSensitive(rootValue, "exposuretime");
+    CHECK_AND_FREE_RETURN_RET_LOG((exposuretimeJson == nullptr || !cJSON_IsNumber(exposuretimeJson) ||
+        exposuretimeJson->valueint < 0), false, rootValue, "exposuretime parse fail");
+    uint32_t exposureTime = static_cast<uint32_t>(exposuretimeJson->valueint);
+    uint8_t* exposureTimeBytes =  reinterpret_cast<uint8_t*>(&exposureTime);
+    result.insert(result.end(), exposureTimeBytes, exposureTimeBytes + INT32_T_BYTE_LEN);
+
+    cJSON *offsetJson = cJSON_GetObjectItemCaseSensitive(rootValue, "offset");
+    int64_t offset = 0;
+    if (offsetJson != nullptr && cJSON_IsNumber(offsetJson))  {
+        offset = static_cast<int64_t>(offsetJson->valuedouble);
+    }
+    uint8_t* offsetBytes =  reinterpret_cast<uint8_t*>(&offset);
+    result.insert(result.end(), offsetBytes, offsetBytes + UINT64_T_BYTE_LEN);
+
+    cJSON *imuAccJson = cJSON_GetObjectItemCaseSensitive(rootValue, "imuAccData");
+    CHECK_AND_FREE_RETURN_RET_LOG((imuAccJson == nullptr || !cJSON_IsArray(imuAccJson) ||
+        !UnmarshalIMUArray(imuAccJson, result, AR_ACC_TYPE)), false, rootValue, "acc data parse fail.");
+
+    cJSON *imuGyroJson = cJSON_GetObjectItemCaseSensitive(rootValue, "imuGyroData");
+    CHECK_AND_FREE_RETURN_RET_LOG((imuGyroJson == nullptr || !cJSON_IsArray(imuGyroJson) ||
+        !UnmarshalIMUArray(imuGyroJson, result, AR_GYRO_TYPE)), false, rootValue, "gyro dat parse fail.");
+
+    cJSON_Delete(rootValue);
+    return true;
+}
+
+bool DCameraStreamDataProcessProducer::UnmarshalIMUArray(cJSON *imuJsonArray,
+    std::vector<uint8_t>& result, int32_t currentType)
+{
+    cJSON *imuJson = nullptr;
+    cJSON_ArrayForEach(imuJson, imuJsonArray) {
+        int32_t typeLE = currentType;
+        uint8_t* typeBytes = reinterpret_cast<uint8_t*>(&typeLE);
+        result.insert(result.end(), typeBytes, typeBytes + INT32_T_BYTE_LEN);
+
+        cJSON *timestampJson = cJSON_GetObjectItemCaseSensitive(imuJson, "timestamp");
+        CHECK_AND_RETURN_RET_LOG((timestampJson == nullptr || !cJSON_IsNumber(timestampJson)), false,
+            "timestamp parse fail.");
+        int64_t timestamp = static_cast<int64_t>(timestampJson->valuedouble);
+        uint8_t* timestampBytes =  reinterpret_cast<uint8_t*>(&timestamp);
+        result.insert(result.end(), timestampBytes, timestampBytes + UINT64_T_BYTE_LEN);
+
+        cJSON *imuXJson = cJSON_GetObjectItemCaseSensitive(imuJson, "x");
+        CHECK_AND_RETURN_RET_LOG((imuXJson == nullptr || !cJSON_IsNumber(imuXJson)), false,
+            "x parse fail.");
+        float x = static_cast<float>(imuXJson->valuedouble);
+        uint8_t* xBytes =  reinterpret_cast<uint8_t*>(&x);
+        result.insert(result.end(), xBytes, xBytes + FLOAT_T_BYTE_LEN);
+
+        cJSON *imuYJson = cJSON_GetObjectItemCaseSensitive(imuJson, "y");
+        CHECK_AND_RETURN_RET_LOG((imuYJson == nullptr || !cJSON_IsNumber(imuYJson)), false,
+            "y parse fail.");
+        float y = static_cast<float>(imuYJson->valuedouble);
+        uint8_t* yBytes =  reinterpret_cast<uint8_t*>(&y);
+        result.insert(result.end(), yBytes, yBytes + FLOAT_T_BYTE_LEN);
+
+        cJSON *imuZJson = cJSON_GetObjectItemCaseSensitive(imuJson, "z");
+        CHECK_AND_RETURN_RET_LOG((imuZJson == nullptr || !cJSON_IsNumber(imuZJson)), false,
+            "z parse fail.");
+        float z = static_cast<float>(imuZJson->valuedouble);
+        uint8_t* zBytes =  reinterpret_cast<uint8_t*>(&z);
+        result.insert(result.end(), zBytes, zBytes + FLOAT_T_BYTE_LEN);
+    }
+    return true;
+}
+
+bool DCameraStreamDataProcessProducer::SetIMUTOBuffer(const DCameraBuffer& sharedMemory,
     const std::shared_ptr<DataBuffer>& buffer)
+{
+    const BufferHandle* bufferHandle = nullptr;
+    if (sharedMemory.bufferHandle_ != nullptr) {
+        bufferHandle = sharedMemory.bufferHandle_->GetBufferHandle();
+    } else {
+        return false;
+    }
+    if (DCameraSrcImuSensor::GetInstance().GetAREnable(devId_) && bufferHandle != nullptr && buffer != nullptr) {
+        auto eisInfo = buffer->eisInfo_;
+        std::vector<uint8_t> imuData;
+        imuData.reserve(UNIFORM_METADATA_LEN);
+
+        int32_t frameID = eisInfo.frameId;
+        uint8_t* frameIDBytes = reinterpret_cast<uint8_t*>(&frameID);
+        imuData.insert(imuData.end(), frameIDBytes, frameIDBytes + INT32_T_BYTE_LEN);
+
+        int64_t frameTimeStamp = eisInfo.frameTimeStamp;
+        uint8_t* frameTimeStampBytes = reinterpret_cast<uint8_t*>(&frameTimeStamp);
+        imuData.insert(imuData.end(), frameTimeStampBytes, frameTimeStampBytes + UINT64_T_BYTE_LEN);
+
+        if (!UnmarshalIMUData(eisInfo.imuData, imuData)) {
+            return false;
+        }
+        if (imuData.size() < UNIFORM_METADATA_LEN) {
+            imuData.resize(UNIFORM_METADATA_LEN, 0);
+        }
+        auto displayBuffer = OHOS::HDI::Display::Buffer::V1_1::IDisplayBuffer::Get();
+        if (displayBuffer == nullptr) {
+            DHLOGE("SetIMUTOBuffer get display buffer failed");
+            return false;
+        }
+        int32_t ret = displayBuffer->RegisterBuffer(*bufferHandle);
+        if (ret != 0) {
+            DHLOGE("SetIMUTOBuffer register buffer error ret:%{public}d", ret);
+            return false;
+        }
+        ret = displayBuffer->SetMetadata(*bufferHandle, AR_META_DATA_KEY, imuData);
+        if (ret != 0) {
+            DHLOGE("SetIMUTOBuffer set metadata error ret:%{public}d", ret);
+            return false;
+        }
+        return true;
+    }
+    return false;
+}
+
+int32_t DCameraStreamDataProcessProducer::CheckPreconditions(const std::shared_ptr<DataBuffer>& buffer)
 {
     if (camHdiProvider_ == nullptr) {
         DHLOGI("camHdiProvider is nullptr");
+        return DCAMERA_BAD_VALUE;
+    }
+    if (DCameraSrcImuSensor::GetInstance().GetAREnable(devId_) &&
+            buffer != nullptr && buffer->eisInfo_.frameTimeStamp ==0) {
+        DHLOGI("skip first frame when ar enable");
+        return DCAMERA_BAD_VALUE;
+    }
+    return DCAMERA_OK;
+}
+
+int32_t DCameraStreamDataProcessProducer::FeedStreamToDriver(const DHBase& dhBase,
+    const std::shared_ptr<DataBuffer>& buffer)
+{
+    if (CheckPreconditions(buffer) != DCAMERA_OK) {
         return DCAMERA_BAD_VALUE;
     }
     DCameraBuffer sharedMemory;
@@ -242,6 +376,7 @@ int32_t DCameraStreamDataProcessProducer::FeedStreamToDriver(const DHBase& dhBas
                 GetAnonyString(dhId_).c_str());
             break;
         }
+        SetIMUTOBuffer(sharedMemory, buffer);
         sharedMemory.bufferHandle_->GetBufferHandle()->virAddr =
             DCameraMemoryMap(sharedMemory.bufferHandle_->GetBufferHandle());
         if (sharedMemory.bufferHandle_->GetBufferHandle()->virAddr == nullptr) {
