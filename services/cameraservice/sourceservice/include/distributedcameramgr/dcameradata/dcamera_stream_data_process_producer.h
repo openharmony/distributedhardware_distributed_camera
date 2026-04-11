@@ -30,6 +30,7 @@
 #include "v1_1/id_camera_provider.h"
 #include "dcamera_feeding_smoother.h"
 #include "idistributed_camera_source.h"
+#include "cJSON.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -72,6 +73,10 @@ private:
     bool WaitForVideoFrame(std::shared_ptr<DataBuffer>& buffer);
     int32_t SyncVideoFrame(uint64_t videoPtsUs);
     void UpdateVideoClock(uint64_t videoPtsUs);
+    bool SetIMUTOBuffer(const DCameraBuffer& sharedMemory, const std::shared_ptr<DataBuffer>& buffer);
+    bool UnmarshalIMUData(const std::string& jsonStr, std::vector<uint8_t>& result);
+    bool UnmarshalIMUArray(cJSON *imuJsonArray, std::vector<uint8_t>& result, int32_t currentType);
+    int32_t CheckPreconditions(const std::shared_ptr<DataBuffer>& buffer);
 
     const uint32_t DCAMERA_PRODUCER_MAX_BUFFER_SIZE = 30;
     const uint32_t DCAMERA_PRODUCER_RETRY_SLEEP_MS = 500;

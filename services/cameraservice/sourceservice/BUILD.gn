@@ -155,6 +155,8 @@ ohos_shared_library("distributed_camera_source") {
     "media_foundation:media_foundation",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "drivers_interface_display:libdisplay_buffer_hdi_impl_v1_1",
+    "drivers_interface_display:libdisplay_buffer_proxy_1.0",
   ]
 
   if (os_account_camera) {

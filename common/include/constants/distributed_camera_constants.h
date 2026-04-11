@@ -161,6 +161,17 @@ const uint32_t UINT32_SHIFT_MASK_8 = 0x0000ff00;
 const uint32_t UINT32_SHIFT_MASK_0 = 0x000000ff;
 const uint16_t UINT16_SHIFT_MASK_0 = 0x00ff;
 
+const int32_t AR_ACC_TYPE = 2;
+const int32_t AR_GYRO_TYPE = 3;
+const int32_t AR_DATA_STREAM_WIDTH = 640;
+const int32_t AR_MODE_TAG_OFFSET = 40;
+const uint32_t UNIFORM_METADATA_LEN = 2000;
+const uint32_t AR_META_DATA_KEY = 8000;
+const uint32_t AR_MODE_ENABLE_IMU = 9;
+const int32_t INT32_T_BYTE_LEN = 4;
+const int32_t UINT64_T_BYTE_LEN = 8;
+const int32_t FLOAT_T_BYTE_LEN = 4;
+
 const std::string CHANNEL_DISCONNECTED = "disconnected";
 const std::string PRODUCER = "producer";
 const std::string REGISTER_SERVICE_NOTIFY = "regSvcNotify";
