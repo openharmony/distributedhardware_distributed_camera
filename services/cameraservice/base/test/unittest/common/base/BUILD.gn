@@ -40,9 +40,11 @@ ohos_unittest("DCameraServicesBaseTest") {
     "dcamera_event_cmd_test.cpp",
     "dcamera_info_cmd_test.cpp",
     "dcamera_metadata_setting_cmd_test.cpp",
+    "dcamera_metadata_setting_cmd_roundtrip_test.cpp",
     "dcamera_open_info_cmd_test.cpp",
     "dcamera_protocol_test.cpp",
     "dcamera_sink_frame_info_test.cpp",
+    "dcamera_sink_frame_info_roundtrip_test.cpp",
   ]
 
   configs = [ ":module_private_config" ]

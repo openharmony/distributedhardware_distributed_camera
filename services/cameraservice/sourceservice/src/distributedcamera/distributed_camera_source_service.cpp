@@ -297,7 +297,7 @@ int32_t DistributedCameraSourceService::UnregisterDistributedHardware(const std:
     std::shared_ptr<DCameraSourceDev> camDev = GetCamDevByIndex(camIndex);
     if (camDev == nullptr) {
         DHLOGE("DistributedCameraSourceService UnregisterDistributedHardware not found device");
-        return DCAMERA_NOT_FOUND;
+        return DCAMERA_OK;
     }
 
     int32_t ret = camDev->UnRegisterDistributedHardware(devId, dhId, reqId);
