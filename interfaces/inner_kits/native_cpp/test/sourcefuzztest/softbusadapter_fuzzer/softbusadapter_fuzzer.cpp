@@ -254,30 +254,38 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     FuzzedDataProvider fuzzedData(data, size);
     int32_t testStrLen = 4;
     uint8_t groupId = fuzzedData.ConsumeIntegralInRange<uint8_t>(0, testStrLen);
+    size_t remainingSize = fuzzedData.remaining_bytes();
+    std::vector<uint8_t> remainingData(remainingSize);
+    fuzzedData.ConsumeData(remainingData.data(), remainingSize);
+    const uint8_t* remainingDataPtr = remainingData.data();
+
     switch (groupId) {
         case 0:
-            OHOS::DistributedHardware::SoftbusCreatSoftBusSinkSocketServerFuzzTest(data, size);
-            OHOS::DistributedHardware::SoftbusCreateSoftBusSourceSocketClientFuzzTest(data, size);
+            OHOS::DistributedHardware::SoftbusCreatSoftBusSinkSocketServerFuzzTest(remainingDataPtr, remainingSize);
+            OHOS::DistributedHardware::SoftbusCreateSoftBusSourceSocketClientFuzzTest(remainingDataPtr, remainingSize);
             break;
         case 1: // testCase1
-            OHOS::DistributedHardware::SoftbusDestroySoftbusSessionServerFuzzTest(data, size);
-            OHOS::DistributedHardware::SoftbusCloseSoftbusSessionFuzzTest(data, size);
-            OHOS::DistributedHardware::SoftbusGetLocalNetworkIdFuzzTest(data, size);
+            OHOS::DistributedHardware::SoftbusDestroySoftbusSessionServerFuzzTest(remainingDataPtr, remainingSize);
+            OHOS::DistributedHardware::SoftbusCloseSoftbusSessionFuzzTest(remainingDataPtr, remainingSize);
+            OHOS::DistributedHardware::SoftbusGetLocalNetworkIdFuzzTest(remainingDataPtr, remainingSize);
             break;
         case 2: // testCase2
-            OHOS::DistributedHardware::SoftbusSendSofbusStreamFuzzTest(data, size);
-            OHOS::DistributedHardware::FuzzSendSofbusBytes(data, size);
+            OHOS::DistributedHardware::SoftbusSendSofbusStreamFuzzTest(remainingDataPtr, remainingSize);
+            OHOS::DistributedHardware::FuzzSendSofbusBytes(remainingDataPtr, remainingSize);
             break;
         case 3: // testCase3
-            OHOS::DistributedHardware::FuzzReplaceSuffix(data, size);
-            OHOS::DistributedHardware::FuzzRecordSourceSocketSession(data, size);
-            OHOS::DistributedHardware::FuzzCloseSessionWithNetWorkId(data, size);
+            OHOS::DistributedHardware::FuzzReplaceSuffix(remainingDataPtr, remainingSize);
+            OHOS::DistributedHardware::FuzzRecordSourceSocketSession(remainingDataPtr, remainingSize);
+            OHOS::DistributedHardware::FuzzCloseSessionWithNetWorkId(remainingDataPtr, remainingSize);
             break;
         case 4: // testCase4
-            OHOS::DistributedHardware::DCameraSoftbusAdapterCheckOsTypeFuzzTest(data, size);
-            OHOS::DistributedHardware::DCameraSoftbusAdapterParseValueFromCjsonFuzzTest(data, size);
-            OHOS::DistributedHardware::DCameraSoftbusAdapterHandleConflictSessionFuzzTest(data, size);
-            OHOS::DistributedHardware::DCameraSoftbusAdapterExecuteConflictCleanupAsyncFuzzTest(data, size);
+            OHOS::DistributedHardware::DCameraSoftbusAdapterCheckOsTypeFuzzTest(remainingDataPtr, remainingSize);
+            OHOS::DistributedHardware::DCameraSoftbusAdapterParseValueFromCjsonFuzzTest(
+                remainingDataPtr, remainingSize);
+            OHOS::DistributedHardware::DCameraSoftbusAdapterHandleConflictSessionFuzzTest(
+                remainingDataPtr, remainingSize);
+            OHOS::DistributedHardware::DCameraSoftbusAdapterExecuteConflictCleanupAsyncFuzzTest(
+                remainingDataPtr, remainingSize);
             break;
         default:
             break;
