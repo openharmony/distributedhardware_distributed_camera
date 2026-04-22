@@ -76,16 +76,21 @@ void ScaleConvertProcess::ReleaseProcessNode()
 {
     DHLOGI("Start release [%{public}zu] node : ScaleConvertNode.", nodeRank_);
     isScaleConvert_.store(false);
+    DHLOGI("ReleaseProcessNode: isScaleConvert_ set to false.");
 
     {
         std::lock_guard<std::mutex> autoLock(scaleMutex_);
         if (swsContext_ != nullptr) {
+            DHLOGI("ReleaseProcessNode: start free swsContext.");
             sws_freeContext(swsContext_);
             swsContext_ = nullptr;
+        } else {
+            DHLOGI("ReleaseProcessNode: swsContext_ is null, skip free.");
         }
     }
 
     if (nextDataProcess_ != nullptr) {
+        DHLOGI("ReleaseProcessNode: start release nextDataProcess_.");
         nextDataProcess_->ReleaseProcessNode();
         nextDataProcess_ = nullptr;
     }
