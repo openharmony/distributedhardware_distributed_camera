@@ -276,31 +276,37 @@ int32_t DecodeDataProcess::StartVideoDecoder()
 
 int32_t DecodeDataProcess::StopVideoDecoder()
 {
+    DHLOGI("StopVideoDecoder enter.");
     if (videoDecoder_ == nullptr) {
         DHLOGE("The video decoder does not exist before StopVideoDecoder.");
         return DCAMERA_BAD_VALUE;
     }
 
     bool isSuccess = true;
+    DHLOGI("StopVideoDecoder: start flush video decoder.");
     int32_t ret = videoDecoder_->Flush();
     if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
         DHLOGE("VideoDecoder flush failed. ret %{public}d.", ret);
         isSuccess = isSuccess && false;
     }
+    DHLOGI("StopVideoDecoder: start stop video decoder.");
     ret = videoDecoder_->Stop();
     if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
         DHLOGE("VideoDecoder stop failed. ret %{public}d.", ret);
         isSuccess = isSuccess && false;
     }
+    DHLOGI("StopVideoDecoder: stop video decoder success.");
     if (!isSuccess) {
+        DHLOGE("StopVideoDecoder failed.");
         return DCAMERA_BAD_OPERATE;
     }
+    DHLOGI("StopVideoDecoder exit with success.");
     return DCAMERA_OK;
 }
 
 void DecodeDataProcess::ReleaseVideoDecoder()
 {
-    DHLOGD("Start release videoDecoder.");
+    DHLOGI("Start release videoDecoder.");
     std::shared_ptr<MediaAVCodec::AVCodecVideoDecoder> videoDecoder = nullptr;
     {
         std::lock_guard<std::mutex> inputLock(mtxDecoderLock_);
@@ -311,52 +317,63 @@ void DecodeDataProcess::ReleaseVideoDecoder()
             decodeVideoCallback_ = nullptr;
             return;
         }
+        DHLOGI("ReleaseVideoDecoder: videoDecoder_ is not null, ready to stop and release.");
     }
     int32_t ret = StopVideoDecoder();
     CHECK_AND_LOG(ret != DCAMERA_OK, "Stop video decoder failed. ret %{public}d.", ret);
+    DHLOGI("ReleaseVideoDecoder: start release video decoder resource.");
     ret = videoDecoder->Release();
     CHECK_AND_LOG(ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK,
         "VideoDecoder release failed. ret %{public}d.", ret);
+    DHLOGI("ReleaseVideoDecoder: VideoDecoder release success.");
     {
         std::lock_guard<std::mutex> inputLock(mtxDecoderLock_);
         std::lock_guard<std::mutex> outputLock(mtxDecoderState_);
         videoDecoder_ = nullptr;
         decodeVideoCallback_ = nullptr;
     }
+    DHLOGI("ReleaseVideoDecoder exit.");
 }
 
 void DecodeDataProcess::ReleaseDecoderSurface()
 {
+    DHLOGI("ReleaseDecoderSurface enter.");
     if (decodeConsumerSurface_ == nullptr) {
         decodeProducerSurface_ = nullptr;
         DHLOGE("The decode consumer surface does not exist before UnregisterConsumerListener.");
         return;
     }
+    DHLOGI("ReleaseDecoderSurface: start unregister consumer listener.");
     int32_t ret = decodeConsumerSurface_->UnregisterConsumerListener();
     CHECK_AND_LOG(ret != SURFACE_ERROR_OK, "VideoDecoder release failed. ret %d.", ret);
     decodeConsumerSurface_ = nullptr;
     decodeProducerSurface_ = nullptr;
+    DHLOGI("ReleaseDecoderSurface exit.");
 }
 
 void DecodeDataProcess::ReleaseCodecEvent()
 {
+    DHLOGI("ReleaseCodecEvent enter.");
     {
         std::lock_guard<std::mutex> lock(eventMutex_);
         if ((decEventHandler_ != nullptr) && (decEventHandler_->GetEventRunner() != nullptr)) {
+            DHLOGI("ReleaseCodecEvent: stop event runner and join event thread.");
             decEventHandler_->GetEventRunner()->Stop();
             if (eventThread_.joinable()) {
                 eventThread_.join();
+                DHLOGI("ReleaseCodecEvent: event thread joined.");
             }
         }
+        DHLOGI("ReleaseCodecEvent: decEventHandler_ or event runner is null, skip stop.");
         decEventHandler_ = nullptr;
     }
     pipeSrcEventHandler_ = nullptr;
-    DHLOGD("Release DecodeNode eventBusDecode and eventBusPipeline end.");
+    DHLOGI("ReleaseCodecEvent end.");
 }
 
 void DecodeDataProcess::ReleaseProcessNode()
 {
-    DHLOGD("Start release [%{public}zu] node : DecodeNode.", nodeRank_);
+    DHLOGI("Start release [%{public}zu] node : DecodeNode.", nodeRank_);
     isDecoderProcess_.store(false, std::memory_order_release);
     ReleaseVideoDecoder();
     ReleaseDecoderSurface();
@@ -367,6 +384,7 @@ void DecodeDataProcess::ReleaseProcessNode()
     std::queue<uint32_t>().swap(availableInputIndexsQueue_);
     std::queue<std::shared_ptr<Media::AVSharedMemory>>().swap(availableInputBufferQueue_);
     std::queue<EisInfo>().swap(eisInfoQueue_);
+    DHLOGI("ReleaseProcessNode: clear queues done.");
     {
         std::lock_guard<std::mutex> lock(mtxDequeLock_);
         std::deque<DCameraFrameInfo>().swap(frameInfoDeque_);
@@ -375,12 +393,14 @@ void DecodeDataProcess::ReleaseProcessNode()
     lastFeedDecoderInputBufferTimeUs_ = 0;
     outputTimeStampUs_ = 0;
     alignedHeight_ = 0;
+    DHLOGI("ReleaseProcessNode: reset member variables done.");
 
     if (nextDataProcess_ != nullptr) {
+        DHLOGI("ReleaseProcessNode: start release nextDataProcess_.");
         nextDataProcess_->ReleaseProcessNode();
         nextDataProcess_ = nullptr;
     }
-    DHLOGD("Release [%{public}zu] node : DecodeNode end.", nodeRank_);
+    DHLOGI("Release [%{public}zu] node : DecodeNode end.", nodeRank_);
 }
 
 int32_t DecodeDataProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>& inputBuffers)
