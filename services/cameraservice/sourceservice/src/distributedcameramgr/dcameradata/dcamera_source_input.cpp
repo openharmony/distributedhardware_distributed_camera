@@ -12,7 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include "dcamera_utils_tools.h"
+#include "camera_metadata_operator.h"
+#include "metadata_utils.h"
+#include "dcamera_source_imu_sensor.h"
 #include "anonymous_string.h"
 #include "dcamera_channel_source_impl.h"
 #include "dcamera_hitrace_adapter.h"
@@ -341,6 +344,7 @@ int32_t DCameraSourceInput::UnInit()
     channelState_.clear();
     isInit = false;
     isChannelConnected_.store(false);
+    DCameraSrcImuSensor::GetInstance().SetAREnable(devId_, false);
     return DCAMERA_OK;
 }
 
@@ -349,6 +353,23 @@ int32_t DCameraSourceInput::UpdateSettings(std::vector<std::shared_ptr<DCameraSe
     if (dataProcess_.find(CONTINUOUS_FRAME) == dataProcess_.end()) {
         DHLOGE("UpdateSettings fail, dataProcess is null");
         return DCAMERA_WRONG_STATE;
+    }
+    for (auto& setting : settings) {
+        if (setting == nullptr) {
+            continue;
+        }
+        std::shared_ptr<Camera::CameraMetadata> cameraMetadata =
+            Camera::MetadataUtils::DecodeFromString(Base64Decode(setting->value_));
+        if (cameraMetadata == nullptr) {
+            continue;
+        }
+        camera_metadata_item_t arItem;
+        int32_t ret = Camera::FindCameraMetadataItem(cameraMetadata->get(),
+            OHOS_VENDOR_SECTION_START + AR_MODE_TAG_OFFSET, &arItem);
+        DHLOGI("DCameraSourceInput find ar mode result:%{public}d", ret);
+        if (ret == 0 && arItem.data.u8 != nullptr && *(arItem.data.u8) == AR_MODE_ENABLE_IMU) {
+            DCameraSrcImuSensor::GetInstance().SetAREnable(devId_, true);
+        }
     }
     return dataProcess_[CONTINUOUS_FRAME]->UpdateSettings(settings);
 }
@@ -436,6 +457,7 @@ int32_t DCameraSourceInput::ReleaseAllStreams()
             ret, GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
         return ret;
     }
+    DCameraSrcImuSensor::GetInstance().SetAREnable(devId_, false);
     return DCAMERA_OK;
 }
 

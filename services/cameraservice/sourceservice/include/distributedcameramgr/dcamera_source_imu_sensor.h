@@ -18,6 +18,8 @@
 
 #include <string>
 #include <vector>
+#include <map>
+#include <mutex>
 #include "dhfwk_single_instance.h"
 
 namespace OHOS {
@@ -30,6 +32,8 @@ public:
     std::string GetInitParam();
     void SetSrcEis(bool eis);
     bool GetSrcEis();
+    void SetAREnable(std::string devID, bool arEnable);
+    bool GetAREnable(std::string devID);
 
 private:
     DCameraSrcImuSensor() = default;
@@ -37,7 +41,9 @@ private:
 
     std::string param_;
     bool eis_ = false;
+    std::map<std::string, bool> arEnableMap_;
+    std::mutex arEnableMutex_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // DCAMERA_SINK_IMU_SENSOR_H
+#endif // DCAMERA_SINK_IMU_SENSOR_H

@@ -15,6 +15,7 @@
 
 #include "dcamera_source_imu_sensor.h"
 #include "distributed_hardware_log.h"
+#include "anonymous_string.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -42,5 +43,22 @@ bool DCameraSrcImuSensor::GetSrcEis()
 {
     return eis_;
 }
+
+void DCameraSrcImuSensor::SetAREnable(std::string devID, bool arEnable)
+{
+    std::lock_guard<std::mutex> lock(arEnableMutex_);
+    arEnableMap_.insert_or_assign(devID, arEnable);
+    DHLOGI("DcameraSrcImuSensor set ar enable %{public}d, devId:%{public}s", arEnable, GetAnonyString(devID).c_str());
 }
-}
+
+bool DCameraSrcImuSensor::GetAREnable(std::string devID)
+{
+    std::lock_guard<std::mutex> lock(arEnableMutex_);
+    auto it = arEnableMap_.find(devID);
+    if (it != arEnableMap_.end()) {
+        return it->second;
+    }
+    return false;
+}
+}
+}
