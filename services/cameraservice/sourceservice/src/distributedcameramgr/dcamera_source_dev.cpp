@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -860,6 +860,8 @@ std::string DCameraSourceDev::GetVersion()
 
 int32_t DCameraSourceDev::OnChannelConnectedEvent()
 {
+    CHECK_AND_RETURN_RET_LOG(stateListener_ == nullptr, DCAMERA_BAD_VALUE, "stateListener_ is nullptr.");
+    stateListener_->OnDataSyncTrigger(devId_);
     std::shared_ptr<DCameraEvent> camEvent = std::make_shared<DCameraEvent>();
     camEvent->eventType_ = DCAMERA_MESSAGE;
     camEvent->eventResult_ = DCAMERA_EVENT_CHANNEL_CONNECTED;
