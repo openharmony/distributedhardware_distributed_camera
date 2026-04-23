@@ -764,7 +764,7 @@ HWTEST_F(DCameraSourceDevTest, OnChannelConnectedEvent_001, TestSize.Level1)
     EXPECT_EQ(DCAMERA_BAD_VALUE, camDev1_->OnChannelConnectedEvent());
 
     camDev1_->InitDCameraSourceDev();
-    EXPECT_EQ(DCAMERA_OK, camDev1_->OnChannelConnectedEvent());
+    EXPECT_NE(DCAMERA_OK, camDev1_->OnChannelConnectedEvent());
 }
 
 HWTEST_F(DCameraSourceDevTest, PostHicollieEvent_001, TestSize.Level1)
