@@ -26,6 +26,7 @@
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
 #include "idistributed_camera_source.h"
+#include "dcamera_source_imu_sensor.h"
 #include "v1_1/dcamera_types.h"
 
 using namespace testing::ext;
@@ -52,6 +53,26 @@ const std::string TEST_CAMERA_DH_ID_0 = "camera_0";
 const uint8_t SLEEP_TIME = 1;
 const int32_t STREAM_ID_1 = 1;
 const int32_t STREAM_ID_2 = 2;
+const std::string IMU_STR = R"({
+        "exposuretime": 1,
+        "offset": 100,
+        "imuAccData": [
+            {
+                "timestamp": 1,
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        ],
+        "imuGyroData": [
+            {
+                "timestamp": 1,
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        ]
+    })";
 }
 void DCameraStreamDataProcessProducerTest::SetUpTestCase(void)
 {
@@ -245,6 +266,212 @@ HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_produ
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
     ret = streamProcess2->FeedStreamToDriver(dhBase, buffer);
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_stream_data_process_producer_test_008
+ * @tc.desc: Verify SetIMUTOBuffer func.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_producer_test_008, TestSize.Level1)
+{
+    DHLOGI("dcamera_stream_data_process_producer_test_008");
+    std::shared_ptr<DCameraStreamDataProcessProducer> streamProcess =
+        std::make_shared<DCameraStreamDataProcessProducer>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, STREAM_ID_1,
+        DCStreamType::CONTINUOUS_FRAME);
+
+    DCameraBuffer sharedMemory;
+    sharedMemory.bufferHandle_ = nullptr;
+    auto ret = streamProcess->SetIMUTOBuffer(sharedMemory, nullptr);
+    EXPECT_EQ(ret, false);
+
+    sharedMemory.index_ = 1;
+    sharedMemory.size_ = 1;
+    auto bufferHandle = std::make_unique<BufferHandle>();
+    sharedMemory.bufferHandle_ = sptr<NativeBuffer>(new NativeBuffer(bufferHandle.get()));
+    DCameraSrcImuSensor::GetInstance().SetAREnable(TEST_DEVICE_ID, false);
+    ret = streamProcess->SetIMUTOBuffer(sharedMemory, nullptr);
+    EXPECT_EQ(ret, false);
+
+    DCameraSrcImuSensor::GetInstance().SetAREnable(TEST_DEVICE_ID, true);
+    ret = streamProcess->SetIMUTOBuffer(sharedMemory, nullptr);
+    EXPECT_EQ(ret, false);
+    
+    auto buffer = std::make_shared<DataBuffer>(100);
+    buffer->eisInfo_.frameId = 1;
+    buffer->eisInfo_.frameTimeStamp = 1;
+    buffer->eisInfo_.imuData = IMU_STR;
+    buffer->frameInfo_.rawTime = 1000000;
+    ret = streamProcess->SetIMUTOBuffer(sharedMemory, buffer);
+    DCameraSrcImuSensor::GetInstance().SetAREnable(TEST_DEVICE_ID, false);
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: dcamera_stream_data_process_producer_test_009
+ * @tc.desc: Verify UnmarshalIMUData func.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_producer_test_009, TestSize.Level1)
+{
+    DHLOGI("dcamera_stream_data_process_producer_test_009");
+    std::shared_ptr<DCameraStreamDataProcessProducer> streamProcess =
+        std::make_shared<DCameraStreamDataProcessProducer>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, STREAM_ID_1,
+        DCStreamType::CONTINUOUS_FRAME);
+    std::vector<uint8_t> result;
+    const std::string str = "";
+    auto ret = streamProcess->UnmarshalIMUData(str, result);
+    EXPECT_EQ(ret, false);
+
+    const std::string str2 = R"({"x": 1})";
+    ret = streamProcess->UnmarshalIMUData(str2, result);
+    EXPECT_EQ(ret, false);
+
+    const std::string str3 = R"({"exposuretime": "aa"})";
+    ret = streamProcess->UnmarshalIMUData(str3, result);
+    EXPECT_EQ(ret, false);
+
+    const std::string str4 = R"({"exposuretime": -1})";
+    ret = streamProcess->UnmarshalIMUData(str4, result);
+    EXPECT_EQ(ret, false);
+
+    const std::string str5 = R"({"exposuretime": 1})";
+    ret = streamProcess->UnmarshalIMUData(str5, result);
+    EXPECT_EQ(ret, false);
+
+    const std::string str6 = R"({"exposuretime": 1, "offset": "aa"})";
+    ret = streamProcess->UnmarshalIMUData(str6, result);
+    EXPECT_EQ(ret, false);
+
+    const std::string str7 = R"({"exposuretime": 1, "offset": 1})";
+    ret = streamProcess->UnmarshalIMUData(str7, result);
+    EXPECT_EQ(ret, false);
+
+    const std::string str8 = R"({"exposuretime": 1, "offset": 1, "imuAccData": 1})";
+    ret = streamProcess->UnmarshalIMUData(str8, result);
+    EXPECT_EQ(ret, false);
+
+    const std::string str9 = R"({"exposuretime": 1, "offset": 1, "imuAccData": []})";
+    ret = streamProcess->UnmarshalIMUData(str9, result);
+    EXPECT_EQ(ret, false);
+
+    const std::string str10 = R"({"exposuretime": 1, "offset": 1, "imuAccData": [], "imuGyroData": 1})";
+    ret = streamProcess->UnmarshalIMUData(str10, result);
+    EXPECT_EQ(ret, false);
+
+    const std::string str11 = R"({"exposuretime": 1, "offset": 1, "imuAccData": [], "imuGyroData": []})";
+    ret = streamProcess->UnmarshalIMUData(str11, result);
+    EXPECT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: dcamera_stream_data_process_producer_test_0010
+ * @tc.desc: Verify UnmarshalIMUDataArray func Acc.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_producer_test_0010, TestSize.Level1)
+{
+    DHLOGI("dcamera_stream_data_process_producer_test_010");
+    std::shared_ptr<DCameraStreamDataProcessProducer> streamProcess =
+        std::make_shared<DCameraStreamDataProcessProducer>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, STREAM_ID_1,
+        DCStreamType::CONTINUOUS_FRAME);
+    std::vector<uint8_t> result;
+    const std::string str = R"({"exposuretime": 1, "imuAccData": [{"xx": 1}]})";
+    auto ret = streamProcess->UnmarshalIMUData(str, result);
+    EXPECT_EQ(ret, false);
+
+    const std::string str1 = R"({"exposuretime": 1, "imuAccData": [{"timestamp": "a"}]})";
+    ret = streamProcess->UnmarshalIMUData(str1, result);
+    EXPECT_EQ(ret, false);
+
+    const std::string str2 = R"({"exposuretime": 1, "imuAccData": [{"timestamp": 1}]})";
+    ret = streamProcess->UnmarshalIMUData(str2, result);
+    EXPECT_EQ(ret, false);
+
+    const std::string str3 = R"({"exposuretime": 1, "imuAccData": [{"timestamp": 1, "x": "a"}]})";
+    ret = streamProcess->UnmarshalIMUData(str3, result);
+    EXPECT_EQ(ret, false);
+
+    const std::string str4 = R"({"exposuretime": 1, "imuAccData": [{"timestamp": 1, "x": 1}]})";
+    ret = streamProcess->UnmarshalIMUData(str4, result);
+    EXPECT_EQ(ret, false);
+
+    const std::string str5 = R"({"exposuretime": 1, "imuAccData": [{"timestamp": 1, "x": 1, "y": "a"}]})";
+    ret = streamProcess->UnmarshalIMUData(str5, result);
+    EXPECT_EQ(ret, false);
+
+    const std::string str6 = R"({"exposuretime": 1, "imuAccData": [{"timestamp": 1, "x": 1, "y": 1}]})";
+    ret = streamProcess->UnmarshalIMUData(str6, result);
+    EXPECT_EQ(ret, false);
+
+    const std::string str7 = R"({"exposuretime": 1,
+        "imuAccData": [{"timestamp": 1, "x": 1, "y": 1, "z": "a"}]})";
+    ret = streamProcess->UnmarshalIMUData(str7, result);
+    EXPECT_EQ(ret, false);
+
+    const std::string str8 = R"({"exposuretime": 1,
+        "imuAccData": [{"timestamp": 1, "x": 1, "y": 1, "z": 1}]})";
+    ret = streamProcess->UnmarshalIMUData(str8, result);
+    EXPECT_EQ(ret, false);
+
+    const std::string str9 = R"({"exposuretime": 1,
+        "imuAccData": [{"timestamp": 1, "x": 1, "y": 1, "z": 1}], "imuGyroData": []})";
+    ret = streamProcess->UnmarshalIMUData(str9, result);
+    EXPECT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: dcamera_stream_data_process_producer_test_0011
+ * @tc.desc: Verify UnmarshalIMUDataArray func Gyro.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_producer_test_0011, TestSize.Level1)
+{
+    DHLOGI("dcamera_stream_data_process_producer_test_0011");
+    std::shared_ptr<DCameraStreamDataProcessProducer> streamProcess =
+        std::make_shared<DCameraStreamDataProcessProducer>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, STREAM_ID_1,
+        DCStreamType::CONTINUOUS_FRAME);
+    std::vector<uint8_t> result;
+    const std::string str = R"({"exposuretime": 1, "imuAccData": [],
+        "imuGyroData": [{"xx": 1}]})";
+    auto ret = streamProcess->UnmarshalIMUData(str, result);
+    EXPECT_EQ(ret, false);
+    const std::string str1 = R"({"exposuretime": 1, "imuAccData": [],
+        "imuGyroData": [{"timestamp": "a"}]})";
+    ret = streamProcess->UnmarshalIMUData(str1, result);
+    EXPECT_EQ(ret, false);
+    const std::string str2 = R"({"exposuretime": 1, "imuAccData": [],
+        "imuGyroData": [{"timestamp": 1}]})";
+    ret = streamProcess->UnmarshalIMUData(str2, result);
+    EXPECT_EQ(ret, false);
+    const std::string str3 = R"({"exposuretime": 1, "imuAccData": [],
+        "imuGyroData": [{"timestamp": 1, "x": "a"}]})";
+    ret = streamProcess->UnmarshalIMUData(str3, result);
+    EXPECT_EQ(ret, false);
+    const std::string str4 = R"({"exposuretime": 1, "imuAccData": [],
+        "imuGyroData": [{"timestamp": 1, "x": 1}]})";
+    ret = streamProcess->UnmarshalIMUData(str4, result);
+    EXPECT_EQ(ret, false);
+    const std::string str5 = R"({"exposuretime": 1, "imuAccData": [],
+        "imuGyroData": [{"timestamp": 1, "x": 1, "y": "a"}]})";
+    ret = streamProcess->UnmarshalIMUData(str5, result);
+    EXPECT_EQ(ret, false);
+    const std::string str6 = R"({"exposuretime": 1, "imuAccData": [],
+        "imuGyroData": [{"timestamp": 1, "x": 1, "y": 1}]})";
+    ret = streamProcess->UnmarshalIMUData(str6, result);
+    EXPECT_EQ(ret, false);
+    const std::string str7 = R"({"exposuretime": 1, "imuAccData": [],
+        "imuGyroData": [{"timestamp": 1, "x": 1, "y": 1, "z": "a"}]})";
+    ret = streamProcess->UnmarshalIMUData(str7, result);
+    EXPECT_EQ(ret, false);
+    const std::string str8 = R"({"exposuretime": 1, "imuAccData": [],
+        "imuGyroData": [{"timestamp": 1, "x": 1, "y": 1, "z": 1}]})";
+    ret = streamProcess->UnmarshalIMUData(str8, result);
+    EXPECT_EQ(ret, true);
 }
 
 /**
