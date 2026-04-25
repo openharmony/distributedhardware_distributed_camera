@@ -49,6 +49,7 @@ const int32_t TEST_WIDTH = 1920;
 const int32_t TEST_HEIGTH = 1080;
 const int32_t TEST_STREAMID = 2;
 const int32_t TEST_SLEEP_SEC = 200000;
+const uint32_t AR_MODE_TAG = (0x8000 << 16) + 40;
 std::vector<std::shared_ptr<DCStreamInfo>> g_streamInfos;
 std::vector<std::shared_ptr<DCCaptureInfo>> g_captureInfos;
 std::vector<std::shared_ptr<DCameraSettings>> g_cameraSettings;
@@ -498,6 +499,59 @@ HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_016, TestSize.Level1)
     dCameraSettings->value_ = Base64Encode(reinterpret_cast<const unsigned char *>(settinStr.c_str()),
         settinStr.length());
     settingVectors.push_back(dCameraSettings);
+
+    int32_t rc = testInput_->UpdateSettings(settingVectors);
+    EXPECT_EQ(rc, DCAMERA_WRONG_STATE);
+
+    rc = testInput_->Init();
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    rc = testInput_->StartCapture(g_captureInfos);
+    EXPECT_EQ(rc, DCAMERA_OK);
+
+    rc = testInput_->UpdateSettings(settingVectors);
+    EXPECT_EQ(rc, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: dcamera_source_input_test_017
+ * @tc.desc: Verify source inptut UpdateSettings.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceInputTest, dcamera_source_input_test_017, TestSize.Level1)
+{
+    std::vector<std::shared_ptr<DCameraSettings>> settingVectors;
+
+    auto metaData1 = std::make_shared<OHOS::Camera::CameraMetadata>(100, 200);
+    uint32_t item1 = AR_MODE_TAG;
+    uint8_t data1 = 9;
+    OHOS::Camera::AddCameraMetadataItem(metaData1->get(), item1, static_cast<void*>(&data1), 1);
+    std::string settinStr1 = Camera::MetadataUtils::EncodeToString(metaData1);
+    std::shared_ptr<DCameraSettings> dCameraSettings1 = std::make_shared<DCameraSettings>();
+    dCameraSettings1->type_ = UPDATE_METADATA;
+    dCameraSettings1->value_ = Base64Encode(reinterpret_cast<const unsigned char *>(settinStr1.c_str()),
+        settinStr1.length());
+    settingVectors.push_back(dCameraSettings1);
+
+    auto metaData2 = std::make_shared<OHOS::Camera::CameraMetadata>(100, 200);
+    uint32_t item2 = AR_MODE_TAG;
+    uint8_t data2 = 1;
+    OHOS::Camera::AddCameraMetadataItem(metaData2->get(), item2, static_cast<void*>(&data2), 1);
+    std::string settinStr2 = Camera::MetadataUtils::EncodeToString(metaData2);
+    std::shared_ptr<DCameraSettings> dCameraSettings2 = std::make_shared<DCameraSettings>();
+    dCameraSettings2->type_ = UPDATE_METADATA;
+    dCameraSettings2->value_ = Base64Encode(reinterpret_cast<const unsigned char *>(settinStr2.c_str()),
+        settinStr2.length());
+    settingVectors.push_back(dCameraSettings2);
+
+    auto metaData3 = std::make_shared<OHOS::Camera::CameraMetadata>(100, 200);
+    std::string settinStr3 = Camera::MetadataUtils::EncodeToString(metaData3);
+    std::shared_ptr<DCameraSettings> dCameraSettings3 = std::make_shared<DCameraSettings>();
+    dCameraSettings3->type_ = UPDATE_METADATA;
+    dCameraSettings3->value_ = Base64Encode(reinterpret_cast<const unsigned char *>(settinStr3.c_str()),
+        settinStr3.length());
+    settingVectors.push_back(dCameraSettings3);
 
     int32_t rc = testInput_->UpdateSettings(settingVectors);
     EXPECT_EQ(rc, DCAMERA_WRONG_STATE);
