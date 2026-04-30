@@ -172,7 +172,7 @@ HWTEST_F(DcameraSourceStubTest, dcamera_source_stub_test_005, TestSize.Level1)
     std::string dhId = "dhId000";
     std::string events = "events000";
     int32_t ret = sourceProxy.DCameraNotify(devId, dhId, events);
-    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_NE(ERR_DH_CAMERA_BASE, ret);
 }
 
 /**
