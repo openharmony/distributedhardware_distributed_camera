@@ -39,6 +39,7 @@ public:
     std::string PackedImuData();
     void SetSinkEis(bool eis);
     bool GetSinkEis();
+    int64_t GetMonoToBoottimeOffset();
  
 private:
     DCameraSinkImuSensor() = default;
