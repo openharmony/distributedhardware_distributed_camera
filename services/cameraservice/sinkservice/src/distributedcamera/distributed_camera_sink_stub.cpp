@@ -170,6 +170,11 @@ int32_t DistributedCameraSinkStub::SubscribeLocalHardwareInner(MessageParcel &da
     DHLOGD("enter");
     int32_t ret = DCAMERA_OK;
     do {
+        if (!HasEnableDHPermission()) {
+            DHLOGE("The caller has no ENABLE_DISTRIBUTED_HARDWARE permission.");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
         std::string dhId = data.ReadString();
         std::string parameters = data.ReadString();
         if (parameters.empty() || parameters.size() > PARAM_MAX_SIZE || dhId.empty() ||
@@ -189,6 +194,11 @@ int32_t DistributedCameraSinkStub::UnsubscribeLocalHardwareInner(MessageParcel &
     DHLOGD("enter");
     int32_t ret = DCAMERA_OK;
     do {
+        if (!HasEnableDHPermission()) {
+            DHLOGE("The caller has no ENABLE_DISTRIBUTED_HARDWARE permission.");
+            ret = DCAMERA_BAD_VALUE;
+            break;
+        }
         std::string dhId = data.ReadString();
         if (dhId.empty() || dhId.size() > DID_MAX_SIZE) {
             DHLOGE("params is invalid");
