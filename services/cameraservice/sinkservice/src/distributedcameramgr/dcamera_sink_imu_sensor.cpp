@@ -29,6 +29,36 @@ constexpr int32_t MAX_LEN = 150;
 DCameraSinkImuSensor::~DCameraSinkImuSensor()
 {}
 
+int64_t DCameraSinkImuSensor::GetMonoToBoottimeOffset()
+{
+    const int TRY_TIMES = 3;
+    int64_t bestGap = INT64_MAX;
+    int64_t bestOffset = 0;
+    int64_t s2ns = 1000000000;
+    for (int i = 0; i < TRY_TIMES; i++) {
+        struct timespec m1;
+        struct timespec b;
+        struct timespec m2;
+
+        clock_gettime(CLOCK_MONOTONIC, &m1);
+        clock_gettime(CLOCK_BOOTTIME, &b);
+        clock_gettime(CLOCK_MONOTONIC, &m2);
+
+        int64_t mono1 = (int64_t)m1.tv_sec * s2ns + m1.tv_nsec;
+        int64_t boot = (int64_t)b.tv_sec * s2ns + b.tv_nsec;
+        int64_t mono2 = (int64_t)m2.tv_sec * s2ns + m2.tv_nsec;
+
+        int64_t gap = mono2 - mono1;
+        int64_t offset = boot - (mono1 + mono2) / 2;
+
+        if (gap < bestGap) {
+            bestGap = gap;
+            bestOffset = offset;
+        }
+    }
+    return bestOffset;
+}
+
 void DCameraSinkImuSensor::SaveAccInfo(const SensorData data)
 {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -53,6 +83,7 @@ std::string DCameraSinkImuSensor::PackedImuData()
     cJSON *imuInfo = cJSON_CreateObject();
     CHECK_NULL_RETURN((imuInfo == nullptr), "");
     cJSON_AddNumberToObject(imuInfo, "exposuretime", DCameraExpoTime::GetInstance().GetExpoTime());
+    cJSON_AddNumberToObject(imuInfo, "offset", GetMonoToBoottimeOffset());
     cJSON* accArray = cJSON_CreateArray();
     if (accArray != nullptr) {
         std::lock_guard<std::mutex> lock(mutex_);
