@@ -354,18 +354,20 @@ void DecodeDataProcess::ReleaseDecoderSurface()
 void DecodeDataProcess::ReleaseCodecEvent()
 {
     DHLOGI("ReleaseCodecEvent enter.");
+    bool needJoin = false;
     {
         std::lock_guard<std::mutex> lock(eventMutex_);
         if ((decEventHandler_ != nullptr) && (decEventHandler_->GetEventRunner() != nullptr)) {
             DHLOGI("ReleaseCodecEvent: stop event runner and join event thread.");
             decEventHandler_->GetEventRunner()->Stop();
-            if (eventThread_.joinable()) {
-                eventThread_.join();
-                DHLOGI("ReleaseCodecEvent: event thread joined.");
-            }
+            needJoin = true;
         }
-        DHLOGI("ReleaseCodecEvent: decEventHandler_ or event runner is null, skip stop.");
         decEventHandler_ = nullptr;
+        DHLOGI("ReleaseCodecEvent: decEventHandler_ or event runner is null, skip stop.");
+    }
+    if (needJoin && eventThread_.joinable()) {
+        eventThread_.join();
+        DHLOGI("ReleaseCodecEvent: event thread joined.");
     }
     pipeSrcEventHandler_ = nullptr;
     DHLOGI("ReleaseCodecEvent end.");
