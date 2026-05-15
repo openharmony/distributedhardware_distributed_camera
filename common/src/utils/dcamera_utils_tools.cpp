@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -141,8 +141,8 @@ std::string Base64Encode(const unsigned char *toEncode, unsigned int len)
 std::string Base64Decode(const std::string& basicString)
 {
     std::string ret = "";
-    if (basicString.empty()) {
-        DHLOGE("basicString is empty.");
+    if (basicString.empty() || basicString.size() > INT_MAX) {
+        DHLOGE("basicString is empty or exceeds limit.");
         return ret;
     }
     uint32_t i = 0;

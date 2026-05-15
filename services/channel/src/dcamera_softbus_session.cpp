@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -298,6 +298,7 @@ void DCameraSoftbusSession::PostData(std::shared_ptr<DataBuffer>& buffer)
 
 void DCameraSoftbusSession::GetFragDataLen(uint8_t *ptrPacket, SessionDataHeader& headerPara)
 {
+    CHECK_AND_RETURN_LOG(ptrPacket == nullptr, "ptrPacket is nullptr");
     headerPara.version = U16Get(ptrPacket);
     headerPara.fragFlag = ptrPacket[BINARY_HEADER_FRAG_OFFSET];
     headerPara.dataType = U32Get(ptrPacket + BINARY_HEADER_DATATYPE_OFFSET);

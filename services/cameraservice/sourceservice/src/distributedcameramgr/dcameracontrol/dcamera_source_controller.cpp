@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -605,6 +605,7 @@ void DCameraSourceController::HandleReceivedData(std::shared_ptr<DataBuffer>& da
     CHECK_AND_RETURN_LOG(dataBuffer == nullptr, "dataBuffer is nullptr");
     DHLOGI("DCameraSourceController::HandleReceivedData dhId: %{public}s", GetAnonyString(dhId_).c_str());
     uint8_t *data = dataBuffer->Data();
+    CHECK_AND_RETURN_LOG(data == nullptr, "data is nullptr");
     std::string jsonStr(reinterpret_cast<const char *>(data), dataBuffer->Capacity());
     cJSON *rootValue = cJSON_Parse(jsonStr.c_str());
     if (rootValue == nullptr) {
