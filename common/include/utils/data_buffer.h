@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,8 +26,8 @@
 namespace OHOS {
 namespace DistributedHardware {
 struct EisInfo {
-    int32_t frameId;
-    int64_t frameTimeStamp;
+    int32_t frameId = 0;
+    int64_t frameTimeStamp = 0;
     std::string initParams;
     std::string imuData;
 };
