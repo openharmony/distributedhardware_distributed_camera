@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -71,6 +71,7 @@ public:
 
     int32_t HandleSourceStreamExt(std::shared_ptr<DataBuffer>& buffer, const StreamData *ext);
     void RecordSourceSocketSession(int32_t socket, std::shared_ptr<DCameraSoftbusSession> session);
+    int32_t GetLastBindRet();
 
     void CloseSessionWithNetWorkId(const std::string &networkId);
     void ProcessAuthorizationResult(const std::string &requestId, bool granted);
@@ -109,6 +110,7 @@ private:
     static const uint32_t SOFTBUS_VIDEO_P_FRAME = 2;
 
     int32_t sourceSocketId_ = -1;
+    int32_t lastBindRet_ = 0;
     std::mutex trustSessionIdLock_;
     struct TrustSessionId {
         int32_t controlSessionId_ = -1;

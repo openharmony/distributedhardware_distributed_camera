@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -264,6 +264,7 @@ int32_t DCameraSoftbusAdapter::CreateSoftBusSourceSocketClient(std::string myDhI
         return DCAMERA_BAD_VALUE;
     }
     int ret = Bind(socketId, g_qosInfo, g_QosTV_Param_Index, &sessListeners_[role]);
+    lastBindRet_ = ret;
     if (ret != DCAMERA_OK) {
         DHLOGE("create socket client error");
         Shutdown(socketId);
@@ -274,10 +275,9 @@ int32_t DCameraSoftbusAdapter::CreateSoftBusSourceSocketClient(std::string myDhI
         DCameraAllConnectManager::GetInstance().PublishServiceState(peerDevId, myDhId, SCM_CONNECTED);
         DCameraAllConnectManager::SetSourceNetworkId(peerDevId, sourceSocketId_);
     }
-    DHLOGI("DCamera allconnect create socket client publish scm connected success, dhId: %{public}s",
-        GetAnonyString(myDhId).c_str());
-    DHLOGI("create socket client end, myDevId: %{public}s, peerSessionName: %{public}s",
-        GetAnonyString(myDevId).c_str(), GetAnonyString(peerSessionName).c_str());
+    DHLOGI("DCamera allconnect create socket client publish scm connected success");
+    DHLOGI("create socket client end, myDevId: %{public}s, dhId: %{public}s, peerSessionName: %{public}s",
+        GetAnonyString(myDevId).c_str(), GetAnonyString(myDhId).c_str(), GetAnonyString(peerSessionName).c_str());
     return socketId;
 }
 
@@ -412,6 +412,11 @@ int32_t DCameraSoftbusAdapter::SourceOnBind(int32_t socket, PeerSocketInfo info)
     }
     DHLOGI("source bind socket end, socket: %{public}d end", socket);
     return ret;
+}
+
+int32_t DCameraSoftbusAdapter::GetLastBindRet()
+{
+    return lastBindRet_;
 }
 
 void DCameraSoftbusAdapter::SourceOnShutDown(int32_t socket, ShutdownReason reason)

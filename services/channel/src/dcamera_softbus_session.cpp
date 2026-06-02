@@ -352,6 +352,14 @@ int32_t DCameraSoftbusSession::BindSocketServer()
 {
     int32_t socketId = DCameraSoftbusAdapter::GetInstance().CreateSoftBusSourceSocketClient(myDhId_, myDevId_,
         peerSessionName_, peerDevId_, mode_, DCAMERA_CHANNLE_ROLE_SOURCE);
+    int32_t bindRet = DCameraSoftbusAdapter::GetInstance().GetLastBindRet();
+    if (bindRet != DCAMERA_OK) {
+        DHLOGE("DCameraSoftbusSession BindSocketServer Bind failed, bindRet %{public}d", bindRet);
+        if (listener_ != nullptr) {
+            listener_->OnSessionError(DCAMERA_MESSAGE, DCAMERA_EVENT_DEVICE_ERROR,
+                "Bind socket failed, subcode: " + std::to_string(bindRet));
+        }
+    }
     if (socketId == 0 || socketId == DCAMERA_BAD_VALUE) {
         DHLOGE("DCameraSoftbusSession BindSocketServer Error, socketId %{public}d", socketId);
         return socketId;
