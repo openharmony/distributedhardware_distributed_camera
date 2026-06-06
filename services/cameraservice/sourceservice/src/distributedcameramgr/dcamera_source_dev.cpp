@@ -511,6 +511,12 @@ int32_t DCameraSourceDev::OpenCamera()
         if (ret != DCAMERA_OK) {
             DHLOGE("DCamera allconnect apply advanced resource failed, ret: %{public}d, devId: %{public}s",
                 ret, GetAnonyString(devId_).c_str());
+            int32_t subcode = DCameraAllConnectManager::GetInstance().GetLastRejectSubcode();
+            std::shared_ptr<DCameraEvent> event = std::make_shared<DCameraEvent>();
+            event->eventType_ = DCAMERA_MESSAGE;
+            event->eventResult_ = DCAMERA_EVENT_DEVICE_ERROR;
+            event->eventContent_ = "ApplyAdvancedResource failed, subcode: " + std::to_string(subcode);
+            (void)CameraEventNotify(event);
             return ret;
         }
         ret = DCameraAllConnectManager::GetInstance().PublishServiceState(devId_, dhId_, SCM_PREPARE);

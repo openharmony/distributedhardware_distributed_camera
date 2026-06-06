@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2024-2025 Huawei Device Co., Ltd.
+* Copyright (c) 2024-2026 Huawei Device Co., Ltd.
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
@@ -25,6 +25,7 @@
 #include "distributed_hardware_log.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
+#include "cJSON.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -35,6 +36,7 @@ constexpr const char *ALL_CONNECT_SO_PATH = "/system/lib/";
 #endif
 constexpr const char *ALL_CONNECT_SO_NAME = "libcfwk_allconnect_client.z.so";
 std::shared_ptr<DCameraBlockObject<bool>> DCameraAllConnectManager::applyResultBlock_;
+int32_t DCameraAllConnectManager::lastRejectSubcode_ = 0;
 DCameraAllConnectManager::DCameraAllConnectManager()
 {
     allConnectCallback_.onStop = &DCameraAllConnectManager::OnStop;
@@ -241,6 +243,18 @@ int32_t DCameraAllConnectManager::UnRegisterLifecycleCallback()
     return DistributedCameraErrno::DCAMERA_OK;
 }
 
+void DCameraAllConnectManager::ParseRejectSubcode(const char *reason)
+{
+    CHECK_AND_RETURN_LOG(reason == nullptr, "DCamera allconnect ParseRejectSubcode reason is nullptr");
+    cJSON *root = cJSON_Parse(reason);
+    CHECK_AND_RETURN_LOG(root == nullptr, "DCamera allconnect ParseRejectSubcode root is nullptr");
+    cJSON *subcodeItem = cJSON_GetObjectItemCaseSensitive(root, "subcode");
+    if (subcodeItem != nullptr && cJSON_IsNumber(subcodeItem)) {
+        lastRejectSubcode_ = subcodeItem->valueint;
+    }
+    cJSON_Delete(root);
+}
+
 int32_t DCameraAllConnectManager::ApplyResult(int32_t errorcode, int32_t result, const char *reason)
 {
     CHECK_AND_RETURN_RET_LOG(applyResultBlock_ == nullptr, DistributedCameraErrno::DCAMERA_ERR_APPLY_RESULT,
@@ -250,10 +264,16 @@ int32_t DCameraAllConnectManager::ApplyResult(int32_t errorcode, int32_t result,
         DHLOGE("DCamera allconnect Apply Result is Reject, errorcode is %{public}d, reason is %{public}s",
             errorcode, reason);
         applyResultBlock_->SetValue(false);
+        ParseRejectSubcode(reason);
         return DistributedCameraErrno::DCAMERA_ERR_APPLY_RESULT;
     }
     applyResultBlock_->SetValue(true);
     return DistributedCameraErrno::DCAMERA_OK;
+}
+
+int32_t DCameraAllConnectManager::GetLastRejectSubcode()
+{
+    return lastRejectSubcode_;
 }
 
 int32_t DCameraAllConnectManager::OnStop(const char *peerNetworkId)

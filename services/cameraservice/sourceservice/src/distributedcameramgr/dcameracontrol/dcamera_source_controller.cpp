@@ -586,6 +586,11 @@ void DCameraSourceController::OnSessionError(int32_t eventType, int32_t eventRea
     DHLOGI("DCameraSourceController OnSessionError devId: %{public}s, dhId: %{public}s, eventType: %{public}d, "
         "eventReason: %{public}d, detail %{public}s", GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(),
         eventType, eventReason, detail.c_str());
+    std::shared_ptr<DCameraEvent> events = std::make_shared<DCameraEvent>();
+    events->eventType_ = eventType;
+    events->eventResult_ = eventReason;
+    events->eventContent_ = detail;
+    DCameraNotify(events);
     return;
 }
 

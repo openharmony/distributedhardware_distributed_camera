@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2024 Huawei Device Co., Ltd.
+* Copyright (c) 2024-2026 Huawei Device Co., Ltd.
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
@@ -48,6 +48,7 @@ public:
     int32_t RegisterLifecycleCallback();
     int32_t UnRegisterLifecycleCallback();
     static bool IsInited();
+    static int32_t GetLastRejectSubcode();
 private:
     DCameraAllConnectManager();
     ~DCameraAllConnectManager() = default;
@@ -55,6 +56,7 @@ private:
 
     static int32_t OnStop(const char *peerNetworkId);
     static int32_t ApplyResult(int32_t errorcode, int32_t result, const char *reason);
+    static void ParseRejectSubcode(const char *reason);
 
     std::mutex allConnectLock_;
     std::map<std::string, DCameraCollaborationBussinessStatus> dhIdStateMap_;
@@ -83,6 +85,7 @@ private:
 
     static bool bInited_;
     static std::mutex bInitedLock_;
+    static int32_t lastRejectSubcode_;
 };
 
 } // namespace DistributedHardware
