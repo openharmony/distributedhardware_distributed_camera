@@ -165,12 +165,14 @@ const int32_t AR_ACC_TYPE = 2;
 const int32_t AR_GYRO_TYPE = 3;
 const int32_t AR_DATA_STREAM_WIDTH = 640;
 const int32_t AR_MODE_TAG_OFFSET = 40;
-const uint32_t UNIFORM_METADATA_LEN = 2000;
+const uint32_t UNIFORM_METADATA_LEN = 3000;
 const uint32_t AR_META_DATA_KEY = 8000;
 const uint32_t AR_MODE_ENABLE_IMU = 9;
 const int32_t INT32_T_BYTE_LEN = 4;
 const int32_t UINT64_T_BYTE_LEN = 8;
 const int32_t FLOAT_T_BYTE_LEN = 4;
+const int32_t CAMERA_EXTRINSIC_NUM = 16;
+const int32_t CAMERA_INTRINSIC_NUM = 4;
 
 const std::string CHANNEL_DISCONNECTED = "disconnected";
 const std::string PRODUCER = "producer";

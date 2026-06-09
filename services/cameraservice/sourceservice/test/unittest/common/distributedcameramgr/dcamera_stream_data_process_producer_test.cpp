@@ -73,6 +73,12 @@ const std::string IMU_STR = R"({
             }
         ]
     })";
+const std::string CALIBRATION_STR = R"({
+        "extrinsic": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        "intrin": [1, 1, 1, 1],
+        "rollingShutterTime": 1,
+        "xmlGyroTimestampOffset": 1
+    })";
 }
 void DCameraStreamDataProcessProducerTest::SetUpTestCase(void)
 {
@@ -304,6 +310,15 @@ HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_produ
     buffer->eisInfo_.imuData = IMU_STR;
     buffer->frameInfo_.rawTime = 1000000;
     ret = streamProcess->SetIMUTOBuffer(sharedMemory, buffer);
+    EXPECT_EQ(ret, false);
+
+    auto buffer1 = std::make_shared<DataBuffer>(100);
+    buffer1->eisInfo_.frameId = 1;
+    buffer1->eisInfo_.frameTimeStamp = 1;
+    buffer1->eisInfo_.imuData = IMU_STR;
+    buffer1->eisInfo_.initParams = CALIBRATION_STR;
+    buffer1->frameInfo_.rawTime = 1000000;
+    ret = streamProcess->SetIMUTOBuffer(sharedMemory, buffer1);
     DCameraSrcImuSensor::GetInstance().SetAREnable(TEST_DEVICE_ID, false);
     EXPECT_EQ(ret, false);
 }
@@ -471,6 +486,25 @@ HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_produ
     const std::string str8 = R"({"exposuretime": 1, "imuAccData": [],
         "imuGyroData": [{"timestamp": 1, "x": 1, "y": 1, "z": 1}]})";
     ret = streamProcess->UnmarshalIMUData(str8, result);
+    EXPECT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: dcamera_stream_data_process_producer_test_0012
+ * @tc.desc: Verify UnmarshalCameraIntrin func.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DCameraStreamDataProcessProducerTest, dcamera_stream_data_process_producer_test_0012, TestSize.Level1)
+{
+    std::shared_ptr<DCameraStreamDataProcessProducer> streamProcess =
+        std::make_shared<DCameraStreamDataProcessProducer>(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, STREAM_ID_1,
+        DCStreamType::CONTINUOUS_FRAME);
+    std::vector<uint8_t> result;
+    const std::string str = "";
+    auto ret = streamProcess->UnmarshalCameraIntrin(str, result);
+    EXPECT_EQ(ret, false);
+    ret = streamProcess->UnmarshalCameraIntrin(CALIBRATION_STR, result);
     EXPECT_EQ(ret, true);
 }
 

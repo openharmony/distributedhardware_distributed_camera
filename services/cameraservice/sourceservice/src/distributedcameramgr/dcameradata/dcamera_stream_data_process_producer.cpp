@@ -294,6 +294,56 @@ bool DCameraStreamDataProcessProducer::UnmarshalIMUArray(cJSON *imuJsonArray,
     return true;
 }
 
+bool DCameraStreamDataProcessProducer::UnmarshalCameraIntrin(const std::string& jsonStr, std::vector<uint8_t>& result)
+{
+    cJSON *rootValue = cJSON_Parse(jsonStr.c_str());
+    CHECK_NULL_RETURN((rootValue == nullptr), false);
+    cJSON *extrinsicJson = cJSON_GetObjectItemCaseSensitive(rootValue, "extrinsic");
+    CHECK_AND_FREE_RETURN_RET_LOG((extrinsicJson == nullptr || !cJSON_IsArray(extrinsicJson)), false, rootValue,
+        "extrinsic parse fail.");
+    int32_t extrinsicCount = cJSON_GetArraySize(extrinsicJson);
+    CHECK_AND_FREE_RETURN_RET_LOG((extrinsicCount != CAMERA_EXTRINSIC_NUM), false, rootValue, "extrinsic size error");
+    for (int32_t i = 0; i < extrinsicCount; i++) {
+        cJSON *itemJson = cJSON_GetArrayItem(extrinsicJson, i);
+        CHECK_AND_FREE_RETURN_RET_LOG(!cJSON_IsNumber(itemJson), false, rootValue,
+            "extrinsic item parse fail.");
+        float val = static_cast<float>(itemJson->valuedouble);
+        uint8_t* valBytes = reinterpret_cast<uint8_t*>(&val);
+        result.insert(result.end(), valBytes, valBytes + FLOAT_T_BYTE_LEN);
+    }
+
+    cJSON *intrinJson = cJSON_GetObjectItemCaseSensitive(rootValue, "intrin");
+    CHECK_AND_FREE_RETURN_RET_LOG((intrinJson == nullptr || !cJSON_IsArray(intrinJson)), false, rootValue,
+        "intrin parse fail.");
+    int32_t intrinCount = cJSON_GetArraySize(intrinJson);
+    CHECK_AND_FREE_RETURN_RET_LOG((intrinCount != CAMERA_INTRINSIC_NUM), false, rootValue, "intrin size error.");
+    for (int32_t i = 0; i < intrinCount; i++) {
+        cJSON *itemJson = cJSON_GetArrayItem(intrinJson, i);
+        CHECK_AND_FREE_RETURN_RET_LOG(!cJSON_IsNumber(itemJson), false, rootValue,
+            "intrin item parse fail.");
+        float val = static_cast<float>(itemJson->valuedouble);
+        uint8_t* valBytes = reinterpret_cast<uint8_t*>(&val);
+        result.insert(result.end(), valBytes, valBytes + FLOAT_T_BYTE_LEN);
+    }
+
+    cJSON *rsTimeJson = cJSON_GetObjectItemCaseSensitive(rootValue, "rollingShutterTime");
+    CHECK_AND_FREE_RETURN_RET_LOG((rsTimeJson == nullptr || !cJSON_IsNumber(rsTimeJson)), false,
+        rootValue, "rollingShutterTime parse fail.");
+    float rollingShutterTime = static_cast<float>(rsTimeJson->valuedouble);
+    uint8_t* rollingShutterTimeBytes = reinterpret_cast<uint8_t*>(&rollingShutterTime);
+    result.insert(result.end(), rollingShutterTimeBytes, rollingShutterTimeBytes + FLOAT_T_BYTE_LEN);
+
+    cJSON *delayCam2IMU = cJSON_GetObjectItemCaseSensitive(rootValue, "xmlGyroTimestampOffset");
+    CHECK_AND_FREE_RETURN_RET_LOG((delayCam2IMU == nullptr || !cJSON_IsNumber(delayCam2IMU)),
+        false, rootValue, "xmlGyroTimestampOffset parse fail.");
+    float xmlGyroTimestampOffset = static_cast<float>(delayCam2IMU->valuedouble);
+    uint8_t* xmlGyroTimestampOffsetBytes = reinterpret_cast<uint8_t*>(&xmlGyroTimestampOffset);
+    result.insert(result.end(), xmlGyroTimestampOffsetBytes, xmlGyroTimestampOffsetBytes + FLOAT_T_BYTE_LEN);
+
+    cJSON_Delete(rootValue);
+    return true;
+}
+
 bool DCameraStreamDataProcessProducer::SetIMUTOBuffer(const DCameraBuffer& sharedMemory,
     const std::shared_ptr<DataBuffer>& buffer)
 {
@@ -307,6 +357,9 @@ bool DCameraStreamDataProcessProducer::SetIMUTOBuffer(const DCameraBuffer& share
         auto eisInfo = buffer->eisInfo_;
         std::vector<uint8_t> imuData;
         imuData.reserve(UNIFORM_METADATA_LEN);
+        if (!UnmarshalCameraIntrin(eisInfo.initParams, imuData)) {
+            return false;
+        }
 
         int32_t frameID = eisInfo.frameId;
         uint8_t* frameIDBytes = reinterpret_cast<uint8_t*>(&frameID);
