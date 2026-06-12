@@ -150,7 +150,7 @@ void DCameraSoftbusSession::PackRecvData(std::shared_ptr<DataBuffer>& buffer)
         return;
     }
     uint8_t *ptrPacket = buffer->Data();
-    SessionDataHeader headerPara;
+    SessionDataHeader headerPara = {0};
     GetFragDataLen(ptrPacket, headerPara);
     if (buffer->Size() != (headerPara.dataLen + BINARY_HEADER_FRAG_LEN) || headerPara.dataLen > headerPara.totalLen ||
         headerPara.dataLen > BINARY_DATA_MAX_LEN || headerPara.totalLen > BINARY_DATA_MAX_TOTAL_LEN) {

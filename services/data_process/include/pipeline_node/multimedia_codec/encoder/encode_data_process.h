@@ -72,6 +72,8 @@ private:
     int32_t InitEncoder();
     int32_t ConfigureVideoEncoder();
     int32_t InitEncoderMetadataFormat();
+    int32_t SetEncoderCodecType();
+    int32_t SetEncoderPixelFormat();
     int32_t InitEncoderBitrateFormat();
     int32_t StartVideoEncoder();
     int32_t StopVideoEncoder();
