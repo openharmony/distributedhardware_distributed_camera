@@ -1,0 +1,48 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "DistributedHardWareCast Studio - 分布式硬件能力示范"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "跨端创作台"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "DistributedHardWareCast"
+    },
+    {
+      "name": "permission_distributed_reason",
+      "value": "用于发现、绑定和同步分布式设备"
+    },
+    {
+      "name": "permission_camera_reason",
+      "value": "用于本地和分布式相机预览与拍摄"
+    },
+    {
+      "name": "permission_mic_reason",
+      "value": "用于本地和分布式麦克风录音"
+    },
+    {
+      "name": "permission_dh_reason",
+      "value": "用于注册分布式相机授权监听并响应导播端的镜头共享请求"
+    },
+    {
+      "name": "permission_dh_access_reason",
+      "value": "系统应用：访问分布式硬件框架，使能远端 Mic/Speaker"
+    },
+    {
+      "name": "permission_dh_enable_reason",
+      "value": "系统应用：EnableSink 分布式音频外设"
+    },
+    {
+      "name": "permission_gallery_write_reason",
+      "value": "用于将拍摄的照片和视频保存到系统相册"
+    },
+    {
+      "name": "permission_gallery_read_reason",
+      "value": "用于读取已保存的媒体文件"
+    }
+  ]
+}
