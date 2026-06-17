@@ -181,9 +181,8 @@ int32_t EncodeDataProcess::ConfigureVideoEncoder()
     return DCAMERA_OK;
 }
 
-int32_t EncodeDataProcess::InitEncoderMetadataFormat()
+int32_t EncodeDataProcess::SetEncoderCodecType()
 {
-    processedConfig_ = sourceConfig_;
     switch (targetConfig_.GetVideoCodecType()) {
         case VideoCodecType::CODEC_H264:
             processType_ = "video/avc";
@@ -205,6 +204,11 @@ int32_t EncodeDataProcess::InitEncoderMetadataFormat()
             DHLOGE("The current codec type does not support encoding.");
             return DCAMERA_NOT_FOUND;
     }
+    return DCAMERA_OK;
+}
+
+int32_t EncodeDataProcess::SetEncoderPixelFormat()
+{
     switch (sourceConfig_.GetVideoformat()) {
         case Videoformat::YUVI420:
             metadataFormat_.PutIntValue("pixel_format", static_cast<int32_t>(MediaAVCodec::VideoPixelFormat::YUVI420));
@@ -226,10 +230,21 @@ int32_t EncodeDataProcess::InitEncoderMetadataFormat()
             DHLOGE("The current pixel format does not support encoding.");
             return DCAMERA_NOT_FOUND;
     }
+    return DCAMERA_OK;
+}
+
+int32_t EncodeDataProcess::InitEncoderMetadataFormat()
+{
+    processedConfig_ = sourceConfig_;
+    int32_t ret = SetEncoderCodecType();
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "Set encoder codec type failed. ret %{public}d.", ret);
+    ret = SetEncoderPixelFormat();
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "Set encoder pixel format failed. ret %{public}d.", ret);
     metadataFormat_.PutStringValue("codec_mime", processType_);
     metadataFormat_.PutIntValue("width", static_cast<int32_t>(sourceConfig_.GetWidth()));
     metadataFormat_.PutIntValue("height", static_cast<int32_t>(sourceConfig_.GetHeight()));
     metadataFormat_.PutDoubleValue("frame_rate", MAX_FRAME_RATE);
+    metadataFormat_.PutIntValue("video_encoder_enable_pts_based_ratecontrol", 1);
     return DCAMERA_OK;
 }
 
