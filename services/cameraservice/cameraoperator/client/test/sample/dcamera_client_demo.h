@@ -37,6 +37,7 @@
 #include "preview_output.h"
 #include "surface.h"
 #include "video_output.h"
+#include "iconsumer_surface.h"
 
 namespace OHOS {
 namespace DistributedHardware {
