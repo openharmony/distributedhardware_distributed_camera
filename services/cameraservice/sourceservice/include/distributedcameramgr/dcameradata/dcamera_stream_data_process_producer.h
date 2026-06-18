@@ -76,6 +76,7 @@ private:
     bool SetIMUTOBuffer(const DCameraBuffer& sharedMemory, const std::shared_ptr<DataBuffer>& buffer);
     bool UnmarshalIMUData(const std::string& jsonStr, std::vector<uint8_t>& result);
     bool UnmarshalIMUArray(cJSON *imuJsonArray, std::vector<uint8_t>& result, int32_t currentType);
+    bool UnmarshalCameraIntrin(const std::string& jsonStr, std::vector<uint8_t>& result);
     int32_t CheckPreconditions(const std::shared_ptr<DataBuffer>& buffer);
 
     const uint32_t DCAMERA_PRODUCER_MAX_BUFFER_SIZE = 30;
