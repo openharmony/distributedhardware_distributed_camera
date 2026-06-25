@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -559,7 +559,7 @@ HWTEST_F(DCameraStreamDataProcessProducerTest, SyncVideoFrame_004, TestSize.Leve
     ASSERT_NE(producer_, nullptr);
 
     WorkModeParam param(-1, 0, 0, 0);
-    param.fd = 10;
+    param.fd = dup(10);
     param.sharedMemLen = 1024;
     param.isAVsync = 1;
     param.scene = 0;
@@ -632,7 +632,7 @@ HWTEST_F(DCameraStreamDataProcessProducerTest, UpdateVideoClock_003, TestSize.Le
 
     WorkModeParam param(-1, 0, 0, 0);
     param.isAVsync = 1;
-    param.fd = 10;
+    param.fd = dup(10);
     param.sharedMemLen = 1024;
     producer_->DCameraStreamDataProcessProducer::workModeParam_ = param;
 
@@ -657,7 +657,7 @@ HWTEST_F(DCameraStreamDataProcessProducerTest, UpdateVideoClock_004, TestSize.Le
 
     WorkModeParam param(-1, 0, 0, 0);
     param.isAVsync = 1;
-    param.fd = 10;
+    param.fd = dup(10);
     param.sharedMemLen = 1024;
     param.scene = 0;
     producer_->UpdateProducerWorkMode(param);
@@ -688,7 +688,7 @@ HWTEST_F(DCameraStreamDataProcessProducerTest, UpdateVideoClock_005, TestSize.Le
 
     WorkModeParam param(-1, 0, 0, 0);
     param.isAVsync = 1;
-    param.fd = 10;
+    param.fd = dup(10);
     param.sharedMemLen = 1024;
     producer_->DCameraStreamDataProcessProducer::workModeParam_ = param;
 
