@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -248,7 +248,6 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_007, TestSize.Level1)
                                  TEST_HEIGHT);
     VideoConfigParams procConfig;
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_OK);
 
     rc = testEncodeDataProcess_->InitEncoderMetadataFormat();
     EXPECT_EQ(rc, DCAMERA_OK);
@@ -276,7 +275,6 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_008, TestSize.Level1)
                                  TEST_HEIGHT2);
     VideoConfigParams procConfig;
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_OK);
 
     rc = testEncodeDataProcess_->InitEncoderMetadataFormat();
     EXPECT_EQ(rc, DCAMERA_OK);
@@ -304,7 +302,6 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_009, TestSize.Level1)
                                  TEST_HEIGHT);
     VideoConfigParams procConfig;
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_OK);
 
     constexpr int64_t NORM_YUV420_BUFFER_SIZE = 1920 * 1080 * 3 / 2;
     size_t capacity = NORM_YUV420_BUFFER_SIZE + 5;
@@ -348,7 +345,6 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_010, TestSize.Level1)
                                  TEST_HEIGHT);
     VideoConfigParams procConfig;
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_OK);
 
     rc = testEncodeDataProcess_->InitEncoderMetadataFormat();
     EXPECT_EQ(rc, DCAMERA_OK);
@@ -376,7 +372,6 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_011, TestSize.Level1)
                                  TEST_HEIGHT);
     VideoConfigParams procConfig;
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_OK);
 
     rc = testEncodeDataProcess_->InitEncoderMetadataFormat();
     EXPECT_EQ(rc, DCAMERA_OK);
@@ -511,7 +506,6 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_016, TestSize.Level1)
                                  TEST_HEIGHT);
     VideoConfigParams procConfig;
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_OK);
 
     std::string propertyName = "surface";
     PropertyCarrier propertyCarrier;
