@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,7 +31,8 @@ DCameraSourceControllerChannelListener::~DCameraSourceControllerChannelListener(
 {
 }
 
-void DCameraSourceControllerChannelListener::OnSessionState(int32_t state, std::string networkId)
+void DCameraSourceControllerChannelListener::OnSessionState(int32_t state, std::string networkId,
+    int32_t shutdownReason)
 {
     std::shared_ptr<DCameraSourceController> controller = controller_.lock();
     if (controller == nullptr) {
@@ -39,7 +40,7 @@ void DCameraSourceControllerChannelListener::OnSessionState(int32_t state, std::
         return;
     }
 
-    controller->OnSessionState(state, networkId);
+    controller->OnSessionState(state, networkId, shutdownReason);
 }
 
 void DCameraSourceControllerChannelListener::OnSessionError(int32_t eventType, int32_t eventReason, std::string detail)

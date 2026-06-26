@@ -100,7 +100,7 @@ int32_t DCameraSoftbusSession::OnSessionOpened(int32_t socket, std::string netwo
     return DCAMERA_OK;
 }
 
-int32_t DCameraSoftbusSession::OnSessionClose(int32_t sessionId)
+int32_t DCameraSoftbusSession::OnSessionClose(int32_t sessionId, ShutdownReason reason)
 {
     DHLOGI("OnSessionClose sessionId: %{public}d peerDevId: %{public}s peerSessionName: %{public}s", sessionId,
         GetAnonyString(peerDevId_).c_str(), GetAnonyString(peerSessionName_).c_str());
@@ -111,7 +111,7 @@ int32_t DCameraSoftbusSession::OnSessionClose(int32_t sessionId)
         DHLOGI("OnSessionClose session is in conflict state,socket: %{public}d", sessionId);
         return DCAMERA_OK;
     }
-    listener_->OnSessionState(DCAMERA_CHANNEL_STATE_DISCONNECTED, "");
+    listener_->OnSessionState(DCAMERA_CHANNEL_STATE_DISCONNECTED, "", static_cast<int32_t>(reason));
     return DCAMERA_OK;
 }
 

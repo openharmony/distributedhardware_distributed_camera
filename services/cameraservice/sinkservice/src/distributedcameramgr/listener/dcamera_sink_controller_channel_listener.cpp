@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,8 +24,10 @@ DCameraSinkControllerChannelListener::DCameraSinkControllerChannelListener(
 {
 }
 
-void DCameraSinkControllerChannelListener::OnSessionState(int32_t state, std::string networkId)
+void DCameraSinkControllerChannelListener::OnSessionState(int32_t state, std::string networkId,
+    int32_t shutdownReason)
 {
+    (void)shutdownReason;
     std::shared_ptr<DCameraSinkController> controller = controller_.lock();
     if (controller == nullptr) {
         DHLOGE("DCameraSinkControllerChannelListener::OnSessionState controller is null");
