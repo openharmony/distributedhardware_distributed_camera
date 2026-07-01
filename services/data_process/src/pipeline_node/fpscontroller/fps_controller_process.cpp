@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,7 +23,7 @@ namespace OHOS {
 namespace DistributedHardware {
 FpsControllerProcess::~FpsControllerProcess()
 {
-    if (isFpsControllerProcess_) {
+    if (isFpsControllerProcess_.load()) {
         DHLOGD("~DecodeDataProcess : ReleaseProcessNode.");
         ReleaseProcessNode();
     }
@@ -43,14 +43,14 @@ int32_t FpsControllerProcess::InitNode(const VideoConfigParams& sourceConfig, co
 
     processedConfig_ = sourceConfig;
     processedConfig = processedConfig_;
-    isFpsControllerProcess_ = true;
+    isFpsControllerProcess_.store(true);
     return DCAMERA_OK;
 }
 
 void FpsControllerProcess::ReleaseProcessNode()
 {
     DHLOGD("Start release [%{public}zu] node : FPS controller.", nodeRank_);
-    isFpsControllerProcess_ = false;
+    isFpsControllerProcess_.store(false);
     isFirstFrame_ = false;
     targetFrameRate_ = 0;
     lastFrameIncomeTimeMs_ = 0;
@@ -77,7 +77,7 @@ int32_t FpsControllerProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer
         DHLOGE("Data buffers is null.");
         return DCAMERA_BAD_TYPE;
     }
-    if (!isFpsControllerProcess_) {
+    if (!isFpsControllerProcess_.load()) {
         DHLOGE("Decoder node occurred error.");
         return DCAMERA_DISABLE_PROCESS;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -215,7 +215,7 @@ int32_t DistributedCameraSourceProxy::DCameraNotify(const std::string& devId, co
     std::string& events)
 {
     DHLOGI("DCameraNotify devId: %{public}s dhId: %{public}s events: %{public}s",
-        GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), events.c_str());
+        GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), GetAnonyString(events).c_str());
     if (!CheckNotifyParams(devId, dhId, events)) {
         DHLOGE("input is invalid");
         return DCAMERA_BAD_VALUE;

@@ -15,6 +15,7 @@
 #ifndef OHOS_FPS_CONTROLLER_PROCESS_H
 #define OHOS_FPS_CONTROLLER_PROCESS_H
 
+#include <atomic>
 #include <cstdint>
 #include <vector>
 
@@ -64,7 +65,7 @@ private:
     VideoConfigParams sourceConfig_;
     VideoConfigParams targetConfig_;
     VideoConfigParams processedConfig_;
-    bool isFpsControllerProcess_ = false;
+    std::atomic<bool> isFpsControllerProcess_ = false;
     bool isFirstFrame_ = false;
     int32_t targetFrameRate_ = 0;
     int64_t lastFrameIncomeTimeMs_ = 0;

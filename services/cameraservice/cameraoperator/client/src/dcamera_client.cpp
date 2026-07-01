@@ -286,6 +286,10 @@ void DCameraClient::GetFpsRanges()
 
         std::string metadataStr = Base64Decode(metadataSetting);
         std::shared_ptr<Camera::CameraMetadata> cameraMetadata = Camera::MetadataUtils::DecodeFromString(metadataStr);
+        if (cameraMetadata == nullptr) {
+            DHLOGE("GetFpsRanges: DecodeFromString failed");
+            continue;
+        }
         camera_metadata_item_t fpsItem;
         int32_t val = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_CONTROL_FPS_RANGES, &fpsItem);
         if (val == CAM_META_SUCCESS) {
