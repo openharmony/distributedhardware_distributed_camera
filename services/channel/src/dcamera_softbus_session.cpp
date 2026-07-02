@@ -385,14 +385,14 @@ int32_t DCameraSoftbusSession::UnPackSendData(std::shared_ptr<DataBuffer>& buffe
         headPara.fragFlag = FRAG_START_END;
         headPara.dataLen = buffer->Size();
         std::shared_ptr<DataBuffer> unpackData = std::make_shared<DataBuffer>(buffer->Size() + BINARY_HEADER_FRAG_LEN);
+        CHECK_AND_RETURN_RET_LOG(unpackData == nullptr || unpackData->Data() == nullptr, DCAMERA_BAD_VALUE,
+            "UnPackSendData START_END unpackData is nullptr");
         MakeFragDataHeader(headPara, unpackData->Data(), BINARY_HEADER_FRAG_LEN);
         int32_t ret = memcpy_s(unpackData->Data() + BINARY_HEADER_FRAG_LEN, unpackData->Size() - BINARY_HEADER_FRAG_LEN,
             buffer->Data(), buffer->Size());
-        if (ret != EOK) {
-            DHLOGE("UnPackSendData START_END memcpy_s failed, ret: %{public}d, sess: %{public}s peerSess: %{public}s",
-                ret, GetAnonyString(mySessionName_).c_str(), GetAnonyString(peerSessionName_).c_str());
-            return ret;
-        }
+        CHECK_AND_RETURN_RET_LOG(ret != EOK, ret,
+            "UnPackSendData START_END memcpy_s failed, ret: %{public}d, sess: %{public}s peerSess: %{public}s",
+            ret, GetAnonyString(mySessionName_).c_str(), GetAnonyString(peerSessionName_).c_str());
         return SendBytes(unpackData);
     }
     uint32_t offset = 0;
@@ -403,20 +403,18 @@ int32_t DCameraSoftbusSession::UnPackSendData(std::shared_ptr<DataBuffer>& buffe
             "nowTime: %{public}" PRId64" start:", bufferSize, headPara.dataLen, headPara.totalLen, GetNowTimeStampUs());
         std::shared_ptr<DataBuffer> unpackData =
             std::make_shared<DataBuffer>(headPara.dataLen + BINARY_HEADER_FRAG_LEN);
+        CHECK_AND_RETURN_RET_LOG(unpackData == nullptr || unpackData->Data() == nullptr, DCAMERA_BAD_VALUE,
+            "UnPackSendData unpackData is nullptr");
         MakeFragDataHeader(headPara, unpackData->Data(), BINARY_HEADER_FRAG_LEN);
         int ret = memcpy_s(unpackData->Data() + BINARY_HEADER_FRAG_LEN, unpackData->Size() - BINARY_HEADER_FRAG_LEN,
             buffer->Data() + offset, headPara.dataLen);
-        if (ret != EOK) {
-            DHLOGE("DCameraSoftbusSession UnPackSendData memcpy_s failed, ret: %{public}d, sess: %{public}s peerSess: "
-                "%{public}s", ret, GetAnonyString(mySessionName_).c_str(), GetAnonyString(peerSessionName_).c_str());
-            return ret;
-        }
+        CHECK_AND_RETURN_RET_LOG(ret != EOK, ret,
+            "UnPackSendData memcpy_s failed, ret: %{public}d, sess: %{public}s peerSess: %{public}s",
+            ret, GetAnonyString(mySessionName_).c_str(), GetAnonyString(peerSessionName_).c_str());
         ret = SendBytes(unpackData);
-        if (ret != DCAMERA_OK) {
-            DHLOGE("DCameraSoftbusSession sendData failed, ret: %{public}d, sess: %{public}s peerSess: %{public}s",
-                ret, GetAnonyString(mySessionName_).c_str(), GetAnonyString(peerSessionName_).c_str());
-            return ret;
-        }
+        CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret,
+            "DCameraSoftbusSession sendData failed, ret: %{public}d, sess: %{public}s peerSess: %{public}s",
+            ret, GetAnonyString(mySessionName_).c_str(), GetAnonyString(peerSessionName_).c_str());
         DHLOGD("DCameraSoftbusSession UnPackSendData, size: %" PRIu64", dataLen: %{public}d, totalLen: %{public}d, "
             "nowTime: %{public}" PRId64" end:", bufferSize, headPara.dataLen, headPara.totalLen, GetNowTimeStampUs());
         headPara.subSeq++;
@@ -441,6 +439,7 @@ void DCameraSoftbusSession::SetHeadParaDataLen(SessionDataHeader& headPara, cons
 
 void DCameraSoftbusSession::MakeFragDataHeader(const SessionDataHeader& headPara, uint8_t *header, uint32_t len)
 {
+    CHECK_AND_RETURN_LOG(header == nullptr, "MakeFragDataHeader header is nullptr");
     uint32_t headerLen = sizeof(uint8_t) * HEADER_UINT8_NUM + sizeof(uint16_t) * HEADER_UINT16_NUM +
         sizeof(uint32_t) * HEADER_UINT32_NUM;
     if (headerLen > len) {
