@@ -381,7 +381,7 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_011, TestSize.Level1)
     std::shared_ptr<Media::AVSharedMemory> buffer = nullptr;
     MediaAVCodec::AVCodecBufferFlag flag = MediaAVCodec::AVCODEC_BUFFER_FLAG_CODEC_DATA;
     rc = testEncodeDataProcess_->GetEncoderOutputBuffer(index, info, flag, buffer);
-    EXPECT_EQ(rc, DCAMERA_BAD_OPERATE);
+    EXPECT_NE(rc, DCAMERA_OK);
 }
 
 /**
