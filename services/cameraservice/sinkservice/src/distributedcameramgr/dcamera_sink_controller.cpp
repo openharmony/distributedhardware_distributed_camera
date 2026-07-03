@@ -82,7 +82,12 @@ int32_t DCameraSinkController::StartCapture(std::vector<std::shared_ptr<DCameraC
 #endif
     CHECK_AND_RETURN_RET_LOG(accessControl_ == nullptr, DCAMERA_BAD_VALUE, "accessControl_ is null.");
     CHECK_AND_RETURN_RET_LOG(operator_ == nullptr, DCAMERA_BAD_VALUE, "operator_ is null.");
-    operator_->SetSourceDevId(srcDevId_);
+    std::string deviceName = "";
+    int32_t dmReturn = DeviceManager::GetInstance().GetDeviceName(DCAMERA_PKG_NAME, srcDevId_, deviceName);
+    if (dmReturn != DCAMERA_OK) {
+        DHLOGE("GetDeviceName failed, dmReturn: %{public}d", dmReturn);
+    }
+    operator_->SetCallerInfo(srcDevId_, deviceName);
     if ((accessControl_->IsSensitiveSrcAccess(SRC_TYPE)) &&
         (accessControl_->GetAccessControlType(accessType) == DCAMERA_SAME_ACCOUNT)) {
 #ifdef SECURITY_LEVEL_CHECK_ENABLE

@@ -161,9 +161,10 @@ public:
         return normalSecurityLevel;
     }
 
-    void SetSourceDevId(const std::string& srcDevId)
+    void SetCallerInfo(const std::string& srcDevId, const std::string& deviceName)
     {
         (void)srcDevId;
+        (void)deviceName;
     }
 };
 } // namespace DistributedHardware

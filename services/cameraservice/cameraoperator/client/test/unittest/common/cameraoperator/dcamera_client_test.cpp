@@ -920,16 +920,17 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_030, TestSize.Level1)
 
 /**
  * @tc.name: dcamera_client_test_031
- * @tc.desc: Verify SetSourceDevId
+ * @tc.desc: Verify SetCallerInfo
  * @tc.type: FUNC
  * @tc.require: DTS
  */
 HWTEST_F(DCameraClientTest, dcamera_client_test_031, TestSize.Level1)
 {
-    DHLOGI("DCameraClientTest dcamera_client_test_031: test SetSourceDevId");
+    DHLOGI("DCameraClientTest dcamera_client_test_031: test SetCallerInfo");
     ASSERT_NE(client_, nullptr);
     std::string srcDevId = "test_device_123";
-    EXPECT_NO_FATAL_FAILURE(client_->SetSourceDevId(srcDevId));
+    std::string deviceName = "test_device_name_123";
+    EXPECT_NO_FATAL_FAILURE(client_->SetCallerInfo(srcDevId, deviceName));
     EXPECT_EQ(client_->srcDevId_, srcDevId);
 }
 
