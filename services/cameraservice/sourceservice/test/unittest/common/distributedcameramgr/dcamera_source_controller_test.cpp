@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,6 +27,7 @@
 #include "icamera_state_listener.h"
 #include "dcamera_source_controller_channel_listener.h"
 #include "distributed_camera_errno.h"
+#include "distributed_camera_constants.h"
 #include "mock_dcamera_source_dev.h"
 #include "mock_dcamera_source_state_listener.h"
 #include "mock_device_manager.h"
@@ -383,6 +384,8 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_010, TestSi
     listener->OnSessionState(state, "");
     state = 1;
     listener->OnSessionState(state, "");
+    int32_t shutdownReason = 1;
+    listener->OnSessionState(state, "", shutdownReason);
     int32_t eventType = 1;
     int32_t eventReason = 1;
     std::string detail = "OnSessionErrorTest";
@@ -625,6 +628,8 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_019, TestSi
         std::make_shared<DCameraSourceControllerChannelListener>(controller);
     int32_t state = DCAMERA_CHANNEL_STATE_CONNECTED;
     listener_->OnSessionState(state, "");
+    int32_t shutdownReason = 1;
+    listener_->OnSessionState(state, "", shutdownReason);
     int32_t eventType = 1;
     int32_t eventReason = 1;
     std::string detail = "OnSessionErrorTest";
@@ -1933,5 +1938,22 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_check_acl_r
     }
 }
 #endif
+
+/**
+ * @tc.name: dcamera_source_controller_test_on_session_state_with_shutdown_reason_003
+ * @tc.desc: Verify OnSessionState with shutdownReason when DCAMERA_CHANNEL_STATE_CONNECTED.
+ * @tc.type: FUNC
+ * @tc.require: AR000GK6MT
+ */
+HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_on_session_state_with_shutdown_reason_003,
+    TestSize.Level1)
+{
+    int32_t state = DCAMERA_CHANNEL_STATE_CONNECTED;
+    std::string networkId = "networkId";
+    int32_t shutdownReason = 0;
+    controller_->OnSessionState(state, networkId, shutdownReason);
+    EXPECT_EQ(state, controller_->channelState_);
+    EXPECT_TRUE(controller_->isChannelConnected_.load());
+}
 }
 }

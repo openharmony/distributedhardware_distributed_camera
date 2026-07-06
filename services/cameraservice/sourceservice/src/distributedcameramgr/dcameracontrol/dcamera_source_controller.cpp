@@ -549,9 +549,9 @@ int32_t DCameraSourceController::UnInit()
     return DCAMERA_OK;
 }
 
-void DCameraSourceController::OnSessionState(int32_t state, std::string networkId)
+void DCameraSourceController::OnSessionState(int32_t state, std::string networkId, int32_t shutdownReason)
 {
-    DHLOGI("DCameraSourceController OnSessionState state %{public}d", state);
+    DHLOGI("DCameraSourceController OnSessionState state %{public}d shutdownReason %{public}d", state, shutdownReason);
     channelState_ = state;
     switch (state) {
         case DCAMERA_CHANNEL_STATE_CONNECTED: {
@@ -572,7 +572,7 @@ void DCameraSourceController::OnSessionState(int32_t state, std::string networkI
             DHLOGI("DCameraSourceDev PostTask Controller CloseSession OnClose devId %{public}s dhId %{public}s",
                 GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
             isChannelConnected_.store(false);
-            PostChannelDisconnectedEvent();
+            PostChannelDisconnectedEvent(shutdownReason);
             break;
         }
         default: {
@@ -675,14 +675,14 @@ int32_t DCameraSourceController::PublishEnableLatencyMsg(const std::string& devI
     return DCAMERA_OK;
 }
 
-void DCameraSourceController::PostChannelDisconnectedEvent()
+void DCameraSourceController::PostChannelDisconnectedEvent(int32_t shutdownReason)
 {
     std::shared_ptr<DCameraSourceDev> camDev = camDev_.lock();
     if (camDev == nullptr) {
         DHLOGE("DCameraSourceController PostChannelDisconnectedEvent camDev is nullptr");
         return;
     }
-    camDev->OnChannelDisconnectedEvent();
+    camDev->OnChannelDisconnectedEvent(shutdownReason);
 }
 
 int32_t DCameraSourceController::PauseDistributedHardware(const std::string &networkId)
