@@ -880,7 +880,7 @@ int32_t DCameraSourceDev::OnChannelConnectedEvent()
     return DCAMERA_OK;
 }
 
-int32_t DCameraSourceDev::OnChannelDisconnectedEvent()
+int32_t DCameraSourceDev::OnChannelDisconnectedEvent(int32_t shutdownReason)
 {
     DCameraIndex camIndex(devId_, dhId_);
     std::shared_ptr<DCameraIndex> index = std::make_shared<DCameraIndex>(camIndex);
@@ -893,6 +893,7 @@ int32_t DCameraSourceDev::OnChannelDisconnectedEvent()
     std::shared_ptr<DCameraEvent> camEvent = std::make_shared<DCameraEvent>();
     camEvent->eventType_ = DCAMERA_MESSAGE;
     camEvent->eventResult_ = DCAMERA_EVENT_CHANNEL_DISCONNECTED;
+    camEvent->eventContent_ = "session closed, subcode: " + std::to_string(shutdownReason);
     DCameraSourceEvent eventNotify(DCAMERA_EVENT_NOFIFY, camEvent);
     eventParam = std::make_shared<DCameraSourceEvent>(eventNotify);
     msgEvent = AppExecFwk::InnerEvent::Get(EVENT_SOURCE_DEV_PROCESS, eventParam, 0);

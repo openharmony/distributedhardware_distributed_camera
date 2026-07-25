@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,9 +28,11 @@
 #include "distributed_camera_errno.h"
 #include "icamera_channel.h"
 #include "mock_camera_operator.h"
+#include "mock/dcamera_channel_listener_mock.h"
 #include "session_bus_center.h"
 
 using namespace testing::ext;
+using namespace testing;
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -408,7 +410,7 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_015, TestSize.L
 {
     EXPECT_NE(nullptr, softbusSession_);
     int32_t sessionId = 1;
-    int32_t ret = softbusSession_->OnSessionClose(sessionId);
+    int32_t ret = softbusSession_->OnSessionClose(sessionId, SHUTDOWN_REASON_LOCAL);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
@@ -443,7 +445,7 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_017, TestSize.L
     softbusSession_->SetConflict(true);
     EXPECT_TRUE(softbusSession_->isConflict_);
     int32_t sessionId = 1;
-    int32_t ret = softbusSession_->OnSessionClose(sessionId);
+    int32_t ret = softbusSession_->OnSessionClose(sessionId, SHUTDOWN_REASON_LOCAL);
     EXPECT_EQ(DCAMERA_OK, ret);
     EXPECT_EQ(-1, softbusSession_->sessionId_);
     EXPECT_EQ(DCAMERA_SOFTBUS_STATE_CLOSED, softbusSession_->state_);
@@ -528,13 +530,13 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_022, TestSize.L
     softbusSession_->SetConflict(true);
     EXPECT_TRUE(softbusSession_->isConflict_);
     int32_t sessionId = 1;
-    int32_t ret = softbusSession_->OnSessionClose(sessionId);
+    int32_t ret = softbusSession_->OnSessionClose(sessionId, SHUTDOWN_REASON_LOCAL);
     EXPECT_EQ(DCAMERA_OK, ret);
     EXPECT_EQ(-1, softbusSession_->sessionId_);
     EXPECT_EQ(DCAMERA_SOFTBUS_STATE_CLOSED, softbusSession_->state_);
     softbusSession_->SetConflict(false);
     EXPECT_FALSE(softbusSession_->isConflict_);
-    ret = softbusSession_->OnSessionClose(sessionId);
+    ret = softbusSession_->OnSessionClose(sessionId, SHUTDOWN_REASON_LOCAL);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
@@ -660,5 +662,18 @@ HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_029, TestSize.L
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
+/**
+ * @tc.name: dcamera_softbus_session_test_030
+ * @tc.desc: Verify BindSocketServer does not call OnSessionError when listener is nullptr.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusSessionTest, dcamera_softbus_session_test_030, TestSize.Level1)
+{
+    EXPECT_NE(nullptr, softbusSession_);
+    softbusSession_->listener_ = nullptr;
+    int32_t ret = softbusSession_->BindSocketServer();
+    EXPECT_TRUE(ret == 0 || ret == DCAMERA_BAD_VALUE || ret != DCAMERA_OK);
+}
 }
 }

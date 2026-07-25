@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,7 +38,7 @@ public:
     ~DCameraSoftbusSession();
     int32_t CloseSession();
     int32_t OnSessionOpened(int32_t socket, std::string networkId);
-    int32_t OnSessionClose(int32_t sessionId);
+    int32_t OnSessionClose(int32_t sessionId, ShutdownReason reason);
     int32_t OnDataReceived(std::shared_ptr<DataBuffer>& buffer);
     int32_t SendData(DCameraSessionMode mode, std::shared_ptr<DataBuffer>& buffer);
     std::string GetPeerDevId();

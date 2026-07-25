@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,8 +24,10 @@ DCameraSinkOutputChannelListener::DCameraSinkOutputChannelListener(
 {
 }
 
-void DCameraSinkOutputChannelListener::OnSessionState(int32_t state, std::string networkId)
+void DCameraSinkOutputChannelListener::OnSessionState(int32_t state, std::string networkId,
+    int32_t shutdownReason)
 {
+    (void)shutdownReason;
     std::shared_ptr<DCameraSinkOutput> output = output_.lock();
     if (output == nullptr) {
         DHLOGE("DCameraSinkOutputChannelListener::OnSessionState output is null");

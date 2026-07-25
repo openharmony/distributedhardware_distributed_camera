@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,7 +27,7 @@ public:
     DCameraChannelListenerMock() = default;
     ~DCameraChannelListenerMock() override = default;
 
-    MOCK_METHOD(void, OnSessionState, (int32_t, std::string));
+    MOCK_METHOD(void, OnSessionState, (int32_t, std::string, int32_t));
     MOCK_METHOD(void, OnSessionError, (int32_t, int32_t, std::string));
     MOCK_METHOD(void, OnDataReceived, (std::vector<std::shared_ptr<DataBuffer>>&));
 };
