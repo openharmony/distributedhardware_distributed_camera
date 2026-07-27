@@ -49,7 +49,8 @@ int64_t DCameraSinkImuSensor::GetMonoToBoottimeOffset()
         int64_t mono2 = (int64_t)m2.tv_sec * s2ns + m2.tv_nsec;
 
         int64_t gap = mono2 - mono1;
-        int64_t offset = boot - (mono1 + mono2) / 2;
+        uint64_t sum = static_cast<uint64_t>(mono1) + static_cast<uint64_t>(mono2);
+        int64_t offset = boot - static_cast<int64_t>(sum / 2);
 
         if (gap < bestGap) {
             bestGap = gap;

@@ -27,7 +27,7 @@
 #include "distributed_hardware_log.h"
 #include <sys/prctl.h>
 #include "dcamera_frame_info.h"
-#include "v1_1/include/idisplay_buffer.h"
+#include "v1_1/imetadata.h"
 #include "dcamera_source_imu_sensor.h"
 namespace OHOS {
 namespace DistributedHardware {
@@ -347,7 +347,7 @@ bool DCameraStreamDataProcessProducer::UnmarshalCameraIntrin(const std::string& 
 bool DCameraStreamDataProcessProducer::SetIMUTOBuffer(const DCameraBuffer& sharedMemory,
     const std::shared_ptr<DataBuffer>& buffer)
 {
-    const BufferHandle* bufferHandle = nullptr;
+    BufferHandle* bufferHandle = nullptr;
     if (sharedMemory.bufferHandle_ != nullptr) {
         bufferHandle = sharedMemory.bufferHandle_->GetBufferHandle();
     } else {
@@ -375,19 +375,21 @@ bool DCameraStreamDataProcessProducer::SetIMUTOBuffer(const DCameraBuffer& share
         if (imuData.size() < UNIFORM_METADATA_LEN) {
             imuData.resize(UNIFORM_METADATA_LEN, 0);
         }
-        auto displayBuffer = OHOS::HDI::Display::Buffer::V1_1::IDisplayBuffer::Get();
-        if (displayBuffer == nullptr) {
-            DHLOGE("SetIMUTOBuffer get display buffer failed");
+        auto metadata_ = OHOS::HDI::Display::Buffer::V1_1::IMetadata::Get(true);
+        if (metadata_ == nullptr) {
+            DHLOGE("SetIMUTOBuffert metadata get failed");
+        }
+        sptr<NativeBuffer> hdiBufer = new NativeBuffer();
+        hdiBufer->SetBufferHandle(bufferHandle);
+        int32_t ret = metadata_->RegisterBuffer(hdiBufer);
+        if (ret != 0) {
+            DHLOGE("SetIMUTOBuffer RegisterBuffer failed, ret = %{public}d", ret);
             return false;
         }
-        int32_t ret = displayBuffer->RegisterBuffer(*bufferHandle);
+
+        ret = metadata_->SetMetadata(hdiBufer, AR_META_DATA_KEY, imuData);
         if (ret != 0) {
-            DHLOGE("SetIMUTOBuffer register buffer error ret:%{public}d", ret);
-            return false;
-        }
-        ret = displayBuffer->SetMetadata(*bufferHandle, AR_META_DATA_KEY, imuData);
-        if (ret != 0) {
-            DHLOGE("SetIMUTOBuffer set metadata error ret:%{public}d", ret);
+            DHLOGE("SetIMUTOBuffer SetMetadata failed, ret = %{public}d", ret);
             return false;
         }
         return true;
