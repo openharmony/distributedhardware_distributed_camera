@@ -379,15 +379,15 @@ bool DCameraStreamDataProcessProducer::SetIMUTOBuffer(const DCameraBuffer& share
         if (metadata_ == nullptr) {
             DHLOGE("SetIMUTOBuffert metadata get failed");
         }
-        sptr<NativeBuffer> hdiBufer = new NativeBuffer();
-        hdiBufer->SetBufferHandle(bufferHandle);
-        int32_t ret = metadata_->RegisterBuffer(hdiBufer);
+        sptr<NativeBuffer> hdiBuffer = new NativeBuffer();
+        hdiBuffer->SetBufferHandle(bufferHandle);
+        int32_t ret = metadata_->RegisterBuffer(hdiBuffer);
         if (ret != 0) {
             DHLOGE("SetIMUTOBuffer RegisterBuffer failed, ret = %{public}d", ret);
             return false;
         }
 
-        ret = metadata_->SetMetadata(hdiBufer, AR_META_DATA_KEY, imuData);
+        ret = metadata_->SetMetadata(hdiBuffer, AR_META_DATA_KEY, imuData);
         if (ret != 0) {
             DHLOGE("SetIMUTOBuffer SetMetadata failed, ret = %{public}d", ret);
             return false;
