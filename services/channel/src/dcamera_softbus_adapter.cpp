@@ -428,7 +428,7 @@ void DCameraSoftbusAdapter::SourceOnShutDown(int32_t socket, ShutdownReason reas
         DHLOGE("SourceOnShutDown can not find socket %{public}d", socket);
         return;
     }
-    session->OnSessionClose(socket);
+    session->OnSessionClose(socket, reason);
     if (session->GetPeerSessionName().find("_control") != std::string::npos && DCameraAllConnectManager::IsInited()) {
         DCameraAllConnectManager::RemoveSourceNetworkId(socket);
     }
@@ -806,7 +806,7 @@ void DCameraSoftbusAdapter::SinkOnShutDown(int32_t socket, ShutdownReason reason
             session->SetConflict(false);
         }
     }
-    session->OnSessionClose(socket);
+    session->OnSessionClose(socket, reason);
     if (session->GetPeerSessionName().find("_control") != std::string::npos && DCameraAllConnectManager::IsInited()) {
         std::string devId = DCameraAllConnectManager::GetSinkDevIdBySocket(socket);
         if (!devId.empty()) {
@@ -934,7 +934,7 @@ void DCameraSoftbusAdapter::CloseSessionWithNetWorkId(const std::string &network
         DHLOGE("DCamera allconnect CloseSessionWithNetWorkId can not find session %{public}d", sessionId);
         return;
     }
-    session->OnSessionClose(sessionId);
+    session->OnSessionClose(sessionId, SHUTDOWN_REASON_UNKNOWN);
     Shutdown(sessionId);
     if (bSinkConflict) {
         ret = DCameraAllConnectManager::GetInstance().PublishServiceState(networkId, session->GetMyDhId(), SCM_IDLE);

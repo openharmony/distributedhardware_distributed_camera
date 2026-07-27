@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -157,6 +157,36 @@ HWTEST_F(DCameraAllConnectManagerTest, SourceSideScenario_002, testing::ext::Tes
     auto targetSessionId = DCameraAllConnectManager::GetSourceSocketByNetworkId(PEER_NETWORK_ID);
     DCameraAllConnectManager::RemoveSourceNetworkId(UNVALUABLE_SESSION_ID);
     EXPECT_EQ(targetSessionId, UNVALUABLE_SESSION_ID);
+}
+
+HWTEST_F(DCameraAllConnectManagerTest, ParseRejectSubcode_001, testing::ext::TestSize.Level1)
+{
+    DCameraAllConnectManager::ParseRejectSubcode("{\"subcode\":123}");
+    EXPECT_EQ(DCameraAllConnectManager::GetLastRejectSubcode(), 123);
+}
+
+HWTEST_F(DCameraAllConnectManagerTest, ParseRejectSubcode_002, testing::ext::TestSize.Level2)
+{
+    DCameraAllConnectManager::ParseRejectSubcode(nullptr);
+    EXPECT_EQ(DCameraAllConnectManager::GetLastRejectSubcode(), 123);
+}
+
+HWTEST_F(DCameraAllConnectManagerTest, ParseRejectSubcode_003, testing::ext::TestSize.Level2)
+{
+    DCameraAllConnectManager::ParseRejectSubcode("invalid_json");
+    EXPECT_EQ(DCameraAllConnectManager::GetLastRejectSubcode(), 123);
+}
+
+HWTEST_F(DCameraAllConnectManagerTest, ParseRejectSubcode_004, testing::ext::TestSize.Level2)
+{
+    DCameraAllConnectManager::ParseRejectSubcode("{\"subcode\":\"not_a_number\"}");
+    EXPECT_EQ(DCameraAllConnectManager::GetLastRejectSubcode(), 123);
+}
+
+HWTEST_F(DCameraAllConnectManagerTest, ParseRejectSubcode_005, testing::ext::TestSize.Level2)
+{
+    DCameraAllConnectManager::ParseRejectSubcode("{\"otherkey\":456}");
+    EXPECT_EQ(DCameraAllConnectManager::GetLastRejectSubcode(), 123);
 }
 } // namespace DistributedHardware
 } // OHOS

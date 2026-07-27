@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -53,13 +53,13 @@ public:
     int32_t StopDistributedHardware(const std::string &networkId) override;
     void SetTokenId(uint64_t token) override;
 
-    void OnSessionState(int32_t state, std::string networkId);
+    void OnSessionState(int32_t state, std::string networkId, int32_t shutdownReason = 0);
     void OnSessionError(int32_t eventType, int32_t eventReason, std::string detail);
     void OnDataReceived(std::vector<std::shared_ptr<DataBuffer>>& buffers);
 
 private:
     void HandleMetaDataResult(std::string& jsonStr);
-    void PostChannelDisconnectedEvent();
+    void PostChannelDisconnectedEvent(int32_t shutdownReason = 0);
     int32_t PublishEnableLatencyMsg(const std::string& devId);
     void HandleReceivedData(std::shared_ptr<DataBuffer> &dataBuffer);
     bool CheckAclRight();

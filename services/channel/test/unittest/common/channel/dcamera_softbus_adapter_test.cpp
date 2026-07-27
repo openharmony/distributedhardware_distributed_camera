@@ -1021,7 +1021,7 @@ HWTEST_F(DCameraSoftbusAdapterTest, DCameraSoftbusAdapterTest_037, TestSize.Leve
     auto listener = std::make_shared<DCameraChannelListenerMock>();
     auto session = std::make_shared<DCameraSoftbusSession>(
         dhId, myDevId, sessionName, peerDevId, peerSessName, listener, DCameraSessionMode::DCAMERA_SESSION_MODE_CTRL);
-    EXPECT_CALL(*listener, OnSessionState(_, _)).Times(AtLeast(1));
+    EXPECT_CALL(*listener, OnSessionState(_, _, _)).Times(AtLeast(1));
 
     DCameraSoftbusAdapter::GetInstance().RecordSourceSocketSession(UNIQUE_SOCKED_ID, session);
     PeerSocketInfo info = {
@@ -1052,7 +1052,7 @@ HWTEST_F(DCameraSoftbusAdapterTest, DCameraSoftbusAdapterTest_038, TestSize.Leve
     DCameraSoftbusAdapter::GetInstance().CreatSoftBusSinkSocketServer(
         mySessionName, role, sessionMode, peerDevId, peerSessionName);
     auto listener = std::make_shared<DCameraChannelListenerMock>();
-    EXPECT_CALL(*listener, OnSessionState(_, _)).Times(AtLeast(1));
+    EXPECT_CALL(*listener, OnSessionState(_, _, _)).Times(AtLeast(1));
     auto session = std::make_shared<DCameraSoftbusSession>(
         dhId, myDevId, mySessionName, peerDevId, peerSessionName, listener,
         DCameraSessionMode::DCAMERA_SESSION_MODE_CTRL);
@@ -2328,6 +2328,45 @@ HWTEST_F(DCameraSoftbusAdapterTest, dcamera_softbus_adapter_test_101, TestSize.L
     int32_t ret = DCameraSoftbusAdapter::GetInstance().RequestAndWaitForAuthorization(peerNetworkId);
     
     EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: DCameraSoftbusAdapterTest_076
+ * @tc.desc: Verify SourceOnShutDown passes ShutdownReason to OnSessionClose.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, DCameraSoftbusAdapterTest_076, TestSize.Level1)
+{
+    std::string sessionName = "sourcetest076";
+    DCAMERA_CHANNEL_ROLE role = DCAMERA_CHANNLE_ROLE_SOURCE;
+    std::string mySessName = "sourcetest076";
+    std::string peerSessName = "sinktest076";
+    DCameraSessionMode sessionMode = DCameraSessionMode::DCAMERA_SESSION_MODE_VIDEO;
+    std::string peerDevId = TEST_DEVICE_ID;
+    std::string myDevId = "abcde";
+    std::string myDhId = "mydhid";
+    auto listener = std::make_shared<DCameraChannelListenerMock>();
+    EXPECT_CALL(*listener, OnSessionState(_, _, _)).Times(AtLeast(1));
+    auto session = std::make_shared<DCameraSoftbusSession>(
+        myDhId, myDevId, sessionName, peerDevId, peerSessName, listener,
+        DCameraSessionMode::DCAMERA_SESSION_MODE_VIDEO);
+    int32_t socketId = 76;
+    DCameraSoftbusAdapter::GetInstance().RecordSourceSocketSession(socketId, session);
+    DCameraSoftbusAdapter::GetInstance().SourceOnShutDown(socketId, ShutdownReason::SHUTDOWN_REASON_CONN_CHANGED);
+    DCameraSoftbusAdapter::GetInstance().sourceSocketSessionMap_.erase(socketId);
+}
+
+/**
+ * @tc.name: DCameraSoftbusAdapterTest_GetLastBindRet_001
+ * @tc.desc: Verify GetLastBindRet returns 0 initially.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DCameraSoftbusAdapterTest, DCameraSoftbusAdapterTest_GetLastBindRet_001, TestSize.Level1)
+{
+    int32_t bindRet = DCameraSoftbusAdapter::GetInstance().GetLastBindRet();
+    EXPECT_EQ(bindRet, 0);
 }
 }
 }
