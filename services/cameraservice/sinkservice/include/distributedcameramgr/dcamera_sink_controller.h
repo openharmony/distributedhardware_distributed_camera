@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -79,6 +79,7 @@ public:
                 EVENT_START_BASE = 100,
                 EVENT_ENCODER_PREPARED,
                 EVENT_CAMERA_PREPARED,
+                EVENT_AUTHORIZATION_PREPARED,
             };
         private:
             std::weak_ptr<DCameraSinkController> sinkContrWPtr_;
@@ -107,11 +108,18 @@ private:
     };
     void HandleCaptureError(int32_t errorCode, const std::string& errorMsg);
     void CheckAndCommitCapture();
+    void OnEncoderPrepared(const AppExecFwk::InnerEvent::Pointer &event);
+    void OnCameraPrepared(const AppExecFwk::InnerEvent::Pointer &event);
+    void OnAuthorizationPrepared(const AppExecFwk::InnerEvent::Pointer &event);
+    void StartOutputTask();
+    void StartAuthAndOpTask();
 
     std::atomic<bool> isEncoderReady_ {false};
     std::atomic<bool> isCameraReady_ {false};
+    std::atomic<bool> isAuthorizationReady_ {false};
     int32_t encoderResult_ = DCAMERA_OK;
     int32_t cameraResult_ = DCAMERA_OK;
+    bool authorizationResult_ = true;
     sptr<Surface> preparedSurface_ = nullptr;
     std::mutex stateMutex_;
     std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfosCache_;
@@ -150,6 +158,7 @@ private:
         CAPTURE_IDLE,
         CAPTURE_STARTING,
         CAPTURE_RUNNING,
+        CAPTURE_ERROR,
     };
 
     std::mutex captureStateMutex_;
