@@ -137,26 +137,39 @@ int32_t DCameraSinkController::StopCapture()
         DHLOGI("StopCapture called when state is already IDLE. dhId: %{public}s", GetAnonyString(dhId_).c_str());
         return DCAMERA_OK;
     }
+    if (captureState_ == CAPTURE_ERROR) {
+        DHLOGI("StopCapture cleaning up after capture error. dhId: %{public}s", GetAnonyString(dhId_).c_str());
+        captureState_ = CAPTURE_IDLE;
+        if (operator_ != nullptr) {
+            int32_t ret = operator_->StopCapture();
+            if (ret != DCAMERA_OK) {
+                DHLOGE("StopCapture operator stop capture failed after error, ret: %{public}d", ret);
+            }
+        }
+        if (output_ != nullptr) {
+            int32_t ret = output_->StopCapture();
+            if (ret != DCAMERA_OK) {
+                DHLOGE("StopCapture output stop capture failed after error, ret: %{public}d", ret);
+            }
+        }
+        DHLOGI("StopCapture cleaning up after capture error %{public}s success", GetAnonyString(dhId_).c_str());
+        return DCAMERA_OK;
+    }
     captureState_ = CAPTURE_IDLE;
-    if (operator_ == nullptr) {
-        return DCAMERA_BAD_VALUE;
+    if (operator_ != nullptr) {
+        int32_t ret = operator_->StopCapture();
+        if (ret != DCAMERA_OK) {
+            DHLOGE("client stop capture failed, dhId: %{public}s, ret: %{public}d", GetAnonyString(dhId_).c_str(), ret);
+            DCameraNotifyInner(DCAMERA_MESSAGE, DCAMERA_EVENT_DEVICE_ERROR,
+                std::string("operator stop capture failed."));
+        }
     }
-    int32_t ret = operator_->StopCapture();
-    if (ret != DCAMERA_OK) {
-        DHLOGE("client stop capture failed, dhId: %{public}s, ret: %{public}d",
-               GetAnonyString(dhId_).c_str(), ret);
-        DCameraNotifyInner(DCAMERA_MESSAGE, DCAMERA_EVENT_DEVICE_ERROR, std::string("operator stop capture failed."));
-        return ret;
-    }
-    if (output_ == nullptr) {
-        return DCAMERA_BAD_VALUE;
-    }
-    ret = output_->StopCapture();
-    if (ret != DCAMERA_OK) {
-        DHLOGE("output stop capture failed, dhId: %{public}s, ret: %{public}d",
-               GetAnonyString(dhId_).c_str(), ret);
-        DCameraNotifyInner(DCAMERA_MESSAGE, DCAMERA_EVENT_DEVICE_ERROR, std::string("output stop capture failed"));
-        return ret;
+    if (output_ != nullptr) {
+        int32_t ret = output_->StopCapture();
+        if (ret != DCAMERA_OK) {
+            DHLOGE("output stop capture failed, dhId: %{public}s, ret: %{public}d", GetAnonyString(dhId_).c_str(), ret);
+            DCameraNotifyInner(DCAMERA_MESSAGE, DCAMERA_EVENT_DEVICE_ERROR, std::string("output stop capture failed"));
+        }
     }
     DHLOGI("StopCapture %{public}s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
@@ -510,30 +523,55 @@ void DCameraSinkController::DCameraSinkContrEventHandler::ProcessEvent(const App
         case EVENT_AUTHORIZATION:
             sinkContr->ProcessPostAuthorization(event);
             break;
-        case EVENT_ENCODER_PREPARED: {
-            std::shared_ptr<DCameraSurfaceHolder> holder = event->GetSharedObject<DCameraSurfaceHolder>();
-            if (holder != nullptr) {
-                {
-                    std::lock_guard<std::mutex> lock(sinkContr->captureStateMutex_);
-                    sinkContr->isEncoderReady_ = true;
-                    sinkContr->encoderResult_ = holder->result;
-                    sinkContr->preparedSurface_ = holder->surface;
-                    sinkContr->CheckAndCommitCapture();
-                }
-            }
+        case EVENT_ENCODER_PREPARED:
+            sinkContr->OnEncoderPrepared(event);
             break;
-        }
-        case EVENT_CAMERA_PREPARED: {
-            int32_t result = event->GetParam();
-            std::lock_guard<std::mutex> lock(sinkContr->captureStateMutex_);
-            sinkContr->isCameraReady_ = true;
-            sinkContr->cameraResult_ = result;
-            sinkContr->CheckAndCommitCapture();
+        case EVENT_CAMERA_PREPARED:
+            sinkContr->OnCameraPrepared(event);
             break;
-        }
+        case EVENT_AUTHORIZATION_PREPARED:
+            sinkContr->OnAuthorizationPrepared(event);
+            break;
         default:
-            DHLOGE("event is undefined, id is %d", eventId);
+            DHLOGE("event is undefined, id is %{public}d", eventId);
             break;
+    }
+}
+
+void DCameraSinkController::OnEncoderPrepared(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::shared_ptr<DCameraSurfaceHolder> holder = event->GetSharedObject<DCameraSurfaceHolder>();
+    if (holder == nullptr) {
+        return;
+    }
+    std::lock_guard<std::mutex> lock(captureStateMutex_);
+    isEncoderReady_ = true;
+    encoderResult_ = holder->result;
+    preparedSurface_ = holder->surface;
+    CheckAndCommitCapture();
+}
+
+void DCameraSinkController::OnCameraPrepared(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    int32_t result = event->GetParam();
+    std::lock_guard<std::mutex> lock(captureStateMutex_);
+    isCameraReady_ = true;
+    cameraResult_ = result;
+    CheckAndCommitCapture();
+}
+
+void DCameraSinkController::OnAuthorizationPrepared(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    int32_t result = event->GetParam();
+    std::lock_guard<std::mutex> lock(captureStateMutex_);
+    isAuthorizationReady_ = true;
+    authorizationResult_ = (result == 1);
+    if (!authorizationResult_) {
+        captureState_ = CAPTURE_ERROR;
+        captureStateCv_.notify_all();
+        HandleCaptureError(DCAMERA_ALLOC_ERROR, "commit capture no permission.");
+    } else {
+        CheckAndCommitCapture();
     }
 }
 
@@ -561,21 +599,14 @@ static bool WaitForAuthorization()
 void DCameraSinkController::CheckAndCommitCapture()
 {
     if (!isEncoderReady_ || !isCameraReady_) {
-        DHLOGI("Waiting... EncoderReady: %d, CameraReady: %d", isEncoderReady_.load(), isCameraReady_.load());
+        DHLOGI("Waiting... EncoderReady: %{public}d, CameraReady: %{public}d",
+            isEncoderReady_.load(), isCameraReady_.load());
         return;
     }
 
-    bool result = WaitForAuthorization();
-    if (!result) {
-        captureState_ = CAPTURE_IDLE;
-        captureStateCv_.notify_all();
-        HandleCaptureError(DCAMERA_ALLOC_ERROR, "commit capture no permission.");
-        return;
-    }
-
-    DHLOGI("Both tasks prepared. Checking results...");
+    DHLOGI("All tasks prepared. Checking results...");
     if (cameraResult_ != DCAMERA_OK || encoderResult_ != DCAMERA_OK) {
-        DHLOGE("Preparation failed! Camera ret: %d, Encoder ret: %d", cameraResult_, encoderResult_);
+        DHLOGE("Preparation failed! Camera ret: %{public}d, Encoder ret: %{public}d", cameraResult_, encoderResult_);
         int32_t finalErrorCode = DCAMERA_OK;
         std::string errorMsg = "unknown preparation error";
         if (cameraResult_ != DCAMERA_OK) {
@@ -585,24 +616,24 @@ void DCameraSinkController::CheckAndCommitCapture()
             finalErrorCode = encoderResult_;
             errorMsg = "output start capture failed";
         }
-        captureState_ = CAPTURE_IDLE;
+        captureState_ = CAPTURE_ERROR;
         captureStateCv_.notify_all();
         HandleCaptureError(finalErrorCode, errorMsg);
         return;
     }
-    
+
     DHLOGI("All preparations successful. Committing capture...");
     int32_t ret = operator_->CommitCapture(preparedSurface_);
     if (ret != DCAMERA_OK) {
-        DHLOGE("CommitCapture failed, ret: %d", ret);
-        captureState_ = CAPTURE_IDLE;
+        DHLOGE("CommitCapture failed, ret: %{public}d", ret);
+        captureState_ = CAPTURE_ERROR;
         captureStateCv_.notify_all();
         HandleCaptureError(ret, "commit capture failed.");
         return;
     }
     captureState_ = CAPTURE_RUNNING;
     captureStateCv_.notify_all();
-    
+
     DCameraNotifyInner(DCAMERA_MESSAGE, DCAMERA_EVENT_CAMERA_SUCCESS, START_CAPTURE_SUCC);
     DHLOGI("CheckAndCommitCapture successfully started capture.");
 }
@@ -751,18 +782,29 @@ int32_t DCameraSinkController::StartCaptureInner(std::vector<std::shared_ptr<DCa
 {
     DHLOGI("StartCaptureInner (EventHandler) dhId: %{public}s", GetAnonyString(dhId_).c_str());
     std::lock_guard<std::mutex> lock(captureStateMutex_);
-    if (captureState_ == CAPTURE_STARTING) {
-        DHLOGW("StartCaptureInner called while another start is in progress. Call ignored.");
+    if (captureState_ == CAPTURE_STARTING || captureState_ == CAPTURE_ERROR) {
+        DHLOGE("StartCaptureInner called in invalid state %{public}d, dhId: %{public}s",
+            captureState_, GetAnonyString(dhId_).c_str());
         return DCAMERA_WRONG_STATE;
     }
     captureState_ = CAPTURE_STARTING;
 
     isEncoderReady_ = false;
     isCameraReady_ = false;
+    isAuthorizationReady_ = false;
     encoderResult_ = DCAMERA_OK;
     cameraResult_ = DCAMERA_OK;
+    authorizationResult_ = true;
     preparedSurface_ = nullptr;
     captureInfosCache_ = captureInfos;
+    StartOutputTask();
+    StartAuthAndOpTask();
+    DHLOGI("StartCaptureInner has dispatched parallel tasks.");
+    return DCAMERA_OK;
+}
+
+void DCameraSinkController::StartOutputTask()
+{
     ffrt::submit([this]() {
         DHLOGI("Output initialization task start.");
         int32_t ret = output_->StartCapture(captureInfosCache_);
@@ -780,17 +822,29 @@ int32_t DCameraSinkController::StartCaptureInner(std::vector<std::shared_ptr<DCa
             DCameraSinkContrEventHandler::EVENT_ENCODER_PREPARED, holder);
         sinkCotrEventHandler_->SendEvent(event);
         }, {}, ffrt::task_attr().name("DCamSinkOutput").qos(ffrt::qos_user_initiated));
+}
 
+void DCameraSinkController::StartAuthAndOpTask()
+{
     ffrt::submit([this]() {
+        DHLOGI("Authorization task start.");
+        bool authResult = WaitForAuthorization();
+        if (!authResult) {
+            DHLOGE("Authorization denied or timeout, skip PrepareCapture.");
+            AppExecFwk::InnerEvent::Pointer authEvent = AppExecFwk::InnerEvent::Get(
+                DCameraSinkContrEventHandler::EVENT_AUTHORIZATION_PREPARED, 0);
+            sinkCotrEventHandler_->SendEvent(authEvent);
+            return;
+        }
+        AppExecFwk::InnerEvent::Pointer authEvent = AppExecFwk::InnerEvent::Get(
+            DCameraSinkContrEventHandler::EVENT_AUTHORIZATION_PREPARED, 1);
+        sinkCotrEventHandler_->SendEvent(authEvent);
         DHLOGI("Operator preparation task start.");
         int32_t ret = operator_->PrepareCapture(captureInfosCache_, sceneMode_);
-        AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(
+        AppExecFwk::InnerEvent::Pointer camEvent = AppExecFwk::InnerEvent::Get(
             DCameraSinkContrEventHandler::EVENT_CAMERA_PREPARED, ret);
-        sinkCotrEventHandler_->SendEvent(event);
-        }, {}, ffrt::task_attr().name("DCamOpPrepare").qos(ffrt::qos_user_initiated));
-
-    DHLOGI("StartCaptureInner has dispatched parallel tasks.");
-    return DCAMERA_OK;
+        sinkCotrEventHandler_->SendEvent(camEvent);
+        }, {}, ffrt::task_attr().name("DCamAuthAndOpPrepare").qos(ffrt::qos_user_initiated));
 }
 
 int32_t DCameraSinkController::DCameraNotifyInner(int32_t type, int32_t result, std::string reason)
