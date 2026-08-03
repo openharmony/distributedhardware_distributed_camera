@@ -21,6 +21,7 @@
 
 #include "icamera_operator.h"
 #include "capture_session.h"
+#include "camera_device_ability_items.h"
 
 namespace OHOS {
 namespace DistributedHardware {

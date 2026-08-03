@@ -15,6 +15,7 @@
 
 #include "dcamera_client.h"
 
+#include "camera_metadata.h"
 #include "anonymous_string.h"
 #include "camera_util.h"
 #include "camera_metadata_operator.h"
