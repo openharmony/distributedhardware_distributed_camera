@@ -79,7 +79,7 @@ ohos_shared_library("distributed_camera_channel") {
 
 
   external_deps = [
-    "access_token:libnativetoken",
+    "access_token:libnativetoken_shared",
     "access_token:libtokensetproc_shared",
     "cJSON:cjson",
     "c_utils:utils",
