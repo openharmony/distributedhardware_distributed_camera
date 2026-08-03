@@ -26,6 +26,7 @@
 #include "distributed_hardware_log.h"
 #include "nativetoken_kit.h"
 #include "token_setproc.h"
+#include "camera_device_ability_items.h"
 
 using namespace testing::ext;
 

@@ -97,6 +97,7 @@ ohos_unittest("DCameraSourceMgrTest") {
     "device_manager:devicemanagersdk",
     "distributed_hardware_fwk:distributedhardwareutils",
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.1",
+    "drivers_interface_camera:metadata",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
     "graphic_surface:surface",
