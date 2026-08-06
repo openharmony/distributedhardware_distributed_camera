@@ -9,7 +9,7 @@
 
 数据流方向：**本地相机 → sink 编码 → SoftBus 传输 → source 解码 → 显示/拍照输出**。
 
-不要混淆：source 不做编码，sink 不做解码。source 的 pipeline 是解码管线，sink 的 pipeline 是编码管线。
+注意区分：source 不做编码，sink 不做解码。source 的 pipeline 是解码管线，sink 的 pipeline 是编码管线。
 
 ## 端到端阶段
 
@@ -46,6 +46,29 @@ source 和 sink 之间维护两条数据通道：
 | `UPDATE_METADATA` | source → sink | 更新相机参数 |
 | `STATE_NOTIFY` | 双向 | 状态变更通知 |
 
+## 关联阅读
+
+修改本文涉及内容时，可能还需要阅读：
+- 修改编解码节点 → `dcamera-data-process.md`（编解码细节和线程模型）
+- 修改通道传输 → `dcamera-channel-softbus.md`（通道类型和数据收发）
+- 修改 source 端状态 → `dcamera-source-lifecycle.md`（会话建立阶段）
+
+### 触发条件
+
+遇到以下术语时必须阅读本文：CONTINUOUS_FRAME、SNAPSHOT_FRAME、pipeline、端到端、数据流方向、编码管线、解码管线、`CAPTURE`、`CHANNEL_NEG`、`GET_INFO`。
+
+修改以下路径时必须阅读本文：`data_process/pipeline/`、`channel/`、`cameraservice/sourceservice/`、`cameraservice/sinkservice/`。
+
+## 常见故障排查
+
+| 症状 | 排查方向 | 关键检查点 |
+|------|----------|------------|
+| source 端无画面 | 解码管线 | 通道是否收到数据？`DecodeDataProcess` 是否初始化？`ScaleConvertProcess` 参数是否匹配？ |
+| sink 端编码输出异常 | 编码管线 | `EncodeDataProcess` 是否启动？IDR 帧间隔是否为 2000ms？码率是否动态调整？ |
+| 画面分辨率不对 | CHANNEL_NEG 协商 | source/sink 两端 `VideoConfigParams` 是否一致？sink 管线分辨率是否超过 1920×1920？ |
+| CONTINUOUS_FRAME 和 SNAPSHOT_FRAME 互相干扰 | 双路流独立性 | 两条流是否使用独立的通道实例？通道状态是否独立管理？ |
+| 控制命令未到达 | 控制流通道 | 命令是否走 bytes 通道而非 stream 通道？`CAPTURE`/`CHANNEL_NEG` 命令方向是否正确（source → sink）？ |
+
 ## 修改前检查
 
 - 修改的数据路径是 source 侧还是 sink 侧？编码在 sink，解码在 source。
@@ -55,4 +78,11 @@ source 和 sink 之间维护两条数据通道：
 
 ## 测试指引
 
-端到端集成使用双设备组网测试。编解码单元测试在 `services/data_process/test/`。通道传输测试在 `services/channel/test/`。sink 相机操作测试在 `services/cameraservice/sinkservice/test/`。
+| 测试目标 | 构建目标 | 测试文件 |
+|----------|---------|---------|
+| 编解码节点 | `DCameraDataProcessPipelineNodeTest` | `data_process/test/unittest/common/pipeline_node/encode_data_process_test.cpp`、`data_process/test/unittest/common/pipeline_node/decode_data_process_test.cpp`、`data_process/test/unittest/common/pipeline_node/scale_convert_process_test.cpp`、`data_process/test/unittest/common/pipeline_node/eis_data_process_test.cpp` |
+| 编解码管线 | `DCameraDataProcessPipelineTest` | `data_process/test/unittest/common/pipeline/dcamera_pipeline_source_test.cpp`、`data_process/test/unittest/common/pipeline/dcamera_pipeline_sink_test.cpp` |
+| 通道传输 | `DCameraChannelTest` | `channel/test/unittest/common/channel/dcamera_channel_source_impl_test.cpp`、`channel/test/unittest/common/channel/dcamera_channel_sink_impl_test.cpp` |
+| sink 控制器 | `DCameraSinkMgrTest` | `sinkservice/test/unittest/common/distributedcameramgr/dcamera_sink_controller_test.cpp` |
+
+端到端集成使用双设备组网测试。

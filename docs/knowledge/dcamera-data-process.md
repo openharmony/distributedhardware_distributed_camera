@@ -26,7 +26,7 @@
 | 最大分辨率 | 4160×3120 | 1920×1920 | 同上 |
 | 帧率范围 | 0-30 fps | 0-30 fps | 同上 |
 
-source 的最大分辨率（4160×3120）大于 sink（1920×1920），因为 source 需要支持高分辨率拍照输出。不要在 sink 管线中配置超过 1920×1920 的分辨率。
+source 的最大分辨率（4160×3120）大于 sink（1920×1920），因为 source 需要支持高分辨率拍照输出。不应在 sink 管线中配置超过 1920×1920 的分辨率。
 
 ## 编码节点（EncodeDataProcess）
 
@@ -36,7 +36,7 @@ source 的最大分辨率（4160×3120）大于 sink（1920×1920），因为 so
 - 支持动态码率调整（根据网络状况）。
 - 编码 buffer 使用循环队列管理，需要同步等待可用 buffer。
 
-编码回调在 codec 工作线程中执行，不要在回调中调用 pipeline 的同步接口。
+编码回调在 codec 工作线程中执行，回调中不应调用 pipeline 的同步接口。
 
 ## 解码节点（DecodeDataProcess）
 
@@ -73,13 +73,13 @@ source 的最大分辨率（4160×3120）大于 sink（1920×1920），因为 so
 
 | buffer 类型 | 管理方式 | 要点 |
 |-------------|----------|------|
-| Surface buffer | camera framework / codec 框架 | 回调线程归还，不要跨线程持有 |
+| Surface buffer | camera framework / codec 框架 | 回调线程归还，不应跨线程持有 |
 | 编码输入 buffer | 循环队列 + 条件变量 | 队列满时阻塞等待 |
 | 编码输出 buffer | AVCodec 输出回调 | 异步获取，需要同步到 pipeline 线程 |
 | 缩放临时 buffer | FFmpeg 对齐分配 | 16 字节对齐，使用后立即释放 |
 | 通道发送 buffer | DataBuffer 引用计数 | 发送完成后释放引用 |
 
-不要在 codec 回调线程中直接分配大内存或执行 pipeline 同步操作，应通过 EventHandler 转发。
+不应在 codec 回调线程中直接分配大内存或执行 pipeline 同步操作，应通过 EventHandler 转发。
 
 ## 线程模型
 
@@ -87,7 +87,7 @@ source 的最大分辨率（4160×3120）大于 sink（1920×1920），因为 so
 |------|------|------|
 | pipeline 事件线程 | source pipeline 事件处理 | `DCameraPipelineSource::StartEventHandler` 创建 |
 | codec 工作线程 | 编解码回调 | AVCodec 框架管理 |
-| SoftBus 线程池 | 数据收发回调 | 不要在回调中阻塞 |
+| SoftBus 线程池 | 数据收发回调 | 回调中不应阻塞 |
 | 主线程 | 操作入口 | 启停采集、配置参数 |
 | IMU 传感器线程 | EIS 传感器数据 | 仅 EIS 启用时活跃 |
 
@@ -103,6 +103,29 @@ source 的最大分辨率（4160×3120）大于 sink（1920×1920），因为 so
 
 修改管线参数时，确保 source 和 sink 两端的协商结果一致。参数不匹配会导致编解码失败。
 
+## 关联阅读
+
+修改本文涉及内容时，可能还需要阅读：
+- 修改管线节点位置 → `dcamera-data-pipeline.md`（端到端阶段和数据流方向）
+- 修改通道发送 buffer → `dcamera-channel-softbus.md`（分片和会话管理）
+
+### 触发条件
+
+遇到以下术语时必须阅读本文：AVCodec、编码、解码、EIS、`EncodeDataProcess`、`DecodeDataProcess`、`ScaleConvertProcess`、`FpsControllerProcess`、IDR、帧率、分辨率、Surface buffer、`VideoConfigParams`、`AbstractDataProcess`。
+
+修改以下路径时必须阅读本文：`data_process/pipeline/dcamera_pipeline_sink/`、`data_process/pipeline/dcamera_pipeline_source/`、`data_process/include/pipeline_node/`。
+
+## 常见故障排查
+
+| 症状 | 排查方向 | 关键检查点 |
+|------|----------|------------|
+| 编码器初始化失败 | AVCodec 配置 | 编码格式是否支持（H.264/H.265）？分辨率是否在管线限制范围内？buffer 队列是否已满？ |
+| 解码器输出花屏 | 格式/参数不匹配 | `VideoConfigParams` 是否与编码端一致？像素格式是否在 `image_common_type.h` 中注册？Surface 渲染模式是否正确？ |
+| 缩放后画面异常 | ScaleConvertProcess | 源/目标格式是否支持（YUV420/NV12/RGBA/P010）？临时 buffer 是否 16 字节对齐？FFmpeg 格式常量映射是否正确？ |
+| EIS 节点无效果 | IMU 传感器 | `DCameraIMUSensor` 是否获取到数据？EIS 节点是否仅在 source pipeline 中使用？ |
+| 编码回调阻塞 | 线程模型 | codec 回调中是否调用了 pipeline 同步接口？是否在回调中分配大内存？是否通过 EventHandler 转发？ |
+| 帧率异常 | FpsControllerProcess | `FeedingSmoother` 是否正常工作？目标帧率是否在 0-30 fps 范围内？ |
+
 ## 修改前检查
 
 - 新增 pipeline 节点是否插在正确位置（sink 编码前 / source 解码后）？
@@ -114,4 +137,14 @@ source 的最大分辨率（4160×3120）大于 sink（1920×1920），因为 so
 
 ## 测试指引
 
-编解码单元测试在 `data_process/test/`。缩放和格式转换使用 `ScaleConvertProcess*Test`。编解码使用 mock 的 AVCodec 接口。完整 pipeline 测试需要板侧双设备验证真实编解码路径。
+| 测试目标 | 构建目标 | 测试文件 |
+|----------|---------|---------|
+| 编码节点 | `DCameraDataProcessPipelineNodeTest` | `data_process/test/unittest/common/pipeline_node/encode_data_process_test.cpp` |
+| 解码节点 | `DCameraDataProcessPipelineNodeTest` | `data_process/test/unittest/common/pipeline_node/decode_data_process_test.cpp` |
+| 缩放/格式转换 | `DCameraDataProcessPipelineNodeTest` | `data_process/test/unittest/common/pipeline_node/scale_convert_process_test.cpp` |
+| EIS 节点 | `DCameraDataProcessPipelineNodeTest` | `data_process/test/unittest/common/pipeline_node/eis_data_process_test.cpp` |
+| FPS 控制 | `DCameraDataProcessPipelineNodeTest` | `data_process/test/unittest/common/pipeline_node/fps_controller_process_test.cpp` |
+| source 管线 | `DCameraDataProcessPipelineTest` | `data_process/test/unittest/common/pipeline/dcamera_pipeline_source_test.cpp` |
+| sink 管线 | `DCameraDataProcessPipelineTest` | `data_process/test/unittest/common/pipeline/dcamera_pipeline_sink_test.cpp` |
+
+完整 pipeline 测试需要板侧双设备验证真实编解码路径。
