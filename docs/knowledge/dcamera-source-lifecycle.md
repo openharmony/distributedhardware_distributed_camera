@@ -78,6 +78,28 @@ source 通过 HDF 虚拟相机驱动与相机框架对接：
 - 使用 HDI 接口 `IDCameraProvider`（V1.1）管理相机会话。
 - HDF 驱动使能后，相机框架可以发现并使用分布式相机，接口与本地相机一致。
 
+## 关联阅读
+
+修改本文涉及内容时，可能还需要阅读：
+- 修改会话建立流程 → `dcamera-channel-softbus.md`（通道创建和超时）
+- 修改 enable/disable → `dcamera-data-pipeline.md`（HDF 驱动与数据流关系）
+
+### 触发条件
+
+遇到以下术语时必须阅读本文：状态机、`DCAMERA_STATE_INIT`、`REGIST`、`OPENED`、`CONFIG_STREAM`、`CAPTURE`、enable、disable、HDF、`RegisterDistributedHardware`。
+
+修改以下路径时必须阅读本文：`sourceservice/src/distributedcameramgr/dcamera_source_dev.cpp`、`sourceservice/src/distributedcameramgr/dcamerastate/`、`sourceservice/include/distributedcameramgr/dcamerahdf/`。
+
+## 常见故障排查
+
+| 症状 | 排查方向 | 关键检查点 |
+|------|----------|------------|
+| RegisterDistributedHardware 失败 | HDF 驱动加载 | `DCameraProviderCallbackImpl` 是否回调？HDF 驱动是否已加载？参数校验是否通过（devId/dhId 长度 ≤ 256）？ |
+| 状态机卡在 REGIST | OPEN 事件未触发 | sink 侧是否已上线？通道是否建立成功？`GET_INFO` 命令是否发送并收到响应？ |
+| CONFIG_STREAM 后无数据 | 通道协商 | `CHANNEL_NEG` 协商结果是否一致？source/sink 两端 `VideoConfigParams` 是否匹配？ |
+| 采集停止后资源未释放 | Disable 流程 | HDF 驱动是否卸载？通道是否关闭？设备是否从 device map 移除？ |
+| 状态机转换异常 | 非法事件 | 当前状态是否允许该事件？是否跳过状态执行？新增事件是否在所有状态中都有处理？ |
+
 ## 修改前检查
 
 - 状态转换是否遵循状态机规则？不能跳状态。
@@ -88,4 +110,11 @@ source 通过 HDF 虚拟相机驱动与相机框架对接：
 
 ## 测试指引
 
-状态机测试使用 `DCameraSourceState*Test`。设备生命周期测试使用 `DCameraSourceDev*Test`。HDF 集成需要板侧双设备组网验证。
+| 测试目标 | 构建目标 | 测试文件 |
+|----------|---------|---------|
+| source 状态机 | `DCameraSourceMgrTest` | `sourceservice/test/unittest/common/distributedcameramgr/dcamera_source_state_machine_test.cpp` |
+| source 设备生命周期 | `DCameraSourceMgrTest` | `sourceservice/test/unittest/common/distributedcameramgr/dcamera_source_dev_test.cpp` |
+| source 控制器 | `DCameraSourceMgrTest` | `sourceservice/test/unittest/common/distributedcameramgr/dcamera_source_controller_test.cpp` |
+| HDF 回调 | `DCameraSourceMgrTest` | `sourceservice/test/unittest/common/distributedcameramgr/dcamera_provider_callback_impl_test.cpp` |
+
+HDF 集成需要板侧双设备组网验证。

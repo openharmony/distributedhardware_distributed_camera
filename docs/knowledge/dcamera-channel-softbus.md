@@ -19,9 +19,9 @@
 |------|----------|----------|------|
 | 控制通道 | `DCAMERA_SESSION_MODE_CTRL` | bytes | 协议命令（GET_INFO、CAPTURE 等） |
 | 视频通道 | `DCAMERA_SESSION_MODE_VIDEO` | stream | 连续视频帧（CONTINUOUS_FRAME） |
-| JPEG 通道 | bytes | 单帧拍照数据（SNAPSHOT_FRAME） |
+| JPEG 通道 | `DCAMERA_SESSION_MODE_JPEG` | bytes | 单帧拍照数据（SNAPSHOT_FRAME） |
 
-不要在控制通道上传输视频帧，也不要在视频通道上传输命令协议。新增通道类型时必须在 `ICameraChannel` 接口和 `DCameraSoftbusAdapter` 中同步注册。
+应在控制通道上传输命令协议，在视频/JPEG 通道上传输帧数据，不可混用。新增通道类型时必须在 `ICameraChannel` 接口和 `DCameraSoftbusAdapter` 中同步注册。
 
 ## 会话名称
 
@@ -52,7 +52,7 @@ SoftBus 适配器注册的回调：
 | `SourceOnStream` / `SinkOnStream` | 收到 stream 数据 | 视频流通道使用 |
 | `SourceOnShutDown` / `SinkOnShutDown` | 连接断开 | 触发重连或状态清理 |
 
-回调在 SoftBus 线程池中执行，不要在回调中执行耗时操作。需要转发到 EventHandler 处理。
+回调在 SoftBus 线程池中执行，回调中不应执行耗时操作。需要转发到 EventHandler 处理。
 
 ## 通道超时和重连
 
@@ -83,6 +83,29 @@ SoftBus 适配器注册的回调：
 
 命令通过 JSON 格式封装，包含 `TYPE` 和 `CMD` 字段。新增命令时必须保持 JSON 格式兼容。
 
+## 关联阅读
+
+修改本文涉及内容时，可能还需要阅读：
+- 修改分片逻辑 → `dcamera-data-process.md`（编解码 buffer 管理和大小限制）
+- 修改通道建立流程 → `dcamera-source-lifecycle.md`（会话建立阶段和超时）
+- 修改授权/安全逻辑 → `dcamera-sink-operations.md`（授权结果通过通道发送）
+
+### 触发条件
+
+遇到以下术语时必须阅读本文：SoftBus、会话、分片、`DCAMERA_SESSION_MODE_CTRL`、`DCAMERA_SESSION_MODE_VIDEO`、stream、bytes、`SendSofbusStream`、`SourceOnStream`、`SinkOnBytes`、QoS、会话名称。
+
+修改以下路径时必须阅读本文：`channel/src/dcamera_channel_sink_impl.cpp`、`channel/src/dcamera_channel_source_impl.cpp`、`channel/include/dcamera_softbus_adapter.h`、`channel/include/dcamera_softbus_session.h`。
+
+## 常见故障排查
+
+| 症状 | 排查方向 | 关键检查点 |
+|------|----------|------------|
+| 通道建立失败 | SoftBus 连接 | sink server socket 是否已创建？source client 是否发起连接？控制通道超时 4 秒（QoS）、数据通道超时 3 秒是否超时？ |
+| 数据分片重组失败 | 分片协议头 | 版本号是否一致？序列号是否连续？数据总长度是否正确？协议头是否向后兼容？ |
+| 视频帧丢帧 | 通道类型混淆 | 视频帧是否误走 bytes 模式？控制命令是否误走 stream 模式？会话名称是否两端一致？ |
+| 连接断开频繁 | 重连机制 | sink 侧重试是否超过 3 次？`OnShutDown` 回调是否触发状态清理？source 侧 death recipient 是否触发？ |
+| 控制命令无响应 | bytes 通道 | `SinkOnBytes` / `SourceOnBytes` 回调是否触发？JSON 格式是否正确（`TYPE` + `CMD` 字段）？ |
+
 ## 修改前检查
 
 - 新增通道类型是否在 source 和 sink 两端同步实现？
@@ -93,4 +116,10 @@ SoftBus 适配器注册的回调：
 
 ## 测试指引
 
-通道传输测试在 `services/channel/test/`。SoftBus 适配器测试使用 mock 的 socket 接口。双设备组网测试验证真实通道建立和数据传输。
+| 测试目标 | 构建目标 | 测试文件 |
+|----------|---------|---------|
+| 通道传输（source/sink） | `DCameraChannelTest` | `channel/test/unittest/common/channel/dcamera_channel_source_impl_test.cpp`、`channel/test/unittest/common/channel/dcamera_channel_sink_impl_test.cpp` |
+| SoftBus 适配器 | `DCameraChannelTest` | `channel/test/unittest/common/channel/dcamera_softbus_adapter_test.cpp` |
+| SoftBus 会话/分片 | `DCameraChannelTest` | `channel/test/unittest/common/channel/dcamera_softbus_session_test.cpp` |
+
+双设备组网测试验证真实通道建立和数据传输。
