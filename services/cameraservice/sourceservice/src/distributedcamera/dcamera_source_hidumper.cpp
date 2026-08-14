@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -101,6 +101,7 @@ int32_t DcameraSourceHidumper::ProcessDump(const std::string& args, std::string&
         return DCAMERA_OK;
     }
     result.clear();
+    std::lock_guard<std::mutex> lock(camDumpMutex_);
     SetSourceDumpInfo(camDumpInfo_);
     int32_t ret = DCAMERA_BAD_VALUE;
     switch (hf) {

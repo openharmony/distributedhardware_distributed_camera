@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 #define OHOS_DISTRIBUTED_CAMERA_SOURCE_HIDUMPER_H
 
 #include <map>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -68,6 +69,7 @@ private:
     int32_t GetVersionInfo(std::string& result);
 
 private:
+    std::mutex camDumpMutex_;
     CameraDumpInfo camDumpInfo_;
     const int32_t DUMP_MAX_SIZE = 10 * 1024;
 };

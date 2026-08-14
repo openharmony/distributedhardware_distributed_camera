@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -670,7 +670,11 @@ int32_t DCameraStreamDataProcessProducer::SyncVideoFrame(uint64_t videoPtsUs)
            videoPts, estimatedPts, diff);
 
     if (diff > DCAMERA_TIME_DIFF_MAX) {
-        int32_t queueSize = static_cast<int32_t>(syncBufferQueue_.size());
+        int32_t queueSize = 0;
+        {
+            std::lock_guard<std::mutex> lock(syncBufferMutex_);
+            queueSize = static_cast<int32_t>(syncBufferQueue_.size());
+        }
         DHLOGI("SyncVideoFrame::late (diff=%{public}" PRId64 "ms, videoPts=%{public}" PRId64
             "ms, queueSize:%{public}d), skip this frame.", diff, videoPts, queueSize);
         // Drop if there is still data in the queue, play the last frame directly
