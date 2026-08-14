@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -54,6 +54,7 @@ void CaOnResultCallback::OnResult(const uint64_t timestamp,
     const std::shared_ptr<Camera::CameraMetadata> &result) const
 {
     DHLOGI("OnResult start for:%{public}s", Name_);
+    CHECK_AND_RETURN_LOG(result == nullptr, "result is null");
     auto metaData = result->get();
     camera_metadata_item item{};
     auto ret = Camera::FindCameraMetadataItem(metaData, OHOS_STATUS_SENSOR_EXPOSURE_TIME, &item);
@@ -61,7 +62,16 @@ void CaOnResultCallback::OnResult(const uint64_t timestamp,
     if (ret == CAM_META_SUCCESS) {
         int32_t numerator = item.data.r->numerator;
         int32_t denominator = item.data.r->denominator;
-        uint32_t value = static_cast<uint32_t>(numerator / (denominator / SECONDS_TO_MICROSECONDS));
+        if (denominator == 0) {
+            DHLOGE("denominator is 0, skip exposure time");
+            return;
+        }
+        int32_t divisor = denominator / SECONDS_TO_MICROSECONDS;
+        if (divisor == 0) {
+            DHLOGE("divisor is 0, denominator: %{public}d", denominator);
+            return;
+        }
+        uint32_t value = static_cast<uint32_t>(numerator / divisor);
         DCameraExpoTime::GetInstance().SetExpoTime(value);
     }
 }

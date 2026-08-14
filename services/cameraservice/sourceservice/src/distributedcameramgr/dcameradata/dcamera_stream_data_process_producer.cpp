@@ -378,6 +378,7 @@ bool DCameraStreamDataProcessProducer::SetIMUTOBuffer(const DCameraBuffer& share
         auto metadata_ = OHOS::HDI::Display::Buffer::V1_1::IMetadata::Get(true);
         if (metadata_ == nullptr) {
             DHLOGE("SetIMUTOBuffert metadata get failed");
+            return false;
         }
         sptr<NativeBuffer> hdiBuffer = new NativeBuffer();
         hdiBuffer->SetBufferHandle(bufferHandle);
