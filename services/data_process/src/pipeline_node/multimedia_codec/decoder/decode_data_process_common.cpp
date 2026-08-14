@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -319,23 +319,34 @@ int32_t DecodeDataProcess::StopVideoDecoder()
 void DecodeDataProcess::ReleaseVideoDecoder()
 {
     DHLOGD("Start release videoDecoder.");
-    std::lock_guard<std::mutex> inputLock(mtxDecoderLock_);
-    std::lock_guard<std::mutex> outputLock(mtxDecoderState_);
-    if (videoDecoder_ == nullptr) {
-        DHLOGE("The video decoder does not exist before ReleaseVideoDecoder.");
-        decodeVideoCallback_ = nullptr;
-        return;
+    std::shared_ptr<MediaAVCodec::AVCodecVideoDecoder> videoDecoder = nullptr;
+    {
+        std::lock_guard<std::mutex> inputLock(mtxDecoderLock_);
+        std::lock_guard<std::mutex> outputLock(mtxDecoderState_);
+        videoDecoder = videoDecoder_;
+        if (videoDecoder == nullptr) {
+            DHLOGE("The video decoder does not exist before ReleaseVideoDecoder.");
+            decodeVideoCallback_ = nullptr;
+            return;
+        }
+        DHLOGI("ReleaseVideoDecoder: videoDecoder_ is not null, ready to stop and release.");
     }
     int32_t ret = StopVideoDecoder();
     if (ret != DCAMERA_OK) {
         DHLOGE("StopVideoDecoder failed.");
     }
-    ret = videoDecoder_->Release();
+    ret = videoDecoder->Release();
     if (ret != MediaAVCodec::AVCodecServiceErrCode::AVCS_ERR_OK) {
         DHLOGE("VideoDecoder release failed. ret %{public}d.", ret);
     }
-    videoDecoder_ = nullptr;
-    decodeVideoCallback_ = nullptr;
+    DHLOGI("ReleaseVideoDecoder: VideoDecoder release success.");
+    {
+        std::lock_guard<std::mutex> inputLock(mtxDecoderLock_);
+        std::lock_guard<std::mutex> outputLock(mtxDecoderState_);
+        videoDecoder_ = nullptr;
+        decodeVideoCallback_ = nullptr;
+    }
+    DHLOGI("ReleaseVideoDecoder exit.");
 }
 
 void DecodeDataProcess::ReleaseDecoderSurface()

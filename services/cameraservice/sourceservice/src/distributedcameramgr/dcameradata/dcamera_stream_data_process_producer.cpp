@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -378,6 +378,7 @@ bool DCameraStreamDataProcessProducer::SetIMUTOBuffer(const DCameraBuffer& share
         auto metadata_ = OHOS::HDI::Display::Buffer::V1_1::IMetadata::Get(true);
         if (metadata_ == nullptr) {
             DHLOGE("SetIMUTOBuffert metadata get failed");
+            return false;
         }
         sptr<NativeBuffer> hdiBuffer = new NativeBuffer();
         hdiBuffer->SetBufferHandle(bufferHandle);

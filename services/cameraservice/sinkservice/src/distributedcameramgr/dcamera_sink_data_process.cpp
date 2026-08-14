@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -90,10 +90,10 @@ void DCameraSinkDataProcess::AccRegisterSensorListener()
     int32_t activateRet = ActivateSensor(SENSOR_TYPE_ID_ACCELEROMETER, &accUser);
     DHLOGI("SENSOR_TYPE_ID_ACCELEROMETER, activateRet: %{public}d", activateRet);
 }
- 
+
 void DCameraSinkDataProcess::AccSensorCallback(SensorEvent* event)
 {
-    if (event == nullptr) {
+    if (event == nullptr || event->data == nullptr) {
         DHLOGE("event is nullptr");
         return;
     }
@@ -123,7 +123,7 @@ void DCameraSinkDataProcess::GyroRegisterSensorListener()
  
 void DCameraSinkDataProcess::GyroSensorCallback(SensorEvent* event)
 {
-    if (event == nullptr) {
+    if (event == nullptr || event->data == nullptr) {
         DHLOGE("event is nullptr");
         return;
     }
