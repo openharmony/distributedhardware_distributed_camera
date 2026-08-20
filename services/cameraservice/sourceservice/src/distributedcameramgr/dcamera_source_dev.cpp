@@ -111,13 +111,12 @@ int32_t DCameraSourceDev::RegisterDistributedHardware(const std::string& devId, 
     if (root == nullptr) {
         return DCAMERA_BAD_VALUE;
     }
+    eis_ = false;
     if (cJSON_HasObjectItem(root, "EIS")) {
         cJSON* item = cJSON_GetObjectItemCaseSensitive(root, "EIS");
-        if (cJSON_IsTrue(item)) {
-            eis_ = true;
-            DCameraSrcImuSensor::GetInstance().SetSrcEis(eis_);
-        }
+        eis_ = cJSON_IsTrue(item) ? true : false;
     }
+    DCameraSrcImuSensor::GetInstance().SetSrcEis(eis_);
     DHLOGI("EIS ability value, eis_ is = %{public}d", eis_);
     cJSON_Delete(root);
 
