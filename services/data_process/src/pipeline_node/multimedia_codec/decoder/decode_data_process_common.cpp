@@ -429,7 +429,9 @@ int32_t DecodeDataProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>&
         DHLOGE("video decoder input buffers queue over flow.");
         return DCAMERA_INDEX_OVERFLOW;
     }
-    if (inputBuffers[0]->Size() > MAX_BUFFER_SIZE) {
+    size_t maxBufferSize = (processedConfig_.GetVideoformat() == Videoformat::RGBA_8888) ?
+        MAX_RGB32_BUFFER_SIZE : MAX_YUV420_BUFFER_SIZE;
+    if (inputBuffers[0]->Size() > maxBufferSize) {
         DHLOGE("DecodeNode input buffer size %{public}zu error.", inputBuffers[0]->Size());
         return DCAMERA_MEMORY_OPT_ERROR;
     }
