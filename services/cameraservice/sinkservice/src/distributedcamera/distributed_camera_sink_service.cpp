@@ -429,7 +429,7 @@ int32_t DistributedCameraSinkService::StopDistributedHardware(const std::string 
 int32_t DistributedCameraSinkService::SetAccessListener(const sptr<IAccessListener> &listener,
     int32_t timeOut, const std::string &pkgName)
 {
-    DHLOGI("SetAccessListener, pkgName: %{public}s, timeOut: %{public}d", pkgName.c_str(), timeOut);
+    DHLOGI("SetAccessListener, pkgName: %{public}s, timeOut: %{public}d", GetAnonyString(pkgName).c_str(), timeOut);
     if (listener == nullptr) {
         DHLOGE("listener is nullptr");
         return DCAMERA_BAD_VALUE;
@@ -451,7 +451,7 @@ int32_t DistributedCameraSinkService::SetAccessListener(const sptr<IAccessListen
 
 int32_t DistributedCameraSinkService::RemoveAccessListener(const std::string &pkgName)
 {
-    DHLOGI("RemoveAccessListener, pkgName: %{public}s", pkgName.c_str());
+    DHLOGI("RemoveAccessListener, pkgName: %{public}s", GetAnonyString(pkgName).c_str());
     if (pkgName.empty()) {
         DHLOGE("pkgName is empty");
         return DCAMERA_BAD_VALUE;
