@@ -178,6 +178,7 @@ int32_t DCameraSinkController::StopCapture()
 int32_t DCameraSinkController::ChannelNeg(std::shared_ptr<DCameraChannelInfo>& info)
 {
     DHLOGI("ChannelNeg dhId: %{public}s", GetAnonyString(dhId_).c_str());
+    CHECK_AND_RETURN_RET_LOG(output_ == nullptr, DCAMERA_BAD_VALUE, "output_ is null.");
     int32_t ret = output_->OpenChannel(info);
     if (ret != DCAMERA_OK) {
         DHLOGE("channel negotiate failed, dhId: %{public}s, ret: %{public}d", GetAnonyString(dhId_).c_str(), ret);

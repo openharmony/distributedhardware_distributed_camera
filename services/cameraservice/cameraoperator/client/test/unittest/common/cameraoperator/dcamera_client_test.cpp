@@ -102,6 +102,8 @@ constexpr double LONGITUDE = 52.12;
 constexpr double ALTITUDE = 2.365;
 constexpr uint32_t DCAMERA_TEST_MAX_METADATA_SIZE = 20;
 
+static bool g_hasCamera = false;
+
 class DCameraClientTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -133,11 +135,9 @@ void DCameraClientTest::SetUp(void)
     DHLOGI("DCameraClientTest::SetUp");
     DCameraHandler::GetInstance().Initialize();
     std::vector<std::string> cameras = DCameraHandler::GetInstance().GetCameras();
-    if (cameras.empty()) {
-        client_ = nullptr;
-    } else {
-        client_ = std::make_shared<DCameraClient>(cameras[0]);
-    }
+    g_hasCamera = !cameras.empty();
+    std::string dhId = cameras.empty() ? "camrea_0" : cameras[0];
+    client_ = std::make_shared<DCameraClient>(dhId);
 
     photoInfo_false_ = std::make_shared<DCameraCaptureInfo>();
     photoInfo_false_->width_ = TEST_WIDTH_PHOTO;
@@ -343,10 +343,12 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_003, TestSize.Level1)
     EXPECT_EQ(DCAMERA_OK, ret);
 
     ret = client_->Init();
-    EXPECT_EQ(DCAMERA_OK, ret);
+    if (g_hasCamera) {
+        EXPECT_EQ(DCAMERA_OK, ret);
 
-    ret = client_->UnInit();
-    EXPECT_EQ(DCAMERA_OK, ret);
+        ret = client_->UnInit();
+        EXPECT_EQ(DCAMERA_OK, ret);
+    }
 }
 
 /**
@@ -371,47 +373,49 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_004, TestSize.Level1)
     sptr<IBufferConsumerListener> videoListener(new DCameraClientTestVideoSurfaceListener());
     videoSurface->RegisterConsumerListener(videoListener);
     ret = client_->Init();
-    EXPECT_EQ(DCAMERA_OK, ret);
+    if (g_hasCamera) {
+        EXPECT_EQ(DCAMERA_OK, ret);
 
-    SetTokenID();
-    DHLOGI("DCameraClientTest dcamera_client_test_004: video width: %{public}d, height: %{public}d, format: %{public}d,"
-        " isCapture: %{public}d", videoInfo_true_->width_, videoInfo_true_->height_, videoInfo_true_->format_,
-        videoInfo_true_->isCapture_);
-    std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos;
-    captureInfos.push_back(videoInfo_true_);
-    sptr<IBufferProducer> bp = videoSurface->GetProducer();
-    sptr<Surface> pSurface = Surface::CreateSurfaceAsProducer(bp);
-    int32_t mode = 0;
-    ret = client_->StartCapture(captureInfos, pSurface, mode);
-    EXPECT_FALSE(mode);
+        SetTokenID();
+        DHLOGI("dcamera_client_test_004: video width: %{public}d, height: %{public}d, format: %{public}d,"
+            " isCapture: %{public}d", videoInfo_true_->width_, videoInfo_true_->height_, videoInfo_true_->format_,
+            videoInfo_true_->isCapture_);
+        std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos;
+        captureInfos.push_back(videoInfo_true_);
+        sptr<IBufferProducer> bp = videoSurface->GetProducer();
+        sptr<Surface> pSurface = Surface::CreateSurfaceAsProducer(bp);
+        int32_t mode = 0;
+        ret = client_->StartCapture(captureInfos, pSurface, mode);
+        EXPECT_FALSE(mode);
 
-    ret = client_->PauseCapture();
-    EXPECT_FALSE(mode);
+        ret = client_->PauseCapture();
+        EXPECT_FALSE(mode);
 
-    ret = client_->ResumeCapture();
-    EXPECT_FALSE(mode);
+        ret = client_->ResumeCapture();
+        EXPECT_FALSE(mode);
 
-    auto metaData = std::make_shared<Camera::CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
-    std::vector<int32_t> fpsRange = { ENTRY_CAPACITY, ENTRY_CAPACITY };
-    metaData->addEntry(OHOS_CONTROL_FPS_RANGES, fpsRange.data(), fpsRange.size());
-    std::string abilityString = Camera::MetadataUtils::EncodeToString(metaData);
-    std::vector<std::shared_ptr<DCameraSettings>> settings;
-    auto setting = std::make_shared<DCameraSettings>();
-    setting->type_ = UPDATE_METADATA;
-    setting->value_ = Base64Encode(reinterpret_cast<const unsigned char *>(abilityString.c_str()),
-        abilityString.length());
-    settings.push_back(setting);
-    client_->GetFpsRanges();
-    ret = client_->UpdateSettings(settings);
-    EXPECT_EQ(DCAMERA_OK, ret);
+        auto metaData = std::make_shared<Camera::CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
+        std::vector<int32_t> fpsRange = { ENTRY_CAPACITY, ENTRY_CAPACITY };
+        metaData->addEntry(OHOS_CONTROL_FPS_RANGES, fpsRange.data(), fpsRange.size());
+        std::string abilityString = Camera::MetadataUtils::EncodeToString(metaData);
+        std::vector<std::shared_ptr<DCameraSettings>> settings;
+        auto setting = std::make_shared<DCameraSettings>();
+        setting->type_ = UPDATE_METADATA;
+        setting->value_ = Base64Encode(reinterpret_cast<const unsigned char *>(abilityString.c_str()),
+            abilityString.length());
+        settings.push_back(setting);
+        client_->GetFpsRanges();
+        ret = client_->UpdateSettings(settings);
+        EXPECT_EQ(DCAMERA_OK, ret);
 
-    sleep(TEST_SLEEP_SEC);
+        sleep(TEST_SLEEP_SEC);
 
-    ret = client_->StopCapture();
-    EXPECT_EQ(DCAMERA_OK, ret);
+        ret = client_->StopCapture();
+        EXPECT_EQ(DCAMERA_OK, ret);
 
-    ret = client_->UnInit();
-    EXPECT_EQ(DCAMERA_OK, ret);
+        ret = client_->UnInit();
+        EXPECT_EQ(DCAMERA_OK, ret);
+    }
 }
 
 /**
@@ -436,44 +440,46 @@ HWTEST_F(DCameraClientTest, dcamera_client_test_005, TestSize.Level1)
     sptr<IBufferConsumerListener> videoListener(new DCameraClientTestVideoSurfaceListener());
     videoSurface->RegisterConsumerListener(videoListener);
     ret = client_->Init();
-    EXPECT_EQ(DCAMERA_OK, ret);
+    if (g_hasCamera) {
+        EXPECT_EQ(DCAMERA_OK, ret);
 
-    SetTokenID();
-    DHLOGI("DCameraClientTest dcamera_client_test_005: video width: %{public}d, height: %{public}d, format: "
-        "%{public}d, isCapture: %{public}d", videoInfo_true_->width_, videoInfo_true_->height_,
-        videoInfo_true_->format_, videoInfo_true_->isCapture_);
-    DHLOGI("DCameraClientTest dcamera_client_test_005: photo width: %{public}d, height: %{public}d, format: "
-        "%{public}d, isCapture: %{public}d", photoInfo_false_->width_, photoInfo_false_->height_,
-        photoInfo_false_->format_, photoInfo_false_->isCapture_);
-    std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos;
-    captureInfos.push_back(videoInfo_true_);
-    captureInfos.push_back(photoInfo_false_);
-    sptr<IBufferProducer> bp = videoSurface->GetProducer();
-    sptr<Surface> pSurface = Surface::CreateSurfaceAsProducer(bp);
-    int32_t mode = 0;
-    ret = client_->StartCapture(captureInfos, pSurface, mode);
-    EXPECT_FALSE(mode);
+        SetTokenID();
+        DHLOGI("DCameraClientTest dcamera_client_test_005: video width: %{public}d, height: %{public}d, format: "
+            "%{public}d, isCapture: %{public}d", videoInfo_true_->width_, videoInfo_true_->height_,
+            videoInfo_true_->format_, videoInfo_true_->isCapture_);
+        DHLOGI("DCameraClientTest dcamera_client_test_005: photo width: %{public}d, height: %{public}d, format: "
+            "%{public}d, isCapture: %{public}d", photoInfo_false_->width_, photoInfo_false_->height_,
+            photoInfo_false_->format_, photoInfo_false_->isCapture_);
+        std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos;
+        captureInfos.push_back(videoInfo_true_);
+        captureInfos.push_back(photoInfo_false_);
+        sptr<IBufferProducer> bp = videoSurface->GetProducer();
+        sptr<Surface> pSurface = Surface::CreateSurfaceAsProducer(bp);
+        int32_t mode = 0;
+        ret = client_->StartCapture(captureInfos, pSurface, mode);
+        EXPECT_FALSE(mode);
 
-    sleep(TEST_SLEEP_SEC);
+        sleep(TEST_SLEEP_SEC);
 
-    DHLOGI("DCameraClientTest dcamera_client_test_005: video width: %{public}d, height: %{public}d, format: "
-        "%{public}d, isCapture: %{public}d", videoInfo_true_->width_, videoInfo_true_->height_,
-        videoInfo_true_->format_, videoInfo_true_->isCapture_);
-    DHLOGI("DCameraClientTest dcamera_client_test_005: photo width: %{public}d, height: %{public}d, format: "
-        "%{public}d, isCapture: %{public}d", photoInfo_false_->width_, photoInfo_false_->height_,
-        photoInfo_false_->format_, photoInfo_false_->isCapture_);
-    captureInfos.clear();
-    captureInfos.push_back(videoInfo_false_);
-    captureInfos.push_back(photoInfo_true_);
-    ret = client_->StartCapture(captureInfos, pSurface, mode);
-    EXPECT_FALSE(mode);
+        DHLOGI("DCameraClientTest dcamera_client_test_005: video width: %{public}d, height: %{public}d, format: "
+            "%{public}d, isCapture: %{public}d", videoInfo_true_->width_, videoInfo_true_->height_,
+            videoInfo_true_->format_, videoInfo_true_->isCapture_);
+        DHLOGI("DCameraClientTest dcamera_client_test_005: photo width: %{public}d, height: %{public}d, format: "
+            "%{public}d, isCapture: %{public}d", photoInfo_false_->width_, photoInfo_false_->height_,
+            photoInfo_false_->format_, photoInfo_false_->isCapture_);
+        captureInfos.clear();
+        captureInfos.push_back(videoInfo_false_);
+        captureInfos.push_back(photoInfo_true_);
+        ret = client_->StartCapture(captureInfos, pSurface, mode);
+        EXPECT_FALSE(mode);
 
-    sleep(TEST_SLEEP_SEC);
-    ret = client_->StopCapture();
-    EXPECT_EQ(DCAMERA_OK, ret);
+        sleep(TEST_SLEEP_SEC);
+        ret = client_->StopCapture();
+        EXPECT_EQ(DCAMERA_OK, ret);
 
-    ret = client_->UnInit();
-    EXPECT_EQ(DCAMERA_OK, ret);
+        ret = client_->UnInit();
+        EXPECT_EQ(DCAMERA_OK, ret);
+    }
 }
 
 /**

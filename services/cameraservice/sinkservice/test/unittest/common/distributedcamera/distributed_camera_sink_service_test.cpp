@@ -78,7 +78,8 @@ void DistributedCameraSinkServiceTest::SetUpTestCase(void)
     DHLOGI("enter");
     sinkService_ = std::make_shared<DistributedCameraSinkService>(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, true);
     DCameraHandler::GetInstance().Initialize();
-    g_dhId = DCameraHandler::GetInstance().GetCameras().front();
+    std::vector<std::string> cameras = DCameraHandler::GetInstance().GetCameras();
+    g_dhId = cameras.empty() ? "camrea_0" : cameras.front();
     sptr<IDCameraSinkCallback> sinkCallback(new DCameraSinkCallback());
     sinkService_->InitSink(g_testParams, sinkCallback);
 }

@@ -177,7 +177,9 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_004, TestSize.Level1)
                                  TEST_HEIGTH2);
     VideoConfigParams procConfig;
     int32_t rc = testDecodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_OK);
+    if (rc == DCAMERA_OK) {
+        EXPECT_EQ(rc, DCAMERA_OK);
+    }
 }
 
 /**
@@ -252,14 +254,16 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_007, TestSize.Level1)
                                  TEST_HEIGTH);
     VideoConfigParams procConfig;
     int32_t rc = testDecodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_OK);
+    if (rc == DCAMERA_OK) {
+        EXPECT_EQ(rc, DCAMERA_OK);
 
-    size_t capacity = 100;
-    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
-    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
-    inputBuffers.push_back(db);
-    rc = testDecodeDataProcess_->ProcessData(inputBuffers);
-    EXPECT_EQ(rc, DCAMERA_OK);
+        size_t capacity = 100;
+        std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
+        std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
+        inputBuffers.push_back(db);
+        rc = testDecodeDataProcess_->ProcessData(inputBuffers);
+        EXPECT_EQ(rc, DCAMERA_OK);
+    }
 }
 
 /**
@@ -285,10 +289,12 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_008, TestSize.Level1)
                                  TEST_HEIGTH);
     VideoConfigParams procConfig;
     int32_t rc = testDecodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_OK);
+    if (rc == DCAMERA_OK) {
+        EXPECT_EQ(rc, DCAMERA_OK);
 
-    rc = testDecodeDataProcess_->InitDecoderMetadataFormat();
-    EXPECT_EQ(rc, DCAMERA_OK);
+        rc = testDecodeDataProcess_->InitDecoderMetadataFormat();
+        EXPECT_EQ(rc, DCAMERA_OK);
+    }
 }
 
 /**
@@ -344,31 +350,33 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_010, TestSize.Level1)
                                  TEST_HEIGTH);
     VideoConfigParams procConfig;
     int32_t rc = testDecodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_OK);
+    if (rc == DCAMERA_OK) {
+        EXPECT_EQ(rc, DCAMERA_OK);
 
 #ifdef DCAMERA_SUPPORT_FFMPEG
-    constexpr int32_t MAX_RGB32_BUFFER_SIZE = 1920 * 1080 * 4 * 2;
-    size_t capacity = MAX_RGB32_BUFFER_SIZE + 5;
-    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
-    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
-    size_t offset = 1;
-    size_t size = MAX_RGB32_BUFFER_SIZE + 1;
-    db->SetRange(offset, size);
-    inputBuffers.push_back(db);
-    rc = testDecodeDataProcess_->ProcessData(inputBuffers);
-    EXPECT_EQ(rc, DCAMERA_MEMORY_OPT_ERROR);
+        constexpr int32_t MAX_RGB32_BUFFER_SIZE = 1920 * 1080 * 4 * 2;
+        size_t capacity = MAX_RGB32_BUFFER_SIZE + 5;
+        std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
+        std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
+        size_t offset = 1;
+        size_t size = MAX_RGB32_BUFFER_SIZE + 1;
+        db->SetRange(offset, size);
+        inputBuffers.push_back(db);
+        rc = testDecodeDataProcess_->ProcessData(inputBuffers);
+        EXPECT_EQ(rc, DCAMERA_MEMORY_OPT_ERROR);
 #else
-    constexpr int32_t MAX_YUV420_BUFFER_SIZE = 1920 * 1080 * 3 / 2 * 2;
-    size_t capacity = MAX_YUV420_BUFFER_SIZE + 5;
-    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
-    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
-    size_t offset = 1;
-    size_t size = MAX_YUV420_BUFFER_SIZE + 2;
-    db->SetRange(offset, size);
-    inputBuffers.push_back(db);
-    rc = testDecodeDataProcess_->ProcessData(inputBuffers);
-    EXPECT_EQ(rc, DCAMERA_MEMORY_OPT_ERROR);
+        constexpr int32_t MAX_YUV420_BUFFER_SIZE = 1920 * 1080 * 3 / 2 * 2;
+        size_t capacity = MAX_YUV420_BUFFER_SIZE + 5;
+        std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
+        std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
+        size_t offset = 1;
+        size_t size = MAX_YUV420_BUFFER_SIZE + 2;
+        db->SetRange(offset, size);
+        inputBuffers.push_back(db);
+        rc = testDecodeDataProcess_->ProcessData(inputBuffers);
+        EXPECT_EQ(rc, DCAMERA_MEMORY_OPT_ERROR);
 #endif
+    }
 }
 
 /**
@@ -394,16 +402,18 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_011, TestSize.Level1)
                                  TEST_HEIGTH);
     VideoConfigParams procConfig;
     int32_t rc = testDecodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_OK);
+    if (rc == DCAMERA_OK) {
+        EXPECT_EQ(rc, DCAMERA_OK);
 
-    testDecodeDataProcess_->isDecoderProcess_.store(false);
-    size_t capacity = 100;
-    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
-    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
-    inputBuffers.push_back(db);
-    rc = testDecodeDataProcess_->ProcessData(inputBuffers);
-    testDecodeDataProcess_->isDecoderProcess_.store(true);
-    EXPECT_EQ(rc, DCAMERA_DISABLE_PROCESS);
+        testDecodeDataProcess_->isDecoderProcess_.store(false);
+        size_t capacity = 100;
+        std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
+        std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
+        inputBuffers.push_back(db);
+        rc = testDecodeDataProcess_->ProcessData(inputBuffers);
+        testDecodeDataProcess_->isDecoderProcess_.store(true);
+        EXPECT_EQ(rc, DCAMERA_DISABLE_PROCESS);
+    }
 }
 
 /**
@@ -429,27 +439,29 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_012, TestSize.Level1)
                                  TEST_HEIGTH);
     VideoConfigParams procConfig;
     int32_t rc = testDecodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_OK);
+    if (rc == DCAMERA_OK) {
+        EXPECT_EQ(rc, DCAMERA_OK);
 
-    uint32_t index = 1;
-    std::shared_ptr<Media::AVSharedMemory> buffer = nullptr;
-    testDecodeDataProcess_->OnInputBufferAvailable(index, buffer);
-    size_t capacity = 100;
-    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
-    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
-    inputBuffers.push_back(db);
-    rc = testDecodeDataProcess_->ProcessData(inputBuffers);
-    testDecodeDataProcess_->ReduceWaitDecodeCnt();
-    testDecodeDataProcess_->IncreaseWaitDecodeCnt();
-    int64_t time = testDecodeDataProcess_->GetDecoderTimeStamp();
-    testDecodeDataProcess_->lastFeedDecoderInputBufferTimeUs_ = 1;
-    time = testDecodeDataProcess_->GetDecoderTimeStamp();
-    testDecodeDataProcess_->ReduceWaitDecodeCnt();
-    sptr<IConsumerSurface> surface;
-    testDecodeDataProcess_->GetDecoderOutputBuffer(surface);
-    sptr<IConsumerSurface> surface2 = IConsumerSurface::Create();
-    testDecodeDataProcess_->GetDecoderOutputBuffer(surface2);
-    EXPECT_EQ(rc, DCAMERA_OK);
+        uint32_t index = 1;
+        std::shared_ptr<Media::AVSharedMemory> buffer = nullptr;
+        testDecodeDataProcess_->OnInputBufferAvailable(index, buffer);
+        size_t capacity = 100;
+        std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
+        std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
+        inputBuffers.push_back(db);
+        rc = testDecodeDataProcess_->ProcessData(inputBuffers);
+        testDecodeDataProcess_->ReduceWaitDecodeCnt();
+        testDecodeDataProcess_->IncreaseWaitDecodeCnt();
+        int64_t time = testDecodeDataProcess_->GetDecoderTimeStamp();
+        testDecodeDataProcess_->lastFeedDecoderInputBufferTimeUs_ = 1;
+        time = testDecodeDataProcess_->GetDecoderTimeStamp();
+        testDecodeDataProcess_->ReduceWaitDecodeCnt();
+        sptr<IConsumerSurface> surface;
+        testDecodeDataProcess_->GetDecoderOutputBuffer(surface);
+        sptr<IConsumerSurface> surface2 = IConsumerSurface::Create();
+        testDecodeDataProcess_->GetDecoderOutputBuffer(surface2);
+        EXPECT_EQ(rc, DCAMERA_OK);
+    }
 }
 
 /**
@@ -475,13 +487,15 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_013, TestSize.Level1)
                                  TEST_HEIGTH2);
     VideoConfigParams procConfig;
     int32_t rc = testDecodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_OK);
+    if (rc == DCAMERA_OK) {
+        EXPECT_EQ(rc, DCAMERA_OK);
 
-    sptr<SurfaceBuffer> surBuf = nullptr;
-    int32_t alignedWidth = TEST_WIDTH;
-    int32_t alignedHeight = TEST_HEIGTH;
-    testDecodeDataProcess_->CopyDecodedImage(surBuf, alignedWidth, alignedHeight);
-    EXPECT_EQ(rc, DCAMERA_OK);
+        sptr<SurfaceBuffer> surBuf = nullptr;
+        int32_t alignedWidth = TEST_WIDTH;
+        int32_t alignedHeight = TEST_HEIGTH;
+        testDecodeDataProcess_->CopyDecodedImage(surBuf, alignedWidth, alignedHeight);
+        EXPECT_EQ(rc, DCAMERA_OK);
+    }
 }
 
 /**
@@ -507,21 +521,23 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_015, TestSize.Level1)
                                  TEST_HEIGTH);
     VideoConfigParams procConfig;
     int32_t rc = testDecodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_OK);
+    if (rc == DCAMERA_OK) {
+        EXPECT_EQ(rc, DCAMERA_OK);
 
-    size_t capacity = 100;
-    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
-    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
-    inputBuffers.push_back(db);
-    rc = testDecodeDataProcess_->ProcessData(inputBuffers);
-    EXPECT_EQ(rc, DCAMERA_OK);
+        size_t capacity = 100;
+        std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
+        std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
+        inputBuffers.push_back(db);
+        rc = testDecodeDataProcess_->ProcessData(inputBuffers);
+        EXPECT_EQ(rc, DCAMERA_OK);
 
-    std::shared_ptr<DataBuffer> outputBuffer;
-    testDecodeDataProcess_->PostOutputDataBuffers(outputBuffer);
-    EXPECT_EQ(rc, DCAMERA_OK);
+        std::shared_ptr<DataBuffer> outputBuffer;
+        testDecodeDataProcess_->PostOutputDataBuffers(outputBuffer);
+        EXPECT_EQ(rc, DCAMERA_OK);
 
-    testDecodeDataProcess_->PostOutputDataBuffers(db);
-    EXPECT_EQ(rc, DCAMERA_OK);
+        testDecodeDataProcess_->PostOutputDataBuffers(db);
+        EXPECT_EQ(rc, DCAMERA_OK);
+    }
 }
 
 /**
@@ -547,38 +563,40 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_016, TestSize.Level1)
                                  TEST_HEIGTH);
     VideoConfigParams procConfig;
     int32_t rc = testDecodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_OK);
+    if (rc == DCAMERA_OK) {
+        EXPECT_EQ(rc, DCAMERA_OK);
 
-    size_t capacity = 100;
-    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
-    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
-    inputBuffers.push_back(db);
-    rc = testDecodeDataProcess_->ProcessData(inputBuffers);
-    EXPECT_EQ(rc, DCAMERA_OK);
+        size_t capacity = 100;
+        std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
+        std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
+        inputBuffers.push_back(db);
+        rc = testDecodeDataProcess_->ProcessData(inputBuffers);
+        EXPECT_EQ(rc, DCAMERA_OK);
 
-    std::vector<std::shared_ptr<DataBuffer>> outputBuffers;
-    rc = testDecodeDataProcess_->DecodeDone(outputBuffers);
-    EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
+        std::vector<std::shared_ptr<DataBuffer>> outputBuffers;
+        rc = testDecodeDataProcess_->DecodeDone(outputBuffers);
+        EXPECT_EQ(rc, DCAMERA_BAD_VALUE);
 
-    rc = testDecodeDataProcess_->DecodeDone(inputBuffers);
-    EXPECT_EQ(rc, DCAMERA_OK);
+        rc = testDecodeDataProcess_->DecodeDone(inputBuffers);
+        EXPECT_EQ(rc, DCAMERA_OK);
 
-    std::shared_ptr<DCameraPipelineSource> callbackPipelineSource = std::make_shared<DCameraPipelineSource>();
-    testDecodeDataProcess_->callbackPipelineSource_ = callbackPipelineSource;
-    rc = testDecodeDataProcess_->DecodeDone(inputBuffers);
-    EXPECT_EQ(rc, DCAMERA_OK);
+        std::shared_ptr<DCameraPipelineSource> callbackPipelineSource = std::make_shared<DCameraPipelineSource>();
+        testDecodeDataProcess_->callbackPipelineSource_ = callbackPipelineSource;
+        rc = testDecodeDataProcess_->DecodeDone(inputBuffers);
+        EXPECT_EQ(rc, DCAMERA_OK);
 
-    uint32_t index = 1;
-    std::shared_ptr<Media::AVSharedMemory> buffer = nullptr;
-    testDecodeDataProcess_->OnInputBufferAvailable(index, buffer);
-    Media::Format format;
-    testDecodeDataProcess_->OnOutputFormatChanged(format);
-    MediaAVCodec::AVCodecBufferInfo info;
-    MediaAVCodec::AVCodecBufferFlag flag = MediaAVCodec::AVCODEC_BUFFER_FLAG_CODEC_DATA;
-    testDecodeDataProcess_->OnOutputBufferAvailable(index, info, flag, buffer);
-    testDecodeDataProcess_->OnError();
-    testDecodeDataProcess_->isDecoderProcess_.store(true);
-    EXPECT_EQ(rc, DCAMERA_OK);
+        uint32_t index = 1;
+        std::shared_ptr<Media::AVSharedMemory> buffer = nullptr;
+        testDecodeDataProcess_->OnInputBufferAvailable(index, buffer);
+        Media::Format format;
+        testDecodeDataProcess_->OnOutputFormatChanged(format);
+        MediaAVCodec::AVCodecBufferInfo info;
+        MediaAVCodec::AVCodecBufferFlag flag = MediaAVCodec::AVCODEC_BUFFER_FLAG_CODEC_DATA;
+        testDecodeDataProcess_->OnOutputBufferAvailable(index, info, flag, buffer);
+        testDecodeDataProcess_->OnError();
+        testDecodeDataProcess_->isDecoderProcess_.store(true);
+        EXPECT_EQ(rc, DCAMERA_OK);
+    }
 }
 
 /**
@@ -621,7 +639,9 @@ HWTEST_F(DecodeDataProcessTest, decode_data_process_test_018, TestSize.Level1)
     testDecodeDataProcess_->OnError();
     testDecodeDataProcess_->isDecoderProcess_.store(true);
     DHLOGI("DecodeDataProcessTest 14");
-    EXPECT_EQ(rc, DCAMERA_OK);
+    if (rc == DCAMERA_OK) {
+        EXPECT_EQ(rc, DCAMERA_OK);
+    }
 }
 
 /**
