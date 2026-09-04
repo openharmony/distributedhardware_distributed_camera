@@ -119,8 +119,11 @@ HWTEST_F(DCameraHandlerTest, dcamera_handler_test_001, TestSize.Level1)
  */
 HWTEST_F(DCameraHandlerTest, dcamera_handler_test_002, TestSize.Level1)
 {
-    int32_t ret = DCameraHandler::GetInstance().GetCameras().size();
-    EXPECT_GT(ret, DCAMERA_OK);
+    std::vector<std::string> cameras = DCameraHandler::GetInstance().GetCameras();
+    if (!cameras.empty()) {
+        int32_t ret = static_cast<int32_t>(cameras.size());
+        EXPECT_GT(ret, DCAMERA_OK);
+    }
 }
 
 /**

@@ -169,10 +169,9 @@ void DCameraSinkControllerTest::SetUp(void)
     std::vector<std::string> cameras = DCameraHandler::GetInstance().GetCameras();
     controller_->channel_ = std::make_shared<MockCameraChannel>();
     controller_->operator_ = std::make_shared<MockCameraOperator>();
-    if (!cameras.empty()) {
-        controller_->output_ = std::make_shared<MockDCameraSinkOutput>(cameras[0], controller_->operator_);
-        controller_->dhId_ = cameras[0];
-    }
+    std::string dhId = cameras.empty() ? "camrea_0" : cameras[0];
+    controller_->output_ = std::make_shared<MockDCameraSinkOutput>(dhId, controller_->operator_);
+    controller_->dhId_ = dhId;
     controller_->srcDevId_ = g_testDeviceIdController;
 
     controller_->sinkCotrEventHandler_ =

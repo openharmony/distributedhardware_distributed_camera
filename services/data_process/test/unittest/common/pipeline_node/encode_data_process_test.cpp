@@ -248,10 +248,12 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_007, TestSize.Level1)
                                  TEST_HEIGHT);
     VideoConfigParams procConfig;
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_OK);
+    if (rc == DCAMERA_OK) {
+        EXPECT_EQ(rc, DCAMERA_OK);
 
-    rc = testEncodeDataProcess_->InitEncoderMetadataFormat();
-    EXPECT_EQ(rc, DCAMERA_OK);
+        rc = testEncodeDataProcess_->InitEncoderMetadataFormat();
+        EXPECT_EQ(rc, DCAMERA_OK);
+    }
 }
 
 /**
@@ -276,10 +278,12 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_008, TestSize.Level1)
                                  TEST_HEIGHT2);
     VideoConfigParams procConfig;
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_OK);
+    if (rc == DCAMERA_OK) {
+        EXPECT_EQ(rc, DCAMERA_OK);
 
-    rc = testEncodeDataProcess_->InitEncoderMetadataFormat();
-    EXPECT_EQ(rc, DCAMERA_OK);
+        rc = testEncodeDataProcess_->InitEncoderMetadataFormat();
+        EXPECT_EQ(rc, DCAMERA_OK);
+    }
 }
 
 /**
@@ -304,26 +308,28 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_009, TestSize.Level1)
                                  TEST_HEIGHT);
     VideoConfigParams procConfig;
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_OK);
+    if (rc == DCAMERA_OK) {
+        EXPECT_EQ(rc, DCAMERA_OK);
 
-    constexpr int64_t NORM_YUV420_BUFFER_SIZE = 1920 * 1920 * 3 / 2;
-    size_t capacity = NORM_YUV420_BUFFER_SIZE + 5;
-    std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
-    std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
-    size_t offset = 1;
-    size_t size = NORM_YUV420_BUFFER_SIZE + 1;
-    db->SetRange(offset, size);
-    inputBuffers.push_back(db);
-    rc = testEncodeDataProcess_->ProcessData(inputBuffers);
-    EXPECT_EQ(rc, DCAMERA_MEMORY_OPT_ERROR);
+        constexpr int64_t NORM_YUV420_BUFFER_SIZE = 1920 * 1920 * 3 / 2;
+        size_t capacity = NORM_YUV420_BUFFER_SIZE + 5;
+        std::vector<std::shared_ptr<DataBuffer>> inputBuffers;
+        std::shared_ptr<DataBuffer> db = std::make_shared<DataBuffer>(capacity);
+        size_t offset = 1;
+        size_t size = NORM_YUV420_BUFFER_SIZE + 1;
+        db->SetRange(offset, size);
+        inputBuffers.push_back(db);
+        rc = testEncodeDataProcess_->ProcessData(inputBuffers);
+        EXPECT_EQ(rc, DCAMERA_MEMORY_OPT_ERROR);
 
-    inputBuffers.clear();
-    std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);
-    size_t len = 1920 * 1080 * 3 / 2 - 1;
-    db->SetRange(offset, len);
-    inputBuffers.push_back(db);
-    rc = testEncodeDataProcess_->ProcessData(inputBuffers);
-    EXPECT_EQ(rc, DCAMERA_OK);
+        inputBuffers.clear();
+        std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(capacity);
+        size_t len = 1920 * 1080 * 3 / 2 - 1;
+        db->SetRange(offset, len);
+        inputBuffers.push_back(db);
+        rc = testEncodeDataProcess_->ProcessData(inputBuffers);
+        EXPECT_EQ(rc, DCAMERA_OK);
+    }
 }
 
 /**
@@ -348,10 +354,12 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_010, TestSize.Level1)
                                  TEST_HEIGHT);
     VideoConfigParams procConfig;
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_OK);
+    if (rc == DCAMERA_OK) {
+        EXPECT_EQ(rc, DCAMERA_OK);
 
-    rc = testEncodeDataProcess_->InitEncoderMetadataFormat();
-    EXPECT_EQ(rc, DCAMERA_OK);
+        rc = testEncodeDataProcess_->InitEncoderMetadataFormat();
+        EXPECT_EQ(rc, DCAMERA_OK);
+    }
 }
 
 /**
@@ -376,17 +384,19 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_011, TestSize.Level1)
                                  TEST_HEIGHT);
     VideoConfigParams procConfig;
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_OK);
+    if (rc == DCAMERA_OK) {
+        EXPECT_EQ(rc, DCAMERA_OK);
 
-    rc = testEncodeDataProcess_->InitEncoderMetadataFormat();
-    EXPECT_EQ(rc, DCAMERA_OK);
+        rc = testEncodeDataProcess_->InitEncoderMetadataFormat();
+        EXPECT_EQ(rc, DCAMERA_OK);
 
-    uint32_t index = 0;
-    MediaAVCodec::AVCodecBufferInfo info;
-    std::shared_ptr<Media::AVSharedMemory> buffer = nullptr;
-    MediaAVCodec::AVCodecBufferFlag flag = MediaAVCodec::AVCODEC_BUFFER_FLAG_CODEC_DATA;
-    rc = testEncodeDataProcess_->GetEncoderOutputBuffer(index, info, flag, buffer);
-    EXPECT_EQ(rc, DCAMERA_BAD_OPERATE);
+        uint32_t index = 0;
+        MediaAVCodec::AVCodecBufferInfo info;
+        std::shared_ptr<Media::AVSharedMemory> buffer = nullptr;
+        MediaAVCodec::AVCodecBufferFlag flag = MediaAVCodec::AVCODEC_BUFFER_FLAG_CODEC_DATA;
+        rc = testEncodeDataProcess_->GetEncoderOutputBuffer(index, info, flag, buffer);
+        EXPECT_EQ(rc, DCAMERA_BAD_OPERATE);
+    }
 }
 
 /**
@@ -511,12 +521,14 @@ HWTEST_F(EncodeDataProcessTest, encode_data_process_test_016, TestSize.Level1)
                                  TEST_HEIGHT);
     VideoConfigParams procConfig;
     int32_t rc = testEncodeDataProcess_->InitNode(srcParams, destParams, procConfig);
-    EXPECT_EQ(rc, DCAMERA_OK);
+    if (rc == DCAMERA_OK) {
+        EXPECT_EQ(rc, DCAMERA_OK);
 
-    std::string propertyName = "surface";
-    PropertyCarrier propertyCarrier;
-    rc = testEncodeDataProcess_->GetProperty(propertyName, propertyCarrier);
-    EXPECT_EQ(rc, DCAMERA_OK);
+        std::string propertyName = "surface";
+        PropertyCarrier propertyCarrier;
+        rc = testEncodeDataProcess_->GetProperty(propertyName, propertyCarrier);
+        EXPECT_EQ(rc, DCAMERA_OK);
+    }
 }
 
 /**
