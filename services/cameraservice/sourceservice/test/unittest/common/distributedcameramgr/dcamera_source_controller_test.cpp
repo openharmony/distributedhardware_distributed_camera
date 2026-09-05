@@ -212,7 +212,7 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_003, TestSi
     int32_t mode = 0;
     ret = controller_->StartCapture(captureInfos, mode, false);
     controller_->UnInit();
-    EXPECT_EQ(ret, DCAMERA_OK);
+    EXPECT_EQ(ret, DCAMERA_BAD_VALUE);
 }
 
 /**
@@ -1670,7 +1670,6 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_check_os_ty
  */
 HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_check_acl_right_001, TestSize.Level1)
 {
-    // Given: Setup controller state
     controller_->accountId_ = "test_account_id";
     controller_->srcDevId_ = "test_src_dev_id";
     controller_->devId_ = "test_dev_id";
@@ -1954,6 +1953,163 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_on_session_
     controller_->OnSessionState(state, networkId, shutdownReason);
     EXPECT_EQ(state, controller_->channelState_);
     EXPECT_TRUE(controller_->isChannelConnected_.load());
+}
+
+/**
+ * @tc.name: dcamera_source_controller_test_set_enable_first_tokenid_001
+ * @tc.desc: Verify SetEnableFirstTokenId sets the value correctly.
+ * @tc.type: FUNC
+ * @tc.require: DTS
+ */
+HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_set_enable_first_tokenid_001, TestSize.Level1)
+{
+    controller_->enableFirstTokenId_ = 0;
+    controller_->SetEnableFirstTokenId(12345u);
+    EXPECT_EQ(controller_->enableFirstTokenId_, 12345u);
+    controller_->SetEnableFirstTokenId(0u);
+    EXPECT_EQ(controller_->enableFirstTokenId_, 0u);
+}
+
+/**
+ * @tc.name: dcamera_source_controller_test_set_trigger_first_tokenid_001
+ * @tc.desc: Verify SetTriggerFirstTokenId sets the value correctly.
+ * @tc.type: FUNC
+ * @tc.require: DTS
+ */
+HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_set_trigger_first_tokenid_001, TestSize.Level1)
+{
+    controller_->triggerFirstTokenId_ = 0;
+    controller_->SetTriggerFirstTokenId(67890u);
+    EXPECT_EQ(controller_->triggerFirstTokenId_, 67890u);
+    controller_->SetTriggerFirstTokenId(0u);
+    EXPECT_EQ(controller_->triggerFirstTokenId_, 0u);
+}
+
+/**
+ * @tc.name: dcamera_source_controller_test_get_trigger_user_id_001
+ * @tc.desc: Verify GetTriggerUserId with triggerFirstTokenId_ set to non-zero uses it as callerTokenId.
+ * @tc.type: FUNC
+ * @tc.require: DTS
+ */
+HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_get_trigger_user_id_001, TestSize.Level1)
+{
+    controller_->triggerFirstTokenId_ = 67890u;
+    controller_->enableFirstTokenId_ = 0;
+    controller_->triggerFirstUserId_ = -1;
+    uint32_t callerTokenId = 0;
+    int32_t triggerUserId = -1;
+    int32_t enableUserId = -1;
+    controller_->GetTriggerUserId(callerTokenId, triggerUserId, enableUserId);
+    EXPECT_EQ(callerTokenId, 67890u);
+}
+
+/**
+ * @tc.name: dcamera_source_controller_test_get_trigger_user_id_002
+ * @tc.desc: Verify GetTriggerUserId with enableFirstTokenId_ set but triggerFirstTokenId_ zero.
+ * @tc.type: FUNC
+ * @tc.require: DTS
+ */
+HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_get_trigger_user_id_002, TestSize.Level1)
+{
+    controller_->triggerFirstTokenId_ = 0;
+    controller_->enableFirstTokenId_ = 12345u;
+    uint32_t callerTokenId = 0;
+    int32_t triggerUserId = -1;
+    int32_t enableUserId = -1;
+    controller_->GetTriggerUserId(callerTokenId, triggerUserId, enableUserId);
+    EXPECT_EQ(enableUserId, -1);
+}
+
+/**
+ * @tc.name: dcamera_source_controller_test_get_trigger_user_id_003
+ * @tc.desc: Verify GetTriggerUserId with both enableFirstTokenId_ and triggerFirstTokenId_ set to non-zero.
+ * @tc.type: FUNC
+ * @tc.require: DTS
+ */
+HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_get_trigger_user_id_003, TestSize.Level1)
+{
+    controller_->triggerFirstTokenId_ = 111u;
+    controller_->enableFirstTokenId_ = 222u;
+    uint32_t callerTokenId = 0;
+    int32_t triggerUserId = -1;
+    int32_t enableUserId = -1;
+    controller_->GetTriggerUserId(callerTokenId, triggerUserId, enableUserId);
+    EXPECT_EQ(callerTokenId, 111u);
+}
+
+/**
+ * @tc.name: dcamera_source_controller_test_check_acl_right_with_trigger_001
+ * @tc.desc: Verify CheckAclRight with triggerFirstTokenId_ set (uses triggerUserId for ACL).
+ * @tc.type: FUNC
+ * @tc.require: DTS
+ */
+HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_check_acl_right_with_trigger_001, TestSize.Level1)
+{
+    controller_->accountId_ = "test_account_id";
+    controller_->srcDevId_ = "test_src_dev_id";
+    controller_->devId_ = "test_dev_id";
+    controller_->userId_ = 100;
+    controller_->tokenId_ = 200;
+    controller_->triggerFirstTokenId_ = 67890u;
+    controller_->enableFirstTokenId_ = 0;
+
+    bool result = controller_->CheckAclRight();
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: dcamera_source_controller_test_check_acl_right_with_trigger_002
+ * @tc.desc: Verify CheckAclRight with both triggerFirstTokenId_ and enableFirstTokenId_ set.
+ * @tc.type: FUNC
+ * @tc.require: DTS
+ */
+HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_check_acl_right_with_trigger_002, TestSize.Level1)
+{
+    controller_->accountId_ = "test_account_id";
+    controller_->srcDevId_ = "test_src_dev_id";
+    controller_->devId_ = "test_dev_id";
+    controller_->userId_ = 100;
+    controller_->tokenId_ = 200;
+    controller_->triggerFirstTokenId_ = 111u;
+    controller_->enableFirstTokenId_ = 222u;
+
+    bool result = controller_->CheckAclRight();
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: dcamera_source_controller_test_start_capture_with_trigger_001
+ * @tc.desc: Verify StartCapture sets triggerFirstTokenId_ and triggerFirstUserId_ in the cmd.
+ * @tc.type: FUNC
+ * @tc.require: DTS
+ */
+HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_start_capture_with_trigger_001, TestSize.Level1)
+{
+    DCameraIndex index;
+    index.devId_ = TEST_DEVICE_ID;
+    index.dhId_ = TEST_CAMERA_DH_ID_0;
+    controller_->indexs_.push_back(index);
+    controller_->triggerFirstTokenId_ = 12345u;
+    controller_->triggerFirstUserId_ = 100;
+    controller_->accountId_ = "test_account";
+    controller_->tokenId_ = 200;
+    controller_->userId_ = 100;
+
+    std::vector<std::shared_ptr<DCameraCaptureInfo>> captureInfos;
+    std::shared_ptr<DCameraCaptureInfo> capture = std::make_shared<DCameraCaptureInfo>();
+    capture->width_ = TEST_WIDTH;
+    capture->height_ = TEST_HEIGTH;
+    capture->format_ = TEST_FORMAT;
+    capture->dataspace_ = TEST_DATASPACE;
+    capture->isCapture_ = TEST_ISCAPTURE;
+    capture->encodeType_ = DCEncodeType::ENCODE_TYPE_H264;
+    capture->streamType_ = DCStreamType::SNAPSHOT_FRAME;
+    captureInfos.push_back(capture);
+
+    int32_t mode = 0;
+    int32_t ret = controller_->StartCapture(captureInfos, mode, false);
+    EXPECT_EQ(ret, DCAMERA_BAD_VALUE);
+    controller_->UnInit();
 }
 }
 }

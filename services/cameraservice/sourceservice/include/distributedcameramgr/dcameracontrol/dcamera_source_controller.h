@@ -52,6 +52,8 @@ public:
     int32_t ResumeDistributedHardware(const std::string &networkId) override;
     int32_t StopDistributedHardware(const std::string &networkId) override;
     void SetTokenId(uint64_t token) override;
+    void SetEnableFirstTokenId(uint32_t tokenId) override;
+    void SetTriggerFirstTokenId(uint32_t tokenId) override;
 
     void OnSessionState(int32_t state, std::string networkId, int32_t shutdownReason = 0);
     void OnSessionError(int32_t eventType, int32_t eventReason, std::string detail);
@@ -63,6 +65,7 @@ private:
     int32_t PublishEnableLatencyMsg(const std::string& devId);
     void HandleReceivedData(std::shared_ptr<DataBuffer> &dataBuffer);
     bool CheckAclRight();
+    bool GetTriggerUserId(uint32_t &callerTokenId, int32_t &triggerUserId, int32_t &enableUserId);
     bool GetOsAccountInfo();
     int32_t CheckOsType(const std::string &networkId, bool &isInvalid);
     int32_t ParseValueFromCjson(std::string args, std::string key);
@@ -109,6 +112,9 @@ private:
     int32_t userId_ = -1;
     std::string srcDevId_ = "";
     uint64_t tokenId_ = 0;
+    uint32_t enableFirstTokenId_ = 0;
+    uint32_t triggerFirstTokenId_ = 0;
+    int32_t triggerFirstUserId_ = -1;
 };
 
 class DeviceInitCallback : public DmInitCallback {

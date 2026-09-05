@@ -39,6 +39,8 @@
 #include "distributed_hardware_log.h"
 #include "idistributed_camera_sink.h"
 #include "dcamera_low_latency.h"
+#include "accesstoken_kit.h"
+#include "ipc_skeleton.h"
 #ifdef OS_ACCOUNT_ENABLE
 #include "ohos_account_kits.h"
 #include "os_account_manager.h"
@@ -89,6 +91,8 @@ int32_t DCameraSourceController::StartCapture(std::vector<std::shared_ptr<DCamer
     cmd.tokenId_ = tokenId_;
     cmd.accountId_ = accountId_;
     cmd.eis_ = eis;
+    cmd.triggerFirstTokenId_ = triggerFirstTokenId_;
+    cmd.triggerFirstUserId_ = triggerFirstUserId_;
     std::string jsonStr;
     int32_t ret = cmd.Marshal(jsonStr);
     if (ret != DCAMERA_OK) {
@@ -96,8 +100,9 @@ int32_t DCameraSourceController::StartCapture(std::vector<std::shared_ptr<DCamer
             GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
         return ret;
     }
-    DHLOGI("devId: %{public}s, dhId: %{public}s captureCommand: %{public}s", GetAnonyString(devId).c_str(),
-        GetAnonyString(dhId).c_str(), cmd.command_.c_str());
+    DHLOGI("devId: %{public}s, dhId: %{public}s captureCommand: %{public}s, TokenId=%{public}s, UserId=%{public}d",
+        GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), cmd.command_.c_str(),
+        GetAnonyString(std::to_string(triggerFirstTokenId_)).c_str(), triggerFirstUserId_);
     std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(jsonStr.length() + 1);
     ret = memcpy_s(buffer->Data(), buffer->Capacity(), reinterpret_cast<uint8_t *>(const_cast<char *>(jsonStr.c_str())),
         jsonStr.length());
@@ -425,17 +430,24 @@ bool DCameraSourceController::CheckAclRight()
     if (!GetOsAccountInfo()) {
         return false;
     }
-    std::shared_ptr<DmInitCallback> initCallback = std::make_shared<DeviceInitCallback>();
-    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(DCAMERA_PKG_NAME, initCallback);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("InitDeviceManager failed ret = %{public}d", ret);
+    uint32_t callerTokenId = 0;
+    int32_t triggerUserId = -1;
+    int32_t enableUserId = -1;
+    if (!GetTriggerUserId(callerTokenId, triggerUserId, enableUserId)) {
         return false;
     }
+    std::shared_ptr<DmInitCallback> initCallback = std::make_shared<DeviceInitCallback>();
+    int32_t dmRet = DeviceManager::GetInstance().InitDeviceManager(DCAMERA_PKG_NAME, initCallback);
+    if (dmRet != DCAMERA_OK) {
+        DHLOGE("InitDeviceManager failed ret = %{public}d", dmRet);
+        return false;
+    }
+    int32_t aclUserId = (triggerUserId != -1) ? triggerUserId : userId_;
     DmAccessCaller dmSrcCaller = {
         .accountId = accountId_,
         .pkgName = DCAMERA_PKG_NAME,
         .networkId = srcDevId_,
-        .userId = userId_,
+        .userId = aclUserId,
         .tokenId = tokenId_,
     };
     DmAccessCallee dmDstCallee = {
@@ -443,10 +455,39 @@ bool DCameraSourceController::CheckAclRight()
     };
     DHLOGI("CheckAclRight dmSrcCaller networkId: %{public}s, accountId: %{public}s, devId: %{public}s",
         GetAnonyString(srcDevId_).c_str(), GetAnonyString(accountId_).c_str(), GetAnonyString(devId_).c_str());
-    if (DeviceManager::GetInstance().CheckSrcAccessControl(dmSrcCaller, dmDstCallee)) {
-        return true;
+    return DeviceManager::GetInstance().CheckSrcAccessControl(dmSrcCaller, dmDstCallee);
+}
+
+bool DCameraSourceController::GetTriggerUserId(uint32_t &callerTokenId, int32_t &triggerUserId,
+    int32_t &enableUserId)
+{
+    callerTokenId = (triggerFirstTokenId_ != 0) ? triggerFirstTokenId_ : IPCSkeleton::GetCallingTokenID();
+    Security::AccessToken::HapTokenInfo callerTokenInfo;
+    triggerUserId = -1;
+    enableUserId = -1;
+    bool isSA = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerTokenId) ==
+        Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE;
+    if (!isSA) {
+        int32_t res = Security::AccessToken::AccessTokenKit::GetHapTokenInfo(callerTokenId, callerTokenInfo);
+        if (res != 0) {
+            DHLOGI("[MultiUserTrigger] get hap token info failed,ret = %{public}d", res);
+            return false;
+        }
+        triggerUserId = callerTokenInfo.userID;
+        triggerFirstUserId_ = triggerUserId;
     }
-    return false;
+    if (enableFirstTokenId_ != 0) {
+        Security::AccessToken::HapTokenInfo enableTokenInfo;
+        int32_t enableRet = Security::AccessToken::AccessTokenKit::GetHapTokenInfo(
+            enableFirstTokenId_, enableTokenInfo);
+        enableUserId = (enableRet == 0) ? enableTokenInfo.userID : -1;
+    }
+    if (enableUserId != -1 && triggerUserId != -1 && enableUserId != triggerUserId) {
+        DHLOGE("[MultiUserTrigger] userId mismatch! enableUserId=%{public}d != triggerUserId=%{public}d",
+            enableUserId, triggerUserId);
+        return false;
+    }
+    return true;
 }
 
 bool DCameraSourceController::GetOsAccountInfo()
@@ -743,6 +784,16 @@ void DCameraSourceController::CameraServiceRecipient::OnRemoteDied(const wptr<IR
 void DCameraSourceController::SetTokenId(uint64_t token)
 {
     tokenId_ = token;
+}
+
+void DCameraSourceController::SetEnableFirstTokenId(uint32_t tokenId)
+{
+    enableFirstTokenId_ = tokenId;
+}
+
+void DCameraSourceController::SetTriggerFirstTokenId(uint32_t tokenId)
+{
+    triggerFirstTokenId_ = tokenId;
 }
 
 void DeviceInitCallback::OnRemoteDied()

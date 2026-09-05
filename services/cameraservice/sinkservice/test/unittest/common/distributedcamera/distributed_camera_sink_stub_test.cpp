@@ -19,6 +19,7 @@
 #include "nativetoken_kit.h"
 #include "token_setproc.h"
 #include "softbus_common.h"
+#include "dcamera_ipc_interface_code.h"
 #include "dcamera_sink_callback.h"
 #include "distributed_camera_sink_proxy.h"
 #include "distributed_camera_sink_stub.h"
@@ -404,6 +405,139 @@ HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_018, TestSize.Level1)
     MessageParcel data;
     MessageParcel reply;
     EXPECT_EQ(DCAMERA_OK, sinkStubPtr->SetAuthorizationResultInner(data, reply));
+}
+
+/**
+ * @tc.name: dcamera_sink_stub_test_019
+ * @tc.desc: Verify ConfigDistributedHardware via proxy with valid params.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_019, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_stub_test_019");
+    sptr<IRemoteObject> sinkStubPtr(new MockDistributedCameraSinkStub());
+    DistributedCameraSinkProxy sinkProxy(sinkStubPtr);
+    std::string devId = "devId_test";
+    std::string dhId = "camera_0";
+    std::string key = "enable_init_params";
+    std::string value = R"({"tokenId": 12345})";
+    int32_t ret = sinkProxy.ConfigDistributedHardware(devId, dhId, key, value);
+    EXPECT_EQ(DCAMERA_OK, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_stub_test_020
+ * @tc.desc: Verify ConfigDistributedHardware via proxy with empty dhId returns DCAMERA_BAD_VALUE.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_020, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_stub_test_020");
+    sptr<IRemoteObject> sinkStubPtr(new MockDistributedCameraSinkStub());
+    DistributedCameraSinkProxy sinkProxy(sinkStubPtr);
+    std::string devId = "devId_test";
+    std::string dhId = "";
+    std::string key = "enable_init_params";
+    std::string value = R"({"tokenId": 12345})";
+    int32_t ret = sinkProxy.ConfigDistributedHardware(devId, dhId, key, value);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_stub_test_021
+ * @tc.desc: Verify ConfigDistributedHardware via proxy with empty key returns DCAMERA_BAD_VALUE.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_021, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_stub_test_021");
+    sptr<IRemoteObject> sinkStubPtr(new MockDistributedCameraSinkStub());
+    DistributedCameraSinkProxy sinkProxy(sinkStubPtr);
+    std::string devId = "devId_test";
+    std::string dhId = "camera_0";
+    std::string key = "";
+    std::string value = R"({"tokenId": 12345})";
+    int32_t ret = sinkProxy.ConfigDistributedHardware(devId, dhId, key, value);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_stub_test_022
+ * @tc.desc: Verify ConfigDistributedHardware via proxy with empty value returns DCAMERA_BAD_VALUE.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_022, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_stub_test_022");
+    sptr<IRemoteObject> sinkStubPtr(new MockDistributedCameraSinkStub());
+    DistributedCameraSinkProxy sinkProxy(sinkStubPtr);
+    std::string devId = "devId_test";
+    std::string dhId = "camera_0";
+    std::string key = "enable_init_params";
+    std::string value = "";
+    int32_t ret = sinkProxy.ConfigDistributedHardware(devId, dhId, key, value);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_stub_test_023
+ * @tc.desc: Verify ConfigDistributedHardwareInner directly with valid params.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_023, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_stub_test_023");
+    sptr<DistributedCameraSinkStub> sinkStubPtr(new MockDistributedCameraSinkStub());
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteString("devId_test");
+    data.WriteString("camera_0");
+    data.WriteString("enable_init_params");
+    data.WriteString(R"({"tokenId": 12345})");
+    EXPECT_EQ(DCAMERA_OK, sinkStubPtr->ConfigDistributedHardwareInner(data, reply));
+    EXPECT_EQ(DCAMERA_OK, reply.ReadInt32());
+}
+
+/**
+ * @tc.name: dcamera_sink_stub_test_024
+ * @tc.desc: Verify ConfigDistributedHardwareInner with empty data still returns DCAMERA_OK (read empty strings).
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_024, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_stub_test_024");
+    sptr<DistributedCameraSinkStub> sinkStubPtr(new MockDistributedCameraSinkStub());
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_EQ(DCAMERA_OK, sinkStubPtr->ConfigDistributedHardwareInner(data, reply));
+}
+
+/**
+ * @tc.name: dcamera_sink_stub_test_025
+ * @tc.desc: Verify OnRemoteRequest routes CONFIG_DISTRIBUTED_HARDWARE code.
+ * @tc.type: FUNC
+ * @tc.require: issue
+ */
+HWTEST_F(DcameraSinkStubTest, dcamera_sink_stub_test_025, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_stub_test_025");
+    sptr<DistributedCameraSinkStub> sinkStubPtr(new MockDistributedCameraSinkStub());
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    data.WriteString("devId_test");
+    data.WriteString("camera_0");
+    data.WriteString("enable_init_params");
+    data.WriteString(R"({"tokenId": 12345})");
+    uint32_t code = static_cast<uint32_t>(IDCameraSinkInterfaceCode::CONFIG_DISTRIBUTED_HARDWARE);
+    sinkStubPtr->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(DCAMERA_OK, reply.ReadInt32());
 }
 } // namespace DistributedHardware
 } // namespace OHOS

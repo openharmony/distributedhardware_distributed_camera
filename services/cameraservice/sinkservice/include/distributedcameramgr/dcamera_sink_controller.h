@@ -61,6 +61,8 @@ public:
     int32_t ResumeDistributedHardware(const std::string &networkId) override;
     int32_t StopDistributedHardware(const std::string &networkId) override;
     void SetTokenId(uint64_t token) override;
+    void SetEnableFirstTokenId(uint32_t tokenId) override;
+    void SetTriggerFirstTokenId(uint32_t tokenId) override;
 
     void OnStateChanged(std::shared_ptr<DCameraEvent>& event);
     void OnMetadataResult(std::vector<std::shared_ptr<DCameraSettings>>& settings);
@@ -89,6 +91,7 @@ private:
     int32_t StartCaptureInner(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos);
     int32_t DCameraNotifyInner(int32_t type, int32_t result, std::string content);
     int32_t HandleReceivedData(std::shared_ptr<DataBuffer>& dataBuffer);
+    int32_t HandleCaptureCommand(const std::string &jsonStr);
     void PostAuthorization(std::vector<std::shared_ptr<DCameraCaptureInfo>>& captureInfos);
     bool CheckDeviceSecurityLevel(const std::string &srcDeviceId, const std::string &dstDeviceId);
     int32_t GetDeviceSecurityLevel(const std::string &udid);
@@ -99,6 +102,7 @@ private:
     int32_t CreateCtrlSession();
     int32_t CheckSensitive();
     bool CheckAclRight();
+    bool ResolveEnableUser(int32_t &userId, uint32_t &enableTokenId);
     bool IsIdenticalAccount(const std::string &networkId);
     class DCameraSurfaceHolder {
     public:
@@ -148,6 +152,9 @@ private:
     uint64_t tokenId_ = 0;
     uint64_t sinkTokenId_ = 0;
     std::string accountId_ = "";
+    uint32_t enableFirstTokenId_ = 0;
+    uint32_t sourceTrigFirstTokenId_ = 0;
+    int32_t sourceTrigFirstUserId_ = -1;
 
     const std::string SESSION_FLAG = "control";
     const std::string SRC_TYPE = "camera";

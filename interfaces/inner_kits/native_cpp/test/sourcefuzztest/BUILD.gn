@@ -46,6 +46,7 @@ group("fuzztest") {
     "sourceservicecamdeverase_fuzzer:fuzztest",
     "sourceserviceinitsource_fuzzer:fuzztest",
     "sourceserviceregisterdistributedhardware_fuzzer:fuzztest",
+    "sourceserviceregisterdhext_fuzzer:fuzztest",
     "sourceservicereleasesource_fuzzer:fuzztest",
     "sourceserviceunregisterdistributedhardware_fuzzer:fuzztest",
     "sourceserviceupdateworkmode_fuzzer:fuzztest",

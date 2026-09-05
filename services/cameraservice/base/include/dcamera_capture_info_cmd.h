@@ -46,6 +46,8 @@ public:
     uint64_t tokenId_;
     std::string accountId_;
     bool eis_ = false;
+    uint32_t triggerFirstTokenId_ = 0;
+    int32_t triggerFirstUserId_ = -1;
 
 public:
     int32_t Marshal(std::string& jsonStr);
@@ -54,6 +56,10 @@ public:
 private:
     int32_t UmarshalValue(cJSON* rootValue);
     int32_t UmarshalSettings(cJSON* valueJson, std::shared_ptr<DCameraCaptureInfo>& captureInfo);
+    int32_t MarshalValue(cJSON* captureInfos, cJSON* rootValue);
+    int32_t MarshalSettings(cJSON* captureSettings, std::shared_ptr<DCameraCaptureInfo>& capture, cJSON* rootValue);
+    void UmarshalControlInfo(cJSON* rootValue);
+    void UmarshalControlExtraInfo(cJSON* rootValue);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

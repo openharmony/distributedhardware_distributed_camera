@@ -428,5 +428,124 @@ HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_020, TestSi
     ret = sinkService_->SetAuthorizationResult(requestId, granted);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
+
+/**
+ * @tc.name: dcamera_sink_service_test_021
+ * @tc.desc: Verify ConfigDistributedHardware with enable_init_params key and valid tokenId.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_021, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_service_test_021");
+    EXPECT_EQ(sinkService_ == nullptr, false);
+    sinkService_->enableFirstTokenId_ = 0;
+    std::string dhId = "camera_0";
+    std::string key = KEY_ENABLE_INIT_PARAM;
+    std::string value = R"({"tokenId": 12345})";
+    int32_t ret = sinkService_->ConfigDistributedHardware("", dhId, key, value);
+    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(sinkService_->enableFirstTokenId_, static_cast<uint32_t>(12345));
+}
+
+/**
+ * @tc.name: dcamera_sink_service_test_022
+ * @tc.desc: Verify ConfigDistributedHardware with non-enable_init_params key.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_022, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_service_test_022");
+    EXPECT_EQ(sinkService_ == nullptr, false);
+    sinkService_->enableFirstTokenId_ = 0;
+    std::string dhId = "camera_0";
+    std::string key = "other_key";
+    std::string value = R"({"tokenId": 99999})";
+    int32_t ret = sinkService_->ConfigDistributedHardware("", dhId, key, value);
+    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(sinkService_->enableFirstTokenId_, static_cast<uint32_t>(0));
+}
+
+/**
+ * @tc.name: dcamera_sink_service_test_023
+ * @tc.desc: Verify ConfigDistributedHardware with invalid JSON value.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_023, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_service_test_023");
+    EXPECT_EQ(sinkService_ == nullptr, false);
+    sinkService_->enableFirstTokenId_ = 0;
+    std::string dhId = "camera_0";
+    std::string key = KEY_ENABLE_INIT_PARAM;
+    std::string value = "invalid_json";
+    int32_t ret = sinkService_->ConfigDistributedHardware("", dhId, key, value);
+    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(sinkService_->enableFirstTokenId_, static_cast<uint32_t>(0));
+}
+
+/**
+ * @tc.name: dcamera_sink_service_test_024
+ * @tc.desc: Verify ConfigDistributedHardware with enable_init_params key but no tokenId field.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_024, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_service_test_024");
+    EXPECT_EQ(sinkService_ == nullptr, false);
+    sinkService_->enableFirstTokenId_ = 0;
+    std::string dhId = "camera_0";
+    std::string key = KEY_ENABLE_INIT_PARAM;
+    std::string value = R"({"otherField": "value"})";
+    int32_t ret = sinkService_->ConfigDistributedHardware("", dhId, key, value);
+    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(sinkService_->enableFirstTokenId_, static_cast<uint32_t>(0));
+}
+
+/**
+ * @tc.name: dcamera_sink_service_test_025
+ * @tc.desc: Verify ConfigDistributedHardware with tokenId of wrong type (string instead of number).
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_025, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_service_test_025");
+    EXPECT_EQ(sinkService_ == nullptr, false);
+    sinkService_->enableFirstTokenId_ = 0;
+    std::string dhId = "camera_0";
+    std::string key = KEY_ENABLE_INIT_PARAM;
+    std::string value = R"({"tokenId": "not_a_number"})";
+    int32_t ret = sinkService_->ConfigDistributedHardware("", dhId, key, value);
+    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(sinkService_->enableFirstTokenId_, static_cast<uint32_t>(0));
+}
+
+/**
+ * @tc.name: dcamera_sink_service_test_026
+ * @tc.desc: Verify ConfigDistributedHardware called multiple times updates enableFirstTokenId_.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_026, TestSize.Level1)
+{
+    DHLOGI("dcamera_sink_service_test_026");
+    EXPECT_EQ(sinkService_ == nullptr, false);
+    sinkService_->enableFirstTokenId_ = 0;
+    std::string dhId = "camera_0";
+    std::string key = KEY_ENABLE_INIT_PARAM;
+    std::string value1 = R"({"tokenId": 111})";
+    int32_t ret = sinkService_->ConfigDistributedHardware("", dhId, key, value1);
+    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(sinkService_->enableFirstTokenId_, static_cast<uint32_t>(111));
+
+    std::string value2 = R"({"tokenId": 222})";
+    ret = sinkService_->ConfigDistributedHardware("", dhId, key, value2);
+    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(sinkService_->enableFirstTokenId_, static_cast<uint32_t>(222));
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -223,7 +223,6 @@ int32_t DCameraSourceHandler::ConfigDistributedHardware(const std::string& devId
     }
     std::string reqId = GetRandomID();
     std::lock_guard<std::mutex> autoLock(optLock_);
- 
     int32_t ret = dCameraSourceSrv->ConfigDistributedHardware(devId, dhId, key, value);
     if (ret != DCAMERA_OK) {
         DHLOGE("ConfigDistributedHardware failed ret = %{public}d", ret);

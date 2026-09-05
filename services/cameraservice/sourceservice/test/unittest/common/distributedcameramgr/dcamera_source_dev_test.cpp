@@ -22,6 +22,7 @@
 #include "accesstoken_kit.h"
 #include "dcamera_source_state.h"
 #include "dcamera_utils_tools.h"
+#include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "dcamera_source_dev.h"
 #include "mock_dcamera_source_dev.h"
@@ -795,6 +796,179 @@ HWTEST_F(DCameraSourceDevTest, processHDFEvent_001, TestSize.Level1) {
     EXPECT_EQ(result, DCAMERA_OK);
     int32_t rotate = DCameraSystemSwitchInfo::GetInstance().GetSystemSwitchRotation(TEST_DEVICE_ID);
     EXPECT_EQ(rotate, 90);
+}
+
+/**
+ * @tc.name: dcamera_source_dev_test_config_dh_001
+ * @tc.desc: Verify ConfigDistributedHardware with enable_init_params key sets enableFirstTokenId_.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_config_dh_001, TestSize.Level1)
+{
+    camDev_->enableFirstTokenId_ = 0;
+    std::string key = KEY_ENABLE_INIT_PARAM;
+    std::string value = R"({"tokenId": 12345})";
+    int32_t ret = camDev_->ConfigDistributedHardware(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, key, value);
+    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(camDev_->enableFirstTokenId_, static_cast<uint32_t>(12345));
+}
+
+/**
+ * @tc.name: dcamera_source_dev_test_config_dh_002
+ * @tc.desc: Verify ConfigDistributedHardware with non-enable_init_params key does not set enableFirstTokenId_.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_config_dh_002, TestSize.Level1)
+{
+    camDev_->enableFirstTokenId_ = 0;
+    std::string key = "other_key";
+    std::string value = R"({"tokenId": 99999})";
+    int32_t ret = camDev_->ConfigDistributedHardware(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, key, value);
+    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(camDev_->enableFirstTokenId_, static_cast<uint32_t>(0));
+}
+
+/**
+ * @tc.name: dcamera_source_dev_test_config_dh_003
+ * @tc.desc: Verify ConfigDistributedHardware with invalid JSON does not crash.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_config_dh_003, TestSize.Level1)
+{
+    camDev_->enableFirstTokenId_ = 0;
+    std::string key = KEY_ENABLE_INIT_PARAM;
+    std::string value = "invalid_json";
+    int32_t ret = camDev_->ConfigDistributedHardware(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, key, value);
+    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(camDev_->enableFirstTokenId_, static_cast<uint32_t>(0));
+}
+
+/**
+ * @tc.name: dcamera_source_dev_test_config_dh_004
+ * @tc.desc: Verify ConfigDistributedHardware with enable_init_params key but no tokenId field.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_config_dh_004, TestSize.Level1)
+{
+    camDev_->enableFirstTokenId_ = 0;
+    std::string key = KEY_ENABLE_INIT_PARAM;
+    std::string value = R"({"otherField": "value"})";
+    int32_t ret = camDev_->ConfigDistributedHardware(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, key, value);
+    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(camDev_->enableFirstTokenId_, static_cast<uint32_t>(0));
+}
+
+/**
+ * @tc.name: dcamera_source_dev_test_config_dh_005
+ * @tc.desc: Verify ConfigDistributedHardware with tokenId of wrong type (string instead of number).
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_config_dh_005, TestSize.Level1)
+{
+    camDev_->enableFirstTokenId_ = 0;
+    std::string key = KEY_ENABLE_INIT_PARAM;
+    std::string value = R"({"tokenId": "not_a_number"})";
+    int32_t ret = camDev_->ConfigDistributedHardware(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, key, value);
+    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(camDev_->enableFirstTokenId_, static_cast<uint32_t>(0));
+}
+
+/**
+ * @tc.name: dcamera_source_dev_test_config_dh_006
+ * @tc.desc: Verify ConfigDistributedHardware called multiple times updates enableFirstTokenId_.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_config_dh_006, TestSize.Level1)
+{
+    camDev_->enableFirstTokenId_ = 0;
+    std::string key = KEY_ENABLE_INIT_PARAM;
+    int32_t ret = camDev_->ConfigDistributedHardware(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, key,
+        R"({"tokenId": 111})");
+    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(camDev_->enableFirstTokenId_, static_cast<uint32_t>(111));
+
+    ret = camDev_->ConfigDistributedHardware(TEST_DEVICE_ID, TEST_CAMERA_DH_ID_0, key,
+        R"({"tokenId": 222})");
+    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(camDev_->enableFirstTokenId_, static_cast<uint32_t>(222));
+}
+
+/**
+ * @tc.name: dcamera_source_dev_test_process_hdf_trigger_001
+ * @tc.desc: Verify ProcessHDFEvent parses triggerFirstTokenId from event content.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_process_hdf_trigger_001, TestSize.Level1)
+{
+    camDev_->InitDCameraSourceDev();
+    camDev_->controller_ = std::make_shared<MockDCameraSourceController>();
+    DCameraHDFEvent event;
+    event.type_ = EVENT_DCAMERA_FORCE_SWITCH;
+    event.result_ = 0;
+    event.content_ = R"({"triggerFirstTokenId": 12345})";
+    int32_t result = camDev_->ProcessHDFEvent(event);
+    EXPECT_EQ(result, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: dcamera_source_dev_test_process_hdf_trigger_002
+ * @tc.desc: Verify ProcessHDFEvent with content without triggerFirstTokenId does not crash.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_process_hdf_trigger_002, TestSize.Level1)
+{
+    camDev_->InitDCameraSourceDev();
+    camDev_->controller_ = std::make_shared<MockDCameraSourceController>();
+    DCameraHDFEvent event;
+    event.type_ = EVENT_DCAMERA_FORCE_SWITCH;
+    event.result_ = 0;
+    event.content_ = R"({"otherField": "value"})";
+    int32_t result = camDev_->ProcessHDFEvent(event);
+    EXPECT_EQ(result, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: dcamera_source_dev_test_process_hdf_trigger_003
+ * @tc.desc: Verify ProcessHDFEvent with invalid JSON content does not crash.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_process_hdf_trigger_003, TestSize.Level1)
+{
+    camDev_->InitDCameraSourceDev();
+    camDev_->controller_ = std::make_shared<MockDCameraSourceController>();
+    DCameraHDFEvent event;
+    event.type_ = EVENT_DCAMERA_FORCE_SWITCH;
+    event.result_ = 0;
+    event.content_ = "invalid_json";
+    int32_t result = camDev_->ProcessHDFEvent(event);
+    EXPECT_EQ(result, DCAMERA_OK);
+}
+
+/**
+ * @tc.name: dcamera_source_dev_test_process_hdf_trigger_004
+ * @tc.desc: Verify ProcessHDFEvent with null controller does not crash.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraSourceDevTest, dcamera_source_dev_test_process_hdf_trigger_004, TestSize.Level1)
+{
+    camDev_->InitDCameraSourceDev();
+    camDev_->controller_ = nullptr;
+    DCameraHDFEvent event;
+    event.type_ = EVENT_DCAMERA_FORCE_SWITCH;
+    event.result_ = 0;
+    event.content_ = R"({"triggerFirstTokenId": 12345})";
+    int32_t result = camDev_->ProcessHDFEvent(event);
+    EXPECT_EQ(result, DCAMERA_OK);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

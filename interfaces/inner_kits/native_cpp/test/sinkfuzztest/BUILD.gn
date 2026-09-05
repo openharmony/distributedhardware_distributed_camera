@@ -59,6 +59,7 @@ group("fuzztest") {
     "sinkservicestopdistributedhardware_fuzzer:fuzztest",
     "sinkservicesubscribelocalhardware_fuzzer:fuzztest",
     "sinkserviceunsubscribelocalhardware_fuzzer:fuzztest",
+    "sinkserviceconfigdistributedhardware_fuzzer:fuzztest",
     "softbusonsinkbytesreceived_fuzzer:fuzztest",
     "softbusonsinkmessagereceived_fuzzer:fuzztest",
     "softbusonsinksessionclosed_fuzzer:fuzztest",

@@ -33,6 +33,31 @@ int32_t DCameraCaptureInfoCmd::Marshal(std::string& jsonStr)
     cJSON *captureInfos = cJSON_CreateArray();
     CHECK_NULL_FREE_RETURN(captureInfos, DCAMERA_BAD_VALUE, rootValue);
     cJSON_AddItemToObject(rootValue, "Value", captureInfos);
+    int32_t ret = MarshalValue(captureInfos, rootValue);
+    if (ret != DCAMERA_OK) {
+        return ret;
+    }
+    cJSON_AddNumberToObject(rootValue, "mode", sceneMode_);
+    cJSON_AddNumberToObject(rootValue, "userId", userId_);
+    cJSON_AddNumberToObject(rootValue, "tokenId", tokenId_);
+    cJSON_AddStringToObject(rootValue, "accountId", accountId_.c_str());
+    cJSON_AddBoolToObject(rootValue, "eis", eis_);
+    cJSON_AddNumberToObject(rootValue, KEY_TRIGGER_FIRST_TOKENID, triggerFirstTokenId_);
+    cJSON_AddNumberToObject(rootValue, KEY_TRIGGER_FIRST_USERID, triggerFirstUserId_);
+
+    char *data = cJSON_Print(rootValue);
+    if (data == nullptr) {
+        cJSON_Delete(rootValue);
+        return DCAMERA_BAD_VALUE;
+    }
+    jsonStr = std::string(data);
+    cJSON_Delete(rootValue);
+    cJSON_free(data);
+    return DCAMERA_OK;
+}
+
+int32_t DCameraCaptureInfoCmd::MarshalValue(cJSON *captureInfos, cJSON *rootValue)
+{
     for (auto iter = value_.begin(); iter != value_.end(); iter++) {
         std::shared_ptr<DCameraCaptureInfo> capture = *iter;
         CHECK_NULL_FREE_RETURN(capture, DCAMERA_BAD_VALUE, rootValue);
@@ -49,29 +74,25 @@ int32_t DCameraCaptureInfoCmd::Marshal(std::string& jsonStr)
         cJSON *captureSettings = cJSON_CreateArray();
         CHECK_NULL_FREE_RETURN(captureSettings, DCAMERA_BAD_VALUE, rootValue);
         cJSON_AddItemToObject(captureInfo, "CaptureSettings", captureSettings);
-        for (auto settingIter = capture->captureSettings_.begin();
-            settingIter != capture->captureSettings_.end(); settingIter++) {
-            cJSON *captureSetting = cJSON_CreateObject();
-            CHECK_NULL_FREE_RETURN(captureSetting, DCAMERA_BAD_VALUE, rootValue);
-            cJSON_AddNumberToObject(captureSetting, "SettingType", (*settingIter)->type_);
-            cJSON_AddStringToObject(captureSetting, "SettingValue", (*settingIter)->value_.c_str());
-            cJSON_AddItemToArray(captureSettings, captureSetting);
+        int32_t ret = MarshalSettings(captureSettings, capture, rootValue);
+        if (ret != DCAMERA_OK) {
+            return ret;
         }
     }
-    cJSON_AddNumberToObject(rootValue, "mode", sceneMode_);
-    cJSON_AddNumberToObject(rootValue, "userId", userId_);
-    cJSON_AddNumberToObject(rootValue, "tokenId", tokenId_);
-    cJSON_AddStringToObject(rootValue, "accountId", accountId_.c_str());
-    cJSON_AddBoolToObject(rootValue, "eis", eis_);
+    return DCAMERA_OK;
+}
 
-    char *data = cJSON_Print(rootValue);
-    if (data == nullptr) {
-        cJSON_Delete(rootValue);
-        return DCAMERA_BAD_VALUE;
+int32_t DCameraCaptureInfoCmd::MarshalSettings(cJSON *captureSettings,
+    std::shared_ptr<DCameraCaptureInfo>& capture, cJSON *rootValue)
+{
+    for (auto settingIter = capture->captureSettings_.begin();
+        settingIter != capture->captureSettings_.end(); settingIter++) {
+        cJSON *captureSetting = cJSON_CreateObject();
+        CHECK_NULL_FREE_RETURN(captureSetting, DCAMERA_BAD_VALUE, rootValue);
+        cJSON_AddNumberToObject(captureSetting, "SettingType", (*settingIter)->type_);
+        cJSON_AddStringToObject(captureSetting, "SettingValue", (*settingIter)->value_.c_str());
+        cJSON_AddItemToArray(captureSettings, captureSetting);
     }
-    jsonStr = std::string(data);
-    cJSON_Delete(rootValue);
-    cJSON_free(data);
     return DCAMERA_OK;
 }
 
@@ -98,7 +119,13 @@ int32_t DCameraCaptureInfoCmd::Unmarshal(const std::string& jsonStr)
     command_ = command->valuestring;
 
     int32_t ret = UmarshalValue(rootValue);
+    UmarshalControlInfo(rootValue);
+    cJSON_Delete(rootValue);
+    return ret;
+}
 
+void DCameraCaptureInfoCmd::UmarshalControlInfo(cJSON *rootValue)
+{
     cJSON *mode = cJSON_GetObjectItemCaseSensitive(rootValue, "mode");
     if (mode == nullptr || !cJSON_IsNumber(mode)) {
         sceneMode_ = 0;
@@ -123,12 +150,27 @@ int32_t DCameraCaptureInfoCmd::Unmarshal(const std::string& jsonStr)
     } else {
         accountId_ = accountId->valuestring;
     }
+    UmarshalControlExtraInfo(rootValue);
+}
+
+void DCameraCaptureInfoCmd::UmarshalControlExtraInfo(cJSON *rootValue)
+{
     cJSON *eis = cJSON_GetObjectItemCaseSensitive(rootValue, "eis");
     if (eis != nullptr && cJSON_IsBool(eis) && cJSON_IsTrue(eis)) {
         eis_ = true;
     }
-    cJSON_Delete(rootValue);
-    return ret;
+    cJSON *triggerFirstTokenId = cJSON_GetObjectItemCaseSensitive(rootValue, KEY_TRIGGER_FIRST_TOKENID);
+    if (triggerFirstTokenId == nullptr || !cJSON_IsNumber(triggerFirstTokenId)) {
+        triggerFirstTokenId_ = 0;
+    } else {
+        triggerFirstTokenId_ = static_cast<uint32_t>(triggerFirstTokenId->valuedouble);
+    }
+    cJSON *triggerFirstUserId = cJSON_GetObjectItemCaseSensitive(rootValue, KEY_TRIGGER_FIRST_USERID);
+    if (triggerFirstUserId == nullptr || !cJSON_IsNumber(triggerFirstUserId)) {
+        triggerFirstUserId_ = -1;
+    } else {
+        triggerFirstUserId_ = triggerFirstUserId->valueint;
+    }
 }
 
 int32_t DCameraCaptureInfoCmd::UmarshalValue(cJSON *rootValue)

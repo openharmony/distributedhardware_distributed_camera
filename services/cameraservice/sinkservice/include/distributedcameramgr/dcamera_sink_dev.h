@@ -45,6 +45,7 @@ public:
     int32_t ResumeDistributedHardware(const std::string &networkId);
     int32_t StopDistributedHardware(const std::string &networkId);
     void SetTokenId(uint64_t token);
+    void SetEnableFirstTokenId(uint32_t tokenId);
 
 private:
     bool isInit_;

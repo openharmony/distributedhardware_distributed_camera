@@ -24,6 +24,7 @@
 #include "system_ability_definition.h"
 
 #include "anonymous_string.h"
+#include "cJSON.h"
 #include "dcamera_handler.h"
 #include "dcamera_hisysevent_adapter.h"
 #include "dcamera_sink_service_ipc.h"
@@ -124,7 +125,7 @@ int32_t DistributedCameraSinkService::InitSink(const std::string& params,
     }
     for (auto& dhId : cameras) {
         std::shared_ptr<DCameraSinkDev> sinkDevice = std::make_shared<DCameraSinkDev>(dhId, sinkCallback);
-        sinkDevice->SetTokenId(GetFirstCallerTokenID());
+        sinkDevice->SetTokenId(OHOS::IPCSkeleton::GetFirstTokenID());
         ret = sinkDevice->Init();
         CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "sink device init failed, ret: %{public}d", ret);
         {
@@ -473,6 +474,32 @@ int32_t DistributedCameraSinkService::SetAuthorizationResult(const std::string &
     DCameraSoftbusAdapter::GetInstance().ProcessAuthorizationResult(requestId, granted);
 
     DHLOGI("SetAuthorizationResult success");
+    return DCAMERA_OK;
+}
+
+int32_t DistributedCameraSinkService::ConfigDistributedHardware(const std::string& devId, const std::string& dhId,
+    const std::string& key, const std::string& value)
+{
+    DHLOGI("ConfigDistributedHardware dhId: %{public}s", GetAnonyString(dhId).c_str());
+    if (key == KEY_ENABLE_INIT_PARAM) {
+        cJSON* root = cJSON_Parse(value.c_str());
+        if (root == nullptr) {
+            DHLOGI("root is null.");
+            return DCAMERA_OK;
+        }
+        cJSON* item = cJSON_GetObjectItemCaseSensitive(root, KEY_TOKEN_ID);
+        if (item != nullptr && cJSON_IsNumber(item)) {
+            enableFirstTokenId_ = static_cast<uint32_t>(item->valuedouble);
+            DHLOGI("[MultiUserEnable] ConfigDistributedHardware enableFirstTokenId=%{public}s",
+                GetAnonyString(std::to_string(enableFirstTokenId_)).c_str());
+            std::lock_guard<std::mutex> lock(mapMutex_);
+            auto it = camerasMap_.find(dhId);
+            if (it != camerasMap_.end() && it->second != nullptr) {
+                it->second->SetEnableFirstTokenId(enableFirstTokenId_);
+            }
+        }
+        cJSON_Delete(root);
+    }
     return DCAMERA_OK;
 }
 } // namespace DistributedHardware

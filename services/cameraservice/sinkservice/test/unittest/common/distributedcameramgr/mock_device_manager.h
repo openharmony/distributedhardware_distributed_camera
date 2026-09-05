@@ -31,6 +31,7 @@ public:
     virtual int32_t GetUdidByNetworkId(const std::string &pkgName, const std::string &nextworkId,
         std::string &udid);
     virtual bool CheckSrcAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee);
+    virtual bool CheckSinkAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee);
 public:
     static inline std::shared_ptr<IDeviceManager> deviceMgrMock = nullptr;
 };
@@ -44,6 +45,7 @@ public:
     MOCK_METHOD3(GetUdidByNetworkId, int32_t(const std::string &pkgName, const std::string &nextworkId,
         std::string &udid));
     MOCK_METHOD2(CheckSrcAccessControl, bool(const DmAccessCaller &caller, const DmAccessCallee &callee));
+    MOCK_METHOD2(CheckSinkAccessControl, bool(const DmAccessCaller &caller, const DmAccessCallee &callee));
 };
 }
 }

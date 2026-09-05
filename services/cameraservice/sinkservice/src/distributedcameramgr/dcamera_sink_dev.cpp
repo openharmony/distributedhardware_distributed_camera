@@ -216,5 +216,12 @@ void DCameraSinkDev::SetTokenId(uint64_t token)
 {
     tokenId_ = token;
 }
+
+void DCameraSinkDev::SetEnableFirstTokenId(uint32_t tokenId)
+{
+    if (controller_ != nullptr) {
+        controller_->SetEnableFirstTokenId(tokenId);
+    }
+}
 } // namespace DistributedHardware
 } // namespace OHOS

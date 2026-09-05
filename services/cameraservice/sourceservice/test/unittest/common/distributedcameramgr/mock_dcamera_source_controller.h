@@ -88,6 +88,12 @@ public:
     void SetTokenId(uint64_t token)
     {
     }
+    void SetEnableFirstTokenId(uint32_t tokenId)
+    {
+    }
+    void SetTriggerFirstTokenId(uint32_t tokenId)
+    {
+    }
 };
 class MockDCameraSourceControllerRetErr : public MockDCameraSourceController {
 public:

@@ -43,10 +43,12 @@
 #include "ffrt_inner.h"
 #include "idistributed_camera_source.h"
 #include "ipc_skeleton.h"
+#include "accesstoken_kit.h"
 #include "dcamera_low_latency.h"
 #ifdef OS_ACCOUNT_ENABLE
 #include "ohos_account_kits.h"
 #include "os_account_manager.h"
+#include "os_account_info.h"
 #endif
 #include <sys/prctl.h>
 
@@ -874,25 +876,7 @@ int32_t DCameraSinkController::HandleReceivedData(std::shared_ptr<DataBuffer>& d
     std::string command = std::string(comvalue->valuestring);
     cJSON_Delete(rootValue);
     if ((!command.empty()) && (command.compare(DCAMERA_PROTOCOL_CMD_CAPTURE) == 0)) {
-        DCameraCaptureInfoCmd captureInfoCmd;
-        int32_t ret = captureInfoCmd.Unmarshal(jsonStr);
-        if (ret != DCAMERA_OK) {
-            DHLOGE("Capture Info Unmarshal failed, dhId: %{public}s ret: %{public}d",
-                GetAnonyString(dhId_).c_str(), ret);
-            return ret;
-        }
-        sceneMode_ = captureInfoCmd.sceneMode_;
-        userId_ = captureInfoCmd.userId_;
-        tokenId_ = captureInfoCmd.tokenId_;
-        accountId_ = captureInfoCmd.accountId_;
-        if (!CheckAclRight()) {
-            DHLOGE("ACL check failed.");
-            return DCAMERA_BAD_VALUE;
-        }
-#ifdef DCAMERA_OPEN_STABILE
-        CHECK_AND_RETURN_RET_LOG(!IsIdenticalAccount(srcDevId_), DCAMERA_BAD_VALUE, "Account check failed.");
-#endif
-        return StartCapture(captureInfoCmd.value_, sceneMode_, captureInfoCmd.eis_);
+        return HandleCaptureCommand(jsonStr);
     } else if ((!command.empty()) && (command.compare(DCAMERA_PROTOCOL_CMD_UPDATE_METADATA) == 0)) {
         DCameraMetadataSettingCmd metadataSettingCmd;
         int32_t ret = metadataSettingCmd.Unmarshal(jsonStr);
@@ -908,10 +892,36 @@ int32_t DCameraSinkController::HandleReceivedData(std::shared_ptr<DataBuffer>& d
     return DCAMERA_BAD_VALUE;
 }
 
+int32_t DCameraSinkController::HandleCaptureCommand(const std::string &jsonStr)
+{
+    DCameraCaptureInfoCmd captureInfoCmd;
+    int32_t ret = captureInfoCmd.Unmarshal(jsonStr);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("Capture Info Unmarshal failed, dhId: %{public}s ret: %{public}d",
+            GetAnonyString(dhId_).c_str(), ret);
+        return ret;
+    }
+    sceneMode_ = captureInfoCmd.sceneMode_;
+    userId_ = captureInfoCmd.userId_;
+    tokenId_ = captureInfoCmd.tokenId_;
+    accountId_ = captureInfoCmd.accountId_;
+    sourceTrigFirstTokenId_ = captureInfoCmd.triggerFirstTokenId_;
+    sourceTrigFirstUserId_ = captureInfoCmd.triggerFirstUserId_;
+    DHLOGI("[MultiUserSink] Sink received sourceTrigFirstTokenId=%{public}s, sourceTrigFirstUserId=%{public}d",
+        GetAnonyString(std::to_string(sourceTrigFirstTokenId_)).c_str(), sourceTrigFirstUserId_);
+    if (!CheckAclRight()) {
+        DHLOGE("ACL check failed.");
+        return DCAMERA_BAD_VALUE;
+    }
+#ifdef DCAMERA_OPEN_STABILE
+    CHECK_AND_RETURN_RET_LOG(!IsIdenticalAccount(srcDevId_), DCAMERA_BAD_VALUE, "Account check failed.");
+#endif
+    return StartCapture(captureInfoCmd.value_, sceneMode_, captureInfoCmd.eis_);
+}
+
 bool DCameraSinkController::CheckAclRight()
 {
     if (userId_ == -1) {
-        DHLOGI("Acl check version compatibility processing.");
         return true;
     }
     std::string sinkDevId;
@@ -922,16 +932,17 @@ bool DCameraSinkController::CheckAclRight()
 #ifdef OS_ACCOUNT_ENABLE
     std::vector<int32_t> ids;
     ret = AccountSA::OsAccountManager::QueryActiveOsAccountIds(ids);
-    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK || ids.empty(), false,
-        "Get userId from active os accountIds fail, ret: %{public}d", ret);
-    userId = ids[0];
-
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, false, "Get userId fail, ret: %{public}d", ret);
+    userId = ids.empty() ? 0 : ids[0];
     AccountSA::OhosAccountInfo osAccountInfo;
     ret = AccountSA::OhosAccountKits::GetInstance().GetOhosAccountInfo(osAccountInfo);
-    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, false,
-        "Get accountId from ohos account info fail, ret: %{public}d", ret);
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, false, "Get accountId fail, ret: %{public}d", ret);
     accountId = osAccountInfo.uid_;
 #endif
+    uint32_t enableTokenId = 0;
+    if (!ResolveEnableUser(userId, enableTokenId)) {
+        return false;
+    }
     ret = DeviceManager::GetInstance().InitDeviceManager(DCAMERA_PKG_NAME, initCallback_);
     if (ret != DCAMERA_OK) {
         DHLOGE("InitDeviceManager failed ret = %{public}d", ret);
@@ -942,18 +953,58 @@ bool DCameraSinkController::CheckAclRight()
         .pkgName = DCAMERA_PKG_NAME,
         .networkId = srcDevId_,
         .userId = userId_,
-        .tokenId = tokenId_,
+        .tokenId = (sourceTrigFirstTokenId_ != 0) ? sourceTrigFirstTokenId_ : tokenId_,
     };
     DmAccessCallee dmDstCallee = {
         .accountId = accountId,
         .networkId = sinkDevId,
         .pkgName = DCAMERA_PKG_NAME,
         .userId = userId,
-        .tokenId = sinkTokenId_,
+        .tokenId = enableTokenId,
     };
-    DHLOGI("CheckAclRight srcDevId: %{public}s, accountId: %{public}s, sinkDevId: %{public}s",
-        GetAnonyString(srcDevId_).c_str(), GetAnonyString(accountId).c_str(), GetAnonyString(sinkDevId).c_str());
+    DHLOGI("[MultiUserSink] CheckAclRight srcUserId=%{public}d, sinkEnableUserId=%{public}d, enableTokenId=%{public}s",
+        userId_, userId, GetAnonyString(std::to_string(enableTokenId)).c_str());
     return DeviceManager::GetInstance().CheckSinkAccessControl(dmSrcCaller, dmDstCallee);
+}
+
+bool DCameraSinkController::ResolveEnableUser(int32_t &userId, uint32_t &enableTokenId)
+{
+    enableTokenId = enableFirstTokenId_;
+    DHLOGI("[MultiUserSink] enableTokenId=%{public}s", GetAnonyString(std::to_string(enableTokenId)).c_str());
+    Security::AccessToken::HapTokenInfo enableTokenInfo;
+    int32_t enableUserId = -1;
+    bool isSA = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(enableTokenId) ==
+        Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE;
+    if (!isSA && enableTokenId != 0) {
+        int32_t res = Security::AccessToken::AccessTokenKit::GetHapTokenInfo(enableTokenId, enableTokenInfo);
+        if (res != 0) {
+            DHLOGI("[MultiUserSink] get hap token info failed, ret = %{public}d", res);
+            return false;
+        }
+        enableUserId = enableTokenInfo.userID;
+    }
+
+    int32_t matchedUserId = -1;
+    if (enableUserId != -1) {
+#ifdef OS_ACCOUNT_ENABLE
+        std::vector<int32_t> activeIds;
+        AccountSA::OsAccountManager::QueryActiveOsAccountIds(activeIds);
+        for (auto &localId : activeIds) {
+            if (localId == enableUserId) {
+                matchedUserId = localId;
+                break;
+            }
+        }
+#endif
+        if (matchedUserId == -1) {
+            DHLOGE("[MultiUserSink] no active match for sourceTrigFirstUserId=%{public}d",
+                sourceTrigFirstUserId_);
+            return false;
+        }
+        userId = matchedUserId;
+    }
+    DHLOGI("[MultiUserSink] use userId_=%{public}d, userId=%{public}d", userId_, userId);
+    return true;
 }
 
 int32_t DCameraSinkController::PauseDistributedHardware(const std::string &networkId)
@@ -1090,6 +1141,16 @@ std::string DCameraSinkController::GetUdidByNetworkId(const std::string &network
 void DCameraSinkController::SetTokenId(uint64_t token)
 {
     sinkTokenId_ = token;
+}
+
+void DCameraSinkController::SetEnableFirstTokenId(uint32_t tokenId)
+{
+    enableFirstTokenId_ = tokenId;
+}
+
+void DCameraSinkController::SetTriggerFirstTokenId(uint32_t tokenId)
+{
+    sourceTrigFirstTokenId_ = tokenId;
 }
 
 void DeviceInitCallback::OnRemoteDied()

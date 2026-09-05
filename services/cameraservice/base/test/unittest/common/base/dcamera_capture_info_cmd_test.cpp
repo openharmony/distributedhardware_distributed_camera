@@ -531,5 +531,143 @@ HWTEST_F(DCameraCaptureInfoCmdlTest, Unmarshal_004, TestSize.Level1)
     EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
 }
 
+/**
+ * @tc.name: Unmarshal_005.
+ * @tc.desc: Verify Unmarshal with triggerFirstTokenId and triggerFirstUserId fields present.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraCaptureInfoCmdlTest, Unmarshal_005, TestSize.Level1)
+{
+    static const std::string jsonWithTriggerFields = R"({
+        "Type": "OPERATION",
+        "dhId": "camera_0",
+        "Command": "CAPTURE",
+        "Value": [
+            {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": 1,
+            "IsCapture": true, "EncodeType": 1, "StreamType": 1,
+            "CaptureSettings": [{"SettingType": 1, "SettingValue": "TestSetting"}]}
+        ],
+        "mode": 1,
+        "userId": 100,
+        "tokenId": 200,
+        "accountId": "accountId",
+        "eis": true,
+        "triggerFirstTokenId": 12345,
+        "triggerFirstUserId": 100
+    })";
+    DCameraCaptureInfoCmd cmd;
+    int32_t ret = cmd.Unmarshal(jsonWithTriggerFields);
+    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(cmd.triggerFirstTokenId_, static_cast<uint32_t>(12345));
+    EXPECT_EQ(cmd.triggerFirstUserId_, 100);
+    EXPECT_EQ(cmd.sceneMode_, 1);
+    EXPECT_EQ(cmd.userId_, 100);
+    EXPECT_EQ(cmd.tokenId_, static_cast<uint64_t>(200));
+    EXPECT_TRUE(cmd.eis_);
+}
+
+/**
+ * @tc.name: Unmarshal_006.
+ * @tc.desc: Verify Unmarshal without triggerFirstTokenId and triggerFirstUserId fields defaults to 0 and -1.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraCaptureInfoCmdlTest, Unmarshal_006, TestSize.Level1)
+{
+    static const std::string jsonWithoutTriggerFields = R"({
+        "Type": "OPERATION",
+        "dhId": "camera_0",
+        "Command": "CAPTURE",
+        "Value": [
+            {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": 1,
+            "IsCapture": true, "EncodeType": 1, "StreamType": 1,
+            "CaptureSettings": [{"SettingType": 1, "SettingValue": "TestSetting"}]}
+        ],
+        "mode": 0,
+        "userId": 0,
+        "tokenId": 0,
+        "accountId": ""
+    })";
+    DCameraCaptureInfoCmd cmd;
+    int32_t ret = cmd.Unmarshal(jsonWithoutTriggerFields);
+    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(cmd.triggerFirstTokenId_, static_cast<uint32_t>(0));
+    EXPECT_EQ(cmd.triggerFirstUserId_, -1);
+    EXPECT_FALSE(cmd.eis_);
+}
+
+/**
+ * @tc.name: Unmarshal_007.
+ * @tc.desc: Verify Unmarshal with triggerFirstTokenId/triggerFirstUserId of wrong type defaults to 0 and -1.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraCaptureInfoCmdlTest, Unmarshal_007, TestSize.Level1)
+{
+    static const std::string jsonTriggerWrongType = R"({
+        "Type": "OPERATION",
+        "dhId": "camera_0",
+        "Command": "CAPTURE",
+        "Value": [
+            {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": 1,
+            "IsCapture": true, "EncodeType": 1, "StreamType": 1,
+            "CaptureSettings": [{"SettingType": 1, "SettingValue": "TestSetting"}]}
+        ],
+        "mode": 1,
+        "userId": 100,
+        "tokenId": 200,
+        "accountId": "accountId",
+        "triggerFirstTokenId": "not_a_number",
+        "triggerFirstUserId": "not_a_number"
+    })";
+    DCameraCaptureInfoCmd cmd;
+    int32_t ret = cmd.Unmarshal(jsonTriggerWrongType);
+    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_EQ(cmd.triggerFirstTokenId_, static_cast<uint32_t>(0));
+    EXPECT_EQ(cmd.triggerFirstUserId_, -1);
+}
+
+/**
+ * @tc.name: Marshal_002.
+ * @tc.desc: Verify Marshal with empty value_ vector.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraCaptureInfoCmdlTest, Marshal_002, TestSize.Level1)
+{
+    DCameraCaptureInfoCmd cmd;
+    cmd.dhId_ = "camera_0";
+    cmd.type_ = "OPERATION";
+    cmd.command_ = "CAPTURE";
+    cmd.triggerFirstTokenId_ = 99999;
+    cmd.triggerFirstUserId_ = 200;
+    std::string jsonStr;
+    int32_t ret = cmd.Marshal(jsonStr);
+    EXPECT_EQ(DCAMERA_OK, ret);
+    EXPECT_NE(jsonStr.find("triggerFirstTokenId"), std::string::npos);
+    EXPECT_NE(jsonStr.find("99999"), std::string::npos);
+    EXPECT_NE(jsonStr.find("triggerFirstUserId"), std::string::npos);
+    EXPECT_NE(jsonStr.find("200"), std::string::npos);
+}
+
+/**
+ * @tc.name: Marshal_003.
+ * @tc.desc: Verify Marshal with null capture in value_ vector returns DCAMERA_BAD_VALUE.
+ * @tc.type: FUNC
+ * @tc.require: Issue Number
+ */
+HWTEST_F(DCameraCaptureInfoCmdlTest, Marshal_003, TestSize.Level1)
+{
+    DCameraCaptureInfoCmd cmd;
+    cmd.dhId_ = "camera_0";
+    cmd.type_ = "OPERATION";
+    cmd.command_ = "CAPTURE";
+    std::shared_ptr<DCameraCaptureInfo> nullCapture = nullptr;
+    cmd.value_.push_back(nullCapture);
+    std::string jsonStr;
+    int32_t ret = cmd.Marshal(jsonStr);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
