@@ -583,5 +583,36 @@ int32_t DistributedCameraSinkProxy::SetAuthorizationResult(const std::string &re
     DHLOGI("SetAuthorizationResult end, result: %{public}d", result);
     return result;
 }
+
+int32_t DistributedCameraSinkProxy::ConfigDistributedHardware(const std::string& devId, const std::string& dhId,
+    const std::string& key, const std::string& value)
+{
+    DHLOGI("dhId: %{public}s", GetAnonyString(dhId).c_str());
+    if (dhId.empty() || key.empty() || value.empty()) {
+        DHLOGE("param is invalid");
+        return DCAMERA_BAD_VALUE;
+    }
+    sptr<IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        DHLOGE("remote service is null");
+        return DCAMERA_BAD_VALUE;
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(DistributedCameraSinkProxy::GetDescriptor())) {
+        DHLOGE("write token failed");
+        return DCAMERA_BAD_VALUE;
+    }
+    if (!data.WriteString(devId) || !data.WriteString(dhId) || !data.WriteString(key) ||
+        !data.WriteString(value)) {
+        DHLOGE("write params failed");
+        return DCAMERA_BAD_VALUE;
+    }
+    remote->SendRequest(static_cast<uint32_t>(IDCameraSinkInterfaceCode::CONFIG_DISTRIBUTED_HARDWARE),
+        data, reply, option);
+    int32_t result = reply.ReadInt32();
+    return result;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

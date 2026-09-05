@@ -1551,5 +1551,173 @@ HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_encoder_prepare
     EXPECT_FALSE(controller_->isEncoderReady_);
 }
 #endif
+
+/**
+ * @tc.name: dcamera_sink_controller_test_set_enable_first_tokenid_001
+ * @tc.desc: Verify SetEnableFirstTokenId sets the value correctly.
+ * @tc.type: FUNC
+ * @tc.require: DTS
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_set_enable_first_tokenid_001, TestSize.Level1)
+{
+    controller_->enableFirstTokenId_ = 0;
+    controller_->SetEnableFirstTokenId(12345u);
+    EXPECT_EQ(controller_->enableFirstTokenId_, 12345u);
+    controller_->SetEnableFirstTokenId(0u);
+    EXPECT_EQ(controller_->enableFirstTokenId_, 0u);
+}
+
+/**
+ * @tc.name: dcamera_sink_controller_test_set_trigger_first_tokenid_001
+ * @tc.desc: Verify SetTriggerFirstTokenId sets the value correctly.
+ * @tc.type: FUNC
+ * @tc.require: DTS
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_set_trigger_first_tokenid_001, TestSize.Level1)
+{
+    controller_->sourceTrigFirstTokenId_ = 0;
+    controller_->SetTriggerFirstTokenId(67890u);
+    EXPECT_EQ(controller_->sourceTrigFirstTokenId_, 67890u);
+    controller_->SetTriggerFirstTokenId(0u);
+    EXPECT_EQ(controller_->sourceTrigFirstTokenId_, 0u);
+}
+
+/**
+ * @tc.name: dcamera_sink_controller_test_resolve_enable_user_001
+ * @tc.desc: Verify ResolveEnableUser returns true when enableFirstTokenId_ is 0.
+ * @tc.type: FUNC
+ * @tc.require: DTS
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_resolve_enable_user_001, TestSize.Level1)
+{
+    controller_->enableFirstTokenId_ = 0;
+    int32_t userId = 100;
+    uint32_t enableTokenId = 999;
+    bool ret = controller_->ResolveEnableUser(userId, enableTokenId);
+    EXPECT_TRUE(ret);
+    EXPECT_EQ(enableTokenId, 0u);
+    EXPECT_EQ(userId, 100);
+}
+
+/**
+ * @tc.name: dcamera_sink_controller_test_resolve_enable_user_002
+ * @tc.desc: Verify ResolveEnableUser returns false when enableFirstTokenId_ is invalid.
+ * @tc.type: FUNC
+ * @tc.require: DTS
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_resolve_enable_user_002, TestSize.Level1)
+{
+    controller_->enableFirstTokenId_ = 9999;
+    int32_t userId = 100;
+    uint32_t enableTokenId = 0;
+    bool ret = controller_->ResolveEnableUser(userId, enableTokenId);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_controller_test_handle_capture_command_001
+ * @tc.desc: Verify HandleCaptureCommand with invalid JSON returns error.
+ * @tc.type: FUNC
+ * @tc.require: DTS
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_handle_capture_command_001, TestSize.Level1)
+{
+    std::string invalidJson = "invalid_json";
+    int32_t ret = controller_->HandleCaptureCommand(invalidJson);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_controller_test_handle_capture_command_002
+ * @tc.desc: Verify HandleCaptureCommand with empty string returns error.
+ * @tc.type: FUNC
+ * @tc.require: DTS
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_handle_capture_command_002, TestSize.Level1)
+{
+    std::string emptyJson = "";
+    int32_t ret = controller_->HandleCaptureCommand(emptyJson);
+    EXPECT_EQ(DCAMERA_BAD_VALUE, ret);
+}
+
+/**
+ * @tc.name: dcamera_sink_controller_test_handle_capture_command_003
+ * @tc.desc: Verify HandleCaptureCommand with valid JSON sets trigger fields.
+ * @tc.type: FUNC
+ * @tc.require: DTS
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_handle_capture_command_003, TestSize.Level1)
+{
+    std::string validJson = R"({
+        "Type": "OPERATION",
+        "dhId": "camera_0",
+        "Command": "CAPTURE",
+        "Value": [
+            {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": 1,
+            "IsCapture": true, "EncodeType": 1, "StreamType": 1,
+            "CaptureSettings": [{"SettingType": 1, "SettingValue": "TestSetting"}]}
+        ],
+        "mode": 1,
+        "userId": 100,
+        "tokenId": 200,
+        "accountId": "accountId",
+        "eis": false,
+        "triggerFirstTokenId": 12345,
+        "triggerFirstUserId": 100
+    })";
+    controller_->sourceTrigFirstTokenId_ = 0;
+    controller_->sourceTrigFirstUserId_ = -1;
+    controller_->userId_ = -1;
+    controller_->HandleCaptureCommand(validJson);
+    EXPECT_EQ(controller_->sourceTrigFirstTokenId_, static_cast<uint32_t>(12345));
+    EXPECT_EQ(controller_->sourceTrigFirstUserId_, 100);
+    EXPECT_EQ(controller_->sceneMode_, 1);
+    EXPECT_EQ(controller_->userId_, 100);
+    EXPECT_EQ(controller_->tokenId_, static_cast<uint64_t>(200));
+}
+
+/**
+ * @tc.name: dcamera_sink_controller_test_handle_capture_command_004
+ * @tc.desc: Verify HandleCaptureCommand with userId=-1 skips ACL check and returns success or capture error.
+ * @tc.type: FUNC
+ * @tc.require: DTS
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_handle_capture_command_004, TestSize.Level1)
+{
+    std::string jsonWithNegOneUser = R"({
+        "Type": "OPERATION",
+        "dhId": "camera_0",
+        "Command": "CAPTURE",
+        "Value": [
+            {"Width": 1920, "Height": 1080, "Format": 1, "DataSpace": 1,
+            "IsCapture": true, "EncodeType": 1, "StreamType": 1,
+            "CaptureSettings": [{"SettingType": 1, "SettingValue": "TestSetting"}]}
+        ],
+        "mode": 0,
+        "userId": -1,
+        "tokenId": 0,
+        "accountId": ""
+    })";
+    controller_->sourceTrigFirstUserId_ = -1;
+    controller_->HandleCaptureCommand(jsonWithNegOneUser);
+    EXPECT_EQ(controller_->userId_, -1);
+}
+
+/**
+ * @tc.name: dcamera_sink_controller_test_check_acl_right_trigger_tokenid_001
+ * @tc.desc: Verify CheckAclRight uses sourceTrigFirstTokenId_ when set.
+ * @tc.type: FUNC
+ * @tc.require: DTS
+ */
+HWTEST_F(DCameraSinkControllerTest, dcamera_sink_controller_test_check_acl_right_trigger_tokenid_001, TestSize.Level1)
+{
+    controller_->userId_ = -1;
+    controller_->sourceTrigFirstTokenId_ = 0;
+    controller_->tokenId_ = 100;
+    EXPECT_TRUE(controller_->CheckAclRight());
+
+    controller_->sourceTrigFirstTokenId_ = 55555;
+    EXPECT_TRUE(controller_->CheckAclRight());
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -53,6 +53,8 @@ public:
         const std::string &pkgName) override;
     int32_t RemoveAccessListener(const std::string &pkgName) override;
     int32_t SetAuthorizationResult(const std::string &requestId, bool granted) override;
+    int32_t ConfigDistributedHardware(const std::string& devId, const std::string& dhId, const std::string& key,
+        const std::string& value) override;
 
 protected:
     void OnStart() override;
@@ -72,6 +74,7 @@ private:
     std::map<std::string, std::shared_ptr<DCameraSinkDev>> camerasMap_;
     static DistributedCameraSinkService* dcSinkService;
     const size_t DUMP_MAX_SIZE = 10 * 1024;
+    uint32_t enableFirstTokenId_ = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

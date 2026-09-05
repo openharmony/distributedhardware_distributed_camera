@@ -282,7 +282,7 @@ int32_t DistributedCameraSourceService::RegisterDistributedHardware(const std::s
             "dcamera source RegisterDistributedHardware fail.");
         CamDevErase(camIndex);
     }
-    camDev->SetTokenId(GetFirstCallerTokenID());
+    camDev->SetTokenId(OHOS::IPCSkeleton::GetFirstTokenID());
     DHLOGI("RegisterDistributedHardware end devId: %{public}s, dhId: %{public}s, sinkVersion: %{public}s",
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), params.sinkVersion.c_str());
     return ret;

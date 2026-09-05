@@ -128,6 +128,11 @@ constexpr static int8_t FRAME_HEAD = 0;
 const int32_t VALID_OS_TYPE = 10;
 const int32_t INVALID_OS_TYPE = -1;
 const std::string KEY_OS_TYPE = "OS_TYPE";
+constexpr const char *KEY_ENABLE_FIRST_TOKENID = "enableFirstTokenId";
+constexpr const char *KEY_TRIGGER_FIRST_TOKENID = "triggerFirstTokenId";
+constexpr const char *KEY_TRIGGER_FIRST_USERID = "triggerFirstUserId";
+constexpr const char *KEY_ENABLE_INIT_PARAM = "enable_init_params";
+constexpr const char *KEY_TOKEN_ID = "tokenId";
 
 const int32_t RESOLUTION_MAX_WIDTH_SNAPSHOT = 4096;
 const int32_t RESOLUTION_MAX_HEIGHT_SNAPSHOT = 3072;

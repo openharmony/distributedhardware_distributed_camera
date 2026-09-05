@@ -53,3 +53,11 @@ bool DeviceManagerImpl::CheckSrcAccessControl(const DmAccessCaller &caller, cons
     }
     return IDeviceManager::deviceMgrMock->CheckSrcAccessControl(caller, callee);
 }
+
+bool DeviceManagerImpl::CheckSinkAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee)
+{
+    if (IDeviceManager::deviceMgrMock == nullptr) {
+        return 0;
+    }
+    return IDeviceManager::deviceMgrMock->CheckSinkAccessControl(caller, callee);
+}

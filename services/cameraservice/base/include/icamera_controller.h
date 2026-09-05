@@ -45,6 +45,8 @@ public:
     virtual int32_t ResumeDistributedHardware(const std::string &networkId) = 0;
     virtual int32_t StopDistributedHardware(const std::string &networkId) = 0;
     virtual void SetTokenId(uint64_t token) = 0;
+    virtual void SetEnableFirstTokenId(uint32_t tokenId) = 0;
+    virtual void SetTriggerFirstTokenId(uint32_t tokenId) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -251,6 +251,22 @@ int32_t DCameraSinkHandler::SetAuthorizationResult(const std::string &requestId,
     return dCameraSinkSrv->SetAuthorizationResult(requestId, granted);
 }
 
+int32_t DCameraSinkHandler::ConfigDistributedHardware(const std::string& dhId, const std::string& key,
+    const std::string& value)
+{
+    DHLOGI("dhId: %{public}s", GetAnonyString(dhId).c_str());
+    sptr<IDistributedCameraSink> dCameraSinkSrv = DCameraSinkHandlerIpc::GetInstance().GetSinkLocalCamSrv();
+    if (dCameraSinkSrv == nullptr) {
+        DHLOGE("get Service failed");
+        return DCAMERA_BAD_VALUE;
+    }
+    int32_t ret = dCameraSinkSrv->ConfigDistributedHardware("", dhId, key, value);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("ConfigDistributedHardware failed ret = %{public}d", ret);
+    }
+    return ret;
+}
+
 void DCameraSinkHandler::RegisterDistributedHardwareSinkStateListener(
     std::shared_ptr<DistributedHardwareSinkStateListener> listener)
 {

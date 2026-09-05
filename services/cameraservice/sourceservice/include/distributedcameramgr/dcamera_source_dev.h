@@ -126,6 +126,7 @@ private:
     sptr<IDCameraProviderCallback> hdiCallback_;
     int32_t sceneMode_ = 0;
     uint64_t tokenId_ = 0;
+    uint32_t enableFirstTokenId_ = 0;
     bool eis_ = false;
 
     std::map<uint32_t, DCameraNotifyFunc> memberFuncMap_;

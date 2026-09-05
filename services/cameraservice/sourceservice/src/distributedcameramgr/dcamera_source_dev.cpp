@@ -16,6 +16,7 @@
 #include "dcamera_source_dev.h"
 
 #include "anonymous_string.h"
+#include "cJSON.h"
 #include "dcamera_hisysevent_adapter.h"
 #include "dcamera_hitrace_adapter.h"
 #include "dcamera_radar.h"
@@ -31,6 +32,7 @@
 #include "dcamera_source_input.h"
 #include "dcamera_utils_tools.h"
 #include "distributed_camera_allconnect_manager.h"
+#include "accesstoken_kit.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -154,6 +156,18 @@ int32_t DCameraSourceDev::ConfigDistributedHardware(const std::string& devId, co
 {
     DHLOGI("DCameraSourceDev ConfigDistributedHardware value %{public}s", value.c_str());
     DCameraSrcImuSensor::GetInstance().SetInitParam(value);
+    if (key == KEY_ENABLE_INIT_PARAM) {
+        cJSON* root = cJSON_Parse(value.c_str());
+        if (root != nullptr) {
+            cJSON* item = cJSON_GetObjectItemCaseSensitive(root, KEY_TOKEN_ID);
+            if (item != nullptr && cJSON_IsNumber(item)) {
+                enableFirstTokenId_ = static_cast<uint32_t>(item->valuedouble);
+                DHLOGI("[MultiUserEnable] ConfigDistributedHardware enableFirstTokenId=%{public}s",
+                    GetAnonyString(std::to_string(enableFirstTokenId_)).c_str());
+            }
+            cJSON_Delete(root);
+        }
+    }
     return DCAMERA_OK;
 }
 
@@ -275,6 +289,19 @@ int32_t DCameraSourceDev::ProcessHDFEvent(const DCameraHDFEvent& event)
 {
     DHLOGI("DCameraSourceDev ProcessHDFEvent devId %{public}s dhId %{public}s event_type %{public}d",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), event.type_);
+    cJSON* root = cJSON_Parse(event.content_.c_str());
+    if (root != nullptr) {
+        cJSON* item = cJSON_GetObjectItemCaseSensitive(root, KEY_TRIGGER_FIRST_TOKENID);
+        if (item != nullptr && cJSON_IsNumber(item)) {
+            uint32_t triggerFirstTokenId = static_cast<uint32_t>(item->valuedouble);
+            DHLOGI("[MultiUserTrigger] ProcessHDFEvent triggerFirstTokenId=%{public}s",
+                GetAnonyString(std::to_string(triggerFirstTokenId)).c_str());
+            if (controller_ != nullptr) {
+                controller_->SetTriggerFirstTokenId(triggerFirstTokenId);
+            }
+        }
+        cJSON_Delete(root);
+    }
     if (event.type_ == EVENT_DCAMERA_FORCE_SWITCH) {
         DCameraSystemSwitchInfo::GetInstance().SetSystemSwitchFlagAndRotation(devId_, true, event.result_);
         DHLOGI("recv force switch event from hdf, result: %{public}d", event.result_);
@@ -494,6 +521,7 @@ int32_t DCameraSourceDev::OpenCamera()
         GetAnonyString(dhId_).c_str());
     ReportCameraOperaterEvent(OPEN_CAMERA_EVENT, GetAnonyString(devId_), dhId_, "execute open camera event.");
     controller_->SetTokenId(tokenId_);
+    controller_->SetEnableFirstTokenId(enableFirstTokenId_);
     std::shared_ptr<DCameraOpenInfo> openInfo = std::make_shared<DCameraOpenInfo>();
     int32_t ret = GetLocalDeviceNetworkId(openInfo->sourceDevId_);
     DcameraRadar::GetInstance().ReportDcameraOpen("GetLocalDeviceNetworkId", CameraOpen::OPEN_CAMERA,

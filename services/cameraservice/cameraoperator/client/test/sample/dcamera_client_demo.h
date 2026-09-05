@@ -12,12 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #ifndef OHOS_DCAMERA_CLIENT_DEMO_H
 #define OHOS_DCAMERA_CLIENT_DEMO_H
-
 #include <fstream>
-
 #include "anonymous_string.h"
 #include "camera_device_ability_items.h"
 #include "camera_input.h"
@@ -38,7 +35,6 @@
 #include "surface.h"
 #include "video_output.h"
 #include "iconsumer_surface.h"
-
 namespace OHOS {
 namespace DistributedHardware {
 class DemoDCameraBufferConsumerListener : public IBufferConsumerListener {
@@ -46,7 +42,6 @@ public:
     explicit DemoDCameraBufferConsumerListener(const sptr<IConsumerSurface>& surface) : surface_(surface)
     {
     }
-
     void OnBufferAvailable()
     {
         DHLOGI("DemoDCameraBufferConsumerListener::OnBufferAvailable");
@@ -54,7 +49,6 @@ public:
             DHLOGE("DemoDCameraBufferConsumerListener surface is null");
             return;
         }
-
         int32_t flushFence = 0;
         int64_t timestamp = 0;
         OHOS::Rect damage;
@@ -64,31 +58,25 @@ public:
             DHLOGE("DemoDCameraBufferConsumerListener AcquireBuffer failed");
             return;
         }
-
         width_ = buffer->GetWidth();
         height_ = buffer->GetHeight();
         size_ = buffer->GetSize();
         address_ = static_cast<char *>(buffer->GetVirAddr());
         buffer->GetExtraData()->ExtraGet("dataSize", dataSize_);
-
 #ifdef DCAMERA_YUV
         actualSize_ = width_ * height_ * YUV_BYTES_PER_PIXEL / Y2UV_RATIO;
 #else
         actualSize_ = width_ * height_ * RGB_BYTES_PER_PIXEL;
 #endif
-
         SaveFile();
         surface_->ReleaseBuffer(buffer, -1);
     }
-
 protected:
     virtual void SaveFile() const = 0;
-
 protected:
     constexpr static int32_t Y2UV_RATIO = 2;
     constexpr static int32_t YUV_BYTES_PER_PIXEL = 3;
     constexpr static int32_t RGB_BYTES_PER_PIXEL = 4;
-
     char *address_ = nullptr;
     int32_t actualSize_ = 0;
     int32_t dataSize_ = 0;
@@ -97,14 +85,12 @@ protected:
     int32_t size_ = 0;
     sptr<IConsumerSurface> surface_;
 };
-
 class DemoDCameraPhotoSurfaceListener : public DemoDCameraBufferConsumerListener {
 public:
     explicit DemoDCameraPhotoSurfaceListener(const sptr<IConsumerSurface>& surface)
         : DemoDCameraBufferConsumerListener(surface)
     {
     }
-
 protected:
     void SaveFile() const override
     {
@@ -114,7 +100,6 @@ protected:
             DHLOGE("DemoDCameraPhotoSurfaceListener invalid params, dataSize: %{public}d", dataSize_);
             return;
         }
-
         std::ofstream ofs;
         std::cout << "saving photo ..." << std::endl;
         std::string fileName = "/data/log/dcamera_photo_" + std::to_string(GetNowTimeStampMs()) + ".jpg";
@@ -128,14 +113,12 @@ protected:
         std::cout << "saving photo success" << std::endl;
     }
 };
-
 class DemoDCameraPreviewSurfaceListener : public DemoDCameraBufferConsumerListener {
 public:
     explicit DemoDCameraPreviewSurfaceListener(const sptr<IConsumerSurface>& surface)
         : DemoDCameraBufferConsumerListener(surface)
     {
     }
-
 protected:
     void SaveFile() const override
     {
@@ -145,7 +128,6 @@ protected:
             DHLOGE("DemoDCameraPreviewSurfaceListener invalid params, actualSize: %{public}d", actualSize_);
             return;
         }
-
         std::ofstream ofs;
         std::cout << "saving preview ..." << std::endl;
         std::string resolution = std::to_string(width_) + "_" + std::to_string(height_);
@@ -160,14 +142,12 @@ protected:
         std::cout << "saving preview success" << std::endl;
     }
 };
-
 class DemoDCameraVideoSurfaceListener : public DemoDCameraBufferConsumerListener {
 public:
     explicit DemoDCameraVideoSurfaceListener(const sptr<IConsumerSurface>& surface)
         : DemoDCameraBufferConsumerListener(surface)
     {
     }
-
 protected:
     void SaveFile() const override
     {
@@ -177,7 +157,6 @@ protected:
             DHLOGE("DemoDCameraVideoSurfaceListener invalid params, actualSize: %{public}d", actualSize_);
             return;
         }
-
         std::ofstream ofs;
         std::cout << "saving video ..." << std::endl;
         std::string resolution = std::to_string(width_) + "_" + std::to_string(height_);
@@ -192,122 +171,101 @@ protected:
         std::cout << "saving video success" << std::endl;
     }
 };
-
 class DemoDCameraPhotoCallback : public CameraStandard::PhotoStateCallback {
 public:
     void OnCaptureStarted(const int32_t captureID) const
     {
         DHLOGI("DemoDCameraPhotoCallback::OnCaptureStarted captureID: %{public}d", captureID);
     }
-
     void OnCaptureStarted(const int32_t captureID, uint32_t exposureTime) const
     {
         DHLOGI("DemoDCameraPhotoCallback::OnCaptureStarted captureID: %{public}d, exposureTime: %{public}u",
             captureID, exposureTime);
     }
-
     void OnCaptureEnded(const int32_t captureID, int32_t frameCount) const
     {
         DHLOGI("DemoDCameraPhotoCallback::OnCaptureEnded captureID: %{public}d frameCount: %{public}d",
             captureID, frameCount);
     }
-
     void OnFrameShutter(const int32_t captureId, const uint64_t timestamp) const
     {
         DHLOGI("DemoDCameraPhotoCallback::OnFrameShutter captureID: %{public}d timestamp: %{public}" PRIu64,
             captureId, timestamp);
     }
-
     void OnFrameShutterEnd(const int32_t captureId, const uint64_t timestamp) const
     {
         DHLOGI("DemoDCameraPhotoCallback::OnFrameShutterEnd captureID: %{public}d timestamp: %{public}" PRIu64,
             captureId, timestamp);
     }
-
     void OnCaptureReady(const int32_t captureId, const uint64_t timestamp) const
     {
         DHLOGI("DemoDCameraPhotoCallback::OnCaptureReady captureID: %{public}d timestamp: %{public}" PRIu64,
             captureId, timestamp);
     }
-
     void OnEstimatedCaptureDuration(const int32_t duration) const
     {
         DHLOGI("DemoDCameraPhotoCallback::OnEstimatedCaptureDuration duration: %{public}d", duration);
     }
-
     void OnCaptureError(const int32_t captureId, const int32_t errorCode) const
     {
         DHLOGI("DemoDCameraPhotoCallback::OnCaptureError captureID: %{public}d errorCode: %{public}d",
             captureId, errorCode);
     }
-
     void OnOfflineDeliveryFinished(const int32_t captureId)  const
     {
         DHLOGI("DemoDCameraPhotoCallback::OnOfflineDeliveryFinished duration: %{public}d", captureId);
     }
-
     void OnConstellationDrawingState(const int32_t drawingState) const
     {
         DHLOGI("enter, drawingState: %{public}d", drawingState);
     }
 };
-
 class DemoDCameraPreviewCallback : public CameraStandard::PreviewStateCallback {
 public:
     void OnFrameStarted() const
     {
         DHLOGI("DemoDCameraPreviewCallback::OnFrameStarted.");
     }
-
     void OnFrameEnded(const int32_t frameCount) const
     {
         DHLOGI("DemoDCameraPreviewCallback::OnFrameEnded frameCount: %{public}d", frameCount);
     }
-
     void OnError(const int32_t errorCode) const
     {
         DHLOGI("DemoDCameraPreviewCallback::OnError errorCode: %{public}d", errorCode);
     }
-
     void OnSketchStatusDataChanged(const CameraStandard::SketchStatusData& statusData) const
     {
         DHLOGI("DemoDCameraPreviewCallback::OnSketchStatusDataChanged.");
     }
-
     void OnFramePaused() const
     {
         DHLOGI("enter");
     }
-
     void OnFrameResumed() const
     {
         DHLOGI("enter");
     }
 };
-
 class DemoDCameraVideoCallback : public CameraStandard::VideoStateCallback {
 public:
     void OnFrameStarted() const
     {
         DHLOGI("DemoDCameraVideoCallback::OnFrameStarted.");
     }
-
     void OnFrameEnded(const int32_t frameCount) const
     {
         DHLOGI("DemoDCameraVideoCallback::OnFrameEnded frameCount: %{public}d", frameCount);
     }
-
     void OnError(const int32_t errorCode) const
     {
         DHLOGI("DemoDCameraVideoCallback::OnError errorCode: %{public}d", errorCode);
     }
-
     void OnDeferredVideoEnhancementInfo(const CameraStandard::CaptureEndedInfoExt info) const
     {
         DHLOGI("DemoDCameraVideoCallback::OnDeferredVideoEnhancementInfo videoId: %{public}s", info.videoId.c_str());
     }
 };
-
 class DemoDCameraInputCallback : public CameraStandard::ErrorCallback {
 public:
     void OnError(const int32_t errorType, const int32_t errorMsg) const
@@ -315,7 +273,6 @@ public:
         DHLOGI("DemoDCameraInputCallback::OnError errorType: %{public}d errorMsg: %{public}d", errorType, errorMsg);
     }
 };
-
 class DemoDCameraManagerCallback : public CameraStandard::CameraManagerCallback {
 public:
     void OnCameraStatusChanged(const CameraStandard::CameraStatusInfo &cameraStatusInfo) const
@@ -323,7 +280,6 @@ public:
         DHLOGI("DemoDCameraManagerCallback::OnCameraStatusChanged cameraStatus: %{public}d",
             cameraStatusInfo.cameraStatus);
     }
-
     void OnFlashlightStatusChanged(const std::string &cameraID,
         const CameraStandard::FlashStatus flashStatus) const
     {
@@ -331,14 +287,12 @@ public:
             GetAnonyString(cameraID).c_str(), flashStatus);
     }
 };
-
 class DemoDCameraSessionCallback : public CameraStandard::SessionCallback, public CameraStandard::FocusCallback {
 public:
     void OnError(int32_t errorCode)
     {
         DHLOGI("DemoDCameraSessionCallback::OnError errorCode: %{public}d", errorCode);
     }
-
     void OnFocusState(FocusState state)
     {
         DHLOGI("DemoDCameraSessionCallback::OnFocusState state: %{public}d", state);
