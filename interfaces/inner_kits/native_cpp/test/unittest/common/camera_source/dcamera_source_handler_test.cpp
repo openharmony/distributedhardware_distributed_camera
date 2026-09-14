@@ -17,6 +17,8 @@
 #include <thread>
 #include <chrono>
 #include <atomic>
+#include <condition_variable>
+#include <mutex>
 
 #define private public
 #include "dcamera_source_handler.h"
@@ -301,19 +303,25 @@ HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_011, TestSize.Lev
 {
     DHLOGI("Testing concurrent scenario simulation");
     DCameraSourceHandler::GetInstance().state_ = DCameraSourceHandler::DCAMERA_SA_STATE_START;
-    std::atomic<bool> releaseThreadStarted{false};
+    std::mutex syncMutex;
+    std::condition_variable syncCv;
+    bool releaseStarted = false;
     std::atomic<bool> releaseThreadCompleted{false};
     std::atomic<bool> initThreadCompleted{false};
     std::atomic<int32_t> initResult{-1};
-    std::thread releaseThread([&releaseThreadStarted, &releaseThreadCompleted]() {
-        releaseThreadStarted = true;
+    std::thread releaseThread([&syncMutex, &syncCv, &releaseStarted, &releaseThreadCompleted]() {
         {
             std::lock_guard<std::mutex> lock(DCameraSourceHandler::GetInstance().producerMutex_);
             EXPECT_EQ(DCameraSourceHandler::GetInstance().state_,
                       DCameraSourceHandler::DCAMERA_SA_STATE_START);
             DCameraSourceHandler::GetInstance().state_ = DCameraSourceHandler::DCAMERA_SA_STATE_RELEASING;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        {
+            std::lock_guard<std::mutex> lock(syncMutex);
+            releaseStarted = true;
+            syncCv.notify_one();
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
         {
             std::lock_guard<std::mutex> lock(DCameraSourceHandler::GetInstance().producerMutex_);
             DCameraSourceHandler::GetInstance().state_ = DCameraSourceHandler::DCAMERA_SA_STATE_STOP;
@@ -321,10 +329,10 @@ HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_011, TestSize.Lev
         }
         releaseThreadCompleted = true;
     });
-    std::thread initThread([&releaseThreadStarted, &initResult, &initThreadCompleted]() {
-        while (!releaseThreadStarted) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        }
+    std::thread initThread([&syncMutex, &syncCv, &releaseStarted, &initResult, &initThreadCompleted]() {
+        std::unique_lock<std::mutex> lock(syncMutex);
+        syncCv.wait(lock, [&releaseStarted] { return releaseStarted; });
+        lock.unlock();
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
         std::string params = "test013_concurrent";
         auto start = std::chrono::steady_clock::now();
@@ -332,7 +340,7 @@ HWTEST_F(DCameraSourceHandlerTest, dcamera_source_handler_test_011, TestSize.Lev
         auto end = std::chrono::steady_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
         initThreadCompleted = true;
-        EXPECT_GE(duration.count(), 80);
+        EXPECT_GE(duration.count(), 170);
     });
     releaseThread.join();
     initThread.join();

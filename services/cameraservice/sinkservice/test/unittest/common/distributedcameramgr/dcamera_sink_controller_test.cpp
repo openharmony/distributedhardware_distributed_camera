@@ -183,6 +183,13 @@ void DCameraSinkControllerTest::SetUp(void)
 
 void DCameraSinkControllerTest::TearDown(void)
 {
+    if (controller_) {
+        {
+            std::unique_lock<std::mutex> lock(controller_->captureStateMutex_);
+            controller_->captureStateCv_.wait_for(lock, std::chrono::seconds(TEST_FIVE_S),
+                [this] { return controller_->captureState_ != DCameraSinkController::CAPTURE_STARTING; });
+        }
+    }
     if (controller_ && controller_->operator_) {
         auto mockOperator = std::static_pointer_cast<MockCameraOperator>(controller_->operator_);
         if (mockOperator && mockOperator->asyncOperationState.load() != 0) {
