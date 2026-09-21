@@ -100,6 +100,7 @@ private:
     void ProcessFrameTrigger(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessPostAuthorization(const AppExecFwk::InnerEvent::Pointer &event);
     int32_t CreateCtrlSession();
+    int32_t CloseChannelInner(const std::string &srcDevId);
     int32_t CheckSensitive();
     bool CheckAclRight();
     bool ResolveEnableUser(int32_t &userId, uint32_t &enableTokenId);

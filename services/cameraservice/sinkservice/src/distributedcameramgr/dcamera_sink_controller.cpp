@@ -85,19 +85,21 @@ int32_t DCameraSinkController::StartCapture(std::vector<std::shared_ptr<DCameraC
     CHECK_AND_RETURN_RET_LOG(accessControl_ == nullptr, DCAMERA_BAD_VALUE, "accessControl_ is null.");
     CHECK_AND_RETURN_RET_LOG(operator_ == nullptr, DCAMERA_BAD_VALUE, "operator_ is null.");
     std::string deviceName = "";
-    int32_t dmReturn = DeviceManager::GetInstance().GetDeviceName(DCAMERA_PKG_NAME, srcDevId_, deviceName);
+    std::string srcDevId;
+    {
+        std::lock_guard<std::mutex> autoLock(autoLock_);
+        srcDevId = srcDevId_;
+    }
+    int32_t dmReturn = DeviceManager::GetInstance().GetDeviceName(DCAMERA_PKG_NAME, srcDevId, deviceName);
     if (dmReturn != DCAMERA_OK) {
         DHLOGE("GetDeviceName failed, dmReturn: %{public}d", dmReturn);
     }
-    operator_->SetCallerInfo(srcDevId_, deviceName);
+    operator_->SetCallerInfo(srcDevId, deviceName);
     if ((accessControl_->IsSensitiveSrcAccess(SRC_TYPE)) &&
         (accessControl_->GetAccessControlType(accessType) == DCAMERA_SAME_ACCOUNT)) {
 #ifdef SECURITY_LEVEL_CHECK_ENABLE
-        std::string sourceUdid = GetUdidByNetworkId(srcDevId_);
-        if (sourceUdid.empty()) {
-            DHLOGE("source udid is empty");
-            return DCAMERA_BAD_VALUE;
-        }
+        std::string sourceUdid = GetUdidByNetworkId(srcDevId);
+        CHECK_AND_RETURN_RET_LOG(sourceUdid.empty(), DCAMERA_BAD_VALUE, "source udid is empty");
         int32_t sourceSecurityLevel = GetDeviceSecurityLevel(sourceUdid);
         DHLOGI("sourceSecurityLevel: %{public}d", sourceSecurityLevel);
         if (sourceSecurityLevel < MINIMUM_SECURITY_LEVEL) {
@@ -194,7 +196,12 @@ int32_t DCameraSinkController::ChannelNeg(std::shared_ptr<DCameraChannelInfo>& i
 int32_t DCameraSinkController::DCameraNotify(std::shared_ptr<DCameraEvent>& events)
 {
     DHLOGI("DCameraNotify dhId: %{public}s", GetAnonyString(dhId_).c_str());
-    CHECK_AND_RETURN_RET_LOG(srcDevId_.empty(), DCAMERA_BAD_VALUE, "source deviceId is empty");
+    std::string srcDevId;
+    {
+        std::lock_guard<std::mutex> autoLock(autoLock_);
+        srcDevId = srcDevId_;
+    }
+    CHECK_AND_RETURN_RET_LOG(srcDevId.empty(), DCAMERA_BAD_VALUE, "source deviceId is empty");
 
     DCameraEventCmd eventCmd;
     std::string jsonStr = "";
@@ -203,11 +210,8 @@ int32_t DCameraSinkController::DCameraNotify(std::shared_ptr<DCameraEvent>& even
     eventCmd.command_ = DCAMERA_PROTOCOL_CMD_STATE_NOTIFY;
     eventCmd.value_ = events;
     int32_t ret = eventCmd.Marshal(jsonStr);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("DCameraEventCmd marshal failed, dhId: %{public}s, ret: %{public}d",
-               GetAnonyString(dhId_).c_str(), ret);
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "eventCmd marshal failed, dhId: %{public}s, ret: %{public}d",
+        GetAnonyString(dhId_).c_str(), ret);
 
     if (ManageSelectChannel::GetInstance().GetSinkConnect()) {
         std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(jsonStr.length() + 1);
@@ -229,12 +233,12 @@ int32_t DCameraSinkController::DCameraNotify(std::shared_ptr<DCameraEvent>& even
             return ret;
         }
 
-        sptr<IDistributedCameraSource> sourceSA = DCameraSinkServiceIpc::GetInstance().GetSourceRemoteCamSrv(srcDevId_);
+        sptr<IDistributedCameraSource> sourceSA = DCameraSinkServiceIpc::GetInstance().GetSourceRemoteCamSrv(srcDevId);
         CHECK_AND_RETURN_RET_LOG(sourceSA == nullptr, DCAMERA_BAD_VALUE, "sourceSA is null");
         ret = sourceSA->DCameraNotify(sinkDevId, dhId_, jsonStr);
         if (ret != DCAMERA_OK) {
             DHLOGE("SourceSA notify failed, srcId: %{public}s, sinkId: %{public}s, dhId: %{public}s, ret: %{public}d",
-                GetAnonyString(srcDevId_).c_str(), GetAnonyString(sinkDevId).c_str(),
+                GetAnonyString(srcDevId).c_str(), GetAnonyString(sinkDevId).c_str(),
                 GetAnonyString(dhId_).c_str(), ret);
             return ret;
         }
@@ -288,8 +292,13 @@ int32_t DCameraSinkController::CheckSensitive()
         DHLOGE("check sensitive callback is nullptr.");
         return DCAMERA_BAD_VALUE;
     }
+    std::string srcDevId;
+    {
+        std::lock_guard<std::mutex> autoLock(autoLock_);
+        srcDevId = srcDevId_;
+    }
     int32_t ret = sinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_QUERY_RESOURCE, PAGE_SUBTYPE,
-        srcDevId_, isSensitive_, isSameAccount_);
+        srcDevId, isSensitive_, isSameAccount_);
     CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "Query resource failed, ret: %{public}d", ret);
     DHLOGI("OpenChannel isSensitive: %{public}d, isSameAccout: %{public}d", isSensitive_, isSameAccount_);
     if (isSensitive_ && !isSameAccount_) {
@@ -301,7 +310,7 @@ int32_t DCameraSinkController::CheckSensitive()
         std::string sinkDevId;
         ret = GetLocalDeviceNetworkId(sinkDevId);
         CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "GetLocalDeviceNetworkId failed, ret: %{public}d", ret);
-        if (isSensitive_ && !CheckDeviceSecurityLevel(srcDevId_, sinkDevId)) {
+        if (isSensitive_ && !CheckDeviceSecurityLevel(srcDevId, sinkDevId)) {
             DHLOGE("Check device security level failed!");
             return DCAMERA_BAD_VALUE;
         }
@@ -317,9 +326,14 @@ int32_t DCameraSinkController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& ope
         DHLOGE("wrong state, dhId: %{public}s, sessionState: %{public}d", GetAnonyString(dhId_).c_str(), sessionState_);
         return DCAMERA_WRONG_STATE;
     }
-    srcDevId_ = openInfo->sourceDevId_;
+    std::string srcDevId;
+    {
+        std::lock_guard<std::mutex> autoLock(autoLock_);
+        srcDevId_ = openInfo->sourceDevId_;
+        srcDevId = srcDevId_;
+    }
     std::vector<DCameraIndex> indexs;
-    indexs.push_back(DCameraIndex(srcDevId_, dhId_));
+    indexs.push_back(DCameraIndex(srcDevId, dhId_));
     auto controller = std::shared_ptr<DCameraSinkController>(shared_from_this());
     std::shared_ptr<ICameraChannelListener> listener =
         std::make_shared<DCameraSinkControllerChannelListener>(controller);
@@ -335,10 +349,15 @@ int32_t DCameraSinkController::OpenChannel(std::shared_ptr<DCameraOpenInfo>& ope
 int32_t DCameraSinkController::PullUpPage()
 {
     if (isSensitive_) {
+        std::string srcDevId;
+        {
+            std::lock_guard<std::mutex> autoLock(autoLock_);
+            srcDevId = srcDevId_;
+        }
         bool isSensitive = false;
         bool isSameAccout = false;
         int32_t ret = sinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_PULL_UP_PAGE, PAGE_SUBTYPE,
-            srcDevId_, isSensitive, isSameAccout);
+            srcDevId, isSensitive, isSameAccout);
         if (ret != DCAMERA_OK) {
             DHLOGE("pull up page failed, ret %{public}d", ret);
             return ret;
@@ -348,12 +367,12 @@ int32_t DCameraSinkController::PullUpPage()
     return DCAMERA_OK;
 }
 
-int32_t DCameraSinkController::CloseChannel()
+int32_t DCameraSinkController::CloseChannelInner(const std::string &srcDevId)
 {
-    DHLOGI("DCameraSinkController CloseChannel Start, dhId: %{public}s", GetAnonyString(dhId_).c_str());
+    DHLOGI("DCameraSinkController CloseChannelInner Start, dhId: %{public}s", GetAnonyString(dhId_).c_str());
     std::lock_guard<std::mutex> autoLock(channelLock_);
     if (!ManageSelectChannel::GetInstance().GetSinkConnect()) {
-        DCameraSinkServiceIpc::GetInstance().DeleteSourceRemoteCamSrv(srcDevId_);
+        DCameraSinkServiceIpc::GetInstance().DeleteSourceRemoteCamSrv(srcDevId);
         if (channel_ == nullptr) {
             DHLOGE("DCameraSinkController CloseChannel channel_ is nullptr");
             return DCAMERA_BAD_VALUE;
@@ -370,11 +389,22 @@ int32_t DCameraSinkController::CloseChannel()
                 GetAnonyString(dhId_).c_str(), ret);
         }
     }
-    srcDevId_.clear();
     sessionState_ = DCAMERA_CHANNEL_STATE_DISCONNECTED;
     isPageStatus_.store(false);
-    DHLOGI("DCameraSinkController CloseChannel %{public}s success", GetAnonyString(dhId_).c_str());
+    DHLOGI("DCameraSinkController CloseChannelInner %{public}s success", GetAnonyString(dhId_).c_str());
     return DCAMERA_OK;
+}
+
+int32_t DCameraSinkController::CloseChannel()
+{
+    DHLOGI("DCameraSinkController CloseChannel Start");
+    std::string srcDevId;
+    {
+        std::lock_guard<std::mutex> autoLock(autoLock_);
+        srcDevId = srcDevId_;
+        srcDevId_.clear();
+    }
+    return CloseChannelInner(srcDevId);
 }
 
 int32_t DCameraSinkController::Init(std::vector<DCameraIndex>& indexs)
@@ -457,11 +487,12 @@ int32_t DCameraSinkController::UnInit()
             GetAnonyString(dhId_).c_str(), ret);
     }
 
-    ret = CloseChannel();
+    ret = CloseChannelInner(srcDevId_);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSinkController UnInit %{public}s close channel failed, ret: %{public}d",
             GetAnonyString(dhId_).c_str(), ret);
     }
+    srcDevId_.clear();
 
     DCameraLowLatency::GetInstance().DisableLowLatency();
     if (ManageSelectChannel::GetInstance().GetSinkConnect()) {
@@ -723,7 +754,10 @@ void DCameraSinkController::OnSessionState(int32_t state, std::string networkId)
             if (!ManageSelectChannel::GetInstance().GetSinkConnect()) {
                 break;
             }
-            srcDevId_ = networkId;
+            {
+                std::lock_guard<std::mutex> autoLock(autoLock_);
+                srcDevId_ = networkId;
+            }
             break;
         }
         case DCAMERA_CHANNEL_STATE_DISCONNECTED:
@@ -736,16 +770,11 @@ void DCameraSinkController::OnSessionState(int32_t state, std::string networkId)
                     GetAnonyString(dhId_).c_str(), sessionState_);
                 prctl(PR_SET_NAME, CHANNEL_DISCONNECTED.c_str());
                 std::lock_guard<std::mutex> autoLock(autoLock_);
-                int32_t ret = CloseChannel();
-                if (ret != DCAMERA_OK) {
-                    DHLOGE("session state: %{public}d, %{public}s close channel failed, ret: %{public}d",
-                        sessionState_, GetAnonyString(dhId_).c_str(), ret);
-                }
+                int32_t ret = CloseChannelInner(srcDevId_);
+                CHECK_AND_LOG(ret != DCAMERA_OK, "close channel failed, ret: %{public}d", ret);
+                srcDevId_.clear();
                 ret = StopCapture();
-                if (ret != DCAMERA_OK) {
-                    DHLOGE("session state: %{public}d, %{public}s stop capture failed, ret: %{public}d",
-                        sessionState_, GetAnonyString(dhId_).c_str(), ret);
-                }
+                CHECK_AND_LOG(ret != DCAMERA_OK, "stop capture failed, ret: %{public}d", ret);
             });
             break;
         default:
@@ -915,7 +944,14 @@ int32_t DCameraSinkController::HandleCaptureCommand(const std::string &jsonStr)
         return DCAMERA_BAD_VALUE;
     }
 #ifdef DCAMERA_OPEN_STABILE
-    CHECK_AND_RETURN_RET_LOG(!IsIdenticalAccount(srcDevId_), DCAMERA_BAD_VALUE, "Account check failed.");
+    {
+        std::string srcDevId;
+        {
+            std::lock_guard<std::mutex> autoLock(autoLock_);
+            srcDevId = srcDevId_;
+        }
+        CHECK_AND_RETURN_RET_LOG(!IsIdenticalAccount(srcDevId), DCAMERA_BAD_VALUE, "Account check failed.");
+    }
 #endif
     return StartCapture(captureInfoCmd.value_, sceneMode_, captureInfoCmd.eis_);
 }
@@ -945,14 +981,16 @@ bool DCameraSinkController::CheckAclRight()
         return false;
     }
     ret = DeviceManager::GetInstance().InitDeviceManager(DCAMERA_PKG_NAME, initCallback_);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("InitDeviceManager failed ret = %{public}d", ret);
-        return false;
+    CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, false, "InitDeviceManager failed ret = %{public}d", ret);
+    std::string srcDevId;
+    {
+        std::lock_guard<std::mutex> autoLock(autoLock_);
+        srcDevId = srcDevId_;
     }
     DmAccessCaller dmSrcCaller = {
         .accountId = accountId_,
         .pkgName = DCAMERA_PKG_NAME,
-        .networkId = srcDevId_,
+        .networkId = srcDevId,
         .userId = userId_,
         .tokenId = (sourceTrigFirstTokenId_ != 0) ? sourceTrigFirstTokenId_ : tokenId_,
     };
