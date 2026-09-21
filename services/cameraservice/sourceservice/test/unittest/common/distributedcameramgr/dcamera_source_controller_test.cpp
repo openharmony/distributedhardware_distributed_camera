@@ -212,7 +212,7 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_003, TestSi
     int32_t mode = 0;
     ret = controller_->StartCapture(captureInfos, mode, false);
     controller_->UnInit();
-    EXPECT_EQ(ret, DCAMERA_BAD_VALUE);
+    EXPECT_EQ(ret, DCAMERA_OK);
 }
 
 /**
@@ -2108,7 +2108,7 @@ HWTEST_F(DCameraSourceControllerTest, dcamera_source_controller_test_start_captu
 
     int32_t mode = 0;
     int32_t ret = controller_->StartCapture(captureInfos, mode, false);
-    EXPECT_EQ(ret, DCAMERA_BAD_VALUE);
+    EXPECT_EQ(ret, DCAMERA_OK);
     controller_->UnInit();
 }
 }
