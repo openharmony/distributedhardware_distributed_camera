@@ -120,7 +120,8 @@ void DCameraSinkOutputTest::SetUp(void)
     DCameraHandler::GetInstance().Initialize();
     std::vector<std::string> cameras = DCameraHandler::GetInstance().GetCameras();
     operator_ = std::make_shared<MockCameraOperator>();
-    output_ = std::make_shared<DCameraSinkOutput>(cameras[0], operator_);
+    std::string dhId = cameras.empty() ? "camrea_0" : cameras[0];
+    output_ = std::make_shared<DCameraSinkOutput>(dhId, operator_);
 }
 
 void DCameraSinkOutputTest::TearDown(void)
