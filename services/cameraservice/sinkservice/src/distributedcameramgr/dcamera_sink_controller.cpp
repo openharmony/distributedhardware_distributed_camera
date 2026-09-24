@@ -999,10 +999,10 @@ bool DCameraSinkController::CheckAclRight()
         .networkId = sinkDevId,
         .pkgName = DCAMERA_PKG_NAME,
         .userId = userId,
-        .tokenId = enableTokenId,
+        .tokenId = sinkTokenId_,
     };
-    DHLOGI("[MultiUserSink] CheckAclRight srcUserId=%{public}d, sinkEnableUserId=%{public}d, enableTokenId=%{public}s",
-        userId_, userId, GetAnonyString(std::to_string(enableTokenId)).c_str());
+    DHLOGI("[MultiUserSink] CheckAclRight srcUserId=%{public}d, sinkEnableUserId=%{public}d, sinkTokenId_=%{public}s",
+        userId_, userId, GetAnonyString(std::to_string(sinkTokenId_)).c_str());
     return DeviceManager::GetInstance().CheckSinkAccessControl(dmSrcCaller, dmDstCallee);
 }
 
@@ -1179,7 +1179,7 @@ std::string DCameraSinkController::GetUdidByNetworkId(const std::string &network
 
 void DCameraSinkController::SetTokenId(uint64_t token)
 {
-    sinkTokenId_ = token;
+    sinkTokenId_ = (token == 0) ? OHOS::IPCSkeleton::GetSelfTokenID() : token;
 }
 
 void DCameraSinkController::SetEnableFirstTokenId(uint32_t tokenId)

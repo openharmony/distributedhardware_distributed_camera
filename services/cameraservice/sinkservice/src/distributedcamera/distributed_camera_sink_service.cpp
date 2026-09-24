@@ -125,7 +125,7 @@ int32_t DistributedCameraSinkService::InitSink(const std::string& params,
     }
     for (auto& dhId : cameras) {
         std::shared_ptr<DCameraSinkDev> sinkDevice = std::make_shared<DCameraSinkDev>(dhId, sinkCallback);
-        sinkDevice->SetTokenId(OHOS::IPCSkeleton::GetFirstTokenID());
+        sinkDevice->SetTokenId(GetFirstCallerTokenID());
         ret = sinkDevice->Init();
         CHECK_AND_RETURN_RET_LOG(ret != DCAMERA_OK, ret, "sink device init failed, ret: %{public}d", ret);
         {

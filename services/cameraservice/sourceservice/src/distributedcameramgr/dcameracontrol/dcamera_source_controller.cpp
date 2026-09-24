@@ -783,7 +783,7 @@ void DCameraSourceController::CameraServiceRecipient::OnRemoteDied(const wptr<IR
 
 void DCameraSourceController::SetTokenId(uint64_t token)
 {
-    tokenId_ = token;
+    tokenId_ = (token == 0) ? OHOS::IPCSkeleton::GetSelfTokenID() : token;
 }
 
 void DCameraSourceController::SetEnableFirstTokenId(uint32_t tokenId)
